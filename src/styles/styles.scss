@@ -1,0 +1,7 @@
+@use '_variable.scss' as *;
+
+body {
+    background-color: $primary-color-blanc;
+    color: $primary-color-noir;
+    font-family: $font-family-primaire;
+}
