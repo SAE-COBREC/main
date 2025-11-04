@@ -201,11 +201,11 @@ aside {
       @include flex-between;
       padding: 0.5rem 0;
       cursor: pointer;
-      color: $coul-gris-fonce;
+      color: $coul-secondaire;
       @include transition(color);
 
       &:hover {
-        color: $coul-secondaire;
+        color: $coul-gris-fonce;
       }
 
       span:last-child {
