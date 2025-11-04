@@ -198,6 +198,42 @@ aside {
       }
     }
   }
+
+    // Style du slider (input range)
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 8px;
+    background: $primary-color-bleu; // même couleur que #7171A3
+    outline: none;
+
+    /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: $primary-color-bleu;
+      cursor: pointer;
+    }
+
+    /* Curseur - Firefox */
+    &::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: $primary-color-bleu;
+      cursor: pointer;
+    }
+
+    /* Barre - Firefox */
+    &::-moz-range-track {
+      background: $primary-color-bleu;
+      border-radius: 8px;
+    }
+  }
+
 }
 
 // Main (produits)
