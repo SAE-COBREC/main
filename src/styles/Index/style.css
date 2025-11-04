@@ -6,8 +6,8 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f5f5f5;
+  font-family: "Quicksand", sans-serif;
+  background: #EFEFEF;
   display: grid;
   grid-template-columns: 280px 1fr;
   grid-template-rows: auto 1fr auto;
@@ -16,9 +16,9 @@ body {
 
 header {
   grid-column: 1/-1;
-  background: white;
+  background: #FFFFFF;
   padding: 1rem 2rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #EFEFEF;
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -33,12 +33,12 @@ header > div:first-child {
 header > div:first-child > div {
   width: 32px;
   height: 32px;
-  background: #1a1a2e;
+  background: #7171A3;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #FFFFFF;
   font-weight: bold;
 }
 header > div:nth-child(2) {
@@ -49,7 +49,7 @@ header > div:nth-child(2) {
 header > div:nth-child(2) input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #EFEFEF;
   border-radius: 8px;
   font-size: 0.9rem;
 }
@@ -85,7 +85,7 @@ header button img {
 }
 
 aside {
-  background: white;
+  background: #FFFFFF;
   padding: 1.5rem;
   border-radius: 12px;
   height: -moz-fit-content;
@@ -103,14 +103,14 @@ aside > div:first-child {
   gap: 1rem;
 }
 aside > div:first-child span {
-  color: #666;
+  color: #c0c0c0;
 }
 aside > div:first-child button {
-  padding: 5px 10px;
-  border: 1px solid #5b47d6;
-  color: #5b47d6;
+  padding: 2px 7px;
+  border: 1px solid #7171A3;
+  color: #7171A3;
   border-radius: 20px;
-  background: white;
+  background: #FFFFFF;
   cursor: pointer;
 }
 aside > div:nth-child(2) {
@@ -123,7 +123,7 @@ aside > div:nth-child(2) h3 {
   font-size: 1.1rem;
 }
 aside > div:nth-child(2) button {
-  color: #666;
+  color: #c0c0c0;
   background: none;
   border: none;
   cursor: pointer;
@@ -143,42 +143,45 @@ aside section > div {
   align-items: center;
   padding: 0.5rem 0;
   cursor: pointer;
-  color: #5b47d6;
+  color: #7171A3;
   transition: color 0.2s ease;
 }
 aside section > div:hover {
-  color: #333;
+  color: #c0c0c0;
 }
 aside section > div span:last-child {
-  color: #5b47d6;
+  color: #7171A3;
   font-size: 0.9rem;
 }
-aside section:nth-child(3) > div {
-  margin: 1rem 0;
-}
-aside section:nth-child(3) input {
+aside input[type=range] {
+  -webkit-appearance: none;
   width: 100%;
+  height: 8px;
+  border-radius: 8px;
+  background: #7171A3;
+  outline: none;
+  /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
+  /* Curseur - Firefox */
+  /* Barre - Firefox */
 }
-aside section:nth-child(3) > div:last-child {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  color: #666;
+aside input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7171A3;
+  cursor: pointer;
 }
-aside section:nth-child(4) > div {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+aside input[type=range]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7171A3;
+  cursor: pointer;
 }
-aside section:nth-child(4) > div span:first-child {
-  color: #5b47d6;
-}
-aside section:last-child label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+aside input[type=range]::-moz-range-track {
+  background: #7171A3;
+  border-radius: 8px;
 }
 
 main {
@@ -192,7 +195,7 @@ main > div:last-child {
 }
 
 article {
-  background: white;
+  background: #FFFFFF;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -206,46 +209,26 @@ article > div:first-child {
   position: relative;
   width: 100%;
   height: 200px;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  background: linear-gradient(135deg, #EFEFEF 0%, #c0c0c0 100%);
   display: flex;
-  align-items: center;
   justify-content: center;
 }
-article > div:first-child > div:first-child {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-article > div:first-child > div:first-child img {
+article > div:first-child img {
   width: 100%;
   height: 100%;
   -o-object-fit: cover;
      object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 article > div:first-child > span:last-child {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #e63946;
-  color: white;
+  background: #D4183D;
+  color: #FFFFFF;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: bold;
-}
-article > div:first-child > div:last-child:not(:first-child) {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.95);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: #666;
 }
 article > div:last-child {
   padding: 1.25rem;
@@ -255,20 +238,6 @@ article > div:last-child h3 {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
-article > div:last-child > div:first-child {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-article > div:last-child > div:first-child span:first-child {
-  color: #5b47d6;
-  font-size: 0.9rem;
-}
-article > div:last-child > div:first-child span:last-child {
-  color: #999;
-  font-size: 0.85rem;
-}
 article > div:last-child > div:nth-child(3) {
   display: flex;
   align-items: center;
@@ -276,20 +245,19 @@ article > div:last-child > div:nth-child(3) {
   margin-bottom: 1rem;
 }
 article > div:last-child > div:nth-child(3) span:first-child {
-  color: #999;
+  color: #c0c0c0;
   text-decoration: line-through;
-  font-size: 0.9rem;
 }
 article > div:last-child > div:nth-child(3) span:last-child {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #1a1a2e;
+  color: #030212;
 }
 article button {
   width: 100%;
   padding: 0.75rem;
-  background: #1a1a2e;
-  color: white;
+  background: #030212;
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -297,17 +265,17 @@ article button {
   transition: background 0.2s ease;
 }
 article button:hover {
-  background: #2d2d44;
+  background: #7171A3;
 }
 article button[disabled] {
-  background: #9e9eb0;
+  background: #c0c0c0;
   cursor: not-allowed;
 }
 
 footer {
   grid-column: 1/-1;
-  background: #0a0a14;
-  color: white;
+  background: #030212;
+  color: #FFFFFF;
   padding: 3rem 2rem 2rem;
   margin-top: auto;
 }
@@ -321,32 +289,31 @@ footer > div > div:first-child {
   gap: 2rem;
   margin-bottom: 3rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #2d2d44;
+  border-bottom: 1px solid #7171A3;
 }
 footer > div > div:first-child > a {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease;
   font-size: 1.5rem;
   text-decoration: none;
-  color: white;
+  color: #FFFFFF;
 }
 footer > div > div:first-child > a:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-footer > div > nav {
+footer nav {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 2rem;
   margin-bottom: 2rem;
 }
-footer nav section h4 {
+footer nav h4 {
   margin-bottom: 1rem;
   font-size: 1.1rem;
 }
@@ -357,22 +324,18 @@ footer nav li {
   margin-bottom: 0.5rem;
 }
 footer nav a {
-  color: #999;
+  color: #c0c0c0;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 footer nav a:hover {
-  color: white;
+  color: #FFFFFF;
 }
 footer > div > div:last-child {
   text-align: center;
   padding-top: 2rem;
-  border-top: 1px solid #2d2d44;
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  color: #666;
+  border-top: 1px solid #7171A3;
+  color: #c0c0c0;
   font-size: 0.85rem;
 }
 
