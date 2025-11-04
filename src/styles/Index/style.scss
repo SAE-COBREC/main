@@ -32,6 +32,14 @@
   transition: all 0.3s ease;
 }
 
+ // Créez un mixin pour le centrage
+@mixin centre-absolu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 // Reset et base
 * {
   margin: 0;
@@ -255,6 +263,23 @@ article {
   overflow: hidden;
   cursor: pointer;
   @include hover-lift;
+
+ // Puis utilisez-le
+.rupture-stock {
+  @include centre-absolu;
+  background-color: rgba(255, 0, 0, 0.85);
+  color: white;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+article > div:first-child {
+  position: relative;
+}
 
   > div:first-child {
     position: relative;
