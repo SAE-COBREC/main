@@ -46,7 +46,14 @@
     display: flex;
     justify-content: center;
     padding: 0 20px;
+    border-radius: $border-radius-primary;
+    padding: 0.7em 1em;
+    max-width: 500px;
+    background-color: $secondary-color-gris-clair;
+    color: $primary-color-bleu;
 }
+
+
 
 .search-form {
     width: 100%;
@@ -57,6 +64,23 @@
     border-radius: $border-radius-primary;
     padding: 8px 12px;
     box-sizing: border-box;
+}
+
+.search-form {
+    margin-right: 8px;
+    .search-input {
+        &::-webkit-input-placeholder,
+        &::-moz-placeholder,
+        &:-ms-input-placeholder,
+        &::placeholder {
+            color: $primary-color-bleu;
+        }
+
+    }
+}
+
+.loupe-icon {
+    margin-right: 8px;
 }
 
 .search-icon {
@@ -89,7 +113,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;    
+    width: 40px;
     height: 40px;
     border-radius: 8px;
     color: $primary-color-noir;
