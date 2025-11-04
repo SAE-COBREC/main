@@ -7,7 +7,7 @@ body {
   height: 100vh;
   font-size: 24px;
   font-family: "Quicksand", sans-serif;
-  background: linear-gradient(to bottom right, rgb(113, 113, 163), rgb(3, 2, 18));
+  background: linear-gradient(to bottom right, #7171A3, #030212);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,7 +18,7 @@ body {
   }
 }
 body .card {
-  background: #fff;
+  background: #FFFFFF;
   width: 661px;
   height: 764px;
   padding: 50px 25px 25px 25px;
@@ -46,7 +46,7 @@ body .card .logo img {
 body .card h1 {
   font-family: "Baloo 2", cursive;
   font-size: 36px;
-  color: rgb(3, 2, 18);
+  color: #030212;
 }
 @media screen and (max-width: 508px ) {
   body .card h1 {
@@ -55,7 +55,7 @@ body .card h1 {
 }
 body .card .subtitle {
   font-size: 24px;
-  color: rgb(3, 2, 18);
+  color: #030212;
   margin-bottom: 4px;
 }
 @media screen and (max-width: 508px ) {
@@ -73,7 +73,7 @@ body .card form {
 }
 body .card form label {
   font-size: 24px;
-  color: rgb(3, 2, 18);
+  color: #030212;
   text-align: left;
   display: block;
   padding-left: 38px;
@@ -88,7 +88,7 @@ body .card form label {
 body .card form input {
   width: 520px;
   height: 50px;
-  border: 1px solid rgb(3, 2, 18);
+  border: 1px solid #030212;
   border-radius: 14px;
   padding: 0px 12px;
   font-size: 16px;
@@ -103,12 +103,12 @@ body .card form input {
 }
 body .card form input:focus {
   outline: none;
-  border-color: rgb(113, 113, 163);
-  box-shadow: 0 0 4px rgba(113, 113, 163, 0.6);
+  border-color: #7171A3;
+  box-shadow: 0 0 4px #7171A3;
 }
 body .card form .error {
-  background: #ffe6e6;
-  border-radius: 8px;
+  background: #FFFFFF;
+  border-radius: 14px;
   color: #c00;
   padding: 10px;
   text-align: left;
@@ -118,7 +118,7 @@ body .card form .next-btn {
   width: 100%;
   /* plus de fond noir : conteneur visuel mais transparent */
   background: transparent;
-  color: #fff;
+  color: #D4183D;
   font-size: 18px;
   /* réduire le padding pour alléger le conteneur */
   padding: 8px 0;
@@ -134,7 +134,7 @@ body .card form .next-btn {
 }
 body .card form .next-btn .next-text {
   pointer-events: none;
-  color: rgb(3, 2, 18);
+  color: #030212;
   font-weight: 500;
 }
 body .card form .next-btn .arrow-only {
@@ -149,12 +149,12 @@ body .card form .next-btn .arrow-only {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #000;
+  color: #030212;
   border-radius: 50%;
   transition: background 0.18s ease, transform 0.12s ease;
 }
 body .card form .next-btn .arrow-only:hover {
-  background: rgba(3, 2, 18, 0.08);
+  background: #030212;
   transform: scale(1.06);
 }
 body .card form .next-btn .btn-arrow {
@@ -163,7 +163,7 @@ body .card form .next-btn .btn-arrow {
   display: inline-block;
   vertical-align: middle;
   transform: scaleX(-1);
-  color: #000;
+  color: #030212;
 }
 body .card .step {
   margin-top: 1.2rem;
