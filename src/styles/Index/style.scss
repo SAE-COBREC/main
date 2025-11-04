@@ -267,11 +267,10 @@ article {
  // Puis utilisez-le
 .rupture-stock {
   @include centre-absolu;
-  background-color: rgba(255, 0, 0, 0.85);
-  color: white;
-  font-weight: bold;
+  background-color: $secondary-color-gris-clair;
+  color: black;
   padding: 6px 12px;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 0.9rem;
   text-transform: uppercase;
   z-index: 2;
@@ -298,7 +297,7 @@ article > div:first-child {
     > span:last-child {
       position: absolute;
       top: 10px;
-      right: 10px;
+      left: 10px;
       background: $secondary-color-rouge;
       color: $primary-color-blanc;
       padding: 0.25rem 0.5rem;
