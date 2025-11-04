@@ -8,7 +8,7 @@ body {
   height: 100vh;
   font-size: 24px;
   font-family: 'Quicksand', sans-serif;
-  background: linear-gradient(to bottom right, rgba(113, 113, 163, 1), rgba(3, 2, 18, 1));
+  background: linear-gradient(to bottom right, $primary-color-bleu, $primary-color-noir);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,11 +16,11 @@ body {
       font-size: 16px;
     }
   .card {
-    background: #fff;
+    background: $primary-color-blanc;
     width: 661px;
     height: 764px;
     padding: 50px 25px 25px 25px;
-    border-radius: 14px;
+    border-radius: $border-radius-primary;
     text-align: center;
     @media #{$mobile}{
       width: 320px;
@@ -43,7 +43,7 @@ body {
     h1 {
       font-family: 'Baloo 2', cursive;
       font-size: 36px;
-      color: rgba(3, 2, 18, 1);
+      color: $primary-color-noir;
       @media #{$mobile}{
         font-size: 28px;
       }
@@ -51,7 +51,7 @@ body {
 
     .subtitle {
       font-size: 24px;
-      color: rgba(3, 2, 18, 1);
+      color: $primary-color-noir;
       margin-bottom: 4px;
       @media #{$mobile}{
         font-size: 20px;
@@ -66,7 +66,7 @@ body {
 
       label {
         font-size: 24px;
-        color: rgba(3, 2, 18, 1);
+        color: $primary-color-noir;
         text-align: left;
         display: block;
         padding-left: 38px;
@@ -80,8 +80,8 @@ body {
       input {
         width: 520px;
         height: 50px;
-        border: 1px solid rgba(3, 2, 18, 1);
-        border-radius: 14px;
+        border: 1px solid $primary-color-noir;
+        border-radius: $border-radius-primary;
         padding: 0px 12px;
         font-size: 16px;
         
@@ -95,15 +95,15 @@ body {
 
         &:focus {
           outline: none;
-          border-color: rgba(113, 113, 163, 1);
-          box-shadow: 0 0 4px rgba(113, 113, 163, 0.6);
+          border-color: $primary-color-bleu;
+          box-shadow: 0 0 4px $primary-color-bleu;
         }
       }
 
       /* --- Message d’erreur --- */
       .error {
-        background: #ffe6e6;
-        border-radius: 8px;
+        background: $primary-color-blanc;
+        border-radius: $border-radius-primary;
         color: #c00;
         padding: 10px;
         text-align: left;
@@ -115,11 +115,11 @@ body {
         width: 100%;
         /* plus de fond noir : conteneur visuel mais transparent */
         background: transparent;
-        color: #fff;
+        color: $secondary-color-rouge;
         font-size: 18px;
         /* réduire le padding pour alléger le conteneur */
         padding: 8px 0;
-        border-radius: 14px;
+        border-radius: $border-radius-primary;
         margin-top: 1rem;
         transition: 0.15s;
         display: flex;
@@ -131,7 +131,7 @@ body {
 
         .next-text {
           pointer-events: none;
-          color: rgba(3, 2, 18, 1);
+          color: $primary-color-noir;
           font-weight: 500;
         }
 
@@ -147,12 +147,12 @@ body {
            align-items: center;
            justify-content: center;
            cursor: pointer;
-           color: #000; 
+           color: $primary-color-noir; 
            border-radius: 50%;
            transition: background 0.18s ease, transform 0.12s ease;
 
            &:hover {
-             background: rgba(3, 2, 18, 0.08);
+             background: $primary-color-noir;
              transform: scale(1.06);
            }
         }
@@ -163,7 +163,7 @@ body {
           display: inline-block;
           vertical-align: middle;
           transform: scaleX(-1);
-          color: #000;
+          color: $primary-color-noir;
         }
       }
     }
