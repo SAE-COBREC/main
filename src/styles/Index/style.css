@@ -211,7 +211,6 @@ article > div:first-child {
   height: 200px;
   background: linear-gradient(135deg, #EFEFEF 0%, #c0c0c0 100%);
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 article > div:first-child img {
