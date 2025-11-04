@@ -106,8 +106,9 @@ aside > div:first-child span {
   color: #666;
 }
 aside > div:first-child button {
-  padding: 0.25em;
-  border: 1px solid #e0e0e0;
+  padding: 5px 10px;
+  border: 1px solid #5b47d6;
+  color: #5b47d6;
   border-radius: 20px;
   background: white;
   cursor: pointer;
@@ -149,7 +150,7 @@ aside section > div:hover {
   color: #5b47d6;
 }
 aside section > div span:last-child {
-  color: #999;
+  color: #5b47d6;
   font-size: 0.9rem;
 }
 aside section:nth-child(3) > div {

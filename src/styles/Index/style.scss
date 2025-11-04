@@ -162,8 +162,9 @@ aside {
     }
 
     button {
-      padding: 0.25em;
-      border: 1px solid $coul-gris-clair;
+      padding: 5px 10px;
+      border: 1px solid $coul-secondaire;
+      color: $coul-secondaire;
       border-radius: 20px;
       background: $coul-blanc;
       cursor: pointer;
@@ -208,7 +209,7 @@ aside {
       }
 
       span:last-child {
-        color: $coul-texte;
+        color: $coul-secondaire ;
         font-size: 0.9rem;
       }
     }
