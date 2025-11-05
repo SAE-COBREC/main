@@ -61,7 +61,7 @@ foreach ($produits as $produit) {
         continue;
     }
 
-    // Filtre par stock
+    // Filtre par stock (SEULEMENT si la case "En stock uniquement" est cochée)
     if ($enStockSeulement && $produit['p_stock'] <= 0) {
         continue;
     }
@@ -71,8 +71,8 @@ foreach ($produits as $produit) {
         continue;
     }
 
-    // Vérification du statut
-    if ($produit['p_statut'] !== 'En ligne') {
+    // Vérification du statut - AUTORISER les produits "En rupture" à s'afficher
+    if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
         continue;
     }
 
