@@ -18,7 +18,10 @@ body {
     display: flex;
     align-items: center;
   }
-
+  .column-flex {
+    display: flex;
+    flex-direction: column;
+  }
   .hidden {
     display: none;
   }
@@ -52,6 +55,17 @@ body {
         margin-right: 8px;
       }
     }
+
+      /* --- Ajustement de hauteur spécifique pour les cartes 3 et 4 --- */
+      /* On enlève 88px à la hauteur globale (764 - 88 = 676) et au max-height mobile (620 - 88 = 532) */
+      body .card[id="3"],
+      body .card[id="4"] {
+        height: 676px;
+
+        @media #{$mobile} {
+          max-height: 532px;
+        }
+      }
 
     h1 {
       font-family: 'Baloo 2', cursive;
@@ -108,6 +122,7 @@ body {
           padding: 8px 4px;
 
         }
+
 
         &:focus {
           outline: none;

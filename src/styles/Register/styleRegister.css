@@ -16,6 +16,10 @@ body .inline-flex {
   display: flex;
   align-items: center;
 }
+body .column-flex {
+  display: flex;
+  flex-direction: column;
+}
 body .hidden {
   display: none;
 }
@@ -31,6 +35,8 @@ body .card {
   padding: 50px 25px 25px 25px;
   border-radius: 14px;
   text-align: center;
+  /* --- Ajustement de hauteur spécifique pour les cartes 3 et 4 --- */
+  /* On enlève 88px à la hauteur globale (764 - 88 = 676) et au max-height mobile (620 - 88 = 532) */
   /* --- Étape --- */
 }
 @media screen and (max-width: 508px ) {
@@ -49,6 +55,16 @@ body .card .logo {
 body .card .logo img {
   width: 102px;
   margin-right: 8px;
+}
+body .card body .card[id="3"],
+body .card body .card[id="4"] {
+  height: 676px;
+}
+@media screen and (max-width: 508px ) {
+  body .card body .card[id="3"],
+  body .card body .card[id="4"] {
+    max-height: 532px;
+  }
 }
 body .card h1 {
   font-family: "Baloo 2", cursive;
