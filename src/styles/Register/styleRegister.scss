@@ -1,5 +1,5 @@
 @use "sass:list";
-@use "variable" as *;
+@use "../variable" as *;
 
 * {
   font-family: "Quicksand";
@@ -13,6 +13,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  .inline-flex {
+    display: flex;
+    align-items: center;
+  }
+
+  .hidden {
+    display: none;
+  }
 
   @media #{$mobile} {
     font-size: 16px;
@@ -134,7 +143,6 @@ body {
         /* empile le texte au-dessus de la flèche */
         align-items: center;
         justify-content: center;
-        gap: 6px;
         pointer-events: none;
 
         .next-text {
@@ -160,22 +168,21 @@ body {
           transition: background 0.18s ease, transform 0.12s ease;
 
           &:hover {
-            background: $primary-color-noir;
+            background: rgba($primary-color-noir, 0.1);
             transform: scale(1.06);
+
           }
         }
 
         .btn-arrow {
-          width: 20px;
-          height: auto;
+          max-width: 20px;
           display: inline-block;
           vertical-align: middle;
           transform: scaleX(-1);
           color: $primary-color-noir;
         }
         .btn-arrow-left {
-          width: 20px;
-          height: auto;
+          max-width: 20px;
           display: inline-block;
           vertical-align: middle;
           color: $primary-color-noir;
@@ -203,10 +210,11 @@ body {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
+        /* réduire l'espacement entre les boutons pour qu'ils soient plus collés */
+        gap: 6px;
         width: 100%;
-        margin-top: 1rem;
-        padding: 0 6px;
+        margin-top: 0.6rem;
+        padding: 0 4px;
 
         .btn-prev,
         .btn-next {
@@ -215,8 +223,9 @@ body {
           cursor: pointer;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 8px 12px;
+          gap: 6px;
+          /* boutons plus compacts */
+          padding: 6px 8px;
           border-radius: 8px;
         }
 
@@ -225,14 +234,14 @@ body {
           align-items: center;
           color: $primary-color-noir;
 
-          .nav-arrow { width: 28px; height: auto; margin-bottom: 6px; }
+          .nav-arrow { width: 24px; height: auto; margin-bottom: 4px; }
         }
 
         .btn-next {
           flex-direction: row; // flèche à gauche du texte
           background: $primary-color-noir;
           color: $primary-color-blanc;
-          padding: 10px 14px;
+          padding: 8px 12px;
         }
 
         .nav-arrow.right { transform: scaleX(-1); }
@@ -241,8 +250,8 @@ body {
         .nav-label { font-size: 14px; }
 
         @media #{$mobile} {
-          gap: 8px;
-          .btn-prev .nav-arrow { width: 22px; }
+          gap: 6px;
+          .btn-prev .nav-arrow { width: 20px; }
           .nav-label { font-size: 13px; }
         }
       }
