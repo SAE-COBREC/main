@@ -9,6 +9,17 @@ function showCard(cardId) {
     }
 }
 
+function verifCompletedCard(cardId) {
+    const card = document.getElementById(cardId);
+    const inputs = card.querySelectorAll('input[required], select[required], textarea[required]');
+    for (let input of inputs) {
+        if (!input.value) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function showNextCard() {
     const cards = document.querySelectorAll('.card');
     let activeIndex = -1;
@@ -17,8 +28,12 @@ function showNextCard() {
             activeIndex = index;
         }
     });
-    const nextIndex = activeIndex + 1 < cards.length ? activeIndex + 1 : 0;
-    showCard(cards[nextIndex].id);
+    if (verifCompletedCard(cards[activeIndex].id)) {
+        const nextIndex = (activeIndex + 1) % cards.length;
+        showCard(cards[nextIndex].id);
+    } else {
+        return "Veuillez remplir tous les champs requis avant de continuer.";
+    }
 }
 
 function showPreviousCard() {
@@ -29,6 +44,6 @@ function showPreviousCard() {
             activeIndex = index;
         }
     });
-    const prevIndex = activeIndex - 1 >= 0 ? activeIndex - 1 : cards.length - 1;
-    showCard(cards[prevIndex].id);
+    const previousIndex = (activeIndex - 1 + cards.length) % cards.length;
+    showCard(cards[previousIndex].id);
 }
