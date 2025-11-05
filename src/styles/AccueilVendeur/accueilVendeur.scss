@@ -1,12 +1,9 @@
 // Variables
-$bronze: #CD7F32;
-$bronze-light: #E6A96E;
-$bronze-dark: #8B5A2B;
-$bg: #FFF7F1;
-$black: black;
+@use "../variable";
+$primary-color-noir: black;
 $muted: #757575;
 $border: #E5D5C5;
-$white: white;
+
 
 * {
   box-sizing: border-box;
@@ -16,7 +13,7 @@ $white: white;
 
 body {
   font-family: "Quicksand";
-  background: $bg;
+  background: $secondary-color-rose-claire;
   width: 1440px;
   height: auto;
 }
@@ -25,12 +22,12 @@ body {
   display: grid;
   grid-template-columns:260px 1fr;
   height: 1024px;
-  background: $white;
+  background: $primary-color-blanc;
 }
 
 // Sidebar
 .sidebar {
-  background: linear-gradient(180deg, $bronze-dark 0%, $bronze 100%);
+  background: linear-gradient(180deg, $secondary-color-marron 0%, $primary-color-bronze 100%);
   padding:28px 20px;
   display: flex;
   flex-direction: column;
@@ -45,19 +42,19 @@ body {
   align-items: center;
   gap: 8px;
   margin-bottom: 16px;
-  color: $white;
+  color: $primary-color-blanc;
   font-size: 20px;
   font-weight: bold;
 
   &__icon {
     width: 32px;
     height: 32px;
-    background: $white;
+    background: $primary-color-blanc;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $bronze;
+    color: $primary-color-bronze;
   }
 }
 
@@ -74,7 +71,7 @@ body {
     gap: 10px;
     padding: 12px 8px;
     border-radius: 8px;
-    color: rgba($white, 0.7);
+    color: rgba($primary-color-blanc, 0.7);
     text-decoration: none;
     font-size: 16px;
     transition: all 0.2s;
@@ -85,13 +82,13 @@ body {
       }
 
     &:hover {
-      background: rgba($white, 0.1);
-      color: $white;
+      background: rgba($primary-color-blanc, 0.1);
+      color: $primary-color-blanc;
     }
 
     &--active {
-      background: rgba($white, 0.15);
-      color: $white;
+      background: rgba($primary-color-blanc, 0.15);
+      color: $primary-color-blanc;
     }
   }
 
@@ -104,8 +101,8 @@ body {
 .preview-btn {
   margin-top: auto;
   background: transparent;
-  border: 1px solid rgba($white, 0.3);
-  color: $white;
+  border: 1px solid rgba($primary-color-blanc, 0.3);
+  color: $primary-color-blanc;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 16px;
@@ -113,14 +110,14 @@ body {
   cursor: pointer;
 
   &:hover {
-      background: rgba($white, 0.1);
-      color: $white;
+      background: rgba($primary-color-blanc, 0.1);
+      color: $primary-color-blanc;
     }
 }
 
 // Main Content
 .main {
-  background: $bg;
+  background: $secondary-color-rose-claire;
   padding: 32px 40px;
   overflow-y: auto;
 }
@@ -132,7 +129,7 @@ body {
   &__title {
     font-size: 24px;
     font-weight: 700;
-    color: $black;
+    color: $primary-color-noir;
     margin-bottom: 16px;
   }
 }
@@ -148,7 +145,7 @@ body {
     flex: 1;
     display: flex;
     align-items: center;
-    background: $white;
+    background: $primary-color-blanc;
     border: 1px solid $border;
     border-radius: 8px;
     padding: 10px 16px;
@@ -179,14 +176,14 @@ body {
   white-space: nowrap;
 
   &--primary {
-    background: $bronze;
-    color: $white;
+    background: $primary-color-bronze;
+    color: $primary-color-blanc;
   }
 }
 
 // Content Section
 .content-section {
-  background: $white;
+  background: $primary-color-blanc;
   border-radius: 12px;
   border: 1px solid $border;
   overflow: hidden;
@@ -199,7 +196,7 @@ body {
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: $black;
+    color: $primary-color-noir;
     margin-bottom: 16px;
   }
 }
@@ -220,8 +217,8 @@ body {
     transition: all 0.2s;
 
     &--active {
-      color: $bronze;
-      border-bottom-color: $bronze;
+      color: $primary-color-bronze;
+      border-bottom-color: $primary-color-bronze;
     }
   }
 }
@@ -272,7 +269,7 @@ body {
   &__cell {
     padding: 16px 24px;
     font-size: 14px;
-    color: $black;
+    color: $primary-color-noir;
 
     &--muted {
       color: $muted;
@@ -309,7 +306,7 @@ body {
   &__name {
     font-weight: 600;
     font-size: 14px;
-    color: $black;
+    color: $primary-color-noir;
     margin-bottom: 2px;
   }
 
@@ -339,7 +336,7 @@ body {
 
   &--out {
     background: #F5E8DD;
-    color: $bronze-dark;
+    color: $secondary-color-marron;
   }
 }
 
