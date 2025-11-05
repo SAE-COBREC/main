@@ -131,7 +131,27 @@ array_unshift($categoriesAffichage, [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
     <link rel="stylesheet" href="./Index/style.css">
-    <link rel="stylesheet" href="../src/styles/Header/stylesHeader.css">
+    <link rel="stylesheet" href="../src/styles/stylesHeader.css">
+    <style>
+        .image-rupture {
+            filter: grayscale(100%) opacity(0.7);
+            transition: filter 0.3s ease;
+        }
+        .produit-rupture {
+            position: relative;
+        }
+        .rupture-stock {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            z-index: 2;
+        }
+    </style>
 </head>
 
 <body>
@@ -247,11 +267,12 @@ array_unshift($categoriesAffichage, [
                             : $produit['p_prix'];
                         $note = $produit['avg_rating'] ? round($produit['avg_rating']) : 0;
                         ?>
-                        <article onclick="window.location.href='product.php?id=<?= $produit['id_produit'] ?>'">
+                        <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>" onclick="window.location.href='product.php?id=<?= $produit['id_produit'] ?>'">
                             <div>
                                 <div>
                                     <img src="<?= htmlspecialchars($produit['image_url']) ?>"
-                                        alt="<?= htmlspecialchars($produit['p_nom']) ?>">
+                                        alt="<?= htmlspecialchars($produit['p_nom']) ?>"
+                                        class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
                                 <?php if ($aUneRemise): ?>
                                     <span>-<?= round($produit['discount_percentage']) ?>%</span>

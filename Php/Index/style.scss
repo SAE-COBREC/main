@@ -39,6 +39,12 @@
   transform: translate(-50%, -50%);
 }
 
+// Mixin pour image en rupture de stock
+@mixin image-rupture {
+  filter: grayscale(100%) opacity(0.7);
+  transition: filter 0.3s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -221,6 +227,17 @@ article {
   cursor: pointer;
   @include hover-lift;
   
+  // Style pour les produits en rupture de stock
+  &.produit-rupture {
+    position: relative;
+    
+    // Réduire l'effet de hover pour les produits en rupture
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+  
   > div:first-child {
     position: relative;
     width: 100%;
@@ -233,6 +250,11 @@ article {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      
+      // Application du style pour les images en rupture de stock
+      &.image-rupture {
+        @include image-rupture;
+      }
     }
 
     > span:last-child {
@@ -245,18 +267,20 @@ article {
       border-radius: 8px;
       font-size: 1rem;
       font-weight: bold;
+      z-index: 2;
     }
     
     .rupture-stock {
       @include centre-absolu;
-      background-color: rgba($secondary-color-gris-clair, 0.9);
-      color: $primary-color-noir;
+      background-color: rgba($secondary-color-rouge, 0.9);
+      color: $primary-color-blanc;
       padding: 8px 16px;
       border-radius: 8px;
       font-size: 0.9rem;
       font-weight: bold;
       text-transform: uppercase;
       z-index: 2;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
   }
 
