@@ -1,0 +1,78 @@
+@use '_variable.scss' as *;
+
+
+body{
+  font-family: $font-family-secondaire;
+}
+
+h1, h2, h3 {
+  font-family: $font-family-primaire;
+}
+
+
+img, .unArticleP{
+   border-radius: $border-radius-primary;
+}
+
+.articlesPrixP{
+  display: flex;
+}
+
+.unArticleP{
+  border : 1px solid $primary-color-bleu;
+  max-width: 960px;
+  max-height: 240px;
+  display: flex;
+  padding: 12px 10px;
+  margin: 10px;
+
+  .imageArticleP{
+    width: 280px;
+    height: 190px;
+    overflow: hidden;
+
+    img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+  }
+
+  .articleDetailP{
+    max-width: 648px;
+    margin-left: 15px;
+  }
+
+  .basArticleP{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-height: 33px;
+  }
+}
+
+.recapCommande{
+  background-color: $secondary-color-gris-clair;
+  border-radius: $border-radius-primary;
+  width: 383px;
+  height: 240px;
+  padding: 10px;
+  margin: 10px auto;
+
+  .recapTotal{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  button{
+    background-color: $primary-color-noir;
+    border-radius: 999px;
+    color: $primary-color-blanc;
+    width: 343px;
+    height: 49px;
+    
+    border: none;
+  }
+}
