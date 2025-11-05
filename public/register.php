@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Créer un compte - Alizon</title>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../src/styles/styleRegister.css">
 </head>
+
 <body>
   <div class="card">
     <div class="logo">
@@ -41,7 +45,8 @@
       <div class="next-btn" role="group" aria-label="Suivant action">
         <span class="next-text">Suivant</span>
         <button type="submit" class="arrow-only" aria-label="Suivant">
-          <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow" aria-hidden="true">
+          <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow"
+            aria-hidden="true">
         </button>
       </div>
     </form>
