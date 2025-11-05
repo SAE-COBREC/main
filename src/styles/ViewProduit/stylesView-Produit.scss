@@ -1,4 +1,4 @@
-@use "variable" as vars;
+@use "../variable" as vars;
 
 body {
     font-family: vars.$font-family-secondaire;
