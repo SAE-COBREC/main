@@ -126,10 +126,9 @@ aside {
       @include transition(all);
 
       &:hover {
-        background-color: $primary-color-bleu;
+        background-color: $secondary-color-gris-clair;
         border-radius: 8px;
         padding: 5px 10px;
-        color: $primary-color-bleu;
       }
 
       span:last-child {

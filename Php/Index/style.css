@@ -85,10 +85,9 @@ aside section > div {
   transition: all 0.2s ease;
 }
 aside section > div:hover {
-  background-color: #7171A3;
+  background-color: #EFEFEF;
   border-radius: 8px;
   padding: 5px 10px;
-  color: #7171A3;
 }
 aside section > div span:last-child {
   color: #7171A3;
