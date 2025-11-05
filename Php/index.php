@@ -137,9 +137,11 @@ array_unshift($categoriesAffichage, [
             filter: grayscale(100%) opacity(0.7);
             transition: filter 0.3s ease;
         }
+
         .produit-rupture {
             position: relative;
         }
+
         .rupture-stock {
             position: absolute;
             top: 10px;
@@ -225,7 +227,7 @@ array_unshift($categoriesAffichage, [
                     </div>
                     <div>
                         <span>0€</span>
-                        <span id="affichagePrixMax"><?= $prixMaximum ?>€</span>
+                        <span id="affichagePrixMax" ondblclick="activerEditionPrix()"><?= $prixMaximum ?>€</span>
                     </div>
                 </section>
 
@@ -248,7 +250,8 @@ array_unshift($categoriesAffichage, [
                     </label>
                 </section>
 
-                <input type="hidden" name="category" id="champCategorie" value="<?= htmlspecialchars($categorieFiltre) ?>">
+                <input type="hidden" name="category" id="champCategorie"
+                    value="<?= htmlspecialchars($categorieFiltre) ?>">
                 <input type="hidden" name="rating" id="champNote" value="<?= $noteMinimum ?>">
             </form>
         </aside>
@@ -267,7 +270,8 @@ array_unshift($categoriesAffichage, [
                             : $produit['p_prix'];
                         $note = $produit['avg_rating'] ? round($produit['avg_rating']) : 0;
                         ?>
-                        <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>" onclick="window.location.href='product.php?id=<?= $produit['id_produit'] ?>'">
+                        <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
+                            onclick="window.location.href='product.php?id=<?= $produit['id_produit'] ?>'">
                             <div>
                                 <div>
                                     <img src="<?= htmlspecialchars($produit['image_url']) ?>"
@@ -395,6 +399,56 @@ array_unshift($categoriesAffichage, [
 
         function ajouterAuPanier(idProduit) {
             alert('Produit ' + idProduit + ' ajouté au panier !');
+        }
+
+        function activerEditionPrix() {
+            const affichagePrix = document.getElementById('affichagePrixMax');
+            const prixActuel = affichagePrix.textContent.replace('€', '');
+
+            // Créer un input temporaire
+            const inputPrix = document.createElement('input');
+            inputPrix.type = 'number';
+            inputPrix.value = prixActuel;
+            inputPrix.min = 0;
+            inputPrix.max = 3000;
+            inputPrix.style.width = '60px';
+
+            // Remplacer le span par l'input
+            affichagePrix.replaceWith(inputPrix);
+            inputPrix.focus();
+            inputPrix.select();
+
+            // Sauvegarder quand l'input perd le focus ou quand on appuie sur Entrée
+            inputPrix.addEventListener('blur', sauvegarderPrix);
+            inputPrix.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sauvegarderPrix();
+                }
+            });
+
+            function sauvegarderPrix() {
+                const nouveauPrix = parseInt(inputPrix.value) || 0;
+                const prixValide = Math.min(Math.max(nouveauPrix, 0), 3000);
+
+                // Mettre à jour le slider
+                document.querySelector('input[name="price"]').value = prixValide;
+
+                // Recréer le span
+                const nouveauSpan = document.createElement('span');
+                nouveauSpan.id = 'affichagePrixMax';
+                nouveauSpan.textContent = prixValide + '€';
+                nouveauSpan.ondblclick = activerEditionPrix;
+
+                // Remplacer l'input par le span
+                inputPrix.replaceWith(nouveauSpan);
+
+                // Soumettre le formulaire
+                document.getElementById('filterForm').submit();
+            }
+        }
+
+        function mettreAJourAffichagePrix(valeur) {
+            document.getElementById('affichagePrixMax').textContent = valeur + '€';
         }
     </script>
 </body>
