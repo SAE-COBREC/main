@@ -1,0 +1,348 @@
+// Variables
+$bronze: #CD7F32;
+$bronze-light: #E6A96E;
+$bronze-dark: #8B5A2B;
+$bg: #FFF7F1;
+$black: black;
+$muted: #757575;
+$border: #E5D5C5;
+$white: white;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Quicksand";
+  background: $bg;
+  width: 1440px;
+  height: auto;
+}
+
+.app {
+  display: grid;
+  grid-template-columns:260px 1fr;
+  height: 1024px;
+  background: $white;
+}
+
+// Sidebar
+.sidebar {
+  background: linear-gradient(180deg, $bronze-dark 0%, $bronze 100%);
+  padding:28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap:18px;
+}
+
+// Logo
+.logo {
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: $white;
+  font-size: 20px;
+  font-weight: bold;
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    background: $white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $bronze;
+  }
+}
+
+// Navigation
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 8px;
+    border-radius: 8px;
+    color: rgba($white, 0.7);
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.2s;
+    font-weight: bold;
+      img{
+        width: 20px;
+        height: 20px;
+      }
+
+    &:hover {
+      background: rgba($white, 0.1);
+      color: $white;
+    }
+
+    &--active {
+      background: rgba($white, 0.15);
+      color: $white;
+    }
+  }
+
+  &__icon {
+    font-size: 20px;
+  }
+}
+
+// Preview button
+.preview-btn {
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid rgba($white, 0.3);
+  color: $white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+      background: rgba($white, 0.1);
+      color: $white;
+    }
+}
+
+// Main Content
+.main {
+  background: $bg;
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+
+// Header
+.header {
+  margin-bottom: 24px;
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: $black;
+    margin-bottom: 16px;
+  }
+}
+
+// Search Bar
+.search-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+
+  &__input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: $white;
+    border: 1px solid $border;
+    border-radius: 8px;
+    padding: 10px 16px;
+    gap: 8px;
+
+    input {
+      border: 0;
+      outline: 0;
+      flex: 1;
+      font-size: 14px;
+      background: transparent;
+
+      &::placeholder {
+        color: $muted;
+      }
+    }
+  }
+}
+
+// Buttons
+.btn {
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &--primary {
+    background: $bronze;
+    color: $white;
+  }
+}
+
+// Content Section
+.content-section {
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $border;
+  overflow: hidden;
+
+  &__header {
+    padding: 20px 24px;
+    border-bottom: 1px solid $border;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: $black;
+    margin-bottom: 16px;
+  }
+}
+
+// Tabs
+.tabs {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+
+  &__item {
+    padding-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $muted;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &--active {
+      color: $bronze;
+      border-bottom-color: $bronze;
+    }
+  }
+}
+
+// Filters
+.filters {
+  display: flex;
+  gap: 12px;
+
+  &__item {
+    background: #F9F6F3;
+    border: 1px solid $border;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: $muted;
+    cursor: pointer;
+  }
+}
+
+// Products Table
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  &__head-cell {
+    text-align: left;
+    padding: 16px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    color: $muted;
+    background: #FAFAF9;
+    border-bottom: 1px solid $border;
+
+    &--checkbox {
+      width: 40px;
+    }
+  }
+
+  &__row {
+    border-bottom: 1px solid #F5F5F4;
+
+    &:hover {
+      background: #FAFAF9;
+    }
+  }
+
+  &__cell {
+    padding: 16px 24px;
+    font-size: 14px;
+    color: $black;
+
+    &--muted {
+      color: $muted;
+    }
+  }
+}
+
+// Checkbox
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid $border;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+// Product
+.product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &__image {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  &__name {
+    font-weight: 600;
+    font-size: 14px;
+    color: $black;
+    margin-bottom: 2px;
+  }
+
+  &__model {
+    font-size: 13px;
+    color: $muted;
+  }
+}
+
+// Badge
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &--draft {
+    background: #FFF4E6;
+    color: #E67E22;
+  }
+
+  &--live {
+    background: #FEF3E6;
+    color: #D68910;
+  }
+
+  &--out {
+    background: #F5E8DD;
+    color: $bronze-dark;
+  }
+}
+
+h1, h2{
+  font-family: "Baloo";
+}
