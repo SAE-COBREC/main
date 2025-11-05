@@ -130,8 +130,8 @@ array_unshift($categoriesAffichage, [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
-    <link rel="stylesheet" href="./Index/style.css">
-    <link rel="stylesheet" href="../src/styles/stylesHeader.css">
+    <link rel="stylesheet" href="/Php/Index/style.css">
+    <link rel="stylesheet" href="/src/styles/Header/stylesHeader.css">
     <style>
         .image-rupture {
             filter: grayscale(100%) opacity(0.7);
