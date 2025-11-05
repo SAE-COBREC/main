@@ -79,7 +79,7 @@ function showNextCard() {
     } else {
         const msg = "Veuillez remplir tous les champs requis avant de continuer.";
         if (errorEl) {
-            errorEl.textContent = msg;
+            errorEl.innerHTML = "<strong>Erreur</strong> : " + msg;
             // ensure the error element is visible
             errorEl.classList.remove('hidden');
         } else {
