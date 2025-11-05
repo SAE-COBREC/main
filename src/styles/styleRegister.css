@@ -12,6 +12,13 @@ body {
   justify-content: center;
   align-items: center;
 }
+body .inline-flex {
+  display: flex;
+  align-items: center;
+}
+body .hidden {
+  display: none;
+}
 @media screen and (max-width: 508px ) {
   body {
     font-size: 16px;
@@ -70,6 +77,8 @@ body .card form {
   padding: 10px 20px;
   /* --- Message d’erreur --- */
   /* --- Bouton suivant (seule l'image soumet le formulapire) --- */
+  /* Prev button uses same layout as .next-btn but can be styled separately if needed */
+  /* Navigation buttons (Précédent / Suivant) */
 }
 body .card form label {
   font-size: 24px;
@@ -130,7 +139,6 @@ body .card form .next-btn {
   /* empile le texte au-dessus de la flèche */
   align-items: center;
   justify-content: center;
-  gap: 6px;
   pointer-events: none;
 }
 body .card form .next-btn .next-text {
@@ -155,16 +163,100 @@ body .card form .next-btn .arrow-only {
   transition: background 0.18s ease, transform 0.12s ease;
 }
 body .card form .next-btn .arrow-only:hover {
-  background: #030212;
+  background: rgba(3, 2, 18, 0.1);
   transform: scale(1.06);
 }
 body .card form .next-btn .btn-arrow {
-  width: 20px;
-  height: auto;
+  max-width: 20px;
   display: inline-block;
   vertical-align: middle;
   transform: scaleX(-1);
   color: #030212;
+}
+body .card form .next-btn .btn-arrow-left {
+  max-width: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  color: #030212;
+}
+body .card form .prev-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 1rem;
+}
+body .card form .prev-btn .next-text {
+  color: #030212;
+}
+body .card form .prev-btn .arrow-only {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+body .card form .prev-btn .btn-arrow-left {
+  width: 28px;
+}
+body .card form .nav-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* réduire l'espacement entre les boutons pour qu'ils soient plus collés */
+  gap: 6px;
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0 4px;
+}
+body .card form .nav-actions .btn-prev,
+body .card form .nav-actions .btn-next {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* boutons plus compacts */
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+body .card form .nav-actions .btn-prev {
+  flex-direction: column;
+  align-items: center;
+  color: #030212;
+}
+body .card form .nav-actions .btn-prev .nav-arrow {
+  width: 24px;
+  height: auto;
+  margin-bottom: 4px;
+}
+body .card form .nav-actions .btn-next {
+  flex-direction: row;
+  background: #030212;
+  color: #FFFFFF;
+  padding: 8px 12px;
+}
+body .card form .nav-actions .nav-arrow.right {
+  transform: scaleX(-1);
+}
+body .card form .nav-actions .nav-arrow.left {
+  transform: none;
+}
+body .card form .nav-actions .nav-label {
+  font-size: 14px;
+}
+@media screen and (max-width: 508px ) {
+  body .card form .nav-actions {
+    gap: 6px;
+  }
+  body .card form .nav-actions .btn-prev .nav-arrow {
+    width: 20px;
+  }
+  body .card form .nav-actions .nav-label {
+    font-size: 13px;
+  }
 }
 body .card .step {
   margin-top: 1.2rem;

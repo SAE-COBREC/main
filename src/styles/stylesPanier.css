@@ -1,100 +1,69 @@
-@use '_variable.scss' as *;
-
-
-body{
-  font-family: $font-family-secondaire;
+body {
+  font-family: "Quicksand", sans-serif;
 }
 
 h1, h2, h3 {
-  font-family: $font-family-primaire;
+  font-family: "Baloo", sans-serif;
 }
 
-
-img, .unArticleP{
-   border-radius: $border-radius-primary;
+img, .unArticleP {
+  border-radius: 14px;
 }
 
-.articlesPrixP{
+.articlesPrixP {
   display: flex;
 }
 
-.unArticleP{
-  border : 1px solid $primary-color-bleu;
+.unArticleP {
+  border: 1px solid #7171A3;
   max-width: 960px;
   max-height: 240px;
   display: flex;
   padding: 12px 10px;
   margin: 10px;
-
-  .imageArticleP{
-    width: 280px;
-    height: 190px;
-    overflow: hidden;
-
-    img{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-  }
-
-  .articleDetailP{
-    max-width: 648px;
-    margin-left: 15px;
-  }
-
-  .basArticleP{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-height: 33px;
-
-    p {
-      color: $primary-color-bleu;
-      font-weight: bold;
-    }
-
-    button{
-      background-color: $secondary-color-gris-clair;
-      border-radius: $border-radius-button-plus-moins;
-      border: none;
-      width: 29px;
-      height: 33px;
-
-    }
-  }
+}
+.unArticleP .imageArticleP {
+  width: 280px;
+  height: 190px;
+  overflow: hidden;
+}
+.unArticleP .imageArticleP img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center;
+     object-position: center;
+}
+.unArticleP .articleDetailP {
+  max-width: 648px;
+  margin-left: 15px;
+}
+.unArticleP .basArticleP {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-height: 33px;
 }
 
-.recapCommande{
-  background-color: $secondary-color-gris-clair;
-  border-radius: $border-radius-primary;
+.recapCommande {
+  background-color: #EFEFEF;
+  border-radius: 14px;
   width: 383px;
-  height: fit-content;
-  padding: 15px;
+  height: 240px;
+  padding: 10px;
   margin: 10px auto;
-  text-align: center;
-  position: fixed;
-  right: 10px;
-
-
-  .recapTete{
-    text-align: left;
-  }
-
-  .recapTotal{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  button{
-    background-color: $primary-color-noir;
-    border-radius: 999px;
-    color: $primary-color-blanc;
-    width: 100%;
-    max-width: 343px;
-    height: 49px;
-    border: none;
-  }
 }
+.recapCommande .recapTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.recapCommande button {
+  background-color: #030212;
+  border-radius: 999px;
+  color: #FFFFFF;
+  width: 343px;
+  height: 49px;
+  border: none;
+}/*# sourceMappingURL=stylesPanier.css.map */

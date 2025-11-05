@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Créer un compte - Alizon</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../src/styles/styleRegister.css">
+</head>
+
+<body>
+  <div class="card" id="1">
+    <div class="logo">
+      <img src="../src/img/svg/logo-text.svg" alt="Logo Alizon">
+    </div>
+
+    <h1>Créer un compte</h1>
+    <p class="subtitle">Identifiants</p>
+
+    <form action="" method="POST">
+      <div>
+        <label for="nom">Nom</label>
+        <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
+      </div>
+
+      <div>
+        <label for="prenom">Prénom</label>
+        <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required>
+      </div>
+
+      <div>
+        <label for="pseudo">Pseudonyme</label>
+        <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" required>
+      </div>
+
+      <div class="error">
+        <strong>Erreur :</strong> description de l’erreur
+      </div>
+
+      <div class="step">étape 1 / 4</div>
+
+      <div class="next-btn" role="group" aria-label="Suivant action">
+        <span class="next-text">Suivant</span>
+        <button type="submit" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+          <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow"
+            aria-hidden="true">
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card hidden" id="2">
+    <div class="logo">
+      <img src="../src/img/svg/logo-text.svg" alt="Logo Alizon">
+    </div>
+
+    <h1>Créer un compte</h1>
+    <p class="subtitle">Coordonnées</p>
+
+    <form action="" method="POST">
+      <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" value="" required>
+      </div>
+
+      <div>
+        <label for="telephone">Numéro de téléphone</label>
+        <input type="text" id="telephone" name="telephone" placeholder="ex: 0645893548" value="" required>
+      </div>
+
+      <div>
+        <label for="naissance">Date de naissance</label>
+        <input type="text" id="naissance" name="naissance" placeholder="JJ/MM/AAAA" value="" required>
+      </div>
+
+      <div class="error">
+        Prout
+      </div>
+
+      <div class="step">étape 2 / 2</div>
+
+      <!-- Bouton Précédent centré (même place que dans register.php), utilise double flèche -->
+      <div class="inline-flex">
+        <div class="next-btn" role="group" aria-label="Précédent action">
+          <span class="next-text">Précédent</span>
+          <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
+            <img src="../src/img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)"
+              class="btn-arrow-left" aria-hidden="true">
+          </button>
+        </div>
+        <div class="next-btn" role="group" aria-label="Suivant action">
+          <span class="next-text">Suivant</span>
+          <button type="submit" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+            <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
+              class="btn-arrow" aria-hidden="true">
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script src="/src/js/registerPass.js"></script>
+</body>
+</html>
