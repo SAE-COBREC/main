@@ -51,81 +51,10 @@ body {
   font-family: $font-family-secondaire;
   background: $secondary-color-gris-clair;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
 }
-
-// Header
-header {
-  grid-column: 1 / -1;
-  background: $primary-color-blanc;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid $secondary-color-gris-clair;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-
-  > div:first-child {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-
-    > div {
-      width: 32px;
-      height: 32px;
-      background: $primary-color-bleu;
-      border-radius: 6px;
-      @include flex-center;
-      color: $primary-color-blanc;
-      font-weight: bold;
-    }
-  }
-
-  > div:nth-child(2) {
-    flex: 1;
-    max-width: 500px;
-    position: relative;
-
-    input {
-      width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
-      border: 1px solid $secondary-color-gris-clair;
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-
-    &::before {
-      content: "🔍";
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-  }
-
-  > div:nth-child(3) {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-    margin-left: auto;
-  }
-
-  button {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-
-    img {
-      width: 24px;
-      height: 24px;
-    }
-  }
-}
-
 // Container principal
 .container {
   grid-column: 1 / -1;
@@ -438,13 +367,6 @@ footer {
 
 // Responsive
 @media (max-width: $breakpoint-tablette) {
-  body {
-    grid-template-columns: 1fr;
-  }
-
-  .container {
-    grid-template-columns: 1fr;
-  }
 
   aside {
     position: static;

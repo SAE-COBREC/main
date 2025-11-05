@@ -1,6 +1,8 @@
 @use '_variable.scss' as *;
 
 .site-header {
+    /* s'étend sur toute la grille principale (span full width) */
+    grid-column: 1 / -1;
     background-color: $primary-color-blanc;
     color: $primary-color-noir;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
@@ -68,7 +70,9 @@
 
 .search-form {
     margin-right: 8px;
+
     .search-input {
+
         &::-webkit-input-placeholder,
         &::-moz-placeholder,
         &:-ms-input-placeholder,
