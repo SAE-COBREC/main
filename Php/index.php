@@ -131,7 +131,7 @@ array_unshift($categoriesAffichage, [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
     <link rel="stylesheet" href="./Index/style.css">
-    <link rel="stylesheet" href="../src/styles/stylesHeader.css">
+    <link rel="stylesheet" href="../src/styles/Header/stylesHeader.css">
 </head>
 
 <body>
