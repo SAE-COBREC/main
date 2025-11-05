@@ -1,4 +1,4 @@
-d_produit,p_nom,p_description,p_prix,p_stock,p_note,p_nb_ventes,p_statut,discount_percentage,image_url,review_count,avg_rating,category
+id_produit,p_nom,p_description,p_prix,p_stock,p_note,p_nb_ventes,p_statut,discount_percentage,image_url,review_count,avg_rating,category
 1,Galette Bretonne,Galette au sarrasin traditionnelle,29.99,20,4.5,150,En ligne,10,../src/img/Photo/galette.webp,45,4.5,Nourriture
 2,Crêpe au Chocolat,Crêpe garnie de chocolat fondant,5.50,35,4.2,89,En ligne,0,../src/img/Photo/crepe_chocolat.webp,32,4.2,Nourriture
 3,Cidre Brut,Bouteille de cidre breton,12.00,15,4.7,200,En ligne,15,../src/img/Photo/cidre_brut.webp,67,4.7,Boisson
@@ -35,14 +35,13 @@ d_produit,p_nom,p_description,p_prix,p_stock,p_note,p_nb_ventes,p_statut,discoun
 34,Caramels tendres (sachet),Sachet 200g de caramels au beurre salé,8.00,100,4.5,160,En ligne,0,../src/img/Photo/caramels_tendres.webp,65,4.5,Épicerie
 35,Gravure Marine (Phare),Illustration du phare d'Ar-Men (signée),45.00,10,4.8,30,En ligne,0,../src/img/Photo/gravure_phare.webp,12,4.8,Artisanat
 36,Bonnet Miki Marin,Véritable bonnet de quart (couleur: bleu marine),24.50,50,4.6,105,En ligne,0,../src/img/Photo/bonnet_miki.webp,50,4.6,Textile
-3L,Cotriade (Conserve 400g),Soupe de poisson bretonne traditionnelle,10.50,35,4.3,60,En ligne,0,../src/img/Photo/cotriade.webp,28,4.3,Mer
+37,Cotriade (Conserve 400g),Soupe de poisson bretonne traditionnelle,10.50,35,4.3,60,En ligne,0,../src/img/Photo/cotriade.webp,28,4.3,Mer
 38,Haricots Coco de Paimpol (AOC),Sachet de 1kg (frais),12.99,15,4.7,55,En ligne,0,../src/img/Photo/coco_paimpol.webp,24,4.7,Nourriture
 39,Crêpes Dentelle (Gavottes),Boîte de 125g de biscuits croustillants,4.50,150,4.8,350,En ligne,5,../src/img/Photo/gavottes.webp,140,4.8,Épicerie
 40,Confiture d'Oignons Roscoff,Pot de 100g (idéal foie gras ou fromage),5.60,45,4.5,70,En ligne,0,../src/img/Photo/confit_oignons.webp,30,4.5,Épicerie
 41,Rillettes de Porc (Artisanales),Pot de 200g (recette traditionnelle),7.80,30,4.6,80,En ligne,0,../src/img/Photo/rillettes_porc.webp,35,4.6,Nourriture
 42,Jus de Pomme Artisanal (1L),Pur jus de pommes de vergers locaux,6.00,60,4.7,110,En ligne,0,../src/img/Photo/jus_pomme.webp,50,4.7,Boisson
 43,Porte-clés Triskell,Porte-clés en métal argenté (symbole celte),9.90,100,4.4,200,En ligne,20,../src/img/Photo/portecle_triskell.webp,85,4.4,Artisanat
-De
 44,Set de Table Marin,Set de table en coton (motif ancre),6.50,70,4.3,90,En ligne,0,../src/img/Photo/set_table_marin.webp,40,4.3,Artisanat
 45,Saucisson de sanglier,Saucisson sec artisanal au sanglier (200g),11.00,25,4.2,45,En ligne,0,../src/img/Photo/saucisson_sanglier.webp,22,4.2,Nourriture
 46,Bière Bretonne (Blonde),Pack de 6x33cl (Brasserie Lancelot),19.90,30,4.6,85,En ligne,10,../src/img/Photo/biere_blonde.webp,39,4.6,Boisson
@@ -50,3 +49,18 @@ De
 48,Moules de Bouchot (1kg),Moules fraîches (selon saison),8.00,0,4.5,150,En rupture,0,../src/img/Photo/moules.webp,60,4.5,Mer
 49,Varech (Salade d'algues),Barquette de 150g (aux 3 algues),5.30,40,4.1,50,En ligne,0,../src/img/Photo/varech.webp,20,4.1,Mer
 50,Poster "Phares de Bretagne",Affiche éducative (50x70cm),18.00,50,4.7,70,En ligne,0,../src/img/Photo/poster_phares.webp,30,4.7,Artisanat
+51,Lot de 6 Crêpes Complètes,Crêpes garnies jambon-fromage-œuf,18.50,0,4.3,85,En rupture,0,../src/img/Photo/crepes_completes.webp,40,4.3,Nourriture
+52,Whisky Breton (Armorik),Bouteille 70cl - Single Malt,45.00,0,4.7,25,En rupture,0,../src/img/Photo/whisky_breton.webp,15,4.7,Boisson
+53,Plateau de Fruits de Mer (Moyen),Plateau pour 2 personnes,35.00,0,4.6,60,En rupture,0,../src/img/Photo/plateau_fruits_mer.webp,28,4.6,Mer
+54,Pull Marin (Enfant),Marinière pour enfant (4-6 ans),24.90,0,4.4,45,En rupture,10,../src/img/Photo/pull_enfant.webp,22,4.4,Textile
+55,Figues Séchées de Bretagne,Sachet de 200g de figues séchées,7.50,0,4.2,35,En rupture,0,../src/img/Photo/figues_sechees.webp,18,4.2,Épicerie
+56,Statuette de Korrigan,Sculpture en bois de korrigan (15cm),32.00,0,4.8,20,En rupture,0,../src/img/Photo/korrigan.webp,12,4.8,Artisanat
+57,Terrine de Canard aux Pruneaux,Pot de 250g de terrine artisanale,8.90,0,4.5,55,En rupture,0,../src/img/Photo/terrine_canard.webp,25,4.5,Nourriture
+58,Pommeau de Bretagne,Apéritif à base de cidre et de calvados,22.00,0,4.3,30,En rupture,0,../src/img/Photo/pommeau.webp,16,4.3,Boisson
+59,Coquillage Géant Décoratif,Grand coquillage naturel (20-25cm),15.00,0,4.1,40,En rupture,0,../src/img/Photo/coquillage_geant.webp,20,4.1,Artisanat
+60,Fromage de Chèvre Frais,Fromage de chèvre artisanal (200g),6.50,0,4.6,70,En rupture,0,../src/img/Photo/fromage_chevre.webp,35,4.6,Nourriture
+61,Sirop de Menthe Artisanal,Bouteille 50cl de sirop de menthe,9.50,0,4.4,25,En rupture,0,../src/img/Photo/sirop_menthe.webp,14,4.4,Boisson
+62,Cache-pot Faïence de Quimper,Pot de fleurs décoratif (hauteur 25cm),28.00,0,4.7,15,En rupture,0,../src/img/Photo/cachepot_quimper.webp,8,4.7,Artisanat
+63,Raisins de Mer (Pétoncles),Barquette de 200g de pétoncles,12.50,0,4.5,35,En rupture,0,../src/img/Photo/petoncles.webp,18,4.5,Mer
+64,Bonnet Breton (Femme),Bonnet en laine avec motif breton,18.00,0,4.3,50,En rupture,0,../src/img/Photo/bonnet_femme.webp,24,4.3,Textile
+65,Pralines de Quiberon,Sachet de 150g de pralines artisanales,11.00,0,4.8,40,En rupture,0,../src/img/Photo/pralines_quiberon.webp,20,4.8,Pâtisserie
