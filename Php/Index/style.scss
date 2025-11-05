@@ -56,61 +56,6 @@ body {
   min-height: 100vh;
 }
 
-// Header
-header {
-  background: $primary-color-noir;
-  color: $primary-color-blanc;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  > div:first-child img {
-    height: 40px;
-  }
-  
-  > div:nth-child(2) {
-    flex: 1;
-    max-width: 500px;
-    margin: 0 2rem;
-    
-    form {
-      width: 100%;
-    }
-    
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 8px;
-      border: 1px solid $secondary-color-gris-fonce;
-      font-size: 1rem;
-    }
-  }
-  
-  > div:last-child {
-    display: flex;
-    gap: 1rem;
-    
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: 8px;
-      @include transition(background);
-      
-      &:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
-      
-      img {
-        width: 24px;
-        height: 24px;
-      }
-    }
-  }
-}
-
 // Container principal
 .container {
   grid-column: 1 / -1;
@@ -129,7 +74,7 @@ aside {
   margin: 2rem 0 2rem 2rem;
   @include sticky-aside;
 
-  > div:first-child {
+  form > div:first-child {
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
@@ -150,7 +95,7 @@ aside {
     }
   }
 
-  > div:nth-child(2) {
+  form > div:nth-child(2) {
     @include flex-between;
     margin-bottom: 1.5rem;
 

@@ -14,52 +14,6 @@ body {
   min-height: 100vh;
 }
 
-header {
-  background: #030212;
-  color: #FFFFFF;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-header > div:first-child img {
-  height: 40px;
-}
-header > div:nth-child(2) {
-  flex: 1;
-  max-width: 500px;
-  margin: 0 2rem;
-}
-header > div:nth-child(2) form {
-  width: 100%;
-}
-header > div:nth-child(2) input {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #c0c0c0;
-  font-size: 1rem;
-}
-header > div:last-child {
-  display: flex;
-  gap: 1rem;
-}
-header > div:last-child button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-header > div:last-child button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-header > div:last-child button img {
-  width: 24px;
-  height: 24px;
-}
-
 .container {
   grid-column: 1/-1;
   display: grid;
@@ -80,16 +34,16 @@ aside {
   align-self: start;
   transition: all 0.3s ease;
 }
-aside > div:first-child {
+aside form > div:first-child {
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-aside > div:first-child span {
+aside form > div:first-child span {
   color: #c0c0c0;
 }
-aside > div:first-child select {
+aside form > div:first-child select {
   padding: 6px 12px;
   border: 1px solid #7171A3;
   color: #7171A3;
@@ -98,16 +52,16 @@ aside > div:first-child select {
   cursor: pointer;
   font-size: 0.9rem;
 }
-aside > div:nth-child(2) {
+aside form > div:nth-child(2) {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
-aside > div:nth-child(2) h3 {
+aside form > div:nth-child(2) h3 {
   font-size: 1.1rem;
 }
-aside > div:nth-child(2) button {
+aside form > div:nth-child(2) button {
   color: #c0c0c0;
   background: none;
   border: none;
@@ -115,7 +69,7 @@ aside > div:nth-child(2) button {
   font-size: 0.9rem;
   transition: color 0.2s ease;
 }
-aside > div:nth-child(2) button:hover {
+aside form > div:nth-child(2) button:hover {
   color: #7171A3;
 }
 aside section {
