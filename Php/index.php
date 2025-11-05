@@ -1,6 +1,6 @@
 <?php
 // Lecture du fichier CSV
-$csvFile = 'data/products.csv';
+$csvFile = 'Php/BDD/data.csv';
 $products = [];
 $categories = [];
 
