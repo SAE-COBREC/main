@@ -1,6 +1,6 @@
 id_produit,p_nom,p_description,p_prix,p_stock,p_note,p_nb_ventes,p_statut,discount_percentage,image_url,review_count,avg_rating,category
 1,Galette Bretonne,Galette au sarrasin traditionnelle,2999,20,4.5,150,En ligne,10,../src/img/Photo/galette.webp,45,4.5,Nourriture
 2,Crêpe au Chocolat,Crêpe garnie de chocolat fondant,5.50,35,4.2,89,En ligne,0,../src/img/Photo/crepe_chocolat.webp,32,4.2,Nourriture
-3,Cidre Brut,Bouteille de cidre breton,12.00,15,4.7,200,En ligne,15,../src/img/Photo/cidre.webp,67,4.7,Boisson
+3,Cidre Brut,Bouteille de cidre breton,12.00,15,4.7,200,En ligne,15,https://www.tempetedelouest.fr/wp-content/uploads/2018/10/cidre-artisanal-breton-doux.jpg,67,4.7,Boisson
 4,Caramel au Beurre Salé,Pot de caramel maison,6.50,0,4.0,45,En ligne,0,../src/img/Photo/caramel.webp,23,4.0,Épicerie
 5,Thé à la Menthe,Sachets de thé à la menthe,9.00,8,4.3,78,En ligne,20,../src/img/Photo/the_menthe.webp,34,4.3,Boisson

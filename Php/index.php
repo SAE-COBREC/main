@@ -4,54 +4,6 @@ $csvFile = __DIR__ . '/BDD/data.csv';
 $products = [];
 $categories = [];
 
-// Données par défaut si le CSV n'existe pas
-$defaultProducts = [
-    [
-        'id_produit' => 1,
-        'p_nom' => 'Galette Bretonne',
-        'p_description' => 'Galette au sarrasin traditionnelle',
-        'p_prix' => 8.50,
-        'p_stock' => 20,
-        'p_note' => 4.5,
-        'p_nb_ventes' => 150,
-        'p_statut' => 'En ligne',
-        'discount_percentage' => 10,
-        'image_url' => '../src/img/Photo/galette.webp',
-        'review_count' => 45,
-        'avg_rating' => 4.5,
-        'category' => 'Nourriture'
-    ],
-    [
-        'id_produit' => 2,
-        'p_nom' => 'Crêpe au Chocolat',
-        'p_description' => 'Crêpe garnie de chocolat fondant',
-        'p_prix' => 5.50,
-        'p_stock' => 35,
-        'p_note' => 4.2,
-        'p_nb_ventes' => 89,
-        'p_statut' => 'En ligne',
-        'discount_percentage' => 0,
-        'image_url' => '../src/img/Photo/galette.webp',
-        'review_count' => 32,
-        'avg_rating' => 4.2,
-        'category' => 'Nourriture'
-    ],
-    [
-        'id_produit' => 3,
-        'p_nom' => 'Cidre Brut',
-        'p_description' => 'Bouteille de cidre breton',
-        'p_prix' => 12.00,
-        'p_stock' => 15,
-        'p_note' => 4.7,
-        'p_nb_ventes' => 200,
-        'p_statut' => 'En ligne',
-        'discount_percentage' => 15,
-        'image_url' => '../src/img/Photo/galette.webp',
-        'review_count' => 67,
-        'avg_rating' => 4.7,
-        'category' => 'Boisson'
-    ]
-];
 
 if (file_exists($csvFile)) {
     $handle = fopen($csvFile, 'r');
@@ -187,7 +139,7 @@ array_unshift($categoriesDisplay, [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
-    <link rel="stylesheet" href="../src/styles/Index/style.css">
+    <link rel="stylesheet" href="./Index/style.css">
 </head>
 <body>
     <header>
