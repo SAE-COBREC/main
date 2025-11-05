@@ -70,6 +70,8 @@ body .card form {
   padding: 10px 20px;
   /* --- Message d’erreur --- */
   /* --- Bouton suivant (seule l'image soumet le formulapire) --- */
+  /* Prev button uses same layout as .next-btn but can be styled separately if needed */
+  /* Navigation buttons (Précédent / Suivant) */
 }
 body .card form label {
   font-size: 24px;
@@ -165,6 +167,90 @@ body .card form .next-btn .btn-arrow {
   vertical-align: middle;
   transform: scaleX(-1);
   color: #030212;
+}
+body .card form .next-btn .btn-arrow-left {
+  width: 20px;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+  color: #030212;
+}
+body .card form .prev-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 1rem;
+}
+body .card form .prev-btn .next-text {
+  color: #030212;
+}
+body .card form .prev-btn .arrow-only {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+body .card form .prev-btn .btn-arrow-left {
+  width: 28px;
+}
+body .card form .nav-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0 6px;
+}
+body .card form .nav-actions .btn-prev,
+body .card form .nav-actions .btn-next {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+body .card form .nav-actions .btn-prev {
+  flex-direction: column;
+  align-items: center;
+  color: #030212;
+}
+body .card form .nav-actions .btn-prev .nav-arrow {
+  width: 28px;
+  height: auto;
+  margin-bottom: 6px;
+}
+body .card form .nav-actions .btn-next {
+  flex-direction: row;
+  background: #030212;
+  color: #FFFFFF;
+  padding: 10px 14px;
+}
+body .card form .nav-actions .nav-arrow.right {
+  transform: scaleX(-1);
+}
+body .card form .nav-actions .nav-arrow.left {
+  transform: none;
+}
+body .card form .nav-actions .nav-label {
+  font-size: 14px;
+}
+@media screen and (max-width: 508px ) {
+  body .card form .nav-actions {
+    gap: 8px;
+  }
+  body .card form .nav-actions .btn-prev .nav-arrow {
+    width: 22px;
+  }
+  body .card form .nav-actions .nav-label {
+    font-size: 13px;
+  }
 }
 body .card .step {
   margin-top: 1.2rem;

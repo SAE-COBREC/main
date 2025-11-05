@@ -1,4 +1,4 @@
-body {
+html {
   font-family: "Quicksand", sans-serif;
 }
 
@@ -14,13 +14,17 @@ img, .unArticleP {
   display: flex;
 }
 
+button {
+  border: none;
+}
+
 .unArticleP {
   border: 1px solid #7171A3;
   max-width: 960px;
   max-height: 240px;
   display: flex;
   padding: 12px 10px;
-  margin: 10px;
+  margin-bottom: 20px;
 }
 .unArticleP .imageArticleP {
   width: 280px;
@@ -45,14 +49,38 @@ img, .unArticleP {
   justify-content: space-between;
   max-height: 33px;
 }
+.unArticleP .basArticleP p {
+  color: #7171A3;
+  font-weight: bold;
+}
+.unArticleP .basArticleP button {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+}
+.unArticleP .basArticleP input {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  border-radius: 4px;
+  border-color: #c0c0c0;
+}
 
 .recapCommande {
   background-color: #EFEFEF;
   border-radius: 14px;
   width: 383px;
-  height: 240px;
-  padding: 10px;
-  margin: 10px auto;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 20px;
+  position: fixed;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.recapCommande .recapTete, .recapCommande .recapTotal {
+  width: 100%;
 }
 .recapCommande .recapTotal {
   display: flex;
@@ -66,4 +94,5 @@ img, .unArticleP {
   width: 343px;
   height: 49px;
   border: none;
+  margin-top: 10px;
 }/*# sourceMappingURL=stylesPanier.css.map */
