@@ -200,12 +200,10 @@ array_unshift($categoriesDisplay, [
         </div>
         <div>
             <button onclick="window.location.href='../panier.html'">
-                <img src="../src/img/svg/panier.svg" alt="Panier" style="filter: invert(1); height: 20px;">
-                Panier
+                <img src="../src/img/svg/panier.svg" alt="Panier" style="filter: invert(1);">
             </button>
             <button onclick="window.location.href='../public/register.html'">
-                <img src="../src/img/svg/profile.svg" alt="Profil" style="height: 20px;">
-                Profil
+                <img src="../src/img/svg/profile.svg" alt="Profil">
             </button>
         </div>
     </header>
@@ -225,18 +223,18 @@ array_unshift($categoriesDisplay, [
 
                 <div>
                     <h3>Filtres</h3>
-                    <button type="button" onclick="window.location.href='index.php'">Effacer les filtres</button>
+                    <button type="button" onclick="window.location.href='index.php'">Effacer</button>
                 </div>
 
                 <section>
                     <h4>Catégories</h4>
-                    <div class="category-item" onclick="setCategory('all')">
+                    <div onclick="setCategory('all')">
                         <span>Tous les produits</span>
                         <span><?= $totalProducts ?></span>
                     </div>
                     <?php foreach ($categoriesDisplay as $cat): ?>
                         <?php if ($cat['category'] !== 'all'): ?>
-                        <div class="category-item" onclick="setCategory('<?= htmlspecialchars($cat['category']) ?>')">
+                        <div onclick="setCategory('<?= htmlspecialchars($cat['category']) ?>')">
                             <span><?= htmlspecialchars($cat['category']) ?></span>
                             <span><?= $cat['count'] ?></span>
                         </div>
@@ -245,13 +243,13 @@ array_unshift($categoriesDisplay, [
                 </section>
 
                 <section>
-                    <h4>Prix maximum</h4>
+                    <h4>Prix</h4>
                     <div>
                         <input type="range" name="price" min="0" max="3000" value="<?= $maxPrice ?>" 
                                oninput="updatePriceDisplay(this.value)"
                                onchange="document.getElementById('filterForm').submit()">
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
+                    <div>
                         <span>0€</span>
                         <span id="maxPriceDisplay"><?= $maxPrice ?>€</span>
                     </div>
@@ -260,7 +258,7 @@ array_unshift($categoriesDisplay, [
                 <section>
                     <h4>Note minimum</h4>
                     <?php for ($i = 5; $i >= 1; $i--): ?>
-                    <div class="category-item" onclick="setRating(<?= $i ?>)">
+                    <div onclick="setRating(<?= $i ?>)">
                         <span><?= str_repeat('★', $i) . str_repeat('☆', 5 - $i) ?></span>
                         <span><?= $i ?> et plus</span>
                     </div>
@@ -269,7 +267,7 @@ array_unshift($categoriesDisplay, [
 
                 <section>
                     <h4>Disponibilité</h4>
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label>
                         <input type="checkbox" name="in_stock" <?= $inStockOnly ? 'checked' : '' ?>
                                onchange="document.getElementById('filterForm').submit()">
                         <span>En stock uniquement</span>
@@ -284,9 +282,7 @@ array_unshift($categoriesDisplay, [
         <main>
             <div>
                 <?php if (empty($products)): ?>
-                    <p style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-                        Aucun produit ne correspond à vos critères de recherche.
-                    </p>
+                    <p>Aucun produit ne correspond à vos critères de recherche.</p>
                 <?php else: ?>
                     <?php foreach ($products as $product): ?>
                         <?php
@@ -304,9 +300,7 @@ array_unshift($categoriesDisplay, [
                                          alt="<?= htmlspecialchars($product['p_nom']) ?>">
                                 </div>
                                 <?php if ($hasDiscount): ?>
-                                <span style="background: #dc3545; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; position: absolute; top: 1rem; left: 1rem;">
-                                    -<?= round($product['discount_percentage']) ?>%
-                                </span>
+                                <span>-<?= round($product['discount_percentage']) ?>%</span>
                                 <?php endif; ?>
                                 <?php if ($isOutOfStock): ?>
                                 <div class="rupture-stock">Rupture de stock</div>
@@ -314,15 +308,15 @@ array_unshift($categoriesDisplay, [
                             </div>
                             <div>
                                 <h3><?= htmlspecialchars($product['p_nom']) ?></h3>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0;">
-                                    <span style="color: #ffc107;"><?= str_repeat('★', $rating) . str_repeat('☆', 5 - $rating) ?></span>
-                                    <span style="color: #666; font-size: 0.9rem;">(<?= $product['review_count'] ?> avis)</span>
+                                <div>
+                                    <span><?= str_repeat('★', $rating) . str_repeat('☆', 5 - $rating) ?></span>
+                                    <span>(<?= $product['review_count'] ?>)</span>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0;">
+                                <div>
                                     <?php if ($hasDiscount): ?>
-                                    <span style="text-decoration: line-through; color: #999;"><?= number_format($product['p_prix'], 2, ',', ' ') ?>€</span>
+                                    <span><?= number_format($product['p_prix'], 0, ',', ' ') ?>€</span>
                                     <?php endif; ?>
-                                    <span style="font-weight: bold; color: #007bff;"><?= number_format($finalPrice, 2, ',', ' ') ?>€</span>
+                                    <span><?= number_format($finalPrice, 0, ',', ' ') ?>€</span>
                                 </div>
                                 <button <?= $isOutOfStock ? 'disabled' : '' ?> 
                                         onclick="event.stopPropagation(); addToCart(<?= $product['id_produit'] ?>)">
@@ -338,44 +332,73 @@ array_unshift($categoriesDisplay, [
 
     <footer>
         <div>
-            <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem;">
-                <a href="#" style="color: white; text-decoration: none;">Facebook</a>
-                <a href="#" style="color: white; text-decoration: none;">Instagram</a>
-                <a href="#" style="color: white; text-decoration: none;">Twitter</a>
-                <a href="#" style="color: white; text-decoration: none;">LinkedIn</a>
+            <div>
+                <a href="#">f</a>
+                <a href="#">in</a>
+                <a href="#">▶</a>
+                <a href="#">📷</a>
+                <a href="#">♪</a>
+                <a href="#">P</a>
             </div>
 
-            <nav style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+            <nav>
                 <section>
                     <h4>Alizon</h4>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">À propos</a></li>
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">Carrières</a></li>
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">Mentions légales</a></li>
+                    <ul>
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Investisseurs</a></li>
+                        <li><a href="#">Presse et médias</a></li>
+                        <li><a href="#">Partenaires</a></li>
+                        <li><a href="#">Affiliés</a></li>
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">Statut du service</a></li>
                     </ul>
                 </section>
 
                 <section>
                     <h4>Produits</h4>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">Boutique</a></li>
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">Promotions</a></li>
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">Nouveautés</a></li>
+                    <ul>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">Shop Pay</a></li>
+                        <li><a href="#">Shopify Plus</a></li>
+                        <li><a href="#">Shopify pour les entreprises</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4>Développeurs</h4>
+                    <ul>
+                        <li><a href="#">Alizon.dev</a></li>
+                        <li><a href="#">Documentation API</a></li>
+                        <li><a href="#">Dev Degree</a></li>
                     </ul>
                 </section>
 
                 <section>
                     <h4>Assistance</h4>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">Centre d'aide</a></li>
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">Contact</a></li>
-                        <li><a href="#" style="color: #ccc; text-decoration: none;">FAQ</a></li>
+                    <ul>
+                        <li><a href="#">Assistance aux marchands</a></li>
+                        <li><a href="#">Centre d'aide de Alizon</a></li>
+                        <li><a href="#">Faire appel à un partenaire</a></li>
+                        <li><a href="#">Alizon Academy</a></li>
+                        <li><a href="#">Communauté Alizon</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4>Solutions</h4>
+                    <ul>
+                        <li><a href="#">Éditeur de boutique en ligne</a></li>
+                        <li><a href="#">Outil de création de site web</a></li>
                     </ul>
                 </section>
             </nav>
 
-            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #555;">
-                <span style="color: #ccc;">© 2024 Alizon. Tous droits réservés.</span>
+            <div>
+                <span>Conditions d'utilisation</span>
+                <span>Copyright CGRRSC All right reserved</span>
+                <span>Condition de ventes</span>
             </div>
         </div>
     </footer>
@@ -397,26 +420,6 @@ array_unshift($categoriesDisplay, [
 
         function addToCart(productId) {
             alert('Produit ' + productId + ' ajouté au panier !');
-            // Version simplifiée pour le moment
-            // fetch('cart_add.php', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ product_id: productId, quantity: 1 })
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     if (data.success) {
-            //         alert('Produit ajouté au panier !');
-            //     } else {
-            //         alert('Erreur : ' + data.message);
-            //     }
-            // })
-            // .catch(error => {
-            //     console.error('Erreur:', error);
-            //     alert('Une erreur est survenue');
-            // });
         }
     </script>
 </body>
