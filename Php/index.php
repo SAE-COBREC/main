@@ -1,22 +1,17 @@
 <?php
-// Lecture du fichier CSV
 $fichierCSV = __DIR__ . '/BDD/data.csv';
 $produits = [];
 $categories = [];
 
-
 if (file_exists($fichierCSV)) {
     $handle = fopen($fichierCSV, 'r');
     if ($handle !== FALSE) {
-        // Lecture de l'en-tête
         $entete = fgetcsv($handle, 1000, ',');
 
-        // Lecture des données
         while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
             if (count($donnees) === count($entete)) {
                 $produit = array_combine($entete, $donnees);
 
-                // Conversion des types
                 $produit['id_produit'] = (int) $produit['id_produit'];
                 $produit['p_prix'] = (float) $produit['p_prix'];
                 $produit['p_stock'] = (int) $produit['p_stock'];
@@ -28,7 +23,6 @@ if (file_exists($fichierCSV)) {
 
                 $produits[] = $produit;
 
-                // Construction des catégories avec comptage
                 $categorie = $produit['category'];
                 if (!isset($categories[$categorie])) {
                     $categories[$categorie] = 0;
@@ -40,38 +34,31 @@ if (file_exists($fichierCSV)) {
     }
 }
 
-// Récupération des filtres
 $categorieFiltre = $_GET['category'] ?? 'all';
 $noteMinimum = $_GET['rating'] ?? 0;
 $prixMaximum = $_GET['price'] ?? 3000;
 $enStockSeulement = isset($_GET['in_stock']);
 $triPar = $_GET['sort'] ?? 'best_sellers';
 
-// Filtrage des produits
 $produitsFiltres = [];
 
 foreach ($produits as $produit) {
-    // Filtre par prix
     if ($produit['p_prix'] > $prixMaximum) {
         continue;
     }
 
-    // Filtre par catégorie
     if ($categorieFiltre !== 'all' && $produit['category'] !== $categorieFiltre) {
         continue;
     }
 
-    // Filtre par stock (SEULEMENT si la case "En stock uniquement" est cochée)
     if ($enStockSeulement && $produit['p_stock'] <= 0) {
         continue;
     }
 
-    // Filtre par note
     if ($produit['avg_rating'] < $noteMinimum) {
         continue;
     }
 
-    // Vérification du statut - AUTORISER les produits "En rupture" à s'afficher
     if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
         continue;
     }
@@ -79,7 +66,6 @@ foreach ($produits as $produit) {
     $produitsFiltres[] = $produit;
 }
 
-// Tri des produits
 switch ($triPar) {
     case 'best_sellers':
         usort($produitsFiltres, function ($a, $b) {
@@ -105,7 +91,6 @@ switch ($triPar) {
 
 $produits = $produitsFiltres;
 
-// Préparation des catégories pour l'affichage
 $categoriesAffichage = [];
 $totalProduits = 0;
 
@@ -117,7 +102,6 @@ foreach ($categories as $nomCategorie => $compte) {
     $totalProduits += $compte;
 }
 
-// Ajout de l'option "Tous les produits"
 array_unshift($categoriesAffichage, [
     'category' => 'all',
     'count' => $totalProduits
@@ -405,7 +389,6 @@ array_unshift($categoriesAffichage, [
             const affichagePrix = document.getElementById('affichagePrixMax');
             const prixActuel = affichagePrix.textContent.replace('€', '');
 
-            // Créer un input temporaire
             const inputPrix = document.createElement('input');
             inputPrix.type = 'number';
             inputPrix.value = prixActuel;
@@ -413,12 +396,10 @@ array_unshift($categoriesAffichage, [
             inputPrix.max = 3000;
             inputPrix.style.width = '60px';
 
-            // Remplacer le span par l'input
             affichagePrix.replaceWith(inputPrix);
             inputPrix.focus();
             inputPrix.select();
 
-            // Sauvegarder quand l'input perd le focus ou quand on appuie sur Entrée
             inputPrix.addEventListener('blur', sauvegarderPrix);
             inputPrix.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
@@ -430,19 +411,15 @@ array_unshift($categoriesAffichage, [
                 const nouveauPrix = parseInt(inputPrix.value) || 0;
                 const prixValide = Math.min(Math.max(nouveauPrix, 0), 3000);
 
-                // Mettre à jour le slider
                 document.querySelector('input[name="price"]').value = prixValide;
 
-                // Recréer le span
                 const nouveauSpan = document.createElement('span');
                 nouveauSpan.id = 'affichagePrixMax';
                 nouveauSpan.textContent = prixValide + '€';
                 nouveauSpan.ondblclick = activerEditionPrix;
 
-                // Remplacer l'input par le span
                 inputPrix.replaceWith(nouveauSpan);
 
-                // Soumettre le formulaire
                 document.getElementById('filterForm').submit();
             }
         }
