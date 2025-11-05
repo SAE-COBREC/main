@@ -32,7 +32,6 @@
   transition: all 0.3s ease;
 }
 
-// Créez un mixin pour le centrage
 @mixin centre-absolu {
   position: absolute;
   top: 50%;
@@ -40,7 +39,6 @@
   transform: translate(-50%, -50%);
 }
 
-// Reset et base
 * {
   margin: 0;
   padding: 0;
@@ -54,156 +52,6 @@ body {
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
-}
-
-.site-header {
-    /* s'étend sur toute la grille principale (span full width) */
-    grid-column: 1 / -1;
-    background-color: $primary-color-blanc;
-    color: $primary-color-noir;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-    /* ensure header content vertically centers and has a fixed height */
-    height: 72px;
-}
-
-.site-header .header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    height: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    box-sizing: border-box;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 160px;
-}
-
-.logo {
-    object-fit: contain;
-    height: 40px;
-}
-
-.brand-name {
-    font-family: $font-family-secondaire;
-    font-size: 20px;
-    color: $primary-color-bleu;
-    font-weight: 700;
-}
-
-.search-container {
-    flex: 1 1 560px;
-    display: flex;
-    justify-content: center;
-    padding: 0 20px;
-    border-radius: $border-radius-primary;
-    padding: 0.7em 1em;
-    max-width: 500px;
-    background-color: $secondary-color-gris-clair;
-    color: $primary-color-bleu;
-}
-
-
-
-.search-form {
-    width: 100%;
-    max-width: 720px;
-    display: flex;
-    align-items: center;
-    background-color: $secondary-color-bleu-clair;
-    border-radius: $border-radius-primary;
-    padding: 8px 12px;
-    box-sizing: border-box;
-}
-
-.search-form {
-    margin-right: 8px;
-
-    .search-input {
-
-        &::-webkit-input-placeholder,
-        &::-moz-placeholder,
-        &:-ms-input-placeholder,
-        &::placeholder {
-            color: $primary-color-bleu;
-        }
-
-    }
-}
-
-.loupe-icon {
-    margin-right: 8px;
-}
-
-.search-icon {
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    color: $primary-color-bleu;
-    margin-right: 10px;
-    cursor: pointer;
-}
-
-.search-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14px;
-    color: $primary-color-noir;
-}
-
-.icons-container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-width: 120px;
-    justify-content: flex-end;
-}
-
-.icon-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    color: $primary-color-noir;
-    text-decoration: none;
-    font-size: 18px;
-}
-
-/* Responsive adjustments */
-@media screen and (max-width: 900px) {
-    .brand-name {
-        display: none;
-    }
-
-    .search-container {
-        padding: 0 8px;
-    }
-
-    .search-form {
-        max-width: 480px;
-    }
-}
-
-@media screen and (max-width: 520px) {
-    .search-container {
-        display: none;
-    }
-
-    .icons-container {
-        gap: 10px;
-    }
 }
 
 // Container principal
@@ -235,13 +83,12 @@ aside {
     }
 
     select {
-      padding: 6px 12px;
+      padding: 2px 7px;
       border: 1px solid $primary-color-bleu;
       color: $primary-color-bleu;
       border-radius: 20px;
       background: $primary-color-blanc;
       cursor: pointer;
-      font-size: 0.9rem;
     }
   }
 
@@ -259,11 +106,6 @@ aside {
       border: none;
       cursor: pointer;
       font-size: 0.9rem;
-      @include transition(color);
-      
-      &:hover {
-        color: $primary-color-bleu;
-      }
     }
   }
 
@@ -287,7 +129,6 @@ aside {
         background-color: $secondary-color-gris-clair;
         border-radius: 8px;
         padding: 5px 10px;
-        color: $primary-color-bleu;
       }
 
       span:last-child {
