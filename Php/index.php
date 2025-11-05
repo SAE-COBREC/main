@@ -1,6 +1,43 @@
 <?php
-// Connexion à la base de données
-require_once 'config/database.php';
+// Lecture du fichier CSV
+$csvFile = 'data/products.csv';
+$products = [];
+$categories = [];
+
+if (file_exists($csvFile)) {
+    $handle = fopen($csvFile, 'r');
+    if ($handle !== FALSE) {
+        // Lecture de l'en-tête
+        $header = fgetcsv($handle, 1000, ',');
+        
+        // Lecture des données
+        while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+            if (count($data) === count($header)) {
+                $product = array_combine($header, $data);
+                
+                // Conversion des types
+                $product['id_produit'] = (int)$product['id_produit'];
+                $product['p_prix'] = (float)$product['p_prix'];
+                $product['p_stock'] = (int)$product['p_stock'];
+                $product['p_note'] = (float)$product['p_note'];
+                $product['p_nb_ventes'] = (int)$product['p_nb_ventes'];
+                $product['discount_percentage'] = (float)$product['discount_percentage'];
+                $product['review_count'] = (int)$product['review_count'];
+                $product['avg_rating'] = (float)$product['avg_rating'];
+                
+                $products[] = $product;
+                
+                // Construction des catégories avec comptage
+                $category = $product['category'];
+                if (!isset($categories[$category])) {
+                    $categories[$category] = 0;
+                }
+                $categories[$category]++;
+            }
+        }
+        fclose($handle);
+    }
+}
 
 // Récupération des filtres
 $category = $_GET['category'] ?? 'all';
@@ -9,77 +46,81 @@ $maxPrice = $_GET['price'] ?? 3000;
 $inStockOnly = isset($_GET['in_stock']);
 $sortBy = $_GET['sort'] ?? 'best_sellers';
 
-// Construction de la requête SQL avec votre schéma
-$sql = "SELECT p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
-        p.p_note, p.p_nb_ventes,
-        COALESCE(r.reduction_pourcentage, 0) as discount_percentage,
-        COALESCE(img.i_lien, '../src/img/Photo/galette.webp') as image_url,
-        COALESCE(COUNT(DISTINCT c.id_commentaire), 0) as review_count,
-        COALESCE(AVG(c.a_note), 0) as avg_rating,
-        cat.nom_categorie as category
-        FROM cobrec1._produit p
-        LEFT JOIN cobrec1._en_reduction er ON p.id_produit = er.id_produit
-        LEFT JOIN cobrec1._reduction r ON er.id_reduction = r.id_reduction 
-            AND r.reduction_debut <= CURRENT_TIMESTAMP 
-            AND r.reduction_fin >= CURRENT_TIMESTAMP
-        LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
-        LEFT JOIN cobrec1._image img ON rp.id_image = img.id_image
-        LEFT JOIN cobrec1._commentaire c ON p.id_produit = (
-            SELECT a.id_produit FROM cobrec1._avis a WHERE a.id_avis = c.id_avis
-        )
-        LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
-        LEFT JOIN cobrec1._categorie_produit cat ON fpd.id_categorie = cat.id_categorie
-        WHERE p.p_statut = 'En ligne'
-        AND p.p_prix <= :maxPrice";
+// Filtrage des produits
+$filteredProducts = [];
 
-$params = [':maxPrice' => $maxPrice];
-
-if ($category !== 'all') {
-    $sql .= " AND cat.nom_categorie = :category";
-    $params[':category'] = $category;
+foreach ($products as $product) {
+    // Filtre par prix
+    if ($product['p_prix'] > $maxPrice) {
+        continue;
+    }
+    
+    // Filtre par catégorie
+    if ($category !== 'all' && $product['category'] !== $category) {
+        continue;
+    }
+    
+    // Filtre par stock
+    if ($inStockOnly && $product['p_stock'] <= 0) {
+        continue;
+    }
+    
+    // Filtre par note
+    if ($product['avg_rating'] < $minRating) {
+        continue;
+    }
+    
+    // Vérification du statut
+    if ($product['p_statut'] !== 'En ligne') {
+        continue;
+    }
+    
+    $filteredProducts[] = $product;
 }
 
-if ($inStockOnly) {
-    $sql .= " AND p.p_stock > 0";
-}
-
-$sql .= " GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
-          p.p_note, p.p_nb_ventes, r.reduction_pourcentage, img.i_lien, cat.nom_categorie";
-
-$sql .= " HAVING COALESCE(AVG(c.a_note), 0) >= :minRating";
-$params[':minRating'] = $minRating;
-
-// Tri
+// Tri des produits
 switch ($sortBy) {
     case 'best_sellers':
-        $sql .= " ORDER BY p.p_nb_ventes DESC";
+        usort($filteredProducts, function($a, $b) {
+            return $b['p_nb_ventes'] - $a['p_nb_ventes'];
+        });
         break;
     case 'price_asc':
-        $sql .= " ORDER BY p.p_prix ASC";
+        usort($filteredProducts, function($a, $b) {
+            return $a['p_prix'] - $b['p_prix'];
+        });
         break;
     case 'price_desc':
-        $sql .= " ORDER BY p.p_prix DESC";
+        usort($filteredProducts, function($a, $b) {
+            return $b['p_prix'] - $a['p_prix'];
+        });
         break;
     case 'rating':
-        $sql .= " ORDER BY avg_rating DESC";
+        usort($filteredProducts, function($a, $b) {
+            return $b['avg_rating'] - $a['avg_rating'];
+        });
         break;
 }
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$products = $filteredProducts;
 
-// Récupération des catégories avec comptage
-$categoriesStmt = $pdo->query("
-    SELECT cat.nom_categorie as category, COUNT(DISTINCT p.id_produit) as count 
-    FROM cobrec1._categorie_produit cat
-    LEFT JOIN cobrec1._fait_partie_de fpd ON cat.id_categorie = fpd.id_categorie
-    LEFT JOIN cobrec1._produit p ON fpd.id_produit = p.id_produit AND p.p_statut = 'En ligne'
-    GROUP BY cat.nom_categorie
-    HAVING COUNT(DISTINCT p.id_produit) > 0
-");
-$categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
-$totalProducts = array_sum(array_column($categories, 'count'));
+// Préparation des catégories pour l'affichage
+$categoriesDisplay = [];
+$totalProducts = 0;
+
+foreach ($categories as $categoryName => $count) {
+    $categoriesDisplay[] = [
+        'category' => $categoryName,
+        'count' => $count
+    ];
+    $totalProducts += $count;
+}
+
+// Ajout de l'option "Tous les produits"
+array_unshift($categoriesDisplay, [
+    'category' => 'all',
+    'count' => $totalProducts
+]);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -135,11 +176,13 @@ $totalProducts = array_sum(array_column($categories, 'count'));
                         <span>Tous les produits</span>
                         <span><?= $totalProducts ?></span>
                     </div>
-                    <?php foreach ($categories as $cat): ?>
-                    <div onclick="setCategory('<?= htmlspecialchars($cat['category']) ?>')" style="cursor: pointer;">
-                        <span><?= htmlspecialchars($cat['category']) ?></span>
-                        <span><?= $cat['count'] ?></span>
-                    </div>
+                    <?php foreach ($categoriesDisplay as $cat): ?>
+                        <?php if ($cat['category'] !== 'all'): ?>
+                        <div onclick="setCategory('<?= htmlspecialchars($cat['category']) ?>')" style="cursor: pointer;">
+                            <span><?= htmlspecialchars($cat['category']) ?></span>
+                            <span><?= $cat['count'] ?></span>
+                        </div>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </section>
 
@@ -194,7 +237,7 @@ $totalProducts = array_sum(array_column($categories, 'count'));
                         $finalPrice = $hasDiscount 
                             ? $product['p_prix'] * (1 - $product['discount_percentage'] / 100)
                             : $product['p_prix'];
-                        $rating = $product['p_note'] ? round($product['p_note']) : 0;
+                        $rating = $product['avg_rating'] ? round($product['avg_rating']) : 0;
                         ?>
                         <article onclick="window.location.href='product.php?id=<?= $product['id_produit'] ?>'">
                             <div>
@@ -234,6 +277,7 @@ $totalProducts = array_sum(array_column($categories, 'count'));
     </div>
 
     <footer>
+        <!-- Le footer reste identique -->
         <div>
             <div>
                 <a href="#">f</a>
