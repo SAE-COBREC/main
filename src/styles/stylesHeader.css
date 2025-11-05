@@ -1,4 +1,7 @@
+@charset "UTF-8";
 .site-header {
+  /* s'étend sur toute la grille principale (span full width) */
+  grid-column: 1/-1;
   background-color: #FFFFFF;
   color: #030212;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);

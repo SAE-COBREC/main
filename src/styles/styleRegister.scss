@@ -1,7 +1,8 @@
 @use "sass:list";
 @use "variable" as *;
-*{
-  font-family:"Quicksand";
+
+* {
+  font-family: "Quicksand";
 }
 
 body {
@@ -12,9 +13,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  @media #{$mobile}{
-      font-size: 16px;
-    }
+
+  @media #{$mobile} {
+    font-size: 16px;
+  }
+
   .card {
     background: $primary-color-blanc;
     width: 661px;
@@ -22,7 +25,8 @@ body {
     padding: 50px 25px 25px 25px;
     border-radius: $border-radius-primary;
     text-align: center;
-    @media #{$mobile}{
+
+    @media #{$mobile} {
       width: 320px;
       max-height: 620px;
       padding: 50px 25px 25px 25px;
@@ -44,7 +48,8 @@ body {
       font-family: 'Baloo 2', cursive;
       font-size: 36px;
       color: $primary-color-noir;
-      @media #{$mobile}{
+
+      @media #{$mobile} {
         font-size: 28px;
       }
     }
@@ -53,7 +58,8 @@ body {
       font-size: 24px;
       color: $primary-color-noir;
       margin-bottom: 4px;
-      @media #{$mobile}{
+
+      @media #{$mobile} {
         font-size: 20px;
       }
     }
@@ -71,7 +77,8 @@ body {
         display: block;
         padding-left: 38px;
         margin-bottom: 6px;
-        @media #{$mobile}{
+
+        @media #{$mobile} {
           font-size: 20px;
           padding-left: 0px;
         }
@@ -84,8 +91,8 @@ body {
         border-radius: $border-radius-primary;
         padding: 0px 12px;
         font-size: 16px;
-        
-        @media #{$mobile}{
+
+        @media #{$mobile} {
           width: 280px;
           height: 25px;
           font-size: 16px;
@@ -123,7 +130,8 @@ body {
         margin-top: 1rem;
         transition: 0.15s;
         display: flex;
-        flex-direction: column; /* empile le texte au-dessus de la flèche */
+        flex-direction: column;
+        /* empile le texte au-dessus de la flèche */
         align-items: center;
         justify-content: center;
         gap: 6px;
@@ -136,25 +144,25 @@ body {
         }
 
         .arrow-only {
-          height:35px;
+          height: 35px;
           width: auto;
-           pointer-events: auto;
-           background: transparent;
-           border: none;
-           padding: 8px;
-           margin: 0;
-           display: inline-flex;
-           align-items: center;
-           justify-content: center;
-           cursor: pointer;
-           color: $primary-color-noir; 
-           border-radius: 50%;
-           transition: background 0.18s ease, transform 0.12s ease;
+          pointer-events: auto;
+          background: transparent;
+          border: none;
+          padding: 8px;
+          margin: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: $primary-color-noir;
+          border-radius: 50%;
+          transition: background 0.18s ease, transform 0.12s ease;
 
-           &:hover {
-             background: $primary-color-noir;
-             transform: scale(1.06);
-           }
+          &:hover {
+            background: $primary-color-noir;
+            transform: scale(1.06);
+          }
         }
 
         .btn-arrow {
