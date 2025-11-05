@@ -16,7 +16,7 @@
     <h1>Créer un compte</h1>
     <p class="subtitle">Identifiants</p>
 
-  <form action="conex2.html" method="get">
+  <form action="register2.php" method="POST">
       <div>
         <label for="nom">Nom</label>
         <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
@@ -48,3 +48,17 @@
   </div>
 </body>
 </html>
+<?php
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nom = trim($_POST['nom'] ?? '');
+    $prenom = trim($_POST['prenom'] ?? '');
+    $pseudo = trim($_POST['pseudo'] ?? '');
+
+    $nom = strtoupper($nom);
+    $prenom = strlen($prenom) ? strtoupper(substr($prenom,0,1)) . substr($prenom,1) : '';
+    $prenom = preg_replace_callback('/-(\w)/', function($matches) {
+        return '-' . strtoupper($matches[1]);
+    }, $prenom);
+  }
+?>

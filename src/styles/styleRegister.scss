@@ -165,6 +165,78 @@ body {
           transform: scaleX(-1);
           color: $primary-color-noir;
         }
+        .btn-arrow-left {
+          width: 20px;
+          height: auto;
+          display: inline-block;
+          vertical-align: middle;
+          color: $primary-color-noir;
+        }
+      }
+
+      /* Prev button uses same layout as .next-btn but can be styled separately if needed */
+      .prev-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 1rem;
+
+        .next-text { color: $primary-color-noir; }
+
+        .arrow-only { background: transparent; border: none; padding: 8px; border-radius: 50%; cursor: pointer; }
+
+        .btn-arrow-left { width: 28px; }
+      }
+
+      /* Navigation buttons (Précédent / Suivant) */
+      .nav-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0 6px;
+
+        .btn-prev,
+        .btn-next {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 12px;
+          border-radius: 8px;
+        }
+
+        .btn-prev {
+          flex-direction: column; // flèche au dessus, texte en dessous
+          align-items: center;
+          color: $primary-color-noir;
+
+          .nav-arrow { width: 28px; height: auto; margin-bottom: 6px; }
+        }
+
+        .btn-next {
+          flex-direction: row; // flèche à gauche du texte
+          background: $primary-color-noir;
+          color: $primary-color-blanc;
+          padding: 10px 14px;
+        }
+
+        .nav-arrow.right { transform: scaleX(-1); }
+        .nav-arrow.left { transform: none; }
+
+        .nav-label { font-size: 14px; }
+
+        @media #{$mobile} {
+          gap: 8px;
+          .btn-prev .nav-arrow { width: 22px; }
+          .nav-label { font-size: 13px; }
+        }
       }
     }
 
