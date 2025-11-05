@@ -32,7 +32,7 @@
   transition: all 0.3s ease;
 }
 
- // Créez un mixin pour le centrage
+// Créez un mixin pour le centrage
 @mixin centre-absolu {
   position: absolute;
   top: 50%;
@@ -51,77 +51,62 @@ body {
   font-family: $font-family-secondaire;
   background: $secondary-color-gris-clair;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
 }
 
 // Header
 header {
-  grid-column: 1 / -1;
-  background: $primary-color-blanc;
+  background: $primary-color-noir;
+  color: $primary-color-blanc;
   padding: 1rem 2rem;
-  border-bottom: 1px solid $secondary-color-gris-clair;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 2rem;
-
-  > div:first-child {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-
-    > div {
-      width: 32px;
-      height: 32px;
-      background: $primary-color-bleu;
-      border-radius: 6px;
-      @include flex-center;
-      color: $primary-color-blanc;
-      font-weight: bold;
-    }
+  
+  > div:first-child img {
+    height: 40px;
   }
-
+  
   > div:nth-child(2) {
     flex: 1;
     max-width: 500px;
-    position: relative;
-
+    margin: 0 2rem;
+    
+    form {
+      width: 100%;
+    }
+    
     input {
       width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
-      border: 1px solid $secondary-color-gris-clair;
+      padding: 0.75rem;
       border-radius: 8px;
-      font-size: 0.9rem;
-    }
-
-    &::before {
-      content: "🔍";
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
+      border: 1px solid $secondary-color-gris-fonce;
+      font-size: 1rem;
     }
   }
-
-  > div:nth-child(3) {
+  
+  > div:last-child {
     display: flex;
-    gap: 1.5rem;
-    align-items: center;
-    margin-left: auto;
-  }
-
-  button {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-
-    img {
-      width: 24px;
-      height: 24px;
+    gap: 1rem;
+    
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      @include transition(background);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      img {
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 }
@@ -131,6 +116,7 @@ header {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 280px 1fr;
+  gap: 0;
   position: relative;
 }
 
@@ -153,13 +139,14 @@ aside {
       color: $secondary-color-gris-fonce;
     }
 
-    button {
-      padding: 2px 7px;
+    select {
+      padding: 6px 12px;
       border: 1px solid $primary-color-bleu;
       color: $primary-color-bleu;
       border-radius: 20px;
       background: $primary-color-blanc;
       cursor: pointer;
+      font-size: 0.9rem;
     }
   }
 
@@ -177,6 +164,11 @@ aside {
       border: none;
       cursor: pointer;
       font-size: 0.9rem;
+      @include transition(color);
+      
+      &:hover {
+        color: $primary-color-bleu;
+      }
     }
   }
 
@@ -193,13 +185,14 @@ aside {
       @include flex-between;
       padding: 0.5rem 0;
       cursor: pointer;
-      color: $primary-color-bleu;
-      @include transition(color);
+      color: $secondary-color-gris-fonce;
+      @include transition(all);
 
       &:hover {
         background-color: $secondary-color-gris-clair;
         border-radius: 8px;
         padding: 5px 10px;
+        color: $primary-color-bleu;
       }
 
       span:last-child {
@@ -207,15 +200,32 @@ aside {
         font-size: 0.9rem;
       }
     }
+    
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.5rem 0;
+      @include transition(color);
+      
+      &:hover {
+        color: $primary-color-bleu;
+      }
+      
+      input[type="checkbox"] {
+        cursor: pointer;
+      }
+    }
   }
 
-    // Style du slider (input range)
+  // Style du slider (input range)
   input[type="range"] {
     -webkit-appearance: none;
     width: 100%;
     height: 8px;
     border-radius: 8px;
-    background: $primary-color-bleu; // même couleur que #7171A3
+    background: $secondary-color-gris-clair;
     outline: none;
 
     /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
@@ -235,15 +245,16 @@ aside {
       border-radius: 50%;
       background: $primary-color-bleu;
       cursor: pointer;
+      border: none;
     }
 
     /* Barre - Firefox */
     &::-moz-range-track {
-      background: $primary-color-bleu;
+      background: $secondary-color-gris-clair;
       border-radius: 8px;
+      border: none;
     }
   }
-
 }
 
 // Main (produits)
@@ -251,10 +262,18 @@ main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
 
-  > div:last-child {
+  > div:first-child {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    
+    > p {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 2rem;
+      color: $secondary-color-gris-fonce;
+      font-size: 1.1rem;
+    }
   }
 }
 
@@ -265,23 +284,7 @@ article {
   overflow: hidden;
   cursor: pointer;
   @include hover-lift;
-
- // Puis utilisez-le
-.rupture-stock {
-  @include centre-absolu;
-  background-color: $secondary-color-gris-clair;
-  color: black;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  z-index: 2;
-}
-
-article > div:first-child {
-  position: relative;
-}
-
+  
   > div:first-child {
     position: relative;
     width: 100%;
@@ -307,6 +310,18 @@ article > div:first-child {
       font-size: 0.8rem;
       font-weight: bold;
     }
+    
+    .rupture-stock {
+      @include centre-absolu;
+      background-color: rgba($secondary-color-gris-clair, 0.9);
+      color: $primary-color-noir;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      z-index: 2;
+    }
   }
 
   > div:last-child {
@@ -316,6 +331,23 @@ article > div:first-child {
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
+      color: $primary-color-noir;
+    }
+
+    > div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      
+      span:first-child {
+        color: #ffc107; // Couleur pour les étoiles
+      }
+      
+      span:last-child {
+        color: $secondary-color-gris-fonce;
+        font-size: 0.85rem;
+      }
     }
 
     > div:nth-child(3) {
@@ -327,10 +359,11 @@ article > div:first-child {
       span:first-child {
         color: $secondary-color-gris-fonce;
         text-decoration: line-through;
+        font-size: 0.9rem;
       }
 
       span:last-child {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: bold;
         color: $primary-color-noir;
       }
@@ -348,13 +381,14 @@ article > div:first-child {
     font-weight: 600;
     @include transition(background);
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: $primary-color-bleu;
     }
 
-    &[disabled] {
+    &:disabled {
       background: $secondary-color-gris-fonce;
       cursor: not-allowed;
+      color: $secondary-color-gris-clair;
     }
   }
 }
@@ -390,9 +424,11 @@ footer {
       font-size: 1.5rem;
       text-decoration: none;
       color: $primary-color-blanc;
+      @include transition(all);
 
       &:hover {
         background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
       }
     }
   }
@@ -406,6 +442,7 @@ footer {
     h4 {
       margin-bottom: 1rem;
       font-size: 1.1rem;
+      color: $primary-color-blanc;
     }
 
     ul {
@@ -433,15 +470,23 @@ footer {
     border-top: 1px solid $primary-color-bleu;
     color: $secondary-color-gris-fonce;
     font-size: 0.85rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    
+    span {
+      cursor: pointer;
+      @include transition(color);
+      
+      &:hover {
+        color: $primary-color-blanc;
+      }
+    }
   }
 }
 
 // Responsive
 @media (max-width: $breakpoint-tablette) {
-  body {
-    grid-template-columns: 1fr;
-  }
-
   .container {
     grid-template-columns: 1fr;
   }
@@ -455,5 +500,21 @@ footer {
   main {
     order: 1;
     padding: 1rem;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    
+    > div:nth-child(2) {
+      margin: 0;
+      width: 100%;
+    }
+  }
+  
+  footer > div > div:last-child {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
