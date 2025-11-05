@@ -38,16 +38,6 @@ if (file_exists($csvFile)) {
         }
         fclose($handle);
     }
-} else {
-    // Utiliser les données par défaut si le CSV n'existe pas
-    $products = $defaultProducts;
-    foreach ($products as $product) {
-        $category = $product['category'];
-        if (!isset($categories[$category])) {
-            $categories[$category] = 0;
-        }
-        $categories[$category]++;
-    }
 }
 
 // Récupération des filtres
