@@ -153,6 +153,36 @@ aside section > div span:last-child {
   color: #7171A3;
   font-size: 0.9rem;
 }
+aside input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 8px;
+  background: #7171A3;
+  outline: none;
+  /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
+  /* Curseur - Firefox */
+  /* Barre - Firefox */
+}
+aside input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7171A3;
+  cursor: pointer;
+}
+aside input[type=range]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7171A3;
+  cursor: pointer;
+}
+aside input[type=range]::-moz-range-track {
+  background: #7171A3;
+  border-radius: 8px;
+}
 
 main {
   padding: 2rem 2rem 2rem 1rem;
@@ -175,13 +205,28 @@ article:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
+article .rupture-stock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #EFEFEF;
+  color: black;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  z-index: 2;
+}
+article article > div:first-child {
+  position: relative;
+}
 article > div:first-child {
   position: relative;
   width: 100%;
   height: 200px;
   background: linear-gradient(135deg, #EFEFEF 0%, #c0c0c0 100%);
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 article > div:first-child img {
@@ -193,7 +238,7 @@ article > div:first-child img {
 article > div:first-child > span:last-child {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 10px;
   background: #D4183D;
   color: #FFFFFF;
   padding: 0.25rem 0.5rem;
