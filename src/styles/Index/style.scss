@@ -197,7 +197,9 @@ aside {
       @include transition(color);
 
       &:hover {
-        color: $secondary-color-gris-fonce;
+        background-color: $secondary-color-gris-clair;
+        border-radius: 8px;
+        padding: 5px 10px;
       }
 
       span:last-child {
