@@ -1,12 +1,5 @@
 // Variables
-$bronze: #CD7F32;
-$bronze-light: #E6A96E;
-$bronze-dark: #8B5A2B;
-$bg: #FFF7F1;
-$black: black;
-$muted: #757575;
-$border: #E5D5C5;
-$white: white;
+@use "../variable" as *;
 
 * {
   box-sizing: border-box;
@@ -15,8 +8,8 @@ $white: white;
 }
 
 body {
-  font-family: "Quicksand";
-  background: $bg;
+  font-family: $font-family-secondaire;
+  background: $secondary-color-rose-claire;
   width: 1440px;
   height: auto;
 }
@@ -25,12 +18,12 @@ body {
   display: grid;
   grid-template-columns:260px 1fr;
   height: 1024px;
-  background: $white;
+  background: $primary-color-blanc;
 }
 
 // Sidebar
 .sidebar {
-  background: linear-gradient(180deg, $bronze-dark 0%, $bronze 100%);
+  background: linear-gradient(180deg, $secondary-color-marron 0%, $primary-color-bronze 100%);
   padding:28px 20px;
   display: flex;
   flex-direction: column;
@@ -45,19 +38,19 @@ body {
   align-items: center;
   gap: 8px;
   margin-bottom: 16px;
-  color: $white;
+  color: $primary-color-blanc;
   font-size: 20px;
   font-weight: bold;
 
   &__icon {
     width: 32px;
     height: 32px;
-    background: $white;
+    background: $primary-color-blanc;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $bronze;
+    color: $primary-color-bronze;
   }
 }
 
@@ -74,7 +67,7 @@ body {
     gap: 10px;
     padding: 12px 8px;
     border-radius: 8px;
-    color: rgba($white, 0.7);
+    color: rgba($primary-color-blanc, 0.7);
     text-decoration: none;
     font-size: 16px;
     transition: all 0.2s;
@@ -85,13 +78,13 @@ body {
       }
 
     &:hover {
-      background: rgba($white, 0.1);
-      color: $white;
+      background: rgba($primary-color-blanc, 0.1);
+      color: $primary-color-blanc;
     }
 
     &--active {
-      background: rgba($white, 0.15);
-      color: $white;
+      background: rgba($primary-color-blanc, 0.15);
+      color: $primary-color-blanc;
     }
   }
 
@@ -104,8 +97,8 @@ body {
 .preview-btn {
   margin-top: auto;
   background: transparent;
-  border: 1px solid rgba($white, 0.3);
-  color: $white;
+  border: 1px solid rgba($primary-color-blanc, 0.3);
+  color: $primary-color-blanc;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 16px;
@@ -113,14 +106,14 @@ body {
   cursor: pointer;
 
   &:hover {
-      background: rgba($white, 0.1);
-      color: $white;
-    }
+    background: rgba($primary-color-blanc, 0.1);
+    color: $primary-color-blanc;
+  }
 }
 
 // Main Content
 .main {
-  background: $bg;
+  background: $secondary-color-rose-claire;
   padding: 32px 40px;
   overflow-y: auto;
 }
@@ -132,7 +125,7 @@ body {
   &__title {
     font-size: 24px;
     font-weight: 700;
-    color: $black;
+    color: $primary-color-noir;
     margin-bottom: 16px;
   }
 }
@@ -148,8 +141,8 @@ body {
     flex: 1;
     display: flex;
     align-items: center;
-    background: $white;
-    border: 1px solid $border;
+    background: $primary-color-blanc;
+    border: 1px solid $secondary-color-orange-clair;
     border-radius: 8px;
     padding: 10px 16px;
     gap: 8px;
@@ -162,7 +155,7 @@ body {
       background: transparent;
 
       &::placeholder {
-        color: $muted;
+        color: $primary-color-noir;
       }
     }
   }
@@ -179,27 +172,32 @@ body {
   white-space: nowrap;
 
   &--primary {
-    background: $bronze;
-    color: $white;
+    background: $primary-color-bronze;
+    color: $primary-color-blanc;
   }
+
+  &:hover {
+      background: rgba($secondary-color-bronze-clair, 0.9);
+      color: $primary-color-blanc;
+    }
 }
 
 // Content Section
 .content-section {
-  background: $white;
+  background: $primary-color-blanc;
   border-radius: 12px;
-  border: 1px solid $border;
+  border: 1px solid $secondary-color-orange-clair;
   overflow: hidden;
 
   &__header {
     padding: 20px 24px;
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid $secondary-color-orange-clair;
   }
 
   &__title {
     font-size: 18px;
     font-weight: 700;
-    color: $black;
+    color: $primary-color-noir;
     margin-bottom: 16px;
   }
 }
@@ -214,14 +212,14 @@ body {
     padding-bottom: 8px;
     font-size: 14px;
     font-weight: 600;
-    color: $muted;
+    color: $primary-color-noir;
     border-bottom: 3px solid transparent;
     cursor: pointer;
     transition: all 0.2s;
 
     &--active {
-      color: $bronze;
-      border-bottom-color: $bronze;
+      color: $primary-color-bronze;
+      border-bottom-color: $primary-color-bronze;
     }
   }
 }
@@ -233,11 +231,11 @@ body {
 
   &__item {
     background: #F9F6F3;
-    border: 1px solid $border;
+    border: 1px solid $secondary-color-orange-clair;
     padding: 8px 16px;
     border-radius: 8px;
     font-size: 13px;
-    color: $muted;
+    color: $primary-color-noir;
     cursor: pointer;
   }
 }
@@ -252,9 +250,9 @@ body {
     padding: 16px 24px;
     font-size: 13px;
     font-weight: 600;
-    color: $muted;
+    color: $primary-color-noir;
     background: #FAFAF9;
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid $secondary-color-orange-clair;
 
     &--checkbox {
       width: 40px;
@@ -272,10 +270,10 @@ body {
   &__cell {
     padding: 16px 24px;
     font-size: 14px;
-    color: $black;
+    color: $primary-color-noir;
 
     &--muted {
-      color: $muted;
+      color: $primary-color-noir;
     }
   }
 }
@@ -284,7 +282,7 @@ body {
 .checkbox {
   width: 18px;
   height: 18px;
-  border: 2px solid $border;
+  border: 2px solid $secondary-color-orange-clair;
   border-radius: 4px;
   cursor: pointer;
 }
@@ -309,13 +307,13 @@ body {
   &__name {
     font-weight: 600;
     font-size: 14px;
-    color: $black;
+    color: $primary-color-noir;
     margin-bottom: 2px;
   }
 
   &__model {
     font-size: 13px;
-    color: $muted;
+    color: $primary-color-noir;
   }
 }
 
@@ -339,10 +337,10 @@ body {
 
   &--out {
     background: #F5E8DD;
-    color: $bronze-dark;
+    color: $secondary-color-marron;
   }
 }
 
 h1, h2{
-  font-family: "Baloo";
+  font-family: $font-family-primaire;
 }

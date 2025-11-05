@@ -4,49 +4,49 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1440, height=1024" />
   <title>Alizon - Page Accueil Vendeur</title>
-  <link rel="stylesheet" href="/src/styles/AccueilVendeur/Style_accueil_vendeur.css" />
+  <link rel="stylesheet" href="../src/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.svg" alt="logo" class="logo__icon">
+        <img src="../src/img/svg/logo_bronze.svg" alt="logo" class="logo__icon">
         <span class="logo__text">Alizon</span>
       </div>
 
       <nav class="nav">
         <a href="#" class="nav__item nav__item--active">
-          <img class="nav__icon" src="images/home.svg" alt="home">
+          <img class="nav__icon" src="../src/img/svg/home.svg" alt="home">
           <span class="nav__label">Accueil</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="images/box.svg" alt="box">
+          <img class="nav__icon" src="../src/img/svg/box.svg" alt="box">
           <span class="nav__label">Commandes</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="images/folder.svg" alt="folder">
+          <img class="nav__icon" src="../src/img/svg/folder.svg" alt="folder">
           <span class="nav__label">Produits</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="images/profile-v.svg" alt="profile">
+          <img class="nav__icon" src="../src/img/svg/profile-v.svg" alt="profile">
           <span class="nav__label">Clients</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="images/stats.svg" alt="stats">
+          <img class="nav__icon" src="../src/img/svg/stats.svg" alt="stats">
           <span class="nav__label">Statistiques</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="images/promotion.svg" alt="promotion">
+          <img class="nav__icon" src="../src/img/svg/promotion.svg" alt="promotion">
           <span class="nav__label">Promotion</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="images/reduction.svg" alt="reduction">
+          <img class="nav__icon" src="../src/img/svg/reduction.svg" alt="reduction">
           <span class="nav__label">Réductions</span>
         </a>
       </nav>
@@ -78,6 +78,20 @@
             <div class="tabs__item">Brouillon</div>
             <div class="tabs__item">Archivé</div>
           </div>
+          <script>
+            // Sélectionne tous les éléments avec la classe .tabs__item
+            const tabs = document.querySelectorAll('.tabs__item');
+
+            tabs.forEach(tab => {
+              tab.addEventListener('click', () => {
+                // Retire la classe active sur tous les onglets
+                tabs.forEach(t => t.classList.remove('tabs__item--active'));
+
+                // Ajoute la classe active sur celui cliqué
+                tab.classList.add('tabs__item--active');
+              });
+            });
+          </script>
 
           <div class="filters">
             <div class="filters__item">Filtrer les produits</div>
