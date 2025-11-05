@@ -294,7 +294,7 @@ footer > div > div:last-child {
   font-size: 0.85rem;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   aside {
     position: static;
     margin: 1rem;
