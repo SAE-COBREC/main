@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1440, height=1024" />
   <title>Alizon - Page Accueil Vendeur</title>
-  <link rel="stylesheet" href="../src/styles/AccueilVendeur/Style_accueil_vendeur.css" />
+  <link rel="stylesheet" href="../src/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
 <body>
   <div class="app">
@@ -78,6 +78,20 @@
             <div class="tabs__item">Brouillon</div>
             <div class="tabs__item">Archivé</div>
           </div>
+          <script>
+            // Sélectionne tous les éléments avec la classe .tabs__item
+            const tabs = document.querySelectorAll('.tabs__item');
+
+            tabs.forEach(tab => {
+              tab.addEventListener('click', () => {
+                // Retire la classe active sur tous les onglets
+                tabs.forEach(t => t.classList.remove('tabs__item--active'));
+
+                // Ajoute la classe active sur celui cliqué
+                tab.classList.add('tabs__item--active');
+              });
+            });
+          </script>
 
           <div class="filters">
             <div class="filters__item">Filtrer les produits</div>
