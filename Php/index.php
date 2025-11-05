@@ -277,7 +277,6 @@ array_unshift($categoriesDisplay, [
     </div>
 
     <footer>
-        <!-- Le footer reste identique -->
         <div>
             <div>
                 <a href="#">f</a>
