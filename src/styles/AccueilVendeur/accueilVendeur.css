@@ -223,7 +223,7 @@ body {
   font-size: 13px;
   font-weight: 600;
   color: #030212;
-  background: #FAFAF9;
+  background: #FFFFFF;
   border-bottom: 1px solid #E5D5C5;
 }
 .products-table__head-cell--checkbox {
@@ -256,23 +256,13 @@ body {
 }
 
 .checkbox--active {
-  background-color: #007bff;
-  border-color: #007bff;
-  position: relative;
-}
-
-.checkbox--active::after {
-  content: "✓";
-  color: white;
-  font-size: 12px;
-  position: absolute;
-  top: 0;
-  left: 4px;
+  background-color: #E6A96E;
+  border-color: #E6A96E;
 }
 
 /* Met en évidence la ligne sélectionnée */
 .products-table__row.selected {
-  background-color: #e9f3ff;
+  background-color: #FFF2E9;
   transition: background-color 0.2s;
 }
 

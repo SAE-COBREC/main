@@ -251,7 +251,7 @@ body {
     font-size: 13px;
     font-weight: 600;
     color: $primary-color-noir;
-    background: #FAFAF9;
+    background: $primary-color-blanc;
     border-bottom: 1px solid $secondary-color-orange-clair;
 
     &--checkbox {
@@ -290,23 +290,13 @@ body {
 }
 
 .checkbox--active {
-  background-color: #007bff;
-  border-color: #007bff;
-  position: relative;
-}
-
-.checkbox--active::after {
-  content: "✓";
-  color: white;
-  font-size: 12px;
-  position: absolute;
-  top: 0;
-  left: 4px;
+  background-color: $secondary-color-bronze-clair;
+  border-color: $secondary-color-bronze-clair;
 }
 
 /* Met en évidence la ligne sélectionnée */
 .products-table__row.selected {
-  background-color: #e9f3ff;
+  background-color: $secondary-color-marron-clair;
   transition: background-color 0.2s;
 }
 
