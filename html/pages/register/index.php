@@ -8,7 +8,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../src/styles/Register/styleRegister.css">
+  <link rel="stylesheet" href="../../styles/Register/styleRegister.css">
 </head>
 
 <style>
@@ -24,7 +24,7 @@
 <body>
   <div class="card" id="1">
     <div class="logo">
-      <img src="../src/img/svg/logo-text.svg" alt="Logo Alizon">
+      <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
     </div>
 
     <h1>Créer un compte</h1>
@@ -55,7 +55,7 @@
       <div class="next-btn" role="group" aria-label="Suivant action">
         <span class="next-text">Suivant</span>
         <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
-          <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow"
+          <img src="../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow"
             aria-hidden="true">
         </button>
       </div>
@@ -67,7 +67,7 @@
 
   <div class="card hidden" id="2">
     <div class="logo">
-      <img src="../src/img/svg/logo-text.svg" alt="Logo Alizon">
+      <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
     </div>
 
     <h1>Créer un compte</h1>
@@ -99,14 +99,14 @@
         <div class="next-btn" role="group" aria-label="Précédent action">
           <span class="next-text">Précédent</span>
           <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
-            <img src="../src/img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)"
+            <img src="../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow-left" aria-hidden="true">
           </button>
         </div>
         <div class="next-btn" role="group" aria-label="Suivant action">
           <span class="next-text">Suivant</span>
           <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
-            <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
+            <img src="../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow" aria-hidden="true">
           </button>
         </div>
@@ -118,7 +118,7 @@
 
   <div class="card hidden" id="3">
     <div class="logo">
-      <img src="../src/img/svg/logo-text.svg" alt="Logo Alizon">
+      <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
     </div>
 
     <h1>Créer un compte</h1>
@@ -152,14 +152,14 @@
         <div class="next-btn" role="group" aria-label="Précédent action">
           <span class="next-text">Précédent</span>
           <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
-            <img src="../src/img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)"
+            <img src="../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow-left" aria-hidden="true">
           </button>
         </div>
         <div class="next-btn" role="group" aria-label="Suivant action">
           <span class="next-text">Suivant</span>
           <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
-            <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
+            <img src="../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow" aria-hidden="true">
           </button>
         </div>
@@ -171,7 +171,7 @@
 
   <div class="card hidden" id="4">
     <div class="logo">
-      <img src="../src/img/svg/logo-text.svg" alt="Logo Alizon">
+      <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
     </div>
 
     <h1>Créer un compte</h1>
@@ -199,20 +199,20 @@
         <div class="next-btn" role="group" aria-label="Précédent action">
           <span class="next-text">Précédent</span>
           <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
-            <img src="../src/img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)"
+            <img src="../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow-left" aria-hidden="true">
           </button>
         </div>
         <div class="next-btn" role="group" aria-label="Suivant action">
           <span class="next-text">Terminer</span>
-          <button type="submit" id="finishBtn" class="arrow-only" aria-label="Terminer">
-            <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
+          <button onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+            <img src="../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow" aria-hidden="true">
           </button>
         </div>
       </div>
     </form>
-  <script type="module" src="../src/js/registerPass.js" ></script>
+  <script type="module" src="../../js/registerPass.js" ></script>
 </body>
 
 </html>

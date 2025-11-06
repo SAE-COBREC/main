@@ -14,11 +14,11 @@ import storage, { isLocalStorageAvailable, setLocal, getLocal, setCookie, getCoo
 
 // Fonctions utilitaires : sauvegarde / restauration des données d'une card
 // Utilise localStorage si disponible, sinon fallback sur cookies
-export function _getCardStorageKey(cardId) {
+function _getCardStorageKey(cardId) {
     return `register:card:${cardId}`;
 }
 
-export function saveCardData(cardId) {
+function saveCardData(cardId) {
     const card = document.getElementById(cardId);
     if (!card) return false;
     const inputs = card.querySelectorAll('input, select, textarea');
@@ -60,7 +60,7 @@ export function saveCardData(cardId) {
     }
 }
 
-export function restoreCardData(cardId) {
+function restoreCardData(cardId) {
     const card = document.getElementById(cardId);
     if (!card) return false;
     const key = _getCardStorageKey(cardId);
@@ -102,7 +102,7 @@ export function restoreCardData(cardId) {
     return true;
 }
 
-export function showCard(cardId) {
+function showCard(cardId) {
     /**
      * Hides all cards and shows the card with the given ID.
      * @param {string} cardId - The ID of the card to show.
@@ -129,7 +129,7 @@ export function showCard(cardId) {
     }
 }
 
-export function verifCompletedCard(cardId) {
+function verifCompletedCard(cardId) {
     /**
      * Vérifie que tous les champs requis de la card spécifiée sont remplis.
      * @param {string} cardId - L'ID de la card à vérifier.
@@ -149,7 +149,7 @@ export function verifCompletedCard(cardId) {
     return true;
 }
 
-export function showNextCard() {
+function showNextCard() {
     /**
      * Shows the next card if the current card is completed.
      * @returns {boolean} - True if the next card is shown, false if the current card is incomplete.
@@ -198,23 +198,24 @@ export function showNextCard() {
     }
 }
 
-export function showPreviousCard() {
+
+
+function showPreviousCard() {
     /**
      * Shows the previous card.
-     * @returns {void}
-     * @description Navigates to the previous card in the sequence.
-     * @example
-     * // Show the previous card
-     * showPreviousCard();
-    /**
-     * Affiche la card précédente dans la séquence.
-     * @returns {void}
-     * @description Navigue vers la card précédente. Les données de la card courante
-     * sont sauvegardées avant la navigation afin de conserver les modifications.
-     * @example
-     * // Afficher la card précédente
-     * showPreviousCard();
+     * @returns {boolean} - true if navigation succeeded
+     * @description Navigates to the previous card in the sequence. Sauvegarde
+     * les données de la card courante avant la navigation.
      */
+    const cards = document.querySelectorAll('.card');
+    let activeIndex = -1;
+    cards.forEach((card, index) => {
+        if (!card.classList.contains('hidden')) {
+            activeIndex = index;
+        }
+    });
+    if (activeIndex < 0) return false;
+
     const previousIndex = (activeIndex - 1 + cards.length) % cards.length;
     // save current card before going back (to keep edits)
     const activeCard = cards[activeIndex];
@@ -222,4 +223,14 @@ export function showPreviousCard() {
         try { saveCardData(activeCard.id); } catch (e) { console.warn('saveCardData error', e); }
     }
     showCard(cards[previousIndex].id);
+    return true;
+}
+
+// Expose helpers on window so HTML onclick attributes can call them even when
+// this file is loaded as a module (module scope doesn't populate global scope).
+// This is a pragmatic choice for this project where HTML uses inline handlers.
+if (typeof window !== 'undefined') {
+    window.showCard = showCard;
+    window.showNextCard = showNextCard;
+    window.showPreviousCard = showPreviousCard;
 }
