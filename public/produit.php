@@ -3,7 +3,7 @@ $fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
 $produit = null;
 
 // Récupérer l'ID du produit depuis l'URL
-$idProduit = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$idProduit = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 if ($idProduit > 0 && file_exists($fichierCSV)) {
     $handle = fopen($fichierCSV, 'r');
@@ -13,7 +13,7 @@ if ($idProduit > 0 && file_exists($fichierCSV)) {
         while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
             if (count($donnees) === count($entete)) {
                 $produitTemp = array_combine($entete, $donnees);
-                
+
                 // Convertir les types
                 $produitTemp['id_produit'] = (int) $produitTemp['id_produit'];
                 $produitTemp['p_prix'] = (float) $produitTemp['p_prix'];
@@ -59,6 +59,99 @@ $noteEntiere = floor($note);
     <title><?= htmlspecialchars($produit['p_nom']) ?> – Alizon</title>
     <link rel="stylesheet" href="/src/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/src/styles/Header/stylesHeader.css">
+    <style>
+        footer {
+            grid-column: 1/-1;
+            background: #030212;
+            color: #FFFFFF;
+            padding: 3rem 2rem 2rem;
+            margin-top: auto;
+        }
+
+        footer>div:first-child {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        footer>div>div:first-child {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #7171A3;
+        }
+
+        footer>div>div:first-child>a {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: #FFFFFF;
+            transition: all 0.2s ease;
+        }
+
+        footer>div>div:first-child>a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        footer nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        footer nav h4 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #FFFFFF;
+        }
+
+        footer nav ul {
+            list-style: none;
+        }
+
+        footer nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        footer nav a {
+            color: #c0c0c0;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        footer nav a:hover {
+            color: #FFFFFF;
+        }
+
+        footer>div>div:last-child {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #7171A3;
+            color: #c0c0c0;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        footer>div>div:last-child span {
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        footer>div>div:last-child span:hover {
+            color: #FFFFFF;
+        }
+    </style>
 </head>
 
 <body>
@@ -99,8 +192,8 @@ $noteEntiere = floor($note);
 
             <!-- Image principale -->
             <section class="main-image">
-                <img src="<?= htmlspecialchars($produit['image_url']) ?>" 
-                     alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
+                <img src="<?= htmlspecialchars($produit['image_url']) ?>"
+                    alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
             </section>
 
             <!-- Colonne droite - résumé produit -->
@@ -172,19 +265,16 @@ $noteEntiere = floor($note);
         <section class="section">
             <h3>Description</h3>
             <div style="display:flex;gap:8px;margin:8px 0 14px 0">
-                <span
-                    style="background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:24px;font-size:13px">
+                <span style="background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:24px;font-size:13px">
                     <?= htmlspecialchars($produit['category']) ?>
                 </span>
                 <?php if ($aUneRemise): ?>
-                    <span
-                        style="background:#fff3cd;color:#856404;padding:6px 10px;border-radius:24px;font-size:13px">
+                    <span style="background:#fff3cd;color:#856404;padding:6px 10px;border-radius:24px;font-size:13px">
                         -<?= round($produit['discount_percentage']) ?>% de réduction
                     </span>
                 <?php endif; ?>
                 <?php if ($produit['p_nb_ventes'] > 100): ?>
-                    <span
-                        style="background:#d4edda;color:#155724;padding:6px 10px;border-radius:24px;font-size:13px">
+                    <span style="background:#d4edda;color:#155724;padding:6px 10px;border-radius:24px;font-size:13px">
                         Populaire
                     </span>
                 <?php endif; ?>
@@ -199,7 +289,8 @@ $noteEntiere = floor($note);
             <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:8px">
                 <div style="font-size:14px;color:var(--muted);margin-bottom:8px">Note moyenne</div>
                 <div style="display:flex;align-items:center;gap:10px">
-                    <span style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
+                    <span
+                        style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
                     <div>
                         <div class="stars">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -229,7 +320,8 @@ $noteEntiere = floor($note);
                         </div>
                     </div>
                 </div>
-                <div style="color:var(--muted)">Très satisfait de mon achat. Le produit correspond parfaitement à la description.</div>
+                <div style="color:var(--muted)">Très satisfait de mon achat. Le produit correspond parfaitement à la
+                    description.</div>
             </div>
 
             <div class="review">
@@ -239,7 +331,9 @@ $noteEntiere = floor($note);
                         M</div>
                     <div>
                         <div style="font-weight:700">Marie_P</div>
-                        <div style="color:var(--muted);font-size:13px">Bon rapport qualité-prix – <strong><?= number_format($note, 1) ?></strong></div>
+                        <div style="color:var(--muted);font-size:13px">Bon rapport qualité-prix –
+                            <strong><?= number_format($note, 1) ?></strong>
+                        </div>
                     </div>
                 </div>
                 <div style="color:var(--muted)">Livraison rapide et produit de qualité. Je recommande !</div>
@@ -266,15 +360,48 @@ $noteEntiere = floor($note);
                         <li><a href="#">Carrières</a></li>
                         <li><a href="#">Investisseurs</a></li>
                         <li><a href="#">Presse et médias</a></li>
+                        <li><a href="#">Partenaires</a></li>
+                        <li><a href="#">Affiliés</a></li>
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">Statut du service</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4>Produits</h4>
+                    <ul>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">Shop Pay</a></li>
+                        <li><a href="#">Shopify Plus</a></li>
+                        <li><a href="#">Shopify pour les entreprises</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4>Développeurs</h4>
+                    <ul>
+                        <li><a href="#">Alizon.dev</a></li>
+                        <li><a href="#">Documentation API</a></li>
+                        <li><a href="#">Dev Degree</a></li>
                     </ul>
                 </section>
 
                 <section>
                     <h4>Assistance</h4>
                     <ul>
-                        <li><a href="#">Centre d'aide</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Retours</a></li>
+                        <li><a href="#">Assistance aux marchands</a></li>
+                        <li><a href="#">Centre d'aide de Alizon</a></li>
+                        <li><a href="#">Faire appel à un partenaire</a></li>
+                        <li><a href="#">Alizon Academy</a></li>
+                        <li><a href="#">Communauté Alizon</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4>Solutions</h4>
+                    <ul>
+                        <li><a href="#">Éditeur de boutique en ligne</a></li>
+                        <li><a href="#">Outil de création de site web</a></li>
                     </ul>
                 </section>
             </nav>
