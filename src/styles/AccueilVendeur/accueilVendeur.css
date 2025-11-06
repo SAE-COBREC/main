@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: "Quicksand";
+  font-family: "Quicksand", sans-serif;
   background: #FFF7F1;
   width: 1440px;
   height: auto;
@@ -15,7 +15,7 @@ body {
   display: grid;
   grid-template-columns: 260px 1fr;
   height: 1024px;
-  background: white;
+  background: #FFFFFF;
 }
 
 .sidebar {
@@ -33,14 +33,14 @@ body {
   align-items: center;
   gap: 8px;
   margin-bottom: 16px;
-  color: white;
+  color: #FFFFFF;
   font-size: 20px;
   font-weight: bold;
 }
 .logo__icon {
   width: 32px;
   height: 32px;
-  background: white;
+  background: #FFFFFF;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -72,11 +72,11 @@ body {
 }
 .nav__item:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: #FFFFFF;
 }
 .nav__item--active {
   background: rgba(255, 255, 255, 0.15);
-  color: white;
+  color: #FFFFFF;
 }
 .nav__icon {
   font-size: 20px;
@@ -86,7 +86,7 @@ body {
   margin-top: auto;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  color: #FFFFFF;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 16px;
@@ -95,7 +95,7 @@ body {
 }
 .preview-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: #FFFFFF;
 }
 
 .main {
@@ -110,7 +110,7 @@ body {
 .header__title {
   font-size: 24px;
   font-weight: 700;
-  color: black;
+  color: #030212;
   margin-bottom: 16px;
 }
 
@@ -124,7 +124,7 @@ body {
   flex: 1;
   display: flex;
   align-items: center;
-  background: white;
+  background: #FFFFFF;
   border: 1px solid #E5D5C5;
   border-radius: 8px;
   padding: 10px 16px;
@@ -138,10 +138,10 @@ body {
   background: transparent;
 }
 .search-bar__input input::-moz-placeholder {
-  color: #757575;
+  color: #030212;
 }
 .search-bar__input input::placeholder {
-  color: #757575;
+  color: #030212;
 }
 
 .btn {
@@ -155,11 +155,15 @@ body {
 }
 .btn--primary {
   background: #CD7F32;
-  color: white;
+  color: #FFFFFF;
+}
+.btn:hover {
+  background: rgba(230, 169, 110, 0.9);
+  color: #FFFFFF;
 }
 
 .content-section {
-  background: white;
+  background: #FFFFFF;
   border-radius: 12px;
   border: 1px solid #E5D5C5;
   overflow: hidden;
@@ -171,7 +175,7 @@ body {
 .content-section__title {
   font-size: 18px;
   font-weight: 700;
-  color: black;
+  color: #030212;
   margin-bottom: 16px;
 }
 
@@ -184,7 +188,7 @@ body {
   padding-bottom: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #757575;
+  color: #030212;
   border-bottom: 3px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
@@ -204,7 +208,7 @@ body {
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;
-  color: #757575;
+  color: #030212;
   cursor: pointer;
 }
 
@@ -217,7 +221,7 @@ body {
   padding: 16px 24px;
   font-size: 13px;
   font-weight: 600;
-  color: #757575;
+  color: #030212;
   background: #FAFAF9;
   border-bottom: 1px solid #E5D5C5;
 }
@@ -233,10 +237,10 @@ body {
 .products-table__cell {
   padding: 16px 24px;
   font-size: 14px;
-  color: black;
+  color: #030212;
 }
 .products-table__cell--muted {
-  color: #757575;
+  color: #030212;
 }
 
 .checkbox {
@@ -265,12 +269,12 @@ body {
 .product__name {
   font-weight: 600;
   font-size: 14px;
-  color: black;
+  color: #030212;
   margin-bottom: 2px;
 }
 .product__model {
   font-size: 13px;
-  color: #757575;
+  color: #030212;
 }
 
 .badge {
@@ -294,5 +298,5 @@ body {
 }
 
 h1, h2 {
-  font-family: "Baloo";
-}/*# sourceMappingURL=Style_accueil_vendeur.css.map */
+  font-family: "Baloo", sans-serif;
+}/*# sourceMappingURL=accueilVendeur.css.map */

@@ -1,22 +1,17 @@
 <?php
-// Lecture du fichier CSV
 $fichierCSV = __DIR__ . '/BDD/data.csv';
 $produits = [];
 $categories = [];
 
-
 if (file_exists($fichierCSV)) {
     $handle = fopen($fichierCSV, 'r');
     if ($handle !== FALSE) {
-        // Lecture de l'en-tête
         $entete = fgetcsv($handle, 1000, ',');
 
-        // Lecture des données
         while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
             if (count($donnees) === count($entete)) {
                 $produit = array_combine($entete, $donnees);
 
-                // Conversion des types
                 $produit['id_produit'] = (int) $produit['id_produit'];
                 $produit['p_prix'] = (float) $produit['p_prix'];
                 $produit['p_stock'] = (int) $produit['p_stock'];
@@ -28,7 +23,6 @@ if (file_exists($fichierCSV)) {
 
                 $produits[] = $produit;
 
-                // Construction des catégories avec comptage
                 $categorie = $produit['category'];
                 if (!isset($categories[$categorie])) {
                     $categories[$categorie] = 0;
@@ -40,38 +34,31 @@ if (file_exists($fichierCSV)) {
     }
 }
 
-// Récupération des filtres
 $categorieFiltre = $_GET['category'] ?? 'all';
 $noteMinimum = $_GET['rating'] ?? 0;
 $prixMaximum = $_GET['price'] ?? 3000;
 $enStockSeulement = isset($_GET['in_stock']);
 $triPar = $_GET['sort'] ?? 'best_sellers';
 
-// Filtrage des produits
 $produitsFiltres = [];
 
 foreach ($produits as $produit) {
-    // Filtre par prix
     if ($produit['p_prix'] > $prixMaximum) {
         continue;
     }
 
-    // Filtre par catégorie
     if ($categorieFiltre !== 'all' && $produit['category'] !== $categorieFiltre) {
         continue;
     }
 
-    // Filtre par stock (SEULEMENT si la case "En stock uniquement" est cochée)
     if ($enStockSeulement && $produit['p_stock'] <= 0) {
         continue;
     }
 
-    // Filtre par note
     if ($produit['avg_rating'] < $noteMinimum) {
         continue;
     }
 
-    // Vérification du statut - AUTORISER les produits "En rupture" à s'afficher
     if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
         continue;
     }
@@ -79,7 +66,6 @@ foreach ($produits as $produit) {
     $produitsFiltres[] = $produit;
 }
 
-// Tri des produits
 switch ($triPar) {
     case 'best_sellers':
         usort($produitsFiltres, function ($a, $b) {
@@ -105,7 +91,6 @@ switch ($triPar) {
 
 $produits = $produitsFiltres;
 
-// Préparation des catégories pour l'affichage
 $categoriesAffichage = [];
 $totalProduits = 0;
 
@@ -117,7 +102,6 @@ foreach ($categories as $nomCategorie => $compte) {
     $totalProduits += $compte;
 }
 
-// Ajout de l'option "Tous les produits"
 array_unshift($categoriesAffichage, [
     'category' => 'all',
     'count' => $totalProduits
@@ -130,8 +114,30 @@ array_unshift($categoriesAffichage, [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
-    <link rel="stylesheet" href="./Index/style.css">
-    <link rel="stylesheet" href="../src/styles/stylesHeader.css">
+    <link rel="stylesheet" href="/Php/Index/style.css">
+    <link rel="stylesheet" href="/src/styles/Header/stylesHeader.css">
+    <style>
+        .image-rupture {
+            filter: grayscale(100%) opacity(0.7);
+            transition: filter 0.3s ease;
+        }
+
+        .produit-rupture {
+            position: relative;
+        }
+
+        .rupture-stock {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            z-index: 2;
+        }
+    </style>
 </head>
 
 <body>
@@ -205,7 +211,7 @@ array_unshift($categoriesAffichage, [
                     </div>
                     <div>
                         <span>0€</span>
-                        <span id="affichagePrixMax"><?= $prixMaximum ?>€</span>
+                        <span id="affichagePrixMax" ondblclick="activerEditionPrix()"><?= $prixMaximum ?>€</span>
                     </div>
                 </section>
 
@@ -228,7 +234,8 @@ array_unshift($categoriesAffichage, [
                     </label>
                 </section>
 
-                <input type="hidden" name="category" id="champCategorie" value="<?= htmlspecialchars($categorieFiltre) ?>">
+                <input type="hidden" name="category" id="champCategorie"
+                    value="<?= htmlspecialchars($categorieFiltre) ?>">
                 <input type="hidden" name="rating" id="champNote" value="<?= $noteMinimum ?>">
             </form>
         </aside>
@@ -247,11 +254,13 @@ array_unshift($categoriesAffichage, [
                             : $produit['p_prix'];
                         $note = $produit['avg_rating'] ? round($produit['avg_rating']) : 0;
                         ?>
-                        <article onclick="window.location.href='product.php?id=<?= $produit['id_produit'] ?>'">
+                        <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
+                            onclick="window.location.href='product.php?id=<?= $produit['id_produit'] ?>'">
                             <div>
                                 <div>
                                     <img src="<?= htmlspecialchars($produit['image_url']) ?>"
-                                        alt="<?= htmlspecialchars($produit['p_nom']) ?>">
+                                        alt="<?= htmlspecialchars($produit['p_nom']) ?>"
+                                        class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
                                 <?php if ($aUneRemise): ?>
                                     <span>-<?= round($produit['discount_percentage']) ?>%</span>
@@ -374,6 +383,49 @@ array_unshift($categoriesAffichage, [
 
         function ajouterAuPanier(idProduit) {
             alert('Produit ' + idProduit + ' ajouté au panier !');
+        }
+
+        function activerEditionPrix() {
+            const affichagePrix = document.getElementById('affichagePrixMax');
+            const prixActuel = affichagePrix.textContent.replace('€', '');
+
+            const inputPrix = document.createElement('input');
+            inputPrix.type = 'number';
+            inputPrix.value = prixActuel;
+            inputPrix.min = 0;
+            inputPrix.max = 3000;
+            inputPrix.style.width = '60px';
+
+            affichagePrix.replaceWith(inputPrix);
+            inputPrix.focus();
+            inputPrix.select();
+
+            inputPrix.addEventListener('blur', sauvegarderPrix);
+            inputPrix.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sauvegarderPrix();
+                }
+            });
+
+            function sauvegarderPrix() {
+                const nouveauPrix = parseInt(inputPrix.value) || 0;
+                const prixValide = Math.min(Math.max(nouveauPrix, 0), 3000);
+
+                document.querySelector('input[name="price"]').value = prixValide;
+
+                const nouveauSpan = document.createElement('span');
+                nouveauSpan.id = 'affichagePrixMax';
+                nouveauSpan.textContent = prixValide + '€';
+                nouveauSpan.ondblclick = activerEditionPrix;
+
+                inputPrix.replaceWith(nouveauSpan);
+
+                document.getElementById('filterForm').submit();
+            }
+        }
+
+        function mettreAJourAffichagePrix(valeur) {
+            document.getElementById('affichagePrixMax').textContent = valeur + '€';
         }
     </script>
 </body>
