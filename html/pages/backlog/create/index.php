@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="/src/styles/creerArticle/creerArticle.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="/html/styles/creerArticle/creerArticle.css" media="screen">
     <title>Ajouter un produit</title>
 </head>
 
@@ -14,38 +14,40 @@
             session_start();
             // session_unset();
             // session_destroy();
+            $warn = 0;
+            $warnPromo = false;
             if ($_POST !== []) {
-                if (count($_FILES["photo"]["name"]) === 0) {
-                    print_r("Aucune photo ");
-                }// else{
+                // if (count($_FILES["photo"]["name"]) === 0) {
+                //     print_r("Aucune photo ");
+                // }// else{
                 //     print_r(count($_FILES["photo"]["name"]) . ' photos.');
                 // }
-                if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '')) {
-                    print_r("réduc vide");
-                } elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '')) {
-                    print_r("réduc pleine");
-                } else {
-                    print_r("entre deux");
+                // if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '')) {
+                //     print_r("réduc vide");
+                // } elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '')) {
+                //     print_r("réduc pleine");
+                // } else {
+                //     print_r("entre deux");
+                // }
+                // print_r($_POST);
+                // print_r($_FILES);
+                print_r($_POST["debut"]);
+                print_r($_POST["fin"]);
+
+
+                if ($_FILES["photo"]["name"][0] !== ''){
+                    foreach ($_FILES["photo"]["name"] as $key => $value) {
+                        //if (!in_array($value,$_SESSION["_FILES"]['name'])){
+                            $_SESSION["_FILES"]["name"][] = $_FILES["photo"]["name"][$key];
+                            $_SESSION["_FILES"]["tmp_name"][] = $_FILES["photo"]["tmp_name"][$key];
+                        //}
+                    }
                 }
-                print_r($_POST);
-                print_r($_FILES);
-
-
                 //print_r($_SESSION);
-                // for($i=0;i<3;i++) {
-                //     $_FILES["photo"][count($_FILES)-$i];
-            
-
-
-                // $time = time();
-                // $value["name"] = $time . "." . substr($value["type"],6);
-                //$_SESSION[$_POST['titre']][$i--] = $_FILES;
-                // $value["full_path"] = $value["name"];
-                // move_uploaded_file($value["tmp_name"], 'avatars/' . $value['name']);
-                //}
-            } else {
-                $_FILES["photo"]["name"] = [];
-            }
+                } else {
+                    $_FILES["photo"]["name"] = [];
+                    $_SESSION["_FILES"]['name'] = [];
+                }
 
             ?>
         </pre>
@@ -107,16 +109,17 @@
                         <!-- Texte avec label -->
                         <label for="titre">Titre</label>
                         <br>
-                        <input type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; ?>"
+                        <input style="<?php if ($_POST["titre"] === 'Déjà pris') {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; ?>"
                             maxlength="100"
-                            pattern="\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\.|\>|\?|\/|\;|\:|\s"
+                            pattern="[&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ]+"
                             required />
                         <?php
-                        if ($_POST["titre"] === 'Déjà prit') {
+                        if($_POST["titre"] === 'Déjà pris'){
                             ?>
                             <br>
                             <small class="warn"><?php
-                            echo 'Le titre de votre article est déjà prit. Veuillez choisir';
+                                echo 'Le titre de votre article est déjà pris. Veuillez choisir un autre titre';
+                                $warn++;
                             ?></small>
                             <?php
                         }
@@ -139,27 +142,28 @@
                         <h3>Photo(s)</h3>
                         <label for="photo[]">Sélectionner un fichier</label>
                         <br>
-                        <input type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
+                         <input style="<?php if ($_SESSION["_FILES"]["name"][0] === '') {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
                         // for (i=0;i<3; i++){
-                        //     echo $_FILES["photo"]["tmp_name"][i] . '/' . $_FILES["photo"]["full_path"][i];
+                        //     echo $_SESSION["_FILES"]["photo"]["tmp_name"][i] . '/' . $_SESSION["_FILES"]["photo"]["full_path"][i];
                         // }
-                        echo $_FILES["photo"]["tmp_name"][0] . '/' . $_FILES["photo"]["full_path"][0];
+                        echo $_SESSION["_FILES"]["photo"]["tmp_name"][0] . '/' . $_SESSION["_FILES"]["photo"]["full_path"][0];
                         ?>" />
                         <?php
-                        $i = count($_FILES["photo"]["name"]);
+                        $i = count($_SESSION["_FILES"]["name"]);
                         $i = 3;
-                        if ($_FILES["photo"]["name"][0] === '') {
+                        if ($_SESSION["_FILES"]["name"][0] === '') {
                             ?>
                             <br>
                             <small class="warn"><?php
                             echo 'Veuillez téléverser au moins une photographie.';
+                            $warn++;
                             ?></small>
                             <?php
                         }
                         for ($i = 1; $i < 4; $i++) {
                             ?><br>
                             <small>
-                                <?php echo $_FILES["photo"]["name"][count($_FILES["photo"]["name"]) - $i]; ?>
+                                <?php echo $_SESSION["_FILES"]["name"][count($_SESSION["_FILES"]["name"]) - $i]; ?>
                             </small>
                             <?php
                         }
@@ -182,7 +186,7 @@
                         <label for="prix">Prix</label>
                         <br>
                         <input type="number" id="prix" name="prix" value="<?php echo $_POST["prix"]; ?>" step="0.01"
-                            min="0" placeholder="0.00 €" required>
+                            min="1" placeholder="0.00 €" required>
                         <br />
                     </article>
 
@@ -201,28 +205,59 @@
 
                 </section>
 
-                <section>
+                <section style="<?php 
+                    if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '') ){
+                        //
+                    }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
+                        //
+                    }else{
+                        $warn++;
+                        $warnPromo = true;
+                        echo 'border: 3px solid red';
+                    }
+                ?>">
                     <article>
+                        <?php 
+                            if ($warnPromo){
+                        ?>
+                        <small class="warn"><?php
+                            echo 'Veuillez remplir tous les champs du bloc réduction ou n\'en remplir aucun.';
+                            $warn++;
+                        ?></small>
+                        <?php
+                            }
+                        ?>
                         <label for="pourcentage">Pourcentage réduction</label>
                         <br>
-                        <input type="number" id="pourcentage" name="pourcentage"
-                            value="<?php echo $_POST["pourcentage"]; ?>" step="0.01" min="0" placeholder="20,00 %" />
+                        <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00 %" />
+
                         <br />
                     </article>
 
                     <article>
                         <label for="debut">Date de début de réduction</label>
                         <br>
-                        <input type="date" id="debut" name="debut" placeholer="20/10/2025"
-                            value="<?php echo $_POST["debut"]; ?>" min="2025-01-01" max="2100-01-01" />
+                        <input style="<?php if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
+                            value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
+                            <?php
+                                if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
+                                    ?>
+                                    <br>
+                                    <small class="warn"><?php
+                                        echo $_POST["debut"] . ' '. $_POST["fin"] . ' ' . 'Le premieur horodatage est postérieur (ou égal) au second';
+                                        $warn++;
+                                    ?></small>
+                                    <?php
+                                }
+                        ?>
                         <br />
                     </article>
 
                     <article>
                         <label for="fin">Date de fin de réduction</label>
                         <br>
-                        <input type="date" id="fin" name="fin" placeholer="20/10/2025"
-                            value="<?php echo $_POST["fin"]; ?>" min="2025-01-01" max="2100-01-01" />
+                        <input style="<?php if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
+                            value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
                         <br />
                     </article>
                 </section>

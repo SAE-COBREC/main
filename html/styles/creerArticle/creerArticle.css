@@ -58,7 +58,7 @@ body main section article input, body main section article textarea {
   width: 80%;
   padding: 0.6em;
 }
-body main section article .warn {
+body main .warn {
   color: red;
 }
 body main div {
