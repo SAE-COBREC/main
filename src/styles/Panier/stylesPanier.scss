@@ -38,7 +38,7 @@ button {
 .unArticleP {
   border: 1px solid $primary-color-bleu;
   max-width: 960px;
-  max-height: 240px;
+  height: fit-content;
   display: flex;
   padding: 12px 10px;
   margin-bottom: 20px;
@@ -49,8 +49,11 @@ button {
     overflow: hidden;
 
     @media screen and (max-width: 428px) {
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0; // empêche la réduction forcée
+      min-width: 100px;
       max-width: 100px;
-      max-height: 100px;
     }
   }
 
@@ -59,6 +62,10 @@ button {
     height: 100%;
     object-fit: cover;
     object-position: center;
+
+    @media screen and (max-width: 428px) {
+      flex-shrink: 0;
+    }
   }
 
   .articleDetailP {
@@ -77,7 +84,7 @@ button {
       font-weight: bold;
 
       @media screen and (max-width: 428px) {
-        font-size: 1.5em;
+        font-size: 1.3em;
       }
     }
 

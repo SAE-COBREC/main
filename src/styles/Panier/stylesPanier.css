@@ -2,15 +2,19 @@ html {
   font-family: "Quicksand", sans-serif;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: "Baloo", sans-serif;
 }
 
-img, .unArticleP {
+img,
+.unArticleP {
   border-radius: 14px;
 }
 @media screen and (max-width: 428px) {
-  img, .unArticleP {
+  img,
+  .unArticleP {
     border-radius: 8px;
   }
 }
@@ -33,7 +37,8 @@ button {
 .unArticleP {
   border: 1px solid #7171A3;
   max-width: 960px;
-  max-height: 240px;
+  height: -moz-fit-content;
+  height: fit-content;
   display: flex;
   padding: 12px 10px;
   margin-bottom: 20px;
@@ -45,8 +50,11 @@ button {
 }
 @media screen and (max-width: 428px) {
   .unArticleP .imageArticleP {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    min-width: 100px;
     max-width: 100px;
-    max-height: 100px;
   }
 }
 .unArticleP img {
@@ -56,6 +64,11 @@ button {
      object-fit: cover;
   -o-object-position: center;
      object-position: center;
+}
+@media screen and (max-width: 428px) {
+  .unArticleP img {
+    flex-shrink: 0;
+  }
 }
 .unArticleP .articleDetailP {
   max-width: 648px;
@@ -73,7 +86,7 @@ button {
 }
 @media screen and (max-width: 428px) {
   .unArticleP .basArticleP p {
-    font-size: 1.5em;
+    font-size: 1.3em;
   }
 }
 .unArticleP .basArticleP button {
@@ -109,7 +122,8 @@ button {
     width: calc(100% - 40px);
   }
 }
-.recapCommande .recapTete, .recapCommande .recapTotal {
+.recapCommande .recapTete,
+.recapCommande .recapTotal {
   width: 100%;
 }
 .recapCommande .recapTotal {
