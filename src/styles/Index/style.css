@@ -18,6 +18,7 @@ body {
   grid-column: 1/-1;
   display: grid;
   grid-template-columns: 280px 1fr;
+  gap: 0;
   position: relative;
 }
 
@@ -33,16 +34,16 @@ aside {
   align-self: start;
   transition: all 0.3s ease;
 }
-aside > div:first-child {
+aside form > div:first-child {
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-aside > div:first-child span {
+aside form > div:first-child span {
   color: #c0c0c0;
 }
-aside > div:first-child button {
+aside form > div:first-child select {
   padding: 2px 7px;
   border: 1px solid #7171A3;
   color: #7171A3;
@@ -50,16 +51,16 @@ aside > div:first-child button {
   background: #FFFFFF;
   cursor: pointer;
 }
-aside > div:nth-child(2) {
+aside form > div:nth-child(2) {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
-aside > div:nth-child(2) h3 {
+aside form > div:nth-child(2) h3 {
   font-size: 1.1rem;
 }
-aside > div:nth-child(2) button {
+aside form > div:nth-child(2) button {
   color: #c0c0c0;
   background: none;
   border: none;
@@ -80,8 +81,8 @@ aside section > div {
   align-items: center;
   padding: 0.5rem 0;
   cursor: pointer;
-  color: #7171A3;
-  transition: color 0.2s ease;
+  color: #c0c0c0;
+  transition: all 0.2s ease;
 }
 aside section > div:hover {
   background-color: #EFEFEF;
@@ -92,12 +93,26 @@ aside section > div span:last-child {
   color: #7171A3;
   font-size: 0.9rem;
 }
+aside section label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+}
+aside section label:hover {
+  color: #7171A3;
+}
+aside section label input[type=checkbox] {
+  cursor: pointer;
+}
 aside input[type=range] {
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
   border-radius: 8px;
-  background: #7171A3;
+  background: #EFEFEF;
   outline: none;
   /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
   /* Curseur - Firefox */
@@ -117,20 +132,29 @@ aside input[type=range]::-moz-range-thumb {
   border-radius: 50%;
   background: #7171A3;
   cursor: pointer;
+  border: none;
 }
 aside input[type=range]::-moz-range-track {
-  background: #7171A3;
+  background: #EFEFEF;
   border-radius: 8px;
+  border: none;
 }
 
 main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
 }
-main > div:last-child {
+main > div:first-child {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+}
+main > div:first-child > p {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 2rem;
+  color: #c0c0c0;
+  font-size: 1.1rem;
 }
 
 article {
@@ -143,22 +167,6 @@ article {
 article:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-article .rupture-stock {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #EFEFEF;
-  color: black;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  z-index: 2;
-}
-article article > div:first-child {
-  position: relative;
 }
 article > div:first-child {
   position: relative;
@@ -181,9 +189,23 @@ article > div:first-child > span:last-child {
   background: #D4183D;
   color: #FFFFFF;
   padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: bold;
+}
+article > div:first-child .rupture-stock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(239, 239, 239, 0.9);
+  color: #030212;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  z-index: 2;
 }
 article > div:last-child {
   padding: 1.25rem;
@@ -192,6 +214,20 @@ article > div:last-child h3 {
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
+  color: #030212;
+}
+article > div:last-child > div:nth-child(2) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+article > div:last-child > div:nth-child(2) span:first-child {
+  color: #ffc107;
+}
+article > div:last-child > div:nth-child(2) span:last-child {
+  color: #c0c0c0;
+  font-size: 0.85rem;
 }
 article > div:last-child > div:nth-child(3) {
   display: flex;
@@ -202,9 +238,10 @@ article > div:last-child > div:nth-child(3) {
 article > div:last-child > div:nth-child(3) span:first-child {
   color: #c0c0c0;
   text-decoration: line-through;
+  font-size: 0.9rem;
 }
 article > div:last-child > div:nth-child(3) span:last-child {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
   color: #030212;
 }
@@ -219,12 +256,13 @@ article button {
   font-weight: 600;
   transition: background 0.2s ease;
 }
-article button:hover {
+article button:hover:not(:disabled) {
   background: #7171A3;
 }
-article button[disabled] {
+article button:disabled {
   background: #c0c0c0;
   cursor: not-allowed;
+  color: #EFEFEF;
 }
 
 footer {
@@ -250,7 +288,6 @@ footer > div > div:first-child > a {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 2px solid #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -258,9 +295,11 @@ footer > div > div:first-child > a {
   font-size: 1.5rem;
   text-decoration: none;
   color: #FFFFFF;
+  transition: all 0.2s ease;
 }
 footer > div > div:first-child > a:hover {
   background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
 }
 footer nav {
   display: grid;
@@ -271,6 +310,7 @@ footer nav {
 footer nav h4 {
   margin-bottom: 1rem;
   font-size: 1.1rem;
+  color: #FFFFFF;
 }
 footer nav ul {
   list-style: none;
@@ -292,9 +332,22 @@ footer > div > div:last-child {
   border-top: 1px solid #7171A3;
   color: #c0c0c0;
   font-size: 0.85rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+footer > div > div:last-child span {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+footer > div > div:last-child span:hover {
+  color: #FFFFFF;
 }
 
 @media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
   aside {
     position: static;
     margin: 1rem;
@@ -303,5 +356,18 @@ footer > div > div:last-child {
   main {
     order: 1;
     padding: 1rem;
+  }
+  header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  header > div:nth-child(2) {
+    margin: 0;
+    width: 100%;
+  }
+  footer > div > div:last-child {
+    flex-direction: column;
+    gap: 1rem;
   }
 }/*# sourceMappingURL=style.css.map */

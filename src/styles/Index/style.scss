@@ -32,7 +32,6 @@
   transition: all 0.3s ease;
 }
 
- // Créez un mixin pour le centrage
 @mixin centre-absolu {
   position: absolute;
   top: 50%;
@@ -40,7 +39,6 @@
   transform: translate(-50%, -50%);
 }
 
-// Reset et base
 * {
   margin: 0;
   padding: 0;
@@ -55,11 +53,13 @@ body {
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
 }
+
 // Container principal
 .container {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 280px 1fr;
+  gap: 0;
   position: relative;
 }
 
@@ -72,7 +72,7 @@ aside {
   margin: 2rem 0 2rem 2rem;
   @include sticky-aside;
 
-  > div:first-child {
+  form > div:first-child {
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
@@ -82,7 +82,7 @@ aside {
       color: $secondary-color-gris-fonce;
     }
 
-    button {
+    select {
       padding: 2px 7px;
       border: 1px solid $primary-color-bleu;
       color: $primary-color-bleu;
@@ -92,7 +92,7 @@ aside {
     }
   }
 
-  > div:nth-child(2) {
+  form > div:nth-child(2) {
     @include flex-between;
     margin-bottom: 1.5rem;
 
@@ -122,8 +122,8 @@ aside {
       @include flex-between;
       padding: 0.5rem 0;
       cursor: pointer;
-      color: $primary-color-bleu;
-      @include transition(color);
+      color: $secondary-color-gris-fonce;
+      @include transition(all);
 
       &:hover {
         background-color: $secondary-color-gris-clair;
@@ -136,15 +136,32 @@ aside {
         font-size: 0.9rem;
       }
     }
+    
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.5rem 0;
+      @include transition(color);
+      
+      &:hover {
+        color: $primary-color-bleu;
+      }
+      
+      input[type="checkbox"] {
+        cursor: pointer;
+      }
+    }
   }
 
-    // Style du slider (input range)
+  // Style du slider (input range)
   input[type="range"] {
     -webkit-appearance: none;
     width: 100%;
     height: 8px;
     border-radius: 8px;
-    background: $primary-color-bleu; // même couleur que #7171A3
+    background: $secondary-color-gris-clair;
     outline: none;
 
     /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
@@ -164,15 +181,16 @@ aside {
       border-radius: 50%;
       background: $primary-color-bleu;
       cursor: pointer;
+      border: none;
     }
 
     /* Barre - Firefox */
     &::-moz-range-track {
-      background: $primary-color-bleu;
+      background: $secondary-color-gris-clair;
       border-radius: 8px;
+      border: none;
     }
   }
-
 }
 
 // Main (produits)
@@ -180,10 +198,18 @@ main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
 
-  > div:last-child {
+  > div:first-child {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    
+    > p {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 2rem;
+      color: $secondary-color-gris-fonce;
+      font-size: 1.1rem;
+    }
   }
 }
 
@@ -194,23 +220,7 @@ article {
   overflow: hidden;
   cursor: pointer;
   @include hover-lift;
-
- // Puis utilisez-le
-.rupture-stock {
-  @include centre-absolu;
-  background-color: $secondary-color-gris-clair;
-  color: black;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  z-index: 2;
-}
-
-article > div:first-child {
-  position: relative;
-}
-
+  
   > div:first-child {
     position: relative;
     width: 100%;
@@ -232,9 +242,21 @@ article > div:first-child {
       background: $secondary-color-rouge;
       color: $primary-color-blanc;
       padding: 0.25rem 0.5rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
       font-weight: bold;
+    }
+    
+    .rupture-stock {
+      @include centre-absolu;
+      background-color: rgba($secondary-color-gris-clair, 0.9);
+      color: $primary-color-noir;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      z-index: 2;
     }
   }
 
@@ -245,6 +267,23 @@ article > div:first-child {
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
+      color: $primary-color-noir;
+    }
+
+    > div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      
+      span:first-child {
+        color: #ffc107; // Couleur pour les étoiles
+      }
+      
+      span:last-child {
+        color: $secondary-color-gris-fonce;
+        font-size: 0.85rem;
+      }
     }
 
     > div:nth-child(3) {
@@ -256,10 +295,11 @@ article > div:first-child {
       span:first-child {
         color: $secondary-color-gris-fonce;
         text-decoration: line-through;
+        font-size: 0.9rem;
       }
 
       span:last-child {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: bold;
         color: $primary-color-noir;
       }
@@ -277,13 +317,14 @@ article > div:first-child {
     font-weight: 600;
     @include transition(background);
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: $primary-color-bleu;
     }
 
-    &[disabled] {
+    &:disabled {
       background: $secondary-color-gris-fonce;
       cursor: not-allowed;
+      color: $secondary-color-gris-clair;
     }
   }
 }
@@ -313,15 +354,16 @@ footer {
       width: 50px;
       height: 50px;
       border-radius: 50%;
-      border: 2px solid $primary-color-blanc;
       @include flex-center;
       cursor: pointer;
       font-size: 1.5rem;
       text-decoration: none;
       color: $primary-color-blanc;
+      @include transition(all);
 
       &:hover {
         background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
       }
     }
   }
@@ -335,6 +377,7 @@ footer {
     h4 {
       margin-bottom: 1rem;
       font-size: 1.1rem;
+      color: $primary-color-blanc;
     }
 
     ul {
@@ -362,11 +405,26 @@ footer {
     border-top: 1px solid $primary-color-bleu;
     color: $secondary-color-gris-fonce;
     font-size: 0.85rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    
+    span {
+      cursor: pointer;
+      @include transition(color);
+      
+      &:hover {
+        color: $primary-color-blanc;
+      }
+    }
   }
 }
 
 // Responsive
 @media (max-width: $breakpoint-tablette) {
+  .container {
+    grid-template-columns: 1fr;
+  }
 
   aside {
     position: static;
@@ -377,5 +435,21 @@ footer {
   main {
     order: 1;
     padding: 1rem;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    
+    > div:nth-child(2) {
+      margin: 0;
+      width: 100%;
+    }
+  }
+  
+  footer > div > div:last-child {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
