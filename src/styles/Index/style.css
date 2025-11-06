@@ -444,4 +444,46 @@ footer > div > div:last-child span:hover {
     padding: 0.6rem;
     font-size: 0.9rem;
   }
+  footer {
+    padding: 2rem 1rem 1rem;
+  }
+  footer > div > div:first-child {
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+  footer > div > div:first-child > a {
+    height: 50px;
+  }
+  footer > div > div:first-child > a > img {
+    width: 45px;
+  }
+  footer nav {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  footer nav h4 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  footer nav ul {
+    padding-left: 0;
+  }
+  footer nav li {
+    margin-bottom: 0.4rem;
+  }
+  footer nav a {
+    font-size: 0.9rem;
+  }
+  footer > div > div:last-child {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    font-size: 0.8rem;
+  }
+  footer > div > div:last-child span {
+    text-align: center;
+  }
 }/*# sourceMappingURL=style.css.map */
