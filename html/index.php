@@ -6,11 +6,11 @@ function chargerProduitsCSV($fichierCSV)
     $categories = [];
 
     if (file_exists($fichierCSV)) {
-        $handle = fopen($fichierCSV, 'r');
-        if ($handle !== FALSE) {
-            $entete = fgetcsv($handle, 1000, ',');
+        $fichier = fopen($fichierCSV, 'r');
+        if ($fichier !== FALSE) {
+            $entete = fgetcsv($fichier, 1000, ',');
 
-            while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
+            while (($donnees = fgetcsv($fichier, 1000, ',')) !== FALSE) {
                 if (count($donnees) === count($entete)) {
                     $produit = array_combine($entete, $donnees);
 
@@ -19,9 +19,9 @@ function chargerProduitsCSV($fichierCSV)
                     $produit['p_stock'] = (int) $produit['p_stock'];
                     $produit['p_note'] = (float) $produit['p_note'];
                     $produit['p_nb_ventes'] = (int) $produit['p_nb_ventes'];
-                    $produit['discount_percentage'] = (float) $produit['discount_percentage'];
-                    $produit['review_count'] = (int) $produit['review_count'];
-                    $produit['avg_rating'] = (float) $produit['avg_rating'];
+                    $produit['pourcentage_reduction'] = (float) $produit['pourcentage_reduction'];
+                    $produit['nombre_avis'] = (int) $produit['nombre_avis'];
+                    $produit['note_moyenne'] = (float) $produit['note_moyenne'];
 
                     $produits[] = $produit;
 
@@ -32,16 +32,16 @@ function chargerProduitsCSV($fichierCSV)
                     $categories[$categorie]++;
                 }
             }
-            fclose($handle);
+            fclose($fichier);
         }
     }
-    
+
     return ['produits' => $produits, 'categories' => $categories];
 }
 
 function filtrerProduits($produits, $filtres)
 {
-    $produitsFiltres = [];
+    $produits_filtres = [];
 
     foreach ($produits as $produit) {
         if ($produit['p_prix'] > $filtres['prixMaximum']) {
@@ -56,7 +56,7 @@ function filtrerProduits($produits, $filtres)
             continue;
         }
 
-        if ($produit['avg_rating'] < $filtres['noteMinimum']) {
+        if ($produit['note_moyenne'] < $filtres['noteMinimum']) {
             continue;
         }
 
@@ -64,15 +64,15 @@ function filtrerProduits($produits, $filtres)
             continue;
         }
 
-        $produitsFiltres[] = $produit;
+        $produits_filtres[] = $produit;
     }
 
-    return $produitsFiltres;
+    return $produits_filtres;
 }
 
-function trierProduits($produits, $triPar)
+function trierProduits($produits, $tri_par)
 {
-    switch ($triPar) {
+    switch ($tri_par) {
         case 'best_sellers':
             usort($produits, function ($a, $b) {
                 return $b['p_nb_ventes'] - $a['p_nb_ventes'];
@@ -90,33 +90,33 @@ function trierProduits($produits, $triPar)
             break;
         case 'rating':
             usort($produits, function ($a, $b) {
-                return $b['avg_rating'] - $a['avg_rating'];
+                return $b['note_moyenne'] - $a['note_moyenne'];
             });
             break;
     }
-    
+
     return $produits;
 }
 
-function preparerCategoriesAffichage($categories)
+function preparercategories_affichage($categories)
 {
-    $categoriesAffichage = [];
-    $totalProduits = 0;
+    $categories_affichage = [];
+    $total_produits = 0;
 
     foreach ($categories as $nomCategorie => $compte) {
-        $categoriesAffichage[] = [
+        $categories_affichage[] = [
             'category' => $nomCategorie,
             'count' => $compte
         ];
-        $totalProduits += $compte;
+        $total_produits += $compte;
     }
 
-    array_unshift($categoriesAffichage, [
+    array_unshift($categories_affichage, [
         'category' => 'all',
-        'count' => $totalProduits
+        'count' => $total_produits
     ]);
-    
-    return $categoriesAffichage;
+
+    return $categories_affichage;
 }
 
 // Traitement principal
@@ -129,7 +129,7 @@ $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['rating'] ?? 0;
 $prixMaximum = $_POST['price'] ?? 3000;
 $enStockSeulement = isset($_POST['in_stock']);
-$triPar = $_POST['sort'] ?? 'best_sellers';
+$tri_par = $_POST['sort'] ?? 'best_sellers';
 
 $filtres = [
     'categorieFiltre' => $categorieFiltre,
@@ -138,9 +138,9 @@ $filtres = [
     'enStockSeulement' => $enStockSeulement
 ];
 
-$produitsFiltres = filtrerProduits($produits, $filtres);
-$produits = trierProduits($produitsFiltres, $triPar);
-$categoriesAffichage = preparerCategoriesAffichage($categories);
+$produits_filtres = filtrerProduits($produits, $filtres);
+$produits = trierProduits($produits_filtres, $tri_par);
+$categories_affichage = preparercategories_affichage($categories);
 ?>
 
 <!DOCTYPE html>
@@ -208,12 +208,12 @@ $categoriesAffichage = preparerCategoriesAffichage($categories);
                 <div>
                     <span>Tri par :</span>
                     <select name="sort" onchange="document.getElementById('filterForm').submit()">
-                        <option value="best_sellers" <?= $triPar === 'best_sellers' ? 'selected' : '' ?>>Meilleures ventes
+                        <option value="best_sellers" <?= $tri_par === 'best_sellers' ? 'selected' : '' ?>>Meilleures ventes
                         </option>
-                        <option value="price_asc" <?= $triPar === 'price_asc' ? 'selected' : '' ?>>Prix croissant</option>
-                        <option value="price_desc" <?= $triPar === 'price_desc' ? 'selected' : '' ?>>Prix décroissant
+                        <option value="price_asc" <?= $tri_par === 'price_asc' ? 'selected' : '' ?>>Prix croissant</option>
+                        <option value="price_desc" <?= $tri_par === 'price_desc' ? 'selected' : '' ?>>Prix décroissant
                         </option>
-                        <option value="rating" <?= $triPar === 'rating' ? 'selected' : '' ?>>Mieux notés</option>
+                        <option value="rating" <?= $tri_par === 'rating' ? 'selected' : '' ?>>Mieux notés</option>
                     </select>
                 </div>
 
@@ -226,9 +226,9 @@ $categoriesAffichage = preparerCategoriesAffichage($categories);
                     <h4>Catégories</h4>
                     <div onclick="definirCategorie('all')">
                         <span>Tous les produits</span>
-                        <span><?= $categoriesAffichage[0]['count'] ?></span>
+                        <span><?= $categories_affichage[0]['count'] ?></span>
                     </div>
-                    <?php foreach ($categoriesAffichage as $categorie): ?>
+                    <?php foreach ($categories_affichage as $categorie): ?>
                         <?php if ($categorie['category'] !== 'all'): ?>
                             <div onclick="definirCategorie('<?= htmlspecialchars($categorie['category']) ?>')">
                                 <span><?= htmlspecialchars($categorie['category']) ?></span>
@@ -284,11 +284,11 @@ $categoriesAffichage = preparerCategoriesAffichage($categories);
                     <?php foreach ($produits as $produit): ?>
                         <?php
                         $estEnRupture = $produit['p_stock'] <= 0;
-                        $aUneRemise = !empty($produit['discount_percentage']) && $produit['discount_percentage'] > 0;
+                        $aUneRemise = !empty($produit['pourcentage_reduction']) && $produit['pourcentage_reduction'] > 0;
                         $prixFinal = $aUneRemise
-                            ? $produit['p_prix'] * (1 - $produit['discount_percentage'] / 100)
+                            ? $produit['p_prix'] * (1 - $produit['pourcentage_reduction'] / 100)
                             : $produit['p_prix'];
-                        $note = $produit['avg_rating'] ? round($produit['avg_rating']) : 0;
+                        $note = $produit['note_moyenne'] ? round($produit['note_moyenne']) : 0;
                         ?>
                         <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
                             onclick="window.location.href='produit.php?id=<?= $produit['id_produit'] ?>'">
@@ -299,7 +299,7 @@ $categoriesAffichage = preparerCategoriesAffichage($categories);
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
                                 <?php if ($aUneRemise): ?>
-                                    <span>-<?= round($produit['discount_percentage']) ?>%</span>
+                                    <span>-<?= round($produit['pourcentage_reduction']) ?>%</span>
                                 <?php endif; ?>
                                 <?php if ($estEnRupture): ?>
                                     <div class="rupture-stock">Rupture de stock</div>
@@ -309,7 +309,7 @@ $categoriesAffichage = preparerCategoriesAffichage($categories);
                                 <h3><?= htmlspecialchars($produit['p_nom']) ?></h3>
                                 <div>
                                     <span><?= str_repeat('★', $note) . str_repeat('☆', 5 - $note) ?></span>
-                                    <span>(<?= $produit['review_count'] ?>)</span>
+                                    <span>(<?= $produit['nombre_avis'] ?>)</span>
                                 </div>
                                 <div>
                                     <?php if ($aUneRemise): ?>
