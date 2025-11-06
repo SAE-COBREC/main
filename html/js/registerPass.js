@@ -198,7 +198,59 @@ function showNextCard() {
     }
 }
 
+function finishRegistration() {
+    /**
+     * Finalizes the registration process by aggregating all cards' data
+     * into a single storage entry (localStorage when available, otherwise a cookie).
+     * The data is stored as an object keyed by card id.
+     * @returns {void}
+     */
+    const cards = document.querySelectorAll('.card');
+    if (!cards || cards.length === 0) return;
 
+    const allData = {};
+
+    cards.forEach(card => {
+        const cardId = card.id || `card-${Math.random().toString(36).slice(2, 8)}`;
+        const inputs = card.querySelectorAll('input, select, textarea');
+        const data = {};
+        const radioHandled = new Set();
+
+        inputs.forEach(el => {
+            const name = el.name || el.id || null;
+            if (!name) return;
+
+            if (el.type === 'checkbox') {
+                data[name] = el.checked;
+            } else if (el.type === 'radio') {
+                if (radioHandled.has(name)) return;
+                const checked = card.querySelector(`input[name="${name}"]:checked`);
+                data[name] = checked ? checked.value : null;
+                radioHandled.add(name);
+            } else if (el.tagName.toLowerCase() === 'select' && el.multiple) {
+                const vals = Array.from(el.options).filter(o => o.selected).map(o => o.value);
+                data[name] = vals;
+            } else {
+                data[name] = el.value;
+            }
+        });
+
+        allData[cardId] = data;
+        console.log('finishRegistration collected data for', cardId, data);
+    });
+
+    const aggregateKey = 'register:all';
+    try {
+        if (isLocalStorageAvailable()) {
+            setLocal(aggregateKey, allData);
+        } else {
+            setCookie(aggregateKey, JSON.stringify(allData), { days: 7, path: '/' });
+        }
+    } catch (e) {
+        console.warn('finishRegistration save erreur', e);
+    }
+    
+}
 
 function showPreviousCard() {
     /**
@@ -233,4 +285,5 @@ if (typeof window !== 'undefined') {
     window.showCard = showCard;
     window.showNextCard = showNextCard;
     window.showPreviousCard = showPreviousCard;
+    window.finishRegistration = finishRegistration;
 }
