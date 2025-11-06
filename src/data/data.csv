@@ -22,3 +22,36 @@ LEO;Tessier;houlala;leotessier@gmail.com;0606060606;060606
 GRE;Gr;gre;bro@gmail.com;06060606;05060506
 GAETAN;Lollieric;whyrox;gatgat@gmail.ocm;0664271644;05092006
 X;X;x;xc@mail.com;cx;050505
+
+
+body .card form input#codeP {
+  width: 140px;
+  margin-left: 40px;
+}
+
+@media #{$mobile} {
+  body .card form input#codeP {
+    width: 140px;
+    margin-left: 40px;
+  }
+}
+body .card form input#commune {
+  width: 330px;
+  margin-left: 20px;
+}
+
+@media #{$mobile} {
+  body .card form input#commune {
+    width: 360px;
+    margin-left: 20px;
+  }
+}
+
+body .card[id="3"],
+body .card[id="4"] {
+  height: 620px !important;
+
+  @media #{$mobile} {
+    max-height: 500px !important;
+  }
+}

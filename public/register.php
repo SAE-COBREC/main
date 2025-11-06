@@ -20,7 +20,7 @@
     <h1>Créer un compte</h1>
     <p class="subtitle">Identifiants</p>
 
-    <form action="" method="POST">
+    <form action="register.php" method="POST">
       <div>
         <label for="nom">Nom</label>
         <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
@@ -195,7 +195,7 @@
         </div>
         <div class="next-btn" role="group" aria-label="Suivant action">
           <span class="next-text">Terminer</span>
-          <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+          <button type="button" class="arrow-only" aria-label="Suivant">
             <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow" aria-hidden="true">
           </button>
@@ -206,3 +206,9 @@
   <script src="../src/js/registerPass.js"></script>
 </body>
 </html>
+<?php
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    print_r( "caca");
+  }
+
+?>
