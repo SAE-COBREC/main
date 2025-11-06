@@ -6,11 +6,11 @@ function chargerProduitsCSV($fichierCSV)
     $categories = [];
 
     if (file_exists($fichierCSV)) {
-        $gestionnaireFichier = fopen($fichierCSV, 'r');
-        if ($gestionnaireFichier !== FALSE) {
-            $entete = fgetcsv($gestionnaireFichier, 1000, ',');
+        $handle = fopen($fichierCSV, 'r');
+        if ($handle !== FALSE) {
+            $entete = fgetcsv($handle, 1000, ',');
 
-            while (($donnees = fgetcsv($gestionnaireFichier, 1000, ',')) !== FALSE) {
+            while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
                 if (count($donnees) === count($entete)) {
                     $produit = array_combine($entete, $donnees);
 
@@ -19,9 +19,9 @@ function chargerProduitsCSV($fichierCSV)
                     $produit['p_stock'] = (int) $produit['p_stock'];
                     $produit['p_note'] = (float) $produit['p_note'];
                     $produit['p_nb_ventes'] = (int) $produit['p_nb_ventes'];
-                    $produit['pourcentage_reduction'] = (float) $produit['pourcentage_reduction'];
-                    $produit['nombre_avis'] = (int) $produit['nombre_avis'];
-                    $produit['note_moyenne'] = (float) $produit['note_moyenne'];
+                    $produit['discount_percentage'] = (float) $produit['discount_percentage'];
+                    $produit['review_count'] = (int) $produit['review_count'];
+                    $produit['avg_rating'] = (float) $produit['avg_rating'];
 
                     $produits[] = $produit;
 
@@ -32,7 +32,7 @@ function chargerProduitsCSV($fichierCSV)
                     $categories[$categorie]++;
                 }
             }
-            fclose($gestionnaireFichier);
+            fclose($handle);
         }
     }
     
@@ -44,19 +44,19 @@ function filtrerProduits($produits, $filtres)
     $produitsFiltres = [];
 
     foreach ($produits as $produit) {
-        if ($produit['p_prix'] > $filtres['prix_maximum']) {
+        if ($produit['p_prix'] > $filtres['prixMaximum']) {
             continue;
         }
 
-        if ($filtres['categorie_filtre'] !== 'all' && $produit['category'] !== $filtres['categorie_filtre']) {
+        if ($filtres['categorieFiltre'] !== 'all' && $produit['category'] !== $filtres['categorieFiltre']) {
             continue;
         }
 
-        if ($filtres['en_stock_uniquement'] && $produit['p_stock'] <= 0) {
+        if ($filtres['enStockSeulement'] && $produit['p_stock'] <= 0) {
             continue;
         }
 
-        if ($produit['note_moyenne'] < $filtres['note_minimum']) {
+        if ($produit['avg_rating'] < $filtres['noteMinimum']) {
             continue;
         }
 
@@ -70,9 +70,9 @@ function filtrerProduits($produits, $filtres)
     return $produitsFiltres;
 }
 
-function trierProduits($produits, $tri_par)
+function trierProduits($produits, $triPar)
 {
-    switch ($tri_par) {
+    switch ($triPar) {
         case 'best_sellers':
             usort($produits, function ($a, $b) {
                 return $b['p_nb_ventes'] - $a['p_nb_ventes'];
@@ -90,7 +90,7 @@ function trierProduits($produits, $tri_par)
             break;
         case 'rating':
             usort($produits, function ($a, $b) {
-                return $b['note_moyenne'] - $a['note_moyenne'];
+                return $b['avg_rating'] - $a['avg_rating'];
             });
             break;
     }
@@ -100,23 +100,23 @@ function trierProduits($produits, $tri_par)
 
 function preparerCategoriesAffichage($categories)
 {
-    $categories_affichage = [];
-    $total_produits = 0;
+    $categoriesAffichage = [];
+    $totalProduits = 0;
 
-    foreach ($categories as $nom_categorie => $compte) {
-        $categories_affichage[] = [
-            'category' => $nom_categorie,
+    foreach ($categories as $nomCategorie => $compte) {
+        $categoriesAffichage[] = [
+            'category' => $nomCategorie,
             'count' => $compte
         ];
-        $total_produits += $compte;
+        $totalProduits += $compte;
     }
 
-    array_unshift($categories_affichage, [
+    array_unshift($categoriesAffichage, [
         'category' => 'all',
-        'count' => $total_produits
+        'count' => $totalProduits
     ]);
     
-    return $categories_affichage;
+    return $categoriesAffichage;
 }
 
 // Traitement principal
@@ -125,22 +125,22 @@ $donnees = chargerProduitsCSV($fichierCSV);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
-$categorie_filtre = $_POST['category'] ?? 'all';
-$note_minimum = $_POST['rating'] ?? 0;
-$prix_maximum = $_POST['price'] ?? 3000;
-$en_stock_uniquement = isset($_POST['in_stock']);
-$tri_par = $_POST['sort'] ?? 'best_sellers';
+$categorieFiltre = $_POST['category'] ?? 'all';
+$noteMinimum = $_POST['rating'] ?? 0;
+$prixMaximum = $_POST['price'] ?? 3000;
+$enStockSeulement = isset($_POST['in_stock']);
+$triPar = $_POST['sort'] ?? 'best_sellers';
 
 $filtres = [
-    'categorie_filtre' => $categorie_filtre,
-    'note_minimum' => $note_minimum,
-    'prix_maximum' => $prix_maximum,
-    'en_stock_uniquement' => $en_stock_uniquement
+    'categorieFiltre' => $categorieFiltre,
+    'noteMinimum' => $noteMinimum,
+    'prixMaximum' => $prixMaximum,
+    'enStockSeulement' => $enStockSeulement
 ];
 
-$produits_filtres = filtrerProduits($produits, $filtres);
-$produits = trierProduits($produits_filtres, $tri_par);
-$categories_affichage = preparerCategoriesAffichage($categories);
+$produitsFiltres = filtrerProduits($produits, $filtres);
+$produits = trierProduits($produitsFiltres, $triPar);
+$categoriesAffichage = preparerCategoriesAffichage($categories);
 ?>
 
 <!DOCTYPE html>
