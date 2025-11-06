@@ -8,7 +8,7 @@ $prixArt2 = 40.02;
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Panier</title>
-        <link rel="stylesheet" href="/html/styles/Panier/stylesPanier.css">
+        <link rel="stylesheet" href="/main/html/styles/Panier/stylesPanier.css">
     </head>
     <body>
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
