@@ -203,7 +203,7 @@
       </div>
     </form>
   </div>
-  <script src="../src/js/registerPass.js"></script>
+  <script type="module" src="../src/js/registerPass.js"></script>
 </body>
 
 </html>
