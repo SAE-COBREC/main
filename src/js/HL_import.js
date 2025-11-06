@@ -1,14 +1,14 @@
 $(function () {
     /**
-     * Load header and footer partials
+     * Charge les partials d'en-tête et de pied de page
      * @returns {void}
-     * @description Loads the header and footer HTML partials into the respective elements.
+     * @description Insère les fichiers HTML partiels du header et du footer
+     * dans les éléments correspondant de la page.
      * @example
-     * // This function is called on document ready
-     * <link rel="stylesheet" href="path/to/this/style_for_header_and_for_footer.css">
-     * <script src="path/to/this/script.js"></script>
-     * <div id="header"></div>
-     * <div id="footer"></div>
+     * // Cette fonction est appelée au chargement du document (document ready)
+     * // Exemples d'éléments où les partials seront insérés :
+     * // <div id="header"></div>
+     * // <div id="footer"></div>
      */
     $("#header").load("/public/partials/header.html");
     $("#footer").load("/public/partials/footer.html");
