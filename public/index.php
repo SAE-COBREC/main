@@ -1,38 +1,129 @@
 <?php
-$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
-$produits = [];
-$categories = [];
+// Fonctions utilitaires
+function chargerProduitsCSV($fichierCSV)
+{
+    $produits = [];
+    $categories = [];
 
-if (file_exists($fichierCSV)) {
-    $handle = fopen($fichierCSV, 'r');
-    if ($handle !== FALSE) {
-        $entete = fgetcsv($handle, 1000, ',');
+    if (file_exists($fichierCSV)) {
+        $handle = fopen($fichierCSV, 'r');
+        if ($handle !== FALSE) {
+            $entete = fgetcsv($handle, 1000, ',');
 
-        while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            if (count($donnees) === count($entete)) {
-                $produit = array_combine($entete, $donnees);
+            while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                if (count($donnees) === count($entete)) {
+                    $produit = array_combine($entete, $donnees);
 
-                $produit['id_produit'] = (int) $produit['id_produit'];
-                $produit['p_prix'] = (float) $produit['p_prix'];
-                $produit['p_stock'] = (int) $produit['p_stock'];
-                $produit['p_note'] = (float) $produit['p_note'];
-                $produit['p_nb_ventes'] = (int) $produit['p_nb_ventes'];
-                $produit['discount_percentage'] = (float) $produit['discount_percentage'];
-                $produit['review_count'] = (int) $produit['review_count'];
-                $produit['avg_rating'] = (float) $produit['avg_rating'];
+                    $produit['id_produit'] = (int) $produit['id_produit'];
+                    $produit['p_prix'] = (float) $produit['p_prix'];
+                    $produit['p_stock'] = (int) $produit['p_stock'];
+                    $produit['p_note'] = (float) $produit['p_note'];
+                    $produit['p_nb_ventes'] = (int) $produit['p_nb_ventes'];
+                    $produit['discount_percentage'] = (float) $produit['discount_percentage'];
+                    $produit['review_count'] = (int) $produit['review_count'];
+                    $produit['avg_rating'] = (float) $produit['avg_rating'];
 
-                $produits[] = $produit;
+                    $produits[] = $produit;
 
-                $categorie = $produit['category'];
-                if (!isset($categories[$categorie])) {
-                    $categories[$categorie] = 0;
+                    $categorie = $produit['category'];
+                    if (!isset($categories[$categorie])) {
+                        $categories[$categorie] = 0;
+                    }
+                    $categories[$categorie]++;
                 }
-                $categories[$categorie]++;
             }
+            fclose($handle);
         }
-        fclose($handle);
     }
+    
+    return ['produits' => $produits, 'categories' => $categories];
 }
+
+function filtrerProduits($produits, $filtres)
+{
+    $produitsFiltres = [];
+
+    foreach ($produits as $produit) {
+        if ($produit['p_prix'] > $filtres['prixMaximum']) {
+            continue;
+        }
+
+        if ($filtres['categorieFiltre'] !== 'all' && $produit['category'] !== $filtres['categorieFiltre']) {
+            continue;
+        }
+
+        if ($filtres['enStockSeulement'] && $produit['p_stock'] <= 0) {
+            continue;
+        }
+
+        if ($produit['avg_rating'] < $filtres['noteMinimum']) {
+            continue;
+        }
+
+        if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
+            continue;
+        }
+
+        $produitsFiltres[] = $produit;
+    }
+
+    return $produitsFiltres;
+}
+
+function trierProduits($produits, $triPar)
+{
+    switch ($triPar) {
+        case 'best_sellers':
+            usort($produits, function ($a, $b) {
+                return $b['p_nb_ventes'] - $a['p_nb_ventes'];
+            });
+            break;
+        case 'price_asc':
+            usort($produits, function ($a, $b) {
+                return $a['p_prix'] - $b['p_prix'];
+            });
+            break;
+        case 'price_desc':
+            usort($produits, function ($a, $b) {
+                return $b['p_prix'] - $a['p_prix'];
+            });
+            break;
+        case 'rating':
+            usort($produits, function ($a, $b) {
+                return $b['avg_rating'] - $a['avg_rating'];
+            });
+            break;
+    }
+    
+    return $produits;
+}
+
+function preparerCategoriesAffichage($categories)
+{
+    $categoriesAffichage = [];
+    $totalProduits = 0;
+
+    foreach ($categories as $nomCategorie => $compte) {
+        $categoriesAffichage[] = [
+            'category' => $nomCategorie,
+            'count' => $compte
+        ];
+        $totalProduits += $compte;
+    }
+
+    array_unshift($categoriesAffichage, [
+        'category' => 'all',
+        'count' => $totalProduits
+    ]);
+    
+    return $categoriesAffichage;
+}
+
+// Traitement principal
+$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
+$donnees = chargerProduitsCSV($fichierCSV);
+$produits = $donnees['produits'];
+$categories = $donnees['categories'];
 
 $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['rating'] ?? 0;
@@ -40,73 +131,18 @@ $prixMaximum = $_POST['price'] ?? 3000;
 $enStockSeulement = isset($_POST['in_stock']);
 $triPar = $_POST['sort'] ?? 'best_sellers';
 
-$produitsFiltres = [];
+$filtres = [
+    'categorieFiltre' => $categorieFiltre,
+    'noteMinimum' => $noteMinimum,
+    'prixMaximum' => $prixMaximum,
+    'enStockSeulement' => $enStockSeulement
+];
 
-foreach ($produits as $produit) {
-    if ($produit['p_prix'] > $prixMaximum) {
-        continue;
-    }
-
-    if ($categorieFiltre !== 'all' && $produit['category'] !== $categorieFiltre) {
-        continue;
-    }
-
-    if ($enStockSeulement && $produit['p_stock'] <= 0) {
-        continue;
-    }
-
-    if ($produit['avg_rating'] < $noteMinimum) {
-        continue;
-    }
-
-    if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
-        continue;
-    }
-
-    $produitsFiltres[] = $produit;
-}
-
-switch ($triPar) {
-    case 'best_sellers':
-        usort($produitsFiltres, function ($a, $b) {
-            return $b['p_nb_ventes'] - $a['p_nb_ventes'];
-        });
-        break;
-    case 'price_asc':
-        usort($produitsFiltres, function ($a, $b) {
-            return $a['p_prix'] - $b['p_prix'];
-        });
-        break;
-    case 'price_desc':
-        usort($produitsFiltres, function ($a, $b) {
-            return $b['p_prix'] - $a['p_prix'];
-        });
-        break;
-    case 'rating':
-        usort($produitsFiltres, function ($a, $b) {
-            return $b['avg_rating'] - $a['avg_rating'];
-        });
-        break;
-}
-
-$produits = $produitsFiltres;
-
-$categoriesAffichage = [];
-$totalProduits = 0;
-
-foreach ($categories as $nomCategorie => $compte) {
-    $categoriesAffichage[] = [
-        'category' => $nomCategorie,
-        'count' => $compte
-    ];
-    $totalProduits += $compte;
-}
-
-array_unshift($categoriesAffichage, [
-    'category' => 'all',
-    'count' => $totalProduits
-]);
+$produitsFiltres = filtrerProduits($produits, $filtres);
+$produits = trierProduits($produitsFiltres, $triPar);
+$categoriesAffichage = preparerCategoriesAffichage($categories);
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -190,7 +226,7 @@ array_unshift($categoriesAffichage, [
                     <h4>Catégories</h4>
                     <div onclick="definirCategorie('all')">
                         <span>Tous les produits</span>
-                        <span><?= $totalProduits ?></span>
+                        <span><?= $categoriesAffichage[0]['count'] ?></span>
                     </div>
                     <?php foreach ($categoriesAffichage as $categorie): ?>
                         <?php if ($categorie['category'] !== 'all'): ?>
@@ -384,7 +420,6 @@ array_unshift($categoriesAffichage, [
         function ajouterAuPanier(idProduit) {
             alert('Produit ' + idProduit + ' ajouté au panier !');
         }
-
 
         function reinitialiserFiltres() {
             const form = document.createElement('form');
