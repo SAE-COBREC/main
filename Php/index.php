@@ -296,12 +296,12 @@ array_unshift($categoriesAffichage, [
     <footer>
         <div>
             <div>
-                <a href="#">f</a>
-                <a href="#">in</a>
-                <a href="#">▶</a>
-                <a href="#">📷</a>
-                <a href="#">♪</a>
-                <a href="#">P</a>
+                <a href="#"><img src="/src/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/instagram-blank.svg" style="filter: invert(1);" ></a>
+                <a href="#"><img src="/src/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
             </div>
 
             <nav>
