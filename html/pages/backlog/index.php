@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1440, height=1024" />
   <title>Alizon - Page Accueil Vendeur</title>
-  <link rel="stylesheet" href="../src/styles/AccueilVendeur/accueilVendeur.css" />
+  <link rel="stylesheet" href="../../styles/AccueilVendeur/accueilVendeur.css" />
 </head>
 <body>
   <?php
@@ -15,7 +15,7 @@
     $articles = [];
 
     // Lecture du fichier CSV
-    if (($handle = fopen("../src/data/articles_vendeur.csv", "r")) !== false) {
+    if (($handle = fopen("../../../src/data/articles_vendeur.csv", "r")) !== false) {
         $header = fgetcsv($handle, 1000, ";"); // lire l'en-tête
         while (($data = fgetcsv($handle, 1000, ";")) !== false) {
             $article = array_combine($header, $data);
@@ -29,43 +29,43 @@
   <div class="app">
     <aside class="sidebar">
       <div class="logo">
-        <img src="../src/img/svg/logo_bronze.svg" alt="logo" class="logo__icon">
+        <img src="../../img/svg/logo_bronze.svg" alt="logo" class="logo__icon">
         <span class="logo__text">Alizon</span>
       </div>
 
       <nav class="nav">
         <a href="#" class="nav__item nav__item--active">
-          <img class="nav__icon" src="../src/img/svg/home.svg" alt="home">
+          <img class="nav__icon" src="../../img/svg/home.svg" alt="home">
           <span class="nav__label">Accueil</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="../src/img/svg/box.svg" alt="box">
+          <img class="nav__icon" src="../../img/svg/box.svg" alt="box">
           <span class="nav__label">Commandes</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="../src/img/svg/folder.svg" alt="folder">
+          <img class="nav__icon" src="../../img/svg/folder.svg" alt="folder">
           <span class="nav__label">Produits</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="../src/img/svg/profile-v.svg" alt="profile">
+          <img class="nav__icon" src="../../img/svg/profile-v.svg" alt="profile">
           <span class="nav__label">Clients</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="../src/img/svg/stats.svg" alt="stats">
+          <img class="nav__icon" src="../../img/svg/stats.svg" alt="stats">
           <span class="nav__label">Statistiques</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="../src/img/svg/promotion.svg" alt="promotion">
+          <img class="nav__icon" src="../../img/svg/promotion.svg" alt="promotion">
           <span class="nav__label">Promotion</span>
         </a>
 
         <a href="#" class="nav__item">
-          <img class="nav__icon" src="../src/img/svg/reduction.svg" alt="reduction">
+          <img class="nav__icon" src="../../img/svg/reduction.svg" alt="reduction">
           <span class="nav__label">Réductions</span>
         </a>
       </nav>
@@ -80,7 +80,7 @@
 
         <div class="search-bar">
           <div class="search-bar__input">
-            <span class="search-bar__icon"><img src="../src/img/svg/loupe.svg" alt="loupe"></span>
+            <span class="search-bar__icon"><img src="../../img/svg/loupe.svg" alt="loupe"></span>
             <input type="search" placeholder="Rechercher des produits..." />
           </div>
           <button class="btn btn--primary">Ajouter un produit</button>
@@ -144,15 +144,21 @@
                           const checkbox = row.querySelector('.checkbox');
 
                           row.addEventListener('click', () => {
-                            // On retire la sélection de tous les autres
-                            rows.forEach(r => {
-                              r.classList.remove('selected');
-                              r.querySelector('.checkbox').classList.remove('checkbox--active');
-                            });
+                            const isSelected = row.classList.contains('selected');
 
-                            // On active celui qu'on vient de cliquer
-                            row.classList.add('selected');
-                            checkbox.classList.add('checkbox--active');
+                            // Si déjà sélectionné → on désélectionne tout
+                            if (isSelected) {
+                              row.classList.remove('selected');
+                              checkbox.classList.remove('checkbox--active');
+                            } else {
+                              // Sinon on désélectionne les autres et sélectionne celui-ci
+                              rows.forEach(r => {
+                                r.classList.remove('selected');
+                                r.querySelector('.checkbox').classList.remove('checkbox--active');
+                              });
+                              row.classList.add('selected');
+                              checkbox.classList.add('checkbox--active');
+                            }
                           });
                         });
                       });

@@ -28,7 +28,7 @@ body {
 }
 
 .logo {
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 12px;
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@ body {
   width: 32px;
   height: 32px;
   background: #FFFFFF;
-  border-radius: 10px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,7 +60,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 12px 8px;
-  border-radius: 8px;
+  border-radius: 14px;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   font-size: 16px;
@@ -89,7 +89,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #FFFFFF;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -127,7 +127,7 @@ body {
   align-items: center;
   background: #FFFFFF;
   border: 1px solid #E5D5C5;
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 10px 16px;
   gap: 8px;
 }
@@ -148,7 +148,7 @@ body {
 .btn {
   border: 0;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 14px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -165,7 +165,7 @@ body {
 
 .content-section {
   background: #FFFFFF;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid #E5D5C5;
   overflow: hidden;
 }
@@ -207,7 +207,7 @@ body {
   background: #F9F6F3;
   border: 1px solid #E5D5C5;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 13px;
   color: #030212;
   cursor: pointer;
@@ -240,8 +240,8 @@ body {
   font-size: 14px;
   color: #030212;
 }
-.products-table__cell--muted {
-  color: #030212;
+.products-table__cell--stock {
+  text-align: center;
 }
 
 /* Styles pour la case cochée */
@@ -274,7 +274,7 @@ body {
 .product__image {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -294,7 +294,7 @@ body {
 .badge {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 14px;
   font-size: 12px;
   font-weight: 600;
 }
