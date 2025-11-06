@@ -454,6 +454,7 @@ footer {
     gap: 1rem;
   }
 }
+
 // Responsive pour mobile très petit (428px et moins)
 @media (max-width: 428px) {
   body {
@@ -475,26 +476,23 @@ footer {
     padding: 1rem;
     width: calc(100% - 2rem);
     position: static;
-    max-height: 60px; // Hauteur réduite quand fermé
-    overflow: hidden; // Cache le contenu
+    max-height: 60px;
+    overflow: hidden;
     transition: max-height 0.3s ease;
     cursor: pointer;
     
-    // Supprime le padding du contenu quand fermé
     &:not(.open) {
       padding-bottom: 0;
     }
     
-    // Quand l'aside est ouvert
     &.open {
-      max-height: none; // Supprime la limite de hauteur
-      height: auto; // Hauteur automatique selon le contenu
-      overflow: visible; // Pas de scroll
+      max-height: none;
+      height: auto;
+      overflow: visible;
     }
     
-    // Style pour l'en-tête du dépliant
     &::before {
-      content: "📂 Filtres"; // Icône + texte
+      content: "📂 Filtres";
       display: block;
       font-weight: bold;
       font-size: 1.1rem;
@@ -502,19 +500,16 @@ footer {
       color: $primary-color-bleu;
     }
     
-    // Cache l'en-tête quand ouvert
     &.open::before {
       content: "📂 Masquer les filtres";
-      margin-bottom: 1.5rem; // Plus d'espace quand ouvert
+      margin-bottom: 1.5rem;
     }
   }
 
-  // Cache le formulaire quand fermé
   aside:not(.open) form {
     display: none;
   }
 
-  // Affiche le formulaire quand ouvert
   aside.open form {
     display: block;
   }
@@ -550,6 +545,63 @@ footer {
     button {
       padding: 0.6rem;
       font-size: 0.9rem;
+    }
+  }
+
+  // Footer responsive
+  footer {
+    padding: 2rem 1rem 1rem;
+
+    > div > div:first-child {
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+
+      > a {
+        height: 50px;
+
+        > img {
+          width: 45px;
+        }
+
+      }
+
+      
+    }
+
+    nav {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+
+      h4 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      ul {
+        padding-left: 0;
+      }
+
+      li {
+        margin-bottom: 0.4rem;
+      }
+
+      a {
+        font-size: 0.9rem;
+      }
+    }
+
+    > div > div:last-child {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 1.5rem;
+      font-size: 0.8rem;
+      
+      span {
+        text-align: center;
+      }
     }
   }
 }
