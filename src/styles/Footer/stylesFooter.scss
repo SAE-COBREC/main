@@ -2,11 +2,12 @@
 
 /* Footer styles */
 footer {
-  background: #080613; /* très sombre */
+  background: #080613;
+  /* très sombre */
   color: #eeeeee;
   padding: 48px 24px 36px;
   font-family: 'Arial', sans-serif;
-  border-top: 1px solid rgba(255,255,255,0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .footer-inner {
@@ -41,10 +42,10 @@ footer {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   color: #fff;
   text-decoration: none;
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   font-weight: 700;
 }
 
@@ -83,7 +84,7 @@ footer {
   gap: 12px;
   margin-top: 28px;
   padding-top: 18px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 13px;
   opacity: 0.9;
 }
@@ -106,10 +107,12 @@ footer {
   .footer-nav {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .footer-top {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .footer-bottom {
     flex-direction: column;
     align-items: flex-start;

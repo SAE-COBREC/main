@@ -1,112 +1,141 @@
 @use '../_variable.scss' as *;
 
 
-html{
+html {
   font-family: $font-family-secondaire;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: $font-family-primaire;
 }
 
 
-img, .unArticleP{
+img,
+.unArticleP {
   border-radius: $border-radius-primary;
+
+  @media screen and (max-width: 428px) {
+    border-radius: 8px;
+  }
 }
 
-.articlesPrixP{
+.articlesPrixP {
   display: flex;
+  justify-content: space-between;
+
+  @media screen and (max-width: 428px) {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 button {
   border: none;
 }
 
-.unArticleP{
-  border : 1px solid $primary-color-bleu;
+.unArticleP {
+  border: 1px solid $primary-color-bleu;
   max-width: 960px;
   max-height: 240px;
   display: flex;
   padding: 12px 10px;
   margin-bottom: 20px;
 
-  .imageArticleP{
+  .imageArticleP {
     width: 280px;
     height: 190px;
     overflow: hidden;
 
-    img{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
+    @media screen and (max-width: 428px) {
+      max-width: 100px;
+      max-height: 100px;
     }
   }
 
-  .articleDetailP{
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .articleDetailP {
     max-width: 648px;
     margin-left: 15px;
   }
 
-  .basArticleP{
+  .basArticleP {
     display: flex;
     align-items: center;
     justify-content: space-between;
     max-height: 33px;
 
     p {
-      color : $primary-color-bleu;
+      color: $primary-color-bleu;
       font-weight: bold;
+
+      @media screen and (max-width: 428px) {
+        font-size: 1.5em;
+      }
     }
 
-    button { //les boutons + et - pour la quantite
-      width: 30px;
-      height: 30px;
+    button {
+      //les boutons + et - pour la quantite
+      width: 35px;
+      height: 35px;
       border-radius: $border-radius-mini;
+
     }
 
     input {
       width: 30px;
       height: 30px;
       text-align: center;
+      border: 1px solid $secondary-color-gris-fonce;
       border-radius: $border-radius-mini;
-      border-color: $secondary-color-gris-fonce;
     }
   }
 }
 
-.recapCommande{
+.recapCommande {
   background-color: $secondary-color-gris-clair;
   border-radius: $border-radius-primary;
   width: 383px;
   height: fit-content; //pour que le block s'adapte a son contenu et ne déborde pas
   padding: 20px;
-  position:fixed;
-  right: 10px;
-  
+  position: sticky;
+  top: 10px;
   // juste pour centrer le bouton le reste du contenu sera replacé apres
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
 
-  .recapTete, .recapTotal {
+  @media screen and (max-width: 428px) {
+    position: static;
+    margin: 10px auto;
+    width: calc(100% - 40px);
+  }
+
+  .recapTete,
+  .recapTotal {
     width: 100%;
   }
 
-  .recapTotal{
+  .recapTotal {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
-  button{
+  button {
     background-color: $primary-color-noir;
     border-radius: 999px;
     color: $primary-color-blanc;
     width: 343px; //bloqué sa largeur a 343
     height: 49px;
     border: none;
-    margin-top: 10px; 
+    margin-top: 10px;
   }
 }
-

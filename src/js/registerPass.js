@@ -1,9 +1,15 @@
 /**
  * @fileoverview Functions to manage multi-step registration form cards.
  * @module registerPass
+ * @imports cookies from './cookies.js'
+ * @exports showCard
+ * @exports verifCompletedCard
+ * @exports showNextCard
+ * @exports showPreviousCard
+ * @description This module provides functions to manage a multi-step registration form.
  */
 
-function showCard(cardId) {
+export function showCard(cardId) {
     /**
      * Hides all cards and shows the card with the given ID.
      * @param {string} cardId - The ID of the card to show.
@@ -23,7 +29,7 @@ function showCard(cardId) {
     }
 }
 
-function verifCompletedCard(cardId) {
+export function verifCompletedCard(cardId) {
     /**
      * Verifies if all required inputs in the specified card are filled.
      * @param {string} cardId - The ID of the card to verify.
@@ -43,7 +49,7 @@ function verifCompletedCard(cardId) {
     return true;
 }
 
-function showNextCard() {
+export function showNextCard() {
     /**
      * Shows the next card if the current card is completed.
      * @returns {boolean} - True if the next card is shown, false if the current card is incomplete.
@@ -90,7 +96,7 @@ function showNextCard() {
     }
 }
 
-function showPreviousCard() {
+export function showPreviousCard() {
     /**
      * Shows the previous card in the sequence.
      * @returns {void}

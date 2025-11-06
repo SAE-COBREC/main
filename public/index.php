@@ -432,6 +432,16 @@ array_unshift($categoriesAffichage, [
                 document.getElementById('filterForm').submit();
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const aside = document.querySelector('aside');
+
+            if (aside) {
+                aside.addEventListener('click', function () {
+                    this.classList.toggle('open');
+                });
+            }
+        });
     </script>
 </body>
 
