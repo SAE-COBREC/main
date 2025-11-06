@@ -2,10 +2,22 @@
   font-family: "Quicksand";
 }
 
+.card[id="3"],
+.card[id="2"] {
+  height: 620px !important;
+}
+@media screen and (max-width: 508px ) {
+  .card[id="3"],
+  .card[id="2"] {
+    max-height: 500px !important;
+  }
+}
+
 body {
   height: 100vh;
   font-size: 24px;
   font-family: "Quicksand", sans-serif;
+  background: linear-gradient(to bottom right, #CD7F32, #D4183D);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -279,4 +291,4 @@ body .card form .nav-actions .nav-label {
 body .card .step {
   margin-top: 1.2rem;
   font-size: 18px;
-}/*# sourceMappingURL=styleRegister.css.map */
+}/*# sourceMappingURL=styleRegisterVendeur.css.map */

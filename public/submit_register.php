@@ -12,19 +12,30 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Expected fields
 $fields = [
-    'nom','prenom','pseudo','email','telephone','naissance','rue','codeP','commune','mdp','mdpConfirm'
+    'nom',
+    'prenom',
+    'pseudo',
+    'email',
+    'telephone',
+    'naissance',
+    'rue',
+    'codeP',
+    'commune',
+    'mdp',
+    'mdpConfirm'
 ];
 
 $input = [];
 foreach ($fields as $f) {
-    $input[$f] = isset($_POST[$f]) ? trim((string)$_POST[$f]) : '';
+    $input[$f] = isset($_POST[$f]) ? trim((string) $_POST[$f]) : '';
 }
 
 // Basic validation
-$required = ['nom','prenom','pseudo','email','telephone','naissance','rue','codeP','commune','mdp','mdpConfirm'];
+$required = ['nom', 'prenom', 'pseudo', 'email', 'telephone', 'naissance', 'rue', 'codeP', 'commune', 'mdp', 'mdpConfirm'];
 $missing = [];
 foreach ($required as $r) {
-    if ($input[$r] === '') $missing[] = $r;
+    if ($input[$r] === '')
+        $missing[] = $r;
 }
 if (!empty($missing)) {
     http_response_code(400);
@@ -83,7 +94,7 @@ if (!flock($fp, LOCK_EX)) {
 // If file is empty, write header first
 $stat = fstat($fp);
 if ($stat['size'] === 0) {
-    fputcsv($fp, ['nom','prenom','pseudo','email','telephone','naissance','rue','codeP','commune','mdpHash']);
+    fputcsv($fp, ['nom', 'prenom', 'pseudo', 'email', 'telephone', 'naissance', 'rue', 'codeP', 'commune', 'mdpHash']);
 }
 
 fputcsv($fp, $row);

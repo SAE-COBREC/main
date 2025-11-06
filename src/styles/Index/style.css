@@ -370,4 +370,123 @@ footer > div > div:last-child span:hover {
     flex-direction: column;
     gap: 1rem;
   }
+}
+@media (max-width: 428px) {
+  body {
+    display: block;
+    max-width: 428px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .container {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+  aside {
+    order: -1;
+    margin: 1rem;
+    padding: 1rem;
+    width: calc(100% - 2rem);
+    position: static;
+    max-height: 60px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    cursor: pointer;
+  }
+  aside:not(.open) {
+    padding-bottom: 0;
+  }
+  aside.open {
+    max-height: none;
+    height: auto;
+    overflow: visible;
+  }
+  aside::before {
+    content: "📂 Filtres";
+    display: block;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #7171A3;
+  }
+  aside.open::before {
+    content: "📂 Masquer les filtres";
+    margin-bottom: 1.5rem;
+  }
+  aside form > div:first-child select {
+    padding: 15px;
+  }
+  aside:not(.open) form {
+    display: none;
+  }
+  aside.open form {
+    display: block;
+  }
+  main {
+    padding: 1rem;
+    order: 1;
+  }
+  main > div:first-child {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  article > div:first-child {
+    height: 150px;
+  }
+  article > div:last-child {
+    padding: 1rem;
+  }
+  article > div:last-child h3 {
+    font-size: 0.9rem;
+  }
+  article > div:last-child > div:nth-child(3) span:last-child {
+    font-size: 1.1rem;
+  }
+  article button {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+  footer {
+    padding: 2rem 1rem 1rem;
+  }
+  footer > div > div:first-child {
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+  footer > div > div:first-child > a {
+    height: 50px;
+  }
+  footer > div > div:first-child > a > img {
+    width: 45px;
+  }
+  footer nav {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  footer nav h4 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  footer nav ul {
+    padding-left: 0;
+  }
+  footer nav li {
+    margin-bottom: 0.4rem;
+  }
+  footer nav a {
+    font-size: 0.9rem;
+  }
+  footer > div > div:last-child {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    font-size: 0.8rem;
+  }
+  footer > div > div:last-child span {
+    text-align: center;
+  }
 }/*# sourceMappingURL=style.css.map */

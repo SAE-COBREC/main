@@ -11,6 +11,16 @@
   <link rel="stylesheet" href="../src/styles/Register/styleRegister.css">
 </head>
 
+<style>
+  body {
+    background: linear-gradient(to bottom right, #7171A3, #030212);
+  }
+  .card[id="3"],
+  .card[id="4"] {
+    height: 620px !important;
+  }
+</style>
+
 <body>
   <div class="card" id="1">
     <div class="logo">
@@ -20,7 +30,7 @@
     <h1>Créer un compte</h1>
     <p class="subtitle">Identifiants</p>
 
-    <form action="register.php" method="POST">
+    <form action="register.php" method="post" enctype="multipart/form-data">
       <div>
         <label for="nom">Nom</label>
         <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
@@ -37,7 +47,7 @@
       </div>
 
       <div class="error">
-        
+
       </div>
 
       <div class="step">étape 1 / 4</div>
@@ -52,7 +62,7 @@
     </form>
   </div>
 
-        <!-- Card2 -->
+  <!-- Card2 -->
 
 
   <div class="card hidden" id="2">
@@ -104,7 +114,7 @@
     </form>
   </div>
 
-        <!-- Card3 -->
+  <!-- Card3 -->
 
   <div class="card hidden" id="3">
     <div class="logo">
@@ -121,12 +131,12 @@
       </div>
 
       <div class="inline-flex">
-        <div class = "culumn-flex" id="div_codeP">
+        <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
           <input type="number" id="codeP" name="codeP" placeholder="ex: 22300" value="" required>
         </div>
 
-        <div class = "culumn-flex">
+        <div class="culumn-flex">
           <label for="commune">Commune</label>
           <input type="text" id="commune" name="commune" placeholder="ex:lannion" value="" required>
         </div>
@@ -157,7 +167,7 @@
     </form>
   </div>
 
-        <!-- Card4 -->
+  <!-- Card4 -->
 
   <div class="card hidden" id="4">
     <div class="logo">
@@ -195,20 +205,15 @@
         </div>
         <div class="next-btn" role="group" aria-label="Suivant action">
           <span class="next-text">Terminer</span>
-          <button type="button" class="arrow-only" aria-label="Suivant">
+          <button type="submit" id="finishBtn" class="arrow-only" aria-label="Terminer">
             <img src="../src/img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
               class="btn-arrow" aria-hidden="true">
           </button>
         </div>
       </div>
     </form>
-  </div>
-  <script src="../src/js/registerPass.js"></script>
+  <script type="module" src="../src/js/registerPass.js" ></script>
 </body>
-</html>
-<?php
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    print_r( "caca");
-  }
 
-?>
+</html>
+

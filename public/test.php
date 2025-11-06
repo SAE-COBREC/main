@@ -1,112 +1,148 @@
 <?php
-$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
-$produits = [];
-$categories = [];
+// Fonctions utilitaires
+function chargerProduitsCSV($fichierCSV)
+{
+    $produits = [];
+    $categories = [];
 
-if (file_exists($fichierCSV)) {
-    $handle = fopen($fichierCSV, 'r');
-    if ($handle !== FALSE) {
-        $entete = fgetcsv($handle, 1000, ',');
+    if (file_exists($fichierCSV)) {
+        $gestionnaireFichier = fopen($fichierCSV, 'r');
+        if ($gestionnaireFichier !== FALSE) {
+            $entete = fgetcsv($gestionnaireFichier, 1000, ',');
 
-        while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            if (count($donnees) === count($entete)) {
-                $produit = array_combine($entete, $donnees);
+            while (($donnees = fgetcsv($gestionnaireFichier, 1000, ',')) !== FALSE) {
+                if (count($donnees) === count($entete)) {
+                    $produit = array_combine($entete, $donnees);
 
-                $produit['id_produit'] = (int) $produit['id_produit'];
-                $produit['p_prix'] = (float) $produit['p_prix'];
-                $produit['p_stock'] = (int) $produit['p_stock'];
-                $produit['p_note'] = (float) $produit['p_note'];
-                $produit['p_nb_ventes'] = (int) $produit['p_nb_ventes'];
-                $produit['discount_percentage'] = (float) $produit['discount_percentage'];
-                $produit['review_count'] = (int) $produit['review_count'];
-                $produit['avg_rating'] = (float) $produit['avg_rating'];
+                    $produit['id_produit'] = (int) $produit['id_produit'];
+                    $produit['p_prix'] = (float) $produit['p_prix'];
+                    $produit['p_stock'] = (int) $produit['p_stock'];
+                    $produit['p_note'] = (float) $produit['p_note'];
+                    $produit['p_nb_ventes'] = (int) $produit['p_nb_ventes'];
+                    $produit['pourcentage_reduction'] = (float) $produit['pourcentage_reduction'];
+                    $produit['nombre_avis'] = (int) $produit['nombre_avis'];
+                    $produit['note_moyenne'] = (float) $produit['note_moyenne'];
 
-                $produits[] = $produit;
+                    $produits[] = $produit;
 
-                $categorie = $produit['category'];
-                if (!isset($categories[$categorie])) {
-                    $categories[$categorie] = 0;
+                    $categorie = $produit['category'];
+                    if (!isset($categories[$categorie])) {
+                        $categories[$categorie] = 0;
+                    }
+                    $categories[$categorie]++;
                 }
-                $categories[$categorie]++;
             }
+            fclose($gestionnaireFichier);
         }
-        fclose($handle);
     }
+    
+    return ['produits' => $produits, 'categories' => $categories];
 }
 
-$categorieFiltre = $_POST['category'] ?? 'all';
-$noteMinimum = $_POST['rating'] ?? 0;
-$prixMaximum = $_POST['price'] ?? 3000;
-$enStockSeulement = isset($_POST['in_stock']);
-$triPar = $_POST['sort'] ?? 'best_sellers';
+function filtrerProduits($produits, $filtres)
+{
+    $produitsFiltres = [];
 
-$produitsFiltres = [];
+    foreach ($produits as $produit) {
+        if ($produit['p_prix'] > $filtres['prix_maximum']) {
+            continue;
+        }
 
-foreach ($produits as $produit) {
-    if ($produit['p_prix'] > $prixMaximum) {
-        continue;
+        if ($filtres['categorie_filtre'] !== 'all' && $produit['category'] !== $filtres['categorie_filtre']) {
+            continue;
+        }
+
+        if ($filtres['en_stock_uniquement'] && $produit['p_stock'] <= 0) {
+            continue;
+        }
+
+        if ($produit['note_moyenne'] < $filtres['note_minimum']) {
+            continue;
+        }
+
+        if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
+            continue;
+        }
+
+        $produitsFiltres[] = $produit;
     }
 
-    if ($categorieFiltre !== 'all' && $produit['category'] !== $categorieFiltre) {
-        continue;
-    }
-
-    if ($enStockSeulement && $produit['p_stock'] <= 0) {
-        continue;
-    }
-
-    if ($produit['avg_rating'] < $noteMinimum) {
-        continue;
-    }
-
-    if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
-        continue;
-    }
-
-    $produitsFiltres[] = $produit;
+    return $produitsFiltres;
 }
 
-switch ($triPar) {
-    case 'best_sellers':
-        usort($produitsFiltres, function ($a, $b) {
-            return $b['p_nb_ventes'] - $a['p_nb_ventes'];
-        });
-        break;
-    case 'price_asc':
-        usort($produitsFiltres, function ($a, $b) {
-            return $a['p_prix'] - $b['p_prix'];
-        });
-        break;
-    case 'price_desc':
-        usort($produitsFiltres, function ($a, $b) {
-            return $b['p_prix'] - $a['p_prix'];
-        });
-        break;
-    case 'rating':
-        usort($produitsFiltres, function ($a, $b) {
-            return $b['avg_rating'] - $a['avg_rating'];
-        });
-        break;
+function trierProduits($produits, $tri_par)
+{
+    switch ($tri_par) {
+        case 'best_sellers':
+            usort($produits, function ($a, $b) {
+                return $b['p_nb_ventes'] - $a['p_nb_ventes'];
+            });
+            break;
+        case 'price_asc':
+            usort($produits, function ($a, $b) {
+                return $a['p_prix'] - $b['p_prix'];
+            });
+            break;
+        case 'price_desc':
+            usort($produits, function ($a, $b) {
+                return $b['p_prix'] - $a['p_prix'];
+            });
+            break;
+        case 'rating':
+            usort($produits, function ($a, $b) {
+                return $b['note_moyenne'] - $a['note_moyenne'];
+            });
+            break;
+    }
+    
+    return $produits;
 }
 
-$produits = $produitsFiltres;
+function preparerCategoriesAffichage($categories)
+{
+    $categories_affichage = [];
+    $total_produits = 0;
 
-$categoriesAffichage = [];
-$totalProduits = 0;
+    foreach ($categories as $nom_categorie => $compte) {
+        $categories_affichage[] = [
+            'category' => $nom_categorie,
+            'count' => $compte
+        ];
+        $total_produits += $compte;
+    }
 
-foreach ($categories as $nomCategorie => $compte) {
-    $categoriesAffichage[] = [
-        'category' => $nomCategorie,
-        'count' => $compte
-    ];
-    $totalProduits += $compte;
+    array_unshift($categories_affichage, [
+        'category' => 'all',
+        'count' => $total_produits
+    ]);
+    
+    return $categories_affichage;
 }
 
-array_unshift($categoriesAffichage, [
-    'category' => 'all',
-    'count' => $totalProduits
-]);
+// Traitement principal
+$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
+$donnees = chargerProduitsCSV($fichierCSV);
+$produits = $donnees['produits'];
+$categories = $donnees['categories'];
+
+$categorie_filtre = $_POST['category'] ?? 'all';
+$note_minimum = $_POST['rating'] ?? 0;
+$prix_maximum = $_POST['price'] ?? 3000;
+$en_stock_uniquement = isset($_POST['in_stock']);
+$tri_par = $_POST['sort'] ?? 'best_sellers';
+
+$filtres = [
+    'categorie_filtre' => $categorie_filtre,
+    'note_minimum' => $note_minimum,
+    'prix_maximum' => $prix_maximum,
+    'en_stock_uniquement' => $en_stock_uniquement
+];
+
+$produits_filtres = filtrerProduits($produits, $filtres);
+$produits = trierProduits($produits_filtres, $tri_par);
+$categories_affichage = preparerCategoriesAffichage($categories);
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -190,7 +226,7 @@ array_unshift($categoriesAffichage, [
                     <h4>Catégories</h4>
                     <div onclick="definirCategorie('all')">
                         <span>Tous les produits</span>
-                        <span><?= $totalProduits ?></span>
+                        <span><?= $categoriesAffichage[0]['count'] ?></span>
                     </div>
                     <?php foreach ($categoriesAffichage as $categorie): ?>
                         <?php if ($categorie['category'] !== 'all'): ?>
@@ -384,7 +420,6 @@ array_unshift($categoriesAffichage, [
         function ajouterAuPanier(idProduit) {
             alert('Produit ' + idProduit + ' ajouté au panier !');
         }
-
 
         function reinitialiserFiltres() {
             const form = document.createElement('form');

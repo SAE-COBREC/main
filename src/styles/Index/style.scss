@@ -19,6 +19,7 @@
 
 @mixin hover-lift {
   transition: transform 0.2s, box-shadow 0.2s;
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
@@ -72,7 +73,7 @@ aside {
   margin: 2rem 0 2rem 2rem;
   @include sticky-aside;
 
-  form > div:first-child {
+  form>div:first-child {
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
@@ -92,7 +93,7 @@ aside {
     }
   }
 
-  form > div:nth-child(2) {
+  form>div:nth-child(2) {
     @include flex-between;
     margin-bottom: 1.5rem;
 
@@ -118,7 +119,7 @@ aside {
       font-weight: 600;
     }
 
-    > div {
+    >div {
       @include flex-between;
       padding: 0.5rem 0;
       cursor: pointer;
@@ -136,7 +137,7 @@ aside {
         font-size: 0.9rem;
       }
     }
-    
+
     label {
       display: flex;
       align-items: center;
@@ -144,11 +145,11 @@ aside {
       cursor: pointer;
       padding: 0.5rem 0;
       @include transition(color);
-      
+
       &:hover {
         color: $primary-color-bleu;
       }
-      
+
       input[type="checkbox"] {
         cursor: pointer;
       }
@@ -158,6 +159,7 @@ aside {
   // Style du slider (input range)
   input[type="range"] {
     -webkit-appearance: none;
+    appearance: none;
     width: 100%;
     height: 8px;
     border-radius: 8px;
@@ -167,6 +169,7 @@ aside {
     /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
+      appearance: none;
       width: 18px;
       height: 18px;
       border-radius: 50%;
@@ -176,6 +179,7 @@ aside {
 
     /* Curseur - Firefox */
     &::-moz-range-thumb {
+      appearance: none;
       width: 18px;
       height: 18px;
       border-radius: 50%;
@@ -198,12 +202,12 @@ main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
 
-  > div:first-child {
+  >div:first-child {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
-    
-    > p {
+
+    >p {
       grid-column: 1 / -1;
       text-align: center;
       padding: 2rem;
@@ -220,8 +224,8 @@ article {
   overflow: hidden;
   cursor: pointer;
   @include hover-lift;
-  
-  > div:first-child {
+
+  >div:first-child {
     position: relative;
     width: 100%;
     height: 200px;
@@ -235,7 +239,7 @@ article {
       object-fit: cover;
     }
 
-    > span:last-child {
+    >span:last-child {
       position: absolute;
       top: 10px;
       left: 10px;
@@ -246,7 +250,7 @@ article {
       font-size: 1rem;
       font-weight: bold;
     }
-    
+
     .rupture-stock {
       @include centre-absolu;
       background-color: rgba($secondary-color-gris-clair, 0.9);
@@ -260,7 +264,7 @@ article {
     }
   }
 
-  > div:last-child {
+  >div:last-child {
     padding: 1.25rem;
 
     h3 {
@@ -270,23 +274,23 @@ article {
       color: $primary-color-noir;
     }
 
-    > div:nth-child(2) {
+    >div:nth-child(2) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 0.75rem;
-      
+
       span:first-child {
         color: #ffc107; // Couleur pour les étoiles
       }
-      
+
       span:last-child {
         color: $secondary-color-gris-fonce;
         font-size: 0.85rem;
       }
     }
 
-    > div:nth-child(3) {
+    >div:nth-child(3) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -337,12 +341,12 @@ footer {
   padding: 3rem 2rem 2rem;
   margin-top: auto;
 
-  > div:first-child {
+  >div:first-child {
     max-width: 1400px;
     margin: 0 auto;
   }
 
-  > div > div:first-child {
+  >div>div:first-child {
     display: flex;
     justify-content: center;
     gap: 2rem;
@@ -350,7 +354,7 @@ footer {
     padding-bottom: 2rem;
     border-bottom: 1px solid $primary-color-bleu;
 
-    > a {
+    >a {
       width: 50px;
       height: 50px;
       border-radius: 50%;
@@ -399,7 +403,7 @@ footer {
     }
   }
 
-  > div > div:last-child {
+  >div>div:last-child {
     text-align: center;
     padding-top: 2rem;
     border-top: 1px solid $primary-color-bleu;
@@ -408,11 +412,11 @@ footer {
     display: flex;
     justify-content: center;
     gap: 2rem;
-    
+
     span {
       cursor: pointer;
       @include transition(color);
-      
+
       &:hover {
         color: $primary-color-blanc;
       }
@@ -436,20 +440,175 @@ footer {
     order: 1;
     padding: 1rem;
   }
-  
+
   header {
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
-    
-    > div:nth-child(2) {
+
+    >div:nth-child(2) {
       margin: 0;
       width: 100%;
     }
   }
-  
-  footer > div > div:last-child {
+
+  footer>div>div:last-child {
     flex-direction: column;
     gap: 1rem;
   }
 }
+
+// Responsive pour mobile très petit (428px et moins)
+@media (max-width: 428px) {
+  body {
+    display: block;
+    max-width: 428px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .container {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+
+  aside {
+    order: -1;
+    margin: 1rem;
+    padding: 1rem;
+    width: calc(100% - 2rem);
+    position: static;
+    max-height: 60px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    cursor: pointer;
+    
+    &:not(.open) {
+      padding-bottom: 0;
+    }
+    
+    &.open {
+      max-height: none;
+      height: auto;
+      overflow: visible;
+    }
+    
+    &::before {
+      content: "📂 Filtres";
+      display: block;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: $primary-color-bleu;
+    }
+    
+    &.open::before {
+      content: "📂 Masquer les filtres";
+      margin-bottom: 1.5rem;
+    }
+
+    form > div:first-child select {
+      padding: 15px;
+    }
+  }
+
+  aside:not(.open) form {
+    display: none;
+  }
+
+  aside.open form {
+    display: block;
+  }
+
+  main {
+    padding: 1rem;
+    order: 1;
+  }
+
+  main > div:first-child {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  // Ajustement de la taille des articles
+  article {
+    > div:first-child {
+      height: 150px;
+    }
+
+    > div:last-child {
+      padding: 1rem;
+      
+      h3 {
+        font-size: 0.9rem;
+      }
+      
+      > div:nth-child(3) span:last-child {
+        font-size: 1.1rem;
+      }
+    }
+
+    button {
+      padding: 0.6rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  // Footer responsive
+  footer {
+    padding: 2rem 1rem 1rem;
+
+    > div > div:first-child {
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+
+      > a {
+        height: 50px;
+
+        > img {
+          width: 45px;
+        }
+
+      }
+      
+      
+    }
+
+    nav {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+
+      h4 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      ul {
+        padding-left: 0;
+      }
+
+      li {
+        margin-bottom: 0.4rem;
+      }
+
+      a {
+        font-size: 0.9rem;
+      }
+    }
+
+    > div > div:last-child {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 1.5rem;
+      font-size: 0.8rem;
+      
+      span {
+        text-align: center;
+      }
+    }
+  }
+} 
