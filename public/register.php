@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
-<?php 
-    print_r($_POST);
-?>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -214,8 +212,7 @@
         </div>
       </div>
     </form>
-  <script src="../src/js/registerPass.js" ></script>
-  </script>
+  <script type="module" src="../src/js/registerPass.js" ></script>
 </body>
 
 </html>
