@@ -362,3 +362,47 @@ export {
 };
 
 export default storage;
+
+/**
+ * Comment utilisé pour créé, modifier, supprimer des cookies et du localStorage
+ *
+ * import storage, { setCookie, getCookie, removeCookie, listCookies, 
+ *                  setLocal, getLocal, removeLocal, listLocal } from './storage.js';
+ *
+ * // Cookies
+ * setCookie('nom', 'valeur', { days: 7 });
+ * const valeur = getCookie('nom');
+ * 
+ * // LocalStorage
+ * setLocal('nom', 'valeur');
+ * const valeur = getLocal('nom');
+ * 
+ * // Supprimer
+ * removeLocal('nom');
+ * deleteCookie('nom');
+ * 
+ * // Lister
+ * const allCookies = listCookies();
+ * const allLocal = listLocal();
+ * console.log(allCookies);
+ * console.log(allLocal);
+ *
+ * // Exemple de structure de données
+ * {
+ *     nom: "valeur",
+ *     prenom: "Jean"
+ * }
+ *
+ * // Différents types de valeurs stockables
+ * // - Chaînes de caractères
+ * // - Nombres
+ * // - Objets
+ * // - Tableaux
+ * // - Valeurs booléennes
+ *
+ * Différence entre cookies et localStorage
+ * -> Cookies : envoyés au serveur à chaque requête HTTP, utilisés pour
+ *    la gestion de session, expiration configurable.
+ * -> localStorage : stocké localement dans le navigateur, non envoyé
+ *    au serveur, persiste jusqu'à suppression manuelle.
+ */
