@@ -4,10 +4,21 @@
 * {
   font-family: "Quicksand";
 }
+
+.card[id="3"],
+.card[id="2"] {
+  height: 620px !important;
+
+  @media #{$mobile} {
+    max-height: 500px !important;
+  }
+}
+
 body {
   height: 100vh;
   font-size: 24px;
   font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(to bottom right, $primary-color-bronze, $secondary-color-rouge);
   display: flex;
   justify-content: center;
   align-items: center;
