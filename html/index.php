@@ -120,7 +120,7 @@ function preparercategories_affichage($categories)
 }
 
 // Traitement principal
-$fichierCSV = realpath(__DIR__ . '/src/data/mls.csv');
+$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
 $donnees = chargerProduitsCSV($fichierCSV);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];

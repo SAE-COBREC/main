@@ -8,7 +8,7 @@ $prixArt2 = 40.02;
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Panier</title>
-        <link rel="stylesheet" href="/src/styles/Panier/stylesPanier.css">
+        <link rel="stylesheet" href="/main/html/styles/Panier/stylesPanier.css">
     </head>
     <body>
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
@@ -64,6 +64,30 @@ $prixArt2 = 40.02;
                     </div>
                 </article>
 
+
+                <article class="unArticleP" data-price="40.02">
+                    <div class="imageArticleP">
+                        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400" alt="Biscuits">
+                    </div>
+                    <div class="articleDetailP">
+                        <h2 class="articleTitreP">Cookies premium</h2>
+                        <p class="articleDescP">
+                                        Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum 
+                                        has been the industry's standard dummy text ever since the 1500s, when an unknown 
+                                        printer took a galley of type and scrambled it to make a type specimen book. It has 
+                                        survived not only five centuries.
+                        </p>
+                        <div class="basArticleP">
+                        <p class="articlePrix">40.02€</p>
+                            <div class="quantite">
+                                <button class="btn-minus">-</button>
+                                <input type="text" class="quantite-input" value="1">
+                                <button class="btn-plus">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
             </div>
 
             <!-- BLOCK DU RECAP DE LA COMMANDE -->
@@ -82,12 +106,12 @@ $prixArt2 = 40.02;
 
         <script>
 
-        //fonction pour mettre a jour le recap de la commande 
+        //fonction pour mettre a jour le recap de la commande
         function updateRecap() {
             const articles = document.querySelectorAll('.unArticleP');
             let totalPrice = 0;
             let totalItems = 0;
-            let productsHTML = '';
+            let produitEnHTML = '';
             
             articles.forEach(article => {
                 const price = parseFloat(article.dataset.price);
@@ -98,13 +122,13 @@ $prixArt2 = 40.02;
                 if (quantity > 0) {
                     totalPrice += price * quantity;
                     totalItems += quantity;
-                    productsHTML += `<p>${titre} <span>x${quantity}</span></p>`;
+                    produitEnHTML += `<p>${titre} <span>x${quantity}</span></p>`;
                 }
             });
             
             document.getElementById('prixTotal').textContent = totalPrice.toFixed(2) + '€';
             document.getElementById('totalArticles').textContent = `Récapitulatif (${totalItems} produit${totalItems > 1 ? 's' : ''}) :`;
-            document.getElementById('listeProduits').innerHTML = productsHTML;
+            document.getElementById('listeProduits').innerHTML = produitEnHTML;
         }
 
         // Gestion des boutons + et -
