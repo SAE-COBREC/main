@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   box-sizing: border-box;
   margin: 0;
@@ -222,7 +223,7 @@ body {
   font-size: 13px;
   font-weight: 600;
   color: #030212;
-  background: #FAFAF9;
+  background: #FFFFFF;
   border-bottom: 1px solid #E5D5C5;
 }
 .products-table__head-cell--checkbox {
@@ -243,12 +244,26 @@ body {
   color: #030212;
 }
 
+/* Styles pour la case cochée */
 .checkbox {
   width: 18px;
   height: 18px;
   border: 2px solid #E5D5C5;
   border-radius: 4px;
+  display: inline-block;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.checkbox--active {
+  background-color: #E6A96E;
+  border-color: #E6A96E;
+}
+
+/* Met en évidence la ligne sélectionnée */
+.products-table__row.selected {
+  background-color: #FFF2E9;
+  transition: background-color 0.2s;
 }
 
 .product {
@@ -259,7 +274,6 @@ body {
 .product__image {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%);
   border-radius: 8px;
   display: flex;
   align-items: center;
