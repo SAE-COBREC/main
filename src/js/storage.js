@@ -1,6 +1,6 @@
 /**
  * Module de gestion du storage (cookies + localStorage)
- * Usage (ES module):
+ * Utilisation (module ES) :
  * import storage, { setCookie, getCookie } from './storage.js';
  * setCookie('nom', 'valeur', { days: 7 });
  * setLocal('user', { id: 1, name: 'Elouan' });
@@ -347,18 +347,62 @@ const storage = {
 };
 
 export {
-  setCookie, // for setting cookies
-  getCookie, // for retrieval of cookies
-  editCookie, // for editing cookies (same as setCookie)
-  deleteCookie, // for deletion of cookies
-  listCookies, // for listing all cookies
-  isLocalStorageAvailable, // to check localStorage availability
-  setLocal, // for setting localStorage items
-  getLocal, // for retrieval of localStorage items
-  editLocal, // for editing localStorage items (same as setLocal)
-  removeLocal, // for deletion of localStorage items
-  clearLocal, // for clearing all localStorage
-  listLocal, // for listing all localStorage items
+  setCookie, // pour définir un cookie
+  getCookie, // pour récupérer la valeur d'un cookie
+  editCookie, // pour modifier un cookie (alias de setCookie)
+  deleteCookie, // pour supprimer un cookie
+  listCookies, // pour lister tous les cookies
+  isLocalStorageAvailable, // pour vérifier la disponibilité du localStorage
+  setLocal, // pour définir une entrée dans le localStorage
+  getLocal, // pour récupérer une entrée du localStorage
+  editLocal, // pour modifier une entrée du localStorage (alias de setLocal)
+  removeLocal, // pour supprimer une entrée du localStorage
+  clearLocal, // pour vider le localStorage
+  listLocal, // pour lister toutes les entrées du localStorage
 };
 
 export default storage;
+
+/**
+ * Comment utilisé pour créé, modifier, supprimer des cookies et du localStorage
+ *
+ * import storage, { setCookie, getCookie, removeCookie, listCookies, 
+ *                  setLocal, getLocal, removeLocal, listLocal } from './storage.js';
+ *
+ * // Cookies
+ * setCookie('nom', 'valeur', { days: 7 });
+ * const valeur = getCookie('nom');
+ * 
+ * // LocalStorage
+ * setLocal('nom', 'valeur');
+ * const valeur = getLocal('nom');
+ * 
+ * // Supprimer
+ * removeLocal('nom');
+ * deleteCookie('nom');
+ * 
+ * // Lister
+ * const allCookies = listCookies();
+ * const allLocal = listLocal();
+ * console.log(allCookies);
+ * console.log(allLocal);
+ *
+ * // Exemple de structure de données
+ * {
+ *     nom: "valeur",
+ *     prenom: "Jean"
+ * }
+ *
+ * // Différents types de valeurs stockables
+ * // - Chaînes de caractères
+ * // - Nombres
+ * // - Objets
+ * // - Tableaux
+ * // - Valeurs booléennes
+ *
+ * Différence entre cookies et localStorage
+ * -> Cookies : envoyés au serveur à chaque requête HTTP, utilisés pour
+ *    la gestion de session, expiration configurable.
+ * -> localStorage : stocké localement dans le navigateur, non envoyé
+ *    au serveur, persiste jusqu'à suppression manuelle.
+ */

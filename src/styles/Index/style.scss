@@ -159,6 +159,7 @@ aside {
   // Style du slider (input range)
   input[type="range"] {
     -webkit-appearance: none;
+    appearance: none;
     width: 100%;
     height: 8px;
     border-radius: 8px;
@@ -168,6 +169,7 @@ aside {
     /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
+      appearance: none;
       width: 18px;
       height: 18px;
       border-radius: 50%;
@@ -177,6 +179,7 @@ aside {
 
     /* Curseur - Firefox */
     &::-moz-range-thumb {
+      appearance: none;
       width: 18px;
       height: 18px;
       border-radius: 50%;
