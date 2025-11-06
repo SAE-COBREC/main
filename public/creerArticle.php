@@ -17,10 +17,12 @@
                 session_start();
                 // session_unset();
                 // session_destroy();
+                $warn = 0;
+                $warnPromo = false;
                 if ($_POST !== []){
-                    if(count($_FILES["photo"]["name"]) === 0){
-                        print_r("Aucune photo ");
-                    }// else{
+                    // if($_FILES["photo"]["name"][0] === ''){
+                    //     print_r("Aucune photo ");
+                    // }// else{
                     //     print_r(count($_FILES["photo"]["name"]) . ' photos.');
                     // }
                     if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '') ){
@@ -30,24 +32,27 @@
                     }else{
                         print_r("entre deux");
                     }
+                    if (!($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '') || 
+                        !($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '')){
+                        print_r(" Fonctionnel ");
+                    }else{
+                        print_r(" :( ");
+                    }
                     print_r($_POST);
                     print_r($_FILES);
-
-                    
-                    //print_r($_SESSION);
-                    // for($i=0;i<3;i++) {
-                    //     $_FILES["photo"][count($_FILES)-$i];
-
-
-
-                        // $time = time();
-                        // $value["name"] = $time . "." . substr($value["type"],6);
-                        //$_SESSION[$_POST['titre']][$i--] = $_FILES;
-                        // $value["full_path"] = $value["name"];
-                        // move_uploaded_file($value["tmp_name"], 'avatars/' . $value['name']);
-                    //}
+                    if ($_FILES["photo"]["name"][0] !== ''){
+                        foreach ($_FILES["photo"]["name"] as $key => $value) {
+                            if (!in_array($value,$_SESSION["_FILES"])){
+                                print_r($value . ' ');
+                                $_SESSION["_FILES"]["name"][] = $_FILES["photo"]["name"][$key];
+                                $_SESSION["_FILES"]["tmp_name"][] = $_FILES["photo"]["tmp_name"][$key];
+                            }
+                        }
+                    }
+                    print_r($_SESSION);
                 }else{
                     $_FILES["photo"]["name"] = [];
+                    $_SESSION["_FILES"] = [];
                 }
 
             ?>
@@ -110,13 +115,14 @@
                             <!-- Texte avec label -->
                             <label for="titre">Titre</label>
                             <br>
-                            <input type="text" id="titre" name="titre" value="<?php echo $_POST["titre"];?>" maxlength="100" pattern="\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\.|\>|\?|\/|\;|\:|\s" required />
+                            <input style="<?php if ($_POST["titre"] === 'Déjà pris') {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"];?>" maxlength="100" pattern="\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\.|\>|\?|\/|\;|\:|\s" required />
                             <?php
-                                if($_POST["titre"] === 'Déjà prit'){
+                                if($_POST["titre"] === 'Déjà pris'){
                             ?>
                             <br>
                             <small class="warn"><?php
-                                    echo 'Le titre de votre article est déjà prit. Veuillez choisir';
+                                echo 'Le titre de votre article est déjà pris. Veuillez choisir un autre titre';
+                                $warn++;
                             ?></small>
                             <?php
                                 }
@@ -138,7 +144,7 @@
                             <h3>Photo(s)</h3>
                             <label for="photo[]">Sélectionner un fichier</label>
                             <br>
-                            <input type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php 
+                            <input style="<?php if ($_FILES["photo"]["name"][0] === '') {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php 
                                 // for (i=0;i<3; i++){
                                 //     echo $_FILES["photo"]["tmp_name"][i] . '/' . $_FILES["photo"]["full_path"][i];
                                 // }
@@ -152,6 +158,7 @@
                             <br>
                             <small class="warn"><?php
                                     echo 'Veuillez téléverser au moins une photographie.';
+                                    $warn++;
                             ?></small>
                             <?php
                                 }
@@ -198,11 +205,32 @@
                         
                     </section>
 
-                    <section>
+                    <section style="<?php 
+                                    if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '') ){
+                                        //
+                                    }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
+                                        //
+                                    }else{
+                                        $warn++;
+                                        $warnPromo = true;
+                                        echo 'border: 3px solid red';
+                                    }
+                                ?>">
                         <article>
+                                <?php 
+                                    if ($warnPromo){
+                                
+                                ?>
+                            <small class="warn"><?php
+                                echo 'Veuillez remplir tous les champs du bloc réduction ou n\'en remplir aucun.';
+
+                            ?></small>
+                            <?php
+                                }
+                            ?>
                             <label for="pourcentage">Pourcentage réduction</label>
                             <br>
-                            <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="0" placeholder="20,00 %" />
+                            <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00 %" />
                             <br />
                         </article>
 
