@@ -5,6 +5,15 @@
   font-family: "Quicksand";
 }
 
+.card[id="3"],
+.card[id="4"] {
+  height: 620px !important;
+
+  @media #{$mobile} {
+    max-height: 500px !important;
+  }
+}
+
 body {
   height: 100vh;
   font-size: 24px;
@@ -25,6 +34,15 @@ body {
 
   @media #{$mobile} {
     font-size: 16px;
+  }
+
+  .card[id="3"],
+  .card[id="4"] {
+    height: 620px !important;
+
+    @media #{$mobile} {
+      max-height: 500px !important;
+    }
   }
 
   .card {
@@ -115,8 +133,29 @@ body {
           box-shadow: 0 0 4px $primary-color-bleu;
         }
       }
+      input#codeP {
+        width: 140px;
+        margin-left: 40px;
+      }
 
-      /* --- Message d’erreur --- */
+      @media #{$mobile} {
+        input#codeP {
+          width: 140px;
+          margin-left: 40px;
+        }
+      }
+      input#commune {
+        width: 330px;
+        margin-left: 20px;
+      }
+
+      @media #{$mobile} {
+        input#commune {
+          width: 280px;
+          margin-left: 20px;
+        }
+      }
+
       .error {
         background: $primary-color-blanc;
         border-radius: $border-radius-primary;
@@ -126,21 +165,21 @@ body {
         font-size: 15px;
       }
 
-      /* --- Bouton suivant (seule l'image soumet le formulapire) --- */
+
       .next-btn {
         width: 100%;
-        /* plus de fond noir : conteneur visuel mais transparent */
+
         background: transparent;
         color: $secondary-color-rouge;
         font-size: 18px;
-        /* réduire le padding pour alléger le conteneur */
+
         padding: 8px 0;
         border-radius: $border-radius-primary;
         margin-top: 1rem;
         transition: 0.15s;
         display: flex;
         flex-direction: column;
-        /* empile le texte au-dessus de la flèche */
+
         align-items: center;
         justify-content: center;
         pointer-events: none;
@@ -189,7 +228,6 @@ body {
         }
       }
 
-      /* Prev button uses same layout as .next-btn but can be styled separately if needed */
       .prev-btn {
         display: flex;
         flex-direction: column;
@@ -205,12 +243,11 @@ body {
         .btn-arrow-left { width: 28px; }
       }
 
-      /* Navigation buttons (Précédent / Suivant) */
       .nav-actions {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        /* réduire l'espacement entre les boutons pour qu'ils soient plus collés */
+
         gap: 6px;
         width: 100%;
         margin-top: 0.6rem;
@@ -224,13 +261,13 @@ body {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          /* boutons plus compacts */
+
           padding: 6px 8px;
           border-radius: 8px;
         }
 
         .btn-prev {
-          flex-direction: column; // flèche au dessus, texte en dessous
+          flex-direction: column; 
           align-items: center;
           color: $primary-color-noir;
 
@@ -238,7 +275,7 @@ body {
         }
 
         .btn-next {
-          flex-direction: row; // flèche à gauche du texte
+          flex-direction: row; 
           background: $primary-color-noir;
           color: $primary-color-blanc;
           padding: 8px 12px;
@@ -257,7 +294,6 @@ body {
       }
     }
 
-    /* --- Étape --- */
     .step {
       margin-top: 1.2rem;
       font-size: 18px;

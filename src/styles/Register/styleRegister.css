@@ -1,6 +1,16 @@
-@charset "UTF-8";
 * {
   font-family: "Quicksand";
+}
+
+.card[id="3"],
+.card[id="4"] {
+  height: 620px !important;
+}
+@media screen and (max-width: 508px ) {
+  .card[id="3"],
+  .card[id="4"] {
+    max-height: 500px !important;
+  }
 }
 
 body {
@@ -24,6 +34,16 @@ body .hidden {
     font-size: 16px;
   }
 }
+body .card[id="3"],
+body .card[id="4"] {
+  height: 620px !important;
+}
+@media screen and (max-width: 508px ) {
+  body .card[id="3"],
+  body .card[id="4"] {
+    max-height: 500px !important;
+  }
+}
 body .card {
   background: #FFFFFF;
   width: 661px;
@@ -31,7 +51,6 @@ body .card {
   padding: 50px 25px 25px 25px;
   border-radius: 14px;
   text-align: center;
-  /* --- Étape --- */
 }
 @media screen and (max-width: 508px ) {
   body .card {
@@ -75,10 +94,6 @@ body .card form {
   flex-direction: column;
   gap: 1.2rem;
   padding: 10px 20px;
-  /* --- Message d’erreur --- */
-  /* --- Bouton suivant (seule l'image soumet le formulapire) --- */
-  /* Prev button uses same layout as .next-btn but can be styled separately if needed */
-  /* Navigation buttons (Précédent / Suivant) */
 }
 body .card form label {
   font-size: 24px;
@@ -115,6 +130,26 @@ body .card form input:focus {
   border-color: #7171A3;
   box-shadow: 0 0 4px #7171A3;
 }
+body .card form input#codeP {
+  width: 140px;
+  margin-left: 40px;
+}
+@media screen and (max-width: 508px ) {
+  body .card form input#codeP {
+    width: 140px;
+    margin-left: 40px;
+  }
+}
+body .card form input#commune {
+  width: 330px;
+  margin-left: 20px;
+}
+@media screen and (max-width: 508px ) {
+  body .card form input#commune {
+    width: 280px;
+    margin-left: 20px;
+  }
+}
 body .card form .error {
   background: #FFFFFF;
   border-radius: 14px;
@@ -125,18 +160,15 @@ body .card form .error {
 }
 body .card form .next-btn {
   width: 100%;
-  /* plus de fond noir : conteneur visuel mais transparent */
   background: transparent;
   color: #D4183D;
   font-size: 18px;
-  /* réduire le padding pour alléger le conteneur */
   padding: 8px 0;
   border-radius: 14px;
   margin-top: 1rem;
   transition: 0.15s;
   display: flex;
   flex-direction: column;
-  /* empile le texte au-dessus de la flèche */
   align-items: center;
   justify-content: center;
   pointer-events: none;
@@ -204,7 +236,6 @@ body .card form .nav-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* réduire l'espacement entre les boutons pour qu'ils soient plus collés */
   gap: 6px;
   width: 100%;
   margin-top: 0.6rem;
@@ -218,7 +249,6 @@ body .card form .nav-actions .btn-next {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  /* boutons plus compacts */
   padding: 6px 8px;
   border-radius: 8px;
 }

@@ -1,5 +1,5 @@
 <?php
-$fichierCSV = __DIR__ . '/BDD/data.csv';
+$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
 $produits = [];
 $categories = [];
 
@@ -34,11 +34,12 @@ if (file_exists($fichierCSV)) {
     }
 }
 
-$categorieFiltre = $_GET['category'] ?? 'all';
-$noteMinimum = $_GET['rating'] ?? 0;
-$prixMaximum = $_GET['price'] ?? 3000;
-$enStockSeulement = isset($_GET['in_stock']);
-$triPar = $_GET['sort'] ?? 'best_sellers';
+// Changement de GET à POST
+$categorieFiltre = $_POST['category'] ?? 'all';
+$noteMinimum = $_POST['rating'] ?? 0;
+$prixMaximum = $_POST['price'] ?? 3000;
+$enStockSeulement = isset($_POST['in_stock']);
+$triPar = $_POST['sort'] ?? 'best_sellers';
 
 $produitsFiltres = [];
 
@@ -114,7 +115,7 @@ array_unshift($categoriesAffichage, [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
-    <link rel="stylesheet" href="/Php/Index/style.css">
+    <link rel="stylesheet" href="/src/styles/Index/style.css">
     <link rel="stylesheet" href="/src/styles/Header/stylesHeader.css">
     <style>
         .image-rupture {
@@ -168,7 +169,8 @@ array_unshift($categoriesAffichage, [
 
     <div class="container">
         <aside>
-            <form method="GET" action="" id="filterForm">
+            <!-- Changement de GET à POST -->
+            <form method="POST" action="" id="filterForm">
                 <div>
                     <span>Tri par :</span>
                     <select name="sort" onchange="document.getElementById('filterForm').submit()">
@@ -183,7 +185,8 @@ array_unshift($categoriesAffichage, [
 
                 <div>
                     <h3>Filtres</h3>
-                    <button type="button" onclick="window.location.href='index.php'">Effacer</button>
+                    <!-- Changement pour la réinitialisation -->
+                    <button type="button" onclick="reinitialiserFiltres()">Effacer</button>
                 </div>
 
                 <section>
@@ -296,12 +299,12 @@ array_unshift($categoriesAffichage, [
     <footer>
         <div>
             <div>
-                <a href="#">f</a>
-                <a href="#">in</a>
-                <a href="#">▶</a>
-                <a href="#">📷</a>
-                <a href="#">♪</a>
-                <a href="#">P</a>
+                <a href="#"><img src="/src/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/src/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
             </div>
 
             <nav>
@@ -385,6 +388,16 @@ array_unshift($categoriesAffichage, [
             alert('Produit ' + idProduit + ' ajouté au panier !');
         }
 
+        // Nouvelle fonction pour réinitialiser les filtres avec POST
+        function reinitialiserFiltres() {
+            // Créer un formulaire temporaire pour POST sans paramètres
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'index.php';
+            document.body.appendChild(form);
+            form.submit();
+        }
+
         function activerEditionPrix() {
             const affichagePrix = document.getElementById('affichagePrixMax');
             const prixActuel = affichagePrix.textContent.replace('€', '');
@@ -422,10 +435,6 @@ array_unshift($categoriesAffichage, [
 
                 document.getElementById('filterForm').submit();
             }
-        }
-
-        function mettreAJourAffichagePrix(valeur) {
-            document.getElementById('affichagePrixMax').textContent = valeur + '€';
         }
     </script>
 </body>
