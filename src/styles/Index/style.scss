@@ -504,6 +504,10 @@ footer {
       content: "📂 Masquer les filtres";
       margin-bottom: 1.5rem;
     }
+
+    form > div:first-child select {
+      padding: 15px;
+    }
   }
 
   aside:not(.open) form {
@@ -566,7 +570,7 @@ footer {
         }
 
       }
-
+      
       
     }
 
@@ -604,4 +608,4 @@ footer {
       }
     }
   }
-}
+} 

@@ -414,6 +414,9 @@ footer > div > div:last-child span:hover {
     content: "📂 Masquer les filtres";
     margin-bottom: 1.5rem;
   }
+  aside form > div:first-child select {
+    padding: 15px;
+  }
   aside:not(.open) form {
     display: none;
   }
