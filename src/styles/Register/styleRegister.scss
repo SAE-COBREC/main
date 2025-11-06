@@ -133,6 +133,7 @@ body {
           box-shadow: 0 0 4px $primary-color-bleu;
         }
       }
+
       input#codeP {
         width: 140px;
         margin-left: 40px;
@@ -144,6 +145,7 @@ body {
           margin-left: 40px;
         }
       }
+
       input#commune {
         width: 330px;
         margin-left: 20px;
@@ -220,6 +222,7 @@ body {
           transform: scaleX(-1);
           color: $primary-color-noir;
         }
+
         .btn-arrow-left {
           max-width: 20px;
           display: inline-block;
@@ -236,11 +239,21 @@ body {
         gap: 6px;
         margin-top: 1rem;
 
-        .next-text { color: $primary-color-noir; }
+        .next-text {
+          color: $primary-color-noir;
+        }
 
-        .arrow-only { background: transparent; border: none; padding: 8px; border-radius: 50%; cursor: pointer; }
+        .arrow-only {
+          background: transparent;
+          border: none;
+          padding: 8px;
+          border-radius: 50%;
+          cursor: pointer;
+        }
 
-        .btn-arrow-left { width: 28px; }
+        .btn-arrow-left {
+          width: 28px;
+        }
       }
 
       .nav-actions {
@@ -267,29 +280,46 @@ body {
         }
 
         .btn-prev {
-          flex-direction: column; 
+          flex-direction: column;
           align-items: center;
           color: $primary-color-noir;
 
-          .nav-arrow { width: 24px; height: auto; margin-bottom: 4px; }
+          .nav-arrow {
+            width: 24px;
+            height: auto;
+            margin-bottom: 4px;
+          }
         }
 
         .btn-next {
-          flex-direction: row; 
+          flex-direction: row;
           background: $primary-color-noir;
           color: $primary-color-blanc;
           padding: 8px 12px;
         }
 
-        .nav-arrow.right { transform: scaleX(-1); }
-        .nav-arrow.left { transform: none; }
+        .nav-arrow.right {
+          transform: scaleX(-1);
+        }
 
-        .nav-label { font-size: 14px; }
+        .nav-arrow.left {
+          transform: none;
+        }
+
+        .nav-label {
+          font-size: 14px;
+        }
 
         @media #{$mobile} {
           gap: 6px;
-          .btn-prev .nav-arrow { width: 20px; }
-          .nav-label { font-size: 13px; }
+
+          .btn-prev .nav-arrow {
+            width: 20px;
+          }
+
+          .nav-label {
+            font-size: 13px;
+          }
         }
       }
     }
