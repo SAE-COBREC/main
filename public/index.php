@@ -1,5 +1,5 @@
 <?php
-$fichierCSV = __DIR__ . '/src/data/mls.csv';
+$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
 $produits = [];
 $categories = [];
 
@@ -302,7 +302,7 @@ array_unshift($categoriesAffichage, [
                 <a href="#"><img src="/src/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
                 <a href="#"><img src="/src/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
                 <a href="#"><img src="/src/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/instagram-blank.svg" style="filter: invert(1);" ></a>
+                <a href="#"><img src="/src/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
                 <a href="#"><img src="/src/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
                 <a href="#"><img src="/src/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
             </div>
