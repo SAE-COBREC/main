@@ -150,8 +150,8 @@ $categories_affichage = preparercategories_affichage($categories);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
-    <link rel="stylesheet" href="/src/styles/Index/style.css">
-    <link rel="stylesheet" href="/src/styles/Header/stylesHeader.css">
+    <link rel="stylesheet" href="/html/styles/Index/style.css">
+    <link rel="stylesheet" href="/html/styles/Header/stylesHeader.css">
     <style>
         .image-rupture {
             filter: grayscale(100%) opacity(0.7);
@@ -181,21 +181,21 @@ $categories_affichage = preparercategories_affichage($categories);
         <div class="header-inner">
             <div class="logo-container">
                 <a href="/" class="brand">
-                    <img src="/src/img/svg/logo-text.svg" alt="Alizon" class="logo" />
+                    <img src="/html/img/svg/logo-text.svg" alt="Alizon" class="logo" />
                 </a>
             </div>
 
             <div class="search-container">
-                <img src="/src/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
+                <img src="/html/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
                 <input type="text" placeholder="Rechercher des produits..." class="search-input">
             </div>
 
             <div class="icons-container">
                 <a href="#" class="icon-link">
-                    <img src="/src/img/svg/profile.svg" alt="Profile" class="fas fa-shopping-cart icon">
+                    <img src="/html/img/svg/profile.svg" alt="Profile" class="fas fa-shopping-cart icon">
                 </a>
                 <a href="#" class="icon-link">
-                    <img src="/src/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
+                    <img src="/html/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
                         style="filter: invert(1) saturate(0.9);">
                 </a>
             </div>
@@ -332,12 +332,12 @@ $categories_affichage = preparercategories_affichage($categories);
     <footer>
         <div>
             <div>
-                <a href="#"><img src="/src/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/html/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/html/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/html/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/html/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/html/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/html/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
             </div>
 
             <nav>
