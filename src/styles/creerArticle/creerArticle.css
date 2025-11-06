@@ -1,0 +1,89 @@
+body {
+  display: flex;
+  flex-direction: row;
+  height: 80%;
+  width: 80%;
+  margin: 0;
+  overflow: auto;
+  background-color: #FFF2E9;
+}
+body main {
+  background: var(--bg);
+  padding: 24px 36px;
+  width: 100%;
+  overflow-y: auto;
+}
+body main form > input {
+  position: relative;
+  left: 81%;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+  background: #FFFFFF;
+  border: 1px solid #ecd9c6;
+  color: #030212;
+  margin-bottom: 2em;
+}
+body main form > input:nth-of-type(3) {
+  background: #CD7F32;
+  color: #fff;
+  box-shadow: 0 4px 0.1em rgba(205, 127, 50, 0.12);
+}
+body main section {
+  grid-column: 1;
+  grid-row: 1;
+  width: 50em;
+  background: white;
+  border-radius: 0.1em;
+  padding: 14px;
+  border: 1px solid #ecd9c6;
+}
+body main section h3 {
+  font-weight: bold;
+}
+body main section article {
+  padding: 0.3em;
+  margin-bottom: 0.3em;
+}
+body main section article label {
+  font-weight: bold;
+}
+body main section article input, body main section article textarea {
+  border: 1px solid #ecd9c6;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  width: 80%;
+  padding: 0.6em;
+}
+body main section article .warn {
+  color: red;
+}
+body main div {
+  display: grid;
+  gap: 2em;
+}
+body main #photo {
+  border: 2px dashed #ecd9c6;
+  border-radius: 0.1em;
+  padding: 28px;
+  text-align: center;
+  color: #8b7a6a;
+}
+body main section:nth-child(2) {
+  grid-row: 2;
+  max-height: 12em;
+}
+body main section:nth-child(3), body main section:nth-child(4) {
+  width: 30em;
+  max-height: 15em;
+  grid-column: 2;
+}
+body main section:nth-child(3) {
+  grid-row: 1;
+}
+body main section:nth-child(4) {
+  grid-row: 2;
+}/*# sourceMappingURL=creerArticle.css.map */
