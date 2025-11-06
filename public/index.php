@@ -34,7 +34,6 @@ if (file_exists($fichierCSV)) {
     }
 }
 
-// Changement de GET à POST
 $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['rating'] ?? 0;
 $prixMaximum = $_POST['price'] ?? 3000;
@@ -169,7 +168,6 @@ array_unshift($categoriesAffichage, [
 
     <div class="container">
         <aside>
-            <!-- Changement de GET à POST -->
             <form method="POST" action="" id="filterForm">
                 <div>
                     <span>Tri par :</span>
@@ -185,7 +183,6 @@ array_unshift($categoriesAffichage, [
 
                 <div>
                     <h3>Filtres</h3>
-                    <!-- Changement pour la réinitialisation -->
                     <button type="button" onclick="reinitialiserFiltres()">Effacer</button>
                 </div>
 
@@ -388,9 +385,8 @@ array_unshift($categoriesAffichage, [
             alert('Produit ' + idProduit + ' ajouté au panier !');
         }
 
-        // Nouvelle fonction pour réinitialiser les filtres avec POST
+
         function reinitialiserFiltres() {
-            // Créer un formulaire temporaire pour POST sans paramètres
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = 'index.php';

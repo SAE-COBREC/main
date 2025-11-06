@@ -7,6 +7,25 @@
   <link rel="stylesheet" href="../src/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
 <body>
+  <?php
+    // ID du vendeur à afficher
+    $vendeur_id = 101;
+
+    // Tableau pour stocker les articles
+    $articles = [];
+
+    // Lecture du fichier CSV
+    if (($handle = fopen("../Php/BDD/articles_vendeur.csv", "r")) !== false) {
+        $header = fgetcsv($handle, 1000, ";"); // lire l'en-tête
+        while (($data = fgetcsv($handle, 1000, ";")) !== false) {
+            $article = array_combine($header, $data);
+            if ($article['id_vendeur'] == $vendeur_id) {
+                $articles[] = $article;
+            }
+        }
+        fclose($handle);
+    }
+    ?>
   <div class="app">
     <aside class="sidebar">
       <div class="logo">
@@ -61,7 +80,7 @@
 
         <div class="search-bar">
           <div class="search-bar__input">
-            <span class="search-bar__icon">🔍</span>
+            <span class="search-bar__icon"><img src="../src/img/svg/loupe.svg" alt="loupe"></span>
             <input type="search" placeholder="Rechercher des produits..." />
           </div>
           <button class="btn btn--primary">Ajouter un produit</button>
@@ -112,89 +131,40 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="products-table__row">
-              <td class="products-table__cell">
-                <div class="checkbox"></div>
-              </td>
-              <td class="products-table__cell">
-                <div class="product">
-                  <div class="product__image">🎧</div>
-                  <div class="product__info">
-                    <h4 class="product__name">Casque Audio Premium</h4>
-                    <p class="product__model">Modèle: A-100</p>
-                  </div>
-                </div>
-              </td>
-              <td class="products-table__cell">
-                <span class="badge badge--draft">Ébauche</span>
-              </td>
-              <td class="products-table__cell products-table__cell--muted">20 en stock</td>
-              <td class="products-table__cell products-table__cell--muted">Casque</td>
-              <td class="products-table__cell products-table__cell--muted">Gaetan Lolléric</td>
-            </tr>
-
-            <tr class="products-table__row">
-              <td class="products-table__cell">
-                <div class="checkbox"></div>
-              </td>
-              <td class="products-table__cell">
-                <div class="product">
-                  <div class="product__image">🎧</div>
-                  <div class="product__info">
-                    <h4 class="product__name">Casque Audio Premium</h4>
-                    <p class="product__model">Modèle: A-100</p>
-                  </div>
-                </div>
-              </td>
-              <td class="products-table__cell">
-                <span class="badge badge--live">En ligne</span>
-              </td>
-              <td class="products-table__cell products-table__cell--muted">20 en stock</td>
-              <td class="products-table__cell products-table__cell--muted">Casque</td>
-              <td class="products-table__cell products-table__cell--muted">Gaetan Lolléric</td>
-            </tr>
-
-            <tr class="products-table__row">
-              <td class="products-table__cell">
-                <div class="checkbox"></div>
-              </td>
-              <td class="products-table__cell">
-                <div class="product">
-                  <div class="product__image">🎧</div>
-                  <div class="product__info">
-                    <h4 class="product__name">Casque Audio Premium</h4>
-                    <p class="product__model">Modèle: A-100</p>
-                  </div>
-                </div>
-              </td>
-              <td class="products-table__cell">
-                <span class="badge badge--draft">Ébauche</span>
-              </td>
-              <td class="products-table__cell products-table__cell--muted">20 en stock</td>
-              <td class="products-table__cell products-table__cell--muted">Casque</td>
-              <td class="products-table__cell products-table__cell--muted">Gaetan Lolléric</td>
-            </tr>
-
-            <tr class="products-table__row">
-              <td class="products-table__cell">
-                <div class="checkbox"></div>
-              </td>
-              <td class="products-table__cell">
-                <div class="product">
-                  <div class="product__image">🎧</div>
-                  <div class="product__info">
-                    <h4 class="product__name">Casque Audio Premium</h4>
-                    <p class="product__model">Modèle: A-100</p>
-                  </div>
-                </div>
-              </td>
-              <td class="products-table__cell">
-                <span class="badge badge--out">Épuisé</span>
-              </td>
-              <td class="products-table__cell products-table__cell--muted">0 en stock</td>
-              <td class="products-table__cell products-table__cell--muted">Casque</td>
-              <td class="products-table__cell products-table__cell--muted">Gaetan Lolléric</td>
-            </tr>
+            <?php if (!empty($articles)): ?>
+              <?php foreach ($articles as $article): ?>
+                <tr class="products-table__row">
+                  <td class="products-table__cell">
+                    <div class="checkbox"></div>
+                  </td>
+                  <td class="products-table__cell">
+                    <div class="product">
+                      <div class="product__image">
+                        <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['nom_article']); ?>" width="50" height="50">
+                      </div>
+                      <div class="product__info">
+                        <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
+                        <p class="product__model"><?php echo number_format($article['prix'], 2, ',', ' '); ?> €</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="products-table__cell">
+                    <?php if ($article['stock'] > 0): ?>
+                      <span class="badge badge--live">En ligne</span>
+                    <?php else: ?>
+                      <span class="badge badge--out">Épuisé</span>
+                    <?php endif; ?>
+                  </td>
+                  <td class="products-table__cell products-table__cell--muted"><?php echo htmlspecialchars($article['stock']); ?> en stock</td>
+                  <td class="products-table__cell products-table__cell--muted"><?php echo htmlspecialchars($article['categorie']); ?></td>
+                  <td class="products-table__cell products-table__cell--muted"><?php echo htmlspecialchars($article['description']); ?></td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="6" style="text-align:center;">Aucun article</td>
+              </tr>
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
