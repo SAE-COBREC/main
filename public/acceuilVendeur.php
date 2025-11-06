@@ -15,7 +15,7 @@
     $articles = [];
 
     // Lecture du fichier CSV
-    if (($handle = fopen("../Php/BDD/articles_vendeur.csv", "r")) !== false) {
+    if (($handle = fopen("../src/data/articles_vendeur.csv", "r")) !== false) {
         $header = fgetcsv($handle, 1000, ";"); // lire l'en-tête
         while (($data = fgetcsv($handle, 1000, ";")) !== false) {
             $article = array_combine($header, $data);
@@ -140,7 +140,7 @@
                   <td class="products-table__cell">
                     <div class="product">
                       <div class="product__image">
-                        <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['nom_article']); ?>" width="50" height="50">
+                        <img src="<?= htmlspecialchars($article['image_url']) ?>" alt="<?php echo htmlspecialchars($article['nom_article']); ?>" width="50" height="50">
                       </div>
                       <div class="product__info">
                         <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
