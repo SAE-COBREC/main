@@ -1,33 +1,31 @@
 <!doctype html>
 <html lang="fr">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1440, height=1024" />
   <title>Alizon - Page Accueil Vendeur</title>
   <link rel="stylesheet" href="../src/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
-
 <body>
   <?php
-  // ID du vendeur à afficher
-  $vendeur_id = 101;
+    // ID du vendeur à afficher
+    $vendeur_id = 101;
 
-  // Tableau pour stocker les articles
-  $articles = [];
+    // Tableau pour stocker les articles
+    $articles = [];
 
-  // Lecture du fichier CSV
-  if (($handle = fopen("../src/data/articles_vendeur.csv", "r")) !== false) {
-    $header = fgetcsv($handle, 1000, ";"); // lire l'en-tête
-    while (($data = fgetcsv($handle, 1000, ";")) !== false) {
-      $article = array_combine($header, $data);
-      if ($article['id_vendeur'] == $vendeur_id) {
-        $articles[] = $article;
-      }
+    // Lecture du fichier CSV
+    if (($handle = fopen("../src/data/articles_vendeur.csv", "r")) !== false) {
+        $header = fgetcsv($handle, 1000, ";"); // lire l'en-tête
+        while (($data = fgetcsv($handle, 1000, ";")) !== false) {
+            $article = array_combine($header, $data);
+            if ($article['id_vendeur'] == $vendeur_id) {
+                $articles[] = $article;
+            }
+        }
+        fclose($handle);
     }
-    fclose($handle);
-  }
-  ?>
+    ?>
   <div class="app">
     <aside class="sidebar">
       <div class="logo">
@@ -138,12 +136,32 @@
                 <tr class="products-table__row">
                   <td class="products-table__cell">
                     <div class="checkbox"></div>
+                    <script>
+                      document.addEventListener('DOMContentLoaded', () => {
+                        const rows = document.querySelectorAll('.products-table__row');
+
+                        rows.forEach(row => {
+                          const checkbox = row.querySelector('.checkbox');
+
+                          row.addEventListener('click', () => {
+                            // On retire la sélection de tous les autres
+                            rows.forEach(r => {
+                              r.classList.remove('selected');
+                              r.querySelector('.checkbox').classList.remove('checkbox--active');
+                            });
+
+                            // On active celui qu'on vient de cliquer
+                            row.classList.add('selected');
+                            checkbox.classList.add('checkbox--active');
+                          });
+                        });
+                      });
+                    </script>
                   </td>
                   <td class="products-table__cell">
                     <div class="product">
                       <div class="product__image">
-                        <img src="<?= htmlspecialchars($article['image_url']) ?>"
-                          alt="<?php echo htmlspecialchars($article['nom_article']); ?>" width="50" height="50">
+                        <img src="<?php echo htmlspecialchars($article['image_url']) ?>" width="50" height="50" alt="<?php echo htmlspecialchars($article['nom_article']); ?>">
                       </div>
                       <div class="product__info">
                         <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
@@ -158,15 +176,9 @@
                       <span class="badge badge--out">Épuisé</span>
                     <?php endif; ?>
                   </td>
-                  <td class="products-table__cell products-table__cell--muted">
-                    <?php echo htmlspecialchars($article['stock']); ?> en stock
-                  </td>
-                  <td class="products-table__cell products-table__cell--muted">
-                    <?php echo htmlspecialchars($article['categorie']); ?>
-                  </td>
-                  <td class="products-table__cell products-table__cell--muted">
-                    <?php echo htmlspecialchars($article['description']); ?>
-                  </td>
+                  <td class="products-table__cell products-table__cell--stock"><?php echo htmlspecialchars($article['stock']); ?></td>
+                  <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['categorie']); ?></td>
+                  <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['description']); ?></td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
@@ -180,5 +192,4 @@
     </main>
   </div>
 </body>
-
 </html>
