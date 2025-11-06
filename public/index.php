@@ -1,5 +1,5 @@
 <?php
-$fichierCSV = __DIR__ . '/BDD/data.csv';
+$fichierCSV = __DIR__ . '/src/data/mls.csv';
 $produits = [];
 $categories = [];
 
@@ -115,7 +115,7 @@ array_unshift($categoriesAffichage, [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
-    <link rel="stylesheet" href="/Php/Index/style.css">
+    <link rel="stylesheet" href="/src/styles/Index/style.css">
     <link rel="stylesheet" href="/src/styles/Header/stylesHeader.css">
     <style>
         .image-rupture {
