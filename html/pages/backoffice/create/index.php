@@ -49,7 +49,7 @@ if ($_POST !== []) {
 ?>
 <body>
     <?php
-    include __DIR__ . '/../../partials/aside.html';
+    include __DIR__ . '/../../../partials/aside.html';
     ?>
     <main>
         <h2>⏴ Produit non enregistré</h2>
