@@ -5,6 +5,11 @@ html {
   font-family: $font-family-secondaire;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
 h1,
 h2,
 h3 {
@@ -24,10 +29,13 @@ img,
 .articlesPrixP {
   display: flex;
   justify-content: space-between;
+  margin: 1em;
 
   @media screen and (max-width: 428px) {
     flex-direction: column;
     align-items: center;
+    max-width: 404px;
+    margin: auto;
   }
 }
 
@@ -122,7 +130,6 @@ button {
   @media screen and (max-width: 428px) {
     position: static;
     margin: 10px auto;
-    width: calc(100% - 40px);
   }
 
   .recapTete,

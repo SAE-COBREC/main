@@ -249,7 +249,15 @@ function finishRegistration() {
     } catch (e) {
         console.warn('finishRegistration save erreur', e);
     }
-    
+    // After saving aggregated data, submit the form if present so the server
+    // can handle final processing (preview/write CSV/etc.). This mirrors the
+    // previous inline behaviour which explicitly submitted the form.
+    try {
+        const form = document.getElementById('multiForm');
+        if (form) form.submit();
+    } catch (e) {
+        // non-blocking
+    }
 }
 
 function showPreviousCard() {
@@ -286,4 +294,21 @@ if (typeof window !== 'undefined') {
     window.showNextCard = showNextCard;
     window.showPreviousCard = showPreviousCard;
     window.finishRegistration = finishRegistration;
+}
+
+// Auto-initialize visible card and attempt to restore saved values on page load.
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', () => {
+        const cards = Array.from(document.querySelectorAll('.card'));
+        // If there is already a visible card, try to restore its values.
+        let visibleIndex = cards.findIndex(c => !c.classList.contains('hidden'));
+        if (visibleIndex === -1 && cards.length > 0) {
+            // No explicit visible card: show the first one
+            showCard(cards[0].id);
+            visibleIndex = 0;
+        }
+        if (visibleIndex >= 0) {
+            try { restoreCardData(cards[visibleIndex].id); } catch (e) { /* non-blocking */ }
+        }
+    });
 }
