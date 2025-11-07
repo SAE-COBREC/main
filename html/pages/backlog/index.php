@@ -25,53 +25,12 @@
         }
         fclose($handle);
     }
-    ?>
+    ?>   
   <div class="app">
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../img/svg/logo_bronze.svg" alt="logo" class="logo__icon">
-        <span class="logo__text">Alizon</span>
-      </div>
+    <?php
+    include __DIR__ . '/../../partials/aside.html';
+    ?>
 
-      <nav class="nav">
-        <a href="#" class="nav__item nav__item--active">
-          <img class="nav__icon" src="../../img/svg/home.svg" alt="home">
-          <span class="nav__label">Accueil</span>
-        </a>
-
-        <a href="#" class="nav__item">
-          <img class="nav__icon" src="../../img/svg/box.svg" alt="box">
-          <span class="nav__label">Commandes</span>
-        </a>
-
-        <a href="#" class="nav__item">
-          <img class="nav__icon" src="../../img/svg/folder.svg" alt="folder">
-          <span class="nav__label">Produits</span>
-        </a>
-
-        <a href="#" class="nav__item">
-          <img class="nav__icon" src="../../img/svg/profile-v.svg" alt="profile">
-          <span class="nav__label">Clients</span>
-        </a>
-
-        <a href="#" class="nav__item">
-          <img class="nav__icon" src="../../img/svg/stats.svg" alt="stats">
-          <span class="nav__label">Statistiques</span>
-        </a>
-
-        <a href="#" class="nav__item">
-          <img class="nav__icon" src="../../img/svg/promotion.svg" alt="promotion">
-          <span class="nav__label">Promotion</span>
-        </a>
-
-        <a href="#" class="nav__item">
-          <img class="nav__icon" src="../../img/svg/reduction.svg" alt="reduction">
-          <span class="nav__label">Réductions</span>
-        </a>
-      </nav>
-
-      <button class="preview-btn">Tout Prévisualiser</button>
-    </aside>
 
     <!-- Main Content -->
     <main class="main">

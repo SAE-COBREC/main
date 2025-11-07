@@ -3,4 +3,4 @@ id_article;id_vendeur;nom_article;description;prix;stock;image_url;categorie
 2;101;Clavier Mécanique;Clavier RGB avec switchs bleus.;59.90;15;../../img/Photo/galette.webp;Informatique
 3;101;Souris Gaming;Souris ergonomique avec 6 boutons programmables.;39.50;30;../../img/Photo/galette.webp;Informatique
 4;101;Enceinte Portable;Enceinte Bluetooth étanche avec batterie longue durée.;49.99;20;../../img/Photo/galette.webp;Audio
-5;101;Webcam HD;Caméra 1080p pour visioconférence.;69.00;10;../../img/Photo/galette.webp;Informatique
+5;101;Webcam HD;Caméra 1080p pour visioconférence.;69.00;0;../../img/Photo/galette.webp;Informatique
