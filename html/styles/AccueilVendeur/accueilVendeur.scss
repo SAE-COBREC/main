@@ -16,7 +16,7 @@ body {
 
 .app {
   display: grid;
-  grid-template-columns:260px 1fr;
+  grid-template-columns:240px 1fr;
   height: 1024px;
   background: $primary-color-blanc;
 }
@@ -84,12 +84,19 @@ body {
   &--primary {
     background: $primary-color-bronze;
     color: $primary-color-blanc;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  &--primary:active {
+    transform: scale(0.97);
   }
 
   &:hover {
       background: rgba($secondary-color-bronze-clair, 0.9);
       color: $primary-color-blanc;
     }
+
+
 }
 
 // Content Section
@@ -197,11 +204,10 @@ body {
   display: inline-block;
   cursor: pointer;
   transition: 0.2s;
-}
-
-.checkbox--active {
-  background-color: $secondary-color-bronze-clair;
-  border-color: $secondary-color-bronze-clair;
+  &--active {
+    background-color: $secondary-color-bronze-clair;
+    border-color: $secondary-color-bronze-clair;
+  }
 }
 
 /* Met en évidence la ligne sélectionnée */
@@ -256,13 +262,13 @@ body {
   }
 
   &--live {
-    background: #FEF3E6;
-    color: #D68910;
+    background: $primary-color-bronze;
+    color: $primary-color-blanc;
   }
 
   &--out {
-    background: #F5E8DD;
-    color: $secondary-color-marron;
+    background: $secondary-color-marron;
+    color: $primary-color-blanc;
   }
 }
 

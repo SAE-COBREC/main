@@ -5,6 +5,11 @@ html {
   font-family: $font-family-secondaire;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
 h1,
 h2,
 h3 {
@@ -23,13 +28,16 @@ img,
 
 .articlesPrixP {
   display: flex;
-  justify-content: space-between;
-
-  @media screen and (max-width: 428px) {
-    flex-direction: column;
-    align-items: center;
-  }
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 1em;
 }
+
 
 button {
   border: none;
@@ -109,20 +117,21 @@ button {
 .recapCommande {
   background-color: $secondary-color-gris-clair;
   border-radius: $border-radius-primary;
-  width: 383px;
-  height: fit-content; //pour que le block s'adapte a son contenu et ne déborde pas
+  width: 404px;
+  max-width: 100%;
   padding: 20px;
   position: sticky;
   top: 10px;
-  // juste pour centrer le bouton le reste du contenu sera replacé apres
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0 auto;
 
-  @media screen and (max-width: 428px) {
+  @media screen and (max-width: 768px) {
     position: static;
-    margin: 10px auto;
-    width: calc(100% - 40px);
+    width: 100%;
+    max-width: 404px;
   }
 
   .recapTete,
@@ -144,5 +153,32 @@ button {
     height: 49px;
     border: none;
     margin-top: 10px;
+  }
+}
+
+#panierVide {
+  width: 25%;
+  display: block;
+  margin: 0 auto 1em auto;
+
+  @media screen and (max-width: 768px) {
+    width: 75%;
+  }
+}
+
+#retourAchat {
+  width: fit-content;
+  display: block;
+  margin: 0 auto;
+  background-color: $primary-color-noir;
+  border-radius: 999px;
+  text-decoration: none;
+  color: $primary-color-blanc;
+  text-align: center;
+  padding: 1em;
+  margin: 1em auto;
+
+  @media screen and (max-width: 768px) {
+    margin: 3em auto;
   }
 }

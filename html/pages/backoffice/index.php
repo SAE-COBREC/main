@@ -4,8 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1440, height=1024" />
   <title>Alizon - Page Accueil Vendeur</title>
-  <link rel="stylesheet" href="../../styles/AccueilVendeur/accueilVendeur.css" />
+  <link rel="stylesheet" href="/html/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
+<?php include '../../../../config.php';?>
 <body>
   <?php
     // ID du vendeur à afficher
@@ -98,6 +99,7 @@
                     <script>
                       document.addEventListener('DOMContentLoaded', () => {
                         const rows = document.querySelectorAll('.products-table__row');
+                        const addButton = document.querySelector('.btn--primary');
 
                         rows.forEach(row => {
                           const checkbox = row.querySelector('.checkbox');
@@ -109,19 +111,24 @@
                             if (isSelected) {
                               row.classList.remove('selected');
                               checkbox.classList.remove('checkbox--active');
+                              addButton.textContent = "Ajouter un produit"; // revenir à l'état initial
                             } else {
-                              // Sinon on désélectionne les autres et sélectionne celui-ci
+                              // Sinon on désélectionne les autres
                               rows.forEach(r => {
                                 r.classList.remove('selected');
                                 r.querySelector('.checkbox').classList.remove('checkbox--active');
                               });
+
+                              // Et on sélectionne celui-ci
                               row.classList.add('selected');
                               checkbox.classList.add('checkbox--active');
+                              addButton.textContent = "Modifier le produit"; // changer le texte
                             }
                           });
                         });
                       });
                     </script>
+
                   </td>
                   <td class="products-table__cell">
                     <div class="product">

@@ -119,9 +119,12 @@ function showCard(cardId) {
     const activeCard = document.getElementById(cardId);
     if (activeCard) {
         activeCard.classList.remove('hidden');
-        // restore previously saved values (if any)
+        // Restore previously saved values only if explicit flag is enabled.
+        // By default we disable automatic restore to avoid surprising prefilled fields.
         try {
-            restoreCardData(cardId);
+            if (window.restoreCardOnShow) {
+                restoreCardData(cardId);
+            }
         } catch (e) {
             // non-bloquant : on affiche un avertissement en console
             console.warn('restoreCardData erreur pour', cardId, e);
@@ -249,7 +252,15 @@ function finishRegistration() {
     } catch (e) {
         console.warn('finishRegistration save erreur', e);
     }
-    
+    // After saving aggregated data, submit the form if present so the server
+    // can handle final processing (preview/write CSV/etc.). This mirrors the
+    // previous inline behaviour which explicitly submitted the form.
+    try {
+        const form = document.getElementById('multiForm');
+        if (form) form.submit();
+    } catch (e) {
+        // non-blocking
+    }
 }
 
 function showPreviousCard() {
@@ -286,4 +297,49 @@ if (typeof window !== 'undefined') {
     window.showNextCard = showNextCard;
     window.showPreviousCard = showPreviousCard;
     window.finishRegistration = finishRegistration;
+}
+
+// Auto-initialize visible card and attempt to restore saved values on page load.
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', () => {
+        const cards = Array.from(document.querySelectorAll('.card'));
+        // If there is already a visible card, try to restore its values.
+        let visibleIndex = cards.findIndex(c => !c.classList.contains('hidden'));
+        if (visibleIndex === -1 && cards.length > 0) {
+            // No explicit visible card: show the first one
+            showCard(cards[0].id);
+            visibleIndex = 0;
+        }
+        // By default we do not automatically restore saved drafts on page load.
+        // To enable automatic restore set `window.restoreCardOnShow = true` before DOMContentLoaded.
+        if (visibleIndex >= 0 && window.restoreCardOnShow) {
+            try { restoreCardData(cards[visibleIndex].id); } catch (e) { /* non-blocking */ }
+        }
+    });
+}
+
+// Utility to clear saved registration data from localStorage or cookies
+function clearSavedRegistration() {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            Object.keys(localStorage).filter(k => k.startsWith('register:')).forEach(k => localStorage.removeItem(k));
+        }
+        // clear cookies that start with register:
+        document.cookie.split(';').forEach(c => {
+            const name = c.split('=')[0].trim();
+            if (name && name.startsWith('register:')) {
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+            }
+        });
+        console.info('Saved registration data cleared.');
+        return true;
+    } catch (e) {
+        console.warn('clearSavedRegistration failed', e);
+        return false;
+    }
+}
+
+// expose the utility to the global scope for HTML buttons
+if (typeof window !== 'undefined') {
+    window.clearSavedRegistration = clearSavedRegistration;
 }

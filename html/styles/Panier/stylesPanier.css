@@ -2,6 +2,11 @@ html {
   font-family: "Quicksand", sans-serif;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
 h1,
 h2,
 h3 {
@@ -21,13 +26,14 @@ img,
 
 .articlesPrixP {
   display: flex;
-  justify-content: space-between;
-}
-@media screen and (max-width: 428px) {
-  .articlesPrixP {
-    flex-direction: column;
-    align-items: center;
-  }
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 1em;
 }
 
 button {
@@ -105,21 +111,22 @@ button {
 .recapCommande {
   background-color: #EFEFEF;
   border-radius: 14px;
-  width: 383px;
-  height: -moz-fit-content;
-  height: fit-content;
+  width: 404px;
+  max-width: 100%;
   padding: 20px;
   position: sticky;
   top: 10px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0 auto;
 }
-@media screen and (max-width: 428px) {
+@media screen and (max-width: 768px) {
   .recapCommande {
     position: static;
-    margin: 10px auto;
-    width: calc(100% - 40px);
+    width: 100%;
+    max-width: 404px;
   }
 }
 .recapCommande .recapTete,
@@ -139,4 +146,34 @@ button {
   height: 49px;
   border: none;
   margin-top: 10px;
+}
+
+#panierVide {
+  width: 25%;
+  display: block;
+  margin: 0 auto 1em auto;
+}
+@media screen and (max-width: 768px) {
+  #panierVide {
+    width: 75%;
+  }
+}
+
+#retourAchat {
+  width: -moz-fit-content;
+  width: fit-content;
+  display: block;
+  margin: 0 auto;
+  background-color: #030212;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #FFFFFF;
+  text-align: center;
+  padding: 1em;
+  margin: 1em auto;
+}
+@media screen and (max-width: 768px) {
+  #retourAchat {
+    margin: 3em auto;
+  }
 }/*# sourceMappingURL=stylesPanier.css.map */

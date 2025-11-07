@@ -1,7 +1,3 @@
-<?php 
-$prixArt1 = 29.99;
-$prixArt2 = 40.02;
-?>
 <!DOCTYPE html>
 <html lang="fr">
     <head>
@@ -10,11 +6,17 @@ $prixArt2 = 40.02;
         <title>Panier</title>
         <link rel="stylesheet" href="/styles/Panier/stylesPanier.css">
         <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
+        <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     </head>
+
+    <div id="header"></div>
     <body>
-        <div id="header"></div>
+
+        
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
         <section class="articlesPrixP">
+            
+        <?php if (0==0):?>
             
             <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
             <div>
@@ -104,9 +106,19 @@ $prixArt2 = 40.02;
                 </div>
                 <button class="finaliserCommande">Finaliser commande</button>
             </aside>
+
+        <?php else:?>
+
+            <img id="panierVide" src="/img/svg/panier-empty.svg"/> 
+            
+        <?php endif;?>  
         </section>
 
-        <script>
+        
+    </body>
+    <div id="footer"></div>
+
+    <script>
 
         //fonction pour mettre a jour le recap de la commande
         function updateRecap() {
@@ -189,8 +201,7 @@ $prixArt2 = 40.02;
 
         //initialisation du récap sinon il y a rien au début.
         updateRecap();
-        </script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script src="/js/HL_import.js"></script>
-    </body>
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/js/HL_import.js"></script>
 </html>

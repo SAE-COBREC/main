@@ -63,4 +63,4 @@ id_produit,p_nom,p_description,p_prix,p_stock,p_note,p_nb_ventes,p_statut,pource
 62,Cache-pot Faïence de Quimper,Pot de fleurs décoratif (hauteur 25cm),28.00,0,4.7,15,En rupture,0,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s,8,4.7,Artisanat
 63,Raisins de Mer (Pétoncles),Barquette de 200g de pétoncles,12.50,0,4.5,35,En rupture,0,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s,18,4.5,Mer
 64,Bonnet Breton (Femme),Bonnet en laine avec motif breton,18.00,0,4.3,50,En rupture,0,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s,24,4.3,Textile
-65,Pralines de Quiberon,Sachet de 150g de pralines artisanales,11.00,0,4.8,40,En rupture,0,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s,20,4.8,Pâtisserie
+65,Pralines de Quiberon,Sachet de 150g de pralines artisanales,11.00,0,4.8,40,En rupture,0,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s,20,2,Pâtisserie

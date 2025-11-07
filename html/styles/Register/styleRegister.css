@@ -29,7 +29,7 @@ body .card[id="4"] {
 @media screen and (max-width: 508px ) {
   body .card[id="3"],
   body .card[id="4"] {
-    max-height: 500px !important;
+    max-height: 540px !important;
   }
 }
 body .card {
@@ -43,15 +43,74 @@ body .card {
 @media screen and (max-width: 508px ) {
   body .card {
     width: 320px;
-    max-height: 620px;
+    max-height: 630px;
     padding: 50px 25px 25px 25px;
   }
+}
+body .card .modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
+body .card .modal.hidden {
+  display: none;
+}
+body .card .modal-content {
+  background: #FFFFFF;
+  color: #030212;
+  padding: 20px 24px;
+  border-radius: 14px;
+  width: 520px;
+  max-width: calc(100% - 40px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+body .card .modal-content h2 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+}
+body .card .summary-body dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+}
+body .card .summary-body dt {
+  font-weight: 600;
+}
+body .card .summary-body dd {
+  margin: 0 0 6px 0;
+}
+body .card .modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+body .card .btn-cancel {
+  background: transparent;
+  border: 1px solid #030212;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+body .card .btn-confirm {
+  background: #030212;
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 body .card .logo {
   display: flex;
   align-items: center;
   justify-content: left;
   margin-bottom: 1.2rem;
+  margin-top: 20px;
+  margin-left: 10px;
 }
 body .card .logo img {
   width: 102px;
@@ -70,83 +129,67 @@ body .card h1 {
 body .card .subtitle {
   font-size: 24px;
   color: #030212;
-  margin-bottom: 4px;
+  margin-bottom: 40px;
 }
 @media screen and (max-width: 508px ) {
   body .card .subtitle {
     font-size: 20px;
   }
 }
-body .card form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  padding: 10px 20px;
-}
-body .card form label {
+body .card label {
   font-size: 24px;
   color: #030212;
   text-align: left;
   display: block;
-  padding-left: 38px;
+  padding-left: 60px;
   margin-bottom: 6px;
 }
 @media screen and (max-width: 508px ) {
-  body .card form label {
+  body .card label {
     font-size: 20px;
-    padding-left: 0px;
+    padding-left: 15px;
   }
 }
-body .card form input {
+body .card input {
   width: 520px;
   height: 50px;
   border: 1px solid #030212;
   border-radius: 14px;
   padding: 0px 12px;
   font-size: 16px;
+  margin: 10px;
 }
 @media screen and (max-width: 508px ) {
-  body .card form input {
+  body .card input {
     width: 280px;
     height: 25px;
     font-size: 16px;
     padding: 8px 4px;
   }
 }
-body .card form input:focus {
+body .card input:focus {
   outline: none;
   border-color: #7171A3;
   box-shadow: 0 0 4px #7171A3;
 }
-body .card form input#codeP {
+body .card input#codeP {
   width: 140px;
-  margin-left: 40px;
+  margin-left: 55px;
 }
-@media screen and (max-width: 508px ) {
-  body .card form input#codeP {
-    width: 140px;
-    margin-left: 40px;
-  }
-}
-body .card form input#commune {
-  width: 330px;
+body .card input#commune {
+  width: 325px;
   margin-left: 20px;
 }
-@media screen and (max-width: 508px ) {
-  body .card form input#commune {
-    width: 280px;
-    margin-left: 20px;
-  }
-}
-body .card form .error {
+body .card .error {
   background: #FFFFFF;
   border-radius: 14px;
   color: #c00;
   padding: 10px;
   text-align: left;
   font-size: 15px;
+  margin-left: 55px;
 }
-body .card form .next-btn {
+body .card .next-btn {
   width: 100%;
   background: transparent;
   color: #D4183D;
@@ -159,14 +202,15 @@ body .card form .next-btn {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  /* make the whole button area interactive again (previously disabled) */
+  pointer-events: auto;
 }
-body .card form .next-btn .next-text {
+body .card .next-btn .next-text {
   pointer-events: none;
   color: #030212;
   font-weight: 500;
 }
-body .card form .next-btn .arrow-only {
+body .card .next-btn .arrow-only {
   height: 45px;
   width: auto;
   pointer-events: auto;
@@ -182,24 +226,24 @@ body .card form .next-btn .arrow-only {
   border-radius: 50%;
   transition: background 0.18s ease, transform 0.12s ease;
 }
-body .card form .next-btn .arrow-only:hover {
+body .card .next-btn .arrow-only:hover {
   background: rgba(3, 2, 18, 0.1);
   transform: scale(1.06);
 }
-body .card form .next-btn .btn-arrow {
+body .card .next-btn .btn-arrow {
   max-width: 50px;
   display: inline-block;
   vertical-align: middle;
   transform: scaleX(-1);
   color: #030212;
 }
-body .card form .next-btn .btn-arrow-left {
+body .card .next-btn .btn-arrow-left {
   max-width: 50px;
   display: inline-block;
   vertical-align: middle;
   color: #030212;
 }
-body .card form .prev-btn {
+body .card .prev-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -207,20 +251,20 @@ body .card form .prev-btn {
   gap: 6px;
   margin-top: 1rem;
 }
-body .card form .prev-btn .next-text {
+body .card .prev-btn .next-text {
   color: #030212;
 }
-body .card form .prev-btn .arrow-only {
+body .card .prev-btn .arrow-only {
   background: transparent;
   border: none;
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
 }
-body .card form .prev-btn .btn-arrow-left {
+body .card .prev-btn .btn-arrow-left {
   width: 28px;
 }
-body .card form .nav-actions {
+body .card .nav-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -229,8 +273,8 @@ body .card form .nav-actions {
   margin-top: 0.6rem;
   padding: 0 4px;
 }
-body .card form .nav-actions .btn-prev,
-body .card form .nav-actions .btn-next {
+body .card .nav-actions .btn-prev,
+body .card .nav-actions .btn-next {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -240,43 +284,47 @@ body .card form .nav-actions .btn-next {
   padding: 6px 8px;
   border-radius: 8px;
 }
-body .card form .nav-actions .btn-prev {
+body .card .nav-actions .btn-prev {
   flex-direction: column;
   align-items: center;
   color: #030212;
 }
-body .card form .nav-actions .btn-prev .nav-arrow {
+body .card .nav-actions .btn-prev .nav-arrow {
   width: 24px;
   height: auto;
   margin-bottom: 4px;
 }
-body .card form .nav-actions .btn-next {
+body .card .nav-actions .btn-next {
   flex-direction: row;
   background: #030212;
   color: #FFFFFF;
   padding: 8px 12px;
 }
-body .card form .nav-actions .nav-arrow.right {
+body .card .nav-actions .nav-arrow.right {
   transform: scaleX(-1);
 }
-body .card form .nav-actions .nav-arrow.left {
+body .card .nav-actions .nav-arrow.left {
   transform: none;
 }
-body .card form .nav-actions .nav-label {
+body .card .nav-actions .nav-label {
   font-size: 14px;
 }
 @media screen and (max-width: 508px ) {
-  body .card form .nav-actions {
+  body .card .nav-actions {
     gap: 6px;
   }
-  body .card form .nav-actions .btn-prev .nav-arrow {
+  body .card .nav-actions .btn-prev .nav-arrow {
     width: 20px;
   }
-  body .card form .nav-actions .nav-label {
+  body .card .nav-actions .nav-label {
     font-size: 13px;
   }
 }
 body .card .step {
   margin-top: 1.2rem;
   font-size: 18px;
+}
+
+.card.hidden {
+  display: none !important;
 }/*# sourceMappingURL=styleRegister.css.map */

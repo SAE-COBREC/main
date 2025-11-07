@@ -14,7 +14,7 @@ body {
 
 .app {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 240px 1fr;
   height: 1024px;
   background: #FFFFFF;
 }
@@ -77,6 +77,10 @@ body {
 .btn--primary {
   background: #CD7F32;
   color: #FFFFFF;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.btn--primary:active {
+  transform: scale(0.97);
 }
 .btn:hover {
   background: rgba(230, 169, 110, 0.9);
@@ -174,7 +178,6 @@ body {
   cursor: pointer;
   transition: 0.2s;
 }
-
 .checkbox--active {
   background-color: #E6A96E;
   border-color: #E6A96E;
@@ -225,12 +228,12 @@ body {
   color: #E67E22;
 }
 .badge--live {
-  background: #FEF3E6;
-  color: #D68910;
+  background: #CD7F32;
+  color: #FFFFFF;
 }
 .badge--out {
-  background: #F5E8DD;
-  color: #8B5A2B;
+  background: #8B5A2B;
+  color: #FFFFFF;
 }
 
 h1, h2 {
