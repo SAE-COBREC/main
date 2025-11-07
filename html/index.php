@@ -197,25 +197,6 @@ $categories_affichage = preparercategories_affichage($categories);
     <title>Alizon - E-commerce</title>
     <link rel="stylesheet" href="/styles/Index/style.css">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-    <style>
-        /* Style pour les images en rupture de stock */
-        .image-rupture {
-            filter: grayscale(100%) opacity(0.7);
-            transition: filter 0.3s ease;
-        }
-
-        /* Style pour les produits en rupture */
-        .produit-rupture {
-            position: relative;
-        }
-
-        .panier-icon {
-            width: 16px;
-            height: 16px;
-            vertical-align: middle;
-            margin-right: 5px;
-        }
-    </style>
 </head>
 
 <body>
