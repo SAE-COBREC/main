@@ -3,118 +3,22 @@
 $card: #ecd9c6;
 
 body{
-    //display:grid;
-    // grid-template-columns:240px 1fr;
     display: flex;
     flex-direction: row;
-    height:80%;
-    width:80%;
     margin:0;
     overflow: auto;
     background-color: $secondary-color-marron-clair;
-
-//     // Sidebar
-// .sidebar {
-//     background: linear-gradient(180deg, $secondary-color-marron 0%, $primary-color-bronze 100%);
-//     padding:28px 20px;
-//     display: flex;
-//     flex-direction: column;
-//     gap:18px;
-//    }
-   
-//    // Logo
-//    .logo {
-//     border-radius: 10px;
-//     padding: 12px;
-//     display: flex;
-//     align-items: center;
-//     gap: 8px;
-//     margin-bottom: 16px;
-//     color: $primary-color-blanc;
-//     font-size: 20px;
-//     font-weight: bold;
-   
-//     &__icon {
-//     width: 32px;
-//     height: 32px;
-//     background: $primary-color-blanc;
-//     border-radius: 10px;
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     color: $primary-color-bronze;
-//     }
-//    }
-   
-//    // Navigation
-//    .nav {
-//     display: flex;
-//     flex-direction: column;
-//     gap: 8px;
-   
-//     &__item {
-//     display: flex;
-//     flex-direction: row;
-//     align-items: center;
-//     gap: 10px;
-//     padding: 12px 8px;
-//     border-radius: 8px;
-//     color: rgba($primary-color-blanc, 0.7);
-//     text-decoration: none;
-//     font-size: 16px;
-//     transition: all 0.2s;
-//     font-weight: bold;
-//     img{
-//     width: 20px;
-//     height: 20px;
-//     }
-   
-//     &:hover {
-//     background: rgba($primary-color-blanc, 0.1);
-//     color: $primary-color-blanc;
-//     }
-   
-//     &--active {
-//     background: rgba($primary-color-blanc, 0.15);
-//     color: $primary-color-blanc;
-//     }
-//     }
-   
-//     &__icon {
-//     font-size: 20px;
-//     }
-//    }
-   
-//    // Preview button
-//    .preview-btn {
-//     margin-top: auto;
-//     background: transparent;
-//     border: 1px solid rgba($primary-color-blanc, 0.3);
-//     color: $primary-color-blanc;
-//     padding: 10px 12px;
-//     border-radius: 8px;
-//     font-size: 16px;
-//     font-weight: bold;
-//     cursor: pointer;
-   
-//     &:hover {
-//     background: rgba($primary-color-blanc, 0.1);
-//     color: $primary-color-blanc;
-//     }
-//    }
-    
+    height: 1024px;
+    width: 1440px;
 
     main{
-
         background:var(--bg);
         padding:24px 36px;
-        // height:100%;
-        width:100%;
         overflow-y:auto;
         form{
             > input{
-                position:relative;
-                left:81%;
+                position: relative;
+                left: 785px;
                 padding: 8px 16px;
                 border-radius: 8px;
                 font-weight: 700;
@@ -136,11 +40,12 @@ body{
         section{
             grid-column:1;
             grid-row:1;
-            width: 50em;
+            width: 630px;
             background:white;
             border-radius:0.1em;
             padding:14px;
             border:1px solid $card;
+            border-radius: $border-radius-primary;
 
             h3{
                 font-weight: bold;
@@ -160,7 +65,7 @@ body{
                         family:inherit;
                         size: 15px;
                     }
-                    width:80%;
+                    width:40em;
                     padding:0.6em;
                 }
             }
@@ -190,9 +95,13 @@ body{
         }
     
         section:nth-child(3), section:nth-child(4){
-            width: 30em;
+            width: 360px;
             max-height: 15em;
             grid-column: 2;
+            input, textarea{
+                width: 325px;
+                padding:0.6em;
+            }
         }
 
         section:nth-child(3){
