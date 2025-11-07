@@ -186,7 +186,8 @@ $categories_affichage = preparercategories_affichage($categories);
             </div>
 
             <div class="search-container">
-                <img src="/html/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
+                <img src="/html/img/svg/loupe.svg" alt="Loupe de recherche"
+                    class="fas fa-shopping-cart icon loupe-icon">
                 <input type="text" placeholder="Rechercher des produits..." class="search-input">
             </div>
 
@@ -194,7 +195,7 @@ $categories_affichage = preparercategories_affichage($categories);
                 <a href="#" class="icon-link">
                     <img src="/html/img/svg/profile.svg" alt="Profile" class="fas fa-shopping-cart icon">
                 </a>
-                <a href="#" class="icon-link">
+                <a href="/html/pages/panier/index.php" class="icon-link">
                     <img src="/html/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
                         style="filter: invert(1) saturate(0.9);">
                 </a>
