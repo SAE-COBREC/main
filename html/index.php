@@ -221,6 +221,13 @@ $categories_affichage = preparercategories_affichage($categories);
             font-weight: bold;
             z-index: 2;
         }
+
+        .panier-icon {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
     </style>
 </head>
 
@@ -264,10 +271,13 @@ $categories_affichage = preparercategories_affichage($categories);
                 <div>
                     <span>Tri par :</span>
                     <select name="sort" onchange="document.getElementById('filterForm').submit()">
-                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>Meilleures ventes
+                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>
+                            Meilleures ventes
                         </option>
-                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix croissant</option>
-                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix décroissant
+                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix
+                            croissant</option>
+                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix
+                            décroissant
                         </option>
                         <option value="note" <?= $tri_par === 'note' ? 'selected' : '' ?>>Mieux notés</option>
                     </select>
@@ -392,7 +402,7 @@ $categories_affichage = preparercategories_affichage($categories);
                                 <!-- Bouton d'ajout au panier -->
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
                                     onclick="event.stopPropagation(); ajouterAuPanier(<?= $produit['id_produit'] ?>)">
-                                    <?= $estEnRupture ? 'Indisponible' : '🛒 Ajouter au panier' ?>
+                                    <?= $estEnRupture ? 'Indisponible' : '<img src="/html/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
                                 </button>
                             </div>
                         </article>
