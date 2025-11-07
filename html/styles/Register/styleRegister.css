@@ -187,6 +187,7 @@ body .card .error {
   padding: 10px;
   text-align: left;
   font-size: 15px;
+  margin-left: 55px;
 }
 body .card .next-btn {
   width: 100%;
