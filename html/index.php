@@ -1,5 +1,6 @@
 <?php
-include '../../config.php';
+
+include __DIR__ . '/../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 
@@ -272,7 +273,7 @@ $categories_affichage = preparercategories_affichage($categories);
                         $note = $produit['note_moyenne'] ? round($produit['note_moyenne']) : 0;
                         ?>
                         <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
-                            onclick="window.location.href='produit.php?id=<?= $produit['id_produit'] ?>'">
+                            onclick="window.location.href='/pages/produit/index.php?id=<?= $produit['id_produit'] ?>'">
                             <div>
                                 <div>
                                     <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/default-product.jpg') ?>"
