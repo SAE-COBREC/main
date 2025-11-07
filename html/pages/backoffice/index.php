@@ -6,6 +6,7 @@
   <title>Alizon - Page Accueil Vendeur</title>
   <link rel="stylesheet" href="/html/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
+<?php include '../../../../config.php';?>
 <body>
   <?php
     // ID du vendeur à afficher
