@@ -212,6 +212,17 @@ ALTER TABLE ONLY cobrec1._produit
 ALTER TABLE ONLY cobrec1._produit
     ADD CONSTRAINT unique_produit_nom UNIQUE (p_nom);
 
+-- Supprimer la contrainte existante
+ALTER TABLE cobrec1._produit DROP CONSTRAINT verif_produit_taille;
+
+-- Recréer avec plus de flexibilité
+ALTER TABLE cobrec1._produit 
+ADD CONSTRAINT verif_produit_taille CHECK (
+    p_taille IS NULL OR 
+    p_taille IN ('XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL') OR
+    (p_taille ~ '^[3-4][0-9]$') -- Tailles de chaussures 30-49
+);
+
 -- TABLE IMAGE
 CREATE TABLE cobrec1._image (
     id_image SERIAL NOT NULL,
@@ -721,7 +732,7 @@ INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock,
 (2, 1, 'Casque audio Bluetooth', 'Casque sans fil avec réduction de bruit active, autonomie 30h', 149.99, 40, 'En ligne', 0.250, 0.002, 5.99, NULL, 4.5, 25),
 (1, 2, 'Sac à dos urbain', 'Sac à dos pour ordinateur portable, compartiments multiples, imperméable', 69.99, 45, 'En ligne', 0.600, 0.015, 6.99, NULL, NULL, 10),
 (1, 1, 'Montre connectée', 'Montre sport avec GPS, cardiofréquencemètre, étanche 50m', 199.99, 35, 'En ligne', 0.050, 0.0001, 3.99, NULL, 4.7, 20),
-(1, 3, 'Chaussures running', 'Chaussures de course avec amorti premium, semelle respirante', 89.99, 70, 'En ligne', 0.400, 0.008, 5.99, '42', 4.2, 16),
+(1, 3, 'Chaussures running', 'Chaussures de course avec amorti premium, semelle respirante', 89.99, 70, 'En ligne', 0.400, 0.008, 5.99, NULL, 4.2, 16), -- Taille NULL pour chaussures
 (1, 1, 'Tablette 10 pouces', 'Tablette Android, écran Full HD, 64Go, stylet inclus', 299.99, 25, 'En ligne', 0.500, 0.002, 7.99, NULL, 3.8, 9),
 (1, 3, 'Ballon de football', 'Ballon officiel en cuir synthétique, taille 5', 29.99, 120, 'En ligne', 0.450, 0.006, 4.99, NULL, 4.6, 35),
 (1, 2, 'Veste en cuir', 'Veste en cuir véritable, coupe motard, doublure intérieure', 189.99, 20, 'En ligne', 1.200, 0.010, 8.99, 'L', NULL, 5),
@@ -851,13 +862,13 @@ INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp
 (14, 'Tapis de yoga parfait, bonne épaisseur et vraiment antidérapant.', 16, 0, '2025-11-08 10:00:00'),
 (15, 'Clavier agréable à utiliser, les switches sont de qualité. RGB bien réglable.', 11, 2, '2025-11-06 21:00:00');
 
--- 24. COMMENTAIRES (liés aux livraisons)
+-- 24. COMMENTAIRES (liés aux livraisons) - VERSION CORRIGÉE
 INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client) VALUES
 (1, 4.5, 1, TRUE, 1),
 (3, 5.0, 2, TRUE, 2),
 (4, 4.0, 3, TRUE, 3),
 (6, 4.5, 5, TRUE, 6),
-(10, 5.0, 1, TRUE, 1);
+(10, 5.0, 4, TRUE, 1); -- Changer id_livraison pour éviter les doublons
 
 -- 25. RÉPONSES aux avis
 INSERT INTO _reponse (id_avis, id_avis_parent) VALUES
