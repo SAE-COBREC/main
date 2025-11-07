@@ -158,4 +158,27 @@ button {
 
 #panierVide {
   width: 25%;
+  display: block;
+  margin: 0 auto 1em auto;
+
+  @media screen and (max-width: 768px) {
+    width: 75%;
+  }
+}
+
+#retourAchat {
+  width: fit-content;
+  display: block;
+  margin: 0 auto;
+  background-color: $primary-color-noir;
+  border-radius: 999px;
+  text-decoration: none;
+  color: $primary-color-blanc;
+  text-align: center;
+  padding: 1em;
+  margin: 1em auto;
+
+  @media screen and (max-width: 768px) {
+    margin: 3em auto;
+  }
 }
