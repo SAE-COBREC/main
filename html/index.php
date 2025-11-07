@@ -197,31 +197,6 @@ $categories_affichage = preparercategories_affichage($categories);
     <title>Alizon - E-commerce</title>
     <link rel="stylesheet" href="/styles/Index/style.css">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-    <style>
-        /* Style pour les images en rupture de stock */
-        .image-rupture {
-            filter: grayscale(100%) opacity(0.7);
-            transition: filter 0.3s ease;
-        }
-
-        /* Style pour les produits en rupture */
-        .produit-rupture {
-            position: relative;
-        }
-
-        /* Badge "Rupture de stock" */
-        .rupture-stock {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            z-index: 2;
-        }
-    </style>
 </head>
 
 <body>
@@ -264,10 +239,13 @@ $categories_affichage = preparercategories_affichage($categories);
                 <div>
                     <span>Tri par :</span>
                     <select name="sort" onchange="document.getElementById('filterForm').submit()">
-                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>Meilleures ventes
+                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>
+                            Meilleures ventes
                         </option>
-                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix croissant</option>
-                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix décroissant
+                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix
+                            croissant</option>
+                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix
+                            décroissant
                         </option>
                         <option value="note" <?= $tri_par === 'note' ? 'selected' : '' ?>>Mieux notés</option>
                     </select>
@@ -392,7 +370,7 @@ $categories_affichage = preparercategories_affichage($categories);
                                 <!-- Bouton d'ajout au panier -->
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
                                     onclick="event.stopPropagation(); ajouterAuPanier(<?= $produit['id_produit'] ?>)">
-                                    <?= $estEnRupture ? 'Indisponible' : '🛒 Ajouter au panier' ?>
+                                    <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
                                 </button>
                             </div>
                         </article>

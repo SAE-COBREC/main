@@ -1,121 +1,168 @@
 @import "../_variable.scss";
 
-/* Footer styles */
-footer {
-  background: #080613;
-  /* très sombre */
-  color: #eeeeee;
-  padding: 48px 24px 36px;
-  font-family: 'Arial', sans-serif;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.footer-inner {
-  max-width: 1200px;
-  margin: 0 auto;
+@mixin flex-center {
   display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-
-.footer-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.footer-top .brand {
-  display: flex;
-  align-items: center;
-}
-
-.footer-top .socials {
-  display: flex;
-  gap: 18px;
-}
-
-.footer-top .socials a {
-  display: inline-flex;
-  width: 56px;
-  height: 56px;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.04);
-  color: #fff;
-  text-decoration: none;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  font-weight: 700;
 }
 
-.footer-nav {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 24px 36px;
-  margin-top: 12px;
+
+@mixin transition($property: all, $duration: 0.2s) {
+  transition: $property $duration ease;
 }
 
-.footer-nav h4 {
-  font-size: 22px;
-  margin: 0 0 12px 0;
-}
+// Footer
+footer {
+  grid-column: 1 / -1;
+  background: $primary-color-noir;
+  color: $primary-color-blanc;
+  padding: 3rem 2rem 2rem;
+  margin-top: auto;
 
-.footer-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+  >div:first-child {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
 
-.footer-nav li {
-  margin-bottom: 10px;
-}
+  >div>div:first-child {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid $primary-color-bleu;
 
-.footer-nav a {
-  color: #e6e6e6;
-  text-decoration: none;
-  opacity: 0.95;
-}
+    >a {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      @include flex-center;
+      cursor: pointer;
+      font-size: 1.5rem;
+      text-decoration: none;
+      color: $primary-color-blanc;
+      @include transition(all);
 
-.footer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 28px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 13px;
-  opacity: 0.9;
-}
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
+      }
+    }
+  }
 
-.socials {
-  a {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    background-color: $secondary-color-gris-clair;
+  nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
 
-    img {
-      width: 100%;
-      display: block;
+    h4 {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      color: $primary-color-blanc;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    a {
+      color: $secondary-color-gris-fonce;
+      text-decoration: none;
+      @include transition(color);
+
+      &:hover {
+        color: $primary-color-blanc;
+      }
+    }
+  }
+
+  >div>div:last-child {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid $primary-color-bleu;
+    color: $secondary-color-gris-fonce;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+
+    span {
+      cursor: pointer;
+      @include transition(color);
+
+      &:hover {
+        color: $primary-color-blanc;
+      }
     }
   }
 }
 
-@media (max-width: 900px) {
-  .footer-nav {
-    grid-template-columns: repeat(2, 1fr);
-  }
+// Responsive pour mobile très petit (428px et moins) - partie footer
+@media (max-width: 428px) {
+  // Footer responsive
+  footer {
+    padding: 2rem 1rem 1rem;
 
-  .footer-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+    > div > div:first-child {
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
 
-  .footer-bottom {
+      > a {
+        height: 50px;
+
+        > img {
+          width: 45px;
+        }
+      }
+    }
+
+    nav {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+
+      h4 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      ul {
+        padding-left: 0;
+      }
+
+      li {
+        margin-bottom: 0.4rem;
+      }
+
+      a {
+        font-size: 0.9rem;
+      }
+    }
+
+    > div > div:last-child {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 1.5rem;
+      font-size: 0.8rem;
+      
+      span {
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Responsive tablette - partie footer
+@media (max-width: $breakpoint-tablette) {
+  footer>div>div:last-child {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    gap: 1rem;
   }
 }

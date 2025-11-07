@@ -7,92 +7,50 @@
     <link rel="stylesheet" type="text/css" href="/html/styles/creerArticle/creerArticle.css" media="screen">
     <title>Ajouter un produit</title>
 </head>
+<?php
+session_start();
+// session_unset();
+// session_destroy();
+$warn = 0;
+$warnPromo = false;
+if ($_POST !== []) {
+    // if (count($_FILES["photo"]["name"]) === 0) {
+    //     print_r("Aucune photo ");
+    // }// else{
+    //     print_r(count($_FILES["photo"]["name"]) . ' photos.');
+    // }
+    // if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '')) {
+    //     print_r("réduc vide");
+    // } elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '')) {
+    //     print_r("réduc pleine");
+    // } else {
+    //     print_r("entre deux");
+    // }
+    // print_r($_POST);
+    // print_r($_FILES);
+    print_r($_POST["debut"]);
+    print_r($_POST["fin"]);
 
+
+    if ($_FILES["photo"]["name"][0] !== ''){
+        foreach ($_FILES["photo"]["name"] as $key => $value) {
+            //if (!in_array($value,$_SESSION["_FILES"]['name'])){
+                $_SESSION["_FILES"]["name"][] = $_FILES["photo"]["name"][$key];
+                $_SESSION["_FILES"]["tmp_name"][] = $_FILES["photo"]["tmp_name"][$key];
+            //}
+        }
+    }
+    //print_r($_SESSION);
+    } else {
+        $_FILES["photo"]["name"] = [];
+        $_SESSION["_FILES"]['name'] = [];
+    }
+
+?>
 <body>
-    <pre>
-            <?php
-            session_start();
-            // session_unset();
-            // session_destroy();
-            $warn = 0;
-            $warnPromo = false;
-            if ($_POST !== []) {
-                // if (count($_FILES["photo"]["name"]) === 0) {
-                //     print_r("Aucune photo ");
-                // }// else{
-                //     print_r(count($_FILES["photo"]["name"]) . ' photos.');
-                // }
-                // if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '')) {
-                //     print_r("réduc vide");
-                // } elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '')) {
-                //     print_r("réduc pleine");
-                // } else {
-                //     print_r("entre deux");
-                // }
-                // print_r($_POST);
-                // print_r($_FILES);
-                print_r($_POST["debut"]);
-                print_r($_POST["fin"]);
-
-
-                if ($_FILES["photo"]["name"][0] !== ''){
-                    foreach ($_FILES["photo"]["name"] as $key => $value) {
-                        //if (!in_array($value,$_SESSION["_FILES"]['name'])){
-                            $_SESSION["_FILES"]["name"][] = $_FILES["photo"]["name"][$key];
-                            $_SESSION["_FILES"]["tmp_name"][] = $_FILES["photo"]["tmp_name"][$key];
-                        //}
-                    }
-                }
-                //print_r($_SESSION);
-                } else {
-                    $_FILES["photo"]["name"] = [];
-                    $_SESSION["_FILES"]['name'] = [];
-                }
-
-            ?>
-        </pre>
-    <!-- <aside class="sidebar">
- <div class="logo">
- <img src="images/logo.svg" alt="logo" class="logo__icon">
- <span class="logo__text">Alizon</span>
- </div>
-
- <nav class="nav">
- <a href="#" class="nav__item nav__item--active">
- <img class="nav__icon" src="images/home.svg" alt="home">
- <span class="nav__label">Accueil</span>
- </a>
-
- <a href="#" class="nav__item">
- <img class="nav__icon" src="images/box.svg" alt="box">
- <span class="nav__label">Commandes</span>
- </a>
-
- <a href="#" class="nav__item">
- <img class="nav__icon" src="images/folder.svg" alt="folder">
- <span class="nav__label">Produits</span>
- </a>
-
- <a href="#" class="nav__item">
- <img class="nav__icon" src="images/profile-v.svg" alt="profile">
- <span class="nav__label">Clients</span>
- </a>
-
- <a href="#" class="nav__item">
- <img class="nav__icon" src="images/stats.svg" alt="stats">
- <span class="nav__label">Statistiques</span>
- </a>
-
- <a href="#" class="nav__item">
- <img class="nav__icon" src="images/promotion.svg" alt="promotion">
- <span class="nav__label">Promotion</span>
- </a>
-
- <a href="#" class="nav__item">
- <img class="nav__icon" src="images/reduction.svg" alt="reduction">
- <span class="nav__label">Réductions</span>
- </a>
- </nav> -->
+    <?php
+    include __DIR__ . '/../../../partials/aside.html';
+    ?>
     <main>
         <h2>⏴ Produit non enregistré</h2>
         <form action="creerArticle.php" method="post" enctype="multipart/form-data">
