@@ -201,34 +201,9 @@ $categories_affichage = preparercategories_affichage($categories);
 
 <body>
     <!-- En-tête du site -->
-    <header class="site-header" role="banner">
-        <div class="header-inner">
-            <!-- Logo -->
-            <div class="logo-container">
-                <a href="/" class="brand">
-                    <img src="/img/svg/logo-text.svg" alt="Alizon" class="logo" />
-                </a>
-            </div>
-
-            <!-- Barre de recherche -->
-            <div class="search-container">
-                <img src="/img/svg/loupe.svg" alt="Loupe de recherche"
-                    class="fas fa-shopping-cart icon loupe-icon">
-                <input type="text" placeholder="Rechercher des produits..." class="search-input">
-            </div>
-
-            <!-- Icônes utilisateur et panier -->
-            <div class="icons-container">
-                <a href="#" class="icon-link">
-                    <img src="/img/svg/profile.svg" alt="Profile" class="fas fa-shopping-cart icon">
-                </a>
-                <a href="/pages/panier/index.php" class="icon-link">
-                    <img src="/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
-                        style="filter: invert(1) saturate(0.9);">
-                </a>
-            </div>
-        </div>
-    </header>
+    <?php
+    include __DIR__ . '/partials/header.html';
+    ?>
 
     <!-- Contenu principal -->
     <div class="container">
@@ -381,81 +356,9 @@ $categories_affichage = preparercategories_affichage($categories);
     </div>
 
     <!-- Pied de page -->
-    <footer>
-        <div>
-            <!-- Liens vers les réseaux sociaux -->
-            <div>
-                <a href="#"><img src="/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
-            </div>
-
-            <!-- Navigation du pied de page -->
-            <nav>
-                <section>
-                    <h4>Alizon</h4>
-                    <ul>
-                        <li><a href="#">À propos</a></li>
-                        <li><a href="#">Carrières</a></li>
-                        <li><a href="#">Investisseurs</a></li>
-                        <li><a href="#">Presse et médias</a></li>
-                        <li><a href="#">Partenaires</a></li>
-                        <li><a href="#">Affiliés</a></li>
-                        <li><a href="#">Mentions légales</a></li>
-                        <li><a href="#">Statut du service</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Produits</h4>
-                    <ul>
-                        <li><a href="#">Shop</a></li>
-                        <li><a href="#">Shop Pay</a></li>
-                        <li><a href="#">Shopify Plus</a></li>
-                        <li><a href="#">Shopify pour les entreprises</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Développeurs</h4>
-                    <ul>
-                        <li><a href="#">Alizon.dev</a></li>
-                        <li><a href="#">Documentation API</a></li>
-                        <li><a href="#">Dev Degree</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Assistance</h4>
-                    <ul>
-                        <li><a href="#">Assistance aux marchands</a></li>
-                        <li><a href="#">Centre d'aide de Alizon</a></li>
-                        <li><a href="#">Faire appel à un partenaire</a></li>
-                        <li><a href="#">Alizon Academy</a></li>
-                        <li><a href="#">Communauté Alizon</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Solutions</h4>
-                    <ul>
-                        <li><a href="#">Éditeur de boutique en ligne</a></li>
-                        <li><a href="#">Outil de création de site web</a></li>
-                    </ul>
-                </section>
-            </nav>
-
-            <!-- Informations légales -->
-            <div>
-                <span>Conditions d'utilisation</span>
-                <span>Copyright CGRRSC All right reserved</span>
-                <span>Condition de ventes</span>
-            </div>
-        </div>
-    </footer>
+    <?php
+    include __DIR__ . '/partials/footer.html';
+    ?>
 
     <script>
         /**
@@ -560,5 +463,3 @@ $categories_affichage = preparercategories_affichage($categories);
         });
     </script>
 </body>
-
-<>
