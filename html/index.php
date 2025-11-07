@@ -3,18 +3,12 @@ include '../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 
-/**
- * Charge les produits depuis la base de données
- * @param PDO $pdo Instance PDO
- * @return array Tableau contenant les produits et les catégories
- */
 function chargerProduitsBDD($pdo)
 {
     $produits = [];
     $categories = [];
 
     try {
-        // Requête pour récupérer les produits avec leurs statistiques
         $sql = "
             SELECT 
                 p.id_produit,
@@ -49,7 +43,6 @@ function chargerProduitsBDD($pdo)
         $stmt = $pdo->query($sql);
         $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Récupère les catégories avec leurs comptes
         $sqlCategories = "
             SELECT cp.nom_categorie as category, COUNT(*) as count
             FROM _produit p
@@ -73,33 +66,23 @@ function chargerProduitsBDD($pdo)
     return ['produits' => $produits, 'categories' => $categories];
 }
 
-/**
- * Filtre les produits selon des critères donnés
- * @param array $produits Liste des produits
- * @param array $filtres Critères de filtrage
- * @return array Produits filtrés
- */
 function filtrerProduits($produits, $filtres)
 {
     $produits_filtres = [];
 
     foreach ($produits as $produit) {
-        // Filtre par prix maximum
         if ($produit['p_prix'] > $filtres['prixMaximum']) {
             continue;
         }
 
-        // Filtre par catégorie
         if ($filtres['categorieFiltre'] !== 'all' && $produit['category'] !== $filtres['categorieFiltre']) {
             continue;
         }
 
-        // Filtre par disponibilité en stock
         if ($filtres['enStockSeulement'] && $produit['p_stock'] <= 0) {
             continue;
         }
 
-        // Filtre par note minimum
         if ($produit['note_moyenne'] < $filtres['noteMinimum']) {
             continue;
         }
@@ -110,35 +93,25 @@ function filtrerProduits($produits, $filtres)
     return $produits_filtres;
 }
 
-/**
- * Trie les produits selon un critère donné
- * @param array $produits Liste des produits
- * @param string $tri_par Critère de tri
- * @return array Produits triés
- */
 function trierProduits($produits, $tri_par)
 {
     switch ($tri_par) {
         case 'meilleures_ventes':
-            // Tri par meilleures ventes (décroissant)
             usort($produits, function ($a, $b) {
                 return $b['p_nb_ventes'] - $a['p_nb_ventes'];
             });
             break;
         case 'prix_croissant':
-            // Tri par prix croissant
             usort($produits, function ($a, $b) {
                 return $a['p_prix'] - $b['p_prix'];
             });
             break;
         case 'prix_decroissant':
-            // Tri par prix décroissant
             usort($produits, function ($a, $b) {
                 return $b['p_prix'] - $a['p_prix'];
             });
             break;
         case 'note':
-            // Tri par note moyenne (décroissant)
             usort($produits, function ($a, $b) {
                 return $b['note_moyenne'] - $a['note_moyenne'];
             });
@@ -148,17 +121,11 @@ function trierProduits($produits, $tri_par)
     return $produits;
 }
 
-/**
- * Prépare les catégories pour l'affichage avec leurs comptes
- * @param array $categories Liste des catégories
- * @return array Catégories formatées pour l'affichage
- */
 function preparercategories_affichage($categories)
 {
     $categories_affichage = [];
     $total_produits = 0;
 
-    // Formate chaque catégorie avec son compte
     foreach ($categories as $nomCategorie => $compte) {
         $categories_affichage[] = [
             'category' => $nomCategorie,
@@ -167,7 +134,6 @@ function preparercategories_affichage($categories)
         $total_produits += $compte;
     }
 
-    // Ajoute l'option "Tous les produits" en première position
     array_unshift($categories_affichage, [
         'category' => 'all',
         'count' => $total_produits
@@ -176,21 +142,16 @@ function preparercategories_affichage($categories)
     return $categories_affichage;
 }
 
-// Traitement principal
-
-// Charge les données depuis la base de données
 $donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
-// Récupère les filtres depuis le formulaire ou utilise les valeurs par défaut
 $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['note'] ?? 0;
 $prixMaximum = $_POST['price'] ?? 3000;
 $enStockSeulement = isset($_POST['in_stock']);
 $tri_par = $_POST['sort'] ?? 'meilleures_ventes';
 
-// Prépare le tableau de filtres
 $filtres = [
     'categorieFiltre' => $categorieFiltre,
     'noteMinimum' => $noteMinimum,
@@ -198,7 +159,6 @@ $filtres = [
     'enStockSeulement' => $enStockSeulement
 ];
 
-// Applique les filtres et le tri
 $produits_filtres = filtrerProduits($produits, $filtres);
 $produits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($categories);
@@ -216,17 +176,13 @@ $categories_affichage = preparercategories_affichage($categories);
 </head>
 
 <body>
-    <!-- En-tête du site -->
     <?php
     include __DIR__ . '/partials/header.html';
     ?>
 
-    <!-- Contenu principal -->
     <div class="container">
-        <!-- Barre latérale avec filtres -->
         <aside>
             <form method="POST" action="" id="filterForm">
-                <!-- Sélecteur de tri -->
                 <div>
                     <span>Tri par :</span>
                     <select name="sort" onchange="document.getElementById('filterForm').submit()">
@@ -242,13 +198,11 @@ $categories_affichage = preparercategories_affichage($categories);
                     </select>
                 </div>
 
-                <!-- Titre des filtres avec bouton de réinitialisation -->
                 <div>
                     <h3>Filtres</h3>
                     <button type="button" onclick="reinitialiserFiltres()">Effacer</button>
                 </div>
 
-                <!-- Filtre par catégorie -->
                 <section>
                     <h4>Catégories</h4>
                     <div onclick="definirCategorie('all')">
@@ -265,7 +219,6 @@ $categories_affichage = preparercategories_affichage($categories);
                     <?php endforeach; ?>
                 </section>
 
-                <!-- Filtre par prix -->
                 <section>
                     <h4>Prix</h4>
                     <div>
@@ -279,7 +232,6 @@ $categories_affichage = preparercategories_affichage($categories);
                     </div>
                 </section>
 
-                <!-- Filtre par note -->
                 <section>
                     <h4>Note minimum</h4>
                     <?php for ($i = 5; $i >= 1; $i--): ?>
@@ -290,7 +242,6 @@ $categories_affichage = preparercategories_affichage($categories);
                     <?php endfor; ?>
                 </section>
 
-                <!-- Filtre par disponibilité -->
                 <section>
                     <h4>Disponibilité</h4>
                     <label>
@@ -300,24 +251,19 @@ $categories_affichage = preparercategories_affichage($categories);
                     </label>
                 </section>
 
-                <!-- Champs cachés pour les filtres -->
                 <input type="hidden" name="category" id="champCategorie"
                     value="<?= htmlspecialchars($categorieFiltre) ?>">
                 <input type="hidden" name="note" id="champNote" value="<?= $noteMinimum ?>">
             </form>
         </aside>
 
-        <!-- Zone principale d'affichage des produits -->
         <main>
             <div>
                 <?php if (empty($produits)): ?>
-                    <!-- Message si aucun produit ne correspond aux filtres -->
                     <p>Aucun produit ne correspond à vos critères de recherche.</p>
                 <?php else: ?>
-                    <!-- Boucle d'affichage des produits -->
                     <?php foreach ($produits as $produit): ?>
                         <?php
-                        // Détermine l'état du produit
                         $estEnRupture = $produit['p_stock'] <= 0;
                         $aUneRemise = !empty($produit['pourcentage_reduction']) && $produit['pourcentage_reduction'] > 0;
                         $prixFinal = $aUneRemise
@@ -325,7 +271,6 @@ $categories_affichage = preparercategories_affichage($categories);
                             : $produit['p_prix'];
                         $note = $produit['note_moyenne'] ? round($produit['note_moyenne']) : 0;
                         ?>
-                        <!-- Carte produit -->
                         <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
                             onclick="window.location.href='produit.php?id=<?= $produit['id_produit'] ?>'">
                             <div>
@@ -334,24 +279,19 @@ $categories_affichage = preparercategories_affichage($categories);
                                         alt="<?= htmlspecialchars($produit['p_nom']) ?>"
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
-                                <!-- Badge de réduction si applicable -->
                                 <?php if ($aUneRemise): ?>
                                     <span>-<?= round($produit['pourcentage_reduction']) ?>%</span>
                                 <?php endif; ?>
-                                <!-- Badge de rupture de stock si applicable -->
                                 <?php if ($estEnRupture): ?>
                                     <div class="rupture-stock">Rupture de stock</div>
                                 <?php endif; ?>
                             </div>
                             <div>
-                                <!-- Nom du produit -->
                                 <h3><?= htmlspecialchars($produit['p_nom']) ?></h3>
-                                <!-- Note et nombre d'avis -->
                                 <div>
                                     <span><?= str_repeat('★', $note) . str_repeat('☆', 5 - $note) ?></span>
                                     <span>(<?= $produit['nombre_avis'] ?>)</span>
                                 </div>
-                                <!-- Prix -->
                                 <div>
                                     <span>
                                         <?php if ($aUneRemise): ?>
@@ -360,7 +300,6 @@ $categories_affichage = preparercategories_affichage($categories);
                                     </span>
                                     <span><?= number_format($prixFinal, 0, ',', ' ') ?>€</span>
                                 </div>
-                                <!-- Bouton d'ajout au panier -->
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
                                     onclick="event.stopPropagation(); ajouterAuPanier(<?= $produit['id_produit'] ?>)">
                                     <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
@@ -373,45 +312,29 @@ $categories_affichage = preparercategories_affichage($categories);
         </main>
     </div>
 
-    <!-- Pied de page -->
     <?php
     include __DIR__ . '/partials/footer.html';
     ?>
 
     <script>
-        /**
-         * Définit la catégorie sélectionnée et soumet le formulaire
-         */
         function definirCategorie(categorie) {
             document.getElementById('champCategorie').value = categorie;
             document.getElementById('filterForm').submit();
         }
 
-        /**
-         * Définit la note minimum et soumet le formulaire
-         */
         function definirNote(note) {
             document.getElementById('champNote').value = note;
             document.getElementById('filterForm').submit();
         }
 
-        /**
-         * Met à jour l'affichage du prix maximum pendant le glissement
-         */
         function mettreAJourAffichagePrix(valeur) {
             document.getElementById('affichagePrixMax').textContent = valeur + '€';
         }
 
-        /**
-         * Simule l'ajout d'un produit au panier
-         */
         function ajouterAuPanier(idProduit) {
             alert('Produit ' + idProduit + ' ajouté au panier !');
         }
 
-        /**
-         * Réinitialise tous les filtres en soumettant un formulaire vide
-         */
         function reinitialiserFiltres() {
             const form = document.createElement('form');
             form.method = 'POST';
@@ -420,14 +343,10 @@ $categories_affichage = preparercategories_affichage($categories);
             form.submit();
         }
 
-        /**
-         * Active l'édition directe du prix maximum
-         */
         function activerEditionPrix() {
             const affichagePrix = document.getElementById('affichagePrixMax');
             const prixActuel = affichagePrix.textContent.replace('€', '');
 
-            // Remplace le span par un input
             const inputPrix = document.createElement('input');
             inputPrix.type = 'number';
             inputPrix.value = prixActuel;
@@ -439,7 +358,6 @@ $categories_affichage = preparercategories_affichage($categories);
             inputPrix.focus();
             inputPrix.select();
 
-            // Gère la sauvegarde
             inputPrix.addEventListener('blur', sauvegarderPrix);
             inputPrix.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
@@ -451,10 +369,8 @@ $categories_affichage = preparercategories_affichage($categories);
                 const nouveauPrix = parseInt(inputPrix.value) || 0;
                 const prixValide = Math.min(Math.max(nouveauPrix, 0), 3000);
 
-                // Met à jour le champ caché
                 document.querySelector('input[name="price"]').value = prixValide;
 
-                // Recrée le span
                 const nouveauSpan = document.createElement('span');
                 nouveauSpan.id = 'affichagePrixMax';
                 nouveauSpan.textContent = prixValide + '€';
@@ -462,14 +378,10 @@ $categories_affichage = preparercategories_affichage($categories);
 
                 inputPrix.replaceWith(nouveauSpan);
 
-                // Soumet le formulaire
                 document.getElementById('filterForm').submit();
             }
         }
 
-        /**
-         * Initialise les interactions après le chargement de la page
-         */
         document.addEventListener('DOMContentLoaded', function () {
             const aside = document.querySelector('aside');
 
