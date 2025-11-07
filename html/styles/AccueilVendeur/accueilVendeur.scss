@@ -16,7 +16,7 @@ body {
 
 .app {
   display: grid;
-  grid-template-columns:260px 1fr;
+  grid-template-columns:240px 1fr;
   height: 1024px;
   background: $primary-color-blanc;
 }
@@ -197,11 +197,10 @@ body {
   display: inline-block;
   cursor: pointer;
   transition: 0.2s;
-}
-
-.checkbox--active {
-  background-color: $secondary-color-bronze-clair;
-  border-color: $secondary-color-bronze-clair;
+  &--active {
+    background-color: $secondary-color-bronze-clair;
+    border-color: $secondary-color-bronze-clair;
+  }
 }
 
 /* Met en évidence la ligne sélectionnée */
@@ -256,8 +255,8 @@ body {
   }
 
   &--live {
-    background: #FEF3E6;
-    color: #D68910;
+    background: $secondary-color-orange-clair;
+    color: $secondary-color-marron;
   }
 
   &--out {
