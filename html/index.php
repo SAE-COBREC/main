@@ -209,19 +209,6 @@ $categories_affichage = preparercategories_affichage($categories);
             position: relative;
         }
 
-        /* Badge "Rupture de stock" */
-        .rupture-stock {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            z-index: 2;
-        }
-
         .panier-icon {
             width: 16px;
             height: 16px;
@@ -402,7 +389,7 @@ $categories_affichage = preparercategories_affichage($categories);
                                 <!-- Bouton d'ajout au panier -->
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
                                     onclick="event.stopPropagation(); ajouterAuPanier(<?= $produit['id_produit'] ?>)">
-                                    <?= $estEnRupture ? 'Indisponible' : '<img src="/html/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
+                                    <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
                                 </button>
                             </div>
                         </article>
