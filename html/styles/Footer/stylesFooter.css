@@ -1,7 +1,8 @@
 @charset "UTF-8";
 /* Footer styles */
 footer {
-  background: #080613; /* très sombre */
+  background: #080613;
+  /* très sombre */
   color: #eeeeee;
   padding: 48px 24px 36px;
   font-family: "Arial", sans-serif;
