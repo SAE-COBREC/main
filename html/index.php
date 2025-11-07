@@ -1,32 +1,6 @@
 <?php
 include '../../config.php';
 
-$pdo->exec("SET search_path TO cobrec1");
-
-// Test 1: Vérification de la version PostgreSQL
-$stmt = $pdo->query("SELECT version()");
-echo "Version PostgreSQL : ";
-print_r($stmt->fetch());
-
-// Test 2: Vérification des tables créées
-echo "\n\nTables dans le schéma cobrec1 :\n";
-$stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'cobrec1' ORDER BY table_name");
-$tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-print_r($tables);
-
-// Test 3: Comptage des enregistrements par table
-echo "\n\nNombre d'enregistrements par table :\n";
-foreach ($tables as $table) {
-    try {
-        $stmt = $pdo->query("SELECT COUNT(*) FROM $table");
-        $count = $stmt->fetchColumn();
-        echo "$table: $count enregistrements\n";
-    } catch (Exception $e) {
-        echo "$table: erreur - " . $e->getMessage() . "\n";
-    }
-}
-
-
 /**
  * Charge les produits depuis un fichier CSV
  * @param string $fichierCSV Chemin vers le fichier CSV
