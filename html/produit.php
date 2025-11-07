@@ -57,8 +57,8 @@ $noteEntiere = floor($note);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title><?= htmlspecialchars($produit['p_nom']) ?> – Alizon</title>
-    <link rel="stylesheet" href="/src/styles/ViewProduit/stylesView-Produit.css" />
-    <link rel="stylesheet" href="/src/styles/Header/stylesHeader.css">
+    <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
+    <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <style>
         footer {
             grid-column: 1/-1;
