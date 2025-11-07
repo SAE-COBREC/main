@@ -742,8 +742,8 @@ INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock,
 
 -- 12. IMAGES
 INSERT INTO _image (i_lien, i_title, i_alt) VALUES
-('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s', 'Smartphone XPro', 'Image du smartphone'),
-('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s', 'Ordinateur portable', 'Image de l ordinateur'),
+('https://img-4.linternaute.com/0w1UnVLIlgG1eAJSuRzF-ADmwGc=/1500x/smart/c4a044e826674aeda177183ab171edc5/ccmcms-linternaute/80567150.jpg', 'Smartphone XPro', 'Image du smartphone'),
+('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-rswjgamDC5ht_mbQHVz2JUWfHy9XtaMcIQ&s', 'Ordinateur portable', 'Image de l ordinateur'),
 ('https://example.com/tshirt.jpg', 'T-shirt', 'Image du t-shirt'),
 ('https://example.com/jean.jpg', 'Jean', 'Image du jean'),
 ('https://example.com/casque.jpg', 'Casque audio', 'Image du casque'),
@@ -939,50 +939,3 @@ UPDATE _produit SET p_stock = p_stock - 11 WHERE id_produit = 15;
 -- Mise à jour des signalements sur produits
 UPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 1;
 UPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 12;
-
--- ============================================
--- VÉRIFICATIONS FINALES
--- ============================================
-
-SELECT '========================================' AS "RAPPORT DE PEUPLEMENT";
-SELECT 'Comptes créés: ' || COUNT(*) AS "Statistique" FROM _compte
-UNION ALL
-SELECT 'Administrateurs: ' || COUNT(*) FROM _administrateur
-UNION ALL
-SELECT 'Vendeurs: ' || COUNT(*) FROM _vendeur
-UNION ALL
-SELECT 'Clients: ' || COUNT(*) FROM _client
-UNION ALL
-SELECT 'Adresses: ' || COUNT(*) FROM _adresse
-UNION ALL
-SELECT 'Produits: ' || COUNT(*) FROM _produit
-UNION ALL
-SELECT 'Images: ' || COUNT(*) FROM _image
-UNION ALL
-SELECT 'Catégories: ' || COUNT(*) FROM _categorie_produit
-UNION ALL
-SELECT 'Couleurs: ' || COUNT(*) FROM _couleur
-UNION ALL
-SELECT 'Commandes passées: ' || COUNT(*) FROM _panier_commande WHERE timestamp_commande IS NOT NULL
-UNION ALL
-SELECT 'Paniers actifs: ' || COUNT(*) FROM _panier_commande WHERE timestamp_commande IS NULL
-UNION ALL
-SELECT 'Factures: ' || COUNT(*) FROM _facture
-UNION ALL
-SELECT 'Paiements: ' || COUNT(*) FROM _paiement
-UNION ALL
-SELECT 'Livraisons: ' || COUNT(*) FROM _livraison
-UNION ALL
-SELECT 'Avis: ' || COUNT(*) FROM _avis
-UNION ALL
-SELECT 'Commentaires: ' || COUNT(*) FROM _commentaire
-UNION ALL
-SELECT 'Réponses: ' || COUNT(*) FROM _reponse
-UNION ALL
-SELECT 'Signalements: ' || COUNT(*) FROM _signalement
-UNION ALL
-SELECT 'Réductions: ' || COUNT(*) FROM _reduction
-UNION ALL
-SELECT 'Promotions: ' || COUNT(*) FROM _promotion;
-
-SELECT '========================================' AS "FIN DU RAPPORT";
