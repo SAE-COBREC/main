@@ -1,0 +1,92 @@
+// Variables
+@use "../variable" as *;
+
+// Sidebar
+.sidebar {
+  background: linear-gradient(180deg, $secondary-color-marron 0%, $primary-color-bronze 100%);
+  padding:28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap:18px;
+}
+
+// Logo
+.logo {
+  border-radius: $border-radius-primary;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: $primary-color-blanc;
+  font-size: 20px;
+  font-weight: bold;
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    background: $primary-color-blanc;
+    border-radius: $border-radius-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color-bronze;
+  }
+}
+
+// Navigation
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 8px;
+    border-radius: $border-radius-primary;
+    color: rgba($primary-color-blanc, 0.7);
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.2s;
+    font-weight: bold;
+      img{
+        width: 20px;
+        height: 20px;
+      }
+
+    &:hover {
+      background: rgba($primary-color-blanc, 0.1);
+      color: $primary-color-blanc;
+    }
+
+    &--active {
+      background: rgba($primary-color-blanc, 0.15);
+      color: $primary-color-blanc;
+    }
+  }
+
+  &__icon {
+    font-size: 20px;
+  }
+}
+
+// Preview button
+.preview-btn {
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid rgba($primary-color-blanc, 0.3);
+  color: $primary-color-blanc;
+  padding: 10px 12px;
+  border-radius: $border-radius-primary;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba($primary-color-blanc, 0.1);
+    color: $primary-color-blanc;
+  }
+}

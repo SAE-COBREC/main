@@ -21,96 +21,6 @@ body {
   background: $primary-color-blanc;
 }
 
-// Sidebar
-.sidebar {
-  background: linear-gradient(180deg, $secondary-color-marron 0%, $primary-color-bronze 100%);
-  padding:28px 20px;
-  display: flex;
-  flex-direction: column;
-  gap:18px;
-}
-
-// Logo
-.logo {
-  border-radius: 10px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  color: $primary-color-blanc;
-  font-size: 20px;
-  font-weight: bold;
-
-  &__icon {
-    width: 32px;
-    height: 32px;
-    background: $primary-color-blanc;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $primary-color-bronze;
-  }
-}
-
-// Navigation
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  &__item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 8px;
-    border-radius: 8px;
-    color: rgba($primary-color-blanc, 0.7);
-    text-decoration: none;
-    font-size: 16px;
-    transition: all 0.2s;
-    font-weight: bold;
-      img{
-        width: 20px;
-        height: 20px;
-      }
-
-    &:hover {
-      background: rgba($primary-color-blanc, 0.1);
-      color: $primary-color-blanc;
-    }
-
-    &--active {
-      background: rgba($primary-color-blanc, 0.15);
-      color: $primary-color-blanc;
-    }
-  }
-
-  &__icon {
-    font-size: 20px;
-  }
-}
-
-// Preview button
-.preview-btn {
-  margin-top: auto;
-  background: transparent;
-  border: 1px solid rgba($primary-color-blanc, 0.3);
-  color: $primary-color-blanc;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba($primary-color-blanc, 0.1);
-    color: $primary-color-blanc;
-  }
-}
-
 // Main Content
 .main {
   background: $secondary-color-rose-claire;
@@ -143,7 +53,7 @@ body {
     align-items: center;
     background: $primary-color-blanc;
     border: 1px solid $secondary-color-orange-clair;
-    border-radius: 8px;
+    border-radius: $border-radius-primary;
     padding: 10px 16px;
     gap: 8px;
 
@@ -165,7 +75,7 @@ body {
 .btn {
   border: 0;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: $border-radius-primary;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -185,7 +95,7 @@ body {
 // Content Section
 .content-section {
   background: $primary-color-blanc;
-  border-radius: 12px;
+  border-radius: $border-radius-primary;
   border: 1px solid $secondary-color-orange-clair;
   overflow: hidden;
 
@@ -233,7 +143,7 @@ body {
     background: #F9F6F3;
     border: 1px solid $secondary-color-orange-clair;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: $border-radius-primary;
     font-size: 13px;
     color: $primary-color-noir;
     cursor: pointer;
@@ -272,8 +182,8 @@ body {
     font-size: 14px;
     color: $primary-color-noir;
 
-    &--muted {
-      color: $primary-color-noir;
+    &--stock {
+      text-align: center;
     }
   }
 }
@@ -283,7 +193,7 @@ body {
   width: 18px;
   height: 18px;
   border: 2px solid $secondary-color-orange-clair;
-  border-radius: 4px;
+  border-radius: $border-radius-mini;
   display: inline-block;
   cursor: pointer;
   transition: 0.2s;
@@ -310,11 +220,13 @@ body {
   &__image {
     width: 48px;
     height: 48px;
-    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
+    img{
+      border-radius: $border-radius-primary;
+    }
   }
 
   &__name {
@@ -334,7 +246,7 @@ body {
 .badge {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: $border-radius-primary;
   font-size: 12px;
   font-weight: 600;
 
