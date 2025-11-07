@@ -1,6 +1,4 @@
 <?php
-// Fonctions utilitaires
-
 /**
  * Charge les produits depuis un fichier CSV
  * @param string $fichierCSV Chemin vers le fichier CSV
@@ -104,25 +102,25 @@ function filtrerProduits($produits, $filtres)
 function trierProduits($produits, $tri_par)
 {
     switch ($tri_par) {
-        case 'best_sellers':
+        case 'meilleures_ventes':
             // Tri par meilleures ventes (décroissant)
             usort($produits, function ($a, $b) {
                 return $b['p_nb_ventes'] - $a['p_nb_ventes'];
             });
             break;
-        case 'price_asc':
+        case 'prix_croissant':
             // Tri par prix croissant
             usort($produits, function ($a, $b) {
                 return $a['p_prix'] - $b['p_prix'];
             });
             break;
-        case 'price_desc':
+        case 'prix_decroissant':
             // Tri par prix décroissant
             usort($produits, function ($a, $b) {
                 return $b['p_prix'] - $a['p_prix'];
             });
             break;
-        case 'rating':
+        case 'note':
             // Tri par note moyenne (décroissant)
             usort($produits, function ($a, $b) {
                 return $b['note_moyenne'] - $a['note_moyenne'];
@@ -171,10 +169,10 @@ $categories = $donnees['categories'];
 
 // Récupère les filtres depuis le formulaire ou utilise les valeurs par défaut
 $categorieFiltre = $_POST['category'] ?? 'all';
-$noteMinimum = $_POST['rating'] ?? 0;
+$noteMinimum = $_POST['note'] ?? 0;
 $prixMaximum = $_POST['price'] ?? 3000;
 $enStockSeulement = isset($_POST['in_stock']);
-$tri_par = $_POST['sort'] ?? 'best_sellers';
+$tri_par = $_POST['sort'] ?? 'meilleures_ventes';
 
 // Prépare le tableau de filtres
 $filtres = [
@@ -266,12 +264,12 @@ $categories_affichage = preparercategories_affichage($categories);
                 <div>
                     <span>Tri par :</span>
                     <select name="sort" onchange="document.getElementById('filterForm').submit()">
-                        <option value="best_sellers" <?= $tri_par === 'best_sellers' ? 'selected' : '' ?>>Meilleures ventes
+                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>Meilleures ventes
                         </option>
-                        <option value="price_asc" <?= $tri_par === 'price_asc' ? 'selected' : '' ?>>Prix croissant</option>
-                        <option value="price_desc" <?= $tri_par === 'price_desc' ? 'selected' : '' ?>>Prix décroissant
+                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix croissant</option>
+                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix décroissant
                         </option>
-                        <option value="rating" <?= $tri_par === 'rating' ? 'selected' : '' ?>>Mieux notés</option>
+                        <option value="note" <?= $tri_par === 'note' ? 'selected' : '' ?>>Mieux notés</option>
                     </select>
                 </div>
 
@@ -336,7 +334,7 @@ $categories_affichage = preparercategories_affichage($categories);
                 <!-- Champs cachés pour les filtres -->
                 <input type="hidden" name="category" id="champCategorie"
                     value="<?= htmlspecialchars($categorieFiltre) ?>">
-                <input type="hidden" name="rating" id="champNote" value="<?= $noteMinimum ?>">
+                <input type="hidden" name="note" id="champNote" value="<?= $noteMinimum ?>">
             </form>
         </aside>
 
