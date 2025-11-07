@@ -150,4 +150,30 @@ button {
 
 #panierVide {
   width: 25%;
+  display: block;
+  margin: 0 auto 1em auto;
+}
+@media screen and (max-width: 768px) {
+  #panierVide {
+    width: 75%;
+  }
+}
+
+#retourAchat {
+  width: -moz-fit-content;
+  width: fit-content;
+  display: block;
+  margin: 0 auto;
+  background-color: #030212;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #FFFFFF;
+  text-align: center;
+  padding: 1em;
+  margin: 1em auto;
+}
+@media screen and (max-width: 768px) {
+  #retourAchat {
+    margin: 3em auto;
+  }
 }/*# sourceMappingURL=stylesPanier.css.map */
