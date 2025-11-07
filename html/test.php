@@ -3,74 +3,225 @@ include '../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 
-echo "=== TEST AFFICHAGE DES DONNÉES ===\n\n";
+// Fonction pour afficher une table de manière formatée
+function afficherTable($pdo, $table, $titre)
+{
+    echo "<h2>$titre</h2>\n";
 
-// Test 1: Version PostgreSQL
-$stmt = $pdo->query("SELECT version()");
-$result = $stmt->fetch();
-echo "Version PostgreSQL:\n";
-print_r($result);
-echo "\n";
+    try {
+        $stmt = $pdo->query("SELECT * FROM $table LIMIT 50");
+        $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Test 2: Comptes utilisateurs
-echo "Comptes utilisateurs:\n";
-$stmt = $pdo->query("SELECT id_compte, email, num_telephone FROM _compte ORDER BY id_compte");
-$comptes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-foreach ($comptes as $compte) {
-    echo "ID: " . $compte['id_compte'] . " | Email: " . $compte['email'] . " | Tél: " . $compte['num_telephone'] . "\n";
+        if (count($resultats) > 0) {
+            echo "<pre>\n";
+
+            // En-têtes
+            $entetes = array_keys($resultats[0]);
+            echo implode(" | ", $entetes) . "\n";
+            echo str_repeat("-", count($entetes) * 20) . "\n";
+
+            // Données
+            foreach ($resultats as $ligne) {
+                $valeurs = array_map(function ($v) {
+                    return substr($v ?? 'NULL', 0, 30); // Limiter la longueur pour l'affichage
+                }, $ligne);
+                echo implode(" | ", $valeurs) . "\n";
+            }
+
+            echo "</pre>\n";
+            echo "<p><strong>Total : " . count($resultats) . " enregistrement(s)</strong></p>\n";
+        } else {
+            echo "<p>Aucune donnée dans cette table</p>\n";
+        }
+    } catch (Exception $e) {
+        echo "<p style='color: red;'>Erreur lors de la lecture de la table $table : " . $e->getMessage() . "</p>\n";
+    }
+
+    echo "<hr>\n";
 }
-echo "\n";
 
-// Test 3: Vendeurs
-echo "Vendeurs:\n";
-$stmt = $pdo->query("SELECT v.id_vendeur, c.email, v.denomination, v.SIREN FROM _vendeur v JOIN _compte c ON v.id_compte = c.id_compte");
-$vendeurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-foreach ($vendeurs as $vendeur) {
-    echo "ID: " . $vendeur['id_vendeur'] . " | " . $vendeur['denomination'] . " | SIREN: " . $vendeur['SIREN'] . " | Email: " . $vendeur['email'] . "\n";
-}
-echo "\n";
-
-// Test 4: Clients
-echo "Clients:\n";
-$stmt = $pdo->query("SELECT cl.id_client, c.email, cl.c_pseudo, cl.c_prenom, cl.c_nom FROM _client cl JOIN _compte c ON cl.id_compte = c.id_compte");
-$clients = $stmt->fetchAll(PDO::FETCH_ASSOC);
-foreach ($clients as $client) {
-    echo "ID: " . $client['id_client'] . " | " . $client['c_prenom'] . " " . $client['c_nom'] . " (" . $client['c_pseudo'] . ") | Email: " . $client['email'] . "\n";
-}
-echo "\n";
-
-// Test 5: Produits avec leurs vendeurs
-echo "Produits en ligne:\n";
-$stmt = $pdo->query("SELECT p.id_produit, p.p_nom, p.p_prix, p.p_stock, v.denomination as vendeur FROM _produit p JOIN _vendeur v ON p.id_vendeur = v.id_vendeur WHERE p.p_statut = 'En ligne' ORDER BY p.p_prix");
-$produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
-foreach ($produits as $produit) {
-    echo "ID: " . $produit['id_produit'] . " | " . $produit['p_nom'] . " | " . $produit['p_prix'] . "€ | Stock: " . $produit['p_stock'] . " | Vendeur: " . $produit['vendeur'] . "\n";
-}
-echo "\n";
-
-// Test 6: Catégories et produits associés
-echo "Catégories et produits:\n";
-$stmt = $pdo->query("SELECT c.nom_categorie, COUNT(p.id_produit) as nb_produits FROM _categorie_produit c LEFT JOIN _fait_partie_de f ON c.id_categorie = f.id_categorie LEFT JOIN _produit p ON f.id_produit = p.id_produit GROUP BY c.id_categorie, c.nom_categorie ORDER BY c.nom_categorie");
-$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-foreach ($categories as $categorie) {
-    echo "Catégorie: " . $categorie['nom_categorie'] . " | Produits: " . $categorie['nb_produits'] . "\n";
-}
-echo "\n";
-
-// Test 7: Avis et notes
-echo "Avis des clients:\n";
-$stmt = $pdo->query("SELECT a.id_avis, p.p_nom, cl.c_pseudo, co.a_note, a.a_texte FROM _avis a JOIN _produit p ON a.id_produit = p.id_produit JOIN _commentaire co ON a.id_avis = co.id_avis JOIN _client cl ON co.id_client = cl.id_client ORDER BY co.a_note DESC");
-$avis = $stmt->fetchAll(PDO::FETCH_ASSOC);
-foreach ($avis as $avi) {
-    echo "Produit: " . $avi['p_nom'] . " | Client: " . $avi['c_pseudo'] . " | Note: " . $avi['a_note'] . "/5 | Avis: " . substr($avi['a_texte'], 0, 50) . "...\n";
-}
-echo "\n";
-
-// Test 8: Commandes et paniers
-echo "Commandes clients:\n";
-$stmt = $pdo->query("SELECT pc.id_panier, cl.c_pseudo, COUNT(ct.id_produit) as nb_produits, f.f_total_ttc FROM _panier_commande pc JOIN _client cl ON pc.id_client = cl.id_client LEFT JOIN _contient ct ON pc.id_panier = ct.id_panier LEFT JOIN _facture f ON pc.id_panier = f.id_panier GROUP BY pc.id_panier, cl.c_pseudo, f.f_total_ttc ORDER BY pc.id_panier");
-$commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-foreach ($commandes as $commande) {
-    echo "Panier ID: " . $commande['id_panier'] . " | Client: " . $commande['c_pseudo'] . " | Produits: " . $commande['nb_produits'] . " | Total: " . ($commande['f_total_ttc'] ?? 'N/A') . "€\n";
-}
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affichage des données - Base cobrec1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #444;
+            background-color: #e9ecef;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+        }
+
+        pre {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .statistiques {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📊 Affichage des données - Base cobrec1</h1>
+
+    <div class="info">
+        <strong>Informations :</strong> Cette page affiche les données de toutes les tables du schéma cobrec1.
+        Les données sont limitées à 50 enregistrements par table pour des raisons de performance.
+    </div>
+
+    <?php
+    // Test de connexion et version
+    try {
+        $stmt = $pdo->query("SELECT version()");
+        $version = $stmt->fetch();
+        echo "<div class='statistiques'>\n";
+        echo "<h3>Informations système</h3>\n";
+        echo "<pre>Version PostgreSQL : " . $version['version'] . "</pre>\n";
+
+        // Statistiques générales
+        $stmt = $pdo->query("
+            SELECT 'Comptes' as table_name, COUNT(*) as count FROM _compte
+            UNION ALL SELECT 'Administrateurs', COUNT(*) FROM _administrateur
+            UNION ALL SELECT 'Vendeurs', COUNT(*) FROM _vendeur
+            UNION ALL SELECT 'Clients', COUNT(*) FROM _client
+            UNION ALL SELECT 'Produits', COUNT(*) FROM _produit
+            UNION ALL SELECT 'Commandes', COUNT(*) FROM _panier_commande
+            UNION ALL SELECT 'Avis', COUNT(*) FROM _avis
+        ");
+        $stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo "<h3>Statistiques générales</h3>\n";
+        echo "<pre>\n";
+        foreach ($stats as $stat) {
+            echo str_pad($stat['table_name'], 15) . " : " . $stat['count'] . "\n";
+        }
+        echo "</pre>\n";
+        echo "</div>\n";
+
+    } catch (Exception $e) {
+        echo "<p style='color: red;'>Erreur de connexion : " . $e->getMessage() . "</p>\n";
+        exit;
+    }
+    ?>
+
+    <h2>🎯 Tables principales</h2>
+
+    <?php
+    // Tables principales
+    afficherTable($pdo, '_compte', '📝 Table COMPTE - Comptes utilisateurs');
+    afficherTable($pdo, '_administrateur', '👨‍💼 Table ADMINISTRATEUR - Administrateurs');
+    afficherTable($pdo, '_vendeur', '🏪 Table VENDEUR - Vendeurs');
+    afficherTable($pdo, '_client', '👥 Table CLIENT - Clients');
+    afficherTable($pdo, '_adresse', '📍 Table ADRESSE - Adresses');
+    ?>
+
+    <h2>📦 Tables produits</h2>
+
+    <?php
+    // Tables produits
+    afficherTable($pdo, '_produit', '📦 Table PRODUIT - Produits');
+    afficherTable($pdo, '_categorie_produit', '📂 Table CATEGORIE_PRODUIT - Catégories');
+    afficherTable($pdo, '_couleur', '🎨 Table COULEUR - Couleurs');
+    afficherTable($pdo, '_TVA', '💰 Table TVA - Taxes');
+    afficherTable($pdo, '_image', '🖼️ Table IMAGE - Images');
+    ?>
+
+    <h2>🛒 Tables commandes et paiements</h2>
+
+    <?php
+    // Tables commandes
+    afficherTable($pdo, '_panier_commande', '🛒 Table PANIER_COMMANDE - Paniers et commandes');
+    afficherTable($pdo, '_contient', '📋 Table CONTIENT - Produits dans les paniers');
+    afficherTable($pdo, '_facture', '🧾 Table FACTURE - Factures');
+    afficherTable($pdo, '_paiement', '💳 Table PAIEMENT - Paiements');
+    afficherTable($pdo, '_livraison', '🚚 Table LIVRAISON - Livraisons');
+    ?>
+
+    <h2>💬 Tables avis et commentaires</h2>
+
+    <?php
+    // Tables avis
+    afficherTable($pdo, '_avis', '💬 Table AVIS - Avis produits');
+    afficherTable($pdo, '_commentaire', '📝 Table COMMENTAIRE - Commentaires clients');
+    afficherTable($pdo, '_reponse', '↩️ Table REPONSE - Réponses aux avis');
+    ?>
+
+    <h2>⚠️ Tables signalements</h2>
+
+    <?php
+    // Tables signalements
+    afficherTable($pdo, '_signalement', '⚠️ Table SIGNALEMENT - Signalements');
+    afficherTable($pdo, '_signale_produit', '📦 Table SIGNALE_PRODUIT - Produits signalés');
+    afficherTable($pdo, '_signale_compte', '👥 Table SIGNALE_COMPTE - Comptes signalés');
+    afficherTable($pdo, '_signale_avis', '💬 Table SIGNALE_AVIS - Avis signalés');
+    ?>
+
+    <h2>🎯 Tables promotions et réductions</h2>
+
+    <?php
+    // Tables promotions
+    afficherTable($pdo, '_reduction', '🎯 Table REDUCTION - Réductions');
+    afficherTable($pdo, '_promotion', '🏷️ Table PROMOTION - Promotions');
+    afficherTable($pdo, '_en_reduction', '🔗 Table EN_REDUCTION - Produits en réduction');
+    afficherTable($pdo, '_en_promotion', '🔗 Table EN_PROMOTION - Produits en promotion');
+    ?>
+
+    <h2>🔗 Tables de liaison</h2>
+
+    <?php
+    // Tables de liaison
+    afficherTable($pdo, '_represente_produit', '🖼️🔗 Table REPRESENTE_PRODUIT - Images produits');
+    afficherTable($pdo, '_represente_compte', '👤🔗 Table REPRESENTE_COMPTE - Images comptes');
+    afficherTable($pdo, '_fait_partie_de', '📂🔗 Table FAIT_PARTIE_DE - Produits par catégorie');
+    afficherTable($pdo, '_est_dote_de', '🎨🔗 Table EST_DOTE_DE - Couleurs produits');
+    afficherTable($pdo, '_envoie_signalement', '⚠️🔗 Table ENVOIE_SIGNALEMENT - Envoi signalements');
+    afficherTable($pdo, '_definie_pour', '📊🔗 Table DEFINIE_POUR - Seuils alertes');
+    afficherTable($pdo, '_seuil_alerte', '📊 Table SEUIL_ALERTE - Seuils d\'alerte');
+    ?>
+
+    <div style="text-align: center; margin-top: 30px; padding: 20px; background-color: #fff; border-radius: 5px;">
+        <p><strong>Affichage terminé</strong> - Toutes les tables du schéma cobrec1 ont été affichées</p>
+        <p>Généré le : <?php echo date('d/m/Y H:i:s'); ?></p>
+    </div>
+
+</body>
+
+</html>
