@@ -16,6 +16,8 @@
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
         <section class="articlesPrixP">
             
+        <?php if (0==0):?>
+            
             <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
             <div>
                 
@@ -104,7 +106,15 @@
                 </div>
                 <button class="finaliserCommande">Finaliser commande</button>
             </aside>
+
+        <?php else:?>
+
+            <img id="panierVide" src="/img/svg/panier-empty.svg"/> 
+            
+        <?php endif;?>  
         </section>
+
+        
     </body>
     <div id="footer"></div>
 

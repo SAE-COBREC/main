@@ -1,5 +1,5 @@
 <?php
-$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
+$fichierCSV = realpath(__DIR__ . '/mls.csv');
 $produit = null;
 
 // Récupérer l'ID du produit depuis l'URL
@@ -18,11 +18,25 @@ if ($idProduit > 0 && file_exists($fichierCSV)) {
                 $produitTemp['id_produit'] = (int) $produitTemp['id_produit'];
                 $produitTemp['p_prix'] = (float) $produitTemp['p_prix'];
                 $produitTemp['p_stock'] = (int) $produitTemp['p_stock'];
-                $produitTemp['p_note'] = (float) $produitTemp['p_note'];
-                $produitTemp['p_nb_ventes'] = (int) $produitTemp['p_nb_ventes'];
-                $produitTemp['discount_percentage'] = (float) $produitTemp['discount_percentage'];
-                $produitTemp['review_count'] = (int) $produitTemp['review_count'];
-                $produitTemp['avg_rating'] = (float) $produitTemp['avg_rating'];
+                $produitTemp['p_note'] = isset($produitTemp['p_note']) ? (float) $produitTemp['p_note'] : 0.0;
+                $produitTemp['p_nb_ventes'] = isset($produitTemp['p_nb_ventes']) ? (int) $produitTemp['p_nb_ventes'] : 0;
+
+                // Compatibilité avec les noms de colonnes du CSV existant
+                // (certaines sources utilisent 'pourcentage_reduction', 'nombre_avis', 'note_moyenne')
+                if (isset($produitTemp['pourcentage_reduction']) && !isset($produitTemp['discount_percentage'])) {
+                    $produitTemp['discount_percentage'] = $produitTemp['pourcentage_reduction'];
+                }
+                if (isset($produitTemp['nombre_avis']) && !isset($produitTemp['review_count'])) {
+                    $produitTemp['review_count'] = $produitTemp['nombre_avis'];
+                }
+                if (isset($produitTemp['note_moyenne']) && !isset($produitTemp['avg_rating'])) {
+                    $produitTemp['avg_rating'] = $produitTemp['note_moyenne'];
+                }
+
+                // Conversions sûres (valeurs par défaut si absentes)
+                $produitTemp['discount_percentage'] = isset($produitTemp['discount_percentage']) ? (float) $produitTemp['discount_percentage'] : 0.0;
+                $produitTemp['review_count'] = isset($produitTemp['review_count']) ? (int) $produitTemp['review_count'] : 0;
+                $produitTemp['avg_rating'] = isset($produitTemp['avg_rating']) ? (float) $produitTemp['avg_rating'] : 0.0;
 
                 // Si c'est le produit recherché
                 if ($produitTemp['id_produit'] === $idProduit) {
@@ -155,30 +169,7 @@ $noteEntiere = floor($note);
 </head>
 
 <body>
-    <header class="site-header" role="banner">
-        <div class="header-inner">
-            <div class="logo-container">
-                <a href="/" class="brand">
-                    <img src="/src/img/svg/logo-text.svg" alt="Alizon" class="logo" />
-                </a>
-            </div>
-
-            <div class="search-container">
-                <img src="/src/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
-                <input type="text" placeholder="Rechercher des produits..." class="search-input">
-            </div>
-
-            <div class="icons-container">
-                <a href="#" class="icon-link">
-                    <img src="/src/img/svg/profile.svg" alt="Profile" class="fas fa-shopping-cart icon">
-                </a>
-                <a href="#" class="icon-link">
-                    <img src="/src/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
-                        style="filter: invert(1) saturate(0.9);">
-                </a>
-            </div>
-        </div>
-    </header>
+    <div id="header"></div>
 
     <main class="container">
         <div class="product-row">
@@ -203,9 +194,9 @@ $noteEntiere = floor($note);
                     <span class="stars" aria-hidden="true">
                         <?php for ($i = 1; $i <= 5; $i++): ?>
                             <?php if ($i <= $noteEntiere): ?>
-                                <img src="/src/img/svg/star-full.svg" alt="Etoile" width="20">
+                                <img src="/img/svg/star-full.svg" alt="Etoile" width="20">
                             <?php else: ?>
-                                <img src="/src/img/svg/star-empty.svg" alt="Etoile" width="20">
+                                <img src="/img/svg/star-empty.svg" alt="Etoile" width="20">
                             <?php endif; ?>
                         <?php endfor; ?>
                     </span>
@@ -295,9 +286,9 @@ $noteEntiere = floor($note);
                         <div class="stars">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
                                 <?php if ($i <= $noteEntiere): ?>
-                                    <img src="/src/img/svg/star-full.svg" alt="Etoile" width="16">
+                                    <img src="/img/svg/star-full.svg" alt="Etoile" width="16">
                                 <?php else: ?>
-                                    <img src="/src/img/svg/star-empty.svg" alt="Etoile" width="16">
+                                    <img src="/img/svg/star-empty.svg" alt="Etoile" width="16">
                                 <?php endif; ?>
                             <?php endfor; ?>
                         </div>
@@ -341,78 +332,7 @@ $noteEntiere = floor($note);
         </section>
     </main>
 
-    <footer>
-        <div>
-            <div>
-                <a href="#"><img src="/src/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/src/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
-            </div>
-
-            <nav>
-                <section>
-                    <h4>Alizon</h4>
-                    <ul>
-                        <li><a href="#">À propos</a></li>
-                        <li><a href="#">Carrières</a></li>
-                        <li><a href="#">Investisseurs</a></li>
-                        <li><a href="#">Presse et médias</a></li>
-                        <li><a href="#">Partenaires</a></li>
-                        <li><a href="#">Affiliés</a></li>
-                        <li><a href="#">Mentions légales</a></li>
-                        <li><a href="#">Statut du service</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Produits</h4>
-                    <ul>
-                        <li><a href="#">Shop</a></li>
-                        <li><a href="#">Shop Pay</a></li>
-                        <li><a href="#">Shopify Plus</a></li>
-                        <li><a href="#">Shopify pour les entreprises</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Développeurs</h4>
-                    <ul>
-                        <li><a href="#">Alizon.dev</a></li>
-                        <li><a href="#">Documentation API</a></li>
-                        <li><a href="#">Dev Degree</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Assistance</h4>
-                    <ul>
-                        <li><a href="#">Assistance aux marchands</a></li>
-                        <li><a href="#">Centre d'aide de Alizon</a></li>
-                        <li><a href="#">Faire appel à un partenaire</a></li>
-                        <li><a href="#">Alizon Academy</a></li>
-                        <li><a href="#">Communauté Alizon</a></li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h4>Solutions</h4>
-                    <ul>
-                        <li><a href="#">Éditeur de boutique en ligne</a></li>
-                        <li><a href="#">Outil de création de site web</a></li>
-                    </ul>
-                </section>
-            </nav>
-
-            <div>
-                <span>Conditions d'utilisation</span>
-                <span>Copyright CGRRSC All right reserved</span>
-                <span>Condition de ventes</span>
-            </div>
-        </div>
-    </footer>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -458,6 +378,8 @@ $noteEntiere = floor($note);
             alert('Produit ' + idProduit + ' ajouté au panier ! Quantité : ' + quantite);
         }
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/js/HL_import.js"></script>
 </body>
 
 </html>
