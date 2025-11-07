@@ -30,7 +30,7 @@ body {
     height: 620px !important;
 
     @media #{$mobile} {
-      max-height: 500px !important;
+      max-height: 540px !important;
     }
   }
 
@@ -44,15 +44,44 @@ body {
 
     @media #{$mobile} {
       width: 320px;
-      max-height: 620px;
+      max-height: 630px;
       padding: 50px 25px 25px 25px;
     }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.4);
+      z-index: 9999;
+    }
+    .modal.hidden { display: none; }
+    .modal-content {
+      background: $primary-color-blanc;
+      color: $primary-color-noir;
+      padding: 20px 24px;
+      border-radius: $border-radius-primary;
+      width: 520px;
+      max-width: calc(100% - 40px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .modal-content h2 { margin: 0 0 12px 0; font-size: 20px; }
+    .summary-body dl { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+    .summary-body dt { font-weight: 600; }
+    .summary-body dd { margin: 0 0 6px 0; }
+    .modal-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:12px; }
+    .btn-cancel { background: transparent; border:1px solid $primary-color-noir; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .btn-confirm { background: $primary-color-noir; color: $primary-color-blanc; border: none; padding:8px 12px; border-radius:8px; cursor:pointer; }
 
     .logo {
       display: flex;
       align-items: center;
       justify-content: left;
       margin-bottom: 1.2rem;
+      margin-top: 20px;
+      margin-left: 10px;
 
       img {
         width: 102px;
@@ -73,30 +102,25 @@ body {
     .subtitle {
       font-size: 24px;
       color: $primary-color-noir;
-      margin-bottom: 4px;
+      margin-bottom: 40px;
 
       @media #{$mobile} {
         font-size: 20px;
       }
     }
+    
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      padding: 10px 20px;
-
-      label {
-        font-size: 24px;
-        color: $primary-color-noir;
-        text-align: left;
-        display: block;
-        padding-left: 38px;
-        margin-bottom: 6px;
+    label {
+      font-size: 24px;
+      color: $primary-color-noir;
+      text-align: left;
+      display: block;
+      padding-left: 60px;
+      margin-bottom: 6px;
 
         @media #{$mobile} {
           font-size: 20px;
-          padding-left: 0px;
+          padding-left: 15px;
         }
       }
 
@@ -107,6 +131,7 @@ body {
         border-radius: $border-radius-primary;
         padding: 0px 12px;
         font-size: 16px;
+        margin: 10px;
 
         @media #{$mobile} {
           width: 280px;
@@ -125,26 +150,12 @@ body {
 
       input#codeP {
         width: 140px;
-        margin-left: 40px;
-      }
-
-      @media #{$mobile} {
-        input#codeP {
-          width: 140px;
-          margin-left: 40px;
-        }
+        margin-left: 55px;
       }
 
       input#commune {
-        width: 330px;
+        width: 325px;
         margin-left: 20px;
-      }
-
-      @media #{$mobile} {
-        input#commune {
-          width: 280px;
-          margin-left: 20px;
-        }
       }
 
       .error {
@@ -173,7 +184,8 @@ body {
 
         align-items: center;
         justify-content: center;
-        pointer-events: none;
+        /* make the whole button area interactive again (previously disabled) */
+        pointer-events: auto;
 
         .next-text {
           pointer-events: none;
@@ -311,7 +323,6 @@ body {
           }
         }
       }
-    }
 
     .step {
       margin-top: 1.2rem;
@@ -319,3 +330,6 @@ body {
     }
   }
 }
+
+// Ensure hidden class always hides cards even if .card rules are compiled later
+.card.hidden { display: none !important; }
