@@ -33,8 +33,6 @@
 │   │       ├── logo.svg
 │   │       ├── logo_bronze.svg
 │   │       ├── loupe.svg
-│   │       ├── menu-burger.svg
-│   │       ├── panier.svg
 │   │       ├── pinterest-blank.svg
 │   │       ├── profile-v.svg
 │   │       ├── profile.svg
@@ -51,7 +49,7 @@
 │   │   ├── registerPass.js
 │   │   └── storage.js
 │   ├── pages
-│   │   ├── backlog
+│   │   ├── backoffice
 │   │   │   ├── create
 │   │   │   │   └── index.php
 │   │   │   ├── register
@@ -108,4 +106,6 @@
 ├── .gitignore
 ├── LICENSE
 └── README.md
+│   │       ├── menu-burger.svg
+│   │       ├── panier.svg
 ```
