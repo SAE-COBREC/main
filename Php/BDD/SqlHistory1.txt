@@ -1,0 +1,15 @@
+\nUPDATE _produit SET p_stock = p_stock - 25 WHERE id_produit = 6
+\nUPDATE _produit SET p_stock = p_stock - 10 WHERE id_produit = 7
+\nUPDATE _produit SET p_stock = p_stock - 20 WHERE id_produit = 8
+\nUPDATE _produit SET p_stock = p_stock - 16 WHERE id_produit = 9
+\nUPDATE _produit SET p_stock = p_stock - 9 WHERE id_produit = 10
+\nUPDATE _produit SET p_stock = p_stock - 35 WHERE id_produit = 11
+\nUPDATE _produit SET p_stock = p_stock - 5 WHERE id_produit = 12
+\nUPDATE _produit SET p_stock = p_stock - 22 WHERE id_produit = 13
+\nUPDATE _produit SET p_stock = p_stock - 28 WHERE id_produit = 14
+\nUPDATE _produit SET p_stock = p_stock - 11 WHERE id_produit = 15
+\n\n-- Mise à jour des signalements sur produits\nUPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 1
+\nUPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 12
+\n\n-- ============================================\n-- VÉRIFICATIONS FINALES\n-- ============================================\n\nSELECT '========================================' AS "RAPPORT DE PEUPLEMENT"
+\nSELECT 'Comptes créés: ' || COUNT(*) AS "Statistique" FROM _compte\nUNION ALL\nSELECT 'Administrateurs: ' || COUNT(*) FROM _administrateur\nUNION ALL\nSELECT 'Vendeurs: ' || COUNT(*) FROM _vendeur\nUNION ALL\nSELECT 'Clients: ' || COUNT(*) FROM _client\nUNION ALL\nSELECT 'Adresses: ' || COUNT(*) FROM _adresse\nUNION ALL\nSELECT 'Produits: ' || COUNT(*) FROM _produit\nUNION ALL\nSELECT 'Images: ' || COUNT(*) FROM _image\nUNION ALL\nSELECT 'Catégories: ' || COUNT(*) FROM _categorie_produit\nUNION ALL\nSELECT 'Couleurs: ' || COUNT(*) FROM _couleur\nUNION ALL\nSELECT 'Commandes passées: ' || COUNT(*) FROM _panier_commande WHERE timestamp_commande IS NOT NULL\nUNION ALL\nSELECT 'Paniers actifs: ' || COUNT(*) FROM _panier_commande WHERE timestamp_commande IS NULL\nUNION ALL\nSELECT 'Factures: ' || COUNT(*) FROM _facture\nUNION ALL\nSELECT 'Paiements: ' || COUNT(*) FROM _paiement\nUNION ALL\nSELECT 'Livraisons: ' || COUNT(*) FROM _livraison\nUNION ALL\nSELECT 'Avis: ' || COUNT(*) FROM _avis\nUNION ALL\nSELECT 'Commentaires: ' || COUNT(*) FROM _commentaire\nUNION ALL\nSELECT 'Réponses: ' || COUNT(*) FROM _reponse\nUNION ALL\nSELECT 'Signalements: ' || COUNT(*) FROM _signalement\nUNION ALL\nSELECT 'Réductions: ' || COUNT(*) FROM _reduction\nUNION ALL\nSELECT 'Promotions: ' || COUNT(*) FROM _promotion
+\n\nSELECT '========================================' AS "FIN DU RAPPORT"
