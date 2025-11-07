@@ -1,20 +1,5 @@
 <?php
     session_start();
-    // session_unset();
-    // session_destroy();
-    if (($_SESSION["creerArticle"]["warn"]=== 0) && ($_POST !== []) && (($_POST["sauvegarder"] == "Sauvegarder")) || ($_POST["publier"] == "Publier")){
-        print_r("OK");
-        for ($i=0; $i < 3; $i++) {
-            print_r($i . "\n");
-            print_r($_FILES["photo"]["tmp_name"][$i]);
-            move_uploaded_file($_FILES["photo"]["tmp_name"][$i], 
-            'temp_banque_images/' . $_FILES["photo"]["name"][$i]);
-        }
-        // header('location: ../index.php');
-        // exit(0);
-    }
-    //print_r($_SESSION["creerArticle"]["warn"]);
-    print_r($_POST);
 ?>
 
 
@@ -30,6 +15,11 @@
 </head>
 <pre>
 <?php
+print_r($_POST);
+
+
+
+
 $_SESSION["creerArticle"]["warn"]= 0;
 //print_r($_SESSION["creerArticle"]["warn"]);
 $warnPromo = false;
@@ -51,6 +41,32 @@ if ($_POST !== []) {
     // print_r($_POST["debut"]);
     // print_r($_POST["fin"]);
 
+    print_r(["creerArticle"]["_FILES"]["name"]);
+    if ($_POST["btn_moins0"] == '-'){
+        print_r("if 1\n");
+        if ($_SESSION["creerArticle"]["_FILES"]["name"][1] === null){
+            unset($_SESSION["creerArticle"]["_FILES"]["name"][0]);
+        }else{
+            $_SESSION["creerArticle"]["_FILES"]["name"][0] = $_SESSION["creerArticle"]["_FILES"]["name"][1];
+        }
+        if ($_SESSION["creerArticle"]["_FILES"]["name"][2] === null){
+            unset($_SESSION["creerArticle"]["_FILES"]["name"][1]);
+        }else{
+            $_SESSION["creerArticle"]["_FILES"]["name"][1] = $_SESSION["creerArticle"]["_FILES"]["name"][2];
+        }
+        unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
+    }elseif ($_POST["btn_moins1"] === '-'){
+        print_r("if 2\n");
+        if ($_SESSION["creerArticle"]["_FILES"]["name"][2] === null){
+            unset($_SESSION["creerArticle"]["_FILES"]["name"][1]);
+        }else{
+            $_SESSION["creerArticle"]["_FILES"]["name"][1] = $_SESSION["creerArticle"]["_FILES"]["name"][2];
+        }
+        unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
+    }elseif ($_POST["btn_moins2"] === '-'){
+        print_r("if 3\n");
+        unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
+    }
     
     if ($_FILES["photo"]["name"][0] !== ''){
         // if (count($_SESSION["creerArticle"]["_FILES"]['name']) >3){
@@ -58,31 +74,39 @@ if ($_POST !== []) {
         //         echo $_SESSION["creerArticle"]["_FILES"]["name"][count($_SESSION["creerArticle"]["_FILES"]["name"]) - $i];
         //     }
         // }
-        if ($_POST["btn_moins0"] === '-'){
-            $_SESSION["creerArticle"]["_FILES"]["name"][0] = $_SESSION["creerArticle"]["_FILES"]["name"][1];
-            $_SESSION["creerArticle"]["_FILES"]["name"][1] = $_SESSION["creerArticle"]["_FILES"]["name"][2];
-            unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
-        }elseif ($_POST["btn_moins1"] === '-'){
-            $_SESSION["creerArticle"]["_FILES"]["name"][1] = $_SESSION["creerArticle"]["_FILES"]["name"][2];
-            unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
-        }elseif ($_POST["btn_moins2"] === '-'){
-            unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
+
+
+
+        for ($i=0; (($i<3) && ($i < count($_FILES["photo"]["name"]))) ; ) {
+            //if (!in_array($value,$_SESSION["creerArticle"]["_FILES"]['name'])){
+                // $_SESSION["creerArticle"]["_FILES"]["name"][(count($_SESSION["creerArticle"]["_FILES"]["name"])-1 -$i)] = 
+                //     $_FILES["photo"]["name"][count($_FILES["photo"]["name"])-1-$i];
+                // $_SESSION["creerArticle"]["_FILES"]["tmp_name"][count($_SESSION["creerArticle"]["_FILES"]["name"]) %3] = 
+                //     $_FILES["photo"]["tmp_name"][count($_FILES["photo"]["tmp_name"])-1-$i];
+                $_SESSION["creerArticle"]["tmp_file"]["name"][] = 
+                    $_FILES["photo"]["name"][count($_FILES["photo"]["name"])-1-$i];
+                $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][] = 
+                    $_FILES["photo"]["tmp_name"][count($_FILES["photo"]["name"])-1-$i];
+                $i++;
+            //}
         }
-        $i = 0;
-        foreach ($_FILES["photo"]["name"] as $key => $value) {
-            if (!in_array($value,$_SESSION["creerArticle"]["_FILES"]['name'])){
-                $_SESSION["creerArticle"]["_FILES"]["name"][$i] = $_FILES["photo"]["name"][$key];
-                $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i++] = $_FILES["photo"]["tmp_name"][$key];
-            }
+        for ($i=0; (($i<3) && ($i < count($_SESSION["creerArticle"]["tmp_file"]["name"]))) ; $i++) {
+            $_SESSION["creerArticle"]["_FILES"]["name"][(count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i) % 3] = 
+                $_SESSION["creerArticle"]["tmp_file"]["name"][count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i];
+            $_SESSION["creerArticle"]["_FILES"]["tmp_name"][(count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i) % 3] = 
+                $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i];
         }
     }
     
-    //print_r($_SESSION["creerArticle"]);
-    } else {
-        $_FILES["photo"]["name"] = [];
-        $_SESSION["creerArticle"]["_FILES"]['name'] = [];
-        $_SESSION["creerArticle"]["_FILES"]['tmp_name'] = [];
-    }
+print_r($_SESSION["creerArticle"]["_FILES"]);
+print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
+} else {
+    $_FILES["photo"]["name"] = [];
+    $_SESSION["creerArticle"]["_FILES"]['name'] = [];
+    $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
+    $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
+    $_SESSION["creerArticle"]["_FILES"]['tmp_name'] = [];
+}
 
 ?></pre>
 <body>
@@ -105,9 +129,9 @@ if ($_POST !== []) {
                         <!-- Texte avec label -->
                         <label for="titre">Titre</label>
                         <br>
-                        <input style="<?php if ($_POST["titre"] === 'Déjà pris') {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; ?>"
+                        <small>La plupart des caractères spéciaux ne sont pas acceptés</small>
+                        <input style="<?php if (($_POST["titre"] === 'Déjà pris') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; ?>"
                             maxlength="100"
-                            pattern="[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ]+"
                             required />
                             <?php
                         if($_POST["titre"] === 'Déjà pris'){
@@ -118,7 +142,7 @@ if ($_POST !== []) {
                                 $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                             <?php
-                        // }elseif (preg_match("[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ]+",$_POST["titre"])) {
+                        // }elseif (preg_match("[&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ-_:\ °]+",$_POST["titre"])) {
                         //     # code...
                         }
                         ?>
@@ -140,7 +164,7 @@ if ($_POST !== []) {
                         <h3>Photo(s)</h3>
                         <label for="photo[]">Sélectionner un fichier</label>
                         <br>
-                         <input style="<?php if (($_SESSION["creerArticle"]["_FILES"]["name"] === [])) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
+                         <input style="<?php if ((($_SESSION["creerArticle"]["_FILES"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
                         // for (i=0;i<3; i++){
                         //     echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][i] . '/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][i];
                         // }
@@ -162,14 +186,15 @@ if ($_POST !== []) {
                         for ($i = 0; (($i < 3) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++) {
                             ?><br>
                             <small>
-                                <?php echo $_SESSION["creerArticle"]["_FILES"]["name"][$i]; ?>
-                                <!-- <button type="" name="btn_moins<?php echo $i?>">-</button> -->
-                                <input type="submit" name="btn_moins<?php echo $i?>" value="-" />
+                                <?php echo $_SESSION["creerArticle"]["_FILES"]["name"][count($_SESSION["creerArticle"]["_FILES"]["name"]) -1-$i]; ?>
+                                <input type="submit" name="btn_moins<?php echo count($_SESSION["creerArticle"]["_FILES"]["name"]) -1-$i?>" value="-" />
                             </small>
                             <?php
                         }
 
                         ?>
+                        <br>
+                        <input type="submit" name="btn_maj" value="Voir les images ayant été déposées" />
                         <br />
                     </article>
                 </section>
@@ -211,7 +236,7 @@ if ($_POST !== []) {
                         //
                     }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
                         //
-                    }else{
+                    }elseif ($_POST["btn_maj"] == null){
                         $_SESSION["creerArticle"]["warn"]++;
                         $warnPromo = true;
                         echo 'border: 3px solid red';
@@ -239,7 +264,7 @@ if ($_POST !== []) {
                     <article>
                         <label for="debut">Date de début de réduction</label>
                         <br>
-                        <input style="<?php if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
+                        <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
                             value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
                             <?php
                                 if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
@@ -258,7 +283,7 @@ if ($_POST !== []) {
                     <article>
                         <label for="fin">Date de fin de réduction</label>
                         <br>
-                        <input style="<?php if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
+                        <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
                             value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
                         <br />
                     </article>
@@ -267,9 +292,32 @@ if ($_POST !== []) {
 
             </div>
             </form>
-            <!-- <pre>
-                <?php //print_r($_SESSION["creerArticle"]["warn"]); ?>
-            </pre> -->
+            <pre>
+                <?php 
+                    print_r($_SESSION["creerArticle"]["warn"]); 
+                    if (($_SESSION["creerArticle"]["warn"]=== 0) && ($_POST !== []) && (($_POST["sauvegarder"] == "Sauvegarder")) || ($_POST["publier"] == "Publier")){
+                        print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
+                        print_r("OK");
+                        $_SESSION["creerArticle"]['fin'] = "fin";
+                        for ($i = 0; (($i < 3) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++){
+                            print_r($i . "\n");
+                            //print_r($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i]);
+                            move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i], 
+                            'temp_banque_images/' . $_SESSION["creerArticle"]["_FILES"]["name"][$i]);
+                        }
+                        print_r("  FIN");
+                        // header('location: ../index.php');
+                        // exit(0);
+                
+                
+                
+                ?>
+                <script>
+                    //pop-up javascript de notif de succès
+                </script>
+
+                <?php } ?>
+            </pre>
         </main>
         <!-- <script>
             var btnMoins0 = article.querySelector('.btn_moins0');

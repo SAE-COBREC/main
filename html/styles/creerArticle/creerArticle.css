@@ -47,7 +47,7 @@ body main section article {
 body main section article label {
   font-weight: bold;
 }
-body main section article input, body main section article textarea {
+body main section article > input, body main section article textarea {
   border: 1px solid #ecd9c6;
   border-radius: 8px;
   font-family: inherit;

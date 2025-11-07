@@ -56,7 +56,7 @@ body{
                     font-weight: bold;
                 }
 
-                input, textarea{
+                > input, textarea{
                     border:1px solid $card;
                     border-radius: 8px;
                     font: {
