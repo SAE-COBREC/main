@@ -2,6 +2,11 @@ html {
   font-family: "Quicksand", sans-serif;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
 h1,
 h2,
 h3 {
@@ -22,11 +27,14 @@ img,
 .articlesPrixP {
   display: flex;
   justify-content: space-between;
+  margin: 1em;
 }
 @media screen and (max-width: 428px) {
   .articlesPrixP {
     flex-direction: column;
     align-items: center;
+    max-width: 404px;
+    margin: auto;
   }
 }
 
@@ -119,7 +127,6 @@ button {
   .recapCommande {
     position: static;
     margin: 10px auto;
-    width: calc(100% - 40px);
   }
 }
 .recapCommande .recapTete,
