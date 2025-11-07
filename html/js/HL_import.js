@@ -10,6 +10,6 @@ $(function () {
      * // <div id="header"></div>
      * // <div id="footer"></div>
      */
-    $("#header").load("/public/partials/header.html");
-    $("#footer").load("/public/partials/footer.html");
+    $("#header").load("/partials/header.html");
+    $("#footer").load("/partials/footer.html");
 });
