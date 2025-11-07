@@ -11,6 +11,8 @@
     box-sizing: border-box;
     /* ensure header content vertically centers and has a fixed height */
     height: 72px;
+    border-bottom: 1px solid $secondary-color-gris-clair ;
+    margin-bottom: 10px;
 }
 
 .site-header .header-inner {

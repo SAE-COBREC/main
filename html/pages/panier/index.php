@@ -12,9 +12,6 @@ $prixArt2 = 40.02;
         <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     </head>
     <body>
-        <?php
-        include '/partials/header.html'
-        ?>
         <div id="header"></div>
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
         <section class="articlesPrixP">

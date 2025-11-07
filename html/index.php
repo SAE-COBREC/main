@@ -195,8 +195,8 @@ $categories_affichage = preparercategories_affichage($categories);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alizon - E-commerce</title>
-    <link rel="stylesheet" href="/html/styles/Index/style.css">
-    <link rel="stylesheet" href="/html/styles/Header/stylesHeader.css">
+    <link rel="stylesheet" href="/styles/Index/style.css">
+    <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <style>
         /* Style pour les images en rupture de stock */
         .image-rupture {
@@ -238,13 +238,13 @@ $categories_affichage = preparercategories_affichage($categories);
             <!-- Logo -->
             <div class="logo-container">
                 <a href="/" class="brand">
-                    <img src="/html/img/svg/logo-text.svg" alt="Alizon" class="logo" />
+                    <img src="/img/svg/logo-text.svg" alt="Alizon" class="logo" />
                 </a>
             </div>
 
             <!-- Barre de recherche -->
             <div class="search-container">
-                <img src="/html/img/svg/loupe.svg" alt="Loupe de recherche"
+                <img src="/img/svg/loupe.svg" alt="Loupe de recherche"
                     class="fas fa-shopping-cart icon loupe-icon">
                 <input type="text" placeholder="Rechercher des produits..." class="search-input">
             </div>
@@ -252,10 +252,10 @@ $categories_affichage = preparercategories_affichage($categories);
             <!-- Icônes utilisateur et panier -->
             <div class="icons-container">
                 <a href="#" class="icon-link">
-                    <img src="/html/img/svg/profile.svg" alt="Profile" class="fas fa-shopping-cart icon">
+                    <img src="/img/svg/profile.svg" alt="Profile" class="fas fa-shopping-cart icon">
                 </a>
-                <a href="/html/pages/panier/index.php" class="icon-link">
-                    <img src="/html/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
+                <a href="/pages/panier/index.php" class="icon-link">
+                    <img src="/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
                         style="filter: invert(1) saturate(0.9);">
                 </a>
             </div>
@@ -417,12 +417,12 @@ $categories_affichage = preparercategories_affichage($categories);
         <div>
             <!-- Liens vers les réseaux sociaux -->
             <div>
-                <a href="#"><img src="/html/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/html/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/html/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/html/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/html/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
-                <a href="#"><img src="/html/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/img/svg/facebook-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/img/svg/linkedin-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/img/svg/youtube-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/img/svg/instagram-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/img/svg/tiktok-blank.svg" style="filter: invert(1);"></a>
+                <a href="#"><img src="/img/svg/pinterest-blank.svg" style="filter: invert(1);"></a>
             </div>
 
             <!-- Navigation du pied de page -->
@@ -593,4 +593,4 @@ $categories_affichage = preparercategories_affichage($categories);
     </script>
 </body>
 
-</html>
+<>
