@@ -1,53 +1,73 @@
 <?php
 include '../../config.php';
 
+$pdo->exec("SET search_path TO cobrec1");
+
 /**
- * Charge les produits depuis un fichier CSV
- * @param string $fichierCSV Chemin vers le fichier CSV
+ * Charge les produits depuis la base de données
+ * @param PDO $pdo Instance PDO
  * @return array Tableau contenant les produits et les catégories
  */
-function chargerProduitsCSV($fichierCSV)
+function chargerProduitsBDD($pdo)
 {
     $produits = [];
     $categories = [];
 
-    // Vérifie si le fichier existe
-    if (file_exists($fichierCSV)) {
-        $fichier = fopen($fichierCSV, 'r');
-        if ($fichier !== FALSE) {
-            // Lit la première ligne (en-têtes)
-            $entete = fgetcsv($fichier, 1000, ',');
+    try {
+        // Requête pour récupérer les produits avec leurs statistiques
+        $sql = "
+            SELECT 
+                p.id_produit,
+                p.p_nom,
+                p.p_description,
+                p.p_prix,
+                p.p_stock,
+                p.p_note as note_moyenne,
+                p.p_nb_ventes,
+                p.p_statut,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
+                COALESCE(avis.nombre_avis, 0) as nombre_avis,
+                cp.nom_categorie as category,
+                i.i_lien as image_url
+            FROM _produit p
+            LEFT JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
+            LEFT JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
+                AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin
+            LEFT JOIN (
+                SELECT id_produit, COUNT(*) as nombre_avis 
+                FROM _avis 
+                GROUP BY id_produit
+            ) avis ON p.id_produit = avis.id_produit
+            LEFT JOIN _represente_produit rp ON p.id_produit = rp.id_produit
+            LEFT JOIN _image i ON rp.id_image = i.id_image
+            WHERE p.p_statut IN ('En ligne', 'En rupture')
+            GROUP BY p.id_produit, cp.nom_categorie, r.reduction_pourcentage, avis.nombre_avis, i.i_lien
+        ";
 
-            // Lit chaque ligne du fichier
-            while (($donnees = fgetcsv($fichier, 1000, ',')) !== FALSE) {
-                // Vérifie que le nombre de colonnes correspond aux en-têtes
-                if (count($donnees) === count($entete)) {
-                    // Combine les en-têtes avec les données
-                    $produit = array_combine($entete, $donnees);
+        $stmt = $pdo->query($sql);
+        $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                    // Convertit les types de données
-                    $produit['id_produit'] = (int) $produit['id_produit'];
-                    $produit['p_prix'] = (float) $produit['p_prix'];
-                    $produit['p_stock'] = (int) $produit['p_stock'];
-                    $produit['p_note'] = (float) $produit['p_note'];
-                    $produit['p_nb_ventes'] = (int) $produit['p_nb_ventes'];
-                    $produit['pourcentage_reduction'] = (float) $produit['pourcentage_reduction'];
-                    $produit['nombre_avis'] = (int) $produit['nombre_avis'];
-                    $produit['note_moyenne'] = (float) $produit['note_moyenne'];
+        // Récupère les catégories avec leurs comptes
+        $sqlCategories = "
+            SELECT cp.nom_categorie as category, COUNT(*) as count
+            FROM _produit p
+            JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
+            JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+            WHERE p.p_statut IN ('En ligne', 'En rupture')
+            GROUP BY cp.nom_categorie
+        ";
 
-                    // Ajoute le produit à la liste
-                    $produits[] = $produit;
+        $stmtCategories = $pdo->query($sqlCategories);
+        $categoriesResult = $stmtCategories->fetchAll(PDO::FETCH_ASSOC);
 
-                    // Compte les produits par catégorie
-                    $categorie = $produit['category'];
-                    if (!isset($categories[$categorie])) {
-                        $categories[$categorie] = 0;
-                    }
-                    $categories[$categorie]++;
-                }
-            }
-            fclose($fichier);
+        foreach ($categoriesResult as $cat) {
+            $categories[$cat['category']] = $cat['count'];
         }
+
+    } catch (Exception $e) {
+        echo "<p style='color: red;'>Erreur lors du chargement des produits : " . $e->getMessage() . "</p>";
     }
 
     return ['produits' => $produits, 'categories' => $categories];
@@ -81,11 +101,6 @@ function filtrerProduits($produits, $filtres)
 
         // Filtre par note minimum
         if ($produit['note_moyenne'] < $filtres['noteMinimum']) {
-            continue;
-        }
-
-        // Filtre par statut (uniquement "En ligne" ou "En rupture")
-        if ($produit['p_statut'] !== 'En ligne' && $produit['p_statut'] !== 'En rupture') {
             continue;
         }
 
@@ -163,9 +178,8 @@ function preparercategories_affichage($categories)
 
 // Traitement principal
 
-// Charge les données depuis le fichier CSV
-$fichierCSV = realpath(__DIR__ . '/../src/data/mls.csv');
-$donnees = chargerProduitsCSV($fichierCSV);
+// Charge les données depuis la base de données
+$donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
@@ -316,7 +330,7 @@ $categories_affichage = preparercategories_affichage($categories);
                             onclick="window.location.href='produit.php?id=<?= $produit['id_produit'] ?>'">
                             <div>
                                 <div>
-                                    <img src="<?= htmlspecialchars($produit['image_url']) ?>"
+                                    <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/default-product.jpg') ?>"
                                         alt="<?= htmlspecialchars($produit['p_nom']) ?>"
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
@@ -339,9 +353,11 @@ $categories_affichage = preparercategories_affichage($categories);
                                 </div>
                                 <!-- Prix -->
                                 <div>
-                                    <?php if ($aUneRemise): ?>
-                                        <span><?= number_format($produit['p_prix'], 0, ',', ' ') ?>€</span>
-                                    <?php endif; ?>
+                                    <span>
+                                        <?php if ($aUneRemise): ?>
+                                            <?= number_format($produit['p_prix'], 0, ',', ' ') ?>€
+                                        <?php endif; ?>
+                                    </span>
                                     <span><?= number_format($prixFinal, 0, ',', ' ') ?>€</span>
                                 </div>
                                 <!-- Bouton d'ajout au panier -->
@@ -465,3 +481,5 @@ $categories_affichage = preparercategories_affichage($categories);
         });
     </script>
 </body>
+
+</html>

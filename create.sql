@@ -742,8 +742,8 @@ INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock,
 
 -- 12. IMAGES
 INSERT INTO _image (i_lien, i_title, i_alt) VALUES
-('https://example.com/smartphone.jpg', 'Smartphone XPro', 'Image du smartphone'),
-('https://example.com/laptop.jpg', 'Ordinateur portable', 'Image de l ordinateur'),
+('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s', 'Smartphone XPro', 'Image du smartphone'),
+('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN_VlyqHdDhxj9qXg14AG5JAh0FtvR__gAnQ&s', 'Ordinateur portable', 'Image de l ordinateur'),
 ('https://example.com/tshirt.jpg', 'T-shirt', 'Image du t-shirt'),
 ('https://example.com/jean.jpg', 'Jean', 'Image du jean'),
 ('https://example.com/casque.jpg', 'Casque audio', 'Image du casque'),
