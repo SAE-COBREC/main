@@ -146,4 +146,8 @@ button {
   height: 49px;
   border: none;
   margin-top: 10px;
+}
+
+#panierVide {
+  width: 25%;
 }/*# sourceMappingURL=stylesPanier.css.map */
