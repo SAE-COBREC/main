@@ -77,6 +77,10 @@ body {
 .btn--primary {
   background: #CD7F32;
   color: #FFFFFF;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.btn--primary:active {
+  transform: scale(0.97);
 }
 .btn:hover {
   background: rgba(230, 169, 110, 0.9);
@@ -224,12 +228,12 @@ body {
   color: #E67E22;
 }
 .badge--live {
-  background: #E5D5C5;
-  color: #8B5A2B;
+  background: #CD7F32;
+  color: #FFFFFF;
 }
 .badge--out {
-  background: #F5E8DD;
-  color: #8B5A2B;
+  background: #8B5A2B;
+  color: #FFFFFF;
 }
 
 h1, h2 {

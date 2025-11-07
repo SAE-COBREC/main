@@ -84,12 +84,19 @@ body {
   &--primary {
     background: $primary-color-bronze;
     color: $primary-color-blanc;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  &--primary:active {
+    transform: scale(0.97);
   }
 
   &:hover {
       background: rgba($secondary-color-bronze-clair, 0.9);
       color: $primary-color-blanc;
     }
+
+
 }
 
 // Content Section
@@ -255,13 +262,13 @@ body {
   }
 
   &--live {
-    background: $secondary-color-orange-clair;
-    color: $secondary-color-marron;
+    background: $primary-color-bronze;
+    color: $primary-color-blanc;
   }
 
   &--out {
-    background: #F5E8DD;
-    color: $secondary-color-marron;
+    background: $secondary-color-marron;
+    color: $primary-color-blanc;
   }
 }
 
