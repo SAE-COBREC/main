@@ -35,6 +35,13 @@ body{
             }
         }
 
+        div {
+            display:grid;
+            // grid-template-columns:2fr 1fr;
+            gap:2em;
+            // height:calc(100% - 70px);
+        }
+
         section{
             grid-column:1;
             grid-row:1;
@@ -70,13 +77,6 @@ body{
         }
         .warn{
             color:red;
-        }
-
-        div {
-            display:grid;
-            // grid-template-columns:2fr 1fr;
-            gap:2em;
-            // height:calc(100% - 70px);
         }
 
         #photo {

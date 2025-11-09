@@ -1,5 +1,8 @@
 <?php
+    // include('../../../../config.php');
     session_start();
+    $sth = null ;
+    $dbh = null ;
 ?>
 
 
@@ -15,8 +18,16 @@
 </head>
 <pre>
 <?php
-print_r($_POST);
-
+// print_r($_POST);
+// try{
+//     $dbh = new PDO (
+//         'postgres : host = servbdd ; dbname = pg_test',
+//         $user , $password 
+//     );
+// } catch (PDOException $e) {
+//     print "Erreur ! : " . $e->getMessage() . "<br/>";
+//     die();
+// }
 
 
 
@@ -116,22 +127,19 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
     <main>
         <h2>Produit non enregistré</h2>
         <form action="index.php" method="post" enctype="multipart/form-data">
-            <!-- Bouton de soumission -->
+            <!-- Boutons de soumission principaux -->
             <input type="button" value="Annuler" />
             <input type="submit" name="sauvegarder" value="Sauvegarder" />
             <input type="submit" name="publier" value="Publier" />
-            <!-- Annuler-->
-            <!-- Sauvegarder-->
             <div>
                 <section>
                     <h3>Ajouter produit</h3>
                     <article>
                         <!-- Texte avec label -->
                         <label for="titre">Titre</label>
-                        <br>
-                        <small>La plupart des caractères spéciaux ne sont pas acceptés</small>
                         <input style="<?php if (($_POST["titre"] === 'Déjà pris') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; ?>"
                             maxlength="100"
+                            pattern="[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
                             required />
                             <?php
                         if($_POST["titre"] === 'Déjà pris'){
@@ -139,6 +147,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                             <br>
                             <small class="warn"><?php
                                 echo 'Le titre de votre article est déjà pris. Veuillez choisir un autre titre';
+                                echo $dbh->query('SELECT p_nom FROM cobrec1._produit where p_nom = ' . $_POST['titre']);
                                 $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                             <?php
@@ -146,7 +155,9 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                         //     # code...
                         }
                         ?>
-                        <br />
+                        <br>
+                        <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +=°[]() sont autorisés.</small>
+                        <br /> 
                     </article>
 
                     <article>
@@ -154,8 +165,11 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                         <label for="description">Description</label>
                         <br>
                         <textarea id="description" name="description" rows="5" cols="60"
-                            required><?php echo $_POST["description"]; ?></textarea>
-                        <br />
+                        pattern="[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
+                        required><?php echo $_POST["description"]; ?></textarea>
+                        <br>
+                        <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +=°[]() sont autorisés.</small>
+                        <br /> 
                     </article>
                 </section>
                 <section>
@@ -292,6 +306,29 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
 
             </div>
             </form>
+            <script>
+            const btnPrincipaux = document.querySelectorAll("input");
+            btnPrincipaux[0].addEventListener('click', () => {
+                // const element = document.getElementById(".small_moins0");
+                // element.innerHTML = "";
+                if (confirm("Êtes-vous certain de voulair annuler ? Ce que vous n'avez pas sauvegardé sera perdu.")) {
+                    console.log("You pressed OK!");
+                    document.location.href="http://localhost:8888/html/pages/backoffice/index.php"; 
+                } else {
+                    console.log("You pressed Cancel!");
+                } 
+            });
+
+            function sauvegarder(){
+                confirm("Votre article a bien été sauvegardé.");
+                document.location.href = "http://localhost:8888/html/pages/backoffice/index.php"; 
+            }
+
+            function publier(){
+                confirm("Votre article a bien été publié.");
+                document.location.href = "http://localhost:8888/html/pages/backoffice/index.php"; 
+            }
+        </script>
             <pre>
                 <?php 
                     print_r($_SESSION["creerArticle"]["warn"]); 
@@ -306,27 +343,39 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                             'temp_banque_images/' . $_SESSION["creerArticle"]["_FILES"]["name"][$i]);
                         }
                         print_r("  FIN");
-                        // header('location: ../index.php');
-                        // exit(0);
-                
-                
+
+                        // $stmt = $dbh -> prepare (
+                        //     " INSERT INTO REGISTRY ( name , value )
+                        //     VALUES ('$name','$value')"
+                        // );
+                        // $stmt -> execute ();
+                        
+                        
+                        // $_POST = [];
+                        // $_SESSION["creerArticle"] = [];
+                        // $_FILES = [];
+                        
+                        if ($_POST["sauvegarder"] == "Sauvegarder"){
+                            
                 
                 ?>
                 <script>
-                    //pop-up javascript de notif de succès
+                    sauvegarder();
+                </script>
+                <?php }else if ($_POST["publier"] == "Publier"){
+                   
+                ?>
+                <script>
+                    publier();
                 </script>
 
-                <?php } ?>
+<?php
+                }
+            }
+            $sth = null ;
+            $dbh = null ;
+    ?>
             </pre>
         </main>
-        <!-- <script>
-            var btnMoins0 = article.querySelector('.btn_moins0');
-            var btnMoins1 = article.querySelector('.btn_moins1');
-            var btnMoins2 = article.querySelector('.btn_moins2');
-            btnMoins0.addEventListener('click', () => {
-                const element = document.getElementById(".small_moins0");
-                element.innerHTML = "";
-            });
-        </script> -->
     </body>
 </html>
