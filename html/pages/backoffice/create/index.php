@@ -3,6 +3,7 @@
     session_start();
     $sth = null ;
     $dbh = null ;
+    cont NB_IMGS_MAX = 3;
 ?>
 
 
@@ -52,66 +53,88 @@ if ($_POST !== []) {
     // print_r($_POST["debut"]);
     // print_r($_POST["fin"]);
 
-    print_r(["creerArticle"]["_FILES"]["name"]);
+    //print_r("\n");
+
+    function decalage($aDecaler){
+        if ($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler] === null){
+            //L'image $aDecaler n'existe pas. Décalage interrompu. Suppression de l'image $aDecaler-1.
+            unset($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
+            unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$aDecaler-1]);
+        }else{
+            //L'image $aDecaler existe. Décalage. L'image $aDecaler-1 originale est écrasée.
+            $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1] = $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler];
+            $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$aDecaler-1] = $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$aDecaler];
+        }
+    }
+
+    function supprDeTemp($aSuppr){
+        unset($_SESSION["creerArticle"]["tmp_file"]["tmp_name"][array_search($_SESSION["creerArticle"]["_FILES"]["name"][$aSuppr], $_SESSION["creerArticle"]["tmp_file"]["name"])]);
+        unset($_SESSION["creerArticle"]["tmp_file"]["name"][array_search($_SESSION["creerArticle"]["_FILES"]["name"][$aSuppr], $_SESSION["creerArticle"]["tmp_file"]["name"])]);
+    }
+
+    function supprDeDef(){
+        unset($_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
+        unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][NB_IMGS_MAX-1]);
+    }
     if ($_POST["btn_moins0"] == '-'){
-        print_r("if 1\n");
-        if ($_SESSION["creerArticle"]["_FILES"]["name"][1] === null){
-            unset($_SESSION["creerArticle"]["_FILES"]["name"][0]);
-        }else{
-            $_SESSION["creerArticle"]["_FILES"]["name"][0] = $_SESSION["creerArticle"]["_FILES"]["name"][1];
-        }
-        if ($_SESSION["creerArticle"]["_FILES"]["name"][2] === null){
-            unset($_SESSION["creerArticle"]["_FILES"]["name"][1]);
-        }else{
-            $_SESSION["creerArticle"]["_FILES"]["name"][1] = $_SESSION["creerArticle"]["_FILES"]["name"][2];
-        }
-        unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
+        //suppression de l'image 0 dans $_SESSION["creerArticle"]["tmp_file"]
+        supprDeTemp(0);
+        //écrasement de l'image 0 originale par l'image 1
+        decalage(1);
+        //écrasement de l'image 1 originale par l'image 2
+        decalage(2);
+        //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
+        supprDeDef();
     }elseif ($_POST["btn_moins1"] === '-'){
-        print_r("if 2\n");
-        if ($_SESSION["creerArticle"]["_FILES"]["name"][2] === null){
-            unset($_SESSION["creerArticle"]["_FILES"]["name"][1]);
-        }else{
-            $_SESSION["creerArticle"]["_FILES"]["name"][1] = $_SESSION["creerArticle"]["_FILES"]["name"][2];
-        }
-        unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
+        //suppression de l'image 1 dans $_SESSION["creerArticle"]["tmp_file"]
+        supprDeTemp(1);
+        //écrasement de l'image 1 originale par l'image 2
+        decalage(2);
+        //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
+        supprDeDef();
     }elseif ($_POST["btn_moins2"] === '-'){
-        print_r("if 3\n");
-        unset($_SESSION["creerArticle"]["_FILES"]["name"][2]);
+        //suppression de l'image 2 dans $_SESSION["creerArticle"]["tmp_file"]
+        supprDeTemp(2);
+        //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
+        supprDeDef();
+    }
+
+    if ($_FILES["photo"]["name"][0] !== ''){//Si au moins un fichier a été déposé
+
+
+
+        for ($i=0; (($i<NB_IMGS_MAX) && ($i < count($_FILES["photo"]["name"]))) ; ) {//transfert des 3 dernières images de _FILES
+            $_SESSION["creerArticle"]["tmp_file"]["name"][] = 
+                $_FILES["photo"]["name"][count($_FILES["photo"]["name"])-1-$i];
+            $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][] = 
+                $_FILES["photo"]["tmp_name"][count($_FILES["photo"]["name"])-1-$i];
+            $i++;
+        }
+        $i=0;
+        foreach ($_SESSION["creerArticle"]["tmp_file"]["name"] as $key => $value) {//transfert des 3 dernières images de $_SESSION["creerArticle"]["tmp_file"]
+            //permet d'éviter problèmes causés par suppression d'images
+            $_SESSION["creerArticle"]["_FILES"]["name"][(count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i) % NB_IMGS_MAX] = 
+                $value;
+            $_SESSION["creerArticle"]["_FILES"]["tmp_name"][(count($_SESSION["creerArticle"]["tmp_file"]["tmp_name"])-1-$i) % NB_IMGS_MAX] = 
+                $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][$key];
+            $i++;
+            $i %= NB_IMGS_MAX;
+        }
+            
+        
+        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+            if ($value === null){//permet d'avoir un affichage qui ne parait pas bizarre
+                unset($_SESSION["creerArticle"]["_FILES"]["name"][$key]);
+                unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key]);
+            }
+        }
     }
     
-    if ($_FILES["photo"]["name"][0] !== ''){
-        // if (count($_SESSION["creerArticle"]["_FILES"]['name']) >3){
-        //     for ($i = 3; ($i < count($_SESSION["creerArticle"]["_FILES"]["name"])); $i++) {
-        //         echo $_SESSION["creerArticle"]["_FILES"]["name"][count($_SESSION["creerArticle"]["_FILES"]["name"]) - $i];
-        //     }
-        // }
-
-
-
-        for ($i=0; (($i<3) && ($i < count($_FILES["photo"]["name"]))) ; ) {
-            //if (!in_array($value,$_SESSION["creerArticle"]["_FILES"]['name'])){
-                // $_SESSION["creerArticle"]["_FILES"]["name"][(count($_SESSION["creerArticle"]["_FILES"]["name"])-1 -$i)] = 
-                //     $_FILES["photo"]["name"][count($_FILES["photo"]["name"])-1-$i];
-                // $_SESSION["creerArticle"]["_FILES"]["tmp_name"][count($_SESSION["creerArticle"]["_FILES"]["name"]) %3] = 
-                //     $_FILES["photo"]["tmp_name"][count($_FILES["photo"]["tmp_name"])-1-$i];
-                $_SESSION["creerArticle"]["tmp_file"]["name"][] = 
-                    $_FILES["photo"]["name"][count($_FILES["photo"]["name"])-1-$i];
-                $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][] = 
-                    $_FILES["photo"]["tmp_name"][count($_FILES["photo"]["name"])-1-$i];
-                $i++;
-            //}
-        }
-        for ($i=0; (($i<3) && ($i < count($_SESSION["creerArticle"]["tmp_file"]["name"]))) ; $i++) {
-            $_SESSION["creerArticle"]["_FILES"]["name"][(count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i) % 3] = 
-                $_SESSION["creerArticle"]["tmp_file"]["name"][count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i];
-            $_SESSION["creerArticle"]["_FILES"]["tmp_name"][(count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i) % 3] = 
-                $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i];
-        }
-    }
     
-print_r($_SESSION["creerArticle"]["_FILES"]);
-print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
-} else {
+    print_r($_SESSION["creerArticle"]);
+    print_r($_FILES);
+
+} else {//Initialisation des tablaux pour éviter problèmes de comparaison avec des valeurs nulls
     $_FILES["photo"]["name"] = [];
     $_SESSION["creerArticle"]["_FILES"]['name'] = [];
     $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
@@ -122,6 +145,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
 ?></pre>
 <body>
     <?php
+    //inclusion du bandeau à gauche de la page
     include __DIR__ . '/../../../partials/aside.html';
     ?>
     <main>
@@ -133,7 +157,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
             <input type="submit" name="publier" value="Publier" />
             <div>
                 <section>
-                    <h3>Ajouter produit</h3>
+                    <h3>Ajouter un produit</h3>
                     <article>
                         <!-- Texte avec label -->
                         <label for="titre">Titre</label>
@@ -142,19 +166,15 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                             pattern="[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
                             required />
                             <?php
-                        if($_POST["titre"] === 'Déjà pris'){
+                        if($_POST["titre"] === 'Déjà pris'){//à changer lors de l'incorpo de la bdd
                             ?>
                             <br>
                             <small class="warn"><?php
                                 echo 'Le titre de votre article est déjà pris. Veuillez choisir un autre titre';
-                                echo $dbh->query('SELECT p_nom FROM cobrec1._produit where p_nom = ' . $_POST['titre']);
+                                // echo $dbh->query('SELECT p_nom FROM cobrec1._produit where p_nom = ' . $_POST['titre']);
                                 $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
-                            <?php
-                        // }elseif (preg_match("[&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ-_:\ °]+",$_POST["titre"])) {
-                        //     # code...
-                        }
-                        ?>
+                        <?php } ?>
                         <br>
                         <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +=°[]() sont autorisés.</small>
                         <br /> 
@@ -179,29 +199,28 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                         <label for="photo[]">Sélectionner un fichier</label>
                         <br>
                          <input style="<?php if ((($_SESSION["creerArticle"]["_FILES"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
-                        // for (i=0;i<3; i++){
-                        //     echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][i] . '/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][i];
-                        // }
                         echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] . '/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0];
                         ?>" />
                         <?php
                         $i = count($_SESSION["creerArticle"]["_FILES"]["name"]);
-                        $i = 3;
+                        $i = NB_IMGS_MAX;
                         if (($_SESSION["creerArticle"]["_FILES"]["name"] === [])) {
                             ?>
                             <br>
+
                             <small class="warn"><?php
                             echo 'Veuillez téléverser au moins une photographie.';
                             $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                             <?php
                         }
-                        //for ($i = 1; ($i < 4) && ($i < 1+count($_SESSION["creerArticle"]["_FILES"]["name"])); $i++) {
-                        for ($i = 0; (($i < 3) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++) {
+                        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
                             ?><br>
                             <small>
-                                <?php echo $_SESSION["creerArticle"]["_FILES"]["name"][count($_SESSION["creerArticle"]["_FILES"]["name"]) -1-$i]; ?>
-                                <input type="submit" name="btn_moins<?php echo count($_SESSION["creerArticle"]["_FILES"]["name"]) -1-$i?>" value="-" />
+                                <!-- affichage -->
+                                <img src="temp_/<?php echo $value ?>" height="25">
+                                <?php echo $value; ?>
+                                <input type="submit" name="btn_moins<?php echo $key?>" value="-" />
                             </small>
                             <?php
                         }
@@ -217,7 +236,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                     <article>
                         <label for="stock">Stock</label>
                         <br>
-                        <input type="number" id="stock" name="stock" value="<?php echo $_POST["stock"]; ?>" required
+                        <input type="number" id="stock" name="stock" value="<?php echo $_POST["stock"]; ?>" placeholder="0" required
                             min="0" value="0">
                         <br />
                     </article>
@@ -235,6 +254,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                         <label for="categorie">Catégorie</label>
                         <br>
                         <select id="categorie" value="<?php echo $_POST["categorie"]; ?>" name="categorie">
+                            <!-- à changer lors de l'incorpo de la bdd -->
                             <option value="france">France</option>
                             <option value="england">Angleterre</option>
                             <option value="italie">Italie</option>
@@ -250,7 +270,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                         //
                     }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
                         //
-                    }elseif ($_POST["btn_maj"] == null){
+                    }elseif ($_POST["btn_maj"] == null){//si la zone de réduction n'est que partiellement remplie
                         $_SESSION["creerArticle"]["warn"]++;
                         $warnPromo = true;
                         echo 'border: 3px solid red';
@@ -268,7 +288,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                         <?php
                             }
                         ?>
-                        <label for="pourcentage">Pourcentage réduction</label>
+                        <label for="pourcentage">Pourcentage de réduction</label>
                         <br>
                         <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00 %" />
 
@@ -308,7 +328,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
             </form>
             <script>
             const btnPrincipaux = document.querySelectorAll("input");
-            btnPrincipaux[0].addEventListener('click', () => {
+            btnPrincipaux[0].addEventListener('click', () => {//si clicl sur Annuler
                 // const element = document.getElementById(".small_moins0");
                 // element.innerHTML = "";
                 if (confirm("Êtes-vous certain de voulair annuler ? Ce que vous n'avez pas sauvegardé sera perdu.")) {
@@ -319,12 +339,12 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                 } 
             });
 
-            function sauvegarder(){
+            function sauvegarder(){//si clic sur sauvegarder et pas de warnings
                 confirm("Votre article a bien été sauvegardé.");
                 document.location.href = "http://localhost:8888/html/pages/backoffice/index.php"; 
             }
 
-            function publier(){
+            function publier(){//si clic sur publier et pas de warnings
                 confirm("Votre article a bien été publié.");
                 document.location.href = "http://localhost:8888/html/pages/backoffice/index.php"; 
             }
@@ -333,14 +353,11 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                 <?php 
                     print_r($_SESSION["creerArticle"]["warn"]); 
                     if (($_SESSION["creerArticle"]["warn"]=== 0) && ($_POST !== []) && (($_POST["sauvegarder"] == "Sauvegarder")) || ($_POST["publier"] == "Publier")){
-                        print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
-                        print_r("OK");
-                        $_SESSION["creerArticle"]['fin'] = "fin";
-                        for ($i = 0; (($i < 3) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++){
-                            print_r($i . "\n");
-                            //print_r($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i]);
-                            move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i], 
-                            'temp_banque_images/' . $_SESSION["creerArticle"]["_FILES"]["name"][$i]);
+                        // print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
+                        // print_r("OK");
+                        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+                            mkdir('temp_banque_images/' . $_POST["titre"]);
+                            rename('temp_/' . $value, 'temp_banque_images/' . $_POST["titre"] . '/' . $value );
                         }
                         print_r("  FIN");
 
@@ -356,6 +373,7 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
                         // $_FILES = [];
                         
                         if ($_POST["sauvegarder"] == "Sauvegarder"){
+                            //Vive les if du php
                             
                 
                 ?>
@@ -371,6 +389,11 @@ print_r($_SESSION["creerArticle"]["tmp_file"]["name"]);
 
 <?php
                 }
+            }
+            for ($i = 0; (($i < NB_IMGS_MAX) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++){
+                //déplace les fichiers dans un dossier pour que l'utilisateur puisse voir les imgs
+                move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i], 
+                'temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$i]);
             }
             $sth = null ;
             $dbh = null ;

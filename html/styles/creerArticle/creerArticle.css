@@ -51,6 +51,14 @@ body main section article {
 body main section article label {
   font-weight: bold;
 }
+body main section article img {
+  transition: all 0.5s ease 0.25s;
+  transform: scale(1, 1);
+}
+body main section article img:hover {
+  transition: all 0.5s ease 0.25s;
+  transform: scale(5, 5);
+}
 body main section article > input, body main section article textarea {
   border: 1px solid #ecd9c6;
   border-radius: 8px;
