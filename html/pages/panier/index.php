@@ -4,13 +4,12 @@ include '../../../config.php';
 $id_panier = 8;
 $pdo->exec("SET search_path TO cobrec1");
 
-$requete = "SELECT p_nom, p_description, p_prix
+$requetePanier = "SELECT p_nom, p_description, p_prix
             FROM _contient
             JOIN _produit ON _produit.id_produit = _contient.id_produit
-            WHERE id_panier = 8;";
+            WHERE id_panier = ". $id_panier . ";"; //gestion de la requête en fonction du login à terminer
 
-
-$stmt = $pdo->query($requete);
+$stmt = $pdo->query($requetePanier);
 
 $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
 ?>
@@ -137,7 +136,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
             //bouton -
             btnMoins.addEventListener('click', () => { //same que bouton plus
                 let value = parseInt(input.value);
-                if (value > 0) { //pour ne pas passer en dessous de 0
+                if  (value > 1){ //gestion de la suppression du produit dans le panier
                     input.value = value - 1;
                     updateRecap();
                 }

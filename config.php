@@ -1,9 +1,9 @@
 <?php
 $host = '127.0.0.1';
 $port = '5432';
-$dbname = 'Nom databse';
-$user = 'nom utilisateur';
-$password = 'Mdp';
+$dbname = 'base_sae';
+$user = 'nom_utilisateur';
+$password = 'motdepasse';
 
 if (!class_exists('PDO')) {
     die("❌ Erreur de connexion : l'extension PDO n'est pas installée/activée dans PHP.\n" .
