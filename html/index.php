@@ -10,7 +10,7 @@ function chargerProduitsBDD($pdo)
     $categories = [];
 
     try {
-
+        // REQUÊTE MODIFIÉE : suppression des filtres temporaires pour debug
         $sql = "
             SELECT 
                 p.id_produit,
@@ -37,26 +37,28 @@ function chargerProduitsBDD($pdo)
             FROM _produit p
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
-                AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin
+                -- Condition temporairement commentée pour debug
+                /* AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin */
             LEFT JOIN (
                 SELECT id_produit, COUNT(*) as nombre_avis 
                 FROM _avis 
                 GROUP BY id_produit
             ) avis ON p.id_produit = avis.id_produit
-            WHERE p.p_statut IN ('En ligne', 'En rupture')
+            -- WHERE temporairement commenté pour voir tous les produits
+            /* WHERE p.p_statut IN ('En ligne', 'En rupture') */
         ";
 
         $stmt = $pdo->query($sql);
         $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-  
         $sqlCategories = "
             SELECT cp.nom_categorie as category, 
                    COUNT(DISTINCT p.id_produit) as count
             FROM _produit p
             JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
             JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-            WHERE p.p_statut IN ('En ligne', 'En rupture')
+            -- WHERE temporairement commenté
+            /* WHERE p.p_statut IN ('En ligne', 'En rupture') */
             GROUP BY cp.nom_categorie
         ";
 
@@ -74,13 +76,28 @@ function chargerProduitsBDD($pdo)
     return ['produits' => $produits, 'categories' => $categories];
 }
 
+function getPrixMaximum($pdo)
+{
+    try {
+        $sql = "SELECT MAX(p_prix) AS prix_maximum 
+                FROM _produit";
+        
+        $stmt = $pdo->query($sql);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
+    } catch (Exception $e) {
+        return 3000; // Valeur par défaut en cas d'erreur
+    }
+}
+
 function filtrerProduits($produits, $filtres)
 {
     $produits_filtres = [];
 
     foreach ($produits as $produit) {
         // Filtre par prix
-        if ($produit['p_prix'] > $filtres['prixMaximum']) {
+        if (($produit['p_prix'] ?? 0) > $filtres['prixMaximum']) {
             continue;
         }
 
@@ -93,18 +110,18 @@ function filtrerProduits($produits, $filtres)
         }
 
         // Filtre par stock
-        if ($filtres['enStockSeulement'] && $produit['p_stock'] <= 0) {
+        if ($filtres['enStockSeulement'] && ($produit['p_stock'] ?? 0) <= 0) {
             continue;
         }
 
         // Filtre par note
-        if ($produit['note_moyenne'] < $filtres['noteMinimum']) {
+        if (($produit['note_moyenne'] ?? 0) < $filtres['noteMinimum']) {
             continue;
         }
 
         $produits_filtres[] = $produit;
     }
-
+    
     return $produits_filtres;
 }
 
@@ -113,22 +130,21 @@ function trierProduits($produits, $tri_par)
     switch ($tri_par) {
         case 'meilleures_ventes':
             usort($produits, function ($a, $b) {
-                return $b['p_nb_ventes'] - $a['p_nb_ventes'];
+                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
             });
             break;
         case 'prix_croissant':
             usort($produits, function ($a, $b) {
-                return $a['p_prix'] - $b['p_prix'];
+                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
             });
             break;
         case 'prix_decroissant':
             usort($produits, function ($a, $b) {
-                return $b['p_prix'] - $a['p_prix'];
+                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
             });
             break;
         case 'note':
             usort($produits, function ($a, $b) {
-                // Gérer les valeurs NULL
                 $noteA = $a['note_moyenne'] ?? 0;
                 $noteB = $b['note_moyenne'] ?? 0;
                 return $noteB - $noteA;
@@ -149,7 +165,6 @@ function preparercategories_affichage($categories)
             'category' => $nomCategorie,
             'count' => $compte
         ];
-        $total_produits += $compte;
     }
 
     array_unshift($categories_affichage, [
@@ -164,9 +179,13 @@ $donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
+$tousLesProduits = count($produits);
+
+$prixMaximumDynamique = getPrixMaximum($pdo);
+
 $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['note'] ?? 0;
-$prixMaximum = $_POST['price'] ?? 3000;
+$prixMaximum = $_POST['price'] ?? $prixMaximumDynamique;
 $enStockSeulement = isset($_POST['in_stock']);
 $tri_par = $_POST['sort'] ?? 'meilleures_ventes';
 
@@ -225,7 +244,7 @@ $categories_affichage = preparercategories_affichage($categories);
                     <h4>Catégories</h4>
                     <div onclick="definirCategorie('all')">
                         <span>Tous les produits</span>
-                        <span><?= $categories_affichage[0]['count'] ?></span>
+                        <span><?= $tousLesProduits ?></span>
                     </div>
                     <?php foreach ($categories_affichage as $categorie): ?>
                         <?php if ($categorie['category'] !== 'all'): ?>
@@ -240,7 +259,7 @@ $categories_affichage = preparercategories_affichage($categories);
                 <section>
                     <h4>Prix</h4>
                     <div>
-                        <input type="range" name="price" min="0" max="3000" value="<?= $prixMaximum ?>"
+                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>" value="<?= $prixMaximum ?>"
                             oninput="mettreAJourAffichagePrix(this.value)"
                             onchange="document.getElementById('filterForm').submit()">
                     </div>
@@ -298,7 +317,7 @@ $categories_affichage = preparercategories_affichage($categories);
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
                                 <?php if ($aUneRemise): ?>
-                                    <span>-<?= round($produit['pourcentage_reduction']) ?>%</span>
+                                    <span class="badge-reduction">-<?= round($produit['pourcentage_reduction']) ?>%</span>
                                 <?php endif; ?>
                                 <?php if ($estEnRupture): ?>
                                     <div class="rupture-stock">Rupture de stock</div>
@@ -364,12 +383,13 @@ $categories_affichage = preparercategories_affichage($categories);
         function activerEditionPrix() {
             const affichagePrix = document.getElementById('affichagePrixMax');
             const prixActuel = affichagePrix.textContent.replace('€', '');
+            const prixMaxDynamique = <?= $prixMaximumDynamique ?>;
 
             const inputPrix = document.createElement('input');
             inputPrix.type = 'number';
             inputPrix.value = prixActuel;
             inputPrix.min = 0;
-            inputPrix.max = 3000;
+            inputPrix.max = prixMaxDynamique;
             inputPrix.style.width = '60px';
 
             affichagePrix.replaceWith(inputPrix);
@@ -385,7 +405,7 @@ $categories_affichage = preparercategories_affichage($categories);
 
             function sauvegarderPrix() {
                 const nouveauPrix = parseInt(inputPrix.value) || 0;
-                const prixValide = Math.min(Math.max(nouveauPrix, 0), 3000);
+                const prixValide = Math.min(Math.max(nouveauPrix, 0), prixMaxDynamique);
 
                 document.querySelector('input[name="price"]').value = prixValide;
 

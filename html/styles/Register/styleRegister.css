@@ -1,23 +1,24 @@
-@charset "UTF-8";
 * {
   font-family: "Quicksand";
 }
 
 body {
-  /* allow the page to be at least the viewport height but grow with content */
   min-height: 100vh;
   font-size: 24px;
   font-family: "Quicksand", sans-serif;
   display: flex;
-  justify-content: center; /* keep horizontal centering */
-  align-items: flex-start; /* align items at top so page height grows with content */
-  padding-top: 24px; /* small top spacing when content starts at top */
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 24px;
 }
-
-/* When body has class .centered, center the card vertically */
 body.centered {
   align-items: center;
   padding-top: 0;
+}
+@media screen and (max-width: 508px ) {
+  body {
+    font-size: 16px;
+  }
 }
 
 .inline-flex {
@@ -29,84 +30,22 @@ body.centered {
   display: none;
 }
 
-@media screen and (max-width: 508px ) {
-  body {
-    font-size: 16px;
-  }
-}
 .card {
   background: #FFFFFF;
   width: 100%;
   max-width: 661px;
-  height: auto;
   padding: 50px 25px 25px 25px;
   border-radius: 14px;
   text-align: center;
-  /* Les titres restent inchangés ici; les labels pour la card 3 seront décalés plus bas */
+}
+.card.hidden {
+  display: none !important;
 }
 @media screen and (max-width: 508px ) {
   .card {
     width: 320px;
-    max-height: 750px;
     padding: 50px 25px 25px 25px;
   }
-}
-.card .modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
-}
-.card .modal.hidden {
-  display: none;
-}
-.card .modal-content {
-  background: #FFFFFF;
-  color: #030212;
-  padding: 20px 24px;
-  border-radius: 14px;
-  width: 520px;
-  max-width: calc(100% - 40px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-}
-.card .modal-content h2 {
-  margin: 0 0 12px 0;
-  font-size: 20px;
-}
-.card .summary-body dl {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px 16px;
-}
-.card .summary-body dt {
-  font-weight: 600;
-}
-.card .summary-body dd {
-  margin: 0 0 6px 0;
-}
-.card .modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 12px;
-}
-.card .btn-cancel {
-  background: transparent;
-  border: 1px solid #030212;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.card .btn-confirm {
-  background: #030212;
-  color: #FFFFFF;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
 }
 .card .logo {
   display: flex;
@@ -167,7 +106,6 @@ body.centered {
   .card input {
     width: 280px;
     height: 25px;
-    font-size: 16px;
     padding: 8px 4px;
   }
 }
@@ -192,7 +130,17 @@ body.centered {
   font-size: 15px;
   margin-left: 40px;
 }
-.card .next-btn {
+@media screen and (max-width: 508px ) {
+  .card .error {
+    padding: 0;
+    margin-left: 20px;
+  }
+  .card .error:not(.hidden) {
+    margin-bottom: 20px;
+  }
+}
+.card .next-btn,
+.card .prev-btn {
   width: 100%;
   background: transparent;
   color: #D4183D;
@@ -200,27 +148,25 @@ body.centered {
   padding: 8px 0;
   border-radius: 14px;
   margin-top: 1rem;
-  transition: 0.15s;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* make the whole button area interactive again (previously disabled) */
   pointer-events: auto;
 }
-.card .next-btn .next-text {
+.card .next-btn .next-text,
+.card .prev-btn .next-text {
   pointer-events: none;
   color: #030212;
   font-weight: 500;
 }
-.card .next-btn .arrow-only {
+.card .next-btn .arrow-only,
+.card .prev-btn .arrow-only {
   height: 45px;
   width: auto;
-  pointer-events: auto;
   background: transparent;
   border: none;
   padding: 8px;
-  margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -229,33 +175,28 @@ body.centered {
   border-radius: 50%;
   transition: background 0.18s ease, transform 0.12s ease;
 }
-.card .next-btn .arrow-only:hover {
+.card .next-btn .arrow-only:hover,
+.card .prev-btn .arrow-only:hover {
   background: rgba(3, 2, 18, 0.1);
   transform: scale(1.06);
 }
-.card .next-btn .btn-arrow {
+.card .next-btn .btn-arrow,
+.card .prev-btn .btn-arrow {
   max-width: 50px;
   display: inline-block;
   vertical-align: middle;
   transform: scaleX(-1);
   color: #030212;
 }
-.card .next-btn .btn-arrow-left {
+.card .next-btn .btn-arrow-left,
+.card .prev-btn .btn-arrow-left {
   max-width: 50px;
   display: inline-block;
   vertical-align: middle;
   color: #030212;
 }
 .card .prev-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: 6px;
-  margin-top: 1rem;
-}
-.card .prev-btn .next-text {
-  color: #030212;
 }
 .card .prev-btn .arrow-only {
   background: transparent;
@@ -289,7 +230,6 @@ body.centered {
 }
 .card .nav-actions .btn-prev {
   flex-direction: column;
-  align-items: center;
   color: #030212;
 }
 .card .nav-actions .btn-prev .nav-arrow {
@@ -306,16 +246,10 @@ body.centered {
 .card .nav-actions .nav-arrow.right {
   transform: scaleX(-1);
 }
-.card .nav-actions .nav-arrow.left {
-  transform: none;
-}
 .card .nav-actions .nav-label {
   font-size: 14px;
 }
 @media screen and (max-width: 508px ) {
-  .card .nav-actions {
-    gap: 6px;
-  }
   .card .nav-actions .btn-prev .nav-arrow {
     width: 20px;
   }
@@ -328,24 +262,82 @@ body.centered {
   font-size: 18px;
 }
 
-/* Décalage des labels pour la card 3 sur écran large (PC) seulement */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #FFFFFF;
+  color: #030212;
+  padding: 20px 24px;
+  border-radius: 14px;
+  width: 520px;
+  max-width: calc(100% - 40px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.modal-content h2 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+}
+
+.summary-body dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+}
+.summary-body dt {
+  font-weight: 600;
+}
+.summary-body dd {
+  margin: 0 0 6px 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid #030212;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-confirm {
+  background: #030212;
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 .card[id="3"] label {
   margin-left: 20px;
 }
-
-/* Remove left padding for the 'Commune' label on desktop */
 .card[id="3"] label[for=commune] {
   padding-left: 15px;
   margin-left: 0;
 }
-
-.card.hidden {
-  display: none !important;
-}
-
 @media screen and (max-width: 508px ) {
-  /* Keep nav buttons (flèches) side-by-side while stacking the address inputs.
-     Use flex-wrap on the inline-flex and force the .culumn-flex children to take full width. */
+  .card[id="3"] label {
+    margin-left: 0;
+  }
+}
+@media screen and (max-width: 508px ) {
   .card[id="3"] .address-row {
     flex-wrap: wrap;
     align-items: stretch;
@@ -364,19 +356,13 @@ body.centered {
   .card[id="3"] .error {
     margin-left: 15px;
   }
-  /* Remove padding for error boxes on mobile to save vertical space */
-  .card .error {
-    padding: 0;
-    margin-left: 20px;
+}
+
+@media screen and (max-width: 508px ) {
+  .card .inline-flex {
+    gap: 12px;
+    justify-content: center;
   }
-  /* labels mobile: reset desktop offset */
-  .card[id="3"] label {
-    margin-left: 0;
-  }
-  .card .error:not(.hidden) {
-    margin-bottom: 20px;
-  }
-  /* Ensure nav buttons (next/prev) remain side-by-side on small screens */
   .card .inline-flex > .next-btn,
   .card .inline-flex > .prev-btn {
     width: auto;
@@ -386,14 +372,6 @@ body.centered {
     justify-content: center;
     gap: 8px;
   }
-  /* Add consistent spacing between inline-flex children (covers nav buttons) */
-  .card .inline-flex {
-    gap: 12px;
-    justify-content: center; /* center navigation buttons horizontally */
-  }
-  /* restore spacing between the two nav buttons so they're not glued together */
-  /* restore spacing between the two nav buttons so they're not glued together
-     many navigation rows use two .next-btn elements side-by-side, target both cases */
   .card .inline-flex > .prev-btn + .next-btn,
   .card .inline-flex > .next-btn + .next-btn {
     margin-left: 12px;

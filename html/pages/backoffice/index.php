@@ -6,33 +6,50 @@
   <title>Alizon - Page Accueil Vendeur</title>
   <link rel="stylesheet" href="/html/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
-<?php include '../../../../config.php';?>
 <body>
-  <?php
-    // ID du vendeur à afficher
-    $vendeur_id = 101;
+  <?php 
+    include '../../../../../config.php';
 
-    // Tableau pour stocker les articles
-    $articles = [];
+    // ID du vendeur connecté (à adapter dynamiquement via la session)
+    $vendeur_id = 2;
 
-    // Lecture du fichier CSV
-    if (($handle = fopen("../../../src/data/articles_vendeur.csv", "r")) !== false) {
-        $header = fgetcsv($handle, 1000, ";"); // lire l'en-tête
-        while (($data = fgetcsv($handle, 1000, ";")) !== false) {
-            $article = array_combine($header, $data);
-            if ($article['id_vendeur'] == $vendeur_id) {
-                $articles[] = $article;
-            }
-        }
-        fclose($handle);
+    try {
+    // Récupération des produits depuis la BDD avec leurs catégories
+    $query = "
+        SELECT 
+            p.id_produit,
+            p.p_nom AS nom_article,
+            p.p_description,
+            p.p_stock,
+            p.p_prix,
+            i.i_lien AS image_url,
+            c.nom_categorie AS categorie
+        FROM cobrec1._produit p
+        LEFT JOIN cobrec1._fait_partie_de fpd 
+               ON p.id_produit = fpd.id_produit
+        LEFT JOIN cobrec1._categorie_produit c 
+               ON fpd.id_categorie = c.id_categorie
+        LEFT JOIN cobrec1._represente_produit rp
+               ON p.id_produit = rp.id_produit
+        LEFT JOIN cobrec1._image i
+               ON rp.id_image = i.id_image
+        WHERE p.id_vendeur = :id_vendeur
+        ORDER BY p.id_produit ASC
+    ";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['id_vendeur' => $vendeur_id]);
+    $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (PDOException $e) {
+        die("Erreur de connexion ou de requête : " . htmlspecialchars($e->getMessage()));
     }
-    ?>   
+
+  ?>
   <div class="app">
     <?php
     include __DIR__ . '/../../partials/aside.html';
     ?>
-
-
+    
     <!-- Main Content -->
     <main class="main">
       <div class="header">
@@ -43,7 +60,7 @@
             <span class="search-bar__icon"><img src="../../img/svg/loupe.svg" alt="loupe"></span>
             <input type="search" placeholder="Rechercher des produits..." />
           </div>
-          <button class="btn btn--primary">Ajouter un produit</button>
+          <a href="create/index.php"><button class="btn btn--primary">Ajouter un produit</button></a>
         </div>
       </div>
 
@@ -91,75 +108,74 @@
             </tr>
           </thead>
           <tbody>
-            <?php if (!empty($articles)): ?>
-              <?php foreach ($articles as $article): ?>
-                <tr class="products-table__row">
-                  <td class="products-table__cell">
-                    <div class="checkbox"></div>
-                    <script>
-                      document.addEventListener('DOMContentLoaded', () => {
-                        const rows = document.querySelectorAll('.products-table__row');
-                        const addButton = document.querySelector('.btn--primary');
-
-                        rows.forEach(row => {
-                          const checkbox = row.querySelector('.checkbox');
-
-                          row.addEventListener('click', () => {
-                            const isSelected = row.classList.contains('selected');
-
-                            // Si déjà sélectionné → on désélectionne tout
-                            if (isSelected) {
-                              row.classList.remove('selected');
-                              checkbox.classList.remove('checkbox--active');
-                              addButton.textContent = "Ajouter un produit"; // revenir à l'état initial
-                            } else {
-                              // Sinon on désélectionne les autres
-                              rows.forEach(r => {
-                                r.classList.remove('selected');
-                                r.querySelector('.checkbox').classList.remove('checkbox--active');
-                              });
-
-                              // Et on sélectionne celui-ci
-                              row.classList.add('selected');
-                              checkbox.classList.add('checkbox--active');
-                              addButton.textContent = "Modifier le produit"; // changer le texte
-                            }
-                          });
-                        });
-                      });
-                    </script>
-
-                  </td>
-                  <td class="products-table__cell">
-                    <div class="product">
-                      <div class="product__image">
-                        <img src="<?php echo htmlspecialchars($article['image_url']) ?>" width="50" height="50" alt="<?php echo htmlspecialchars($article['nom_article']); ?>">
-                      </div>
-                      <div class="product__info">
-                        <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
-                        <p class="product__model"><?php echo number_format($article['prix'], 2, ',', ' '); ?> €</p>
-                      </div>
+          <?php if (!empty($articles)): ?>
+            <?php foreach ($articles as $article): ?>
+              <tr class="products-table__row">
+                <td class="products-table__cell">
+                  <div class="checkbox"></div>
+                </td>
+                <td class="products-table__cell">
+                  <div class="product">
+                    <div class="product__image">
+                      <img src="<?php echo htmlspecialchars($article['image_url']); ?>" width="50" height="50" alt="<?php echo htmlspecialchars($article['nom_article']); ?>">
                     </div>
-                  </td>
-                  <td class="products-table__cell">
-                    <?php if ($article['stock'] > 0): ?>
-                      <span class="badge badge--live">En ligne</span>
-                    <?php else: ?>
-                      <span class="badge badge--out">Épuisé</span>
-                    <?php endif; ?>
-                  </td>
-                  <td class="products-table__cell products-table__cell--stock"><?php echo htmlspecialchars($article['stock']); ?></td>
-                  <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['categorie']); ?></td>
-                  <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['description']); ?></td>
-                </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <tr>
-                <td colspan="6" style="text-align:center;">Aucun article</td>
+                    <div class="product__info">
+                      <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
+                      <p class="product__model"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="products-table__cell">
+                  <?php if ($article['p_stock'] > 0): ?>
+                    <span class="badge badge--live">En ligne</span>
+                  <?php else: ?>
+                    <span class="badge badge--out">Épuisé</span>
+                  <?php endif; ?>
+                </td>
+                <td class="products-table__cell products-table__cell--stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
+                <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['categorie']); ?></td>
+                <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['p_description']); ?></td>
               </tr>
-            <?php endif; ?>
-          </tbody>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="6" style="text-align:center;">Aucun article pour ce vendeur</td>
+            </tr>
+          <?php endif; ?>
+        </tbody>
         </table>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll('.products-table__row');
+            const addButton = document.querySelector('.btn--primary');
+
+            rows.forEach(row => {
+              const checkbox = row.querySelector('.checkbox');
+
+              row.addEventListener('click', () => {
+                const isSelected = row.classList.contains('selected');
+
+                // Si déjà sélectionné → on désélectionne tout
+                if (isSelected) {
+                  row.classList.remove('selected');
+                  checkbox.classList.remove('checkbox--active');
+                  addButton.textContent = "Ajouter un produit"; // revenir à l'état initial
+                } else {
+                  // Sinon on désélectionne les autres
+                  rows.forEach(r => {
+                    r.classList.remove('selected');
+                    r.querySelector('.checkbox').classList.remove('checkbox--active');
+                  });
+
+                  // Et on sélectionne celui-ci
+                  row.classList.add('selected');
+                  checkbox.classList.add('checkbox--active');
+                  addButton.textContent = "Modifier le produit"; // changer le texte
+                }
+              });
+            });
+          });
+        </script>
       </div>
     </main>
   </div>
