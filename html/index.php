@@ -317,7 +317,7 @@ $categories_affichage = preparercategories_affichage($categories);
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
                                 <?php if ($aUneRemise): ?>
-                                    <span>-<?= round($produit['pourcentage_reduction']) ?>%</span>
+                                    <span class="badge-reduction">-<?= round($produit['pourcentage_reduction']) ?>%</span>
                                 <?php endif; ?>
                                 <?php if ($estEnRupture): ?>
                                     <div class="rupture-stock">Rupture de stock</div>
