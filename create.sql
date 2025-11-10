@@ -970,5 +970,3 @@ UPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 12;
 UPDATE _vendeur SET nb_produits_crees = 10 WHERE id_vendeur = 1;
 UPDATE _vendeur SET nb_produits_crees = 8 WHERE id_vendeur = 2;
 UPDATE _vendeur SET nb_produits_crees = 7 WHERE id_vendeur = 3;
-
-SELECT COUNT(*) from _produit;
