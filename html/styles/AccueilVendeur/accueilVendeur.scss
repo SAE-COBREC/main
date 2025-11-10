@@ -192,6 +192,10 @@ body {
     &--stock {
       text-align: center;
     }
+
+    &--descrip{
+      max-width: 300px  ;
+    }
   }
 }
 
