@@ -1,5 +1,3 @@
-\nUPDATE _produit SET p_stock = p_stock - 42 WHERE id_produit = 3
-\nUPDATE _produit SET p_stock = p_stock - 18 WHERE id_produit = 4
 \nUPDATE _produit SET p_stock = p_stock - 12 WHERE id_produit = 5
 \nUPDATE _produit SET p_stock = p_stock - 25 WHERE id_produit = 6
 \nUPDATE _produit SET p_stock = p_stock - 10 WHERE id_produit = 7
@@ -13,3 +11,5 @@
 \nUPDATE _produit SET p_stock = p_stock - 11 WHERE id_produit = 15
 \n\n-- Mise à jour des signalements sur produits\nUPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 1
 \nUPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 12
+\n\nSELECT * FROM _produit
+\n\n\n-- Méthode SQL alternative\nSELECT cp.nom_categorie as category, \n       COUNT(DISTINCT p.id_produit) as count\nFROM _produit p\nJOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit\nJOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie\nWHERE p.p_statut IN ('En ligne', 'En rupture')\n  AND p.id_produit IN (\n      SELECT id_produit FROM _produit \n      WHERE p_statut IN ('En ligne', 'En rupture')\n  )\nGROUP BY cp.nom_categorie

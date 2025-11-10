@@ -10,7 +10,7 @@ function chargerProduitsBDD($pdo)
     $categories = [];
 
     try {
-        // REQUETE CORRIGÉE - Plus de doublons
+
         $sql = "
             SELECT 
                 p.id_produit,
@@ -49,9 +49,9 @@ function chargerProduitsBDD($pdo)
         $stmt = $pdo->query($sql);
         $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Comptage des produits par catégorie (sans doublons)
+  
         $sqlCategories = "
-            SELECT DISTINCT cp.nom_categorie as category, 
+            SELECT cp.nom_categorie as category, 
                    COUNT(DISTINCT p.id_produit) as count
             FROM _produit p
             JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
