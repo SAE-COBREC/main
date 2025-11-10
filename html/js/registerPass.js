@@ -12,6 +12,39 @@
 
 import storage, { isLocalStorageAvailable, setLocal, getLocal, setCookie, getCookie } from './storage.js';
 
+/**
+ * Retourne un message d'erreur de validation en français pour un élément donné.
+ * Ne modifie pas l'état de l'élément — caller peut appeler el.setCustomValidity(msg) si besoin.
+ * @param {HTMLElement} el
+ * @returns {string}
+ */
+function getFieldValidationMessage(el) {
+    if (!el) return 'Veuillez remplir ce champ correctement.';
+    try {
+        if (el.validity) {
+            if (el.validity.valueMissing) return 'Ce champ est requis.';
+            if (el.validity.typeMismatch) {
+                if (el.type === 'email') return "Veuillez saisir une adresse e-mail valide.";
+                if (el.type === 'url') return "Veuillez saisir une URL valide.";
+                return "Le format de la valeur est invalide.";
+            }
+            if (el.validity.patternMismatch) {
+                // prefer explicit title attribute when provided
+                return el.getAttribute('title') || 'Le format saisi est incorrect.';
+            }
+            if (el.validity.tooLong) return 'La valeur est trop longue.';
+            if (el.validity.tooShort) return 'La valeur est trop courte.';
+            if (el.validity.rangeUnderflow) return 'La valeur est trop faible.';
+            if (el.validity.rangeOverflow) return 'La valeur est trop élevée.';
+            if (el.validity.stepMismatch) return "La valeur n'est pas un pas valide.";
+            if (el.validity.badInput) return 'Saisie invalide.';
+        }
+    } catch (e) {
+        // ignore and fallback
+    }
+    return el.validationMessage || 'Veuillez remplir ce champ correctement.';
+}
+
 // Fonctions utilitaires : sauvegarde / restauration des données d'une card
 // Utilise localStorage si disponible, sinon fallback sur cookies
 function _getCardStorageKey(cardId) {
@@ -171,34 +204,47 @@ function showNextCard() {
     const activeCard = cards[activeIndex];
     const errorEl = activeCard ? activeCard.querySelector('.error') : null;
 
-    if (verifCompletedCard(activeCard.id)) {
+    // Prefer HTML5 validation for inputs inside the active card: find the first invalid field
+    try {
+        const invalid = activeCard ? activeCard.querySelector(':invalid') : null;
+        if (invalid) {
+            // Prefer our localized message in French
+            const message = getFieldValidationMessage(invalid);
+            try { invalid.setCustomValidity(message); } catch (e) { /* ignore */ }
+            if (errorEl) {
+                errorEl.innerHTML = '<strong>Erreur</strong> : ' + message;
+                errorEl.classList.remove('hidden');
+            } else {
+                if (typeof invalid.reportValidity === 'function') {
+                    invalid.reportValidity();
+                } else {
+                    alert(message);
+                }
+            }
+            try { invalid.focus(); } catch (e) { /* ignore */ }
+            return false;
+        }
+    } catch (e) {
+        // If :invalid selector is not supported for some reason, fallback to simple required check
+        // (keep existing behaviour below)
+        console.warn('HTML5 validation check failed in showNextCard', e);
+    }
+
     // sauvegarde des valeurs de la card courante avant de passer à la suivante
     try { saveCardData(activeCard.id); } catch (e) { console.warn('saveCardData erreur', e); }
     // efface tout message d'erreur précédent
-        if (errorEl) {
-            errorEl.textContent = '';
-            // if CSS uses a 'hidden' class to hide errors, re-hide it
-            if (!errorEl.classList.contains('hidden')) {
-                // do nothing — keep visible if it was intentionally visible elsewhere
-            } else {
-                errorEl.classList.add('hidden');
-            }
-        }
-        const nextIndex = (activeIndex + 1) % cards.length;
-        showCard(cards[nextIndex].id);
-        return true;
-    } else {
-        const msg = "Veuillez remplir tous les champs requis avant de continuer.";
-        if (errorEl) {
-            errorEl.innerHTML = "<strong>Erreur</strong> : " + msg;
-            // ensure the error element is visible
-            errorEl.classList.remove('hidden');
+    if (errorEl) {
+        errorEl.textContent = '';
+        // if CSS uses a 'hidden' class to hide errors, re-hide it
+        if (!errorEl.classList.contains('hidden')) {
+            // do nothing — keep visible if it was intentionally visible elsewhere
         } else {
-            // fallback: alert the user
-            alert(msg);
+            errorEl.classList.add('hidden');
         }
-        return false;
     }
+    const nextIndex = (activeIndex + 1) % cards.length;
+    showCard(cards[nextIndex].id);
+    return true;
 }
 
 function finishRegistration() {
@@ -208,6 +254,31 @@ function finishRegistration() {
      * The data is stored as an object keyed by card id.
      * @returns {void}
      */
+    // If password fields exist on card 4, enforce client-side confirmation before submitting
+    try {
+        const mdpEl = document.getElementById('mdp');
+        const cmdpEl = document.getElementById('Cmdp');
+        const mdpVal = mdpEl ? (mdpEl.value || '') : null;
+        const cmdpVal = cmdpEl ? (cmdpEl.value || '') : null;
+        if (mdpVal !== null && cmdpVal !== null && mdpVal !== cmdpVal) {
+            // show card 4 and display error
+            if (typeof showCard === 'function') showCard('4');
+            const cardEl = document.getElementById('4');
+            if (cardEl) {
+                const err = cardEl.querySelector('.error');
+                if (err) {
+                    err.textContent = 'Les mots de passe ne correspondent pas.';
+                    err.classList.remove('hidden');
+                }
+                if (mdpEl) mdpEl.focus();
+            }
+            return;
+        }
+    } catch (e) {
+        // non-blocking
+        console.warn('password check failed', e);
+    }
+
     const cards = document.querySelectorAll('.card');
     if (!cards || cards.length === 0) return;
 
@@ -257,8 +328,23 @@ function finishRegistration() {
     // previous inline behaviour which explicitly submitted the form.
     try {
         const form = document.getElementById('multiForm');
-        if (form) form.submit();
+        if (form) {
+            // Prefer requestSubmit() so HTML5 validation runs. If not available,
+            // set a guard so the page submit handler can allow the programmatic submit
+            // (prevents submit handler from intercepting and causing recursion).
+            try {
+                window.__allow_submit = true;
+            } catch (e) {
+                // ignore if window is not writable for some reason
+            }
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
+        }
     } catch (e) {
+        try { window.__allow_submit = false; } catch (ex) { /* ignore */ }
         // non-blocking
     }
 }
@@ -293,10 +379,13 @@ function showPreviousCard() {
 // this file is loaded as a module (module scope doesn't populate global scope).
 // This is a pragmatic choice for this project where HTML uses inline handlers.
 if (typeof window !== 'undefined') {
-    window.showCard = showCard;
-    window.showNextCard = showNextCard;
-    window.showPreviousCard = showPreviousCard;
-    window.finishRegistration = finishRegistration;
+    if (typeof window.showCard === 'undefined') window.showCard = showCard;
+    if (typeof window.showNextCard === 'undefined') window.showNextCard = showNextCard;
+    if (typeof window.showPreviousCard === 'undefined') window.showPreviousCard = showPreviousCard;
+    // Do not overwrite an existing finishRegistration defined inline in the page
+    if (typeof window.finishRegistration === 'undefined') {
+        window.finishRegistration = finishRegistration;
+    }
 }
 
 // Auto-initialize visible card and attempt to restore saved values on page load.
@@ -315,6 +404,27 @@ if (typeof window !== 'undefined') {
         if (visibleIndex >= 0 && window.restoreCardOnShow) {
             try { restoreCardData(cards[visibleIndex].id); } catch (e) { /* non-blocking */ }
         }
+
+        // Attach localized invalid handlers to inputs so browser native messages are replaced
+        try {
+            const form = document.getElementById('multiForm');
+            if (form) {
+                const inputs = form.querySelectorAll('input, textarea, select');
+                inputs.forEach(el => {
+                    // on invalid, set a localized custom message
+                    el.addEventListener('invalid', function (ev) {
+                        try {
+                            const msg = getFieldValidationMessage(el);
+                            el.setCustomValidity(msg);
+                        } catch (e) { /* ignore */ }
+                    });
+                    // on input/change, clear custom validity so validation re-evaluates
+                    el.addEventListener('input', function () {
+                        try { el.setCustomValidity(''); } catch (e) { /* ignore */ }
+                    });
+                });
+            }
+        } catch (e) { /* non-blocking */ }
     });
 }
 

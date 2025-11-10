@@ -5,13 +5,20 @@
   font-family: "Quicksand";
 }
 body {
-  height: 100vh;
+  /* allow the page to be at least the viewport height but grow with content */
+  min-height: 100vh;
   font-size: 24px;
   font-family: 'Quicksand', sans-serif;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* keep horizontal centering */
+  align-items: flex-start; /* align items at top so page height grows with content */
+  padding-top: 24px; /* small top spacing when content starts at top */
+}
+/* When body has class .centered, center the card vertically */
+body.centered {
   align-items: center;
-
+  padding-top: 0;
+}
   .inline-flex {
     display: flex;
     align-items: center;
@@ -22,32 +29,29 @@ body {
   }
 
   @media #{$mobile} {
-    font-size: 16px;
-  }
-
-  .card[id="3"],
-  .card[id="4"] {
-    height: 620px !important;
-
-    @media #{$mobile} {
-      max-height: 540px !important;
+    body {
+      font-size: 16px;
     }
   }
 
+  // allow cards to size to their content (no forced fixed height)
+
   .card {
-    background: $primary-color-blanc;
-    width: 661px;
-    height: 764px;
+  background: $primary-color-blanc;
+  width: 100%;
+  max-width: 661px;
+  height: auto;
     padding: 50px 25px 25px 25px;
     border-radius: $border-radius-primary;
     text-align: center;
 
     @media #{$mobile} {
       width: 320px;
-      max-height: 630px;
+      max-height: 750px;
       padding: 50px 25px 25px 25px;
     }
 
+    /* Les titres restent inchangés ici; les labels pour la card 3 seront décalés plus bas */
     .modal {
       position: fixed;
       inset: 0;
@@ -99,6 +103,8 @@ body {
       }
     }
 
+
+
     .subtitle {
       font-size: 24px;
       color: $primary-color-noir;
@@ -115,7 +121,7 @@ body {
       color: $primary-color-noir;
       text-align: left;
       display: block;
-      padding-left: 60px;
+      padding-left: 40px;
       margin-bottom: 6px;
 
         @media #{$mobile} {
@@ -155,7 +161,6 @@ body {
 
       input#commune {
         width: 325px;
-        margin-left: 20px;
       }
 
       .error {
@@ -165,7 +170,7 @@ body {
         padding: 10px;
         text-align: left;
         font-size: 15px;
-        margin-left: 55px;
+        margin-left: 40px;
       }
 
 
@@ -330,7 +335,76 @@ body {
       font-size: 18px;
     }
   }
+
+/* Décalage des labels pour la card 3 sur écran large (PC) seulement */
+.card[id="3"] label {
+  margin-left: 20px;
+}
+
+/* Remove left padding for the 'Commune' label on desktop */
+.card[id="3"] label[for="commune"] {
+  padding-left: 15px;
+  margin-left: 0;
 }
 
 // Ensure hidden class always hides cards even if .card rules are compiled later
 .card.hidden { display: none !important; }
+
+// Make code postal and commune stack vertically on small screens for card 3
+@media #{$mobile} {
+  /* Keep nav buttons (flèches) side-by-side while stacking the address inputs.
+     Use flex-wrap on the inline-flex and force the .culumn-flex children to take full width. */
+  .card[id="3"] .address-row {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .card[id="3"] .address-row > .culumn-flex {
+    flex: 0 0 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0 15px;
+  }
+  .card[id="3"] input#codeP,
+  .card[id="3"] input#commune {
+    width: 100%;
+    margin-left: 0;
+  }
+  .card[id="3"] .error {
+    margin-left: 15px;
+  }
+  /* Remove padding for error boxes on mobile to save vertical space */
+  .card .error {
+    padding: 0;
+    margin-left: 20px;
+  }
+  /* labels mobile: reset desktop offset */
+  .card[id="3"] label {
+    margin-left: 0;
+  }
+  // When an error is visible on mobile, add 58px extra space so the card grows accordingly
+  .card .error:not(.hidden) {
+    margin-bottom: 20px;
+  }
+  /* Ensure nav buttons (next/prev) remain side-by-side on small screens */
+  .card .inline-flex > .next-btn,
+  .card .inline-flex > .prev-btn {
+    width: auto;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  /* Add consistent spacing between inline-flex children (covers nav buttons) */
+  .card .inline-flex {
+    gap: 12px;
+    justify-content: center; /* center navigation buttons horizontally */
+  }
+  /* restore spacing between the two nav buttons so they're not glued together */
+  /* restore spacing between the two nav buttons so they're not glued together
+     many navigation rows use two .next-btn elements side-by-side, target both cases */
+  .card .inline-flex > .prev-btn + .next-btn,
+  .card .inline-flex > .next-btn + .next-btn {
+    margin-left: 12px;
+  }
+}
