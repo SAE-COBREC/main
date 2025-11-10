@@ -121,10 +121,7 @@ function filtrerProduits($produits, $filtres)
 
         $produits_filtres[] = $produit;
     }
-
-    // DEBUG : Afficher le nombre de produits après filtrage
-    echo "<p style='background: orange; padding: 10px; margin: 10px 0;'>DEBUG - Produits après filtrage : " . count($produits_filtres) . "</p>";
-
+    
     return $produits_filtres;
 }
 
@@ -168,7 +165,6 @@ function preparercategories_affichage($categories)
             'category' => $nomCategorie,
             'count' => $compte
         ];
-        $total_produits += $compte;
     }
 
     array_unshift($categories_affichage, [
@@ -183,10 +179,8 @@ $donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
-// DEBUG : Afficher le nombre de produits récupérés
-echo "<p style='background: yellow; padding: 10px; margin: 10px 0;'>DEBUG - Produits récupérés de la BDD : " . count($produits) . "</p>";
+$tousLesProduits = count($produits);
 
-// Récupération du prix maximum dynamique
 $prixMaximumDynamique = getPrixMaximum($pdo);
 
 $categorieFiltre = $_POST['category'] ?? 'all';
@@ -205,10 +199,6 @@ $filtres = [
 $produits_filtres = filtrerProduits($produits, $filtres);
 $produits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($categories);
-
-// DEBUG : Afficher le nombre final de produits
-echo "<p style='background: lightgreen; padding: 10px; margin: 10px 0;'>DEBUG - Produits finaux à afficher : " . count($produits) . "</p>";
-
 ?>
 
 <!DOCTYPE html>
@@ -254,7 +244,7 @@ echo "<p style='background: lightgreen; padding: 10px; margin: 10px 0;'>DEBUG - 
                     <h4>Catégories</h4>
                     <div onclick="definirCategorie('all')">
                         <span>Tous les produits</span>
-                        <span><?= $categories_affichage[0]['count'] ?></span>
+                        <span><?= $tousLesProduits ?></span>
                     </div>
                     <?php foreach ($categories_affichage as $categorie): ?>
                         <?php if ($categorie['category'] !== 'all'): ?>
