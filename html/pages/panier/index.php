@@ -1,3 +1,18 @@
+<?php 
+include '../../../config.php';
+
+$id_panier = 8;
+$pdo->exec("SET search_path TO cobrec1");
+
+$requetePanier = "SELECT p_nom, p_description, p_prix
+            FROM _contient
+            JOIN _produit ON _produit.id_produit = _contient.id_produit
+            WHERE id_panier = ". $id_panier . ";"; //gestion de la requête en fonction du login à terminer
+
+$stmt = $pdo->query($requetePanier);
+
+$articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
+?>
 <!DOCTYPE html>
 <html lang="fr">
     <head>
@@ -16,82 +31,33 @@
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
         <section class="articlesPrixP">
             
-        <?php if (0==0):?>
+        <?php if (count($articles) > 0):?>
             
             <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
             <div>
                 
-                <!--UN ARTICLE DANS LE PANIER-->    
-                <article class="unArticleP" data-prix="29.99">
-                    <div class="imageArticleP">
-                        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400" alt="Biscuits">
-                    </div>
-                    <div class="articleDetailP">
-                        <h2 class="articleTitreP">Biscuits artisanaux</h2>
-                        <p class="articleDescP">
-                                                Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum 
-                                                has been the industry's standard dummy text ever since the 1500s, when an unknown 
-                                                printer took a galley of type and scrambled it to make a type specimen book. It has 
-                                                survived not only five centuries.
-                        </p>
-                        <div class="basArticleP">
-                            <p class="articlePrix">29.99€</p>
-                            <div class="quantite">
-                                <button class="btn_moins">-</button>
-                                <input type="text" class="quantite_input_entre" value="1">
-                                <button class="btn_plus">+</button>
+                <!--UN ARTICLE DANS LE PANIER-->
+                <?php foreach ($articles as $article): ?> 
+                    <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>">
+                        <div class="imageArticleP">
+                            <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400" 
+                                alt="<?php echo htmlspecialchars($article['p_nom']) ?>" 
+                                title="<?php echo htmlspecialchars($article['p_nom'])?>">
+                        </div>
+                        <div class="articleDetailP">
+                            <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                            <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
+                            <div class="basArticleP">
+                                <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?></p>
+                                <div class="quantite">
+                                    <button class="btn_moins">-</button>
+                                    <input type="text" class="quantite_input_entre" value="1">
+                                    <button class="btn_plus">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </article>
-
-                <article class="unArticleP" data-prix="40.02">
-                    <div class="imageArticleP">
-                        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400" alt="Biscuits">
-                    </div>
-                    <div class="articleDetailP">
-                        <h2 class="articleTitreP">Cookies premium</h2>
-                        <p class="articleDescP">
-                                        Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum 
-                                        has been the industry's standard dummy text ever since the 1500s, when an unknown 
-                                        printer took a galley of type and scrambled it to make a type specimen book. It has 
-                                        survived not only five centuries.
-                        </p>
-                        <div class="basArticleP">
-                        <p class="articlePrix">40.02€</p>
-                            <div class="quantite">
-                                <button class="btn_moins">-</button>
-                                <input type="text" class="quantite_input_entre" value="1">
-                                <button class="btn_plus">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-
-                <article class="unArticleP" data-prix="40.02">
-                    <div class="imageArticleP">
-                        <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400" alt="Biscuits"> 
-                    </div>
-                    <div class="articleDetailP">
-                        <h2 class="articleTitreP">Cookies premium</h2>
-                        <p class="articleDescP">
-                                        Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum 
-                                        has been the industry's standard dummy text ever since the 1500s, when an unknown 
-                                        printer took a galley of type and scrambled it to make a type specimen book. It has 
-                                        survived not only five centuries.
-                        </p>
-                        <div class="basArticleP">
-                        <p class="articlePrix">40.02€</p>
-                            <div class="quantite">
-                                <button class="btn_moins">-</button>
-                                <input type="text" class="quantite_input_entre" value="1">
-                                <button class="btn_plus">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
+                    </article>
+                <?php endforeach;?>
             </div>
 
             <!-- BLOCK DU RECAP DE LA COMMANDE -->
@@ -170,7 +136,7 @@
             //bouton -
             btnMoins.addEventListener('click', () => { //same que bouton plus
                 let value = parseInt(input.value);
-                if (value > 0) { //pour ne pas passer en dessous de 0
+                if  (value > 1){ //gestion de la suppression du produit dans le panier
                     input.value = value - 1;
                     updateRecap();
                 }

@@ -167,6 +167,9 @@ body {
 .products-table__cell--stock {
   text-align: center;
 }
+.products-table__cell--descrip {
+  max-width: 300px;
+}
 
 /* Styles pour la case cochée */
 .checkbox {

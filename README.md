@@ -33,6 +33,8 @@
 │   │       ├── logo.svg
 │   │       ├── logo_bronze.svg
 │   │       ├── loupe.svg
+│   │       ├── menu-burger.svg
+│   │       ├── panier.svg
 │   │       ├── pinterest-blank.svg
 │   │       ├── profile-v.svg
 │   │       ├── profile.svg
@@ -106,6 +108,4 @@
 ├── .gitignore
 ├── LICENSE
 └── README.md
-│   │       ├── menu-burger.svg
-│   │       ├── panier.svg
 ```

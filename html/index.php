@@ -1,15 +1,17 @@
 <?php
 
-include __DIR__ . '/../config.php';
+include __DIR__ . '/../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 
+//fonction pour charger tous les produits depuis la base de données
 function chargerProduitsBDD($pdo)
 {
     $produits = [];
     $categories = [];
 
     try {
+        //requête SQL pour récupérer tous les produits avec leurs informations
         $sql = "
             SELECT 
                 p.id_produit,
@@ -22,40 +24,42 @@ function chargerProduitsBDD($pdo)
                 p.p_statut,
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
                 COALESCE(avis.nombre_avis, 0) as nombre_avis,
-                cp.nom_categorie as category,
-                i.i_lien as image_url
+                (SELECT STRING_AGG(cp.nom_categorie, ', ') 
+                 FROM _fait_partie_de fpd 
+                 JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+                 WHERE fpd.id_produit = p.id_produit) as categories,
+                (SELECT i.i_lien 
+                 FROM _represente_produit rp 
+                 JOIN _image i ON rp.id_image = i.id_image
+                 WHERE rp.id_produit = p.id_produit 
+                 LIMIT 1) as image_url
             FROM _produit p
-            LEFT JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
-            LEFT JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
-                AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin
             LEFT JOIN (
                 SELECT id_produit, COUNT(*) as nombre_avis 
                 FROM _avis 
                 GROUP BY id_produit
             ) avis ON p.id_produit = avis.id_produit
-            LEFT JOIN _represente_produit rp ON p.id_produit = rp.id_produit
-            LEFT JOIN _image i ON rp.id_image = i.id_image
-            WHERE p.p_statut IN ('En ligne', 'En rupture')
-            GROUP BY p.id_produit, cp.nom_categorie, r.reduction_pourcentage, avis.nombre_avis, i.i_lien
         ";
 
         $stmt = $pdo->query($sql);
-        $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $produits = $stmt->fetchAll(PDO::FETCH_ASSOC); //récupère tous les produits et les stocke dans une liste
 
+        //requête pour compter les produits par catégorie
         $sqlCategories = "
-            SELECT cp.nom_categorie as category, COUNT(*) as count
+            SELECT cp.nom_categorie as category, 
+                   COUNT(DISTINCT p.id_produit) as count
             FROM _produit p
             JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
             JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-            WHERE p.p_statut IN ('En ligne', 'En rupture')
             GROUP BY cp.nom_categorie
         ";
 
         $stmtCategories = $pdo->query($sqlCategories);
         $categoriesResult = $stmtCategories->fetchAll(PDO::FETCH_ASSOC);
 
+        //organise les catégories dans un tableau associatif
         foreach ($categoriesResult as $cat) {
             $categories[$cat['category']] = $cat['count'];
         }
@@ -67,54 +71,87 @@ function chargerProduitsBDD($pdo)
     return ['produits' => $produits, 'categories' => $categories];
 }
 
+//fonction pour récupérer le prix maximum parmi tous les produits
+function getPrixMaximum($pdo)
+{
+    try {
+        $sql = "SELECT MAX(p_prix) AS prix_maximum 
+                FROM _produit";
+        
+        $stmt = $pdo->query($sql);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        //retourne le prix maximum arrondi au centaine supérieure, ou 3000 par défaut
+        return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
+    } catch (Exception $e) {
+        return 3000;
+    }
+}
+
+//fonction pour filtrer les produits selon les critères choisis
 function filtrerProduits($produits, $filtres)
 {
     $produits_filtres = [];
 
+    //parcourt tous les produits et applique les filtres
     foreach ($produits as $produit) {
-        if ($produit['p_prix'] > $filtres['prixMaximum']) {
+        //filtre par prix maximum
+        if (($produit['p_prix'] ?? 0) > $filtres['prixMaximum']) {
             continue;
         }
 
-        if ($filtres['categorieFiltre'] !== 'all' && $produit['category'] !== $filtres['categorieFiltre']) {
+        //filtre par catégorie
+        if ($filtres['categorieFiltre'] !== 'all') {
+            $categoriesProduit = explode(', ', $produit['categories'] ?? '');
+            if (!in_array($filtres['categorieFiltre'], $categoriesProduit)) {
+                continue;
+            }
+        }
+
+        //filtre pour afficher seulement les produits en stock
+        if ($filtres['enStockSeulement'] && ($produit['p_stock'] ?? 0) <= 0) {
             continue;
         }
 
-        if ($filtres['enStockSeulement'] && $produit['p_stock'] <= 0) {
+        //filtre par note minimum
+        if (($produit['note_moyenne'] ?? 0) < $filtres['noteMinimum']) {
             continue;
         }
 
-        if ($produit['note_moyenne'] < $filtres['noteMinimum']) {
-            continue;
-        }
-
-        $produits_filtres[] = $produit;
+        $produits_filtres[] = $produit; //ajoute le produit s'il passe tous les filtres
     }
-
+    
     return $produits_filtres;
 }
 
+//fonction pour trier les produits selon le critère choisi
 function trierProduits($produits, $tri_par)
 {
     switch ($tri_par) {
         case 'meilleures_ventes':
+            //trie par nombre de ventes décroissant
             usort($produits, function ($a, $b) {
-                return $b['p_nb_ventes'] - $a['p_nb_ventes'];
+                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
             });
             break;
         case 'prix_croissant':
+            //trie par prix croissant
             usort($produits, function ($a, $b) {
-                return $a['p_prix'] - $b['p_prix'];
+                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
             });
             break;
         case 'prix_decroissant':
+            //trie par prix décroissant
             usort($produits, function ($a, $b) {
-                return $b['p_prix'] - $a['p_prix'];
+                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
             });
             break;
         case 'note':
+            //trie par note décroissante
             usort($produits, function ($a, $b) {
-                return $b['note_moyenne'] - $a['note_moyenne'];
+                $noteA = $a['note_moyenne'] ?? 0;
+                $noteB = $b['note_moyenne'] ?? 0;
+                return $noteB - $noteA;
             });
             break;
     }
@@ -122,19 +159,21 @@ function trierProduits($produits, $tri_par)
     return $produits;
 }
 
+//fonction pour préparer les catégories pour l'affichage
 function preparercategories_affichage($categories)
 {
     $categories_affichage = [];
     $total_produits = 0;
 
+    //prépare chaque catégorie pour l'affichage
     foreach ($categories as $nomCategorie => $compte) {
         $categories_affichage[] = [
             'category' => $nomCategorie,
             'count' => $compte
         ];
-        $total_produits += $compte;
     }
 
+    //ajoute l'option "Tous les produits" en premier
     array_unshift($categories_affichage, [
         'category' => 'all',
         'count' => $total_produits
@@ -143,16 +182,23 @@ function preparercategories_affichage($categories)
     return $categories_affichage;
 }
 
+//chargement des données depuis la base de données
 $donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
+$tousLesProduits = count($produits); //compte le nombre total de produits
+
+$prixMaximumDynamique = getPrixMaximum($pdo); //récupère le prix maximum dynamique
+
+//récupère les valeurs des filtres depuis le formulaire ou utilise les valeurs par défaut
 $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['note'] ?? 0;
-$prixMaximum = $_POST['price'] ?? 3000;
+$prixMaximum = $_POST['price'] ?? $prixMaximumDynamique;
 $enStockSeulement = isset($_POST['in_stock']);
 $tri_par = $_POST['sort'] ?? 'meilleures_ventes';
 
+//tableau contenant tous les filtres
 $filtres = [
     'categorieFiltre' => $categorieFiltre,
     'noteMinimum' => $noteMinimum,
@@ -160,6 +206,7 @@ $filtres = [
     'enStockSeulement' => $enStockSeulement
 ];
 
+//application des filtres et du tri
 $produits_filtres = filtrerProduits($produits, $filtres);
 $produits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($categories);
@@ -208,7 +255,7 @@ $categories_affichage = preparercategories_affichage($categories);
                     <h4>Catégories</h4>
                     <div onclick="definirCategorie('all')">
                         <span>Tous les produits</span>
-                        <span><?= $categories_affichage[0]['count'] ?></span>
+                        <span><?= $tousLesProduits ?></span>
                     </div>
                     <?php foreach ($categories_affichage as $categorie): ?>
                         <?php if ($categorie['category'] !== 'all'): ?>
@@ -223,7 +270,7 @@ $categories_affichage = preparercategories_affichage($categories);
                 <section>
                     <h4>Prix</h4>
                     <div>
-                        <input type="range" name="price" min="0" max="3000" value="<?= $prixMaximum ?>"
+                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>" value="<?= $prixMaximum ?>"
                             oninput="mettreAJourAffichagePrix(this.value)"
                             onchange="document.getElementById('filterForm').submit()">
                     </div>
@@ -265,11 +312,15 @@ $categories_affichage = preparercategories_affichage($categories);
                 <?php else: ?>
                     <?php foreach ($produits as $produit): ?>
                         <?php
+                        //détermine si le produit est en rupture de stock
                         $estEnRupture = $produit['p_stock'] <= 0;
+                        //vérifie si le produit a une remise
                         $aUneRemise = !empty($produit['pourcentage_reduction']) && $produit['pourcentage_reduction'] > 0;
+                        //calcule le prix final (avec remise si applicable)
                         $prixFinal = $aUneRemise
                             ? $produit['p_prix'] * (1 - $produit['pourcentage_reduction'] / 100)
                             : $produit['p_prix'];
+                        //arrondit la note moyenne
                         $note = $produit['note_moyenne'] ? round($produit['note_moyenne']) : 0;
                         ?>
                         <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
@@ -281,7 +332,7 @@ $categories_affichage = preparercategories_affichage($categories);
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
                                 <?php if ($aUneRemise): ?>
-                                    <span>-<?= round($produit['pourcentage_reduction']) ?>%</span>
+                                    <span class="badge-reduction">-<?= round($produit['pourcentage_reduction']) ?>%</span>
                                 <?php endif; ?>
                                 <?php if ($estEnRupture): ?>
                                     <div class="rupture-stock">Rupture de stock</div>
@@ -318,24 +369,29 @@ $categories_affichage = preparercategories_affichage($categories);
     ?>
 
     <script>
+        //fonction pour définir la catégorie et soumettre le formulaire
         function definirCategorie(categorie) {
             document.getElementById('champCategorie').value = categorie;
             document.getElementById('filterForm').submit();
         }
 
+        //fonction pour définir la note minimum et soumettre le formulaire
         function definirNote(note) {
             document.getElementById('champNote').value = note;
             document.getElementById('filterForm').submit();
         }
 
+        //fonction pour mettre à jour l'affichage du prix maximum
         function mettreAJourAffichagePrix(valeur) {
             document.getElementById('affichagePrixMax').textContent = valeur + '€';
         }
 
+        //fonction pour simuler l'ajout au panier
         function ajouterAuPanier(idProduit) {
             alert('Produit ' + idProduit + ' ajouté au panier !');
         }
 
+        //fonction pour réinitialiser tous les filtres
         function reinitialiserFiltres() {
             const form = document.createElement('form');
             form.method = 'POST';
@@ -344,34 +400,42 @@ $categories_affichage = preparercategories_affichage($categories);
             form.submit();
         }
 
+        //fonction pour activer l'édition manuelle du prix maximum
         function activerEditionPrix() {
             const affichagePrix = document.getElementById('affichagePrixMax');
             const prixActuel = affichagePrix.textContent.replace('€', '');
+            const prixMaxDynamique = <?= $prixMaximumDynamique ?>;
 
+            //remplace l'affichage par un champ de saisie
             const inputPrix = document.createElement('input');
             inputPrix.type = 'number';
             inputPrix.value = prixActuel;
             inputPrix.min = 0;
-            inputPrix.max = 3000;
+            inputPrix.max = prixMaxDynamique;
             inputPrix.style.width = '60px';
 
             affichagePrix.replaceWith(inputPrix);
             inputPrix.focus();
             inputPrix.select();
 
+            //gère la sauvegarde quand on quitte le champ
             inputPrix.addEventListener('blur', sauvegarderPrix);
+            //gère la sauvegarde quand on appuie sur Entrée
             inputPrix.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     sauvegarderPrix();
                 }
             });
 
+            //fonction pour sauvegarder la nouvelle valeur du prix
             function sauvegarderPrix() {
                 const nouveauPrix = parseInt(inputPrix.value) || 0;
-                const prixValide = Math.min(Math.max(nouveauPrix, 0), 3000);
+                //s'assure que le prix est dans les limites autorisées
+                const prixValide = Math.min(Math.max(nouveauPrix, 0), prixMaxDynamique);
 
                 document.querySelector('input[name="price"]').value = prixValide;
 
+                //recrée l'élément span d'affichage
                 const nouveauSpan = document.createElement('span');
                 nouveauSpan.id = 'affichagePrixMax';
                 nouveauSpan.textContent = prixValide + '€';
@@ -379,10 +443,12 @@ $categories_affichage = preparercategories_affichage($categories);
 
                 inputPrix.replaceWith(nouveauSpan);
 
+                //soumet le formulaire pour appliquer le nouveau filtre
                 document.getElementById('filterForm').submit();
             }
         }
 
+        //initialisation quand la page est chargée
         document.addEventListener('DOMContentLoaded', function () {
             const aside = document.querySelector('aside');
 
