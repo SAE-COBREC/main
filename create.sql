@@ -722,7 +722,7 @@ INSERT INTO _promotion (promotion_debut, promotion_fin) VALUES
 ('2026-01-01 00:00:00', '2026-01-07 23:59:59'),
 ('2025-11-25 00:00:00', '2025-11-29 23:59:59');
 
--- 11. PRODUITS (version corrigée)
+-- 11. PRODUITS
 INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock, p_statut, p_poids, p_volume, p_frais_de_port, p_taille, p_note, p_nb_ventes) VALUES
 (1, 1, 'Smartphone XPro', 'Smartphone dernière génération avec écran OLED 6.7 pouces, 256Go stockage, 5G', 599.99, 50, 'En ligne', 0.180, 0.0001, 5.99, NULL, 4.3, 15),
 (1, 1, 'Ordinateur portable Ultra', 'PC portable 15 pouces, 16Go RAM, SSD 512Go, processeur i7', 899.99, 30, 'En ligne', 2.5, 0.003, 9.99, NULL, 4.0, 8),

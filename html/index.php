@@ -10,6 +10,7 @@ function chargerProduitsBDD($pdo)
     $categories = [];
 
     try {
+        // REQUETE CORRIGÉE - Plus de doublons
         $sql = "
             SELECT 
                 p.id_produit,
@@ -22,11 +23,18 @@ function chargerProduitsBDD($pdo)
                 p.p_statut,
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
                 COALESCE(avis.nombre_avis, 0) as nombre_avis,
-                cp.nom_categorie as category,
-                i.i_lien as image_url
+                -- Catégories via sous-requête
+                (SELECT STRING_AGG(cp.nom_categorie, ', ') 
+                 FROM _fait_partie_de fpd 
+                 JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+                 WHERE fpd.id_produit = p.id_produit) as categories,
+                -- Image principale via sous-requête
+                (SELECT i.i_lien 
+                 FROM _represente_produit rp 
+                 JOIN _image i ON rp.id_image = i.id_image
+                 WHERE rp.id_produit = p.id_produit 
+                 LIMIT 1) as image_url
             FROM _produit p
-            LEFT JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
-            LEFT JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
                 AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin
@@ -35,17 +43,16 @@ function chargerProduitsBDD($pdo)
                 FROM _avis 
                 GROUP BY id_produit
             ) avis ON p.id_produit = avis.id_produit
-            LEFT JOIN _represente_produit rp ON p.id_produit = rp.id_produit
-            LEFT JOIN _image i ON rp.id_image = i.id_image
             WHERE p.p_statut IN ('En ligne', 'En rupture')
-            GROUP BY p.id_produit, cp.nom_categorie, r.reduction_pourcentage, avis.nombre_avis, i.i_lien
         ";
 
         $stmt = $pdo->query($sql);
         $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Comptage des produits par catégorie (sans doublons)
         $sqlCategories = "
-            SELECT cp.nom_categorie as category, COUNT(*) as count
+            SELECT DISTINCT cp.nom_categorie as category, 
+                   COUNT(DISTINCT p.id_produit) as count
             FROM _produit p
             JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
             JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
@@ -72,18 +79,25 @@ function filtrerProduits($produits, $filtres)
     $produits_filtres = [];
 
     foreach ($produits as $produit) {
+        // Filtre par prix
         if ($produit['p_prix'] > $filtres['prixMaximum']) {
             continue;
         }
 
-        if ($filtres['categorieFiltre'] !== 'all' && $produit['category'] !== $filtres['categorieFiltre']) {
-            continue;
+        // Filtre par catégorie
+        if ($filtres['categorieFiltre'] !== 'all') {
+            $categoriesProduit = explode(', ', $produit['categories'] ?? '');
+            if (!in_array($filtres['categorieFiltre'], $categoriesProduit)) {
+                continue;
+            }
         }
 
+        // Filtre par stock
         if ($filtres['enStockSeulement'] && $produit['p_stock'] <= 0) {
             continue;
         }
 
+        // Filtre par note
         if ($produit['note_moyenne'] < $filtres['noteMinimum']) {
             continue;
         }
@@ -114,7 +128,10 @@ function trierProduits($produits, $tri_par)
             break;
         case 'note':
             usort($produits, function ($a, $b) {
-                return $b['note_moyenne'] - $a['note_moyenne'];
+                // Gérer les valeurs NULL
+                $noteA = $a['note_moyenne'] ?? 0;
+                $noteB = $b['note_moyenne'] ?? 0;
+                return $noteB - $noteA;
             });
             break;
     }
