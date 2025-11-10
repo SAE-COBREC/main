@@ -1,0 +1,15 @@
+\nUPDATE _produit SET p_stock = p_stock - 42 WHERE id_produit = 3
+\nUPDATE _produit SET p_stock = p_stock - 18 WHERE id_produit = 4
+\nUPDATE _produit SET p_stock = p_stock - 12 WHERE id_produit = 5
+\nUPDATE _produit SET p_stock = p_stock - 25 WHERE id_produit = 6
+\nUPDATE _produit SET p_stock = p_stock - 10 WHERE id_produit = 7
+\nUPDATE _produit SET p_stock = p_stock - 20 WHERE id_produit = 8
+\nUPDATE _produit SET p_stock = p_stock - 16 WHERE id_produit = 9
+\nUPDATE _produit SET p_stock = p_stock - 9 WHERE id_produit = 10
+\nUPDATE _produit SET p_stock = p_stock - 35 WHERE id_produit = 11
+\nUPDATE _produit SET p_stock = p_stock - 5 WHERE id_produit = 12
+\nUPDATE _produit SET p_stock = p_stock - 22 WHERE id_produit = 13
+\nUPDATE _produit SET p_stock = p_stock - 28 WHERE id_produit = 14
+\nUPDATE _produit SET p_stock = p_stock - 11 WHERE id_produit = 15
+\n\n-- Mise à jour des signalements sur produits\nUPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 1
+\nUPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 12
