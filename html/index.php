@@ -254,7 +254,7 @@ $categories_affichage = preparercategories_affichage($categories);
                     <h4>Note minimum</h4>
                     <?php for ($i = 5; $i >= 1; $i--): ?>
                         <div onclick="definirNote(<?= $i ?>)">
-                            <span><?= str_repeat('★', $i) . str_repeat('☆', 5 - $i) ?></span>
+                            <span><?= str_repeat('<img src="./img/svg/star-full.svg" alt="Etoile" width="16" height="16">', $i) . str_repeat('<img src="./img/svg/star-empty.svg" alt="Etoile" width="16" height="16">', 5 - $i) ?></span>
                             <span><?= $i ?> et plus</span>
                         </div>
                     <?php endfor; ?>
