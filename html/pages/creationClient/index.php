@@ -98,6 +98,20 @@
   body {
     background: linear-gradient(to bottom right, #7171A3, #030212);
   }
+  .card[id="3"] {
+  label {
+    margin-left: 20px;
+
+    &[for="commune"] {
+      padding-left: 15px;
+      margin-left: 0;
+    }
+
+    @media #{$mobile} {
+      margin-left: 0;
+    }
+  }
+
 </style>
 
 <body>
