@@ -773,7 +773,7 @@ INSERT INTO _image (i_lien, i_title, i_alt) VALUES
 ('https://www.micromania.fr/on/demandware.static/-/Sites-masterCatalog_Micromania/default/dwf595bf30/images/high-res/44f2526d-febb-466b-9403-25984f89dcb6_scrmax.jpg', 'Console NextGen', 'Image de la console'),
 ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5IozV9XDtx4UrHcxxuN22bNf8WavAmcwVEQ&s', 'Sweat à capuche', 'Image du sweat'),
 ('https://static.fflose.com/2023/02/807f757c-tennis-gf8a2b0441_1920.jpg', 'Raquette tennis', 'Image de la raquette'),
-('hhttps://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSazLiw7BbdMUPUpsWWFWRYEPRwXruWLCCVuQ&s', 'Écran 4K', 'Image de l écran'),
+('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSazLiw7BbdMUPUpsWWFWRYEPRwXruWLCCVuQ&s', 'Écran 4K', 'Image de l écran'),
 ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMGDU4tVKkWwmBjCzmKx4ZPi8ph3A77fuQfg&s', 'Baskets limited', 'Image des baskets'),
 ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsAuR3KouEm3AAZBS-ZU8ZanLGer2gVAKAVw&s', 'Vélo route', 'Image du vélo'),
 ('https://www.lacameraembarquee.fr/blog/wp-content/uploads/2023/05/Tout-savoir-sur-les-drones-FPV-.jpg', 'Drone 4K', 'Image du drone'),
