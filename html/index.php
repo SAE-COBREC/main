@@ -10,7 +10,7 @@ function chargerProduitsBDD($pdo)
     $categories = [];
 
     try {
-
+        // REQUÊTE MODIFIÉE : suppression des filtres temporaires pour debug
         $sql = "
             SELECT 
                 p.id_produit,
@@ -37,13 +37,15 @@ function chargerProduitsBDD($pdo)
             FROM _produit p
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
-                AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin
+                -- Condition temporairement commentée pour debug
+                /* AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin */
             LEFT JOIN (
                 SELECT id_produit, COUNT(*) as nombre_avis 
                 FROM _avis 
                 GROUP BY id_produit
             ) avis ON p.id_produit = avis.id_produit
-            WHERE p.p_statut IN ('En ligne', 'En rupture')
+            -- WHERE temporairement commenté pour voir tous les produits
+            /* WHERE p.p_statut IN ('En ligne', 'En rupture') */
         ";
 
         $stmt = $pdo->query($sql);
@@ -55,7 +57,8 @@ function chargerProduitsBDD($pdo)
             FROM _produit p
             JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
             JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-            WHERE p.p_statut IN ('En ligne', 'En rupture')
+            -- WHERE temporairement commenté
+            /* WHERE p.p_statut IN ('En ligne', 'En rupture') */
             GROUP BY cp.nom_categorie
         ";
 
@@ -94,7 +97,7 @@ function filtrerProduits($produits, $filtres)
 
     foreach ($produits as $produit) {
         // Filtre par prix
-        if ($produit['p_prix'] > $filtres['prixMaximum']) {
+        if (($produit['p_prix'] ?? 0) > $filtres['prixMaximum']) {
             continue;
         }
 
@@ -107,17 +110,20 @@ function filtrerProduits($produits, $filtres)
         }
 
         // Filtre par stock
-        if ($filtres['enStockSeulement'] && $produit['p_stock'] <= 0) {
+        if ($filtres['enStockSeulement'] && ($produit['p_stock'] ?? 0) <= 0) {
             continue;
         }
 
         // Filtre par note
-        if ($produit['note_moyenne'] < $filtres['noteMinimum']) {
+        if (($produit['note_moyenne'] ?? 0) < $filtres['noteMinimum']) {
             continue;
         }
 
         $produits_filtres[] = $produit;
     }
+
+    // DEBUG : Afficher le nombre de produits après filtrage
+    echo "<p style='background: orange; padding: 10px; margin: 10px 0;'>DEBUG - Produits après filtrage : " . count($produits_filtres) . "</p>";
 
     return $produits_filtres;
 }
@@ -127,22 +133,21 @@ function trierProduits($produits, $tri_par)
     switch ($tri_par) {
         case 'meilleures_ventes':
             usort($produits, function ($a, $b) {
-                return $b['p_nb_ventes'] - $a['p_nb_ventes'];
+                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
             });
             break;
         case 'prix_croissant':
             usort($produits, function ($a, $b) {
-                return $a['p_prix'] - $b['p_prix'];
+                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
             });
             break;
         case 'prix_decroissant':
             usort($produits, function ($a, $b) {
-                return $b['p_prix'] - $a['p_prix'];
+                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
             });
             break;
         case 'note':
             usort($produits, function ($a, $b) {
-                // Gérer les valeurs NULL
                 $noteA = $a['note_moyenne'] ?? 0;
                 $noteB = $b['note_moyenne'] ?? 0;
                 return $noteB - $noteA;
@@ -178,6 +183,9 @@ $donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
+// DEBUG : Afficher le nombre de produits récupérés
+echo "<p style='background: yellow; padding: 10px; margin: 10px 0;'>DEBUG - Produits récupérés de la BDD : " . count($produits) . "</p>";
+
 // Récupération du prix maximum dynamique
 $prixMaximumDynamique = getPrixMaximum($pdo);
 
@@ -197,6 +205,10 @@ $filtres = [
 $produits_filtres = filtrerProduits($produits, $filtres);
 $produits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($categories);
+
+// DEBUG : Afficher le nombre final de produits
+echo "<p style='background: lightgreen; padding: 10px; margin: 10px 0;'>DEBUG - Produits finaux à afficher : " . count($produits) . "</p>";
+
 ?>
 
 <!DOCTYPE html>
@@ -271,7 +283,7 @@ $categories_affichage = preparercategories_affichage($categories);
                     <h4>Note minimum</h4>
                     <?php for ($i = 5; $i >= 1; $i--): ?>
                         <div onclick="definirNote(<?= $i ?>)">
-                            <span><?= str_repeat('<img src="./img/svg/star-full.svg" alt="Etoile" width="16" height="16">', $i) . str_repeat('<img src="./img/svg/star-empty.svg" alt="Etoile" width="16" height="16">', 5 - $i) ?></span>
+                            <span><?= str_repeat('★', $i) . str_repeat('☆', 5 - $i) ?></span>
                             <span><?= $i ?> et plus</span>
                         </div>
                     <?php endfor; ?>
