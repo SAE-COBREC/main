@@ -28,6 +28,10 @@ body main form > input:nth-of-type(3) {
   color: #fff;
   box-shadow: 0 4px 0.1em rgba(205, 127, 50, 0.12);
 }
+body main div {
+  display: grid;
+  gap: 2em;
+}
 body main section {
   grid-column: 1;
   grid-row: 1;
@@ -57,10 +61,6 @@ body main section article > input, body main section article textarea {
 }
 body main .warn {
   color: red;
-}
-body main div {
-  display: grid;
-  gap: 2em;
 }
 body main #photo {
   border: 2px dashed #ecd9c6;
