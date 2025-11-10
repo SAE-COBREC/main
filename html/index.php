@@ -49,7 +49,6 @@ function chargerProduitsBDD($pdo)
         $stmt = $pdo->query($sql);
         $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-  
         $sqlCategories = "
             SELECT cp.nom_categorie as category, 
                    COUNT(DISTINCT p.id_produit) as count
