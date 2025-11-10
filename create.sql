@@ -1,4 +1,4 @@
- -- ============================================
+-- ============================================
 -- CRÉATION DU SCHÉMA ET SUPPRESSION SI EXISTE
 -- ============================================
 DROP SCHEMA IF EXISTS cobrec1 CASCADE;
@@ -28,9 +28,6 @@ CREATE TABLE cobrec1._compte (
 
 ALTER TABLE ONLY cobrec1._compte
     ADD CONSTRAINT pk_compte PRIMARY KEY (id_compte);
-
-ALTER TABLE ONLY cobrec1._compte
-    ADD CONSTRAINT unique_compte_email UNIQUE (email);
 
 -- TABLE ADMINISTRATEUR
 CREATE TABLE cobrec1._administrateur (
@@ -193,7 +190,6 @@ CREATE TABLE cobrec1._produit (
     CONSTRAINT verif_produit_note CHECK (p_note >= 0 AND p_note <= 5),
     CONSTRAINT verif_produit_stock CHECK (p_stock >= 0),
     CONSTRAINT verif_produit_nb_signalements CHECK (p_nb_signalements >= 0),
-    CONSTRAINT verif_produit_taille CHECK (p_taille IS NULL OR p_taille IN ('XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL')),
     CONSTRAINT verif_produit_nb_ventes CHECK (p_nb_ventes >= 0),
     CONSTRAINT verif_produit_statut CHECK (p_statut IN ('Ébauche', 'En ligne', 'Hors ligne', 'Supprimé'))
 );
@@ -212,15 +208,12 @@ ALTER TABLE ONLY cobrec1._produit
 ALTER TABLE ONLY cobrec1._produit
     ADD CONSTRAINT unique_produit_nom UNIQUE (p_nom);
 
--- Supprimer la contrainte existante
-ALTER TABLE cobrec1._produit DROP CONSTRAINT verif_produit_taille;
-
--- Recréer avec plus de flexibilité
+-- Contrainte pour les tailles
 ALTER TABLE cobrec1._produit 
 ADD CONSTRAINT verif_produit_taille CHECK (
     p_taille IS NULL OR 
     p_taille IN ('XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL') OR
-    (p_taille ~ '^[3-4][0-9]$') -- Tailles de chaussures 30-49
+    (p_taille ~ '^[3-4][0-9]$')
 );
 
 -- TABLE IMAGE
@@ -625,7 +618,6 @@ ALTER TABLE ONLY cobrec1._definie_pour
     ADD CONSTRAINT fk_definie_pour_compte FOREIGN KEY (id_compte) 
             REFERENCES cobrec1._compte(id_compte) ON DELETE CASCADE;
 
-
 -- ============================================
 -- PEUPLEMENT DE LA BASE DE DONNÉES
 -- ============================================
@@ -714,31 +706,49 @@ INSERT INTO _reduction (reduction_pourcentage, reduction_debut, reduction_fin) V
 (15.00, '2025-11-15 00:00:00', '2025-11-30 23:59:59'),
 (20.00, '2026-01-01 00:00:00', '2026-01-15 23:59:59'),
 (25.00, '2025-12-20 00:00:00', '2025-12-26 23:59:59'),
-(30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59');
+(30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59'),
+(60.00, '2026-04-01 00:00:00', '2026-04-15 23:59:59'),
+(55.00, '2026-05-01 00:00:00', '2026-05-07 23:59:59'),
+(70.00, '2026-06-10 00:00:00', '2026-06-20 23:59:59'),
+(65.00, '2026-07-01 00:00:00', '2026-07-31 23:59:59');
 
 -- 10. PROMOTIONS (futures)
 INSERT INTO _promotion (promotion_debut, promotion_fin) VALUES
 ('2025-12-20 00:00:00', '2025-12-25 23:59:59'),
 ('2026-01-01 00:00:00', '2026-01-07 23:59:59'),
-('2025-11-25 00:00:00', '2025-11-29 23:59:59');
+('2025-11-25 00:00:00', '2025-11-29 23:59:59'),
+('2026-04-01 00:00:00', '2026-04-15 23:59:59'),
+('2026-05-01 00:00:00', '2026-05-07 23:59:59'),
+('2026-06-10 00:00:00', '2026-06-20 23:59:59'),
+('2026-07-01 00:00:00', '2026-07-31 23:59:59');
 
 -- 11. PRODUITS
 INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock, p_statut, p_poids, p_volume, p_frais_de_port, p_taille, p_note, p_nb_ventes) VALUES
-(1, 1, 'Smartphone XPro', 'Smartphone dernière génération avec écran OLED 6.7 pouces, 256Go stockage, 5G', 599.99, 50, 'En ligne', 0.180, 0.0001, 5.99, NULL, 4.3, 15),
-(1, 1, 'Ordinateur portable Ultra', 'PC portable 15 pouces, 16Go RAM, SSD 512Go, processeur i7', 899.99, 30, 'En ligne', 2.5, 0.003, 9.99, NULL, 4.0, 8),
-(1, 2, 'T-shirt coton bio', 'T-shirt 100% coton biologique, coupe regular, diverses couleurs', 24.99, 100, 'En ligne', 0.150, 0.0005, 3.99, 'M', 5.0, 42),
-(1, 2, 'Jean slim', 'Jean coupe slim stretch, denim premium', 49.99, 80, 'En ligne', 0.500, 0.001, 4.99, 'L', NULL, 18),
-(1, 2, 'Robe d été', 'Robe légère et fluide pour l été, motifs floraux', 39.99, 60, 'En ligne', 0.300, 0.0008, 4.99, 'S', NULL, 12),
-(2, 1, 'Casque audio Bluetooth', 'Casque sans fil avec réduction de bruit active, autonomie 30h', 149.99, 40, 'En ligne', 0.250, 0.002, 5.99, NULL, 4.5, 25),
-(1, 2, 'Sac à dos urbain', 'Sac à dos pour ordinateur portable, compartiments multiples, imperméable', 69.99, 45, 'En ligne', 0.600, 0.015, 6.99, NULL, NULL, 10),
-(1, 1, 'Montre connectée', 'Montre sport avec GPS, cardiofréquencemètre, étanche 50m', 199.99, 35, 'En ligne', 0.050, 0.0001, 3.99, NULL, 4.7, 20),
-(1, 3, 'Chaussures running', 'Chaussures de course avec amorti premium, semelle respirante', 89.99, 70, 'En ligne', 0.400, 0.008, 5.99, NULL, 4.2, 16), -- Taille NULL pour chaussures
-(1, 1, 'Tablette 10 pouces', 'Tablette Android, écran Full HD, 64Go, stylet inclus', 299.99, 25, 'En ligne', 0.500, 0.002, 7.99, NULL, 3.8, 9),
-(1, 3, 'Ballon de football', 'Ballon officiel en cuir synthétique, taille 5', 29.99, 120, 'En ligne', 0.450, 0.006, 4.99, NULL, 4.6, 35),
-(1, 2, 'Veste en cuir', 'Veste en cuir véritable, coupe motard, doublure intérieure', 189.99, 20, 'En ligne', 1.200, 0.010, 8.99, 'L', NULL, 5),
-(3, 1, 'Livre cuisine française', 'Recettes traditionnelles de cuisine française, 300 pages', 24.99, 50, 'En ligne', 0.800, 0.003, 3.99, NULL, 4.8, 22),
-(1, 3, 'Tapis de yoga', 'Tapis antidérapant, épaisseur 6mm, avec sac de transport', 34.99, 80, 'En ligne', 1.100, 0.020, 5.99, NULL, 4.4, 28),
-(1, 1, 'Clavier mécanique RGB', 'Clavier gamer avec rétroéclairage RGB, switches mécaniques', 79.99, 40, 'En ligne', 0.900, 0.004, 5.99, NULL, 4.1, 11);
+(1, 1, 'Smartphone XPro', 'Smartphone dernière génération avec écran OLED 6.7 pouces, 256Go stockage, 5G', 599.99, 35, 'En ligne', 0.180, 0.0001, 5.99, NULL, 4.3, 15),
+(1, 1, 'Ordinateur portable Ultra', 'PC portable 15 pouces, 16Go RAM, SSD 512Go, processeur i7', 899.99, 22, 'En ligne', 2.5, 0.003, 9.99, NULL, 4.0, 8),
+(1, 2, 'T-shirt coton bio', 'T-shirt 100% coton biologique, coupe regular, diverses couleurs', 24.99, 58, 'En ligne', 0.150, 0.0005, 3.99, 'M', 5.0, 42),
+(1, 2, 'Jean slim', 'Jean coupe slim stretch, denim premium', 49.99, 62, 'En ligne', 0.500, 0.001, 4.99, 'L', NULL, 18),
+(1, 2, 'Robe d été', 'Robe légère et fluide pour l été, motifs floraux', 39.99, 48, 'En ligne', 0.300, 0.0008, 4.99, 'S', NULL, 12),
+(2, 1, 'Casque audio Bluetooth', 'Casque sans fil avec réduction de bruit active, autonomie 30h', 149.99, 15, 'En ligne', 0.250, 0.002, 5.99, NULL, 4.5, 25),
+(1, 2, 'Sac à dos urbain', 'Sac à dos pour ordinateur portable, compartiments multiples, imperméable', 69.99, 35, 'En ligne', 0.600, 0.015, 6.99, NULL, NULL, 10),
+(1, 1, 'Montre connectée', 'Montre sport avec GPS, cardiofréquencemètre, étanche 50m', 199.99, 15, 'En ligne', 0.050, 0.0001, 3.99, NULL, 4.7, 20),
+(1, 3, 'Chaussures running', 'Chaussures de course avec amorti premium, semelle respirante', 89.99, 54, 'En ligne', 0.400, 0.008, 5.99, NULL, 4.2, 16),
+(1, 1, 'Tablette 10 pouces', 'Tablette Android, écran Full HD, 64Go, stylet inclus', 299.99, 16, 'En ligne', 0.500, 0.002, 7.99, NULL, 3.8, 9),
+(1, 3, 'Ballon de football', 'Ballon officiel en cuir synthétique, taille 5', 29.99, 85, 'En ligne', 0.450, 0.006, 4.99, NULL, 4.6, 35),
+(1, 2, 'Veste en cuir', 'Veste en cuir véritable, coupe motard, doublure intérieure', 189.99, 15, 'En ligne', 1.200, 0.010, 8.99, 'L', NULL, 5),
+(3, 1, 'Livre cuisine française', 'Recettes traditionnelles de cuisine française, 300 pages', 24.99, 28, 'En ligne', 0.800, 0.003, 3.99, NULL, 4.8, 22),
+(1, 3, 'Tapis de yoga', 'Tapis antidérapant, épaisseur 6mm, avec sac de transport', 34.99, 52, 'En ligne', 1.100, 0.020, 5.99, NULL, 4.4, 28),
+(1, 1, 'Clavier mécanique RGB', 'Clavier gamer avec rétroéclairage RGB, switches mécaniques', 79.99, 29, 'En ligne', 0.900, 0.004, 5.99, NULL, 4.1, 11),
+(1, 1, 'Console NextGen', 'Console de jeu dernière génération, 1To SSD, 4K HDR', 499.99, 0, 'Hors ligne', 3.5, 0.025, 14.99, NULL, 4.8, 25),
+(1, 2, 'Sweat à capuche premium', 'Sweat-shirt en coton bio, coupe oversize, poche kangourou', 59.99, 0, 'Hors ligne', 0.700, 0.003, 5.99, 'L', 4.4, 18),
+(1, 3, 'Raquette de tennis pro', 'Raquette carbone, tension 25kg, grip confort', 129.99, 0, 'Hors ligne', 0.350, 0.002, 6.99, NULL, 4.7, 32),
+(1, 1, 'Écran gaming 4K 27"', 'Écran IPS 27 pouces, 144Hz, HDR400, temps de réponse 1ms', 349.99, 0, 'Hors ligne', 5.2, 0.035, 19.99, NULL, 4.6, 18),
+(1, 2, 'Baskets limited edition', 'Baskets cuir véritable, édition limitée, semelle comfort', 179.99, 0, 'Hors ligne', 0.800, 0.006, 7.99, NULL, 4.9, 65),
+(1, 3, 'Vélo de route carbone', 'Vélo course cadre carbone, groupe Shimano 105, 11 vitesses', 1299.99, 0, 'Hors ligne', 8.5, 0.15, 29.99, NULL, 4.8, 25),
+(1, 1, 'Drone professionnel 4K', 'Drone avec caméra 4K, stabilisation 3 axes, autonomie 30min', 899.99, 0, 'Hors ligne', 1.2, 0.02, 12.99, NULL, 4.6, 18),
+(1, 2, 'Manteau d hiver imperméable', 'Manteau longueur genoux, doublure polaire, coupe-vent', 179.99, 0, 'Hors ligne', 1.5, 0.01, 8.99, 'XL', 4.4, 65),
+(1, 3, 'Tente 4 places', 'Tente familiale, double toit, arceaux aluminium, imperméable', 249.99, 0, 'Hors ligne', 4.8, 0.08, 19.99, NULL, 4.7, 32),
+(1, 1, 'Enceinte Bluetooth waterproof', 'Enceinte portable, autonomie 24h, résistance IP67', 129.99, 0, 'Hors ligne', 0.9, 0.005, 6.99, NULL, 4.9, 95);
 
 -- 12. IMAGES
 INSERT INTO _image (i_lien, i_title, i_alt) VALUES
@@ -759,12 +769,24 @@ INSERT INTO _image (i_lien, i_title, i_alt) VALUES
 ('https://example.com/veste.jpg', 'Veste cuir', 'Image de la veste'),
 ('https://example.com/livre.jpg', 'Livre cuisine', 'Image du livre'),
 ('https://example.com/tapis-yoga.jpg', 'Tapis yoga', 'Image du tapis'),
-('https://example.com/clavier.jpg', 'Clavier', 'Image du clavier');
+('https://example.com/clavier.jpg', 'Clavier', 'Image du clavier'),
+('https://example.com/console.jpg', 'Console NextGen', 'Image de la console'),
+('https://example.com/sweat.jpg', 'Sweat à capuche', 'Image du sweat'),
+('https://example.com/raquette.jpg', 'Raquette tennis', 'Image de la raquette'),
+('https://example.com/ecran.jpg', 'Écran 4K', 'Image de l écran'),
+('https://example.com/baskets.jpg', 'Baskets limited', 'Image des baskets'),
+('https://example.com/velo.jpg', 'Vélo route', 'Image du vélo'),
+('https://example.com/drone.jpg', 'Drone 4K', 'Image du drone'),
+('https://example.com/manteau.jpg', 'Manteau hiver', 'Image du manteau'),
+('https://example.com/tente.jpg', 'Tente 4 places', 'Image de la tente'),
+('https://example.com/enceinte.jpg', 'Enceinte Bluetooth', 'Image de l enceinte');
 
 -- 13. RELATIONS IMAGES-PRODUITS
 INSERT INTO _represente_produit (id_image, id_produit) VALUES
 (1, 1), (2, 2), (3, 3), (4, 4), (5, 6), (10, 8), (11, 7),
-(12, 9), (13, 10), (14, 11), (15, 12), (16, 13), (17, 14), (18, 15);
+(12, 9), (13, 10), (14, 11), (15, 12), (16, 13), (17, 14), (18, 15),
+(19, 16), (20, 17), (21, 18), (22, 19), (23, 20),
+(24, 21), (25, 22), (26, 23), (27, 24), (28, 25);
 
 -- 14. RELATIONS IMAGES-COMPTES
 INSERT INTO _represente_compte (id_image, id_compte) VALUES
@@ -775,7 +797,9 @@ INSERT INTO _fait_partie_de (id_produit, id_categorie) VALUES
 (1, 1), (1, 7), (2, 1), (2, 7), (3, 2), (3, 8), (4, 2), (4, 8),
 (5, 2), (5, 9), (6, 1), (6, 3), (7, 3), (8, 1), (8, 3), (8, 5),
 (9, 5), (9, 10), (10, 1), (10, 7), (11, 5), (12, 2), (12, 8),
-(13, 6), (14, 5), (15, 1), (15, 7);
+(13, 6), (14, 5), (15, 1), (15, 7),
+(16, 1), (16, 7), (17, 2), (17, 8), (18, 5), (19, 1), (19, 7), (20, 10),
+(21, 5), (22, 1), (22, 3), (23, 2), (23, 8), (24, 4), (24, 5), (25, 1), (25, 3);
 
 -- 16. RELATIONS PRODUITS-COULEURS
 INSERT INTO _est_dote_de (id_produit, code_hexa) VALUES
@@ -783,7 +807,11 @@ INSERT INTO _est_dote_de (id_produit, code_hexa) VALUES
 (3, '#00FF00'), (4, '#0000FF'), (4, '#000000'), (5, '#FF0000'), (5, '#FFFFFF'),
 (6, '#000000'), (7, '#808080'), (8, '#000000'), (9, '#0000FF'), (9, '#FF0000'),
 (10, '#808080'), (11, '#FFFFFF'), (12, '#000000'), (12, '#8B4513'),
-(14, '#EE82EE'), (14, '#87CEEB'), (15, '#000000');
+(14, '#EE82EE'), (14, '#87CEEB'), (15, '#000000'),
+(16, '#000000'), (16, '#FFFFFF'), (17, '#808080'), (17, '#000000'), (18, '#FFFFFF'), (18, '#000000'),
+(19, '#000000'), (20, '#FFFFFF'), (20, '#000000'),
+(21, '#0000FF'), (21, '#FF0000'), (22, '#808080'), (23, '#000000'), (23, '#8B4513'),
+(24, '#87CEEB'), (24, '#32CD32'), (25, '#000000'), (25, '#FF0000');
 
 -- 17. SEUILS D'ALERTE
 INSERT INTO _seuil_alerte (nb_seuil, message_seuil) VALUES
@@ -798,10 +826,10 @@ INSERT INTO _panier_commande (id_client, timestamp_commande) VALUES
 (1, '2025-11-01 10:30:00'),
 (2, '2025-11-02 14:45:00'),
 (3, '2025-11-03 09:15:00'),
-(1, NULL), -- Panier actif non commandé
+(1, NULL),
 (4, '2025-11-04 16:20:00'),
 (6, '2025-11-05 11:00:00'),
-(2, NULL), -- Panier actif non commandé
+(2, NULL),
 (5, '2025-11-06 13:30:00');
 
 -- 19. CONTIENT (produits dans paniers)
@@ -860,15 +888,25 @@ INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp
 (3, 'Déçu par la couleur qui ne correspond pas exactement à la photo.', 3, 8, '2025-11-08 12:00:00'),
 (8, 'Montre au top ! Toutes les fonctionnalités promises sont là. GPS précis.', 25, 1, '2025-11-05 17:00:00'),
 (14, 'Tapis de yoga parfait, bonne épaisseur et vraiment antidérapant.', 16, 0, '2025-11-08 10:00:00'),
-(15, 'Clavier agréable à utiliser, les switches sont de qualité. RGB bien réglable.', 11, 2, '2025-11-06 21:00:00');
+(15, 'Clavier agréable à utiliser, les switches sont de qualité. RGB bien réglable.', 11, 2, '2025-11-06 21:00:00'),
+(16, 'Console exceptionnelle ! Graphismes incroyables et chargement ultra-rapide.', 45, 3, '2025-10-15 14:30:00'),
+(17, 'Sweat très confortable et de bonne qualité. Taille normale.', 28, 1, '2025-10-20 11:15:00'),
+(18, 'Raquette parfaite pour compétition. Excellente sensation de frappe.', 32, 0, '2025-10-25 16:45:00'),
+(19, 'Écran gaming impeccable. Fluidité et couleurs au top.', 39, 2, '2025-11-01 09:20:00'),
+(20, 'Baskets super confortables et style unique. Dommage plus en stock !', 67, 1, '2025-11-05 13:10:00'),
+(21, 'Vélo léger et performant. Parfait pour les longues sorties.', 23, 0, '2025-10-18 17:30:00'),
+(22, 'Drone très stable, photos et vidéos de qualité professionnelle.', 41, 1, '2025-10-22 10:45:00'),
+(23, 'Manteau très chaud et imperméable. Idéal pour l hiver.', 52, 2, '2025-10-28 14:20:00'),
+(24, 'Tente spacieuse et facile à monter. Très bonne étanchéité.', 38, 0, '2025-11-03 12:15:00'),
+(25, 'Enceinte puissante avec une autonomie incroyable. Son excellent !', 89, 1, '2025-11-08 15:40:00');
 
--- 24. COMMENTAIRES (liés aux livraisons) - VERSION CORRIGÉE
+-- 24. COMMENTAIRES (liés aux livraisons)
 INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client) VALUES
 (1, 4.5, 1, TRUE, 1),
 (3, 5.0, 2, TRUE, 2),
 (4, 4.0, 3, TRUE, 3),
 (6, 4.5, 5, TRUE, 6),
-(10, 5.0, 4, TRUE, 1); -- Changer id_livraison pour éviter les doublons
+(10, 5.0, 4, TRUE, 1);
 
 -- 25. RÉPONSES aux avis
 INSERT INTO _reponse (id_avis, id_avis_parent) VALUES
@@ -903,39 +941,34 @@ INSERT INTO _envoie_signalement (id_compte, id_signalement) VALUES
 
 -- 29. RÉDUCTIONS APPLIQUÉES
 INSERT INTO _en_reduction (id_produit, id_reduction) VALUES
-(3, 2), (4, 2), (11, 1), (14, 1);
+(3, 2), (4, 2), (11, 1), (14, 1),
+(16, 1), (17, 2), (18, 3), (19, 4), (20, 5),
+(21, 1), (22, 2), (23, 3), (24, 4), (25, 5);
 
 -- 30. PROMOTIONS APPLIQUÉES
 INSERT INTO _en_promotion (id_produit, id_promotion) VALUES
-(1, 1), (6, 1), (8, 1), (13, 3);
+(1, 1), (6, 1), (8, 1), (13, 3),
+(16, 1), (17, 2), (18, 3), (19, 4), (20, 5),
+(21, 1), (22, 2), (23, 3), (24, 4), (25, 5);
 
 -- 31. SEUILS DÉFINIS POUR COMPTES (vendeurs)
 INSERT INTO _definie_pour (id_seuil, id_compte) VALUES
-(1, 2), (2, 2), (3, 2), (4, 2),
-(1, 3), (2, 3), (3, 3),
-(1, 10), (2, 10), (3, 10), (4, 10);
+(1, 2), (2, 2), (3, 2), (4, 2), (5, 2),
+(1, 3), (2, 3), (3, 3), (5, 3),
+(1, 10), (2, 10), (3, 10), (4, 10), (5, 10),
+(5, 1);
 
 -- ============================================
 -- MISES À JOUR DES STATISTIQUES
 -- ============================================
 
--- Mise à jour des stocks après ventes
-UPDATE _produit SET p_stock = p_stock - 15 WHERE id_produit = 1;
-UPDATE _produit SET p_stock = p_stock - 8 WHERE id_produit = 2;
-UPDATE _produit SET p_stock = p_stock - 42 WHERE id_produit = 3;
-UPDATE _produit SET p_stock = p_stock - 18 WHERE id_produit = 4;
-UPDATE _produit SET p_stock = p_stock - 12 WHERE id_produit = 5;
-UPDATE _produit SET p_stock = p_stock - 25 WHERE id_produit = 6;
-UPDATE _produit SET p_stock = p_stock - 10 WHERE id_produit = 7;
-UPDATE _produit SET p_stock = p_stock - 20 WHERE id_produit = 8;
-UPDATE _produit SET p_stock = p_stock - 16 WHERE id_produit = 9;
-UPDATE _produit SET p_stock = p_stock - 9 WHERE id_produit = 10;
-UPDATE _produit SET p_stock = p_stock - 35 WHERE id_produit = 11;
-UPDATE _produit SET p_stock = p_stock - 5 WHERE id_produit = 12;
-UPDATE _produit SET p_stock = p_stock - 22 WHERE id_produit = 13;
-UPDATE _produit SET p_stock = p_stock - 28 WHERE id_produit = 14;
-UPDATE _produit SET p_stock = p_stock - 11 WHERE id_produit = 15;
-
 -- Mise à jour des signalements sur produits
 UPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 1;
 UPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 12;
+
+-- Mise à jour du nombre de produits créés par les vendeurs
+UPDATE _vendeur SET nb_produits_crees = 10 WHERE id_vendeur = 1;
+UPDATE _vendeur SET nb_produits_crees = 8 WHERE id_vendeur = 2;
+UPDATE _vendeur SET nb_produits_crees = 7 WHERE id_vendeur = 3;
+
+SELECT COUNT(*) from _produit;

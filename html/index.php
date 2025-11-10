@@ -73,6 +73,21 @@ function chargerProduitsBDD($pdo)
     return ['produits' => $produits, 'categories' => $categories];
 }
 
+function getPrixMaximum($pdo)
+{
+    try {
+        $sql = "SELECT MAX(p_prix) AS prix_maximum 
+                FROM _produit";
+        
+        $stmt = $pdo->query($sql);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
+    } catch (Exception $e) {
+        return 3000; // Valeur par défaut en cas d'erreur
+    }
+}
+
 function filtrerProduits($produits, $filtres)
 {
     $produits_filtres = [];
@@ -163,9 +178,12 @@ $donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
+// Récupération du prix maximum dynamique
+$prixMaximumDynamique = getPrixMaximum($pdo);
+
 $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['note'] ?? 0;
-$prixMaximum = $_POST['price'] ?? 3000;
+$prixMaximum = $_POST['price'] ?? $prixMaximumDynamique;
 $enStockSeulement = isset($_POST['in_stock']);
 $tri_par = $_POST['sort'] ?? 'meilleures_ventes';
 
@@ -239,7 +257,7 @@ $categories_affichage = preparercategories_affichage($categories);
                 <section>
                     <h4>Prix</h4>
                     <div>
-                        <input type="range" name="price" min="0" max="3000" value="<?= $prixMaximum ?>"
+                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>" value="<?= $prixMaximum ?>"
                             oninput="mettreAJourAffichagePrix(this.value)"
                             onchange="document.getElementById('filterForm').submit()">
                     </div>
@@ -363,12 +381,13 @@ $categories_affichage = preparercategories_affichage($categories);
         function activerEditionPrix() {
             const affichagePrix = document.getElementById('affichagePrixMax');
             const prixActuel = affichagePrix.textContent.replace('€', '');
+            const prixMaxDynamique = <?= $prixMaximumDynamique ?>;
 
             const inputPrix = document.createElement('input');
             inputPrix.type = 'number';
             inputPrix.value = prixActuel;
             inputPrix.min = 0;
-            inputPrix.max = 3000;
+            inputPrix.max = prixMaxDynamique;
             inputPrix.style.width = '60px';
 
             affichagePrix.replaceWith(inputPrix);
@@ -384,7 +403,7 @@ $categories_affichage = preparercategories_affichage($categories);
 
             function sauvegarderPrix() {
                 const nouveauPrix = parseInt(inputPrix.value) || 0;
-                const prixValide = Math.min(Math.max(nouveauPrix, 0), 3000);
+                const prixValide = Math.min(Math.max(nouveauPrix, 0), prixMaxDynamique);
 
                 document.querySelector('input[name="price"]').value = prixValide;
 
