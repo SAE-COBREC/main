@@ -1,8 +1,8 @@
 <?php
-$serveur = 'postgresdb';  
+$serveur = '10.253.5.101';
 $driver = 'pgsql';
 $dbname = 'saedb';
 $user = 'sae';
 $pass = 'kira13';
-$port = 5432; 
+$port = 5432;
 ?>
