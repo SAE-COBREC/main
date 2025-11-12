@@ -1,8 +1,8 @@
 <?php
 session_start();
-include '../../selectBDD.php';
+// Utiliser la configuration centrale PostgreSQL (comme la page d'accueil)
+include __DIR__ . '/../../../config.php';
 $pageError = false;
-$fichierCSV = realpath(__DIR__ . '/mls.csv');
 $produit = null;
 
 // Recalcule la note moyenne d'un produit et met à jour _produit.p_note
@@ -44,50 +44,44 @@ function recalcAndUpdateProductRating(PDO $pdo, int $productId): void {
     }
 }
 
-// Récupérer l'ID du produit depuis l'URL
+// Récupérer l'ID du produit depuis l'URL et charger depuis la base
 $idProduit = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-if ($idProduit > 0 && file_exists($fichierCSV)) {
-    $handle = fopen($fichierCSV, 'r');
-    if ($handle !== FALSE) {
-        $entete = fgetcsv($handle, 1000, ',');
-
-        while (($donnees = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            if (count($donnees) === count($entete)) {
-                $produitTemp = array_combine($entete, $donnees);
-
-                // Convertir les types
-                $produitTemp['id_produit'] = (int) $produitTemp['id_produit'];
-                $produitTemp['p_prix'] = (float) $produitTemp['p_prix'];
-                $produitTemp['p_stock'] = (int) $produitTemp['p_stock'];
-                $produitTemp['p_note'] = isset($produitTemp['p_note']) ? (float) $produitTemp['p_note'] : 0.0;
-                $produitTemp['p_nb_ventes'] = isset($produitTemp['p_nb_ventes']) ? (int) $produitTemp['p_nb_ventes'] : 0;
-
-                // Compatibilité avec les noms de colonnes du CSV existant
-                // (certaines sources utilisent 'pourcentage_reduction', 'nombre_avis', 'note_moyenne')
-                if (isset($produitTemp['pourcentage_reduction']) && !isset($produitTemp['discount_percentage'])) {
-                    $produitTemp['discount_percentage'] = $produitTemp['pourcentage_reduction'];
-                }
-                if (isset($produitTemp['nombre_avis']) && !isset($produitTemp['review_count'])) {
-                    $produitTemp['review_count'] = $produitTemp['nombre_avis'];
-                }
-                if (isset($produitTemp['note_moyenne']) && !isset($produitTemp['avg_rating'])) {
-                    $produitTemp['avg_rating'] = $produitTemp['note_moyenne'];
-                }
-
-                // Conversions sûres (valeurs par défaut si absentes)
-                $produitTemp['discount_percentage'] = isset($produitTemp['discount_percentage']) ? (float) $produitTemp['discount_percentage'] : 0.0;
-                $produitTemp['review_count'] = isset($produitTemp['review_count']) ? (int) $produitTemp['review_count'] : 0;
-                $produitTemp['avg_rating'] = isset($produitTemp['avg_rating']) ? (float) $produitTemp['avg_rating'] : 0.0;
-
-                // Si c'est le produit recherché
-                if ($produitTemp['id_produit'] === $idProduit) {
-                    $produit = $produitTemp;
-                    break;
-                }
-            }
+if ($idProduit > 0) {
+    try {
+        // S'assurer du schéma (config.php le fait déjà, mais idempotent)
+        if (isset($schema) && $schema) {
+            $pdo->exec("SET search_path TO $schema");
         }
-        fclose($handle);
+        // Charger les informations essentielles du produit (même logique que l'accueil)
+        $stmtProd = $pdo->prepare("SELECT 
+                p.id_produit,
+                p.p_nom,
+                p.p_prix,
+                p.p_stock,
+                p.p_statut,
+                p.p_description,
+                COALESCE(p.p_nb_ventes, 0) AS p_nb_ventes,
+                COALESCE(p.p_note, 0) AS p_note,
+                COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
+                (SELECT STRING_AGG(cp.nom_categorie, ', ')
+                   FROM _fait_partie_de fpd
+                   JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+                  WHERE fpd.id_produit = p.id_produit) AS categories,
+                (SELECT i.i_lien
+                   FROM _represente_produit rp
+                   JOIN _image i ON rp.id_image = i.id_image
+                  WHERE rp.id_produit = p.id_produit
+                  LIMIT 1) AS image_url
+            FROM _produit p
+            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            WHERE p.id_produit = :pid
+            LIMIT 1");
+        $stmtProd->execute([':pid' => $idProduit]);
+        $produit = $stmtProd->fetch(PDO::FETCH_ASSOC) ?: null;
+    } catch (Throwable $e) {
+        $produit = null;
     }
 }
 
@@ -99,11 +93,18 @@ if (!$produit) {
 }
 
 // Calculer les informations du produit
-$estEnRupture = $produit['p_stock'] <= 0;
-$aUneRemise = !empty($produit['discount_percentage']) && $produit['discount_percentage'] > 0;
-$prixFinal = $aUneRemise
-    ? $produit['p_prix'] * (1 - $produit['discount_percentage'] / 100)
-    : $produit['p_prix'];
+$estEnRupture = (int)($produit['p_stock'] ?? 0) <= 0;
+$discount = isset($produit['pourcentage_reduction']) ? (float)$produit['pourcentage_reduction'] : 0.0;
+$aUneRemise = $discount > 0;
+$basePrix = isset($produit['p_prix']) ? (float)$produit['p_prix'] : 0.0;
+$prixFinal = $aUneRemise ? $basePrix * (1 - $discount / 100) : $basePrix;
+
+// Catégorie principale pour l'affichage des tags
+$firstCategory = 'Général';
+if (!empty($produit['categories'])) {
+    $parts = explode(', ', $produit['categories']);
+    if (!empty($parts[0])) { $firstCategory = $parts[0]; }
+}
 // Gestion des avis/notes: handlers POST + affichage pure BDD
 
 // Handlers POST: ajout d'avis texte et likes/dislikes
@@ -373,15 +374,15 @@ if ($pageError) {
         <div class="product-row">
             <!-- Vignettes -->
             <aside class="thumbs" aria-hidden="true">
-                <img src="<?= htmlspecialchars($produit['image_url']) ?>" alt="vignette 1" loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url']) ?>" alt="vignette 2" loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url']) ?>" alt="vignette 3" loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url']) ?>" alt="vignette 4" loading="lazy" />
+                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 1" loading="lazy" />
+                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 2" loading="lazy" />
+                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 3" loading="lazy" />
+                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 4" loading="lazy" />
             </aside>
 
             <!-- Image principale -->
             <section class="main-image">
-                <img src="<?= htmlspecialchars($produit['image_url']) ?>"
+                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>"
                     alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
             </section>
 
@@ -433,11 +434,11 @@ if ($pageError) {
                 <div class="section features">
                     <h3>Caractéristiques</h3>
                     <ul>
-                        <li>Catégorie : <?= htmlspecialchars($produit['category']) ?></li>
+                        <li>Catégorie : <?= htmlspecialchars($firstCategory) ?></li>
                         <li>Référence : #<?= $produit['id_produit'] ?></li>
                         <li>Statut : <?= htmlspecialchars($produit['p_statut']) ?></li>
                         <?php if ($aUneRemise): ?>
-                            <li>Réduction : <?= round($produit['discount_percentage']) ?>%</li>
+                            <li>Réduction : <?= round($discount) ?>%</li>
                         <?php endif; ?>
                     </ul>
                 </div>
@@ -455,7 +456,7 @@ if ($pageError) {
             <h3>Description</h3>
             <div style="display:flex;gap:8px;margin:8px 0 14px 0">
                 <span style="background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:24px;font-size:13px">
-                    <?= htmlspecialchars($produit['category']) ?>
+                    <?= htmlspecialchars($firstCategory) ?>
                 </span>
                 <?php if ($aUneRemise): ?>
                     <span style="background:#fff3cd;color:#856404;padding:6px 10px;border-radius:24px;font-size:13px">
