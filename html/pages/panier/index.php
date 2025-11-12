@@ -4,7 +4,7 @@ include '../../selectBDD.php';
 $id_panier = 8;
 $pdo->exec("SET search_path TO cobrec1");
 
-$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit
+$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock
                 FROM _contient
                 JOIN _produit ON _produit.id_produit = _contient.id_produit
                 JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
@@ -26,7 +26,9 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
         <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     </head>
 
-    <div id="header"></div>
+    <?php
+    include __DIR__ . '/../../partials/header.html';
+    ?>
     <body>
 
         
@@ -40,7 +42,8 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 
                 <!--UN ARTICLE DANS LE PANIER-->
                 <?php foreach ($articles as $article): ?> 
-                    <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>">
+                    <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
+                                                data-stock="<?php echo intval($article['p_stock'])?>">
                         <div class="imageArticleP">
                             <img src="<?php echo htmlspecialchars($article['i_lien']) ?>"
                                 alt="<?php echo htmlspecialchars($article['p_nom']) ?>" 
@@ -83,9 +86,9 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 <button class="finaliserCommande">Finaliser commande</button>
                 
                 <!--FORMULAIRE POUR VIDER LE PANIER-->
-                <form method="POST" action="/pages/panier/viderPanier.php">
+                <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php">
                     <input type="hidden" name="id_panier_a_vider" value="<?php echo $id_panier; ?>">
-                    <button type="submit" id="viderPanier" class="viderPanier">Vider le panier</button>
+                    <button type="submit" id="viderPanier" class>Vider le panier</button>
                 </form>
             </aside>
 
@@ -101,104 +104,125 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
 
         
     </body>
-    <div id="footer"></div>
+    <?php
+    include __DIR__ . '/../../partials/footer.html';
+    ?>
 
-    <script>
+    <!--vérifie qu'il y ait minimun un élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
+    <?php if (count($articles) > 0):?>
+        <script>
+            function verifieStockMax(val, stock){
+                console.log(val, stock);
+                if (val > stock){
+                    alert(`la quantité que vous avez saisie est supérieur au stock (${stock}).`);
+                    return stock;
+                }
+                return val;
+            }
+            //fonction pour mettre a jour le recap de la commande
+            function updateRecap() {
+                const articles = document.querySelectorAll('.unArticleP'); //recupere tous les articles et les mets dans une liste
+                let PrixTotal = 0; 
+                let nbArticles = 0;
+                let produitEnHTML = ''; //initialisation du texte qui sera dans le recap de la commande (les titres d'articles)
+                
+                articles.forEach(article => { //pour chaque articles de la liste des articles
+                    const prix = parseFloat(article.dataset.prix); //récupère le prix et le mettre en float
+                    const quantiteEntre = article.querySelector('.quantite_input_entre'); //récupère l'input
+                    console.log(article);
+                    console.log(quantiteEntre);
+                    const quantite = parseInt(quantiteEntre.value); //converti en int et récupère la valeur dans l'input
+                    const titre = article.querySelector('.articleTitreP').textContent; //récupère le titre pour pouvoir l'affiché dans le récap de la commande
+                    
 
-        //fonction pour mettre a jour le recap de la commande
-        function updateRecap() {
-            const articles = document.querySelectorAll('.unArticleP'); //recupere tous les articles et les mets dans une liste
-            let PrixTotal = 0; 
-            let nbArticles = 0;
-            let produitEnHTML = ''; //initialisation du texte qui sera dans le recap de la commande (les titres d'articles)
-            
-            articles.forEach(article => { //pour chaque articles de la liste des articles
-                const prix = parseFloat(article.dataset.prix); //récupère le prix et le mettre en float
-                const quantiteEntre = article.querySelector('.quantite_input_entre'); //récupère l'input
-                console.log(article);
-                console.log(quantiteEntre);
-                const quantite = parseInt(quantiteEntre.value); //converti en int et récupère la valeur dans l'input
-                const titre = article.querySelector('.articleTitreP').textContent; //récupère le titre pour pouvoir l'affiché dans le récap de la commande
+                    if (quantite > 0) {
+                        PrixTotal += prix * quantite; 
+                        console.log(PrixTotal);
+                        nbArticles += quantite; //pour le nombre de produit total
+                        produitEnHTML += `<p>${titre} <span>x${quantite}</span></p>`; //pour ajouter dans le récap
+                    }
+                });
+                
+                //remplit le prix total et arrondit à 2 après la virgule
+                document.getElementById('prixTotal').textContent = PrixTotal.toFixed(2) + '€';
+
+                //remplit le nombre d'articles total, et gère le petit s si il y a plusieurs articles
+                document.getElementById('totalArticles').textContent = `Récapitulatif (${nbArticles} produit${nbArticles > 1 ? 's' : ''}) :`; 
+                
+                //remplit la liste des produits dans le récap
+                document.getElementById('listeProduits').innerHTML = produitEnHTML;
+            }
+
+            //gestion des boutons + et -
+            document.querySelectorAll('.unArticleP').forEach(article => {
+                const input = article.querySelector('.quantite_input_entre');
+                const btnPlus = article.querySelector('.btn_plus');
+                const btnMoins = article.querySelector('.btn_moins');
+                const formSupp = article.querySelector('.suppArt');
+                const stockMax = parseInt(article.dataset.stock); //récup la quantité max en stock
                 
 
-                if (quantite > 0) {
-                    PrixTotal += prix * quantite; 
-                    console.log(PrixTotal);
-                    nbArticles += quantite; //pour le nombre de produit total
-                    produitEnHTML += `<p>${titre} <span>x${quantite}</span></p>`; //pour ajouter dans le récap
-                }
-            });
-            
-            //remplit le prix total et arrondit à 2 après la virgule
-            document.getElementById('prixTotal').textContent = PrixTotal.toFixed(2) + '€';
+                //bouton +
+                btnPlus.addEventListener('click', () => { //quand le plus est cliqué
+                    let value = parseInt(input.value); 
+                    value += 1;
+                    value = verifieStockMax(value, stockMax);
+                    input.value = value;
+                    updateRecap(); //appel de la fonction updateRecap
+                });
+                
+                //bouton -
+                btnMoins.addEventListener('click', () => { //same que bouton plus
+                    let value = parseInt(input.value);
+                    if  (value > 1){ //l'utilisateur ne dépasse pas 1 il sera jamais a 0
+                        input.value = value - 1;
+                        updateRecap();
+                    }
+                });
+                
+                formSupp.addEventListener('submit', (event) => {
+                    if (!confirm(`Souhaitez-vous vraiment supprimer l'article du panier ?`)) {
+                        event.preventDefault(); //empeche la soumission du formulaire
+                    }
+                });
 
-            //remplit le nombre d'articles total, et gère le petit s si il y a plusieurs articles
-            document.getElementById('totalArticles').textContent = `Récapitulatif (${nbArticles} produit${nbArticles > 1 ? 's' : ''}) :`; 
-            
-            //remplit la liste des produits dans le récap
-            document.getElementById('listeProduits').innerHTML = produitEnHTML;
-        }
+                //gere les cas ou le texte change autrement genre du copier colle
+                input.addEventListener('input', (event) => { //event est l'évenement qui vient de se passer dans l'input
 
-        //gestion des boutons + et -
-        document.querySelectorAll('.unArticleP').forEach(article => {
-            const input = article.querySelector('.quantite_input_entre');
-            const btnPlus = article.querySelector('.btn_plus');
-            const btnMoins = article.querySelector('.btn_moins');
-            const formSupp = article.querySelector('.suppArt');
-            
-            //bouton +
-            btnPlus.addEventListener('click', () => { //quand le plus est cliqué
-                let value = parseInt(input.value); 
-                input.value = value + 1;
-                updateRecap(); //appel de la fonction updateRecap
+                    //supprime tout ce qui n'est pas un chiffre
+                    // le g dans le regex sert pour dire que c'est partout dans le input g = général
+                    let value = event.target.value.replace(/[^0-9]/g, '');
+                    
+                    //convertit en nombre ou met a 1 si rien si l'entré est vide ou invalide
+                    value = parseInt(value) || 1;
+                    //vérifie si quantité ne dépasse pas le max du stock
+                    value = verifieStockMax(value, stockMax);
+                    
+                    event.target.value = value; //met a jour la valeur de l'input
+                    updateRecap(); //appele la fonction update récap
+                });
+                
+                //empeche l’utilisateur de taper des caractères interdits comme les lettres directement.
+                input.addEventListener('keypress', (event) => {
+                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+                        event.preventDefault();
+                    }
+                });
             });
             
-            //bouton -
-            btnMoins.addEventListener('click', () => { //same que bouton plus
-                let value = parseInt(input.value);
-                if  (value > 1){ //gestion de la suppression du produit dans le panier
-                    input.value = value - 1;
-                    updateRecap();
-                }
-            });
-            
-            /*document.getElementById('viderPanier').addEventListner('click', () => {
+            //confirmation pour vider le panier
+            const formViderPanier = document.getElementById('formViderPanier');
+
+            formViderPanier.addEventListener('submit', (event) => {
                 if (!confirm(`Souhaitez-vous vraiment vider votre panier ?`)) {
-                    event.preventDefault(); //empeche la soumission du formulaire
-                }
-            });*/
-
-            formSupp.addEventListener('submit', (event) => {
-                if (!confirm(`Souhaitez-vous vraiment supprimer l'article du panier ?`)) {
-                    event.preventDefault(); //empeche la soumission du formulaire
+                    event.preventDefault(); //empeche l'envoi du formulaire si annuler est cliqué
                 }
             });
 
-            //gere les cas ou le texte change autrement genre du copier colle
-            input.addEventListener('input', (event) => { //event est l'évenement qui vient de se passer dans l'input
-
-                //supprime tout ce qui n'est pas un chiffre
-                // le g dans le regex sert pour dire que c'est partout dans le input g = général
-                let value = event.target.value.replace(/[^0-9]/g, '');
-                
-                //convertit en nombre
-                value = parseInt(value) || 1;
-                
-                event.target.value = value; //met a jour la valeur de l'input
-                updateRecap(); //appele la fonction update récap
-            });
-            
-            //empeche l’utilisateur de taper des caractères interdits comme les lettres directement.
-            input.addEventListener('keypress', (event) => {
-                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
-                    event.preventDefault();
-                }
-            });
-        });
-
-        //initialisation du récap sinon il y a rien au début.
-        updateRecap();
-    </script>
+            //initialisation du récap sinon il y a rien au début.
+            updateRecap();
+        </script>
+    <?php endif;?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/js/HL_import.js"></script>
 </html>
