@@ -132,7 +132,21 @@ try {
 }
 $avisTextes = [];
 try {
-    $stmtAvis = $pdo->prepare('SELECT id_avis, a_texte, a_timestamp_creation, a_pouce_bleu, a_pouce_rouge FROM _avis WHERE id_produit = :pid ORDER BY a_timestamp_creation DESC');
+    // Récupère les avis et, si existantes, les notes liées (moyenne par avis)
+    $stmtAvis = $pdo->prepare('
+        SELECT 
+            a.id_avis,
+            a.a_texte,
+            a.a_timestamp_creation,
+            a.a_pouce_bleu,
+            a.a_pouce_rouge,
+            ROUND(COALESCE(AVG(c.a_note), 0)::numeric, 1) AS avis_note
+        FROM _avis a
+        LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
+        WHERE a.id_produit = :pid
+        GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge
+        ORDER BY a.a_timestamp_creation DESC
+    ');
     $stmtAvis->execute([':pid' => $idProduit]);
     $avisTextes = $stmtAvis->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
@@ -352,6 +366,10 @@ if ($pageError) {
                     <p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>
                 <?php else: ?>
                     <?php foreach ($avisTextes as $ta): ?>
+                        <?php 
+                            $avisNote = isset($ta['avis_note']) ? (float)$ta['avis_note'] : 0.0; 
+                            $avisNoteEntiere = (int) floor($avisNote);
+                        ?>
                         <div class="review" data-avis-id="<?= (int) $ta['id_avis'] ?>" style="margin-bottom:12px;">
                             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
                                 <div
@@ -360,6 +378,22 @@ if ($pageError) {
                                 <div>
                                     <div style="font-weight:700">Utilisateur</div>
                                     <div style="color:var(--muted);font-size:13px">Avis</div>
+                                    <?php if ($avisNote > 0): ?>
+                                        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                                            <span class="stars" aria-hidden="true">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <?php if ($i <= $avisNoteEntiere): ?>
+                                                        <img src="/img/svg/star-full.svg" alt="Etoile" width="16">
+                                                    <?php else: ?>
+                                                        <img src="/img/svg/star-empty.svg" alt="Etoile" width="16">
+                                                    <?php endif; ?>
+                                                <?php endfor; ?>
+                                            </span>
+                                            <span style="color:var(--muted);font-weight:600;">
+                                                <?= number_format($avisNote, 1) ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
@@ -519,7 +553,7 @@ if ($pageError) {
                         }
                         const safeComment = escapeHtml(commentaire);
                         const when = data.created_at || new Date().toISOString();
-                        const newHtml = `<div class=\"review\" data-avis-id=\"${data.id_avis}\" style=\"margin-bottom:12px;\">\n                            <div style=\"display:flex;align-items:center;gap:12px;margin-bottom:8px\">\n                                <div style=\"width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)\">U</div>\n                                <div>\n                                    <div style=\"font-weight:700\">Utilisateur</div>\n                                    <div style=\"color:var(--muted);font-size:13px\">Avis</div>\n                                </div>\n                            </div>\n                            <div style=\"color:var(--muted)\">${safeComment}</div>\n                            <div class=\"review-votes\" style=\"display:flex;align-items:center;gap:10px;margin-top:8px\">\n                                <button class=\"ghost btn-vote\" data-type=\"plus\" aria-label=\"Vote plus\"><img src=\"/img/svg/plus.svg\" alt=\"Plus\" width=\"16\" height=\"16\"> <span class=\"like-count\">0</span></button>\n                                <button class=\"ghost btn-vote\" data-type=\"minus\" aria-label=\"Vote moins\"><img src=\"/img/svg/minus.svg\" alt=\"Moins\" width=\"16\" height=\"16\"> <span class=\"dislike-count\">0</span></button>\n                                <span style=\"font-size:12px;color:#888;margin-left:auto;\">${when}</span>\n                            </div>\n                        </div>`;
+                        const newHtml = `<div class=\"review\" data-avis-id=\"${data.id_avis}\" style=\"margin-bottom:12px;\">\n                            <div style=\"display:flex;align-items:center;gap:12px;margin-bottom:8px\">\n                                <div style=\"width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)\">U</div>\n                                <div>\n                                    <div style=\"font-weight:700\">Utilisateur</div>\n                                    <div style=\"color:var(--muted);font-size:13px\">Avis</div>\n                                </div>\n                            </div>\n                            <div style=\"color:var(--muted)\">${safeComment}</div>\n                            <div class=\"review-votes\" style=\"display:flex;align-items:center;gap:10px;margin-top:8px\">\n                                <button class=\"ghost btn-vote\" data-type=\"plus\" aria-label=\"Vote plus\" aria-pressed=\"false\"><img src=\"/img/svg/plus.svg\" alt=\"Plus\" width=\"16\" height=\"16\"> <span class=\"like-count\">0</span></button>\n                                <button class=\"ghost btn-vote\" data-type=\"minus\" aria-label=\"Vote moins\" aria-pressed=\"false\"><img src=\"/img/svg/minus.svg\" alt=\"Moins\" width=\"16\" height=\"16\"> <span class=\"dislike-count\">0</span></button>\n                                <span style=\"font-size:12px;color:#888;margin-left:auto;\">${when}</span>\n                            </div>\n                        </div>`;
 
                         // Si liste vide (paragraphe "Aucun avis"), remplacer; sinon prepend
                         const first = listeAvis.firstElementChild;
@@ -599,6 +633,18 @@ if ($pageError) {
                         alert('Erreur réseau');
                     })
                     .finally(() => { t.disabled = false; });
+            });
+            // Initialiser l'état visuel des votes en fonction des votes déjà enregistrés (localStorage)
+            const reviews = Array.from(listeAvis.querySelectorAll('.review[data-avis-id]'));
+            reviews.forEach((rev) => {
+                const aid = parseInt(rev.getAttribute('data-avis-id'), 10);
+                if (!aid) return;
+                const state = getStoredVote(productId, aid);
+                const buttons = rev.querySelectorAll('.btn-vote');
+                buttons.forEach((b) => {
+                    const type = b.getAttribute('data-type');
+                    b.setAttribute('aria-pressed', state && type === state ? 'true' : 'false');
+                });
             });
         }
     </script>
