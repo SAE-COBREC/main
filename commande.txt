@@ -1,0 +1,141 @@
+su -
+cd /docker 
+docker compose start 
+
+
+sae@sae-01:/docker$ su -
+cd /docker 
+docker compose start 
+Mot de passe : 
+root@sae-01:~# cd /docker 
+docker compose start 
+root@sae-01:/docker# docker compose start 
+root@sae-01:/docker# cat .env
+EQUIPE=01
+PORT_WEB=80
+PORT_PHPMYADMIN=8080
+PORT_PGADMIN=8081
+
+DB_USER=sae
+DB_PASSWORD=kira13
+DB_NAME=saedb
+
+MARIADB_PORT=3306
+MARIADB_ROOT_PASSWORD=kira13
+
+PGDB_PORT=5432
+
+PGADMIN_PASSWORD=kira13
+root@sae-01:/docker# env
+SHELL=/bin/bash
+no_proxy=localhost,10.253.5.0/24
+PWD=/docker
+LOGNAME=root
+HOME=/root
+LANG=fr_FR.UTF-8
+https_proxy=http://sae:rneks5otPb%28l@10.254.0.254:3128
+TERM=xterm-256color
+USER=root
+SHLVL=1
+HTTPS_PROXY=http://sae:rneks5otPb%28l@10.254.0.254:3128
+HTTP_PROXY=http://sae:rneks5otPb%28l@10.254.0.254:3128
+http_proxy=http://sae:rneks5otPb%28l@10.254.0.254:3128
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAIL=/var/mail/root
+OLDPWD=/root
+_=/usr/bin/env
+root@sae-01:/docker# 
+
+
+root@sae-01:/docker# cat docker-compose.yml 
+services:
+   mariadb:
+      container_name: mariadb
+      image: mariadb:11.0
+      volumes:
+         - ./data/mariadb:/var/lib/mysql
+      ports:
+         # - 127.0.0.1:${MARIADB_PORT}:3306
+         - 0.0.0.0:${MARIADB_PORT}:3306
+      environment:
+         MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+         MARIADB_USER: ${DB_USER}
+         MARIADB_PASSWORD: ${DB_PASSWORD}
+         MARIADB_DATABASE: ${DB_NAME}
+         #command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+      networks:
+         - sae
+
+   postgresdb:
+      container_name: postgresdb
+      image: postgres:16.0
+      volumes:
+         - ./data/postgres:/var/lib/postgresql/data
+      ports:
+         # - 127.0.0.1:${PGDB_PORT}:5432
+         - 0.0.0.0:${PGDB_PORT}:5432
+      environment:
+         POSTGRES_PASSWORD: ${DB_PASSWORD}
+         POSTGRES_USER: ${DB_USER}
+         POSTGRES_DB: ${DB_NAME}
+         PGDATA: /var/lib/postgresql/data/pgdata
+      networks:
+         - sae
+
+   web:
+      container_name: web
+      build: .
+      ports:
+        - ${PORT_WEB}:80
+      volumes:
+         - ./data/web/html:/var/www/html
+         - ./data/web/logs:/var/www/logs
+      #environment:
+      #   VIRTUAL_HOST: ${EQUIPE}.ventsdouest.dev
+      #   LETSENCRYPT_HOST: ${EQUIPE}.ventsdouest.dev
+      #   LETSENCRYPT_EMAIL: gildas@bigpapoo.com
+      networks:
+         - sae
+      #   - webproxy_back
+      depends_on:
+         - mariadb
+         - postgresdb
+
+   phpmyadmin:
+      image: phpmyadmin
+      restart: always
+      ports:
+         - ${PORT_PHPMYADMIN}:80
+      environment:
+      #   VIRTUAL_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
+      #   LETSENCRYPT_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
+      #   LETSENCRYPT_EMAIL: gildas@bigpapoo.com
+         PMA_HOST: mariadb
+         PMA_PORT: 3306
+      networks:
+         - sae
+      #   - webproxy_back
+      depends_on:
+         - mariadb
+
+   pgadmin:
+      image: dpage/pgadmin4
+      restart: always
+      ports:
+         - ${PORT_PGADMIN}:80
+      environment:
+      #   VIRTUAL_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
+      #   LETSENCRYPT_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
+      #   LETSENCRYPT_EMAIL: gildas@bigpapoo.com
+         PGADMIN_DEFAULT_EMAIL: ${EQUIPE}@dbadmin-sae.com
+         PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+         PGADMIN_DISABLE_POSTFIX: true
+      networks:
+         - sae
+      #   - webproxy_back
+      depends_on:
+         - postgresdb
+
+networks:
+   sae:
+   #webproxy_back:
