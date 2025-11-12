@@ -65,3 +65,6 @@ git pull
 
 
 http://10.253.5.101/index.php
+
+
+ssh sae@10.253.5.101
