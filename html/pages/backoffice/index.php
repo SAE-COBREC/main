@@ -9,7 +9,7 @@
 <body>
   <?php
     session_start();
-    include '../../../../../config.php';
+    include '../../selectBDD.php';
 
     // ID du vendeur connecté (à adapter dynamiquement via la session)
     $vendeur_id = $_SESSION['id'];
