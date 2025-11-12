@@ -267,10 +267,10 @@
         </div>
         <div class="next-btn" role="group" aria-label="Suivant action">
           <span class="next-text">Terminer</span>
-              <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+              <a href ="../index.php" ><button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer" >
                 <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
                   class="btn-arrow" aria-hidden="true">
-              </button>
+              </button></a>
         </div>
       </div>
     
