@@ -3,7 +3,7 @@
     session_start();
     $sth = null ;
     $dbh = null ;
-    cont NB_IMGS_MAX = 3;
+    const NB_IMGS_MAX = 3;
 ?>
 
 
