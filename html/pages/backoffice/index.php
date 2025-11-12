@@ -48,7 +48,7 @@
   ?>
   <div class="app">
     <?php
-    include __DIR__ . '../../partials/aside.html';
+    include __DIR__ . '/../../partials/aside.html';
     ?>
     
     <!-- Main Content -->
