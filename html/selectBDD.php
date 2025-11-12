@@ -1,6 +1,6 @@
 <?php
 
-include("config.php");
+include("config1.php");
 
 try {
     $dbh = new PDO("$driver:host=$serveur;dbname=$dbname", $user, $pass);
