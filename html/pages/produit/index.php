@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../../config.php';
+include '../../selectBDD.php';
 $pageError = false;
 $fichierCSV = realpath(__DIR__ . '/mls.csv');
 $produit = null;
