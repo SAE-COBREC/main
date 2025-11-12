@@ -25,6 +25,7 @@ source proxy_mox
 ```
 
 Lorsque demandé, entrez vos identifiants :
+
 - Login : `sae301_a11`
 - Mot de passe : `rneks5otPb(l`
 
@@ -60,17 +61,7 @@ Ce répertoire contient les fichiers web de votre application.
 git pull
 ```
 
+### cat docker-compose.yml
 
-### cat docker-compose.yml 
 
-
-Mot de passe : 
-root@sae-01:~# cd /docker/data/web
-root@sae-01:/docker/data/web# cd html
-root@sae-01:/docker/data/web/html# docker exec -ti web bash
-OCI runtime exec failed: exec failed: unable to start container process: current working directory is outside of container mount namespace root -- possible container breakout detected: unknown
-root@sae-01:/docker/data/web/html# docker compose start
-root@sae-01:/docker/data/web/html# docker exec -ti web bash
-OCI runtime exec failed: exec failed: unable to start container process: current working directory is outside of container mount namespace root -- possible container breakout detected: unknown
-root@sae-01:/docker/data/web/html# ^C
-root@sae-01:/docker/data/web/html# 
+http://10.253.5.101/index.php
