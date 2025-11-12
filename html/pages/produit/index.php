@@ -1,4 +1,5 @@
 <?php
+session_start();
 include '../../../config.php';
 $pageError = false;
 $fichierCSV = realpath(__DIR__ . '/mls.csv');
@@ -85,13 +86,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
             // Validation basique de la note (intervalle et pas de 0.5)
             $validSteps = [0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0];
             if (!in_array($note_post, $validSteps, true)) { $note_post = 0.0; }
+            if ($note_post <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Veuillez sélectionner une note (au moins 0,5 étoile).']);
+                exit;
+            }
             // Tenter insertion avec a_note si la colonne existe, sinon fallback
             $row = null;
             try {
                 // S'assurer que la colonne a_note existe (idempotent)
                 $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_note numeric(2,1)');
-                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note) VALUES (:id_produit, :texte, 0, 0, NOW(), :note) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
-                $stmt->execute([':id_produit' => $id_produit_post, ':texte' => $commentaire_post, ':note' => $note_post]);
+                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_owner_token text');
+                // Générer ou récupérer un token propriétaire
+                $ownerToken = isset($_COOKIE['alizon_owner']) && $_COOKIE['alizon_owner'] ? $_COOKIE['alizon_owner'] : bin2hex(random_bytes(16));
+                if (!isset($_COOKIE['alizon_owner']) || !$_COOKIE['alizon_owner']) {
+                    setcookie('alizon_owner', $ownerToken, time() + 3600*24*365, '/');
+                }
+                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note, a_owner_token) VALUES (:id_produit, :texte, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
+                $stmt->execute([':id_produit' => $id_produit_post, ':texte' => $commentaire_post, ':note' => $note_post, ':owner' => $ownerToken]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
             } catch (PDOException $ex) {
                 // Colonne a_note absente: réessayer sans la note
@@ -151,10 +162,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 echo json_encode(['success' => false, 'message' => 'Avis invalide']);
                 exit;
             }
-            $stmt = $pdo->prepare("UPDATE _avis SET a_texte = :texte, a_timestamp_modification = NOW() WHERE id_avis = :id AND id_produit = :pid RETURNING TO_CHAR(a_timestamp_modification,'YYYY-MM-DD HH24:MI') AS updated_at_fmt");
-            $stmt->execute([':texte' => $commentaire_post, ':id' => $id_avis, ':pid' => $id_produit_post]);
+            $ownerToken = isset($_COOKIE['alizon_owner']) ? $_COOKIE['alizon_owner'] : '';
+            $stmt = $pdo->prepare("UPDATE _avis SET a_texte = :texte, a_timestamp_modification = NOW() WHERE id_avis = :id AND id_produit = :pid AND (a_owner_token = :owner) RETURNING TO_CHAR(a_timestamp_modification,'YYYY-MM-DD HH24:MI') AS updated_at_fmt");
+            $stmt->execute([':texte' => $commentaire_post, ':id' => $id_avis, ':pid' => $id_produit_post, ':owner' => $ownerToken]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            echo json_encode(['success' => true, 'message' => 'Avis modifié', 'updated_at_fmt' => $row ? $row['updated_at_fmt'] : null]);
+            if ($row) {
+                echo json_encode(['success' => true, 'message' => 'Avis modifié', 'updated_at_fmt' => $row['updated_at_fmt']]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Non autorisé ou avis introuvable']);
+            }
             exit;
         } elseif ($action === 'delete_avis') {
             $id_avis = isset($_POST['id_avis']) ? (int) $_POST['id_avis'] : 0;
@@ -162,15 +178,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 echo json_encode(['success' => false, 'message' => 'Avis invalide']);
                 exit;
             }
-            $stmt = $pdo->prepare('DELETE FROM _avis WHERE id_avis = :id AND id_produit = :pid RETURNING :id AS deleted_id');
-            $stmt->execute([':id' => $id_avis, ':pid' => $id_produit_post]);
+            $ownerToken = isset($_COOKIE['alizon_owner']) ? $_COOKIE['alizon_owner'] : '';
+            $stmt = $pdo->prepare('DELETE FROM _avis WHERE id_avis = :id AND id_produit = :pid AND (a_owner_token = :owner) RETURNING :id AS deleted_id');
+            $stmt->execute([':id' => $id_avis, ':pid' => $id_produit_post, ':owner' => $ownerToken]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row && (int)$row['deleted_id'] === $id_avis) {
                 echo json_encode(['success' => true, 'message' => 'Avis supprimé']);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Suppression non effectuée']);
+                echo json_encode(['success' => false, 'message' => 'Non autorisé ou suppression non effectuée']);
             }
             exit;
+        } elseif ($action === 'get_rating') {
+            // Renvoie la note moyenne actuelle (vérifiée si dispo, sinon moyenne des avis) + nombre d'avis
+            $avg = 0.0; $countAvis = 0;
+            try {
+                $stmtCnt = $pdo->prepare('SELECT COUNT(*) AS c FROM _avis WHERE id_produit = :pid');
+                $stmtCnt->execute([':pid' => $id_produit_post]);
+                $rc = $stmtCnt->fetch(PDO::FETCH_ASSOC);
+                $countAvis = (int)($rc ? $rc['c'] : 0);
+
+                $stmtAvg = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt FROM _avis a LEFT JOIN _commentaire c ON c.id_avis = a.id_avis WHERE a.id_produit = :pid AND c.a_note IS NOT NULL');
+                $stmtAvg->execute([':pid' => $id_produit_post]);
+                $row = $stmtAvg->fetch(PDO::FETCH_ASSOC);
+                if ($row && (int)$row['cnt'] > 0) {
+                    $avg = round((float)$row['avg_note'], 1);
+                } else {
+                    $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
+                    $stmtAvgAvis->execute([':pid' => $id_produit_post]);
+                    $row2 = $stmtAvgAvis->fetch(PDO::FETCH_ASSOC);
+                    if ($row2 && $row2['avg_note'] !== null) {
+                        $avg = round((float)$row2['avg_note'], 1);
+                    } else {
+                        $avg = 0.0;
+                    }
+                }
+                echo json_encode(['success' => true, 'avg' => $avg, 'countAvis' => $countAvis]);
+                exit;
+            } catch (Throwable $e) {
+                echo json_encode(['success' => false, 'message' => 'Erreur calcul note']);
+                exit;
+            }
         }
         echo json_encode(['success' => false, 'message' => 'Action inconnue']);
         exit;
@@ -186,6 +233,7 @@ try {
 } catch (Throwable $e) {
     $pageError = true;
 }
+$ownerTokenServer = isset($_COOKIE['alizon_owner']) ? $_COOKIE['alizon_owner'] : '';
 $avisTextes = [];
 try {
     // Récupère les avis et, si existantes, les notes liées (moyenne par avis)
@@ -204,13 +252,30 @@ try {
                 GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge, a.a_note
                 ORDER BY a.a_timestamp_creation DESC
             ");
+                $stmtAvis = $pdo->prepare("
+                    SELECT 
+                        a.id_avis,
+                        a.a_texte,
+                        a.a_timestamp_creation,
+                        TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt,
+                        a.a_pouce_bleu,
+                        a.a_pouce_rouge,
+                        a.a_note,
+                        a.a_owner_token,
+                        COALESCE(ROUND(AVG(c.a_note)::numeric, 1), a.a_note, 0) AS avis_note
+                    FROM _avis a
+                    LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
+                    WHERE a.id_produit = :pid
+                    GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge, a.a_note, a.a_owner_token
+                    ORDER BY a.a_timestamp_creation DESC
+                ");
     $stmtAvis->execute([':pid' => $idProduit]);
     $avisTextes = $stmtAvis->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $avisTextes = [];
 }
 
-// Moyenne de notes issues des achats vérifiés (table _commentaire)
+// Moyenne de notes: priorité achats vérifiés (_commentaire), sinon moyenne des a_note de _avis
 $note = 0.0;
 $nbNotes = 0;
 $nbAvis = is_array($avisTextes) ? count($avisTextes) : 0;
@@ -222,8 +287,16 @@ try {
         $note = round((float) $row['avg_note'], 1);
         $nbNotes = (int) $row['cnt'];
     }
-    if ($note <= 0 && isset($produit['avg_rating'])) {
-        $note = round((float) $produit['avg_rating'], 1);
+    if ($note <= 0) {
+        // Fallback: moyenne des notes saisies sur _avis
+        $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
+        $stmtAvgAvis->execute([':pid' => $idProduit]);
+        $row2 = $stmtAvgAvis->fetch(PDO::FETCH_ASSOC);
+        if ($row2 && $row2['avg_note'] !== null) {
+            $note = round((float)$row2['avg_note'], 1);
+        } elseif (isset($produit['avg_rating'])) {
+            $note = round((float) $produit['avg_rating'], 1);
+        }
     }
 } catch (Exception $e) {
     if (isset($produit['avg_rating'])) {
@@ -272,7 +345,7 @@ if ($pageError) {
             <aside class="summary">
                 <div class="title"><?= htmlspecialchars($produit['p_nom']) ?></div>
                 <div class="rating">
-                    <span class="stars" aria-hidden="true">
+                    <span class="stars" id="summaryStars" aria-hidden="true">
                         <?php for ($i = 1; $i <= 5; $i++): ?>
                             <?php if ($i <= $noteEntiere): ?>
                                 <img src="/img/svg/star-full.svg" alt="Etoile" width="20">
@@ -281,8 +354,8 @@ if ($pageError) {
                             <?php endif; ?>
                         <?php endfor; ?>
                     </span>
-                    <span style="color:var(--muted);font-weight:600"><?= number_format($note, 1) ?></span>
-                    <span style="color:var(--muted)">(<?= (int) $nbAvis ?>)</span>
+                    <span id="summaryRatingValue" style="color:var(--muted);font-weight:600"><?= number_format($note, 1) ?></span>
+                    <span id="summaryRatingCount" style="color:var(--muted)">(<?= (int) $nbAvis ?>)</span>
                 </div>
                 <div class="price">
                     €<?= number_format($prixFinal, 2, ',', ' ') ?>
@@ -361,10 +434,10 @@ if ($pageError) {
             <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:8px">
                 <div style="font-size:14px;color:var(--muted);margin-bottom:8px">Note moyenne</div>
                 <div style="display:flex;align-items:center;gap:10px">
-                    <span
+                    <span id="reviewsRatingValue"
                         style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
                     <div>
-                        <div class="stars">
+                        <div class="stars" id="reviewsStars">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
                                 <?php if ($i <= $noteEntiere): ?>
                                     <img src="/img/svg/star-full.svg" alt="Etoile" width="16">
@@ -373,7 +446,7 @@ if ($pageError) {
                                 <?php endif; ?>
                             <?php endfor; ?>
                         </div>
-                        <div style="font-size:13px;color:var(--muted);margin-top:4px">
+                        <div id="reviewsRatingCount" style="font-size:13px;color:var(--muted);margin-top:4px">
                             Basé sur <?= (int) $nbAvis ?> avis
                         </div>
                     </div>
@@ -463,8 +536,10 @@ if ($pageError) {
                                 </button>
                                 <span
                                     style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? $ta['a_timestamp_creation']) ?></span>
-                                <button class="ghost btn-edit-review" style="margin-left:8px;font-size:12px;padding:4px 8px;">Modifier</button>
-                                <button class="ghost btn-delete-review" style="margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;">Supprimer</button>
+                                <?php if ($ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer): ?>
+                                    <button class="ghost btn-edit-review" style="margin-left:8px;font-size:12px;padding:4px 8px;">Modifier</button>
+                                    <button class="ghost btn-delete-review" style="margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;">Supprimer</button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -579,7 +654,7 @@ if ($pageError) {
         }
 
         const productId = <?= (int) $idProduit ?>;
-        const inlineSubmit = document.getElementById('inlineSubmit');
+    const inlineSubmit = document.getElementById('inlineSubmit');
         const inlineNote = document.getElementById('inlineNote');
         const inlineStarInput = document.getElementById('inlineStarInput');
         const inlineComment = document.getElementById('inlineComment');
@@ -624,6 +699,7 @@ if ($pageError) {
                 const commentaire = (inlineComment.value || '').trim();
                 const selectedNote = parseFloat(inlineNote.value || '0') || 0;
                 if (!commentaire) { alert('Veuillez saisir un commentaire.'); return; }
+                if (selectedNote <= 0) { alert('Veuillez choisir une note (cliquez sur une étoile).'); return; }
                 inlineSubmit.disabled = true;
                 postAvis(productId, commentaire, selectedNote)
                     .then(data => {
