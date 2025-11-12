@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
     $pdo->exec("SET search_path TO cobrec1");
 
     $action = isset($_POST['action']) ? $_POST['action'] : 'add_avis';
-    $id_produit_post = isset($_POST['id_produit']) ? (int)$_POST['id_produit'] : 0;
+    $id_produit_post = isset($_POST['id_produit']) ? (int) $_POST['id_produit'] : 0;
     if ($id_produit_post <= 0 || $id_produit_post !== $idProduit) {
         echo json_encode(['success' => false, 'message' => 'Produit invalide']);
         exit;
@@ -87,10 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
             echo json_encode(['success' => true, 'message' => 'Avis enregistré', 'id_avis' => $row['id_avis'], 'created_at' => $row['a_timestamp_creation']]);
             exit;
         } elseif ($action === 'vote') {
-            $id_avis = isset($_POST['id_avis']) ? (int)$_POST['id_avis'] : 0;
+            $id_avis = isset($_POST['id_avis']) ? (int) $_POST['id_avis'] : 0;
             $value = isset($_POST['value']) ? $_POST['value'] : '';
             $prev = isset($_POST['prev']) ? $_POST['prev'] : '';
-            if ($id_avis <= 0 || !in_array($value, ['plus','minus'], true)) {
+            if ($id_avis <= 0 || !in_array($value, ['plus', 'minus'], true)) {
                 echo json_encode(['success' => false, 'message' => 'Paramètres de vote invalides']);
                 exit;
             }
@@ -140,17 +140,26 @@ try {
 }
 
 // Moyenne de notes issues des achats vérifiés (table _commentaire)
-$note = 0.0; $nbNotes = 0; $nbAvis = is_array($avisTextes) ? count($avisTextes) : 0;
+$note = 0.0;
+$nbNotes = 0;
+$nbAvis = is_array($avisTextes) ? count($avisTextes) : 0;
 try {
     $stmtAvg = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt FROM _avis a LEFT JOIN _commentaire c ON c.id_avis = a.id_avis WHERE a.id_produit = :pid AND c.a_note IS NOT NULL');
     $stmtAvg->execute([':pid' => $idProduit]);
     $row = $stmtAvg->fetch(PDO::FETCH_ASSOC);
-    if ($row) { $note = round((float)$row['avg_note'], 1); $nbNotes = (int)$row['cnt']; }
-    if ($note <= 0 && isset($produit['avg_rating'])) { $note = round((float)$produit['avg_rating'], 1); }
+    if ($row) {
+        $note = round((float) $row['avg_note'], 1);
+        $nbNotes = (int) $row['cnt'];
+    }
+    if ($note <= 0 && isset($produit['avg_rating'])) {
+        $note = round((float) $produit['avg_rating'], 1);
+    }
 } catch (Exception $e) {
-    if (isset($produit['avg_rating'])) { $note = round((float)$produit['avg_rating'], 1); }
+    if (isset($produit['avg_rating'])) {
+        $note = round((float) $produit['avg_rating'], 1);
+    }
 }
-$noteEntiere = (int)floor($note);
+$noteEntiere = (int) floor($note);
 // Si une erreur critique est détectée, basculer sur la page produit introuvable
 if ($pageError) {
     include __DIR__ . '/not-found.php';
@@ -167,7 +176,7 @@ if ($pageError) {
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
-    </head>
+</head>
 
 <body>
     <div id="header"></div>
@@ -202,7 +211,7 @@ if ($pageError) {
                         <?php endfor; ?>
                     </span>
                     <span style="color:var(--muted);font-weight:600"><?= number_format($note, 1) ?></span>
-                    <span style="color:var(--muted)">(<?= (int)$nbAvis ?>)</span>
+                    <span style="color:var(--muted)">(<?= (int) $nbAvis ?>)</span>
                 </div>
                 <div class="price">
                     €<?= number_format($prixFinal, 2, ',', ' ') ?>
@@ -281,7 +290,8 @@ if ($pageError) {
             <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:8px">
                 <div style="font-size:14px;color:var(--muted);margin-bottom:8px">Note moyenne</div>
                 <div style="display:flex;align-items:center;gap:10px">
-                    <span style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
+                    <span
+                        style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
                     <div>
                         <div class="stars">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -293,41 +303,48 @@ if ($pageError) {
                             <?php endfor; ?>
                         </div>
                         <div style="font-size:13px;color:var(--muted);margin-top:4px">
-                                    Basé sur <?= (int)$nbAvis ?> avis
-                                </div>
+                            Basé sur <?= (int) $nbAvis ?> avis
+                        </div>
                     </div>
                 </div>
             </div>
 
-                    <!-- Formulaire avis (carte) -->
-                    <div class="review new-review-card" id="newReviewCard">
-                        <div class="review-head">
-                            <div class="review-head-left">
-                                <div class="avatar">V</div>
-                                <div class="review-head-texts">
-                                    <div class="review-author">Vous</div>
-                                    <div class="review-subtitle">Laisser un avis</div>
-                                </div>
-                            </div>
-                            <div class="review-head-right">
-                                <div class="star-input" id="inlineStarInput" title="Survolez pour voir la note (la soumission de note est réservée aux achats vérifiés)">
-                                    <button type="button" data-value="1" aria-label="1 étoile"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                    <button type="button" data-value="2" aria-label="2 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                    <button type="button" data-value="3" aria-label="3 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                    <button type="button" data-value="4" aria-label="4 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                    <button type="button" data-value="5" aria-label="5 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                </div>
-                                <input type="hidden" id="inlineNote" name="note" value="0">
-                            </div>
+            <!-- Formulaire avis (carte) -->
+            <div class="review new-review-card" id="newReviewCard">
+                <div class="review-head">
+                    <div class="review-head-left">
+                        <div class="avatar">V</div>
+                        <div class="review-head-texts">
+                            <div class="review-author">Vous</div>
+                            <div class="review-subtitle">Laisser un avis</div>
                         </div>
-                        <form id="inlineReviewForm" class="review-form">
-                            <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea" placeholder="Partagez votre avis (texte)..."></textarea>
-                            <div class="review-actions">
-                                <small class="review-hint">La notation est réservée aux achats vérifiés.</small>
-                                <button type="button" class="btn" id="inlineSubmit">Publier</button>
-                            </div>
-                        </form>
                     </div>
+                    <div class="review-head-right">
+                        <div class="star-input" id="inlineStarInput"
+                            title="Survolez pour voir la note (la soumission de note est réservée aux achats vérifiés)">
+                            <button type="button" data-value="1" aria-label="1 étoile"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
+                            <button type="button" data-value="2" aria-label="2 étoiles"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
+                            <button type="button" data-value="3" aria-label="3 étoiles"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
+                            <button type="button" data-value="4" aria-label="4 étoiles"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
+                            <button type="button" data-value="5" aria-label="5 étoiles"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
+                        </div>
+                        <input type="hidden" id="inlineNote" name="note" value="0">
+                    </div>
+                </div>
+                <form id="inlineReviewForm" class="review-form">
+                    <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
+                        placeholder="Partagez votre avis (texte)..."></textarea>
+                    <div class="review-actions">
+                        <small class="review-hint">La notation est réservée aux achats vérifiés.</small>
+                        <button type="button" class="btn" id="inlineSubmit">Publier</button>
+                    </div>
+                </form>
+            </div>
 
             <!-- Liste des avis -->
             <div id="listeAvisProduit">
@@ -335,9 +352,11 @@ if ($pageError) {
                     <p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>
                 <?php else: ?>
                     <?php foreach ($avisTextes as $ta): ?>
-                        <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" style="margin-bottom:12px;">
+                        <div class="review" data-avis-id="<?= (int) $ta['id_avis'] ?>" style="margin-bottom:12px;">
                             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                                <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)">U</div>
+                                <div
+                                    style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)">
+                                    U</div>
                                 <div>
                                     <div style="font-weight:700">Utilisateur</div>
                                     <div style="color:var(--muted);font-size:13px">Avis</div>
@@ -346,12 +365,15 @@ if ($pageError) {
                             <div style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
                             <div class="review-votes" style="display:flex;align-items:center;gap:10px;margin-top:8px">
                                 <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus">
-                                    <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
+                                    <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span
+                                        class="like-count"><?= (int) $ta['a_pouce_bleu'] ?></span>
                                 </button>
                                 <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins">
-                                    <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
+                                    <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span
+                                        class="dislike-count"><?= (int) $ta['a_pouce_rouge'] ?></span>
                                 </button>
-                                <span style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_creation']) ?></span>
+                                <span
+                                    style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_creation']) ?></span>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -443,7 +465,7 @@ if ($pageError) {
             }).then(r => r.json());
         }
 
-        const productId = <?= (int)$idProduit ?>;
+        const productId = <?= (int) $idProduit ?>;
         const inlineSubmit = document.getElementById('inlineSubmit');
         const inlineNote = document.getElementById('inlineNote');
         const inlineStarInput = document.getElementById('inlineStarInput');
@@ -451,16 +473,16 @@ if ($pageError) {
         const listeAvis = document.getElementById('listeAvisProduit');
 
         // Widget étoiles: hover -> remplit jusqu'à la position, clic -> sélectionne (visuel uniquement)
-        (function initStarWidget(){
+        (function initStarWidget() {
             if (!inlineStarInput || !inlineNote) return;
             const btns = Array.from(inlineStarInput.querySelectorAll('button[data-value]'));
             const empty = '/img/svg/star-empty.svg';
             const full = '/img/svg/star-full.svg';
             let selected = 0;
 
-            function paint(n){
+            function paint(n) {
                 btns.forEach(b => {
-                    const v = parseInt(b.getAttribute('data-value'),10) || 0;
+                    const v = parseInt(b.getAttribute('data-value'), 10) || 0;
                     const img = b.querySelector('img');
                     if (!img) return;
                     img.src = v <= n ? full : empty;
@@ -470,11 +492,11 @@ if ($pageError) {
 
             btns.forEach(b => {
                 b.addEventListener('mouseenter', () => {
-                    const v = parseInt(b.getAttribute('data-value'),10) || 0;
+                    const v = parseInt(b.getAttribute('data-value'), 10) || 0;
                     paint(v);
                 });
                 b.addEventListener('click', () => {
-                    selected = parseInt(b.getAttribute('data-value'),10) || 0;
+                    selected = parseInt(b.getAttribute('data-value'), 10) || 0;
                     inlineNote.value = String(selected);
                     paint(selected);
                 });
@@ -519,16 +541,16 @@ if ($pageError) {
         }
 
         // Délégation pour votes plus/minus avec bascule et mémorisation locale
-        function voteKey(pid, aid){ return `vote:${pid}:${aid}`; }
-        function getStoredVote(pid, aid){ try { return localStorage.getItem(voteKey(pid,aid)) || ''; } catch(_) { return ''; } }
-        function setStoredVote(pid, aid, val){ try { localStorage.setItem(voteKey(pid,aid), val); } catch(_) {} }
+        function voteKey(pid, aid) { return `vote:${pid}:${aid}`; }
+        function getStoredVote(pid, aid) { try { return localStorage.getItem(voteKey(pid, aid)) || ''; } catch (_) { return ''; } }
+        function setStoredVote(pid, aid, val) { try { localStorage.setItem(voteKey(pid, aid), val); } catch (_) { } }
 
         if (listeAvis) {
             listeAvis.addEventListener('click', (e) => {
                 const t = e.target.closest('.btn-vote');
                 if (!t) return;
                 const reviewEl = t.closest('.review');
-                const avisId = reviewEl ? parseInt(reviewEl.getAttribute('data-avis-id'),10) : 0;
+                const avisId = reviewEl ? parseInt(reviewEl.getAttribute('data-avis-id'), 10) : 0;
                 if (!avisId) return;
                 const newVal = t.getAttribute('data-type'); // 'plus' | 'minus'
                 const current = getStoredVote(productId, avisId); // '' | 'plus' | 'minus'
@@ -537,8 +559,8 @@ if ($pageError) {
                 // Pré-maj UI optimiste
                 const likeSpan = reviewEl.querySelector('.like-count');
                 const dislikeSpan = reviewEl.querySelector('.dislike-count');
-                const likeN = likeSpan ? parseInt(likeSpan.textContent,10) || 0 : 0;
-                const dislikeN = dislikeSpan ? parseInt(dislikeSpan.textContent,10) || 0 : 0;
+                const likeN = likeSpan ? parseInt(likeSpan.textContent, 10) || 0 : 0;
+                const dislikeN = dislikeSpan ? parseInt(dislikeSpan.textContent, 10) || 0 : 0;
 
                 let newLike = likeN, newDislike = dislikeN;
                 if (!current) {
@@ -569,13 +591,14 @@ if ($pageError) {
                             alert((data && data.message) || 'Erreur');
                         }
                     })
-                    .catch(err => { console.error(err);
+                    .catch(err => {
+                        console.error(err);
                         if (likeSpan) likeSpan.textContent = likeN;
                         if (dislikeSpan) dislikeSpan.textContent = dislikeN;
                         buttons.forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-type') === current ? 'true' : 'false'));
                         alert('Erreur réseau');
                     })
-                    .finally(()=> { t.disabled = false; });
+                    .finally(() => { t.disabled = false; });
             });
         }
     </script>

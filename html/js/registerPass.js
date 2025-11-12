@@ -83,7 +83,7 @@ function saveCardData(cardId) {
     if (isLocalStorageAvailable()) {
         return setLocal(key, data);
     } else {
-            // fallback : cookie léger (sérialisation JSON)
+        // fallback : cookie léger (sérialisation JSON)
         try {
             return setCookie(key, JSON.stringify(data), { days: 7, path: '/' });
         } catch (e) {
