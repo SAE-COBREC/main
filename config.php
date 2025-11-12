@@ -1,11 +1,9 @@
 <?php
-// Configuration de la connexion PostgreSQL
-$host = '10.253.5.101';  // Adresse du serveur sae-01 visible dans l'image
-$port = '5432';           // Port PostgreSQL depuis serveurs.sh
-$dbname = 'saedb';        // Nom de la base de données
-$user = 'sae';            // Utilisateur depuis serveurs.sh
-$password = 'kira13';     // Mot de passe depuis serveurs.sh
-$schema = 'cobrec1';      // Schéma visible dans pgAdmin
+$host = '127.0.0.1';
+$port = '5432';
+$dbname = 'sae_db';
+$user = 'saeuser';
+$password = 'SaE_pass_123';
 
 try {
     // Connexion PDO PostgreSQL

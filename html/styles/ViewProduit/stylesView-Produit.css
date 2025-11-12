@@ -154,6 +154,202 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
   border: 1px solid #EFEFEF;
   margin-bottom: 12px;
 }
+.reviews .stars img {
+  vertical-align: middle;
+}
+.reviews .new-review-card {
+  margin-bottom: 12px;
+}
+.reviews .review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.reviews .review-head-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.reviews .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #eef1ff, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #7171A3;
+}
+.reviews .review-author {
+  font-weight: 700;
+}
+.reviews .review-subtitle {
+  color: #c0c0c0;
+  font-size: 13px;
+}
+.reviews .star-input {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.reviews .star-input button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  line-height: 0;
+}
+.reviews .star-input button:focus-visible {
+  outline: 2px solid #7171A3;
+  border-radius: 4px;
+}
+.reviews .star-input img {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.08s ease;
+}
+.reviews .star-input button:hover img {
+  transform: scale(1.05);
+}
+.reviews .review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.reviews .review-textarea {
+  resize: vertical;
+  min-height: 90px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #EFEFEF;
+  background: #FFFFFF;
+  color: #030212;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.reviews .review-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76, 92, 255, 0.12);
+  border-color: #7171A3;
+}
+.reviews .review-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+.reviews .review-hint {
+  color: #c0c0c0;
+  margin-right: auto;
+}
+.reviews .btn-vote img {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.reviews .btn-vote[aria-pressed=true] {
+  background: rgba(76, 92, 255, 0.06);
+  border-color: #7171A3;
+}
+
+/* Footer (déplacé depuis la page) */
+footer {
+  grid-column: 1/-1;
+  background: #030212;
+  color: #FFFFFF;
+  padding: 3rem 2rem 2rem;
+  margin-top: auto;
+}
+
+footer > div:first-child {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+footer > div > div:first-child {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #7171A3;
+}
+
+footer > div > div:first-child > a {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+footer > div > div:first-child > a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+footer nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+footer nav h4 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #FFFFFF;
+}
+
+footer nav ul {
+  list-style: none;
+}
+
+footer nav li {
+  margin-bottom: 0.5rem;
+}
+
+footer nav a {
+  color: #c0c0c0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+footer nav a:hover {
+  color: #FFFFFF;
+}
+
+footer > div > div:last-child {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #7171A3;
+  color: #c0c0c0;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+footer > div > div:last-child span {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+footer > div > div:last-child span:hover {
+  color: #FFFFFF;
+}
 
 @media screen and (max-width: 980px) {
   .product-row {
