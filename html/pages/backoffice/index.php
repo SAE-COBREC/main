@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!doctype html>
 <html lang="fr">
 <head>
@@ -8,11 +9,10 @@
 </head>
 <body>
   <?php
-    session_start();
     include '../../selectBDD.php';
 
     // ID du vendeur connecté (à adapter dynamiquement via la session)
-    $vendeur_id = $_SESSION['id'];
+    $vendeur_id = 2;
 
     try {
     // Récupération des produits depuis la BDD avec leurs catégories
@@ -48,7 +48,7 @@
   ?>
   <div class="app">
     <?php
-    include __DIR__ . '/../../partials/aside.html';
+    include __DIR__ . '../../partials/aside.html';
     ?>
     
     <!-- Main Content -->
