@@ -55,3 +55,6 @@ Ce répertoire contient les fichiers web de votre application.
 ```bash
 git pull
 ```
+
+
+cat docker-compose.yml 
