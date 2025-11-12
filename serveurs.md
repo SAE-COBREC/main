@@ -28,6 +28,11 @@ Lorsque demandé, entrez vos identifiants :
 - Login : `sae301_a11`
 - Mot de passe : `rneks5otPb(l`
 
+### Démarrer les conteneurs Docker
+
+```bash
+docker compose start
+```
 
 ### Vérifier les variables d'environnement
 
@@ -35,10 +40,8 @@ Lorsque demandé, entrez vos identifiants :
 env
 ```
 
-### Démarrer les conteneurs Docker
-
 ```bash
-docker compose start
+wget http://www.google.com
 ```
 
 ## Mise à jour du code
@@ -58,4 +61,4 @@ git pull
 ```
 
 
-cat docker-compose.yml 
+### cat docker-compose.yml 
