@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="/html/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
 <body>
-  <?php 
+  <?php
+    session_start();
     include '../../../../../config.php';
 
     // ID du vendeur connecté (à adapter dynamiquement via la session)
-    $vendeur_id = 2;
+    $vendeur_id = $_SESSION['id'];
 
     try {
     // Récupération des produits depuis la BDD avec leurs catégories
