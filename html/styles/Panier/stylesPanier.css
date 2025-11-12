@@ -96,6 +96,16 @@ button {
   max-height: 33px;
   margin-top: auto;
 }
+.unArticleP .basArticleP img {
+  border-radius: 0px;
+  width: 70%;
+  height: 70%;
+}
+.unArticleP .basArticleP .quantite {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
 .unArticleP .basArticleP p {
   color: #7171A3;
   font-weight: bold;
@@ -163,7 +173,10 @@ button {
   display: block;
   margin: 0 auto 1em auto;
 }
-@media screen and (max-width: 768px) {
+#panierVide img {
+  width: 75%;
+}
+@media screen and (max-width: 428px) {
   #panierVide {
     width: 75%;
   }
@@ -182,7 +195,7 @@ button {
   padding: 1em;
   margin: 1em auto;
 }
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 428px) {
   #retourAchat {
     margin: 3em auto;
   }

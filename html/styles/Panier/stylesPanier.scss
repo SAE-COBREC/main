@@ -96,6 +96,18 @@ button {
     max-height: 33px;
     margin-top: auto;
 
+    img {
+      border-radius: 0px;
+      width: 70%;
+      height: 70%;
+    }
+
+    .quantite {
+      display: flex;
+      align-items: center;
+      gap: 0.8em;
+    }
+
     p {
       color: $primary-color-bleu;
       font-weight: bold;
@@ -170,7 +182,11 @@ button {
   display: block;
   margin: 0 auto 1em auto;
 
-  @media screen and (max-width: 768px) {
+  img {
+    width: 75%;
+  }
+
+  @media screen and (max-width: 428px) {
     width: 75%;
   }
 }
@@ -187,7 +203,7 @@ button {
   padding: 1em;
   margin: 1em auto;
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 428px) {
     margin: 3em auto;
   }
 }
