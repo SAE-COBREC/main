@@ -1,6 +1,9 @@
 // Variables
 @use "../variable" as *;
 
+*{
+  font-family: $font-family-secondaire;
+}
 // Sidebar
 .sidebar {
   background: linear-gradient(180deg, $secondary-color-marron 0%, $primary-color-bronze 100%);
@@ -9,6 +12,7 @@
   flex-direction: column;
   gap:18px;
   width: 240px;
+  max-width: 240px;
 }
 
 // Logo
