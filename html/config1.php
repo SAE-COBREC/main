@@ -1,8 +1,9 @@
 <?php
-$serveur = '10.253.5.101';
+// Configuration PostgreSQL (alignée avec l'environnement local demandé)
+$serveur = 'localhost';
 $driver = 'pgsql';
-$dbname = 'saedb';
-$user = 'sae';
-$pass = 'kira13';
+$dbname = 'sae_db';
+$user = 'saeuser';
+$pass = 'SaE_pass_123';
 $port = 5432;
 ?>
