@@ -4,10 +4,12 @@ include '../../../config.php';
 $id_panier = 8;
 $pdo->exec("SET search_path TO cobrec1");
 
-$requetePanier = "SELECT p_nom, p_description, p_prix
-            FROM _contient
-            JOIN _produit ON _produit.id_produit = _contient.id_produit
-            WHERE id_panier = ". $id_panier . ";"; //gestion de la requête en fonction du login à terminer
+$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien
+                FROM _contient
+                JOIN _produit ON _produit.id_produit = _contient.id_produit
+                JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
+                JOIN _image ON _represente_produit.id_image = _image.id_image
+                WHERE id_panier = ". $id_panier . ";"; //gestion de la requête en fonction du login à terminer
 
 $stmt = $pdo->query($requetePanier);
 
@@ -40,7 +42,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 <?php foreach ($articles as $article): ?> 
                     <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>">
                         <div class="imageArticleP">
-                            <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400" 
+                            <img src="<?php echo htmlspecialchars($article['i_lien']) ?>"
                                 alt="<?php echo htmlspecialchars($article['p_nom']) ?>" 
                                 title="<?php echo htmlspecialchars($article['p_nom'])?>">
                         </div>
@@ -48,8 +50,16 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                             <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
                             <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
                             <div class="basArticleP">
-                                <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?></p>
+                                <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
                                 <div class="quantite">
+
+                                    <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
+                                    <form method="POST" action="/pages/panier/supprimerArticle.php">
+                                        <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
+                                        <input type="hidden" name="id_panier" value="<?php echo $id_panier; ?>"> <!--stock l'id du panier pour la suppression-->
+                                        <!--bouton pour envoyer le formulaire-->
+                                        <button type="submit" class="supprimerArticle"><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
+                                    </form>
                                     <button class="btn_moins">-</button>
                                     <input type="text" class="quantite_input_entre" value="1">
                                     <button class="btn_plus">+</button>
@@ -151,7 +161,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 let value = event.target.value.replace(/[^0-9]/g, '');
                 
                 //convertit en nombre
-                value = parseInt(value) || 0;
+                value = parseInt(value) || 1;
                 
                 event.target.value = value; //met a jour la valeur de l'input
                 updateRecap(); //appele la fonction update récap
