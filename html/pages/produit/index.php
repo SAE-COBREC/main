@@ -94,11 +94,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 echo json_encode(['success' => false, 'message' => 'Paramètres de vote invalides']);
                 exit;
             }
+            // Si on reclique sur le même bouton: on retire le vote
             if ($prev === $value) {
-                $stmt = $pdo->prepare('SELECT a_pouce_bleu, a_pouce_rouge FROM _avis WHERE id_avis = :id AND id_produit = :pid');
+                if ($value === 'plus') {
+                    $sql = 'UPDATE _avis SET a_pouce_bleu = GREATEST(a_pouce_bleu - 1, 0) WHERE id_avis = :id AND id_produit = :pid RETURNING a_pouce_bleu, a_pouce_rouge';
+                } else {
+                    $sql = 'UPDATE _avis SET a_pouce_rouge = GREATEST(a_pouce_rouge - 1, 0) WHERE id_avis = :id AND id_produit = :pid RETURNING a_pouce_bleu, a_pouce_rouge';
+                }
+                $stmt = $pdo->prepare($sql);
                 $stmt->execute([':id' => $id_avis, ':pid' => $id_produit_post]);
                 $counts = $stmt->fetch(PDO::FETCH_ASSOC);
-                echo json_encode(['success' => true, 'message' => 'Aucun changement', 'counts' => $counts]);
+                echo json_encode(['success' => true, 'message' => 'Vote retiré', 'counts' => $counts]);
                 exit;
             }
             if ($prev === 'plus' && $value === 'minus') {
@@ -588,7 +594,6 @@ if ($pageError) {
                 if (!avisId) return;
                 const newVal = t.getAttribute('data-type'); // 'plus' | 'minus'
                 const current = getStoredVote(productId, avisId); // '' | 'plus' | 'minus'
-                if (current === newVal) return; // pas de changement
 
                 // Pré-maj UI optimiste
                 const likeSpan = reviewEl.querySelector('.like-count');
@@ -598,7 +603,11 @@ if ($pageError) {
 
                 let newLike = likeN, newDislike = dislikeN;
                 if (!current) {
+                    // premier vote
                     if (newVal === 'plus') newLike = likeN + 1; else newDislike = dislikeN + 1;
+                } else if (current === newVal) {
+                    // on retire le vote
+                    if (newVal === 'plus') newLike = Math.max(0, likeN - 1); else newDislike = Math.max(0, dislikeN - 1);
                 } else if (current === 'plus' && newVal === 'minus') {
                     newLike = Math.max(0, likeN - 1); newDislike = dislikeN + 1;
                 } else if (current === 'minus' && newVal === 'plus') {
@@ -608,7 +617,12 @@ if ($pageError) {
                 if (dislikeSpan) dislikeSpan.textContent = newDislike;
 
                 const buttons = reviewEl.querySelectorAll('.btn-vote');
-                buttons.forEach(b => b.setAttribute('aria-pressed', b === t ? 'true' : 'false'));
+                if (current === newVal) {
+                    // unvote: aucune sélection active
+                    buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
+                } else {
+                    buttons.forEach(b => b.setAttribute('aria-pressed', b === t ? 'true' : 'false'));
+                }
 
                 t.disabled = true;
                 postVote(productId, avisId, newVal, current)
@@ -616,7 +630,12 @@ if ($pageError) {
                         if (data && data.success && data.counts) {
                             if (likeSpan) likeSpan.textContent = data.counts.a_pouce_bleu;
                             if (dislikeSpan) dislikeSpan.textContent = data.counts.a_pouce_rouge;
-                            setStoredVote(productId, avisId, newVal);
+                            // Persister l'état local en fonction du type d'action
+                            if (current === newVal) {
+                                setStoredVote(productId, avisId, '');
+                            } else {
+                                setStoredVote(productId, avisId, newVal);
+                            }
                         } else {
                             // revert
                             if (likeSpan) likeSpan.textContent = likeN;
