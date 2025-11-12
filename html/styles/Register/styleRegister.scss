@@ -417,3 +417,19 @@ body {
     }
   }
 }
+.footer{
+  width: 60%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  > p{
+    size: 20px;
+  }
+}
+
+.debutant {
+  
+  > strong {
+    color: orange;
+  }
+}
