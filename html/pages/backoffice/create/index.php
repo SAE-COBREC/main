@@ -56,6 +56,7 @@ if ($_POST !== []) {
     //print_r("\n");
 
     function decalage($aDecaler){
+        unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
         if ($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler] === null){
             //L'image $aDecaler n'existe pas. Décalage interrompu. Suppression de l'image $aDecaler-1.
             unset($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
@@ -73,6 +74,7 @@ if ($_POST !== []) {
     }
 
     function supprDeDef(){
+        unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
         unset($_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
         unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][NB_IMGS_MAX-1]);
     }
@@ -131,8 +133,8 @@ if ($_POST !== []) {
     }
     
     
-    print_r($_SESSION["creerArticle"]);
-    print_r($_FILES);
+    // print_r($_SESSION["creerArticle"]);
+    // print_r($_FILES);
 
 } else {//Initialisation des tablaux pour éviter problèmes de comparaison avec des valeurs nulls
     $_FILES["photo"]["name"] = [];
@@ -152,15 +154,16 @@ if ($_POST !== []) {
         <h2>Produit non enregistré</h2>
         <form action="index.php" method="post" enctype="multipart/form-data">
             <!-- Boutons de soumission principaux -->
-            <input type="button" value="Annuler" />
-            <input type="submit" name="sauvegarder" value="Sauvegarder" />
-            <input type="submit" name="publier" value="Publier" />
+            <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
+            <input type="submit" name="sauvegarder" title="Un article sauvegardé est inscrit dans la base de données mais n'est visible que par vous." value="Sauvegarder" />
+            <input type="submit" name="publier"title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier" />
             <div>
                 <section>
                     <h3>Ajouter un produit</h3>
                     <article>
                         <!-- Texte avec label -->
                         <label for="titre">Titre</label>
+                        <br>
                         <input style="<?php if (($_POST["titre"] === 'Déjà pris') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; ?>"
                             maxlength="100"
                             pattern="[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
@@ -220,7 +223,7 @@ if ($_POST !== []) {
                                 <!-- affichage -->
                                 <img src="temp_/<?php echo $value ?>" height="25">
                                 <?php echo $value; ?>
-                                <input type="submit" name="btn_moins<?php echo $key?>" value="-" />
+                                <input type="submit" name="btn_moins<?php echo $key?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
                             <?php
                         }
@@ -331,12 +334,9 @@ if ($_POST !== []) {
             btnPrincipaux[0].addEventListener('click', () => {//si clicl sur Annuler
                 // const element = document.getElementById(".small_moins0");
                 // element.innerHTML = "";
-                if (confirm("Êtes-vous certain de voulair annuler ? Ce que vous n'avez pas sauvegardé sera perdu.")) {
-                    console.log("You pressed OK!");
+                if (confirm("Êtes-vous certain de voulair annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
                     document.location.href="http://localhost:8888/html/pages/backoffice/index.php"; 
-                } else {
-                    console.log("You pressed Cancel!");
-                } 
+                }
             });
 
             function sauvegarder(){//si clic sur sauvegarder et pas de warnings
@@ -351,7 +351,7 @@ if ($_POST !== []) {
         </script>
             <pre>
                 <?php 
-                    print_r($_SESSION["creerArticle"]["warn"]); 
+                    //print_r($_SESSION["creerArticle"]["warn"]); 
                     if (($_SESSION["creerArticle"]["warn"]=== 0) && ($_POST !== []) && (($_POST["sauvegarder"] == "Sauvegarder")) || ($_POST["publier"] == "Publier")){
                         // print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
                         // print_r("OK");
@@ -359,7 +359,7 @@ if ($_POST !== []) {
                             mkdir('temp_banque_images/' . $_POST["titre"]);
                             rename('temp_/' . $value, 'temp_banque_images/' . $_POST["titre"] . '/' . $value );
                         }
-                        print_r("  FIN");
+                        //print_r("  FIN");
 
                         // $stmt = $dbh -> prepare (
                         //     " INSERT INTO REGISTRY ( name , value )

@@ -376,4 +376,17 @@ body.centered {
   .card .inline-flex > .next-btn + .next-btn {
     margin-left: 12px;
   }
+}
+.footer {
+  width: 60%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+.footer > p {
+  size: 20px;
+}
+
+.debutant > strong {
+  color: orange;
 }/*# sourceMappingURL=styleRegister.css.map */

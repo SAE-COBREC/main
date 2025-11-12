@@ -151,7 +151,6 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
   background: #FFFFFF;
   padding: 16px;
   border-radius: 10px;
-  border: 1px solid #EFEFEF;
   margin-bottom: 12px;
 }
 .reviews .stars img {
