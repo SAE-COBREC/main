@@ -388,7 +388,25 @@ $categories_affichage = preparercategories_affichage($categories);
 
         //fonction pour simuler l'ajout au panier
         function ajouterAuPanier(idProduit) {
-            alert('Produit ' + idProduit + ' ajouté au panier !');
+            fetch('pages/panier/ajouterAuPanier.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'id_produit=' + idProduit
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message); 
+                } else {
+                    alert('Erreur : ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Erreur lors de l\'ajout au panier');
+                console.error('Erreur:', error);
+            });
         }
 
         //fonction pour réinitialiser tous les filtres
