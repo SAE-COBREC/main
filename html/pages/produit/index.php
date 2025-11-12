@@ -81,10 +81,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
     try {
         if ($action === 'add_avis') {
             $commentaire_post = isset($_POST['commentaire']) ? trim($_POST['commentaire']) : '';
-            $stmt = $pdo->prepare('INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES (:id_produit, :texte, 0, 0, NOW()) RETURNING id_avis, a_timestamp_creation');
-            $stmt->execute([':id_produit' => $id_produit_post, ':texte' => $commentaire_post]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            echo json_encode(['success' => true, 'message' => 'Avis enregistré', 'id_avis' => $row['id_avis'], 'created_at' => $row['a_timestamp_creation']]);
+            $note_post = isset($_POST['note']) ? (float) $_POST['note'] : 0.0;
+            // Validation basique de la note (intervalle et pas de 0.5)
+            $validSteps = [0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0];
+            if (!in_array($note_post, $validSteps, true)) { $note_post = 0.0; }
+            // Tenter insertion avec a_note si la colonne existe, sinon fallback
+            $row = null;
+            try {
+                // S'assurer que la colonne a_note existe (idempotent)
+                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_note numeric(2,1)');
+                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note) VALUES (:id_produit, :texte, 0, 0, NOW(), :note) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
+                $stmt->execute([':id_produit' => $id_produit_post, ':texte' => $commentaire_post, ':note' => $note_post]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            } catch (PDOException $ex) {
+                // Colonne a_note absente: réessayer sans la note
+                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES (:id_produit, :texte, 0, 0, NOW()) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt");
+                $stmt->execute([':id_produit' => $id_produit_post, ':texte' => $commentaire_post]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $row['a_note'] = 0.0; // Fallback
+            }
+            echo json_encode([
+                'success' => true,
+                'message' => 'Avis enregistré',
+                'id_avis' => $row['id_avis'],
+                'created_at' => $row['a_timestamp_creation'],
+                'created_at_fmt' => isset($row['created_at_fmt']) ? $row['created_at_fmt'] : null,
+                'note' => isset($row['a_note']) ? (float)$row['a_note'] : $note_post
+            ]);
             exit;
         } elseif ($action === 'vote') {
             $id_avis = isset($_POST['id_avis']) ? (int) $_POST['id_avis'] : 0;
@@ -121,6 +144,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
             $counts = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode(['success' => true, 'message' => 'Vote pris en compte', 'counts' => $counts]);
             exit;
+        } elseif ($action === 'edit_avis') {
+            $id_avis = isset($_POST['id_avis']) ? (int) $_POST['id_avis'] : 0;
+            $commentaire_post = isset($_POST['commentaire']) ? trim($_POST['commentaire']) : '';
+            if ($id_avis <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Avis invalide']);
+                exit;
+            }
+            $stmt = $pdo->prepare("UPDATE _avis SET a_texte = :texte, a_timestamp_modification = NOW() WHERE id_avis = :id AND id_produit = :pid RETURNING TO_CHAR(a_timestamp_modification,'YYYY-MM-DD HH24:MI') AS updated_at_fmt");
+            $stmt->execute([':texte' => $commentaire_post, ':id' => $id_avis, ':pid' => $id_produit_post]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'message' => 'Avis modifié', 'updated_at_fmt' => $row ? $row['updated_at_fmt'] : null]);
+            exit;
+        } elseif ($action === 'delete_avis') {
+            $id_avis = isset($_POST['id_avis']) ? (int) $_POST['id_avis'] : 0;
+            if ($id_avis <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Avis invalide']);
+                exit;
+            }
+            $stmt = $pdo->prepare('DELETE FROM _avis WHERE id_avis = :id AND id_produit = :pid RETURNING :id AS deleted_id');
+            $stmt->execute([':id' => $id_avis, ':pid' => $id_produit_post]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row && (int)$row['deleted_id'] === $id_avis) {
+                echo json_encode(['success' => true, 'message' => 'Avis supprimé']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Suppression non effectuée']);
+            }
+            exit;
         }
         echo json_encode(['success' => false, 'message' => 'Action inconnue']);
         exit;
@@ -139,20 +189,21 @@ try {
 $avisTextes = [];
 try {
     // Récupère les avis et, si existantes, les notes liées (moyenne par avis)
-    $stmtAvis = $pdo->prepare('
-        SELECT 
-            a.id_avis,
-            a.a_texte,
-            a.a_timestamp_creation,
-            a.a_pouce_bleu,
-            a.a_pouce_rouge,
-            ROUND(COALESCE(AVG(c.a_note), 0)::numeric, 1) AS avis_note
-        FROM _avis a
-        LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
-        WHERE a.id_produit = :pid
-        GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge
-        ORDER BY a.a_timestamp_creation DESC
-    ');
+            $stmtAvis = $pdo->prepare("
+                SELECT 
+                    a.id_avis,
+                    a.a_texte,
+                    a.a_timestamp_creation,
+                    TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt,
+                    a.a_pouce_bleu,
+                    a.a_pouce_rouge,
+                    COALESCE(ROUND(AVG(c.a_note)::numeric, 1), a.a_note, 0) AS avis_note
+                FROM _avis a
+                LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
+                WHERE a.id_produit = :pid
+                GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge, a.a_note
+                ORDER BY a.a_timestamp_creation DESC
+            ");
     $stmtAvis->execute([':pid' => $idProduit]);
     $avisTextes = $stmtAvis->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
@@ -384,25 +435,23 @@ if ($pageError) {
                                 <div>
                                     <div style="font-weight:700">Utilisateur</div>
                                     <div style="color:var(--muted);font-size:13px">Avis</div>
-                                    <?php if ($avisNote > 0): ?>
-                                        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-                                            <span class="stars" aria-hidden="true">
-                                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                    <?php if ($i <= $avisNoteEntiere): ?>
-                                                        <img src="/img/svg/star-full.svg" alt="Etoile" width="16">
-                                                    <?php else: ?>
-                                                        <img src="/img/svg/star-empty.svg" alt="Etoile" width="16">
-                                                    <?php endif; ?>
-                                                <?php endfor; ?>
-                                            </span>
-                                            <span style="color:var(--muted);font-weight:600;">
-                                                <?= number_format($avisNote, 1) ?>
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
+                                    <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                                        <span class="stars" aria-hidden="true">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <?php if ($i <= $avisNoteEntiere): ?>
+                                                    <img src="/img/svg/star-full.svg" alt="Etoile" width="16">
+                                                <?php else: ?>
+                                                    <img src="/img/svg/star-empty.svg" alt="Etoile" width="16">
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
+                                        </span>
+                                        <span style="color:var(--muted);font-weight:600;">
+                                            <?= number_format($avisNote, 1) ?>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
+                            <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
                             <div class="review-votes" style="display:flex;align-items:center;gap:10px;margin-top:8px">
                                 <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus">
                                     <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span
@@ -413,7 +462,9 @@ if ($pageError) {
                                         class="dislike-count"><?= (int) $ta['a_pouce_rouge'] ?></span>
                                 </button>
                                 <span
-                                    style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_creation']) ?></span>
+                                    style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? $ta['a_timestamp_creation']) ?></span>
+                                <button class="ghost btn-edit-review" style="margin-left:8px;font-size:12px;padding:4px 8px;">Modifier</button>
+                                <button class="ghost btn-delete-review" style="margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;">Supprimer</button>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -479,11 +530,12 @@ if ($pageError) {
                 .replace(/'/g, '&#39;');
         }
 
-        function postAvis(productId, commentaire) {
+        function postAvis(productId, commentaire, note) {
             const form = new URLSearchParams();
             form.append('id_produit', productId);
             form.append('action', 'add_avis');
             form.append('commentaire', commentaire);
+            form.append('note', String(note || 0));
             return fetch('index.php?id=' + encodeURIComponent(productId), {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
@@ -502,6 +554,27 @@ if ($pageError) {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: form
+            }).then(r => r.json());
+        }
+
+        function postEditAvis(productId, avisId, nouveauTexte) {
+            const form = new URLSearchParams();
+            form.append('id_produit', productId);
+            form.append('id_avis', avisId);
+            form.append('action', 'edit_avis');
+            form.append('commentaire', nouveauTexte);
+            return fetch('index.php?id=' + encodeURIComponent(productId), {
+                method: 'POST', headers: { 'Accept': 'application/json' }, body: form
+            }).then(r => r.json());
+        }
+
+        function postDeleteAvis(productId, avisId) {
+            const form = new URLSearchParams();
+            form.append('id_produit', productId);
+            form.append('id_avis', avisId);
+            form.append('action', 'delete_avis');
+            return fetch('index.php?id=' + encodeURIComponent(productId), {
+                method: 'POST', headers: { 'Accept': 'application/json' }, body: form
             }).then(r => r.json());
         }
 
@@ -549,17 +622,21 @@ if ($pageError) {
         if (inlineSubmit && inlineComment && listeAvis) {
             inlineSubmit.addEventListener('click', () => {
                 const commentaire = (inlineComment.value || '').trim();
+                const selectedNote = parseFloat(inlineNote.value || '0') || 0;
                 if (!commentaire) { alert('Veuillez saisir un commentaire.'); return; }
                 inlineSubmit.disabled = true;
-                postAvis(productId, commentaire)
+                postAvis(productId, commentaire, selectedNote)
                     .then(data => {
                         if (!data || !data.success) {
                             alert((data && data.message) || 'Erreur');
                             return;
                         }
                         const safeComment = escapeHtml(commentaire);
-                        const when = data.created_at || new Date().toISOString();
-                        const newHtml = `<div class=\"review\" data-avis-id=\"${data.id_avis}\" style=\"margin-bottom:12px;\">\n                            <div style=\"display:flex;align-items:center;gap:12px;margin-bottom:8px\">\n                                <div style=\"width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)\">U</div>\n                                <div>\n                                    <div style=\"font-weight:700\">Utilisateur</div>\n                                    <div style=\"color:var(--muted);font-size:13px\">Avis</div>\n                                </div>\n                            </div>\n                            <div style=\"color:var(--muted)\">${safeComment}</div>\n                            <div class=\"review-votes\" style=\"display:flex;align-items:center;gap:10px;margin-top:8px\">\n                                <button class=\"ghost btn-vote\" data-type=\"plus\" aria-label=\"Vote plus\" aria-pressed=\"false\"><img src=\"/img/svg/plus.svg\" alt=\"Plus\" width=\"16\" height=\"16\"> <span class=\"like-count\">0</span></button>\n                                <button class=\"ghost btn-vote\" data-type=\"minus\" aria-label=\"Vote moins\" aria-pressed=\"false\"><img src=\"/img/svg/minus.svg\" alt=\"Moins\" width=\"16\" height=\"16\"> <span class=\"dislike-count\">0</span></button>\n                                <span style=\"font-size:12px;color:#888;margin-left:auto;\">${when}</span>\n                            </div>\n                        </div>`;
+                        const when = data.created_at_fmt || data.created_at || new Date().toISOString();
+                        const note = typeof data.note !== 'undefined' ? (parseFloat(data.note) || 0) : selectedNote;
+                        const fullCount = Math.floor(note);
+                        const starImgs = Array.from({length:5}).map((_,i)=> i < fullCount ? '<img src=\"/img/svg/star-full.svg\" alt=\"Etoile\" width=\"16\">' : '<img src=\"/img/svg/star-empty.svg\" alt=\"Etoile\" width=\"16\">').join('');
+                        const newHtml = `<div class=\"review\" data-avis-id=\"${data.id_avis}\" style=\"margin-bottom:12px;\">\n                            <div style=\"display:flex;align-items:center;gap:12px;margin-bottom:8px\">\n                                <div style=\"width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)\">U</div>\n                                <div>\n                                    <div style=\"font-weight:700\">Utilisateur</div>\n                                    <div style=\"color:var(--muted);font-size:13px\">Avis</div>\n                                    <div style=\"display:flex;align-items:center;gap:6px;margin-top:4px\">\n                                        <span class=\"stars\" aria-hidden=\"true\">${starImgs}</span>\n                                        <span style=\"color:var(--muted);font-weight:600;\">${note.toFixed(1)}</span>\n                                    </div>\n                                </div>\n                            </div>\n                            <div class=\"review-content\" style=\"color:var(--muted)\">${safeComment}</div>\n                            <div class=\"review-votes\" style=\"display:flex;align-items:center;gap:10px;margin-top:8px\">\n                                <button class=\"ghost btn-vote\" data-type=\"plus\" aria-label=\"Vote plus\" aria-pressed=\"false\"><img src=\"/img/svg/plus.svg\" alt=\"Plus\" width=\"16\" height=\"16\"> <span class=\"like-count\">0</span></button>\n                                <button class=\"ghost btn-vote\" data-type=\"minus\" aria-label=\"Vote moins\" aria-pressed=\"false\"><img src=\"/img/svg/minus.svg\" alt=\"Moins\" width=\"16\" height=\"16\"> <span class=\"dislike-count\">0</span></button>\n                                <span style=\"font-size:12px;color:#888;margin-left:auto;\">${when}</span>\n                                <button class=\"ghost btn-edit-review\" style=\"margin-left:8px;font-size:12px;padding:4px 8px;\">Modifier</button>\n                                <button class=\"ghost btn-delete-review\" style=\"margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;\">Supprimer</button>\n                            </div>\n                        </div>`;
 
                         // Si liste vide (paragraphe "Aucun avis"), remplacer; sinon prepend
                         const first = listeAvis.firstElementChild;
@@ -569,7 +646,7 @@ if ($pageError) {
                             listeAvis.insertAdjacentHTML('afterbegin', newHtml);
                         }
                         inlineComment.value = '';
-                        // reset visuel note (non soumise côté serveur)
+                        // reset visuel note
                         if (inlineNote) inlineNote.value = '0';
                         const starContainer = document.getElementById('inlineStarInput');
                         if (starContainer) starContainer.dispatchEvent(new Event('mouseleave'));
@@ -652,6 +729,88 @@ if ($pageError) {
                         alert('Erreur réseau');
                     })
                     .finally(() => { t.disabled = false; });
+            });
+            // Edition
+            listeAvis.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.btn-edit-review');
+                if (!editBtn) return;
+                const reviewEl = editBtn.closest('.review');
+                if (!reviewEl) return;
+                const avisId = parseInt(reviewEl.getAttribute('data-avis-id'), 10) || 0;
+                if (!avisId) return;
+                const contentEl = reviewEl.querySelector('.review-content');
+                if (!contentEl) return;
+                const original = contentEl.textContent.trim();
+                // Empêcher édition multiple
+                if (reviewEl.querySelector('textarea')) return;
+                const ta = document.createElement('textarea');
+                ta.value = original;
+                ta.style.width = '100%';
+                ta.style.minHeight = '90px';
+                ta.style.padding = '10px 12px';
+                ta.style.border = '1px solid var(--secondary-color-gris-clair, #d0d4e2)';
+                ta.style.borderRadius = '8px';
+                contentEl.replaceWith(ta);
+                const actionsWrap = document.createElement('div');
+                actionsWrap.style.display = 'flex';
+                actionsWrap.style.gap = '8px';
+                actionsWrap.style.marginTop = '6px';
+                const btnSave = document.createElement('button');
+                btnSave.textContent = 'Enregistrer';
+                btnSave.className = 'btn';
+                const btnCancel = document.createElement('button');
+                btnCancel.textContent = 'Annuler';
+                btnCancel.className = 'ghost';
+                ta.after(actionsWrap);
+                actionsWrap.append(btnSave, btnCancel);
+
+                btnCancel.addEventListener('click', () => {
+                    actionsWrap.remove();
+                    ta.replaceWith(contentEl);
+                });
+                btnSave.addEventListener('click', () => {
+                    const nv = ta.value.trim();
+                    if (!nv) { alert('Le commentaire ne peut pas être vide'); return; }
+                    btnSave.disabled = true;
+                    postEditAvis(productId, avisId, nv)
+                        .then(data => {
+                            if (!data || !data.success) { alert((data && data.message) || 'Erreur'); return; }
+                            contentEl.textContent = nv;
+                            ta.replaceWith(contentEl);
+                            actionsWrap.remove();
+                            if (data.updated_at_fmt) {
+                                const timeSpan = reviewEl.querySelector('.review-votes span[style*="font-size:12px"]');
+                                if (timeSpan) timeSpan.textContent = data.updated_at_fmt + ' (modifié)';
+                            }
+                        })
+                        .catch(err => { console.error(err); alert('Erreur réseau'); })
+                        .finally(() => { btnSave.disabled = false; });
+                });
+            });
+            // Suppression
+            listeAvis.addEventListener('click', (e) => {
+                const delBtn = e.target.closest('.btn-delete-review');
+                if (!delBtn) return;
+                const reviewEl = delBtn.closest('.review');
+                if (!reviewEl) return;
+                const avisId = parseInt(reviewEl.getAttribute('data-avis-id'), 10) || 0;
+                if (!avisId) return;
+                if (!confirm('Supprimer cet avis ?')) return;
+                delBtn.disabled = true;
+                postDeleteAvis(productId, avisId)
+                    .then(data => {
+                        if (data && data.success) {
+                            reviewEl.remove();
+                            // Si plus aucun avis, afficher texte
+                            if (!listeAvis.querySelector('.review')) {
+                                listeAvis.innerHTML = '<p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>';
+                            }
+                        } else {
+                            alert((data && data.message) || 'Erreur suppression');
+                        }
+                    })
+                    .catch(err => { console.error(err); alert('Erreur réseau'); })
+                    .finally(() => { delBtn.disabled = false; });
             });
             // Initialiser l'état visuel des votes en fonction des votes déjà enregistrés (localStorage)
             const reviews = Array.from(listeAvis.querySelectorAll('.review[data-avis-id]'));
