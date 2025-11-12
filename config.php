@@ -12,12 +12,12 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
-    
+
     // Définir le schéma par défaut
     $pdo->exec("SET search_path TO $schema");
-    
+
     echo "✅ Connexion réussie à la base $dbname, schéma $schema !";
-    
+
 } catch (PDOException $e) {
     die("❌ Erreur de connexion : " . $e->getMessage());
 }
