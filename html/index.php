@@ -13,48 +13,48 @@ function chargerProduitsBDD($pdo)
     try {
         //requête SQL pour récupérer tous les produits avec leurs informations
         $sql = "
-            SELECT 
-                p.id_produit,
-                p.p_nom,
-                p.p_description,
-                p.p_prix,
-                p.p_stock,
-                p.p_note as note_moyenne,
-                p.p_nb_ventes,
-                p.p_statut,
-                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
-                COALESCE(avis.nombre_avis, 0) as nombre_avis,
-                (SELECT STRING_AGG(cp.nom_categorie, ', ') 
-                 FROM _fait_partie_de fpd 
-                 JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-                 WHERE fpd.id_produit = p.id_produit) as categories,
-                (SELECT i.i_lien 
-                 FROM _represente_produit rp 
-                 JOIN _image i ON rp.id_image = i.id_image
-                 WHERE rp.id_produit = p.id_produit 
-                 LIMIT 1) as image_url
-            FROM _produit p
-            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
-            LEFT JOIN (
-                SELECT id_produit, COUNT(*) as nombre_avis 
-                FROM _avis 
-                GROUP BY id_produit
-            ) avis ON p.id_produit = avis.id_produit
-        ";
+        SELECT 
+            p.id_produit,
+            p.p_nom,
+            p.p_description,
+            p.p_prix,
+            p.p_stock,
+            p.p_note as note_moyenne,
+            p.p_nb_ventes,
+            p.p_statut,
+            COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
+            COALESCE(avis.nombre_avis, 0) as nombre_avis,
+            (SELECT STRING_AGG(cp.nom_categorie, ', ') 
+                FROM _fait_partie_de fpd 
+                JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+                WHERE fpd.id_produit = p.id_produit) as categories,
+            (SELECT i.i_lien 
+                FROM _represente_produit rp 
+                JOIN _image i ON rp.id_image = i.id_image
+                WHERE rp.id_produit = p.id_produit 
+                LIMIT 1) as image_url
+        FROM _produit p
+        LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+        LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
+        LEFT JOIN (
+            SELECT id_produit, COUNT(*) as nombre_avis 
+            FROM _avis 
+            GROUP BY id_produit
+        ) avis ON p.id_produit = avis.id_produit
+    ";
 
         $stmt = $pdo->query($sql);
         $produits = $stmt->fetchAll(PDO::FETCH_ASSOC); //récupère tous les produits et les stocke dans une liste
 
         //requête pour compter les produits par catégorie
         $sqlCategories = "
-            SELECT cp.nom_categorie as category, 
-                   COUNT(DISTINCT p.id_produit) as count
-            FROM _produit p
-            JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
-            JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-            GROUP BY cp.nom_categorie
-        ";
+        SELECT cp.nom_categorie as category, 
+                COUNT(DISTINCT p.id_produit) as count
+        FROM _produit p
+        JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
+        JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+        GROUP BY cp.nom_categorie
+    ";
 
         $stmtCategories = $pdo->query($sqlCategories);
         $categoriesResult = $stmtCategories->fetchAll(PDO::FETCH_ASSOC);
@@ -76,11 +76,11 @@ function getPrixMaximum($pdo)
 {
     try {
         $sql = "SELECT MAX(p_prix) AS prix_maximum 
-                FROM _produit";
-        
+            FROM _produit";
+
         $stmt = $pdo->query($sql);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         //retourne le prix maximum arrondi au centaine supérieure, ou 3000 par défaut
         return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
     } catch (Exception $e) {
@@ -120,7 +120,7 @@ function filtrerProduits($produits, $filtres)
 
         $produits_filtres[] = $produit; //ajoute le produit s'il passe tous les filtres
     }
-    
+
     return $produits_filtres;
 }
 
@@ -270,8 +270,8 @@ $categories_affichage = preparercategories_affichage($categories);
                 <section>
                     <h4>Prix</h4>
                     <div>
-                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>" value="<?= $prixMaximum ?>"
-                            oninput="mettreAJourAffichagePrix(this.value)"
+                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>"
+                            value="<?= $prixMaximum ?>" oninput="mettreAJourAffichagePrix(this.value)"
                             onchange="document.getElementById('filterForm').submit()">
                     </div>
                     <div>

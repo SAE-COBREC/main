@@ -1,31 +1,18 @@
-su -
-cd /docker 
-docker compose start 
+Linux sae-01 6.1.0-39-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.148-1 (2025-08-26) x86_64
 
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
 
-sae@sae-01:/docker$ su -
-cd /docker 
-docker compose start 
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Wed Nov 12 11:57:59 2025 from 10.253.2.16
+sae@sae-01:~$ su -
 Mot de passe : 
-root@sae-01:~# cd /docker 
-docker compose start 
-root@sae-01:/docker# docker compose start 
-root@sae-01:/docker# cat .env
-EQUIPE=01
-PORT_WEB=80
-PORT_PHPMYADMIN=8080
-PORT_PGADMIN=8081
-
-DB_USER=sae
-DB_PASSWORD=kira13
-DB_NAME=saedb
-
-MARIADB_PORT=3306
-MARIADB_ROOT_PASSWORD=kira13
-
-PGDB_PORT=5432
-
-PGADMIN_PASSWORD=kira13
+root@sae-01:~# cd /docker
+root@sae-01:/docker# source proxy_mox
+Login : sae301_a11
+Mot de passe : 
 root@sae-01:/docker# env
 SHELL=/bin/bash
 no_proxy=localhost,10.253.5.0/24
@@ -33,109 +20,91 @@ PWD=/docker
 LOGNAME=root
 HOME=/root
 LANG=fr_FR.UTF-8
-https_proxy=http://sae:rneks5otPb%28l@10.254.0.254:3128
+https_proxy=http://sae301_a11:rneks5otPb(l@10.254.0.254:3128
 TERM=xterm-256color
 USER=root
 SHLVL=1
-HTTPS_PROXY=http://sae:rneks5otPb%28l@10.254.0.254:3128
-HTTP_PROXY=http://sae:rneks5otPb%28l@10.254.0.254:3128
-http_proxy=http://sae:rneks5otPb%28l@10.254.0.254:3128
+HTTPS_PROXY=http://sae301_a11:rneks5otPb(l@10.254.0.254:3128
+HTTP_PROXY=http://sae301_a11:rneks5otPb(l@10.254.0.254:3128
+http_proxy=http://sae301_a11:rneks5otPb(l@10.254.0.254:3128
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 MAIL=/var/mail/root
 OLDPWD=/root
 _=/usr/bin/env
-root@sae-01:/docker# 
+root@sae-01:/docker# ping 10.254.0.254
+PING 10.254.0.254 (10.254.0.254) 56(84) bytes of data.
+64 bytes from 10.254.0.254: icmp_seq=1 ttl=63 time=1.16 ms
+64 bytes from 10.254.0.254: icmp_seq=2 ttl=63 time=0.960 ms
+64 bytes from 10.254.0.254: icmp_seq=3 ttl=63 time=0.918 ms
+^C
+--- 10.254.0.254 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 0.918/1.011/1.155/0.103 ms
+root@sae-01:/docker# curl -I http://www.google.com
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=ISO-8859-1
+Content-Security-Policy-Report-Only: object-src 'none';base-uri 'self';script-src 'nonce-d-2MwMUyqFcUv7ESwrf5pg' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp
+Date: Wed, 12 Nov 2025 11:09:24 GMT
+Server: gws
+X-XSS-Protection: 0
+X-Frame-Options: SAMEORIGIN
+Expires: Wed, 12 Nov 2025 11:09:24 GMT
+Cache-Control: private
+Set-Cookie: AEC=AaJma5uBQHay1aBB97U0xN93ENtWA6SgTqFmLKtXFFEBBMfYEDSY1oqEePk; expires=Mon, 11-May-2026 11:09:24 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax
+X-Cache: MISS from stp.gtr
+X-Cache-Lookup: MISS from stp.gtr:3128
+Via: 1.1 stp.gtr (squid/5.7)
+Connection: keep-alive
 
+root@sae-01:/docker# wget http://www.google.com
+--2025-11-12 12:09:20--  http://www.google.com/
+Connexion à 10.254.0.254:3128… connecté.
+requête Proxy transmise, en attente de la réponse… 200 OK
+Taille : non indiqué [text/html]
+Sauvegarde en : « index.html »
 
-root@sae-01:/docker# cat docker-compose.yml 
-services:
-   mariadb:
-      container_name: mariadb
-      image: mariadb:11.0
-      volumes:
-         - ./data/mariadb:/var/lib/mysql
-      ports:
-         # - 127.0.0.1:${MARIADB_PORT}:3306
-         - 0.0.0.0:${MARIADB_PORT}:3306
-      environment:
-         MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-         MARIADB_USER: ${DB_USER}
-         MARIADB_PASSWORD: ${DB_PASSWORD}
-         MARIADB_DATABASE: ${DB_NAME}
-         #command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-      networks:
-         - sae
+index.html                   [ <=>                               ]  17,26K  --.-KB/s    ds 0,02s   
 
-   postgresdb:
-      container_name: postgresdb
-      image: postgres:16.0
-      volumes:
-         - ./data/postgres:/var/lib/postgresql/data
-      ports:
-         # - 127.0.0.1:${PGDB_PORT}:5432
-         - 0.0.0.0:${PGDB_PORT}:5432
-      environment:
-         POSTGRES_PASSWORD: ${DB_PASSWORD}
-         POSTGRES_USER: ${DB_USER}
-         POSTGRES_DB: ${DB_NAME}
-         PGDATA: /var/lib/postgresql/data/pgdata
-      networks:
-         - sae
+2025-11-12 12:09:21 (705 KB/s) - « index.html » sauvegardé [17677]
 
-   web:
-      container_name: web
-      build: .
-      ports:
-        - ${PORT_WEB}:80
-      volumes:
-         - ./data/web/html:/var/www/html
-         - ./data/web/logs:/var/www/logs
-      #environment:
-      #   VIRTUAL_HOST: ${EQUIPE}.ventsdouest.dev
-      #   LETSENCRYPT_HOST: ${EQUIPE}.ventsdouest.dev
-      #   LETSENCRYPT_EMAIL: gildas@bigpapoo.com
-      networks:
-         - sae
-      #   - webproxy_back
-      depends_on:
-         - mariadb
-         - postgresdb
-
-   phpmyadmin:
-      image: phpmyadmin
-      restart: always
-      ports:
-         - ${PORT_PHPMYADMIN}:80
-      environment:
-      #   VIRTUAL_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
-      #   LETSENCRYPT_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
-      #   LETSENCRYPT_EMAIL: gildas@bigpapoo.com
-         PMA_HOST: mariadb
-         PMA_PORT: 3306
-      networks:
-         - sae
-      #   - webproxy_back
-      depends_on:
-         - mariadb
-
-   pgadmin:
-      image: dpage/pgadmin4
-      restart: always
-      ports:
-         - ${PORT_PGADMIN}:80
-      environment:
-      #   VIRTUAL_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
-      #   LETSENCRYPT_HOST: dbadmin-${EQUIPE}.ventsdouest.dev
-      #   LETSENCRYPT_EMAIL: gildas@bigpapoo.com
-         PGADMIN_DEFAULT_EMAIL: ${EQUIPE}@dbadmin-sae.com
-         PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-         PGADMIN_DISABLE_POSTFIX: true
-      networks:
-         - sae
-      #   - webproxy_back
-      depends_on:
-         - postgresdb
-
-networks:
-   sae:
-   #webproxy_back:
+root@sae-01:/docker# cd /docker/data/web
+root@sae-01:/docker/data/web# git pull
+remote: Enumerating objects: 119, done.
+remote: Counting objects: 100% (114/114), done.
+remote: Compressing objects: 100% (50/50), done.
+remote: Total 119 (delta 65), reused 110 (delta 62), pack-reused 5 (from 1)
+Réception d'objets: 100% (119/119), 42.35 Kio | 1.18 Mio/s, fait.
+Résolution des deltas: 100% (65/65), complété avec 17 objets locaux.
+Depuis https://github.com/SAE-COBREC/main
+   5be0863..c83f87a  main       -> origin/main
+Mise à jour 5be0863..c83f87a
+Fast-forward
+ .gitignore                                      |   1 +
+ serveurs.sh => commande.txt                     |   2 -
+ config.php                                      |  20 +-
+ html/img/svg/minus.svg                          |   4 +
+ html/img/svg/plus.svg                           |   4 +
+ html/img/svg/poubelle.svg                       |   9 +
+ html/index.php                                  |   2 +-
+ html/js/registerPass.js                         |   2 +-
+ html/pages/creationClient/index.php             | 361 +++++++++++++++---------------
+ html/pages/panier/index.php                     | 228 ++++++++++---------
+ html/pages/panier/supprimerArticle.php          |  22 ++
+ html/pages/produit/index.php                    | 533 ++++++++++++++++++++++++++++++++++----------
+ html/pages/produit/not-found.php                |  81 +++++++
+ html/partials/header.html                       |   2 +-
+ html/styles/Aside/Aside.css                     |   5 +
+ html/styles/Aside/Aside.scss                    |   5 +
+ html/styles/Footer/stylesFooter.scss            |  11 +-
+ html/styles/ViewProduit/stylesView-Produit.css  | 196 ++++++++++++++++
+ html/styles/ViewProduit/stylesView-Produit.scss |  76 +++++++
+ serveurs.md                                     |  60 +++++
+ 20 files changed, 1200 insertions(+), 424 deletions(-)
+ rename serveurs.sh => commande.txt (99%)
+ create mode 100644 html/img/svg/minus.svg
+ create mode 100644 html/img/svg/plus.svg
+ create mode 100644 html/img/svg/poubelle.svg
+ create mode 100644 html/pages/panier/supprimerArticle.php
+ create mode 100644 html/pages/produit/not-found.php
+ create mode 100644 serveurs.md
+root@sae-01:/docker/data/web# 

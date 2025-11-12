@@ -26,7 +26,8 @@ source proxy_mox
 
 Lorsque demandé, entrez vos identifiants :
 - Login : `sae301_a11`
-- Mot de passe : `kira13`
+- Mot de passe : `rneks5otPb(l`
+
 
 ### Vérifier les variables d'environnement
 
