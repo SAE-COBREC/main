@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . '../../config.php';
+include __DIR__ . '/selectBDD.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 
