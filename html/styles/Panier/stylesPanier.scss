@@ -45,11 +45,16 @@ button {
 
 .unArticleP {
   border: 1px solid $primary-color-bleu;
-  max-width: 960px;
+  width: 960px;
   height: fit-content;
   display: flex;
   padding: 12px 10px;
   margin-bottom: 20px;
+
+  @media screen and (max-width: 428px) {
+    width: 374px;
+    padding: 12px 10px;
+  }
 
   .imageArticleP {
     width: 280px;
@@ -73,12 +78,15 @@ button {
 
     @media screen and (max-width: 428px) {
       flex-shrink: 0;
+      align-items: center;
     }
   }
 
   .articleDetailP {
-    max-width: 648px;
+    width: 100%;
     margin-left: 15px;
+    display: flex;
+    flex-direction: column;
   }
 
   .basArticleP {
@@ -86,6 +94,7 @@ button {
     align-items: center;
     justify-content: space-between;
     max-height: 33px;
+    margin-top: auto;
 
     p {
       color: $primary-color-bleu;

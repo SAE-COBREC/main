@@ -42,12 +42,18 @@ button {
 
 .unArticleP {
   border: 1px solid #7171A3;
-  max-width: 960px;
+  width: 960px;
   height: -moz-fit-content;
   height: fit-content;
   display: flex;
   padding: 12px 10px;
   margin-bottom: 20px;
+}
+@media screen and (max-width: 428px) {
+  .unArticleP {
+    width: 374px;
+    padding: 12px 10px;
+  }
 }
 .unArticleP .imageArticleP {
   width: 280px;
@@ -74,17 +80,21 @@ button {
 @media screen and (max-width: 428px) {
   .unArticleP img {
     flex-shrink: 0;
+    align-items: center;
   }
 }
 .unArticleP .articleDetailP {
-  max-width: 648px;
+  width: 100%;
   margin-left: 15px;
+  display: flex;
+  flex-direction: column;
 }
 .unArticleP .basArticleP {
   display: flex;
   align-items: center;
   justify-content: space-between;
   max-height: 33px;
+  margin-top: auto;
 }
 .unArticleP .basArticleP p {
   color: #7171A3;

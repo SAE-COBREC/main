@@ -251,6 +251,19 @@ article {
       font-weight: bold;
     }
 
+    .badge-reduction {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: $secondary-color-rouge;
+      color: $primary-color-blanc;
+      padding: 0.25rem 0.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      z-index: 1;
+    }
+
     .rupture-stock {
       @include centre-absolu;
       background-color: rgba($secondary-color-gris-clair, 0.9);

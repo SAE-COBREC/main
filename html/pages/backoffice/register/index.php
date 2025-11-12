@@ -79,6 +79,9 @@
       exit;
     }
   }
+  session_start();
+  $_SESSION['nom'] = $Rsociale;
+  $_SESSION['id']   = 3;
 ?>
 
 <style>

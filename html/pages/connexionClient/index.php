@@ -78,7 +78,7 @@
         <label for="Cmdp">Mot de passe</label>
         <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" value="" required>
       </div>
-
+      <div class="mdpOublie">Mot de passe oublié ?</div>
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 4): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
@@ -92,6 +92,8 @@
                  class="btn-arrow" aria-hidden="true">
             </button>
       </div>
+      <div class="step">Débutant sur Alison ? <strong> Démarrer -></strong></div>
+      <div class="step">Aide Confidentialité Conditions</div> 
     
       </form>
 

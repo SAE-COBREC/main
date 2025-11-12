@@ -198,6 +198,18 @@ article > div:first-child > span:last-child {
   font-size: 1rem;
   font-weight: bold;
 }
+article > div:first-child .badge-reduction {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #D4183D;
+  color: #FFFFFF;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  z-index: 1;
+}
 article > div:first-child .rupture-stock {
   position: absolute;
   top: 50%;
