@@ -5,6 +5,45 @@ $pageError = false;
 $fichierCSV = realpath(__DIR__ . '/mls.csv');
 $produit = null;
 
+// Recalcule la note moyenne d'un produit et met à jour _produit.p_note
+// Règle métier: priorité aux notes vérifiées (_commentaire.a_note), sinon
+// fallback sur les notes libres éventuellement stockées dans _avis.a_note.
+function recalcAndUpdateProductRating(PDO $pdo, int $productId): void {
+    try {
+        // Assurer le schéma sélectionné (config.php le fait déjà mais idempotent)
+        $pdo->exec("SET search_path TO cobrec1");
+
+        // 1) Moyenne sur achats vérifiés
+        $stmt = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt
+                               FROM _avis a
+                               LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
+                               WHERE a.id_produit = :pid AND c.a_note IS NOT NULL');
+        $stmt->execute([':pid' => $productId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $avg = 0.0;
+        if ($row && (int)$row['cnt'] > 0) {
+            $avg = round((float)$row['avg_note'], 1);
+        } else {
+            // 2) Fallback: moyenne des notes éventuellement posées sur _avis.a_note
+            $stmt2 = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
+            $stmt2->execute([':pid' => $productId]);
+            $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+            if ($row2 && $row2['avg_note'] !== null) {
+                $avg = round((float)$row2['avg_note'], 1);
+            } else {
+                $avg = 0.0;
+            }
+        }
+
+        // Mettre à jour la colonne de cache p_note (utilisée sur la page d'accueil)
+        $upd = $pdo->prepare('UPDATE _produit SET p_note = :avg WHERE id_produit = :pid');
+        $upd->execute([':avg' => $avg, ':pid' => $productId]);
+    } catch (Throwable $e) {
+        // Ne pas interrompre le flux si l'update échoue; simple log possible
+        // error_log('recalcAndUpdateProductRating failed: ' . $e->getMessage());
+    }
+}
+
 // Récupérer l'ID du produit depuis l'URL
 $idProduit = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
@@ -111,6 +150,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $row['a_note'] = 0.0; // Fallback
             }
+            // Recalcul et mise à jour de la note moyenne du produit
+            recalcAndUpdateProductRating($pdo, $id_produit_post);
+
             echo json_encode([
                 'success' => true,
                 'message' => 'Avis enregistré',
@@ -183,6 +225,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
             $stmt->execute([':id' => $id_avis, ':pid' => $id_produit_post, ':owner' => $ownerToken]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row && (int)$row['deleted_id'] === $id_avis) {
+                // Recalcul de la note moyenne après suppression
+                recalcAndUpdateProductRating($pdo, $id_produit_post);
                 echo json_encode(['success' => true, 'message' => 'Avis supprimé']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Non autorisé ou suppression non effectuée']);
@@ -653,6 +697,41 @@ if ($pageError) {
             }).then(r => r.json());
         }
 
+        function fetchRating(productId) {
+            const form = new URLSearchParams();
+            form.append('id_produit', productId);
+            form.append('action', 'get_rating');
+            return fetch('index.php?id=' + encodeURIComponent(productId), {
+                method: 'POST', headers: { 'Accept': 'application/json' }, body: form
+            }).then(r => r.json()).then(data => {
+                if (!data || !data.success) return;
+                const avg = parseFloat(data.avg) || 0;
+                const countAvis = parseInt(data.countAvis, 10) || 0;
+                // Mettre à jour les valeurs principales
+                const summaryValue = document.getElementById('summaryRatingValue');
+                const summaryCount = document.getElementById('summaryRatingCount');
+                const summaryStars = document.getElementById('summaryStars');
+                const reviewsValue = document.getElementById('reviewsRatingValue');
+                const reviewsCount = document.getElementById('reviewsRatingCount');
+                const reviewsStars = document.getElementById('reviewsStars');
+                if (summaryValue) summaryValue.textContent = avg.toFixed(1);
+                if (summaryCount) summaryCount.textContent = '(' + countAvis + ')';
+                if (reviewsValue) reviewsValue.textContent = avg.toFixed(1);
+                if (reviewsCount) reviewsCount.textContent = 'Basé sur ' + countAvis + ' avis';
+                const fullCount = Math.floor(avg);
+                function renderStars(target, fullSvg, emptySvg) {
+                    if (!target) return;
+                    let html = '';
+                    for (let i = 1; i <= 5; i++) {
+                        html += '<img src="' + (i <= fullCount ? fullSvg : emptySvg) + '" alt="Etoile" width="' + (target.id === 'summaryStars' ? '20' : '16') + '">';
+                    }
+                    target.innerHTML = html;
+                }
+                renderStars(summaryStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
+                renderStars(reviewsStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
+            }).catch(() => { /* silencieux */ });
+        }
+
         const productId = <?= (int) $idProduit ?>;
     const inlineSubmit = document.getElementById('inlineSubmit');
         const inlineNote = document.getElementById('inlineNote');
@@ -727,6 +806,8 @@ if ($pageError) {
                         const starContainer = document.getElementById('inlineStarInput');
                         if (starContainer) starContainer.dispatchEvent(new Event('mouseleave'));
                         alert(data.message || 'Avis envoyé');
+                        // Rafraîchir la note moyenne affichée
+                        fetchRating(productId);
                     })
                     .catch(err => { console.error(err); alert('Erreur réseau'); })
                     .finally(() => { inlineSubmit.disabled = false; });
@@ -881,6 +962,8 @@ if ($pageError) {
                             if (!listeAvis.querySelector('.review')) {
                                 listeAvis.innerHTML = '<p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>';
                             }
+                            // Mettre à jour la note moyenne et le compteur après suppression
+                            fetchRating(productId);
                         } else {
                             alert((data && data.message) || 'Erreur suppression');
                         }
