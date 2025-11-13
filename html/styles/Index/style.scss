@@ -1,6 +1,5 @@
 @use "../variable" as *;
 
-// Mixins
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -55,7 +54,6 @@ body {
   min-height: 100vh;
 }
 
-// Container principal
 .container {
   grid-column: 1 / -1;
   display: grid;
@@ -64,7 +62,6 @@ body {
   position: relative;
 }
 
-// Aside (filtres)
 aside {
   background: $primary-color-blanc;
   padding: 1.5rem;
@@ -156,7 +153,6 @@ aside {
     }
   }
 
-  // Style du slider (input range)
   input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -166,7 +162,6 @@ aside {
     background: $secondary-color-gris-clair;
     outline: none;
 
-    /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -177,7 +172,6 @@ aside {
       cursor: pointer;
     }
 
-    /* Curseur - Firefox */
     &::-moz-range-thumb {
       appearance: none;
       width: 18px;
@@ -188,7 +182,6 @@ aside {
       border: none;
     }
 
-    /* Barre - Firefox */
     &::-moz-range-track {
       background: $secondary-color-gris-clair;
       border-radius: 8px;
@@ -197,7 +190,6 @@ aside {
   }
 }
 
-// Main (produits)
 main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
@@ -217,7 +209,6 @@ main {
   }
 }
 
-// Articles produits
 article {
   background: $primary-color-blanc;
   border-radius: 12px;
@@ -362,7 +353,6 @@ article {
   }
 }
 
-// Footer
 footer {
   grid-column: 1 / -1;
   background: $primary-color-noir;
@@ -453,7 +443,21 @@ footer {
   }
 }
 
-// Responsive
+@media (min-width: 429px) and (max-width: 1440px) {
+  aside section > div span {
+    font-size: 1.5em;
+  }
+  
+  aside form > div:first-child span {
+    display: none;
+  } 
+  
+  aside form > div:first-child select {
+    font-size: 1.3em;
+    padding: 5px 10px;
+  }
+}
+
 @media (max-width: $breakpoint-tablette) {
   .container {
     grid-template-columns: 1fr;
@@ -541,6 +545,10 @@ footer {
     }
   }
 
+  aside section > div span {
+    font-size: 1.5em;
+  }
+
   aside:not(.open) form {
     display: none;
   }
@@ -559,7 +567,6 @@ footer {
     gap: 1rem;
   }
 
-  // Ajustement de la taille des articles
   article {
     > div:first-child {
       height: 150px;
@@ -583,7 +590,6 @@ footer {
     }
   }
 
-  // Footer responsive
   footer {
     padding: 2rem 1rem 1rem;
 
@@ -599,10 +605,7 @@ footer {
         > img {
           width: 45px;
         }
-
       }
-      
-      
     }
 
     nav {
@@ -639,4 +642,4 @@ footer {
       }
     }
   }
-} 
+}
