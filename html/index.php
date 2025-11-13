@@ -485,7 +485,7 @@ $id_panier = 8;
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('✓ ' + idProduit + data.message);
+                    alert('✓ ' + data.message);
                     //optionnel : mettre à jour le compteur du panier
                     //mettreAJourCompteurPanier();
                 } else {
