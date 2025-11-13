@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include __DIR__ . '../selectBDD.php';
+include __DIR__ . '/../../../../config.php';
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['client_id'])) {

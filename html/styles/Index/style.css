@@ -184,17 +184,6 @@ article > div:first-child img {
   -o-object-fit: cover;
      object-fit: cover;
 }
-article > div:first-child > span:last-child {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #D4183D;
-  color: #FFFFFF;
-  padding: 0.25rem 0.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: bold;
-}
 article > div:first-child .badge-reduction {
   position: absolute;
   top: 10px;
@@ -224,9 +213,6 @@ article > div:first-child .rupture-stock {
 article > div:first-child .image-rupture {
   filter: grayscale(100%) opacity(0.7);
   transition: filter 0.3s ease;
-}
-article > div:first-child .produit-rupture {
-  position: relative;
 }
 article > div:first-child .panier-icon {
   width: 16px;
@@ -396,15 +382,6 @@ footer > div > div:last-child span:hover {
     order: 1;
     padding: 1rem;
   }
-  header {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  header > div:nth-child(2) {
-    margin: 0;
-    width: 100%;
-  }
   footer > div > div:last-child {
     flex-direction: column;
     gap: 1rem;
@@ -455,15 +432,31 @@ footer > div > div:last-child span:hover {
   }
   aside form > div:first-child select {
     padding: 15px;
-  }
-  aside section > div > span {
-    font-size: 1.3em;
+    font-size: 1.5em;
   }
   aside:not(.open) form {
     display: none;
   }
   aside.open form {
     display: block;
+  }
+  select[name=sort] {
+    width: 100%;
+    text-align: center;
+    -moz-text-align-last: center;
+         text-align-last: center;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 10px;
+  }
+  aside section > div {
+    padding: 1em 0;
+  }
+  aside form > div:first-child span {
+    display: none;
+  }
+  aside span, aside h3, aside h4 {
+    font-size: 1.5em !important;
   }
   main {
     padding: 1rem;
@@ -513,22 +506,10 @@ footer > div > div:last-child span:hover {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  footer nav ul {
-    padding-left: 0;
-  }
-  footer nav li {
-    margin-bottom: 0.4rem;
-  }
-  footer nav a {
-    font-size: 0.9rem;
-  }
   footer > div > div:last-child {
     flex-direction: column;
     gap: 0.75rem;
     padding-top: 1.5rem;
     font-size: 0.8rem;
-  }
-  footer > div > div:last-child span {
-    text-align: center;
   }
 }/*# sourceMappingURL=style.css.map */

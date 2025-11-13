@@ -1,7 +1,7 @@
 <?php
-$session_start();
+session_start();
 
-include __DIR__ . '/selectBDD.php';
+include __DIR__ . '/../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 
