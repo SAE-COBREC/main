@@ -12,7 +12,7 @@
     include '../../selectBDD.php';
 
     // ID du vendeur connecté (à adapter dynamiquement via la session)
-    $vendeur_id = 2;
+    $vendeur_id = $_SESSION['id'];
 
     try {
     // Récupération des produits depuis la BDD avec leurs catégories
