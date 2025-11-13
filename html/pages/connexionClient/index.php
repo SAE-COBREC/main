@@ -2,7 +2,7 @@
 include '../../selectBDD.php';
 
 $pdo->exec("SET search_path TO cobrec1");
-
+session_start();
  ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -18,7 +18,6 @@ $pdo->exec("SET search_path TO cobrec1");
 </head>
 
 <?php
-  session_start();
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
