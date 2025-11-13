@@ -24,8 +24,8 @@
             p.p_stock,
             p.p_prix,
             i.i_lien AS image_url,
-            (SELECT STRING_AGG(cp.nom_categorie, ', ')
             c.nom_categorie AS categorie
+            (SELECT STRING_AGG(categorie, ', ')
         FROM cobrec1._produit p
         LEFT JOIN cobrec1._fait_partie_de fpd 
                ON p.id_produit = fpd.id_produit
@@ -37,6 +37,7 @@
                ON rp.id_image = i.id_image
         WHERE p.id_vendeur = :id_vendeur
         ORDER BY p.id_produit ASC
+        
     ";
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_vendeur' => $vendeur_id]);
