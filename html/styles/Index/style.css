@@ -523,7 +523,20 @@ footer > div > div:last-child span:hover {
 
 /* Media query pour les écrans entre 428px et 1440px */
 @media (min-width: 429px) and (max-width: 1440px) {
+    /* Catégories */
     aside section > div span {
         font-size: 1.5em;
     }
+    
+    /* Trier par - label */
+    aside form > div:first-child span {
+        font-size: 1.5em;
+    }
+    
+    /* Trier par - options du select (Meilleures ventes, etc.) */
+    aside form > div:first-child select {
+        font-size: 1.5em;
+        padding: 5px 10px;
+    }
 }
+
