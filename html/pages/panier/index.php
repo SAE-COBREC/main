@@ -4,7 +4,6 @@ include '../../selectBDD.php';
 session_start();
 
 $id_client = $_SESSION['id'];
-echo $id_client;
 $pdo->exec("SET search_path TO cobrec1");
 
 $requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
