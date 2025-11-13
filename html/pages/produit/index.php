@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Utiliser la configuration centrale PostgreSQL (comme la page d'accueil)
-include __DIR__ . '../../selectBDD.php';
+include __DIR__ . '../selectBDD.php';
 $pageError = false;
 $produit = null;
 
