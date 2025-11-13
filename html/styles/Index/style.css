@@ -528,15 +528,14 @@ footer > div > div:last-child span:hover {
         font-size: 1.5em;
     }
     
-    /* Trier par - label */
+    /* Masquer le texte "Trier par" */
     aside form > div:first-child span {
-        font-size: 1.5em;
+        display: none;
     }
     
-    /* Trier par - options du select (Meilleures ventes, etc.) */
+    /* Agrandir le select (Meilleures ventes, etc.) */
     aside form > div:first-child select {
         font-size: 1.5em;
         padding: 5px 10px;
     }
 }
-
