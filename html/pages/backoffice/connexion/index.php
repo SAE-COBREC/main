@@ -1,3 +1,9 @@
+<?php 
+include '../../../selectBDD.php';
+
+$pdo->exec("SET search_path TO cobrec1");
+session_start();
+ ?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -12,9 +18,6 @@
 </head>
 
 <?php
-  $interdit = "bleu";
-  $interditmail = "a@a.a";
-
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
@@ -22,35 +25,91 @@
     $hasError = false;
     $error_card = null;
     $error_message = '';
-
-    $interdit = "bleu";
-    $interditmail = "bleu@b";
     
-  if (strtolower($mdp) === strtolower($interdit) || strtolower($email) === strtolower($interditmail)) {
+    // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
+    try {
+      $stmt = $pdo->prepare("SELECT * FROM _compte WHERE email = :email LIMIT 1");
+      $stmt->execute([':email' => $email]);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      if (!$row) {
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Adresse mail ou mot de passe incorrecte.';
+      } else {
+        if (!array_key_exists('mdp', $row)) {
+          error_log('[connexion] error: mdp column not found in _compte row: ' . json_encode(array_keys($row)));
+          $hasError = true;
+          $error_card = 1;
+          $error_message = 'Erreur interne lors de la vérification des identifiants.';
+          $row = null;
+        }
+        $stored = $row['mdp'];
+        $passwordOk = false;
+        if (function_exists('password_verify')) {
+          $passwordOk = password_verify($mdp, $stored);
+        }
+        if (!$passwordOk && $stored === $mdp) {
+          $passwordOk = true;
+        }
+        if (!$passwordOk) {
+          $hasError = true;
+          $error_card = 1;
+          $error_message = 'Adresse mail ou mot de passe incorrecte.';
+        } else {
+          $userId = null;
+          foreach ($row as $colName => $colVal) {
+            if (preg_match('/^id(_|[A-Za-z0-9_])*$/i', $colName) && is_numeric($colVal)) {
+              $userId = (int)$colVal;
+              break;
+            }
+          }
+          if ($userId === null && array_key_exists('id', $row)) {
+            $userId = (int)$row['id'];
+          }
+          if ($userId === null) {
+            error_log('[connexion] warning: no id-like column found in _compte row: ' . json_encode(array_keys($row)));
+          }
+          // Attempt to map compte id -> vendeur id and store vendeur id in session instead
+          $sessionIdToStore = $userId;
+          try {
+            if ($userId !== null) {
+              $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte'];
+              $foundVendeur = null;
+              foreach ($candidates as $col) {
+                $q = "SELECT id_vendeur FROM _vendeur WHERE " . $col . " = :cid LIMIT 1";
+                try {
+                  $st2 = $pdo->prepare($q);
+                  $st2->execute([':cid' => $userId]);
+                  $r2 = $st2->fetch(PDO::FETCH_ASSOC);
+                  if ($r2 && isset($r2['id_vendeur'])) { $foundVendeur = (int)$r2['id_vendeur']; break; }
+                } catch (Throwable $t) { }
+              }
+              if ($foundVendeur !== null) {
+                $sessionIdToStore = $foundVendeur;
+                $_SESSION['compte_id'] = $userId;
+              }
+            }
+          } catch (Throwable $t) { }
+          $_SESSION['id'] = $sessionIdToStore;
+        }
+      }
+    } catch (Exception $e) {
       $hasError = true;
       $error_card = 1;
-      $error_message = 'Adresse mail ou mot de passe incorrecte.';
+      $error_message = 'Erreur lors de la vérification des identifiants.';
     }
 
     if (!$hasError) {
-
-
-      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
-      echo "<h2 style=\"margin-top:0;\">Récapitulatif (côté serveur)</h2>";
-      echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-      echo "<dt>Email</dt><dd>{$email}</dd>";
-      echo "<dt>mdp</dt><dd>{$mdp}</dd>";
-      echo "</dl>";
-      echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
-      echo "<a href=\"index.php\" style=\"display:inline-block;padding:8px 12px;border-radius:8px;border:1px solid #030212;color:#030212;text-decoration:none;\">Retour</a>";
+      // Instead of showing a server recap, present a simple link to the backoffice index
+      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);text-align:center;\">";
+      echo "<h2 style=\"margin-top:0;\">Connexion réussie</h2>";
+      echo "<p style=\"margin:18px 0;\">Cliquez pour accéder au backoffice :</p>";
+      echo "<p><a href=\"../index.php\" style=\"display:inline-block;padding:10px 14px;background:#fff;color:#000;border-radius:8px;text-decoration:none;border:1px solid rgba(0,0,0,0.12);\">Aller au backoffice</a></p>";
       echo "</div>";
-      echo "</div>";
-
       exit;
     }
   }
-  session_start();
-  $_SESSION['id'] = 3 ;
+
 ?>
 
 <style>
@@ -105,8 +164,7 @@
         <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
 
-      <h1>Créer un compte</h1>
-      <p class="subtitle">Identifiants</p>
+      <h1>Connexion</h1>
 
       <div>
         <label for="email">Email</label>

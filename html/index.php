@@ -1,4 +1,5 @@
 <?php
+$session_start();
 
 include __DIR__ . '/selectBDD.php';
 
@@ -44,7 +45,7 @@ function chargerProduitsBDD($pdo)
     ";
 
         $stmt = $pdo->query($sql);
-        $produits = $stmt->fetchAll(PDO::FETCH_ASSOC); //récupère tous les produits et les stocke dans une liste
+        $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         //requête pour compter les produits par catégorie
         $sqlCategories = "
@@ -59,7 +60,6 @@ function chargerProduitsBDD($pdo)
         $stmtCategories = $pdo->query($sqlCategories);
         $categoriesResult = $stmtCategories->fetchAll(PDO::FETCH_ASSOC);
 
-        //organise les catégories dans un tableau associatif
         foreach ($categoriesResult as $cat) {
             $categories[$cat['category']] = $cat['count'];
         }
@@ -69,6 +69,120 @@ function chargerProduitsBDD($pdo)
     }
 
     return ['produits' => $produits, 'categories' => $categories];
+}
+
+//fonction pour ajouter un article au panier dans la BDD
+function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
+{
+    try {
+        //récupérer les informations du produit (prix, TVA, frais de port, remise)
+        $sqlProduit = "
+            SELECT 
+                p.p_prix, 
+                p.p_frais_de_port, 
+                p.p_stock,
+                COALESCE(t.montant_tva, 0) as tva,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
+            FROM _produit p
+            LEFT JOIN _tva t ON p.id_tva = t.id_tva
+            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            WHERE p.id_produit = :idProduit
+        ";
+        
+        $stmtProduit = $pdo->prepare($sqlProduit);
+        $stmtProduit->execute([':idProduit' => $idProduit]);
+        $produit = $stmtProduit->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$produit) {
+            return ['success' => false, 'message' => 'Produit introuvable'];
+        }
+        
+        // normaliser la quantité demandée
+        $quantite = (int) $quantite;
+        if ($quantite < 1) { $quantite = 1; }
+        
+        //calculer le prix avec remise
+        $prixUnitaire = $produit['p_prix'];
+        $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $fraisDePort = $produit['p_frais_de_port'];
+        $tva = $produit['tva'];
+        $stock = (int)($produit['p_stock'] ?? 0);
+        
+        //vérifier si l'article existe déjà dans le panier
+        $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
+        $stmtCheck = $pdo->prepare($sqlCheck);
+        $stmtCheck->execute([
+            ':idProduit' => $idProduit,
+            ':idPanier' => $idPanier
+        ]);
+
+        $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $quantiteExistante = $existe ? (int)$existe['quantite'] : 0;
+        $disponible = max(0, $stock - $quantiteExistante);
+
+        if ($disponible <= 0) {
+            return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
+        }
+
+        // quantité réellement ajoutée (ne dépasse pas le disponible)
+        $aAjouter = min($quantite, $disponible);
+
+        if ($existe) {
+            //si l'article existe déjà, augmenter la quantité
+            $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
+            $stmtUpdate = $pdo->prepare($sqlUpdate);
+            $stmtUpdate->execute([
+                ':quantite' => $aAjouter,
+                ':idProduit' => $idProduit,
+                ':idPanier' => $idPanier
+            ]);
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
+            return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
+        } else {
+            //sinon, insérer un nouvel article avec toutes les informations
+            $sqlInsert = "
+                INSERT INTO _contient 
+                (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) 
+                VALUES (:idProduit, :idPanier, :quantite, :prixUnitaire, :remiseUnitaire, :fraisDePort, :tva)
+            ";
+            $stmtInsert = $pdo->prepare($sqlInsert);
+            $stmtInsert->execute([
+                ':idProduit' => $idProduit,
+                ':idPanier' => $idPanier,
+                ':quantite' => $aAjouter,
+                ':prixUnitaire' => $prixUnitaire,
+                ':remiseUnitaire' => $remiseUnitaire,
+                ':fraisDePort' => $fraisDePort,
+                ':tva' => $tva
+            ]);
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
+            return ['success' => true, 'message' => 'Article ajouté au panier'];
+        }
+    } catch (Exception $e) {
+        return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
+    }
+}
+
+//gérer l'ajout au panier via AJAX
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
+    header('Content-Type: application/json');
+
+    $idProduit = $_POST['idProduit'] ?? null;
+    $quantite = $_POST['quantite'] ?? 1;
+    $idPanier = 8; //utilise l'ID du panier actuel (à adapter selon votre système de session)
+
+    if ($idProduit) {
+        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
+        echo json_encode($resultat);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
+    }
+    exit;
 }
 
 //fonction pour récupérer le prix maximum parmi tous les produits
@@ -81,7 +195,6 @@ function getPrixMaximum($pdo)
         $stmt = $pdo->query($sql);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        //retourne le prix maximum arrondi au centaine supérieure, ou 3000 par défaut
         return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
     } catch (Exception $e) {
         return 3000;
@@ -93,14 +206,11 @@ function filtrerProduits($produits, $filtres)
 {
     $produits_filtres = [];
 
-    //parcourt tous les produits et applique les filtres
     foreach ($produits as $produit) {
-        //filtre par prix maximum
         if (($produit['p_prix'] ?? 0) > $filtres['prixMaximum']) {
             continue;
         }
 
-        //filtre par catégorie
         if ($filtres['categorieFiltre'] !== 'all') {
             $categoriesProduit = explode(', ', $produit['categories'] ?? '');
             if (!in_array($filtres['categorieFiltre'], $categoriesProduit)) {
@@ -108,17 +218,15 @@ function filtrerProduits($produits, $filtres)
             }
         }
 
-        //filtre pour afficher seulement les produits en stock
         if ($filtres['enStockSeulement'] && ($produit['p_stock'] ?? 0) <= 0) {
             continue;
         }
 
-        //filtre par note minimum
         if (($produit['note_moyenne'] ?? 0) < $filtres['noteMinimum']) {
             continue;
         }
 
-        $produits_filtres[] = $produit; //ajoute le produit s'il passe tous les filtres
+        $produits_filtres[] = $produit;
     }
 
     return $produits_filtres;
@@ -129,25 +237,21 @@ function trierProduits($produits, $tri_par)
 {
     switch ($tri_par) {
         case 'meilleures_ventes':
-            //trie par nombre de ventes décroissant
             usort($produits, function ($a, $b) {
                 return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
             });
             break;
         case 'prix_croissant':
-            //trie par prix croissant
             usort($produits, function ($a, $b) {
                 return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
             });
             break;
         case 'prix_decroissant':
-            //trie par prix décroissant
             usort($produits, function ($a, $b) {
                 return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
             });
             break;
         case 'note':
-            //trie par note décroissante
             usort($produits, function ($a, $b) {
                 $noteA = $a['note_moyenne'] ?? 0;
                 $noteB = $b['note_moyenne'] ?? 0;
@@ -165,7 +269,6 @@ function preparercategories_affichage($categories)
     $categories_affichage = [];
     $total_produits = 0;
 
-    //prépare chaque catégorie pour l'affichage
     foreach ($categories as $nomCategorie => $compte) {
         $categories_affichage[] = [
             'category' => $nomCategorie,
@@ -173,7 +276,6 @@ function preparercategories_affichage($categories)
         ];
     }
 
-    //ajoute l'option "Tous les produits" en premier
     array_unshift($categories_affichage, [
         'category' => 'all',
         'count' => $total_produits
@@ -187,18 +289,17 @@ $donnees = chargerProduitsBDD($pdo);
 $produits = $donnees['produits'];
 $categories = $donnees['categories'];
 
-$tousLesProduits = count($produits); //compte le nombre total de produits
+$tousLesProduits = count($produits);
 
-$prixMaximumDynamique = getPrixMaximum($pdo); //récupère le prix maximum dynamique
+$prixMaximumDynamique = getPrixMaximum($pdo);
 
-//récupère les valeurs des filtres depuis le formulaire ou utilise les valeurs par défaut
+//récupère les valeurs des filtres depuis le formulaire
 $categorieFiltre = $_POST['category'] ?? 'all';
 $noteMinimum = $_POST['note'] ?? 0;
 $prixMaximum = $_POST['price'] ?? $prixMaximumDynamique;
 $enStockSeulement = isset($_POST['in_stock']);
 $tri_par = $_POST['sort'] ?? 'meilleures_ventes';
 
-//tableau contenant tous les filtres
 $filtres = [
     'categorieFiltre' => $categorieFiltre,
     'noteMinimum' => $noteMinimum,
@@ -210,7 +311,11 @@ $filtres = [
 $produits_filtres = filtrerProduits($produits, $filtres);
 $produits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($categories);
+
+$id_panier = 8;
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -347,10 +452,10 @@ $categories_affichage = preparercategories_affichage($categories);
                                 <div>
                                     <span>
                                         <?php if ($aUneRemise): ?>
-                                            <?= number_format($produit['p_prix'], 0, ',', ' ') ?>€
+                                            <?= number_format($produit['p_prix'], 2, ',', ' ') ?>€
                                         <?php endif; ?>
                                     </span>
-                                    <span><?= number_format($prixFinal, 0, ',', ' ') ?>€</span>
+                                    <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                                 </div>
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
                                     onclick="event.stopPropagation(); ajouterAuPanier(<?= $produit['id_produit'] ?>)">
@@ -386,27 +491,33 @@ $categories_affichage = preparercategories_affichage($categories);
             document.getElementById('affichagePrixMax').textContent = valeur + '€';
         }
 
-        //fonction pour simuler l'ajout au panier
+        //fonction pour ajouter au panier avec requête AJAX vers la base de données
         function ajouterAuPanier(idProduit) {
-            fetch('pages/ajouterAuPanier.php', {
+            //créer les données du formulaire
+            const formData = new FormData();
+            formData.append('action', 'ajouter_panier');
+            formData.append('idProduit', idProduit);
+            formData.append('quantite', 1);
+            
+            //envoyer la requête AJAX
+            fetch('index.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'id_produit=' + idProduit
+                body: formData
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                    } else {
-                        alert('Erreur : ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Erreur lors de l\'ajout au panier');
-                    console.error('Erreur:', error);
-                });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    //optionnel : mettre à jour le compteur du panier
+                    //mettreAJourCompteurPanier();
+                } else {
+                    alert('✗ ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'ajout au panier');
+            });
         }
 
         //fonction pour réinitialiser tous les filtres

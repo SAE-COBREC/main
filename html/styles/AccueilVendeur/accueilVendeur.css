@@ -22,7 +22,10 @@ body {
 .main {
   background: #FFF7F1;
   padding: 32px 40px;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .header {
@@ -91,17 +94,46 @@ body {
   background: #FFFFFF;
   border-radius: 14px;
   border: 1px solid #E5D5C5;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   overflow: hidden;
 }
 .content-section__header {
+  flex-shrink: 0;
   padding: 20px 24px;
   border-bottom: 1px solid #E5D5C5;
+  background: #FFFFFF;
 }
 .content-section__title {
   font-size: 18px;
   font-weight: 700;
   color: #030212;
   margin-bottom: 16px;
+}
+.content-section .products-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-y: auto;
+  display: block;
+  max-height: 810px;
+}
+.content-section .products-table tbody {
+  display: block;
+  overflow-y: auto;
+  height: 600px;
+}
+.content-section .products-table thead,
+.content-section .products-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+.content-section .products-table thead {
+  position: sticky;
+  top: 0;
+  background: #FFFFFF;
+  z-index: 2;
 }
 
 .tabs {

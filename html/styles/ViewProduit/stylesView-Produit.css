@@ -375,6 +375,7 @@ footer > div > div:last-child span:hover {
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 6px;
+    /* évite que les vignettes prennent trop de place */
   }
   .thumbs img {
     width: 56px;
@@ -383,25 +384,65 @@ footer > div > div:last-child span:hover {
   .main-image img {
     height: 220px;
   }
-}/*# sourceMappingURL=stylesView-Produit.css.map */
-/* Responsive additions (copied from SCSS for environments without SCSS build) */
+}
+/* Affinage responsive supplémentaire */
 @media screen and (max-width: 768px) {
-  .product-row .summary .title { font-size: 18px; }
-  .product-row .summary .price { font-size: 20px; }
-  .product-row .summary .rating .stars img { width: 16px; height: 16px; }
-  .product-row .summary .qty { flex-wrap: wrap; }
-  .product-row .summary .qty input[type=number] { min-width: 64px; }
-  .product-row .summary .qty .btn { flex: 1 1 100%; }
-  .section.reviews .review-head { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .section.reviews .review-actions { flex-wrap: wrap; justify-content: flex-start; gap: 8px; }
-  .section.reviews .star-input img { width: 20px; height: 20px; }
+  .product-row .summary .title {
+    font-size: 18px;
+  }
+  .product-row .summary .price {
+    font-size: 20px;
+  }
+  .product-row .summary .rating .stars img {
+    width: 16px;
+    height: 16px;
+  }
+  .product-row .summary .qty {
+    flex-wrap: wrap;
+  }
+  .product-row .summary .qty input[type=number] {
+    min-width: 64px;
+  }
+  .product-row .summary .qty .btn {
+    flex: 1 1 100%;
+  }
+  .section.reviews .review-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .section.reviews .review-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  .section.reviews .star-input img {
+    width: 20px;
+    height: 20px;
+  }
 }
 @media screen and (max-width: 420px) {
-  .container { padding: 12px; margin: 12px; }
-  .product-row { gap: 16px; }
-  .product-row .main-image img { height: 200px; }
-  .product-row .summary .qty { gap: 6px; }
-  .product-row .summary .ghost { width: 100%; text-align: center; }
-  .section.reviews .review { padding: 12px; }
-  .section.reviews .btn, .section.reviews .ghost { width: 100%; }
-}
+  .container {
+    padding: 12px;
+    margin: 12px;
+  }
+  .product-row {
+    gap: 16px;
+  }
+  .product-row .main-image img {
+    height: 200px;
+  }
+  .product-row .summary .qty {
+    gap: 6px;
+  }
+  .product-row .summary .ghost {
+    width: 100%;
+    text-align: center;
+  }
+  .section.reviews .review {
+    padding: 12px;
+  }
+  .section.reviews .btn, .section.reviews .ghost {
+    width: 100%;
+  }
+}/*# sourceMappingURL=stylesView-Produit.css.map */
