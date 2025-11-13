@@ -1,19 +1,19 @@
 <?php 
+session_start();
+
 include '../../../config.php';
 
-session_start();
-$id_client = $_SESSION['id'] ;
+$id_panier = 8;
 
 
 $pdo->exec("SET search_path TO cobrec1");
 
-$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, id_client
+$requetePanier = "SELECT p_nom, p_description, p_prix, 'i_lien', _produit.id_produit, p_stock
                 FROM _contient
                 JOIN _produit ON _produit.id_produit = _contient.id_produit
                 JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
                 JOIN _image ON _represente_produit.id_image = _image.id_image
-                JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
-                WHERE _contient.id_client = ". $id_client . ";"; //gestion de la requête en fonction du login à terminer
+                WHERE id_panier = ". $id_panier . ";"; //gestion de la requête en fonction du login à terminer
 
 $stmt = $pdo->query($requetePanier);
 
