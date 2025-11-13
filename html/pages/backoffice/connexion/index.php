@@ -2,8 +2,8 @@
 include __DIR__ . '../../../../../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
-
-?>
+session_start();
+ ?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -14,11 +14,10 @@ $pdo->exec("SET search_path TO cobrec1");
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../../../styles/Register/styleRegister.css">
+  <link rel="stylesheet" href="../../styles/Register/styleRegister.css">
 </head>
 
 <?php
-  session_start();
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
@@ -26,11 +25,11 @@ $pdo->exec("SET search_path TO cobrec1");
     $hasError = false;
     $error_card = null;
     $error_message = '';
-
-    // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe + récupérer l'id
+    
+    // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
     try {
       $stmt = $pdo->prepare("SELECT id, mdp FROM _compte WHERE email = :email LIMIT 1");
-      $stmt->execute([':email' => $email_input]);
+      $stmt->execute([':email' => $email]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if (!$row) {
         $hasError = true;
@@ -50,7 +49,6 @@ $pdo->exec("SET search_path TO cobrec1");
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
-          // Si authentification OK, stocker l'id du compte en session
           $_SESSION['id'] = (int)$row['id'];
         }
       }
@@ -77,6 +75,7 @@ $pdo->exec("SET search_path TO cobrec1");
       exit;
     }
   }
+
 ?>
 
 <style>
