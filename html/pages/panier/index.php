@@ -5,7 +5,6 @@ session_start();
 
 $id_client = $_SESSION['id'];
 echo $id_client;
-$id_panier = 8;
 $pdo->exec("SET search_path TO cobrec1");
 
 $requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
@@ -13,7 +12,8 @@ $requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produ
                 JOIN _produit ON _produit.id_produit = _contient.id_produit
                 JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
                 JOIN _image ON _represente_produit.id_image = _image.id_image
-                WHERE id_panier = ". $id_panier . ";"; //gestion de la requête en fonction du login à terminer
+                JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
+                WHERE id_client = ". $id_client . ";"; //gestion de la requête en fonction du login à terminer
 
 
 $stmt = $pdo->query($requetePanier);
