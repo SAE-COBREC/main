@@ -1,0 +1,205 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Quicksand", sans-serif;
+    background: #EFEFEF;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    padding: 2em;
+}
+
+section {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 2em;
+    margin-bottom: 2em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin: 2rem 0;
+    color: #7171A3;
+    font-size: 2em;
+    text-align: center;
+}
+
+h2 {
+    color: #7171A3;
+    margin-bottom: 1.5rem;
+    font-size: 1.5em;
+    border-bottom: 2px solid #EFEFEF;
+    padding-bottom: 0.5rem;
+}
+
+button {
+    border: 1px solid #7171A3;
+    color: #7171A3;
+    border-radius: 20px;
+    background: #FFFFFF;
+    cursor: pointer;
+    font-size: 1.3em;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #7171A3;
+    color: #FFFFFF;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+label {
+    color: #333;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+    padding: 12px;
+    border: 1px solid #DEDEDE;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: "Quicksand", sans-serif;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #7171A3;
+}
+
+.adresse-card {
+    background: #F9F9F9;
+    border: 1px solid #DEDEDE;
+    border-radius: 8px;
+    padding: 1.5em;
+    margin-bottom: 1em;
+}
+
+.adresse-card p {
+    margin: 0.5em 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+.commande-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.commande-table th,
+.commande-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #EFEFEF;
+}
+
+.commande-table th {
+    background: #F5F5F5;
+    color: #7171A3;
+    font-weight: 600;
+}
+
+.commande-table tr:hover {
+    background: #FAFAFA;
+}
+
+.statut {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    display: inline-block;
+}
+
+.statut.en-attente {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.statut.en-cours {
+    background: #D1ECF1;
+    color: #0C5460;
+}
+
+.statut.livree {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.success-message {
+    background: #D4EDDA;
+    color: #155724;
+    padding: 1em;
+    border-radius: 8px;
+    margin-bottom: 1em;
+    border: 1px solid #C3E6CB;
+}
+
+.error-message {
+    background: #F8D7DA;
+    color: #721C24;
+    padding: 1em;
+    border-radius: 8px;
+    margin-bottom: 1em;
+    border: 1px solid #F5C6CB;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 2em;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1em;
+    }
+    
+    section {
+        padding: 1.5em;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+    }
+    
+    h2 {
+        font-size: 1.2em;
+    }
+    
+    button {
+        font-size: 1.1em;
+        padding: 8px 16px;
+    }
+    
+    .commande-table {
+        font-size: 0.9em;
+    }
+    
+    .commande-table th,
+    .commande-table td {
+        padding: 8px;
+    }
+}
