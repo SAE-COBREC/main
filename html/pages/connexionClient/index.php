@@ -1,5 +1,5 @@
 <?php 
-include __DIR__ . '../../../../../config.php';
+include __DIR__ . '../../selectBDD.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 
@@ -132,8 +132,7 @@ $pdo->exec("SET search_path TO cobrec1");
         <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
 
-      <h1>Créer un compte</h1>
-      <p class="subtitle">Identifiants</p>
+      <h1>Connexion</h1>
 
       <div>
         <label for="email">Email</label>
