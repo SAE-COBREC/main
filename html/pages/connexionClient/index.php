@@ -69,7 +69,28 @@ session_start();
           if ($userId === null) {
             error_log('[connexion] warning: no id-like column found in _compte row: ' . json_encode(array_keys($row)));
           }
-          $_SESSION['id'] = $userId;
+          // Attempt to map compte id -> vendeur id and store vendeur id in session instead
+          $sessionIdToStore = $userId;
+          try {
+            if ($userId !== null) {
+              $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte'];
+              $foundVendeur = null;
+              foreach ($candidates as $col) {
+                $q = "SELECT id_client FROM _client WHERE " . $col . " = :cid LIMIT 1";
+                try {
+                  $st2 = $pdo->prepare($q);
+                  $st2->execute([':cid' => $userId]);
+                  $r2 = $st2->fetch(PDO::FETCH_ASSOC);
+                  if ($r2 && isset($r2['id_client'])) { $foundVendeur = (int)$r2['id_client']; break; }
+                } catch (Throwable $t) { }
+              }
+              if ($foundVendeur !== null) {
+                $sessionIdToStore = $foundVendeur;
+                $_SESSION['compte_id'] = $userId;
+              }
+            }
+          } catch (Throwable $t) { }
+          $_SESSION['id'] = $sessionIdToStore;
         }
       }
     } catch (Exception $e) {
