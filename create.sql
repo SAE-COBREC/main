@@ -973,9 +973,8 @@ UPDATE _vendeur SET nb_produits_crees = 7 WHERE id_vendeur = 3;
 
 -- Mise à jour de la moyenne des notes des produits ajoutés/modifiés/supprimés
 
-CREATE TRIGGER maj_moyenne_notes_produit_apres_insertion
-AFTER INSERT and UPDATE and DELETE on _produit
-FOR EACH ROW
+CREATE FUNCTION maj_moyenne_notes_produit_apres_insertion()
+RETURNS TRIGGER AS $$
 BEGIN
     UPDATE cobrec1._produit
     SET p_note = (
@@ -984,4 +983,49 @@ BEGIN
         WHERE id_produit = NEW.id_produit
     )
     WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
 END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION maj_moyenne_notes_produit_apres_modification()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(p_note)::numeric,1)
+        FROM cobrec1._avis
+        WHERE id_produit = NEW.id_produit
+    )
+    WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION maj_moyenne_notes_produit_apres_suppression()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(p_note)::numeric,1)
+        FROM cobrec1._avis
+        WHERE id_produit = OLD.id_produit
+    )
+    WHERE id_produit = OLD.id_produit;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion
+AFTER INSERT on _produit
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_insertion();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_modification
+AFTER UPDATE on _produit
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_modification();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
+AFTER DELETE on _produit
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
