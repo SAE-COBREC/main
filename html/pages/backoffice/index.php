@@ -17,28 +17,28 @@
     try {
     // Récupération des produits depuis la BDD avec leurs catégories
     $query = "
-        SELECT 
-            p.id_produit,
-            p.p_nom AS nom_article,
-            p.p_description,
-            p.p_stock,
-            p.p_prix,
-            i.i_lien AS image_url,
-            c.nom_categorie AS categorie
-            (SELECT STRING_AGG(categorie, ', ')
-        FROM cobrec1._produit p
-        LEFT JOIN cobrec1._fait_partie_de fpd 
-               ON p.id_produit = fpd.id_produit
-        LEFT JOIN cobrec1._categorie_produit c 
-               ON fpd.id_categorie = c.id_categorie
-        LEFT JOIN cobrec1._represente_produit rp
-               ON p.id_produit = rp.id_produit
-        LEFT JOIN cobrec1._image i
-               ON rp.id_image = i.id_image
-        WHERE p.id_vendeur = :id_vendeur
-        ORDER BY p.id_produit ASC
-        
-    ";
+    SELECT 
+        p.id_produit,
+        p.p_nom AS nom_article,
+        p.p_description,
+        p.p_stock,
+        p.p_prix,
+        i.i_lien AS image_url,
+        STRING_AGG(c.nom_categorie, ', ') AS categories
+    FROM cobrec1._produit p
+    LEFT JOIN cobrec1._fait_partie_de fpd 
+           ON p.id_produit = fpd.id_produit
+    LEFT JOIN cobrec1._categorie_produit c 
+           ON fpd.id_categorie = c.id_categorie
+    LEFT JOIN cobrec1._represente_produit rp
+           ON p.id_produit = rp.id_produit
+    LEFT JOIN cobrec1._image i
+           ON rp.id_image = i.id_image
+    WHERE p.id_vendeur = :id_vendeur
+    GROUP BY 
+        p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, i.i_lien
+    ORDER BY p.id_produit ASC
+  ";
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_vendeur' => $vendeur_id]);
     $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
