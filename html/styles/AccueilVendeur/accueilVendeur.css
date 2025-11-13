@@ -116,7 +116,7 @@ body {
   border-collapse: collapse;
   overflow-y: auto;
   display: block;
-  max-height: calc(100vh - 350px);
+  max-height: 810px;
 }
 .content-section .products-table tbody {
   display: block;
