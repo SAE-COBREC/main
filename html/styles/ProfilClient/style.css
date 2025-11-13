@@ -92,27 +92,25 @@ input:focus {
     body {
         padding: 1em;
     }
-    
+
     section {
         padding: 1.5em;
     }
-    
+
     h1 {
         font-size: 1.5em;
     }
-    
+
     h2 {
         font-size: 1.2em;
     }
-    
+
     button {
         font-size: 1.1em;
         padding: 8px 16px;
     }
 }
 
-
-/* Styles pour les cartes de commande */
 section article {
     background: #FFFFFF;
     border: 1px solid #E5E5E5;
@@ -272,22 +270,20 @@ section article > footer > button:hover > svg {
         gap: 1em;
         align-items: flex-start;
     }
-    
+
     section article > main > div > div:last-child {
         margin-left: 0;
     }
-    
+
     section article > header > div > strong {
         font-size: 1.1em;
     }
-    
+
     section article em {
         font-size: 1.2em;
     }
 }
 
-
-/* Section adresses - Header avec titre et bouton */
 section:nth-of-type(2) > div:first-child {
     display: flex;
     justify-content: space-between;
@@ -327,7 +323,6 @@ section:nth-of-type(2) > p {
     font-size: 1.1em;
 }
 
-/* Articles adresses */
 section:nth-of-type(2) article {
     background: #FFFFFF;
     border: 1px solid #E5E5E5;
@@ -474,18 +469,16 @@ section:nth-of-type(2) article > footer > button > svg {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     section:nth-of-type(2) > div:first-child > button {
         width: 100%;
     }
-    
+
     section:nth-of-type(2) article > footer {
         flex-direction: column;
     }
 }
 
-
-/* Section sécurité */
 section:nth-of-type(4) article {
     background: #FFFFFF;
     border: 1px solid #E5E5E5;
@@ -624,8 +617,6 @@ section:nth-of-type(4) form > button > svg {
     }
 }
 
-
-/* Section informations personnelles */
 section:nth-of-type(1) article {
     background: #FFFFFF;
     border: 1px solid #E5E5E5;
