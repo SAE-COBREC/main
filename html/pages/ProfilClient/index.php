@@ -9,39 +9,54 @@ if (!isset($_SESSION['client_id'])) {
     exit;
 }
 
-
 $clientId = $_SESSION['client_id'];
 
-// Récupérer les informations du client
+// Récupérer les informations du client avec les données du compte
 $stmtClient = $pdo->prepare("
-    SELECT c_nom, c_prenom, c_email, c_telephone 
-    FROM Client 
-    WHERE c_id = ?
+    SELECT 
+        cl.c_nom, 
+        cl.c_prenom, 
+        co.email, 
+        co.num_telephone 
+    FROM _client cl
+    INNER JOIN _compte co ON cl.id_compte = co.id_compte
+    WHERE cl.id_client = ?
 ");
 $stmtClient->execute([$clientId]);
 $client = $stmtClient->fetch(PDO::FETCH_ASSOC);
 
+// Récupérer l'id_compte du client pour d'autres requêtes
+$stmtIdCompte = $pdo->prepare("SELECT id_compte FROM _client WHERE id_client = ?");
+$stmtIdCompte->execute([$clientId]);
+$idCompte = $stmtIdCompte->fetchColumn();
+
 // Récupérer les adresses du client
 $stmtAdresses = $pdo->prepare("
-    SELECT a_id, a_nom, a_rue, a_code_postal, a_ville, a_pays, a_principale 
-    FROM Adresse 
-    WHERE c_id = ? 
-    ORDER BY a_principale DESC, a_id DESC
+    SELECT 
+        id_adresse, 
+        a_adresse, 
+        a_ville, 
+        a_code_postal, 
+        a_complement 
+    FROM _adresse 
+    WHERE id_compte = ? 
+    ORDER BY id_adresse DESC
 ");
-$stmtAdresses->execute([$clientId]);
+$stmtAdresses->execute([$idCompte]);
 $adresses = $stmtAdresses->fetchAll(PDO::FETCH_ASSOC);
 
-// Récupérer les dernières commandes
+// Récupérer les dernières commandes validées
 $stmtCommandes = $pdo->prepare("
     SELECT 
-        co_id, 
-        co_numero_suivi, 
-        co_date, 
-        co_statut, 
-        co_montant_total 
-    FROM Commande 
-    WHERE c_id = ? 
-    ORDER BY co_date DESC 
+        p.id_panier, 
+        p.timestamp_commande,
+        COALESCE(f.f_total_ttc, 0) as montant_total,
+        COALESCE(l.etat_livraison, 'En attente') as statut
+    FROM _panier_commande p
+    LEFT JOIN _facture f ON p.id_panier = f.id_panier
+    LEFT JOIN _livraison l ON f.id_facture = l.id_facture
+    WHERE p.id_client = ? AND p.timestamp_commande IS NOT NULL
+    ORDER BY p.timestamp_commande DESC 
     LIMIT 5
 ");
 $stmtCommandes->execute([$clientId]);
@@ -57,15 +72,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = htmlspecialchars($_POST['email']);
         $telephone = htmlspecialchars($_POST['telephone']);
         
-        $stmtUpdate = $pdo->prepare("
-            UPDATE Client 
-            SET c_nom = ?, c_prenom = ?, c_email = ?, c_telephone = ? 
-            WHERE c_id = ?
-        ");
-        $stmtUpdate->execute([$nom, $prenom, $email, $telephone, $clientId]);
-        
-        header('Location: profil.php?success=info_updated');
-        exit();
+        try {
+            // Mettre à jour le client
+            $stmtUpdateClient = $pdo->prepare("
+                UPDATE _client 
+                SET c_nom = ?, c_prenom = ?
+                WHERE id_client = ?
+            ");
+            $stmtUpdateClient->execute([$nom, $prenom, $clientId]);
+            
+            // Mettre à jour le compte
+            $stmtUpdateCompte = $pdo->prepare("
+                UPDATE _compte 
+                SET email = ?, num_telephone = ?
+                WHERE id_compte = ?
+            ");
+            $stmtUpdateCompte->execute([$email, $telephone, $idCompte]);
+            
+            header('Location: index.php?success=info_updated');
+            exit();
+        } catch (Exception $e) {
+            $error = "Erreur lors de la mise à jour : " . $e->getMessage();
+        }
     }
     
     // Changement de mot de passe
@@ -74,49 +102,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newPassword = $_POST['new_password'];
         $confirmPassword = $_POST['confirm_password'];
         
-        // Vérifier l'ancien mot de passe
-        $stmtCheckPwd = $pdo->prepare("SELECT c_mdp FROM Client WHERE c_id = ?");
-        $stmtCheckPwd->execute([$clientId]);
-        $hashedPassword = $stmtCheckPwd->fetchColumn();
-        
-        if (password_verify($currentPassword, $hashedPassword)) {
-            if ($newPassword === $confirmPassword) {
-                $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-                $stmtUpdatePwd = $pdo->prepare("UPDATE Client SET c_mdp = ? WHERE c_id = ?");
-                $stmtUpdatePwd->execute([$newHashedPassword, $clientId]);
-                
-                header('Location: profil.php?success=password_changed');
-                exit();
+        try {
+            // Vérifier l'ancien mot de passe
+            $stmtCheckPwd = $pdo->prepare("SELECT mdp FROM _compte WHERE id_compte = ?");
+            $stmtCheckPwd->execute([$idCompte]);
+            $hashedPassword = $stmtCheckPwd->fetchColumn();
+            
+            if (password_verify($currentPassword, $hashedPassword)) {
+                if ($newPassword === $confirmPassword) {
+                    $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+                    $stmtUpdatePwd = $pdo->prepare("UPDATE _compte SET mdp = ? WHERE id_compte = ?");
+                    $stmtUpdatePwd->execute([$newHashedPassword, $idCompte]);
+                    
+                    header('Location: index.php?success=password_changed');
+                    exit();
+                } else {
+                    $error = "Les mots de passe ne correspondent pas.";
+                }
+            } else {
+                $error = "Mot de passe actuel incorrect.";
             }
+        } catch (Exception $e) {
+            $error = "Erreur lors du changement de mot de passe : " . $e->getMessage();
         }
     }
-    
-    // Mise à jour des préférences
-    if (isset($_POST['update_preferences'])) {
-        $newsletter = isset($_POST['newsletter']) ? 1 : 0;
-        $promotions = isset($_POST['promotions']) ? 1 : 0;
-        $recommandations = isset($_POST['recommandations']) ? 1 : 0;
-        
-        $stmtPreferences = $pdo->prepare("
-            UPDATE Client 
-            SET c_newsletter = ?, c_promotions = ?, c_recommandations = ? 
-            WHERE c_id = ?
-        ");
-        $stmtPreferences->execute([$newsletter, $promotions, $recommandations, $clientId]);
-        
-        header('Location: profil.php?success=preferences_updated');
-        exit();
-    }
 }
-
-// Récupérer les préférences du client
-$stmtPrefs = $pdo->prepare("
-    SELECT c_newsletter, c_promotions, c_recommandations 
-    FROM Client 
-    WHERE c_id = ?
-");
-$stmtPrefs->execute([$clientId]);
-$preferences = $stmtPrefs->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -133,9 +143,9 @@ $preferences = $stmtPrefs->fetch(PDO::FETCH_ASSOC);
 </head>
 <body>
     
-    <header>
-        <!-- Votre header existant -->
-    </header>
+    <?php
+    include __DIR__ . '/../../partials/header.html';
+    ?>
 
     <main>
         <div>
@@ -145,6 +155,21 @@ $preferences = $stmtPrefs->fetch(PDO::FETCH_ASSOC);
             
             <h1>Mon Profil</h1>
 
+            <?php if (isset($error)): ?>
+                <div style="color: red; padding: 10px; background: #fee; margin-bottom: 20px;">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['success'])): ?>
+                <div style="color: green; padding: 10px; background: #efe; margin-bottom: 20px;">
+                    <?php 
+                    if ($_GET['success'] === 'info_updated') echo "Informations mises à jour avec succès.";
+                    if ($_GET['success'] === 'password_changed') echo "Mot de passe changé avec succès.";
+                    ?>
+                </div>
+            <?php endif; ?>
+
             <!-- Section informations personnelles -->
             <section>
                 <h2>Informations personnelles</h2>
@@ -153,28 +178,28 @@ $preferences = $stmtPrefs->fetch(PDO::FETCH_ASSOC);
                     <div>
                         <label>
                             <span>Nom</span>
-                            <input type="text" name="nom" value="<?= htmlspecialchars($client['c_nom']) ?>" required>
+                            <input type="text" name="nom" value="<?php echo htmlspecialchars($client['c_nom'] ?? ''); ?>" required>
                         </label>
                     </div>
                     
                     <div>
                         <label>
                             <span>Prénom</span>
-                            <input type="text" name="prenom" value="<?= htmlspecialchars($client['c_prenom']) ?>" required>
+                            <input type="text" name="prenom" value="<?php echo htmlspecialchars($client['c_prenom'] ?? ''); ?>" required>
                         </label>
                     </div>
                     
                     <div>
                         <label>
                             <span>Email</span>
-                            <input type="email" name="email" value="<?= htmlspecialchars($client['c_email']) ?>" required>
+                            <input type="email" name="email" value="<?php echo htmlspecialchars($client['email'] ?? ''); ?>" required>
                         </label>
                     </div>
                     
                     <div>
                         <label>
                             <span>Téléphone</span>
-                            <input type="tel" name="telephone" value="<?= htmlspecialchars($client['c_telephone'] ?? '') ?>">
+                            <input type="tel" name="telephone" value="<?php echo htmlspecialchars($client['num_telephone'] ?? ''); ?>">
                         </label>
                     </div>
                     
@@ -199,23 +224,20 @@ $preferences = $stmtPrefs->fetch(PDO::FETCH_ASSOC);
                     <?php foreach ($adresses as $adresse): ?>
                         <article>
                             <div>
-                                <?php if ($adresse['a_principale']): ?>
-                                    <div>
-                                        <span>Adresse principale</span>
-                                    </div>
-                                <?php endif; ?>
-                                <h3><?= htmlspecialchars($adresse['a_nom']) ?></h3>
+                                <h3>Adresse #<?php echo $adresse['id_adresse']; ?></h3>
                                 <p>
-                                    <?= htmlspecialchars($adresse['a_rue']) ?><br>
-                                    <?= htmlspecialchars($adresse['a_code_postal']) ?> <?= htmlspecialchars($adresse['a_ville']) ?><br>
-                                    <?= htmlspecialchars($adresse['a_pays']) ?>
+                                    <?php echo htmlspecialchars($adresse['a_adresse']); ?><br>
+                                    <?php echo htmlspecialchars($adresse['a_code_postal']); ?> <?php echo htmlspecialchars($adresse['a_ville']); ?><br>
+                                    <?php if (!empty($adresse['a_complement'])): ?>
+                                        <?php echo htmlspecialchars($adresse['a_complement']); ?>
+                                    <?php endif; ?>
                                 </p>
                             </div>
                             <div>
-                                <button type="button" onclick="location.href='modifier-adresse.php?id=<?= $adresse['a_id'] ?>'">
+                                <button type="button" onclick="location.href='modifier-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
                                     Modifier
                                 </button>
-                                <button type="button" onclick="if(confirm('Supprimer cette adresse ?')) location.href='supprimer-adresse.php?id=<?= $adresse['a_id'] ?>'">
+                                <button type="button" onclick="if(confirm('Supprimer cette adresse ?')) location.href='supprimer-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
                                     Supprimer
                                 </button>
                             </div>
@@ -234,16 +256,16 @@ $preferences = $stmtPrefs->fetch(PDO::FETCH_ASSOC);
                     <?php foreach ($commandes as $commande): ?>
                         <article>
                             <div>
-                                <span>Commande #<?= htmlspecialchars($commande['co_numero_suivi']) ?></span>
+                                <span>Commande #<?php echo htmlspecialchars($commande['id_panier']); ?></span>
                             </div>
                             <div>
                                 <div>
-                                    <span>Date : <?= date('d/m/Y', strtotime($commande['co_date'])) ?></span>
-                                    <span>Statut : <?= htmlspecialchars($commande['co_statut']) ?></span>
+                                    <span>Date : <?php echo date('d/m/Y', strtotime($commande['timestamp_commande'])); ?></span>
+                                    <span>Statut : <?php echo htmlspecialchars($commande['statut']); ?></span>
                                 </div>
-                                <span><?= number_format($commande['co_montant_total'], 2, ',', ' ') ?>€</span>
+                                <span><?php echo number_format($commande['montant_total'], 2, ',', ' '); ?>€</span>
                             </div>
-                            <button type="button" onclick="location.href='suivi-commande.php?id=<?= $commande['co_id'] ?>'">
+                            <button type="button" onclick="location.href='suivi-commande.php?id=<?php echo $commande['id_panier']; ?>'">
                                 Voir les détails
                             </button>
                         </article>
@@ -282,38 +304,12 @@ $preferences = $stmtPrefs->fetch(PDO::FETCH_ASSOC);
                     </button>
                 </form>
             </section>
-
-            <!-- Section préférences -->
-            <section>
-                <h2>Préférences</h2>
-                
-                <form method="POST">
-                    <label>
-                        <input type="checkbox" name="newsletter" <?= $preferences['c_newsletter'] ? 'checked' : '' ?>>
-                        <span>Recevoir les newsletters</span>
-                    </label>
-                    
-                    <label>
-                        <input type="checkbox" name="promotions" <?= $preferences['c_promotions'] ? 'checked' : '' ?>>
-                        <span>Recevoir les offres promotionnelles</span>
-                    </label>
-                    
-                    <label>
-                        <input type="checkbox" name="recommandations" <?= $preferences['c_recommandations'] ? 'checked' : '' ?>>
-                        <span>Recevoir les recommandations personnalisées</span>
-                    </label>
-                    
-                    <button type="submit" name="update_preferences">
-                        Enregistrer les préférences
-                    </button>
-                </form>
-            </section>
         </div>
     </main>
 
-    <footer>
-        <!-- Votre footer existant -->
-    </footer>
+    <?php
+    include __DIR__ . '/../../partials/footer.html';
+    ?>
 
 </body>
 </html>
