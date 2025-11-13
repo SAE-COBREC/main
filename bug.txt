@@ -1,5 +1,0 @@
-quand on ajoute un article au panier sur la page d'accueil, par exemple 3 fois
-quand on va sur le panier il apparait 3 fois
-mais quand on le rajoute 1 fois depuis la page d'accueil il apparait 1 fois et pas 4
-
-prix réduction pas changé sur le panier
