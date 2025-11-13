@@ -535,7 +535,7 @@ footer > div > div:last-child span:hover {
     
     /* Agrandir le select (Meilleures ventes, etc.) */
     aside form > div:first-child select {
-        font-size: 1.5em;
+        font-size: 1.35em;
         padding: 5px 10px;
     }
 }
