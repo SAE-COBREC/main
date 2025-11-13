@@ -3,6 +3,9 @@ session_start();
 
 include __DIR__ . '/../../../../config.php';
 
+// Configuration du search_path pour PostgreSQL
+$pdo->exec("SET search_path TO cobrec1, public");
+
 // ========================================
 // MODE TEST - Décommentez l'une des lignes ci-dessous pour tester
 // ========================================
@@ -47,8 +50,8 @@ $stmtClient = $pdo->prepare("
         cl.c_prenom, 
         co.email, 
         co.num_telephone 
-    FROM _client cl
-    INNER JOIN _compte co ON cl.id_compte = co.id_compte
+    FROM cobrec1._client cl
+    INNER JOIN cobrec1._compte co ON cl.id_compte = co.id_compte
     WHERE cl.id_client = ?
 ");
 $stmtClient->execute([$clientId]);
@@ -59,7 +62,7 @@ if (!$client) {
 }
 
 // Récupérer l'id_compte du client pour d'autres requêtes
-$stmtIdCompte = $pdo->prepare("SELECT id_compte FROM _client WHERE id_client = ?");
+$stmtIdCompte = $pdo->prepare("SELECT id_compte FROM cobrec1._client WHERE id_client = ?");
 $stmtIdCompte->execute([$clientId]);
 $idCompte = $stmtIdCompte->fetchColumn();
 
@@ -71,7 +74,7 @@ $stmtAdresses = $pdo->prepare("
         a_ville, 
         a_code_postal, 
         a_complement 
-    FROM _adresse 
+    FROM cobrec1._adresse 
     WHERE id_compte = ? 
     ORDER BY id_adresse DESC
 ");
@@ -85,9 +88,9 @@ $stmtCommandes = $pdo->prepare("
         p.timestamp_commande,
         COALESCE(f.f_total_ttc, 0) as montant_total,
         COALESCE(l.etat_livraison, 'En attente') as statut
-    FROM _panier_commande p
-    LEFT JOIN _facture f ON p.id_panier = f.id_panier
-    LEFT JOIN _livraison l ON f.id_facture = l.id_facture
+    FROM cobrec1._panier_commande p
+    LEFT JOIN cobrec1._facture f ON p.id_panier = f.id_panier
+    LEFT JOIN cobrec1._livraison l ON f.id_facture = l.id_facture
     WHERE p.id_client = ? AND p.timestamp_commande IS NOT NULL
     ORDER BY p.timestamp_commande DESC 
     LIMIT 5
@@ -97,56 +100,56 @@ $commandes = $stmtCommandes->fetchAll(PDO::FETCH_ASSOC);
 
 // Traitement des formulaires
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
+
     // Mise à jour des informations personnelles
     if (isset($_POST['update_info'])) {
         $nom = htmlspecialchars($_POST['nom']);
         $prenom = htmlspecialchars($_POST['prenom']);
         $email = htmlspecialchars($_POST['email']);
         $telephone = htmlspecialchars($_POST['telephone']);
-        
+
         try {
             // Mettre à jour le client
             $stmtUpdateClient = $pdo->prepare("
-                UPDATE _client 
+                UPDATE cobrec1._client 
                 SET c_nom = ?, c_prenom = ?
                 WHERE id_client = ?
             ");
             $stmtUpdateClient->execute([$nom, $prenom, $clientId]);
-            
+
             // Mettre à jour le compte
             $stmtUpdateCompte = $pdo->prepare("
-                UPDATE _compte 
+                UPDATE cobrec1._compte 
                 SET email = ?, num_telephone = ?
                 WHERE id_compte = ?
             ");
             $stmtUpdateCompte->execute([$email, $telephone, $idCompte]);
-            
+
             header('Location: index.php?success=info_updated');
             exit();
         } catch (Exception $e) {
             $error = "Erreur lors de la mise à jour : " . $e->getMessage();
         }
     }
-    
+
     // Changement de mot de passe
     if (isset($_POST['change_password'])) {
         $currentPassword = $_POST['current_password'];
         $newPassword = $_POST['new_password'];
         $confirmPassword = $_POST['confirm_password'];
-        
+
         try {
             // Vérifier l'ancien mot de passe
-            $stmtCheckPwd = $pdo->prepare("SELECT mdp FROM _compte WHERE id_compte = ?");
+            $stmtCheckPwd = $pdo->prepare("SELECT mdp FROM cobrec1._compte WHERE id_compte = ?");
             $stmtCheckPwd->execute([$idCompte]);
             $hashedPassword = $stmtCheckPwd->fetchColumn();
-            
+
             if (password_verify($currentPassword, $hashedPassword)) {
                 if ($newPassword === $confirmPassword) {
                     $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-                    $stmtUpdatePwd = $pdo->prepare("UPDATE _compte SET mdp = ? WHERE id_compte = ?");
+                    $stmtUpdatePwd = $pdo->prepare("UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?");
                     $stmtUpdatePwd->execute([$newHashedPassword, $idCompte]);
-                    
+
                     header('Location: index.php?success=password_changed');
                     exit();
                 } else {
@@ -164,18 +167,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Profil - Alizon</title>
-    <link rel="stylesheet" href="/styles/Pages/ProfilClient" />
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/styles/ProfilClient/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
-    
+
     <?php
     include __DIR__ . '/partials/header.html';
     ?>
@@ -183,14 +188,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <main>
         <div>
             <!-- Bannière de test -->
-            <div style="background: #fff3cd; padding: 10px; margin-bottom: 20px; border: 1px solid #ffc107; border-radius: 5px;">
-                <strong>⚠️ MODE TEST ACTIVÉ</strong> - Vous testez avec le client: <?php echo htmlspecialchars($client['c_prenom'] . ' ' . $client['c_nom']); ?> (ID: <?php echo $clientId; ?>)
+            <div
+                style="background: #fff3cd; padding: 10px; margin-bottom: 20px; border: 1px solid #ffc107; border-radius: 5px;">
+                <strong>⚠️ MODE TEST ACTIVÉ</strong> - Vous testez avec le client:
+                <?php echo htmlspecialchars($client['c_prenom'] . ' ' . $client['c_nom']); ?> (ID:
+                <?php echo $clientId; ?>)
             </div>
 
             <button onclick="history.back()">
                 ← Retour
             </button>
-            
+
             <h1>Mon Profil</h1>
 
             <?php if (isset($error)): ?>
@@ -201,9 +209,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <?php if (isset($_GET['success'])): ?>
                 <div style="color: green; padding: 10px; background: #efe; margin-bottom: 20px;">
-                    <?php 
-                    if ($_GET['success'] === 'info_updated') echo "Informations mises à jour avec succès.";
-                    if ($_GET['success'] === 'password_changed') echo "Mot de passe changé avec succès.";
+                    <?php
+                    if ($_GET['success'] === 'info_updated')
+                        echo "Informations mises à jour avec succès.";
+                    if ($_GET['success'] === 'password_changed')
+                        echo "Mot de passe changé avec succès.";
                     ?>
                 </div>
             <?php endif; ?>
@@ -211,36 +221,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Section informations personnelles -->
             <section>
                 <h2>Informations personnelles</h2>
-                
+
                 <form method="POST">
                     <div>
                         <label>
                             <span>Nom</span>
-                            <input type="text" name="nom" value="<?php echo htmlspecialchars($client['c_nom'] ?? ''); ?>" required>
+                            <input type="text" name="nom"
+                                value="<?php echo htmlspecialchars($client['c_nom'] ?? ''); ?>" required>
                         </label>
                     </div>
-                    
+
                     <div>
                         <label>
                             <span>Prénom</span>
-                            <input type="text" name="prenom" value="<?php echo htmlspecialchars($client['c_prenom'] ?? ''); ?>" required>
+                            <input type="text" name="prenom"
+                                value="<?php echo htmlspecialchars($client['c_prenom'] ?? ''); ?>" required>
                         </label>
                     </div>
-                    
+
                     <div>
                         <label>
                             <span>Email</span>
-                            <input type="email" name="email" value="<?php echo htmlspecialchars($client['email'] ?? ''); ?>" required>
+                            <input type="email" name="email"
+                                value="<?php echo htmlspecialchars($client['email'] ?? ''); ?>" required>
                         </label>
                     </div>
-                    
+
                     <div>
                         <label>
                             <span>Téléphone</span>
-                            <input type="tel" name="telephone" value="<?php echo htmlspecialchars($client['num_telephone'] ?? ''); ?>">
+                            <input type="tel" name="telephone"
+                                value="<?php echo htmlspecialchars($client['num_telephone'] ?? ''); ?>">
                         </label>
                     </div>
-                    
+
                     <button type="submit" name="update_info">
                         Enregistrer les modifications
                     </button>
@@ -255,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         + Ajouter une adresse
                     </button>
                 </div>
-                
+
                 <?php if (empty($adresses)): ?>
                     <p>Aucune adresse enregistrée</p>
                 <?php else: ?>
@@ -265,17 +279,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <h3>Adresse #<?php echo $adresse['id_adresse']; ?></h3>
                                 <p>
                                     <?php echo htmlspecialchars($adresse['a_adresse']); ?><br>
-                                    <?php echo htmlspecialchars($adresse['a_code_postal']); ?> <?php echo htmlspecialchars($adresse['a_ville']); ?><br>
+                                    <?php echo htmlspecialchars($adresse['a_code_postal']); ?>
+                                    <?php echo htmlspecialchars($adresse['a_ville']); ?><br>
                                     <?php if (!empty($adresse['a_complement'])): ?>
                                         <?php echo htmlspecialchars($adresse['a_complement']); ?>
                                     <?php endif; ?>
                                 </p>
                             </div>
                             <div>
-                                <button type="button" onclick="location.href='modifier-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
+                                <button type="button"
+                                    onclick="location.href='modifier-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
                                     Modifier
                                 </button>
-                                <button type="button" onclick="if(confirm('Supprimer cette adresse ?')) location.href='supprimer-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
+                                <button type="button"
+                                    onclick="if(confirm('Supprimer cette adresse ?')) location.href='supprimer-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
                                     Supprimer
                                 </button>
                             </div>
@@ -287,7 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Section commandes récentes -->
             <section>
                 <h2>Mes dernières commandes</h2>
-                
+
                 <?php if (empty($commandes)): ?>
                     <p>Aucune commande effectuée</p>
                 <?php else: ?>
@@ -303,7 +320,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <span><?php echo number_format($commande['montant_total'], 2, ',', ' '); ?>€</span>
                             </div>
-                            <button type="button" onclick="location.href='suivi-commande.php?id=<?php echo $commande['id_panier']; ?>'">
+                            <button type="button"
+                                onclick="location.href='suivi-commande.php?id=<?php echo $commande['id_panier']; ?>'">
                                 Voir les détails
                             </button>
                         </article>
@@ -314,7 +332,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Section sécurité -->
             <section>
                 <h2>Sécurité</h2>
-                
+
                 <form method="POST">
                     <div>
                         <label>
@@ -322,21 +340,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="password" name="current_password" placeholder="••••••••" required>
                         </label>
                     </div>
-                    
+
                     <div>
                         <label>
                             <span>Nouveau mot de passe</span>
                             <input type="password" name="new_password" placeholder="••••••••" required>
                         </label>
                     </div>
-                    
+
                     <div>
                         <label>
                             <span>Confirmer le mot de passe</span>
                             <input type="password" name="confirm_password" placeholder="••••••••" required>
                         </label>
                     </div>
-                    
+
                     <button type="submit" name="change_password">
                         Changer le mot de passe
                     </button>
@@ -350,4 +368,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
 
 </body>
+
 </html>
