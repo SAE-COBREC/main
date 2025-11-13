@@ -456,8 +456,8 @@ footer > div > div:last-child span:hover {
   aside form > div:first-child select {
     padding: 15px;
   }
-  aside section > div span {
-    font-size: 1.5em;
+  aside section > div > span {
+    font-size: 1.3em;
   }
   aside:not(.open) form {
     display: none;
