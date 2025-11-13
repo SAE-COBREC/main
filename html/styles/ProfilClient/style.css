@@ -88,90 +88,6 @@ input:focus {
     border-color: #7171A3;
 }
 
-.adresse-card {
-    background: #F9F9F9;
-    border: 1px solid #DEDEDE;
-    border-radius: 8px;
-    padding: 1.5em;
-    margin-bottom: 1em;
-}
-
-.adresse-card p {
-    margin: 0.5em 0;
-    color: #555;
-    line-height: 1.6;
-}
-
-.commande-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-.commande-table th,
-.commande-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #EFEFEF;
-}
-
-.commande-table th {
-    background: #F5F5F5;
-    color: #7171A3;
-    font-weight: 600;
-}
-
-.commande-table tr:hover {
-    background: #FAFAFA;
-}
-
-.statut {
-    padding: 5px 12px;
-    border-radius: 15px;
-    font-size: 0.9em;
-    display: inline-block;
-}
-
-.statut.en-attente {
-    background: #FFF3CD;
-    color: #856404;
-}
-
-.statut.en-cours {
-    background: #D1ECF1;
-    color: #0C5460;
-}
-
-.statut.livree {
-    background: #D4EDDA;
-    color: #155724;
-}
-
-.success-message {
-    background: #D4EDDA;
-    color: #155724;
-    padding: 1em;
-    border-radius: 8px;
-    margin-bottom: 1em;
-    border: 1px solid #C3E6CB;
-}
-
-.error-message {
-    background: #F8D7DA;
-    color: #721C24;
-    padding: 1em;
-    border-radius: 8px;
-    margin-bottom: 1em;
-    border: 1px solid #F5C6CB;
-}
-
-.empty-state {
-    text-align: center;
-    color: #999;
-    padding: 2em;
-    font-style: italic;
-}
-
 @media (max-width: 768px) {
     body {
         padding: 1em;
@@ -192,14 +108,5 @@ input:focus {
     button {
         font-size: 1.1em;
         padding: 8px 16px;
-    }
-    
-    .commande-table {
-        font-size: 0.9em;
-    }
-    
-    .commande-table th,
-    .commande-table td {
-        padding: 8px;
     }
 }
