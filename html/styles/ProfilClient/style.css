@@ -110,3 +110,178 @@ input:focus {
         padding: 8px 16px;
     }
 }
+
+
+/* Styles pour les cartes de commande */
+section article {
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 1.5em;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+section article:hover {
+    box-shadow: 0 4px 12px rgba(113, 113, 163, 0.15);
+    border-color: #7171A3;
+}
+
+section article > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5em;
+    background: #F9F9FB;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+section article > header > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+}
+
+section article > header > div > span {
+    font-size: 0.85em;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+section article > header > div > strong {
+    font-size: 1.3em;
+    color: #333;
+    font-weight: 700;
+}
+
+section article > header > span {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+section article > header > span[data-statut="en-attente"] {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+section article > header > span[data-statut="en-cours"] {
+    background: #D1ECF1;
+    color: #0C5460;
+}
+
+section article > header > span[data-statut="livree"],
+section article > header > span[data-statut="livrée"] {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+section article > header > span[data-statut="annulee"],
+section article > header > span[data-statut="annulée"] {
+    background: #F8D7DA;
+    color: #721C24;
+}
+
+section article > main {
+    padding: 1.5em;
+}
+
+section article > main > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2em;
+}
+
+section article > main > div > div {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    color: #555;
+    font-size: 1em;
+}
+
+section article > main > div > div:last-child {
+    margin-left: auto;
+}
+
+section article svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+    color: #7171A3;
+    flex-shrink: 0;
+}
+
+section article em {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #7171A3;
+    font-style: normal;
+}
+
+section article > footer {
+    padding: 1.5em;
+    border-top: 1px solid #E5E5E5;
+    background: #FAFAFA;
+}
+
+section article > footer > button {
+    width: 100%;
+    border: 2px solid #7171A3;
+    color: #7171A3;
+    border-radius: 8px;
+    background: #FFFFFF;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+section article > footer > button:hover {
+    background: #7171A3;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
+}
+
+section article > footer > button > svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5;
+    transition: transform 0.3s ease;
+}
+
+section article > footer > button:hover > svg {
+    transform: translateX(4px);
+}
+
+@media (max-width: 768px) {
+    section article > main > div {
+        flex-direction: column;
+        gap: 1em;
+        align-items: flex-start;
+    }
+    
+    section article > main > div > div:last-child {
+        margin-left: 0;
+    }
+    
+    section article > header > div > strong {
+        font-size: 1.1em;
+    }
+    
+    section article em {
+        font-size: 1.2em;
+    }
+}

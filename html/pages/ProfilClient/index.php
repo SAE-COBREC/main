@@ -302,6 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </section>
 
             <!-- Section commandes récentes -->
+
             <section>
                 <h2>Mes dernières commandes</h2>
 
@@ -310,24 +311,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php else: ?>
                     <?php foreach ($commandes as $commande): ?>
                         <article>
-                            <div>
-                                <span>Commande : <?php echo htmlspecialchars($commande['id_panier']); ?></span>
-                            </div>
-                            <div>
+                            <header>
                                 <div>
-                                    <span>Date : <?php echo date('d/m/Y', strtotime($commande['timestamp_commande'])); ?></span>
-                                    <span>Statut : <?php echo htmlspecialchars($commande['statut']); ?></span>
+                                    <span>Commande</span>
+                                    <strong>#<?php echo htmlspecialchars($commande['id_panier']); ?></strong>
                                 </div>
-                                <span><?php echo number_format($commande['montant_total'], 2, ',', ' '); ?>€</span>
-                            </div>
-                            <button type="button"
-                                onclick="location.href='suivi-commande.php?id=<?php echo $commande['id_panier']; ?>'">
-                                Voir les détails
-                            </button>
+                                <span data-statut="<?php echo strtolower(str_replace(' ', '-', $commande['statut'])); ?>">
+                                    <?php echo htmlspecialchars($commande['statut']); ?>
+                                </span>
+                            </header>
+
+                            <main>
+                                <div>
+                                    <div>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        <span><?php echo date('d/m/Y', strtotime($commande['timestamp_commande'])); ?></span>
+                                    </div>
+                                    <div>
+                                        <em><?php echo number_format($commande['montant_total'], 2, ',', ' '); ?> €</em>
+                                    </div>
+                                </div>
+                            </main>
+
+                            <footer>
+                                <button type="button"
+                                    onclick="location.href='suivi-commande.php?id=<?php echo $commande['id_panier']; ?>'">
+                                    Voir les détails
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                </button>
+                            </footer>
                         </article>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </section>
+
 
             <!-- Section sécurité -->
             <section>
