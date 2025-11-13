@@ -20,8 +20,7 @@ $pdo->exec("SET search_path TO cobrec1");
 <?php
   session_start();
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email_input = trim($_POST['email'] ?? '');
-    $email = htmlspecialchars($email_input, ENT_QUOTES, 'UTF-8');
+    $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
 
     $hasError = false;

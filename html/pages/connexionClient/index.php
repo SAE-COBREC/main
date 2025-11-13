@@ -1,5 +1,5 @@
 <?php 
-include '../../selectBDD.php';
+include __DIR__ . '../../selectBDD.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 session_start();
@@ -49,7 +49,6 @@ session_start();
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
-          // Si authentification OK, stocker l'id du compte en session
           $_SESSION['id'] = (int)$row['id'];
         }
       }

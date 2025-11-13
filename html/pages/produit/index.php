@@ -5,16 +5,13 @@ include __DIR__ . '/../../../config.php';
 $pageError = false;
 $produit = null;
 
-// Recalcule la note moyenne d'un produit et met à jour _produit.p_note
-// Règle métier: priorité aux notes vérifiées (_commentaire.a_note), sinon
-// fallback sur les notes libres éventuellement stockées dans _avis.a_note.
-function recalcAndUpdateProductRating(PDO $pdo, int $productId): void {
+function recalculeUpdateProduitNote(PDO $pdo, int $productId): void {
     try {
         // Assurer le schéma sélectionné (config.php le fait déjà mais idempotent)
         $pdo->exec("SET search_path TO cobrec1");
 
-        // 1) Moyenne sur achats vérifiés
-        $stmt = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt
+    // 1) Moyenne sur achats vérifiés
+    $stmt = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt
                                FROM _avis a
                                LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
                                WHERE a.id_produit = :pid AND c.a_note IS NOT NULL');
@@ -40,7 +37,7 @@ function recalcAndUpdateProductRating(PDO $pdo, int $productId): void {
         $upd->execute([':avg' => $avg, ':pid' => $productId]);
     } catch (Throwable $e) {
         // Ne pas interrompre le flux si l'update échoue; simple log possible
-        // error_log('recalcAndUpdateProductRating failed: ' . $e->getMessage());
+        // error_log('recalculeUpdateProduitNote failed: ' . $e->getMessage());
     }
 }
 
@@ -130,29 +127,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 echo json_encode(['success' => false, 'message' => 'Veuillez sélectionner une note (au moins 0,5 étoile).']);
                 exit;
             }
-            // Tenter insertion avec a_note si la colonne existe, sinon fallback
+            // Tenter insertion avec p_note si la colonne existe, sinon fallback
             $row = null;
             try {
-                // S'assurer que la colonne a_note existe (idempotent)
-                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_note numeric(2,1)');
+                // S'assurer que la colonne p_note existe (idempotent)
+                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS p_note numeric(2,1)');
                 $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_owner_token text');
                 // Générer ou récupérer un token propriétaire
                 $ownerToken = isset($_COOKIE['alizon_owner']) && $_COOKIE['alizon_owner'] ? $_COOKIE['alizon_owner'] : bin2hex(random_bytes(16));
                 if (!isset($_COOKIE['alizon_owner']) || !$_COOKIE['alizon_owner']) {
                     setcookie('alizon_owner', $ownerToken, time() + 3600*24*365, '/');
                 }
-                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note, a_owner_token) VALUES (:id_produit, :texte, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
+                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, p_note, a_owner_token) VALUES (:id_produit, :texte, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, p_note AS note");
                 $stmt->execute([':id_produit' => $id_produit_post, ':texte' => $commentaire_post, ':note' => $note_post, ':owner' => $ownerToken]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
             } catch (PDOException $ex) {
-                // Colonne a_note absente: réessayer sans la note
+                // Colonne p_note absente: réessayer sans la note
                 $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES (:id_produit, :texte, 0, 0, NOW()) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt");
                 $stmt->execute([':id_produit' => $id_produit_post, ':texte' => $commentaire_post]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $row['a_note'] = 0.0; // Fallback
+                $row['note'] = 0.0; // Fallback
             }
             // Recalcul et mise à jour de la note moyenne du produit
-            recalcAndUpdateProductRating($pdo, $id_produit_post);
+            recalculeUpdateProduitNote($pdo, $id_produit_post);
 
             echo json_encode([
                 'success' => true,
@@ -160,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 'id_avis' => $row['id_avis'],
                 'created_at' => $row['a_timestamp_creation'],
                 'created_at_fmt' => isset($row['created_at_fmt']) ? $row['created_at_fmt'] : null,
-                'note' => isset($row['a_note']) ? (float)$row['a_note'] : $note_post
+                'note' => isset($row['note']) ? (float)$row['note'] : $note_post
             ]);
             exit;
         } elseif ($action === 'vote') {
@@ -201,16 +198,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
         } elseif ($action === 'edit_avis') {
             $id_avis = isset($_POST['id_avis']) ? (int) $_POST['id_avis'] : 0;
             $commentaire_post = isset($_POST['commentaire']) ? trim($_POST['commentaire']) : '';
+            $note_post = isset($_POST['note']) ? (float) $_POST['note'] : null; // note optionnelle
             if ($id_avis <= 0) {
                 echo json_encode(['success' => false, 'message' => 'Avis invalide']);
                 exit;
             }
+            // Validation de la note si fournie
+            $validSteps = [0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0];
+            if ($note_post !== null && !in_array($note_post, $validSteps, true)) {
+                $note_post = null; // ignorer valeurs non conformes
+            }
             $ownerToken = isset($_COOKIE['alizon_owner']) ? $_COOKIE['alizon_owner'] : '';
-            $stmt = $pdo->prepare("UPDATE _avis SET a_texte = :texte, a_timestamp_modification = NOW() WHERE id_avis = :id AND id_produit = :pid AND (a_owner_token = :owner) RETURNING TO_CHAR(a_timestamp_modification,'YYYY-MM-DD HH24:MI') AS updated_at_fmt");
-            $stmt->execute([':texte' => $commentaire_post, ':id' => $id_avis, ':pid' => $id_produit_post, ':owner' => $ownerToken]);
+            // Construire dynamiquement la partie SET
+            $setParts = ['a_texte = :texte', 'a_timestamp_modification = NOW()'];
+            if ($note_post !== null) { $setParts[] = 'p_note = :note'; }
+            $sql = 'UPDATE _avis SET ' . implode(', ', $setParts) . ' WHERE id_avis = :id AND id_produit = :pid AND (a_owner_token = :owner) RETURNING TO_CHAR(a_timestamp_modification,\'YYYY-MM-DD HH24:MI\') AS updated_at_fmt, p_note AS note';
+            $stmt = $pdo->prepare($sql);
+            $params = [':texte' => $commentaire_post, ':id' => $id_avis, ':pid' => $id_produit_post, ':owner' => $ownerToken];
+            if ($note_post !== null) { $params[':note'] = $note_post; }
+            $stmt->execute($params);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
-                echo json_encode(['success' => true, 'message' => 'Avis modifié', 'updated_at_fmt' => $row['updated_at_fmt']]);
+                // Recalcul si la note a été modifiée
+                if ($note_post !== null) {
+                    recalculeUpdateProduitNote($pdo, $id_produit_post);
+                }
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Avis modifié',
+                    'updated_at_fmt' => $row['updated_at_fmt'],
+                    'note' => $row['note']
+                ]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Non autorisé ou avis introuvable']);
             }
@@ -227,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row && (int)$row['deleted_id'] === $id_avis) {
                 // Recalcul de la note moyenne après suppression
-                recalcAndUpdateProductRating($pdo, $id_produit_post);
+                recalculeUpdateProduitNote($pdo, $id_produit_post);
                 echo json_encode(['success' => true, 'message' => 'Avis supprimé']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Non autorisé ou suppression non effectuée']);
@@ -248,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 if ($row && (int)$row['cnt'] > 0) {
                     $avg = round((float)$row['avg_note'], 1);
                 } else {
-                    $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
+                    $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.p_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.p_note IS NOT NULL');
                     $stmtAvgAvis->execute([':pid' => $id_produit_post]);
                     $row2 = $stmtAvgAvis->fetch(PDO::FETCH_ASSOC);
                     if ($row2 && $row2['avg_note'] !== null) {
@@ -320,7 +338,7 @@ try {
     $avisTextes = [];
 }
 
-// Moyenne de notes: priorité achats vérifiés (_commentaire), sinon moyenne des a_note de _avis
+// Moyenne de notes: priorité achats vérifiés (_commentaire), sinon moyenne des p_note de _avis
 $note = 0.0;
 $nbNotes = 0;
 $nbAvis = is_array($avisTextes) ? count($avisTextes) : 0;
@@ -333,8 +351,8 @@ try {
         $nbNotes = (int) $row['cnt'];
     }
     if ($note <= 0) {
-        // Fallback: moyenne des notes saisies sur _avis
-        $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
+    // Fallback: moyenne des notes saisies sur _avis
+    $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.p_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.p_note IS NOT NULL');
         $stmtAvgAvis->execute([':pid' => $idProduit]);
         $row2 = $stmtAvgAvis->fetch(PDO::FETCH_ASSOC);
         if ($row2 && $row2['avg_note'] !== null) {
@@ -460,7 +478,7 @@ if ($pageError) {
                 </span>
                 <?php if ($aUneRemise): ?>
                     <span style="background:#fff3cd;color:#856404;padding:6px 10px;border-radius:24px;font-size:13px">
-                        -<?= round($produit['discount_percentage']) ?>% de réduction
+                        -<?= round($discount) ?>% de réduction
                     </span>
                 <?php endif; ?>
                 <?php if ($produit['p_nb_ventes'] > 100): ?>
@@ -478,24 +496,24 @@ if ($pageError) {
             <h3>Avis clients</h3>
             <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:8px">
                 <div style="font-size:14px;color:var(--muted);margin-bottom:8px">Note moyenne</div>
-                <div style="display:flex;align-items:center;gap:10px">
-                    <span id="reviewsRatingValue"
-                        style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
-                    <div>
-                        <div class="stars" id="reviewsStars">
-                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <?php if ($i <= $noteEntiere): ?>
-                                    <img src="/img/svg/star-full.svg" alt="Etoile" width="16">
-                                <?php else: ?>
-                                    <img src="/img/svg/star-empty.svg" alt="Etoile" width="16">
-                                <?php endif; ?>
-                            <?php endfor; ?>
-                        </div>
-                        <div id="reviewsRatingCount" style="font-size:13px;color:var(--muted);margin-top:4px">
-                            Basé sur <?= (int) $nbAvis ?> avis
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <span id="reviewsRatingValue"
+                            style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
+                        <div>
+                            <div class="stars" id="reviewsStars">
+                                <?php
+                                // Rendu visuel des étoiles : plein / vide (pas de demi asset disponible)
+                                for ($i = 1; $i <= 5; $i++) {
+                                    $src = $i <= $noteEntiere ? '/img/svg/star-full.svg' : '/img/svg/star-empty.svg';
+                                    echo '<img src="' . $src . '" alt="Etoile" width="16">';
+                                }
+                                ?>
+                            </div>
+                            <div id="reviewsRatingCount" style="font-size:13px;color:var(--muted);margin-top:4px">
+                                Basé sur <?= (int) $nbAvis ?> avis
+                            </div>
                         </div>
                     </div>
-                </div>
             </div>
 
             <!-- Formulaire avis (carte) -->
@@ -677,12 +695,13 @@ if ($pageError) {
             }).then(r => r.json());
         }
 
-        function postEditAvis(productId, avisId, nouveauTexte) {
+        function postEditAvis(productId, avisId, nouveauTexte, note) {
             const form = new URLSearchParams();
             form.append('id_produit', productId);
             form.append('id_avis', avisId);
             form.append('action', 'edit_avis');
             form.append('commentaire', nouveauTexte);
+            if (note) { form.append('note', note); }
             return fetch('index.php?id=' + encodeURIComponent(productId), {
                 method: 'POST', headers: { 'Accept': 'application/json' }, body: form
             }).then(r => r.json());
@@ -909,6 +928,54 @@ if ($pageError) {
                 ta.style.border = '1px solid var(--secondary-color-gris-clair, #d0d4e2)';
                 ta.style.borderRadius = '8px';
                 contentEl.replaceWith(ta);
+                // Ajout widget étoiles pour modification de note
+                const noteWrap = document.createElement('div');
+                noteWrap.style.display = 'flex';
+                noteWrap.style.alignItems = 'center';
+                noteWrap.style.gap = '4px';
+                noteWrap.style.marginTop = '8px';
+                noteWrap.innerHTML = '<strong style="font-size:12px">Note :</strong>';
+                const starContainer = document.createElement('div');
+                starContainer.style.display = 'flex';
+                starContainer.style.gap = '2px';
+                starContainer.className = 'edit-star-input';
+                const editNoteHidden = document.createElement('input');
+                editNoteHidden.type = 'hidden';
+                editNoteHidden.value = '0';
+                const starEmpty = '/img/svg/star-empty.svg';
+                const starFull = '/img/svg/star-full.svg';
+                for (let v = 1; v <= 5; v++) {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.dataset.value = String(v);
+                    b.style.background = 'transparent';
+                    b.style.border = 'none';
+                    b.style.padding = '0';
+                    b.innerHTML = '<img src="' + starEmpty + '" alt="">';
+                    starContainer.appendChild(b);
+                }
+                function paintEdit(n) {
+                    starContainer.querySelectorAll('button').forEach(btn => {
+                        const val = parseInt(btn.dataset.value, 10);
+                        const img = btn.querySelector('img');
+                        if (img) img.src = val <= n ? starFull : starEmpty;
+                    });
+                }
+                starContainer.addEventListener('mouseleave', () => paintEdit(parseInt(editNoteHidden.value, 10) || 0));
+                starContainer.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('mouseenter', () => {
+                        paintEdit(parseInt(btn.dataset.value, 10));
+                    });
+                    btn.addEventListener('click', () => {
+                        const val = parseInt(btn.dataset.value, 10) || 0;
+                        editNoteHidden.value = String(val);
+                        paintEdit(val);
+                    });
+                });
+                paintEdit(0);
+                ta.after(noteWrap);
+                noteWrap.appendChild(starContainer);
+                noteWrap.appendChild(editNoteHidden);
                 const actionsWrap = document.createElement('div');
                 actionsWrap.style.display = 'flex';
                 actionsWrap.style.gap = '8px';
@@ -929,17 +996,34 @@ if ($pageError) {
                 btnSave.addEventListener('click', () => {
                     const nv = ta.value.trim();
                     if (!nv) { alert('Le commentaire ne peut pas être vide'); return; }
+                    const newNote = parseFloat(editNoteHidden.value || '0') || 0;
+                    if (newNote <= 0) { if (!confirm('Sauvegarder sans note ?')) return; }
                     btnSave.disabled = true;
-                    postEditAvis(productId, avisId, nv)
+                    const formNote = newNote > 0 ? newNote : '';
+                    postEditAvis(productId, avisId, nv, formNote)
                         .then(data => {
                             if (!data || !data.success) { alert((data && data.message) || 'Erreur'); return; }
                             contentEl.textContent = nv;
                             ta.replaceWith(contentEl);
+                            noteWrap.remove();
                             actionsWrap.remove();
                             if (data.updated_at_fmt) {
                                 const timeSpan = reviewEl.querySelector('.review-votes span[style*="font-size:12px"]');
                                 if (timeSpan) timeSpan.textContent = data.updated_at_fmt + ' (modifié)';
                             }
+                            // Mettre à jour la note affichée pour l'avis si renvoyée
+                            if (typeof data.note !== 'undefined') {
+                                const starsSpan = reviewEl.querySelector('.stars');
+                                if (starsSpan) {
+                                    const fullCount = Math.floor(parseFloat(data.note) || 0);
+                                    let html = '';
+                                    for (let i = 1; i <= 5; i++) {
+                                        html += '<img src="' + (i <= fullCount ? starFull : starEmpty) + '" alt="Etoile" width="16">';
+                                    }
+                                    starsSpan.innerHTML = html;
+                                }
+                            }
+                            fetchRating(productId); // Recalcul global
                         })
                         .catch(err => { console.error(err); alert('Erreur réseau'); })
                         .finally(() => { btnSave.disabled = false; });
