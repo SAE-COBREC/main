@@ -219,48 +219,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- Section informations personnelles -->
+            <!-- Section informations personnonnelles -->
             <section>
                 <h2>Informations personnelles</h2>
 
-                <form method="POST">
-                    <div>
-                        <label>
-                            <span>Nom</span>
-                            <input type="text" name="nom"
-                                value="<?php echo htmlspecialchars($client['c_nom'] ?? ''); ?>" required>
-                        </label>
-                    </div>
+                <article>
+                    <header>
+                        <div>
+                            <span>Profil</span>
+                            <strong>Vos informations</strong>
+                        </div>
+                        <span data-type="profil">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                ircle cx="12" cy="7" r="4"4"></circle>
+                            </svg>
+                        </span>
+                    </header>
 
-                    <div>
-                        <label>
-                            <span>Prénom</span>
-                            <input type="text" name="prenom"
-                                value="<?php echo htmlspecialchars($client['c_prenom'] ?? ''); ?>" required>
-                        </label>
-                    </div>
+                    <main>
+                        <form method="POST">
+                            <div>
+                                <label>
+                                    <span>Nom</span>
+                                    <input type="text" name="nom"
+                                        value="<?php echo htmlspecialchars($client['c_nom'] ?? ''); ?>" required>
+                                </label>
+                            </div>
 
-                    <div>
-                        <label>
-                            <span>Email</span>
-                            <input type="email" name="email"
-                                value="<?php echo htmlspecialchars($client['email'] ?? ''); ?>" required>
-                        </label>
-                    </div>
+                            <div>
+                                <label>
+                                    <span>Prénom</span>
+                                    <input type="text" name="prenom"
+                                        value="<?php echo htmlspecialchars($client['c_prenom'] ?? ''); ?>" required>
+                                </label>
+                            </div>
 
-                    <div>
-                        <label>
-                            <span>Téléphone</span>
-                            <input type="tel" name="telephone"
-                                value="<?php echo htmlspecialchars($client['num_telephone'] ?? ''); ?>">
-                        </label>
-                    </div>
+                            <div>
+                                <label>
+                                    <span>Email</span>
+                                    <input type="email" name="email"
+                                        value="<?php echo htmlspecialchars($client['email'] ?? ''); ?>" required>
+                                </label>
+                            </div>
 
-                    <button type="submit" name="update_info">
-                        Enregistrer les modifications
-                    </button>
-                </form>
+                            <div>
+                                <label>
+                                    <span>Téléphone</span>
+                                    <input type="tel" name="telephone"
+                                        value="<?php echo htmlspecialchars($client['num_telephone'] ?? ''); ?>">
+                                </label>
+                            </div>
+
+                            <button type="submit" name="update_info">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                                Enregistrer les modifications
+                            </button>
+                        </form>
+                    </main>
+                </article>
             </section>
 
+
+            <!-- Section adresses -->
             <!-- Section adresses -->
             <section>
                 <div>
@@ -275,34 +300,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php else: ?>
                     <?php foreach ($adresses as $adresse): ?>
                         <article>
-                            <div>
-                                <h3>Adresse #<?php echo $adresse['id_adresse']; ?></h3>
-                                <p>
-                                    <?php echo htmlspecialchars($adresse['a_adresse']); ?><br>
-                                    <?php echo htmlspecialchars($adresse['a_code_postal']); ?>
-                                    <?php echo htmlspecialchars($adresse['a_ville']); ?><br>
-                                    <?php if (!empty($adresse['a_complement'])): ?>
-                                        <?php echo htmlspecialchars($adresse['a_complement']); ?>
-                                    <?php endif; ?>
-                                </p>
-                            </div>
-                            <div>
+                            <header>
+                                <div>
+                                    <span>Adresse</span>
+                                    <strong>#<?php echo $adresse['id_adresse']; ?></strong>
+                                </div>
+                                <span data-type="adresse">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </span>
+                            </header>
+
+                            <main>
+                                <div>
+                                    <p>
+                                        <strong><?php echo htmlspecialchars($adresse['a_adresse']); ?></strong><br>
+                                        <?php echo htmlspecialchars($adresse['a_code_postal']); ?>
+                                        <?php echo htmlspecialchars($adresse['a_ville']); ?>
+                                        <?php if (!empty($adresse['a_complement'])): ?>
+                                            <br><em><?php echo htmlspecialchars($adresse['a_complement']); ?></em>
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                            </main>
+
+                            <footer>
                                 <button type="button"
                                     onclick="location.href='modifier-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
                                     Modifier
                                 </button>
                                 <button type="button"
                                     onclick="if(confirm('Supprimer cette adresse ?')) location.href='supprimer-adresse.php?id=<?php echo $adresse['id_adresse']; ?>'">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
                                     Supprimer
                                 </button>
-                            </div>
+                            </footer>
                         </article>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </section>
 
-            <!-- Section commandes récentes -->
 
+            <!-- Section commandes récentes -->
             <section>
                 <h2>Mes dernières commandes</h2>
 
@@ -358,33 +408,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <section>
                 <h2>Sécurité</h2>
 
-                <form method="POST">
-                    <div>
-                        <label>
-                            <span>Mot de passe actuel</span>
-                            <input type="password" name="current_password" placeholder="••••••••" required>
-                        </label>
-                    </div>
+                <article>
+                    <header>
+                        <div>
+                            <span>Mot de passe</span>
+                            <strong>Modifier votre mot de passe</strong>
+                        </div>
+                        <span data-type="securite">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </span>
+                    </header>
 
-                    <div>
-                        <label>
-                            <span>Nouveau mot de passe</span>
-                            <input type="password" name="new_password" placeholder="••••••••" required>
-                        </label>
-                    </div>
+                    <main>
+                        <form method="POST">
+                            <div>
+                                <label>
+                                    <span>Mot de passe actuel</span>
+                                    <input type="password" name="current_password" placeholder="••••••••" required>
+                                </label>
+                            </div>
 
-                    <div>
-                        <label>
-                            <span>Confirmer le mot de passe</span>
-                            <input type="password" name="confirm_password" placeholder="••••••••" required>
-                        </label>
-                    </div>
+                            <div>
+                                <label>
+                                    <span>Nouveau mot de passe</span>
+                                    <input type="password" name="new_password" placeholder="••••••••" required>
+                                </label>
+                            </div>
 
-                    <button type="submit" name="change_password">
-                        Changer le mot de passe
-                    </button>
-                </form>
+                            <div>
+                                <label>
+                                    <span>Confirmer le mot de passe</span>
+                                    <input type="password" name="confirm_password" placeholder="••••••••" required>
+                                </label>
+                            </div>
+
+                            <button type="submit" name="change_password">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                                Changer le mot de passe
+                            </button>
+                        </form>
+                    </main>
+                </article>
             </section>
+
         </div>
     </main>
 
