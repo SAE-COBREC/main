@@ -4,13 +4,11 @@ include '../../selectBDD.php';
 $id_panier = 8;
 $pdo->exec("SET search_path TO cobrec1");
 
-$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite, reduction_pourcentage, reduction_fin
+$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
                 FROM _contient
                 JOIN _produit ON _produit.id_produit = _contient.id_produit
                 JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
                 JOIN _image ON _represente_produit.id_image = _image.id_image
-                JOIN _en_reduction ON _en_reduction.id_produit = _contient.id_produit
-                JOIN _reduction ON _en_reduction.id_reduction = _reduction.id_reduction
                 WHERE id_panier = ". $id_panier . ";"; //gestion de la requête en fonction du login à terminer
 
 
