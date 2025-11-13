@@ -59,6 +59,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                                 <p class="articlePrix">
                                     <?php 
                                         if ($article['reduction_pourcentage'] != 0){ //regarde si l'article est en promotion
+                                            echo "test";
                                             $prix = $article['p_prix'] * (1-1/$article['reduction_pourcentage']);
                                             echo $prix . "_";
                                         }
