@@ -109,11 +109,11 @@ body {
   border: 1px solid $secondary-color-orange-clair;
   display: flex;
   flex-direction: column;
-  flex: 1; // prend tout l’espace restant
-  overflow: hidden; // cache tout dépassement global
+  flex: 1;
+  overflow: hidden;
 
   &__header {
-    flex-shrink: 0; // reste fixe
+    flex-shrink: 0;
     padding: 20px 24px;
     border-bottom: 1px solid $secondary-color-orange-clair;
     background: $primary-color-blanc;
@@ -130,13 +130,13 @@ body {
     border-collapse: collapse;
     overflow-y: auto;
     display: block;
-    max-height: calc(100vh - 350px); // ajustable selon ton layout
+    max-height: 810px;
   }
 
   .products-table tbody {
     display: block;
     overflow-y: auto;
-    height: 400px; // fixe la hauteur visible du tableau
+    height: 400px;
   }
 
   .products-table thead,
