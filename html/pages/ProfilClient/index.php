@@ -3,13 +3,42 @@ session_start();
 
 include __DIR__ . '/../../../../config.php';
 
-// Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['client_id'])) {
-    header("Location: /pages/connexionClient/index.php");
-    exit;
-}
+// ========================================
+// MODE TEST - Décommentez l'une des lignes ci-dessous pour tester
+// ========================================
 
-$clientId = $_SESSION['client_id'];
+// Option 1: Client Jean Dupont (id_client = 1) - A effectué 2 commandes
+$clientId = 1;
+
+// Option 2: Client Marie Martin (id_client = 2) - A effectué 3 commandes
+// $clientId = 2;
+
+// Option 3: Client Pierre Durand (id_client = 3) - A effectué 1 commande
+// $clientId = 3;
+
+// Option 4: Client Sophie Bernard (id_client = 4) - A effectué 2 commandes
+// $clientId = 4;
+
+// Option 5: Client Lucas Petit (id_client = 5) - Aucune commande
+// $clientId = 5;
+
+// Option 6: Client Emma Lefebvre (id_client = 6) - A effectué 1 commande
+// $clientId = 6;
+
+// ========================================
+// MODE PRODUCTION - Vérification de la session (à activer en production)
+// ========================================
+
+// Décommentez ces lignes pour activer le mode production
+// if (!isset($_SESSION['client_id'])) {
+//     header("Location: /pages/connexionClient/index.php");
+//     exit;
+// }
+// $clientId = $_SESSION['client_id'];
+
+// ========================================
+// RESTE DU CODE
+// ========================================
 
 // Récupérer les informations du client avec les données du compte
 $stmtClient = $pdo->prepare("
@@ -24,6 +53,10 @@ $stmtClient = $pdo->prepare("
 ");
 $stmtClient->execute([$clientId]);
 $client = $stmtClient->fetch(PDO::FETCH_ASSOC);
+
+if (!$client) {
+    die("Client introuvable avec l'ID : " . htmlspecialchars($clientId));
+}
 
 // Récupérer l'id_compte du client pour d'autres requêtes
 $stmtIdCompte = $pdo->prepare("SELECT id_compte FROM _client WHERE id_client = ?");
@@ -144,11 +177,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     
     <?php
-    include __DIR__ . '/../../partials/header.html';
+    include __DIR__ . '/partials/header.html';
     ?>
 
     <main>
         <div>
+            <!-- Bannière de test -->
+            <div style="background: #fff3cd; padding: 10px; margin-bottom: 20px; border: 1px solid #ffc107; border-radius: 5px;">
+                <strong>⚠️ MODE TEST ACTIVÉ</strong> - Vous testez avec le client: <?php echo htmlspecialchars($client['c_prenom'] . ' ' . $client['c_nom']); ?> (ID: <?php echo $clientId; ?>)
+            </div>
+
             <button onclick="history.back()">
                 ← Retour
             </button>
@@ -308,7 +346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
     <?php
-    include __DIR__ . '/../../partials/footer.html';
+    include __DIR__ . '/partials/footer.html';
     ?>
 
 </body>
