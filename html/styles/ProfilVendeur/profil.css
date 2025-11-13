@@ -1,0 +1,79 @@
+body {
+  font-family: "Quicksand", sans-serif;
+  background: #FFF7F1;
+  width: 1440px;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 100vh;
+  background: #FFFFFF;
+}
+
+.main {
+  background: #FFF7F1;
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+
+.header__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #030212;
+  margin-bottom: 24px;
+}
+
+.profil-card {
+  background: #FFFFFF;
+  border-radius: 14px;
+  border: 1px solid #E5D5C5;
+  padding: 32px;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.profil-card__title {
+  font-family: "Baloo", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #CD7F32;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.profil-details {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 12px 24px;
+  font-size: 15px;
+  color: #030212;
+}
+.profil-details dt {
+  font-weight: 600;
+}
+.profil-details dd {
+  font-weight: 400;
+}
+
+.profil-actions {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.btn {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn--primary {
+  background: #CD7F32;
+  color: #FFFFFF;
+  transition: background-color 0.3s;
+}
+.btn--primary:hover {
+  background: rgba(230, 169, 110, 0.9);
+}/*# sourceMappingURL=profil.css.map */

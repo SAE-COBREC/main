@@ -1,0 +1,86 @@
+@use "../variable" as *;
+
+body {
+  font-family: $font-family-secondaire;
+  background: $secondary-color-rose-claire;
+  width: 1440px;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 100vh;
+  background: $primary-color-blanc;
+}
+
+.main {
+  background: $secondary-color-rose-claire;
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+
+.header__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: $primary-color-noir;
+  margin-bottom: 24px;
+}
+
+.profil-card {
+  background: $primary-color-blanc;
+  border-radius: $border-radius-primary;
+  border: 1px solid $secondary-color-orange-clair;
+  padding: 32px;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+
+  &__title {
+    font-family: $font-family-primaire;
+    font-size: 20px;
+    font-weight: 700;
+    color: $primary-color-bronze;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+}
+
+.profil-details {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 12px 24px;
+  font-size: 15px;
+  color: $primary-color-noir;
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    font-weight: 400;
+  }
+}
+
+.profil-actions {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.btn {
+  border: none;
+  padding: 10px 20px;
+  border-radius: $border-radius-primary;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+
+  &--primary {
+    background: $primary-color-bronze;
+    color: $primary-color-blanc;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background: rgba($secondary-color-bronze-clair, 0.9);
+    }
+  }
+}
