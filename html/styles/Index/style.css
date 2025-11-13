@@ -116,9 +116,6 @@ aside input[type=range] {
   border-radius: 8px;
   background: #EFEFEF;
   outline: none;
-  /* Curseur (le rond que tu déplaces) - Chrome, Safari, Edge */
-  /* Curseur - Firefox */
-  /* Barre - Firefox */
 }
 aside input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -374,6 +371,18 @@ footer > div > div:last-child span:hover {
   color: #FFFFFF;
 }
 
+@media (min-width: 429px) and (max-width: 1440px) {
+  aside section > div span {
+    font-size: 1.5em;
+  }
+  aside form > div:first-child span {
+    display: none;
+  }
+  aside form > div:first-child select {
+    font-size: 1.3em;
+    padding: 5px 10px;
+  }
+}
 @media (max-width: 1024px) {
   .container {
     grid-template-columns: 1fr;
@@ -519,23 +528,4 @@ footer > div > div:last-child span:hover {
   footer > div > div:last-child span {
     text-align: center;
   }
-}
-
-/* Media query pour les écrans entre 428px et 1440px */
-@media (min-width: 429px) and (max-width: 1440px) {
-    /* Catégories */
-    aside section > div span {
-        font-size: 1.5em;
-    }
-    
-    /* Masquer le texte "Trier par" */
-    aside form > div:first-child span {
-        display: none;
-    }
-    
-    /* Agrandir le select (Meilleures ventes, etc.) */
-    aside form > div:first-child select {
-        font-size: 1.35em;
-        padding: 5px 10px;
-    }
-}
+}/*# sourceMappingURL=style.css.map */
