@@ -1,6 +1,6 @@
 # File Tree: main
 
-**Generated:** 12/11/2025 11:01:47
+**Generated:** 13/11/2025 16:02:00
 
 ```
 ├── 📁 Php
@@ -47,9 +47,12 @@
 │   │       ├── 🖼️ logo_bronze.svg
 │   │       ├── 🖼️ loupe.svg
 │   │       ├── 🖼️ menu-burger.svg
+│   │       ├── 🖼️ minus.svg
 │   │       ├── 🖼️ panier-empty.svg
 │   │       ├── 🖼️ panier.svg
 │   │       ├── 🖼️ pinterest-blank.svg
+│   │       ├── 🖼️ plus.svg
+│   │       ├── 🖼️ poubelle.svg
 │   │       ├── 🖼️ profile-v.svg
 │   │       ├── 🖼️ profile.svg
 │   │       ├── 🖼️ promotion.svg
@@ -65,10 +68,14 @@
 │   │   ├── 📄 registerPass.js
 │   │   └── 📄 storage.js
 │   ├── 📁 pages
+│   │   ├── 📁 ProfilClient
+│   │   │   └── 🐘 index.php
 │   │   ├── 📁 backoffice
 │   │   │   ├── 📁 connexion
 │   │   │   │   └── 🐘 index.php
 │   │   │   ├── 📁 create
+│   │   │   │   └── 🐘 index.php
+│   │   │   ├── 📁 profil
 │   │   │   │   └── 🐘 index.php
 │   │   │   ├── 📁 register
 │   │   │   │   └── 🐘 index.php
@@ -81,10 +88,13 @@
 │   │   │   └── 🐘 index.php
 │   │   ├── 📁 panier
 │   │   │   ├── 🌐 index.html
-│   │   │   └── 🐘 index.php
-│   │   └── 📁 produit
-│   │       ├── 🐘 index.php
-│   │       └── 📄 mls.csv
+│   │   │   ├── 🐘 index.php
+│   │   │   ├── 🐘 supprimerArticle.php
+│   │   │   └── 🐘 viderPanier.php
+│   │   ├── 📁 produit
+│   │   │   ├── 🐘 index.php
+│   │   │   └── 🐘 not-found.php
+│   │   └── 🌐 404.html
 │   ├── 📁 partials
 │   │   ├── 🌐 aside.html
 │   │   ├── 🌐 footer.html
@@ -108,6 +118,11 @@
 │   │   ├── 📁 Panier
 │   │   │   ├── 🎨 stylesPanier.css
 │   │   │   └── 🎨 stylesPanier.scss
+│   │   ├── 📁 ProfilClient
+│   │   │   └── 🎨 style.css
+│   │   ├── 📁 ProfilVendeur
+│   │   │   ├── 🎨 profil.css
+│   │   │   └── 🎨 profil.scss
 │   │   ├── 📁 Register
 │   │   │   ├── 🎨 styleRegister.css
 │   │   │   ├── 🎨 styleRegister.scss
@@ -119,17 +134,15 @@
 │   │   │   ├── 🎨 creerArticle.css
 │   │   │   └── 🎨 creerArticle.scss
 │   │   └── 🎨 _variable.scss
-│   ├── 🌐 404.html
-│   ├── 🐘 index.php
-│   └── 🐘 test.php
-├── 📁 src
-│   └── 📁 data
-│       ├── 📄 articles_vendeur.csv
-│       └── 📄 data.csv
+│   ├── 🐘 config1.php
+│   └── 🐘 selectBDD.php
 ├── ⚙️ .gitattributes
 ├── ⚙️ .gitignore
-├── 📄 LICENSE
 ├── 📝 README.md
+├── 📄 backup_peuplement.sql
+├── 📝 bug.md
+├── 📄 commande.txt
 ├── 📄 create.sql
-└── 📄 lien_GitHub.txt
+├── 📄 lien_GitHub.txt
+└── 📝 serveurs.md
 ```

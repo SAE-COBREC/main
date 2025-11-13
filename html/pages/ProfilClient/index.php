@@ -5,9 +5,10 @@ include __DIR__ . '/../../../../config.php';
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['client_id'])) {
-    header('Location: connexion.php');
-    exit();
+    header("Location: /pages/connexionClient/index.php");
+    exit;
 }
+
 
 $clientId = $_SESSION['client_id'];
 
