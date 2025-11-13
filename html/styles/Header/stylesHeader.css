@@ -5,7 +5,7 @@
   background-color: #FFFFFF;
   color: #030212;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
-  position: relative;
+  position: sticky;
   width: 100%;
   box-sizing: border-box;
   /* ensure header content vertically centers and has a fixed height */
