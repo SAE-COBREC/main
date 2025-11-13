@@ -74,6 +74,34 @@ function chargerProduitsBDD($pdo)
 function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
 {
     try {
+        //récupérer les informations du produit (prix, TVA, frais de port, remise)
+        $sqlProduit = "
+            SELECT 
+                p.p_prix, 
+                p.p_frais_de_port, 
+                COALESCE(t.montant_tva, 0) as tva,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
+            FROM _produit p
+            LEFT JOIN _tva t ON p.id_tva = t.id_tva
+            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            WHERE p.id_produit = :idProduit
+        ";
+        
+        $stmtProduit = $pdo->prepare($sqlProduit);
+        $stmtProduit->execute([':idProduit' => $idProduit]);
+        $produit = $stmtProduit->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$produit) {
+            return ['success' => false, 'message' => 'Produit introuvable'];
+        }
+        
+        //calculer le prix avec remise
+        $prixUnitaire = $produit['p_prix'];
+        $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $fraisDePort = $produit['p_frais_de_port'];
+        $tva = $produit['tva'];
+        
         //vérifier si l'article existe déjà dans le panier
         $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
         $stmtCheck = $pdo->prepare($sqlCheck);
@@ -85,7 +113,7 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
         if ($existe) {
-            // Si l'article existe déjà, augmenter la quantité
+            //si l'article existe déjà, augmenter la quantité
             $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
             $stmtUpdate = $pdo->prepare($sqlUpdate);
             $stmtUpdate->execute([
@@ -93,15 +121,23 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
                 ':idProduit' => $idProduit,
                 ':idPanier' => $idPanier
             ]);
-            return ['success' => true, 'message' => 'Quantité mise à jour'];
+            return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
         } else {
-            // Sinon, insérer un nouvel article
-            $sqlInsert = "INSERT INTO _contient (id_produit, id_panier, quantite) VALUES (:idProduit, :idPanier, :quantite)";
+            //sinon, insérer un nouvel article avec toutes les informations
+            $sqlInsert = "
+                INSERT INTO _contient 
+                (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) 
+                VALUES (:idProduit, :idPanier, :quantite, :prixUnitaire, :remiseUnitaire, :fraisDePort, :tva)
+            ";
             $stmtInsert = $pdo->prepare($sqlInsert);
             $stmtInsert->execute([
                 ':idProduit' => $idProduit,
                 ':idPanier' => $idPanier,
-                ':quantite' => $quantite
+                ':quantite' => $quantite,
+                ':prixUnitaire' => $prixUnitaire,
+                ':remiseUnitaire' => $remiseUnitaire,
+                ':fraisDePort' => $fraisDePort,
+                ':tva' => $tva
             ]);
             return ['success' => true, 'message' => 'Article ajouté au panier'];
         }
@@ -433,9 +469,33 @@ $id_panier = 8;
             document.getElementById('affichagePrixMax').textContent = valeur + '€';
         }
 
-        //fonction pour simuler l'ajout au panier
+        //fonction pour ajouter au panier avec requête AJAX vers la base de données
         function ajouterAuPanier(idProduit) {
-            alert('Produit ' + idProduit + ' ajouté au panier !');
+            //créer les données du formulaire
+            const formData = new FormData();
+            formData.append('action', 'ajouter_panier');
+            formData.append('idProduit', idProduit);
+            formData.append('quantite', 1);
+            
+            //envoyer la requête AJAX
+            fetch('index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    //optionnel : mettre à jour le compteur du panier
+                    //mettreAJourCompteurPanier();
+                } else {
+                    alert('✗ ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'ajout au panier');
+            });
         }
 
         //fonction pour réinitialiser tous les filtres
