@@ -218,7 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-            <!-- Section informations personnelles -->
             <!-- Section informations personnonnelles -->
             <section>
                 <h2>Informations personnelles</h2>
@@ -232,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span data-type="profil">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                ircle cx="12" cy="7" r="4"4"></circle>
+                                <circle cx="12" cy="7" r="4"4"></circle>
                             </svg>
                         </span>
                     </header>
@@ -284,8 +283,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </article>
             </section>
 
-
-            <!-- Section adresses -->
             <!-- Section adresses -->
             <section>
                 <div>
