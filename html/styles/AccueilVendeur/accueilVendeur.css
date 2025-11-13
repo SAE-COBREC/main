@@ -121,7 +121,7 @@ body {
 .content-section .products-table tbody {
   display: block;
   overflow-y: auto;
-  height: 400px;
+  height: 600px;
 }
 .content-section .products-table thead,
 .content-section .products-table tbody tr {

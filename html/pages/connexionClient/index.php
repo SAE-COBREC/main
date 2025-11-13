@@ -28,7 +28,8 @@ session_start();
     
     // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
     try {
-      $stmt = $pdo->prepare("SELECT mdp FROM _compte WHERE email = :email LIMIT 1");
+      // Select both id and mdp so we can store the user's id in session on success
+      $stmt = $pdo->prepare("SELECT id, mdp FROM _compte WHERE email = :email LIMIT 1");
       $stmt->execute([':email' => $email]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if (!$row) {
@@ -49,7 +50,8 @@ session_start();
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
-          $_SESSION['id'] = (int)$row['id'];
+          // Ensure id exists before assigning (defensive)
+          $_SESSION['id'] = isset($row['id']) ? (int)$row['id'] : null;
         }
       }
     } catch (Exception $e) {
