@@ -1,3 +1,9 @@
+<?php 
+include __DIR__ . '../../../../../config.php';
+
+$pdo->exec("SET search_path TO cobrec1");
+
+ ?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -12,9 +18,7 @@
 </head>
 
 <?php
-  $interdit = "bleu";
-  $interditmail = "a@a.a";
-
+  session_start();
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
@@ -22,14 +26,38 @@
     $hasError = false;
     $error_card = null;
     $error_message = '';
-
-    $interdit = "bleu";
-    $interditmail = "bleu@b";
     
-  if (strtolower($mdp) === strtolower($interdit) || strtolower($email) === strtolower($interditmail)) {
+    // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
+    try {
+      $stmt = $pdo->prepare("SELECT mdp FROM _compte WHERE email = :email LIMIT 1");
+      $stmt->execute([':email' => $email]);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      if (!$row) {
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Adresse mail ou mot de passe incorrecte.';
+      } else {
+        $stored = $row['mdp'];
+        $passwordOk = false;
+        if (function_exists('password_verify')) {
+          $passwordOk = password_verify($mdp, $stored);
+        }
+        if (!$passwordOk && $stored === $mdp) {
+          $passwordOk = true;
+        }
+        if (!$passwordOk) {
+          $hasError = true;
+          $error_card = 1;
+          $error_message = 'Adresse mail ou mot de passe incorrecte.';
+        } else {
+          // Si authentification OK, stocker l'id du compte en session
+          $_SESSION['id'] = (int)$row['id'];
+        }
+      }
+    } catch (Exception $e) {
       $hasError = true;
       $error_card = 1;
-      $error_message = 'Adresse mail ou mot de passe incorrecte.';
+      $error_message = 'Erreur lors de la vérification des identifiants.';
     }
 
     if (!$hasError) {
@@ -49,8 +77,7 @@
       exit;
     }
   }
-  session_start();
-  $_SESSION['id'] = 3 ;
+
 ?>
 
 <style>

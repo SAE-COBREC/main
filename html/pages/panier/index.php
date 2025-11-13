@@ -1,9 +1,7 @@
 <?php 
-include '../../selectBDD.php';
-session_start();
-
 include '../../../config.php';
 
+session_start();
 $id_client = $_SESSION['id'] ;
 
 
