@@ -259,6 +259,7 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
             SELECT 
                 p.p_prix, 
                 p.p_frais_de_port, 
+                p.p_stock,
                 COALESCE(t.montant_tva, 0) as tva,
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
             FROM _produit p
@@ -276,11 +277,16 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
         
+        // normaliser la quantité demandée
+        $quantite = (int) $quantite;
+        if ($quantite < 1) { $quantite = 1; }
+        
         //calculer le prix avec remise
         $prixUnitaire = $produit['p_prix'];
         $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
         $fraisDePort = $produit['p_frais_de_port'];
         $tva = $produit['tva'];
+        $stock = (int)($produit['p_stock'] ?? 0);
         
         //vérifier si l'article existe déjà dans le panier
         $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
@@ -291,16 +297,28 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
         ]);
 
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $quantiteExistante = $existe ? (int)$existe['quantite'] : 0;
+        $disponible = max(0, $stock - $quantiteExistante);
+
+        if ($disponible <= 0) {
+            return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
+        }
+
+        // quantité réellement ajoutée (ne dépasse pas le disponible)
+        $aAjouter = min($quantite, $disponible);
 
         if ($existe) {
             //si l'article existe déjà, augmenter la quantité
             $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
             $stmtUpdate = $pdo->prepare($sqlUpdate);
             $stmtUpdate->execute([
-                ':quantite' => $quantite,
+                ':quantite' => $aAjouter,
                 ':idProduit' => $idProduit,
                 ':idPanier' => $idPanier
             ]);
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
             return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
         } else {
             //sinon, insérer un nouvel article avec toutes les informations
@@ -313,12 +331,15 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
             $stmtInsert->execute([
                 ':idProduit' => $idProduit,
                 ':idPanier' => $idPanier,
-                ':quantite' => $quantite,
+                ':quantite' => $aAjouter,
                 ':prixUnitaire' => $prixUnitaire,
                 ':remiseUnitaire' => $remiseUnitaire,
                 ':fraisDePort' => $fraisDePort,
                 ':tva' => $tva
             ]);
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
             return ['success' => true, 'message' => 'Article ajouté au panier'];
         }
     } catch (Exception $e) {
@@ -651,6 +672,16 @@ $noteEntiere = (int)floor($note);
     <div id="footer"></div>
 
     <script>
+        // Wrapper pour garantir une réponse JSON (donne un message clair si 404/HTML)
+        async function fetchJson(url, options) {
+            const resp = await fetch(url, options || {});
+            const ct = resp.headers.get('content-type') || '';
+            if (!resp.ok || ct.indexOf('application/json') === -1) {
+                const text = await resp.text();
+                throw new Error('Réponse non JSON (' + resp.status + '): ' + text.slice(0, 300));
+            }
+            return resp.json();
+        }
         document.addEventListener('DOMContentLoaded', function () {
             const dec = document.getElementById('qty-decrease');
             const inc = document.getElementById('qty-increase');
@@ -703,20 +734,22 @@ $noteEntiere = (int)floor($note);
             });
         });
 
-        //fonction pour ajouter au panier avec requête AJAX vers la base de données
+        //fonction pour ajouter au panier avec requête AJAX vers la base de données (endpoint racine)
         function ajouterAuPanier(idProduit) {
             //créer les données du formulaire
             const formData = new FormData();
             formData.append('action', 'ajouter_panier');
             formData.append('idProduit', idProduit);
-            formData.append('quantite', 1);
+            const qtyEl = document.getElementById('qtyInput');
+            const qty = qtyEl ? Math.max(1, Math.min(parseInt(qtyEl.value || '1', 10) || 1, parseInt(qtyEl.getAttribute('max') || '9999', 10) || 9999)) : 1;
+            formData.append('quantite', qty);
             
-            //envoyer la requête AJAX
-            fetch('index.php', {
+            //envoyer la requête AJAX (cible: /index.php à la racine)
+            fetchJson('/index.php', {
                 method: 'POST',
+                headers: { 'Accept': 'application/json' },
                 body: formData
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     alert('✓ ' + data.message);
@@ -728,7 +761,7 @@ $noteEntiere = (int)floor($note);
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('Erreur lors de l\'ajout au panier');
+                alert('Erreur lors de l\'ajout au panier: ' + (error && error.message ? error.message : 'inconnue'));
             });
         }
 
@@ -749,11 +782,11 @@ $noteEntiere = (int)floor($note);
             form.append('action', 'add_avis');
             form.append('commentaire', commentaire);
             form.append('note', String(note || 0));
-            return fetch('index.php?id=' + encodeURIComponent(productId), {
+            return fetchJson('/pages/produit/index.php?id=' + encodeURIComponent(productId), {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: form
-            }).then(r => r.json());
+            });
         }
 
         function postVote(productId, avisId, value, prev) {
@@ -763,11 +796,11 @@ $noteEntiere = (int)floor($note);
             form.append('action', 'vote');
             form.append('value', value);
             form.append('prev', prev || '');
-            return fetch('index.php?id=' + encodeURIComponent(productId), {
+            return fetchJson('/pages/produit/index.php?id=' + encodeURIComponent(productId), {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: form
-            }).then(r => r.json());
+            });
         }
 
         function postEditAvis(productId, avisId, nouveauTexte, note) {
@@ -777,9 +810,9 @@ $noteEntiere = (int)floor($note);
             form.append('action', 'edit_avis');
             form.append('commentaire', nouveauTexte);
             if (note) { form.append('note', note); }
-            return fetch('index.php?id=' + encodeURIComponent(productId), {
+            return fetchJson('/pages/produit/index.php?id=' + encodeURIComponent(productId), {
                 method: 'POST', headers: { 'Accept': 'application/json' }, body: form
-            }).then(r => r.json());
+            });
         }
 
         function postDeleteAvis(productId, avisId) {
@@ -787,18 +820,18 @@ $noteEntiere = (int)floor($note);
             form.append('id_produit', productId);
             form.append('id_avis', avisId);
             form.append('action', 'delete_avis');
-            return fetch('index.php?id=' + encodeURIComponent(productId), {
+            return fetchJson('/pages/produit/index.php?id=' + encodeURIComponent(productId), {
                 method: 'POST', headers: { 'Accept': 'application/json' }, body: form
-            }).then(r => r.json());
+            });
         }
 
         function fetchRating(productId) {
             const form = new URLSearchParams();
             form.append('id_produit', productId);
             form.append('action', 'get_rating');
-            return fetch('index.php?id=' + encodeURIComponent(productId), {
+            return fetchJson('/pages/produit/index.php?id=' + encodeURIComponent(productId), {
                 method: 'POST', headers: { 'Accept': 'application/json' }, body: form
-            }).then(r => r.json()).then(data => {
+            }).then(data => {
                 if (!data || !data.success) return;
                 const avg = parseFloat(data.avg) || 0;
                 const countAvis = parseInt(data.countAvis, 10) || 0;
