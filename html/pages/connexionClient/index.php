@@ -79,20 +79,11 @@ session_start();
     }
 
     if (!$hasError) {
-
-
-      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
-      echo "<h2 style=\"margin-top:0;\">Récapitulatif (côté serveur)</h2>";
-      echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-      echo "<dt>Email</dt><dd>{$email}</dd>";
-      echo "<dt>mdp</dt><dd>{$mdp}</dd>";
-      echo "<dt>ID</dt><dd>{$userId}</dd>";
-      echo "</dl>";
-      echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
-      echo "<a href=\"index.php\" style=\"display:inline-block;padding:8px 12px;border-radius:8px;border:1px solid #030212;color:#030212;text-decoration:none;\">Retour</a>";
+      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);text-align:center;\">";
+      echo "<h2 style=\"margin-top:0;\">Connexion réussie</h2>";
+      echo "<p style=\"margin:18px 0;\">Cliquez pour accéder au backoffice :</p>";
+      echo "<p><a href=\"../../index.php\" style=\"display:inline-block;padding:10px 14px;background:#fff;color:#000;border-radius:8px;text-decoration:none;border:1px solid rgba(0,0,0,0.12);\">Aller au backoffice</a></p>";
       echo "</div>";
-      echo "</div>";
-
       exit;
     }
   }
