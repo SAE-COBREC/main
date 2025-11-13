@@ -311,7 +311,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php foreach ($commandes as $commande): ?>
                         <article>
                             <div>
-                                <span>Commande #<?php echo htmlspecialchars($commande['id_panier']); ?></span>
+                                <span>Commande : <?php echo htmlspecialchars($commande['id_panier']); ?></span>
                             </div>
                             <div>
                                 <div>
