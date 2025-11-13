@@ -1,46 +1,8 @@
 <?php
 session_start();
-// Utiliser la configuration centrale PostgreSQL (comme la page d'accueil)
-include __DIR__ . '../selectBDD.php';
+include __DIR__ . '/config.php';
 $pageError = false;
 $produit = null;
-
-function recalculeUpdateProduitNote(PDO $pdo, int $productId): void
-{
-    try {
-        // Assurer le schéma sélectionné (config.php le fait déjà mais idempotent)
-        $pdo->exec("SET search_path TO cobrec1");
-
-        // 1) Moyenne sur achats vérifiés
-        $stmt = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt
-                               FROM _avis a
-                               LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
-                               WHERE a.id_produit = :pid AND c.a_note IS NOT NULL');
-        $stmt->execute([':pid' => $productId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $avg = 0.0;
-        if ($row && (int) $row['cnt'] > 0) {
-            $avg = round((float) $row['avg_note'], 1);
-        } else {
-            // 2) Fallback: moyenne des notes éventuellement posées sur _avis.a_note
-            $stmt2 = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
-            $stmt2->execute([':pid' => $productId]);
-            $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
-            if ($row2 && $row2['avg_note'] !== null) {
-                $avg = round((float) $row2['avg_note'], 1);
-            } else {
-                $avg = 0.0;
-            }
-        }
-
-        // Mettre à jour la colonne de cache p_note (utilisée sur la page d'accueil)
-        $upd = $pdo->prepare('UPDATE _produit SET p_note = :avg WHERE id_produit = :pid');
-        $upd->execute([':avg' => $avg, ':pid' => $productId]);
-    } catch (Throwable $e) {
-        // Ne pas interrompre le flux si l'update échoue; simple log possible
-        // error_log('recalculeUpdateProduitNote failed: ' . $e->getMessage());
-    }
-}
 
 // Récupérer l'ID du produit depuis l'URL et charger depuis la base
 $idProduit = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -153,8 +115,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $row['note'] = 0.0; // Fallback
             }
-            // Recalcul et mise à jour de la note moyenne du produit
-            recalculeUpdateProduitNote($pdo, $id_produit_post);
+            // Calcul direct de la nouvelle moyenne et du nouveau compteur (2 requêtes simples)
+            $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
+            $stmtAvg->execute([':pid' => $id_produit_post]);
+            $newAvg = (float)($stmtAvg->fetchColumn() ?: 0.0);
+            $stmtCnt = $pdo->prepare('SELECT COUNT(*) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
+            $stmtCnt->execute([':pid' => $id_produit_post]);
+            $newCountAvis = (int)($stmtCnt->fetchColumn() ?: 0);
 
             echo json_encode([
                 'success' => true,
@@ -162,7 +129,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 'id_avis' => $row['id_avis'],
                 'created_at' => $row['a_timestamp_creation'],
                 'created_at_fmt' => isset($row['created_at_fmt']) ? $row['created_at_fmt'] : null,
-                'note' => isset($row['note']) ? (float) $row['note'] : $note_post
+                'note' => isset($row['note']) ? (float)$row['note'] : $note_post,
+                'avg' => $newAvg,
+                'countAvis' => $newCountAvis
             ]);
             exit;
         } elseif ($action === 'vote') {
@@ -229,9 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
                 // Recalcul si la note a été modifiée
-                if ($note_post !== null) {
-                    recalculeUpdateProduitNote($pdo, $id_produit_post);
-                }
+                // Après modification, pas de recalcul complexe: la moyenne sera récupérée par get_rating si nécessaire
                 echo json_encode([
                     'success' => true,
                     'message' => 'Avis modifié',
@@ -253,38 +220,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
             $stmt->execute([':id' => $id_avis, ':pid' => $id_produit_post, ':owner' => $ownerToken]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row && (int) $row['deleted_id'] === $id_avis) {
-                // Recalcul de la note moyenne après suppression
-                recalculeUpdateProduitNote($pdo, $id_produit_post);
+                // Pas de recalcul immédiat: get_rating effectuera les deux requêtes simples
                 echo json_encode(['success' => true, 'message' => 'Avis supprimé']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Non autorisé ou suppression non effectuée']);
             }
             exit;
         } elseif ($action === 'get_rating') {
-            // Renvoie la note moyenne actuelle (vérifiée si dispo, sinon moyenne des avis) + nombre d'avis
-            $avg = 0.0;
-            $countAvis = 0;
+            // Nouveau système simplifié: 2 requêtes (moyenne et compteur)
             try {
-                $stmtCnt = $pdo->prepare('SELECT COUNT(*) AS c FROM _avis WHERE id_produit = :pid');
-                $stmtCnt->execute([':pid' => $id_produit_post]);
-                $rc = $stmtCnt->fetch(PDO::FETCH_ASSOC);
-                $countAvis = (int) ($rc ? $rc['c'] : 0);
-
-                $stmtAvg = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt FROM _avis a LEFT JOIN _commentaire c ON c.id_avis = a.id_avis WHERE a.id_produit = :pid AND c.a_note IS NOT NULL');
+                $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
                 $stmtAvg->execute([':pid' => $id_produit_post]);
-                $row = $stmtAvg->fetch(PDO::FETCH_ASSOC);
-                if ($row && (int) $row['cnt'] > 0) {
-                    $avg = round((float) $row['avg_note'], 1);
-                } else {
-                    $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
-                    $stmtAvgAvis->execute([':pid' => $id_produit_post]);
-                    $row2 = $stmtAvgAvis->fetch(PDO::FETCH_ASSOC);
-                    if ($row2 && $row2['avg_note'] !== null) {
-                        $avg = round((float) $row2['avg_note'], 1);
-                    } else {
-                        $avg = 0.0;
-                    }
-                }
+                $avg = (float)($stmtAvg->fetchColumn() ?: 0.0);
+                $stmtCnt = $pdo->prepare('SELECT COUNT(*) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
+                $stmtCnt->execute([':pid' => $id_produit_post]);
+                $countAvis = (int)($stmtCnt->fetchColumn() ?: 0);
                 echo json_encode(['success' => true, 'avg' => $avg, 'countAvis' => $countAvis]);
                 exit;
             } catch (Throwable $e) {
@@ -298,6 +248,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
         echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
         exit;
     }
+}
+
+//fonction pour ajouter un article au panier dans la BDD
+function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
+{
+    try {
+        //récupérer les informations du produit (prix, TVA, frais de port, remise)
+        $sqlProduit = "
+            SELECT 
+                p.p_prix, 
+                p.p_frais_de_port, 
+                COALESCE(t.montant_tva, 0) as tva,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
+            FROM _produit p
+            LEFT JOIN _tva t ON p.id_tva = t.id_tva
+            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            WHERE p.id_produit = :idProduit
+        ";
+        
+        $stmtProduit = $pdo->prepare($sqlProduit);
+        $stmtProduit->execute([':idProduit' => $idProduit]);
+        $produit = $stmtProduit->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$produit) {
+            return ['success' => false, 'message' => 'Produit introuvable'];
+        }
+        
+        //calculer le prix avec remise
+        $prixUnitaire = $produit['p_prix'];
+        $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $fraisDePort = $produit['p_frais_de_port'];
+        $tva = $produit['tva'];
+        
+        //vérifier si l'article existe déjà dans le panier
+        $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
+        $stmtCheck = $pdo->prepare($sqlCheck);
+        $stmtCheck->execute([
+            ':idProduit' => $idProduit,
+            ':idPanier' => $idPanier
+        ]);
+
+        $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+        if ($existe) {
+            //si l'article existe déjà, augmenter la quantité
+            $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
+            $stmtUpdate = $pdo->prepare($sqlUpdate);
+            $stmtUpdate->execute([
+                ':quantite' => $quantite,
+                ':idProduit' => $idProduit,
+                ':idPanier' => $idPanier
+            ]);
+            return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
+        } else {
+            //sinon, insérer un nouvel article avec toutes les informations
+            $sqlInsert = "
+                INSERT INTO _contient 
+                (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) 
+                VALUES (:idProduit, :idPanier, :quantite, :prixUnitaire, :remiseUnitaire, :fraisDePort, :tva)
+            ";
+            $stmtInsert = $pdo->prepare($sqlInsert);
+            $stmtInsert->execute([
+                ':idProduit' => $idProduit,
+                ':idPanier' => $idPanier,
+                ':quantite' => $quantite,
+                ':prixUnitaire' => $prixUnitaire,
+                ':remiseUnitaire' => $remiseUnitaire,
+                ':fraisDePort' => $fraisDePort,
+                ':tva' => $tva
+            ]);
+            return ['success' => true, 'message' => 'Article ajouté au panier'];
+        }
+    } catch (Exception $e) {
+        return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
+    }
+}
+
+//gérer l'ajout au panier via AJAX
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
+    header('Content-Type: application/json');
+
+    $idProduit = $_POST['idProduit'] ?? null;
+    $quantite = $_POST['quantite'] ?? 1;
+    $idPanier = 8; //utilise l'ID du panier actuel (à adapter selon votre système de session)
+
+    if ($idProduit) {
+        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
+        echo json_encode($resultat);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
+    }
+    exit;
 }
 
 // Contexte pour affichage: récupérer les avis en base pour ce produit + stats de notes vérifiées
@@ -348,40 +391,22 @@ try {
     $avisTextes = [];
 }
 
-// Moyenne de notes: priorité achats vérifiés (_commentaire), sinon moyenne des a_note de _avis
-$note = 0.0;
-$nbNotes = 0;
-$nbAvis = is_array($avisTextes) ? count($avisTextes) : 0;
+// Nouveau système simplifié pour l'affichage: 2 requêtes (moyenne et compteur)
 try {
-    $stmtAvg = $pdo->prepare('SELECT COALESCE(AVG(c.a_note),0) AS avg_note, COUNT(c.a_note) AS cnt FROM _avis a LEFT JOIN _commentaire c ON c.id_avis = a.id_avis WHERE a.id_produit = :pid AND c.a_note IS NOT NULL');
-    $stmtAvg->execute([':pid' => $idProduit]);
-    $row = $stmtAvg->fetch(PDO::FETCH_ASSOC);
-    if ($row) {
-        $note = round((float) $row['avg_note'], 1);
-        $nbNotes = (int) $row['cnt'];
-    }
-    if ($note <= 0) {
-        // Fallback: moyenne des notes saisies sur _avis
-        $stmtAvgAvis = $pdo->prepare('SELECT AVG(a.a_note) AS avg_note FROM _avis a WHERE a.id_produit = :pid AND a.a_note IS NOT NULL');
-        $stmtAvgAvis->execute([':pid' => $idProduit]);
-        $row2 = $stmtAvgAvis->fetch(PDO::FETCH_ASSOC);
-        if ($row2 && $row2['avg_note'] !== null) {
-            $note = round((float) $row2['avg_note'], 1);
-        } elseif (isset($produit['avg_rating'])) {
-            $note = round((float) $produit['avg_rating'], 1);
-        }
-    }
-} catch (Exception $e) {
-    if (isset($produit['avg_rating'])) {
-        $note = round((float) $produit['avg_rating'], 1);
-    }
-}
-$noteEntiere = (int) floor($note);
-// Si une erreur critique est détectée, basculer sur la page produit introuvable
-if ($pageError) {
-    include __DIR__ . '/not-found.php';
-    exit;
-}
+    $stmtAvgDisplay = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
+    $stmtAvgDisplay->execute([':pid' => $idProduit]);
+    $note = (float)($stmtAvgDisplay->fetchColumn() ?: 0.0);
+} catch (Throwable $e) { $note = 0.0; }
+
+// Compteur d'avis (2ème requête)
+try {
+    $stmtCntDisplay = $pdo->prepare('SELECT COUNT(*) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
+    $stmtCntDisplay->execute([':pid' => $idProduit]);
+    $nbAvis = (int)($stmtCntDisplay->fetchColumn() ?: 0);
+} catch (Throwable $e) { $nbAvis = 0; }
+
+// Partie entière pour rendu des étoiles
+$noteEntiere = (int)floor($note);
 ?>
 <!doctype html>
 <html lang="fr">
@@ -436,15 +461,18 @@ if ($pageError) {
                     <span id="summaryRatingCount" style="color:var(--muted)">(<?= (int) $nbAvis ?>)</span>
                 </div>
                 <div class="price">
-                    €<?= number_format($prixFinal, 2, ',', ' ') ?>
+                    <?= number_format($prixFinal, 2, ',', ' ') ?> €
                     <?php if ($aUneRemise): ?>
-                        <span class="old">€<?= number_format($produit['p_prix'], 2, ',', ' ') ?></span>
-                    <?php endif; ?>
+                        <span class="old"><?= number_format($produit['p_prix'], 2, ',', ' ') ?> €</span>
+                        <span style="background:#D4183D;color:#fff;padding:6px 10px;border-radius:24px;font-size:13px; margin-left: 1em;">
+                            -<?= round($discount) ?>%
+                        </span>
+                <?php endif; ?>
                 </div>
 
                 <div class="qty">
                     <button class="ghost" id="qty-decrease" aria-label="Réduire quantité">−</button>
-                    <input type="number" id="qtyInput" min="1" step="1"
+                    <input type="number" id="qtyInput" min="1" step="1" max="<?= (int)($produit['p_stock'] ?? 0) ?>"
                         style="min-width:36px;text-align:center;background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #f0f2f6"
                         value="1" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
                     <button class="ghost" id="qty-increase" aria-label="Augmenter quantité">+</button>
@@ -470,9 +498,6 @@ if ($pageError) {
                         <li>Catégorie : <?= htmlspecialchars($firstCategory) ?></li>
                         <li>Référence : #<?= $produit['id_produit'] ?></li>
                         <li>Statut : <?= htmlspecialchars($produit['p_statut']) ?></li>
-                        <?php if ($aUneRemise): ?>
-                            <li>Réduction : <?= round($discount) ?>%</li>
-                        <?php endif; ?>
                     </ul>
                 </div>
 
@@ -491,11 +516,6 @@ if ($pageError) {
                 <span style="background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:24px;font-size:13px">
                     <?= htmlspecialchars($firstCategory) ?>
                 </span>
-                <?php if ($aUneRemise): ?>
-                    <span style="background:#fff3cd;color:#856404;padding:6px 10px;border-radius:24px;font-size:13px">
-                        -<?= round($discount) ?>% de réduction
-                    </span>
-                <?php endif; ?>
                 <?php if ($produit['p_nb_ventes'] > 100): ?>
                     <span style="background:#d4edda;color:#155724;padding:6px 10px;border-radius:24px;font-size:13px">
                         Populaire
@@ -647,6 +667,11 @@ if ($pageError) {
                 return isNaN(m) ? 1 : m;
             };
 
+            const getMax = () => {
+                const m = parseInt(input.getAttribute('max'), 10);
+                return isNaN(m) ? Infinity : m;
+            };
+
             dec && dec.addEventListener('click', function (e) {
                 e.preventDefault();
                 let val = parseInt(input.value, 10);
@@ -662,16 +687,49 @@ if ($pageError) {
                 let val = parseInt(input.value, 10);
                 if (isNaN(val)) val = getMin();
                 val = val + parseStep(input.step);
+                const mx = getMax();
+                if (val > mx) val = mx;
                 input.value = val;
                 input.dispatchEvent(new Event('change', { bubbles: true }));
             });
 
             input.addEventListener('wheel', function (e) { e.preventDefault(); }, { passive: false });
+            input.addEventListener('input', function () {
+                let v = parseInt(input.value, 10);
+                if (isNaN(v) || v < getMin()) v = getMin();
+                const mx = getMax();
+                if (v > mx) v = mx;
+                input.value = v;
+            });
         });
 
+        //fonction pour ajouter au panier avec requête AJAX vers la base de données
         function ajouterAuPanier(idProduit) {
-            const quantite = document.getElementById('qtyInput').value;
-            alert('Produit ' + idProduit + ' ajouté au panier ! Quantité : ' + quantite);
+            //créer les données du formulaire
+            const formData = new FormData();
+            formData.append('action', 'ajouter_panier');
+            formData.append('idProduit', idProduit);
+            formData.append('quantite', 1);
+            
+            //envoyer la requête AJAX
+            fetch('index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    //optionnel : mettre à jour le compteur du panier
+                    //mettreAJourCompteurPanier();
+                } else {
+                    alert('✗ ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'ajout au panier');
+            });
         }
 
         // --- Ajout avis côté client ---
@@ -843,8 +901,34 @@ if ($pageError) {
                         const starContainer = document.getElementById('inlineStarInput');
                         if (starContainer) starContainer.dispatchEvent(new Event('mouseleave'));
                         alert(data.message || 'Avis envoyé');
-                        // Rafraîchir la note moyenne affichée
-                        fetchRating(productId);
+                        // Mise à jour immédiate (nouveau système simplifié)
+                        if (typeof data.avg !== 'undefined') {
+                            const avg = parseFloat(data.avg) || 0;
+                            const count = parseInt(data.countAvis, 10) || 0;
+                            const summaryValue = document.getElementById('summaryRatingValue');
+                            const summaryCount = document.getElementById('summaryRatingCount');
+                            const summaryStars = document.getElementById('summaryStars');
+                            const reviewsValue = document.getElementById('reviewsRatingValue');
+                            const reviewsCount = document.getElementById('reviewsRatingCount');
+                            const reviewsStars = document.getElementById('reviewsStars');
+                            if (summaryValue) summaryValue.textContent = avg.toFixed(1);
+                            if (summaryCount) summaryCount.textContent = '(' + count + ')';
+                            if (reviewsValue) reviewsValue.textContent = avg.toFixed(1);
+                            if (reviewsCount) reviewsCount.textContent = 'Basé sur ' + count + ' avis';
+                            const fullCount = Math.floor(avg);
+                            function renderStars(target, fullSvg, emptySvg) {
+                                if (!target) return;
+                                let html = '';
+                                for (let i = 1; i <= 5; i++) {
+                                    html += '<img src="' + (i <= fullCount ? fullSvg : emptySvg) + '" alt="Etoile" width="' + (target.id === 'summaryStars' ? '20' : '16') + '">';
+                                }
+                                target.innerHTML = html;
+                            }
+                            renderStars(summaryStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
+                            renderStars(reviewsStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
+                        } else {
+                            fetchRating(productId); // fallback
+                        }
                     })
                     .catch(err => { console.error(err); alert('Erreur réseau'); })
                     .finally(() => { inlineSubmit.disabled = false; });
