@@ -79,6 +79,7 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
             SELECT 
                 p.p_prix, 
                 p.p_frais_de_port, 
+                p.p_stock,
                 COALESCE(t.montant_tva, 0) as tva,
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
             FROM _produit p
@@ -96,11 +97,16 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
         
+        // normaliser la quantité demandée
+        $quantite = (int) $quantite;
+        if ($quantite < 1) { $quantite = 1; }
+        
         //calculer le prix avec remise
         $prixUnitaire = $produit['p_prix'];
         $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
         $fraisDePort = $produit['p_frais_de_port'];
         $tva = $produit['tva'];
+        $stock = (int)($produit['p_stock'] ?? 0);
         
         //vérifier si l'article existe déjà dans le panier
         $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
@@ -111,16 +117,28 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
         ]);
 
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $quantiteExistante = $existe ? (int)$existe['quantite'] : 0;
+        $disponible = max(0, $stock - $quantiteExistante);
+
+        if ($disponible <= 0) {
+            return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
+        }
+
+        // quantité réellement ajoutée (ne dépasse pas le disponible)
+        $aAjouter = min($quantite, $disponible);
 
         if ($existe) {
             //si l'article existe déjà, augmenter la quantité
             $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
             $stmtUpdate = $pdo->prepare($sqlUpdate);
             $stmtUpdate->execute([
-                ':quantite' => $quantite,
+                ':quantite' => $aAjouter,
                 ':idProduit' => $idProduit,
                 ':idPanier' => $idPanier
             ]);
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
             return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
         } else {
             //sinon, insérer un nouvel article avec toutes les informations
@@ -133,12 +151,15 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
             $stmtInsert->execute([
                 ':idProduit' => $idProduit,
                 ':idPanier' => $idPanier,
-                ':quantite' => $quantite,
+                ':quantite' => $aAjouter,
                 ':prixUnitaire' => $prixUnitaire,
                 ':remiseUnitaire' => $remiseUnitaire,
                 ':fraisDePort' => $fraisDePort,
                 ':tva' => $tva
             ]);
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
             return ['success' => true, 'message' => 'Article ajouté au panier'];
         }
     } catch (Exception $e) {
