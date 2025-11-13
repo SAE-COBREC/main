@@ -1,5 +1,5 @@
 <?php 
-include '../../selectBDD.php';
+include __DIR__ . '../../../../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 session_start();
@@ -28,8 +28,7 @@ session_start();
     
     // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
     try {
-      // Select both id and mdp so we can store the user's id in session on success
-      $stmt = $pdo->prepare("SELECT id, mdp FROM _compte WHERE email = :email LIMIT 1");
+      $stmt = $pdo->prepare("SELECT * FROM _compte WHERE email = :email LIMIT 1");
       $stmt->execute([':email' => $email]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if (!$row) {
@@ -37,6 +36,13 @@ session_start();
         $error_card = 1;
         $error_message = 'Adresse mail ou mot de passe incorrecte.';
       } else {
+        if (!array_key_exists('mdp', $row)) {
+          error_log('[connexion] error: mdp column not found in _compte row: ' . json_encode(array_keys($row)));
+          $hasError = true;
+          $error_card = 1;
+          $error_message = 'Erreur interne lors de la vérification des identifiants.';
+          $row = null;
+        }
         $stored = $row['mdp'];
         $passwordOk = false;
         if (function_exists('password_verify')) {
@@ -50,8 +56,20 @@ session_start();
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
-          // Ensure id exists before assigning (defensive)
-          $_SESSION['id'] = isset($row['id']) ? (int)$row['id'] : null;
+          $userId = null;
+          foreach ($row as $colName => $colVal) {
+            if (preg_match('/^id(_|[A-Za-z0-9_])*$/i', $colName) && is_numeric($colVal)) {
+              $userId = (int)$colVal;
+              break;
+            }
+          }
+          if ($userId === null && array_key_exists('id', $row)) {
+            $userId = (int)$row['id'];
+          }
+          if ($userId === null) {
+            error_log('[connexion] warning: no id-like column found in _compte row: ' . json_encode(array_keys($row)));
+          }
+          $_SESSION['id'] = $userId;
         }
       }
     } catch (Exception $e) {
@@ -68,6 +86,7 @@ session_start();
       echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
       echo "<dt>Email</dt><dd>{$email}</dd>";
       echo "<dt>mdp</dt><dd>{$mdp}</dd>";
+      echo "<dt>ID</dt><dd>{$userId}</dd>";
       echo "</dl>";
       echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
       echo "<a href=\"index.php\" style=\"display:inline-block;padding:8px 12px;border-radius:8px;border:1px solid #030212;color:#030212;text-decoration:none;\">Retour</a>";
