@@ -8,15 +8,16 @@ $vendeur_id = $_SESSION['id'];
 try {
     $query = "
         SELECT 
-            v.v_raison_sociale AS Rsociale,
-            v.v_siren AS SIREN,
-            v.v_email AS email,
-            v.v_telephone AS telephone,
-            a.a_rue AS rue,
+            v.raison_sociale AS Rsociale,
+            v.siren AS SIREN,
+            v.email AS email,
+            v.telephone AS telephone,
+            a.a_adresse AS adresse,
             a.a_code_postal AS codeP,
-            a.a_commune AS commune
+            a.a_ville AS ville
         FROM cobrec1._vendeur v
-        LEFT JOIN cobrec1._adresse a ON v.id_adresse = a.id_adresse
+        LEFT JOIN cobrec1._compte c on v.id_compte = c.id_compte
+        LEFT JOIN cobrec1._adresse a ON c.id_compte = a.id_compte
         WHERE v.id_vendeur = :id_vendeur
     ";
 
