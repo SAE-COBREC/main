@@ -1,8 +1,9 @@
 <?php
-    include '../../../selectBDD.php';
-    session_start();
     $sth = null ;
     $dbh = null ;
+    include '../../../../../config.php';
+    $pdo->exec("SET search_path to cobrec1");
+    session_start();
     const NB_IMGS_MAX = 3;
 ?>
 
@@ -15,7 +16,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="../../../../styles/creerArticle/creerArticle.css" media="screen">
-    <title>Ajouter un produit</title>
+    <title>Ébauche de produit</title>
 </head>
 <pre>
 <?php
@@ -161,20 +162,27 @@ if ($_POST !== []) {
                         <!-- Texte avec label -->
                         <label for="titre">Titre</label>
                         <br>
-                        <input style="<?php if (($_POST["titre"] === 'Déjà pris') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; ?>"
+                        <input style="<?php 
+                            try {
+                                $sql = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . "'" . $_POST['titre'] ."'";
+                                $stmt = $pdo->query($sql);
+                                $titre = $stmt->fetch(PDO::FETCH_ASSOC);
+                                //print_r('Resultat : ' . $result);
+                            } catch (Exception $e) {
+                                //print_r($e);
+                            }
+                            if (($titre != '') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
+                        
+                        ?>"
                             maxlength="100"
                             pattern="[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
                             required />
                             <?php
-                        if($_POST["titre"] === 'Déjà pris'){//à changer lors de l'incorpo de la bdd
+                        if($titre != ''){
                             ?>
                             <br>
                             <small class="warn"><?php
                                 echo 'Le titre de votre article est déjà pris. Veuillez choisir un autre titre';
-                                $query = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . $_POST['titre'];
-                                $stmt = $pdo->prepare($query);
-                                $stmt->execute();
-                                print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
                                 $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                         <?php } ?>
@@ -257,11 +265,20 @@ if ($_POST !== []) {
                         <label for="categorie">Catégorie</label>
                         <br>
                         <select id="categorie" value="<?php echo $_POST["categorie"]; ?>" name="categorie">
-                            <!-- à changer lors de l'incorpo de la bdd -->
-                            <option value="france">France</option>
-                            <option value="england">Angleterre</option>
-                            <option value="italie">Italie</option>
-                            <option value="japon">Japon</option>
+                            <?php
+                                try {
+                                    $sql = 'SELECT nom_categorie FROM cobrec1._categorie_produit';
+                                    $stmt = $pdo->query($sql);
+                                    $categorie = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    print_r($categorie);
+                                } catch (Exception $e) {
+                                    //print_r($e);
+                                }
+
+                                foreach ($categorie as $value) {
+                            ?>
+                            <option value=<?php echo $value['nom_categorie'] ?>><?php echo $value['nom_categorie'] ?></option>
+                            <?php } ?>
                         </select>
                         <br />
                     </article>
@@ -341,12 +358,12 @@ if ($_POST !== []) {
 
             function sauvegarder(){//si clic sur sauvegarder et pas de warnings
                 confirm("Votre article a bien été sauvegardé.");
-                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                //document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
             }
 
             function publier(){//si clic sur publier et pas de warnings
                 confirm("Votre article a bien été publié.");
-                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                //document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
             }
         </script>
             <pre>
@@ -360,12 +377,38 @@ if ($_POST !== []) {
                             rename('temp_/' . $value, 'temp_banque_images/' . $_POST["titre"] . '/' . $value );
                         }
                         //print_r("  FIN");
+                        $id_vendeur  = 1;
+                        $taille  = 'M';
+                        try {
+                            $sql = '
+                            INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_nom,p_description,p_poids,p_volume,p_frais_de_port,p_prix,p_stock,p_taille,date_arrivee_stock_recent,p_statut)
+VALUES ((SELECT id_TVA FROM cobrec1._tva WHERE montant_tva = 20.00), ' . $id_vendeur .', ' . "'" . $_POST['titre'] ."'" .', ' . "'" . $_POST["description"] ."'" .', 0.0, 0.0, 0.0, ' . $_POST['prix'] .',' . $_POST['stock'] .',' . "'" . $taille ."'" .', CURRENT_TIMESTAMP, ' . "'" . 'Ébauche' ."'" .');
+                            ';
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                        } catch (Exception $e) {
+                            print_r($e);
+                        }
+                        /*
+                        INSERT INTO cobrec1._fait_partie_de(id_produit,id_categorie)
+VALUES ((SELECT id_produit FROM cobrec1._produit WHERE p_nom = 'NOM'), (SELECT id_categorie FROM cobrec1._categorie_produit WHERE nom_categorie = 'Livres'));
 
-                        // $stmt = $dbh -> prepare (
-                        //     " INSERT INTO REGISTRY ( name , value )
-                        //     VALUES ('$name','$value')"
-                        // );
-                        // $stmt -> execute ();
+INSERT INTO cobrec1._est_dote_de(id_produit,code_hexa)
+VALUES ((SELECT id_produit FROM cobrec1._produit WHERE p_nom = 'NOM'), '#000000');
+
+--reduction non prise en compte pour le sprint 1
+
+INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
+VALUES ('html/img/Photo/','TITLE', '');
+
+SELECT id_image FROM cobrec1._image WHERE i_title = 'TITLE';
+
+INSERT INTO cobrec1._represente_produit(id_produit,id_image)
+VALUES ((SELECT id_produit FROM cobrec1._produit WHERE p_nom = 'NOM'), (SELECT id_image FROM cobrec1._image WHERE i_title = 'TITLE'));
+
+UPDATE cobrec1._image SET i_lien = 'lien' WHERE i_title = 'TITLE';
+UPDATE cobrec1._image SET i_title = 'titre' WHERE i_title = 'TITLE';
+*/
                         
                         
                         // $_POST = [];
