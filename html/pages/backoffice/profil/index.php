@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../selectBDD.php';
+include '../../../selectBDD.php';
 
 // Exemple : ID du vendeur connecté (à récupérer depuis $_SESSION normalement)
 $vendeur_id = $_SESSION['id'];
@@ -38,11 +38,11 @@ try {
   <meta charset="utf-8">
   <meta name="viewport" content="width=1440, height=1024">
   <title>Profil Vendeur - Alizon</title>
-  <link rel="stylesheet" href="/styles/ProfilVendeur/profilVendeur.css">
+  <link rel="stylesheet" href="../../../styles/ProfilVendeur/profilVendeur.css">
 </head>
 <body>
   <div class="app">
-    <?php include __DIR__ . '/../../partials/aside.html'; ?>
+    <?php include __DIR__ . '/../../../partials/aside.html'; ?>
 
     <main class="main">
       <div class="header">
