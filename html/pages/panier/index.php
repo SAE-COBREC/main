@@ -45,11 +45,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 
                 <!--UN ARTICLE DANS LE PANIER-->
                 <?php foreach ($articles as $article): ?> 
-                    <article class="unArticleP" data-prix="<?php 
-                                                                if ($article['reduction_pourcentage'] != 0){ //regarde si l'article est en promotion ⚠️⚠️⚠️⚠️⚠️⚠️ à finir avec le time-stamp n'éétais pas à faire au sprint 1
-                                                                    $prix = $article['p_prix'] * (1-1/$article['reduction_pourcentage']);
-                                                                }
-                                                                echo number_format($prix, 2, '.')?>"
+                    <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
                                                 data-stock="<?php echo intval($article['p_stock'])?>">
                         <div class="imageArticleP">
                             <img src="<?php echo htmlspecialchars($article['i_lien']) ?>"
@@ -60,7 +56,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                             <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
                             <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
                             <div class="basArticleP">
-                                <p class="articlePrix"><?php echo  number_format($prix, 2, '.')?>€</p>
+                                <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
                                 <div class="quantite">
 
                                     <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->

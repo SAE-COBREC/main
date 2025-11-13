@@ -1,5 +1,5 @@
 <?php 
-include __DIR__ . '../../../../../../config.php';
+include '../../selectBDD.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 session_start();
@@ -14,7 +14,7 @@ session_start();
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../../styles/Register/styleRegister.css">
+  <link rel="stylesheet" href="../../../styles/Register/styleRegister.css">
 </head>
 
 <?php
@@ -28,7 +28,7 @@ session_start();
     
     // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
     try {
-      $stmt = $pdo->prepare("SELECT id, mdp FROM _compte WHERE email = :email LIMIT 1");
+      $stmt = $pdo->prepare("SELECT * FROM _compte WHERE email = :email LIMIT 1");
       $stmt->execute([':email' => $email]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if (!$row) {
@@ -36,6 +36,13 @@ session_start();
         $error_card = 1;
         $error_message = 'Adresse mail ou mot de passe incorrecte.';
       } else {
+        if (!array_key_exists('mdp', $row)) {
+          error_log('[connexion] error: mdp column not found in _compte row: ' . json_encode(array_keys($row)));
+          $hasError = true;
+          $error_card = 1;
+          $error_message = 'Erreur interne lors de la vérification des identifiants.';
+          $row = null;
+        }
         $stored = $row['mdp'];
         $passwordOk = false;
         if (function_exists('password_verify')) {
@@ -49,7 +56,20 @@ session_start();
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
-          $_SESSION['id'] = (int)$row['id'];
+          $userId = null;
+          foreach ($row as $colName => $colVal) {
+            if (preg_match('/^id(_|[A-Za-z0-9_])*$/i', $colName) && is_numeric($colVal)) {
+              $userId = (int)$colVal;
+              break;
+            }
+          }
+          if ($userId === null && array_key_exists('id', $row)) {
+            $userId = (int)$row['id'];
+          }
+          if ($userId === null) {
+            error_log('[connexion] warning: no id-like column found in _compte row: ' . json_encode(array_keys($row)));
+          }
+          $_SESSION['id'] = $userId;
         }
       }
     } catch (Exception $e) {
@@ -59,19 +79,12 @@ session_start();
     }
 
     if (!$hasError) {
-
-
-      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
-      echo "<h2 style=\"margin-top:0;\">Récapitulatif (côté serveur)</h2>";
-      echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-      echo "<dt>Email</dt><dd>{$email}</dd>";
-      echo "<dt>mdp</dt><dd>{$mdp}</dd>";
-      echo "</dl>";
-      echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
-      echo "<a href=\"index.php\" style=\"display:inline-block;padding:8px 12px;border-radius:8px;border:1px solid #030212;color:#030212;text-decoration:none;\">Retour</a>";
+      // Instead of showing a server recap, present a simple link to the backoffice index
+      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);text-align:center;\">";
+      echo "<h2 style=\"margin-top:0;\">Connexion réussie</h2>";
+      echo "<p style=\"margin:18px 0;\">Cliquez pour accéder au backoffice :</p>";
+      echo "<p><a href=\"../index.php\" style=\"display:inline-block;padding:10px 14px;background:#fff;color:#000;border-radius:8px;text-decoration:none;border:1px solid rgba(0,0,0,0.12);\">Aller au backoffice</a></p>";
       echo "</div>";
-      echo "</div>";
-
       exit;
     }
   }
