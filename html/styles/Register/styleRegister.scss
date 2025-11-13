@@ -97,7 +97,6 @@ body {
       padding-left: 15px;
     }
   }
-
   input {
     width: 520px;
     height: 50px;
@@ -284,8 +283,6 @@ body {
     font-size: 18px;
   }
 }
-
-// Modal
 .modal {
   position: fixed;
   inset: 0;
@@ -417,19 +414,22 @@ body {
     }
   }
 }
-.footer{
-  width: 60%;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  > p{
-    size: 20px;
-  }
-}
 
-.debutant {
-  
-  > strong {
-    color: orange;
+.forgot {
+    color: black; 
+    font-size: 20px; /* slightly smaller */
+    margin-left: 40px;
+    text-align: left;
+}
+.connex-btn {
+  > button {
+    background: black;
+    color: white;
+    font-size: 20px;
+    width: 550px;
+    height: 50px;
+    border-radius: $border-radius-primary;
+    margin-bottom: 10px;
+
   }
 }

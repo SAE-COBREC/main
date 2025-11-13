@@ -112,7 +112,8 @@ button {
 }
 @media screen and (max-width: 428px) {
   .unArticleP .basArticleP p {
-    font-size: 1.3em;
+    margin-left: -6em;
+    font-size: 1.15em;
   }
 }
 .unArticleP .basArticleP button {
