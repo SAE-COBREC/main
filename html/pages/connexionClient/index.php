@@ -1,9 +1,8 @@
 <?php 
-include __DIR__ . '../../../../../../config.php';
+include __DIR__ . '../../../../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
 session_start();
-
  ?>
 <!DOCTYPE html>
 <html lang="fr">

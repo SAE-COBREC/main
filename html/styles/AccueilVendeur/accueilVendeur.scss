@@ -25,7 +25,10 @@ body {
 .main {
   background: $secondary-color-rose-claire;
   padding: 32px 40px;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
 }
 
 // Header
@@ -104,11 +107,16 @@ body {
   background: $primary-color-blanc;
   border-radius: $border-radius-primary;
   border: 1px solid $secondary-color-orange-clair;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1; // prend tout l’espace restant
+  overflow: hidden; // cache tout dépassement global
 
   &__header {
+    flex-shrink: 0; // reste fixe
     padding: 20px 24px;
     border-bottom: 1px solid $secondary-color-orange-clair;
+    background: $primary-color-blanc;
   }
 
   &__title {
@@ -116,6 +124,33 @@ body {
     font-weight: 700;
     color: $primary-color-noir;
     margin-bottom: 16px;
+  }
+  .products-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-y: auto;
+    display: block;
+    max-height: calc(100vh - 350px); // ajustable selon ton layout
+  }
+
+  .products-table tbody {
+    display: block;
+    overflow-y: auto;
+    height: 400px; // fixe la hauteur visible du tableau
+  }
+
+  .products-table thead,
+  .products-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .products-table thead {
+    position: sticky;
+    top: 0;
+    background: $primary-color-blanc;
+    z-index: 2;
   }
 }
 
