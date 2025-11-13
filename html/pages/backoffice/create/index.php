@@ -1,5 +1,5 @@
 <?php
-    // include('../../../../config.php');
+    include '../../../selectBDD.php';
     session_start();
     $sth = null ;
     $dbh = null ;
@@ -14,21 +14,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="/html/styles/creerArticle/creerArticle.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="../../../../styles/creerArticle/creerArticle.css" media="screen">
     <title>Ajouter un produit</title>
 </head>
 <pre>
 <?php
-// print_r($_POST);
-// try{
-//     $dbh = new PDO (
-//         'postgres : host = servbdd ; dbname = pg_test',
-//         $user , $password 
-//     );
-// } catch (PDOException $e) {
-//     print "Erreur ! : " . $e->getMessage() . "<br/>";
-//     die();
-// }
 
 
 
@@ -142,6 +132,13 @@ if ($_POST !== []) {
     $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
     $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
     $_SESSION["creerArticle"]["_FILES"]['tmp_name'] = [];
+    $_POST["titre"] = '';
+    $_POST["description"] ='';
+    $_POST["photo"] ='';
+    $_POST["pourcentage"] =null;
+    $_POST["debut"] =null;
+    $_POST["fin"] =null;
+
 }
 
 ?></pre>
@@ -174,7 +171,10 @@ if ($_POST !== []) {
                             <br>
                             <small class="warn"><?php
                                 echo 'Le titre de votre article est déjà pris. Veuillez choisir un autre titre';
-                                // echo $dbh->query('SELECT p_nom FROM cobrec1._produit where p_nom = ' . $_POST['titre']);
+                                $query = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . $_POST['titre'];
+                                $stmt = $pdo->prepare($query);
+                                $stmt->execute();
+                                print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
                                 $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                         <?php } ?>
@@ -335,24 +335,24 @@ if ($_POST !== []) {
                 // const element = document.getElementById(".small_moins0");
                 // element.innerHTML = "";
                 if (confirm("Êtes-vous certain de voulair annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
-                    document.location.href="http://localhost:8888/html/pages/backoffice/index.php"; 
+                    document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
                 }
             });
 
             function sauvegarder(){//si clic sur sauvegarder et pas de warnings
                 confirm("Votre article a bien été sauvegardé.");
-                document.location.href = "http://localhost:8888/html/pages/backoffice/index.php"; 
+                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
             }
 
             function publier(){//si clic sur publier et pas de warnings
                 confirm("Votre article a bien été publié.");
-                document.location.href = "http://localhost:8888/html/pages/backoffice/index.php"; 
+                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
             }
         </script>
             <pre>
                 <?php 
                     //print_r($_SESSION["creerArticle"]["warn"]); 
-                    if (($_SESSION["creerArticle"]["warn"]=== 0) && ($_POST !== []) && (($_POST["sauvegarder"] == "Sauvegarder")) || ($_POST["publier"] == "Publier")){
+                    if (($_SESSION["creerArticle"]["warn"]=== 0) && ($_POST["titre"] !== '') && (($_POST["sauvegarder"] == "Sauvegarder")) || ($_POST["publier"] == "Publier")){
                         // print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
                         // print_r("OK");
                         foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
