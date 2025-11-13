@@ -30,13 +30,12 @@ source proxy_mox
 
 **Identifiants proxy :**
 
-| Paramètre | Valeur |
-|-----------|--------|
-| Login | `sae301_a11` |
+| Paramètre    | Valeur         |
+|--------------|----------------|
+| Login        | `sae301_a11`   |
 | Mot de passe | `rneks5otPb(l` |
 
 ---
-
 ### 🐳 Démarrer les conteneurs Docker
 
 docker compose start
