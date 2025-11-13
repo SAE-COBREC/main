@@ -1,7 +1,8 @@
 <?php 
-include __DIR__ . '../../../../../config.php';
+include __DIR__ . '../../../../../../config.php';
 
 $pdo->exec("SET search_path TO cobrec1");
+session_start();
 
  ?>
 <!DOCTYPE html>
@@ -18,7 +19,6 @@ $pdo->exec("SET search_path TO cobrec1");
 </head>
 
 <?php
-  session_start();
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
@@ -50,7 +50,6 @@ $pdo->exec("SET search_path TO cobrec1");
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
-          // Si authentification OK, stocker l'id du compte en session
           $_SESSION['id'] = (int)$row['id'];
         }
       }
@@ -132,8 +131,7 @@ $pdo->exec("SET search_path TO cobrec1");
         <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
 
-      <h1>Créer un compte</h1>
-      <p class="subtitle">Identifiants</p>
+      <h1>Connexion</h1>
 
       <div>
         <label for="email">Email</label>

@@ -1,10 +1,10 @@
 <?php 
-include '../../../config.php';
+include '../../selectBDD.php';
 
 $id_panier = 8;
 $pdo->exec("SET search_path TO cobrec1");
 
-$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock
+$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
                 FROM _contient
                 JOIN _produit ON _produit.id_produit = _contient.id_produit
                 JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
@@ -64,7 +64,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                                         <button type="submit" id="supprimerArticle" class="supprimerArticle"><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
                                     </form>
                                     <button class="btn_moins">-</button>
-                                    <input type="text" class="quantite_input_entre" value="1">
+                                    <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
                                     <button class="btn_plus">+</button>
                                 </div>
                             </div>

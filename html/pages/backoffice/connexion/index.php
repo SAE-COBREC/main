@@ -1,3 +1,9 @@
+<?php 
+include __DIR__ . '../../../../../../config.php';
+
+$pdo->exec("SET search_path TO cobrec1");
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -14,18 +20,18 @@
 <?php
   session_start();
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
+    $email_input = trim($_POST['email'] ?? '');
+    $email = htmlspecialchars($email_input, ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
 
     $hasError = false;
     $error_card = null;
     $error_message = '';
 
-    
-    // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
+    // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe + récupérer l'id
     try {
-      $stmt = $pdo->prepare("SELECT mdp FROM _compte WHERE email = :email LIMIT 1");
-      $stmt->execute([':email' => $email]);
+      $stmt = $pdo->prepare("SELECT id, mdp FROM _compte WHERE email = :email LIMIT 1");
+      $stmt->execute([':email' => $email_input]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if (!$row) {
         $hasError = true;
@@ -44,6 +50,9 @@
           $hasError = true;
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
+        } else {
+          // Si authentification OK, stocker l'id du compte en session
+          $_SESSION['id'] = (int)$row['id'];
         }
       }
     } catch (Exception $e) {
@@ -69,7 +78,6 @@
       exit;
     }
   }
-  $_SESSION['id'] = 3 ;
 ?>
 
 <style>
@@ -124,8 +132,7 @@
         <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
 
-      <h1>Créer un compte</h1>
-      <p class="subtitle">Identifiants</p>
+      <h1>Connexion</h1>
 
       <div>
         <label for="email">Email</label>

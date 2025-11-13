@@ -14,7 +14,6 @@ if (isset($_POST['id_panier_a_vider'])) {
     echo "ok";
     //redirection vers la page du panier
     header('Location: index.php');
-    echo "ok";
     exit();
 }
 ?>
