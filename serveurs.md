@@ -1,70 +1,91 @@
-## Configuration initiale
+# 🖥️ Guide de Configuration Serveur
 
-### Lancer FortiClient
+> Documentation complète pour la configuration et la gestion des serveurs Docker
 
-Assurez-vous que FortiClient est actif avant de commencer.
+---
 
-### Passer en mode root
+## 🚀 Configuration Initiale
 
-```bash
+### 🔐 Lancer FortiClient
+
+Assurez-vous que **FortiClient** est actif avant de commencer la configuration.
+
+### 👤 Passer en mode root
+
 su -
-```
 
-Entrez le mot de passe root `kira13`
+**Mot de passe root :** `kira13`
 
-### Se positionner dans le répertoire Docker
+---
 
-```bash
+### 📁 Se positionner dans le répertoire Docker
+
 cd /docker
-```
 
-### Configurer le proxy
+---
 
-```bash
+### 🌐 Configurer le proxy
+
 source proxy_mox
-```
 
-Lorsque demandé, entrez vos identifiants :
+**Identifiants proxy :**
 
-- Login : `sae301_a11`
-- Mot de passe : `rneks5otPb(l`
+| Paramètre | Valeur |
+|-----------|--------|
+| Login | `sae301_a11` |
+| Mot de passe | `rneks5otPb(l` |
 
-### Démarrer les conteneurs Docker
+---
 
-```bash
+### 🐳 Démarrer les conteneurs Docker
+
 docker compose start
-```
 
-### Vérifier les variables d'environnement
+---
 
-```bash
+### ✅ Vérifier la configuration
+
+**Variables d'environnement :**
+
 env
-```
 
-```bash
+**Test de connectivité :**
+
 wget http://www.google.com
-```
 
-## Mise à jour du code
+---
 
-### Accéder au répertoire web
+## 🔄 Mise à jour du code
 
-```bash
+### 📂 Accéder au répertoire web
+
 cd /docker/data/web
-```
 
-Ce répertoire contient les fichiers web de votre application.
+> Ce répertoire contient les fichiers web de votre application
 
-### Récupérer les dernières modifications
+---
 
-```bash
+### 🔃 Récupérer les dernières modifications
+
 git pull
-```
 
-### cat docker-compose.yml
+---
 
+### 📋 Commandes utiles
+
+**Consulter la configuration Docker :**
+
+cat docker-compose.yml
+
+---
+
+## 🔗 Accès rapides
+
+### 🌐 Interface Web
 
 http://10.253.5.101/index.php
 
+
+### 🔌 Connexion SSH
 
 ssh sae@10.253.5.101
