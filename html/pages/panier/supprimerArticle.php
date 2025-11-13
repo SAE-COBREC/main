@@ -1,6 +1,7 @@
 <?php
 include '../../selectBDD.php';
 
+
 if (isset($_POST['id_produit']) && isset($_POST['id_panier'])) {
     $id_produit = intval($_POST['id_produit']); //onverti en entier
     $id_panier = intval($_POST['id_panier']); //onverti en entier

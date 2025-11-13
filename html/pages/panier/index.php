@@ -1,5 +1,5 @@
 <?php 
-include '../../../config.php';
+include '../../selectBDD.php';
 
 $id_panier = 8;
 $pdo->exec("SET search_path TO cobrec1");
