@@ -136,7 +136,7 @@
                   <?php endif; ?>
                 </td>
                 <td class="products-table__cell products-table__cell--stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
-                <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['nom_categorie']); ?></td>
+                <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['categories']); ?></td>
                 <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['p_description']); ?></td>
               </tr>
             <?php endforeach; ?>
