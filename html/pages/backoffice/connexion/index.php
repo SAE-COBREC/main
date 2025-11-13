@@ -14,25 +14,26 @@
 <?php
   $interdit = "bleu";
   $interditmail = "a@a.a";
-  // When the form is submitted (Terminer), display the submitted PHP variables server-side
+
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     $mdp = $_POST['mdp'] ?? '';
 
-      // prepare error state
-      $hasError = false;
-      $error_card = null;
-      $error_message = '';
+    $hasError = false;
+    $error_card = null;
+    $error_message = '';
 
-      if (strtolower($email) === strtolower($interditmail)) {
-        $hasError = true;
-        // on affiche l'erreur sur la card présente (id="4")
-        $error_card = 4;
-        $error_message = 'Ce mail n\'est pas autorisé.';
-      }
+    $interdit = "bleu";
+    $interditmail = "bleu@b";
+    
+  if (strtolower($mdp) === strtolower($interdit) || strtolower($email) === strtolower($interditmail)) {
+      $hasError = true;
+      $error_card = 1;
+      $error_message = 'Adresse mail ou mot de passe incorrecte.';
+    }
+
     if (!$hasError) {
-      $mdp = htmlspecialchars($mdp, ENT_QUOTES, 'UTF-8');
-      $Cmdp = htmlspecialchars($Cmdp, ENT_QUOTES, 'UTF-8');
+
 
       echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
       echo "<h2 style=\"margin-top:0;\">Récapitulatif (côté serveur)</h2>";
@@ -48,26 +49,64 @@
       exit;
     }
   }
+  session_start();
+  $_SESSION['id'] = 3 ;
 ?>
 
 <style>
   body {
     background: linear-gradient(to bottom right, #CD7F32, #D4183D);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
   }
+    
+  .footer{
+    margin-left: 40px;
+    margin-bottom: 10px;
+    width: 55%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    font-size: 20px;
+    > p{
+      font-size: 20px;
+      color: #CD7F32;
+    }
+  }
+      /* ensure the card is centered inside the flex body */
+      .card {
+        margin: 0 auto;
+      }
+
+  .debutant {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    text-align: left;
+    a {
+      margin-left: 10px;
+      color: #CD7F32;
+      outline: none;
+      text-decoration: none;
+    }
+
+
+  }
+
 </style>
 
 <body>
   <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
+    <div class="card" id="1">
+      <div class="logo">
+        <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
+      </div>
 
-  <div class="card hidden" id="1">
-    <div class="logo">
-  <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
-    </div>
-
-    <h1>Créer un compte</h1>
-    <p class="subtitle">Mot de passe</p>
-
-    
+      <h1>Créer un compte</h1>
+      <p class="subtitle">Identifiants</p>
 
       <div>
         <label for="email">Email</label>
@@ -75,44 +114,105 @@
       </div>
 
       <div>
-        <label for="Cmdp">Mot de passe</label>
-        <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" value="" required>
+        <label for="mdp">Mot de passe</label>
+  <input type="password" id="mdp" name="mdp" placeholder="***********" required>
       </div>
+      <div class="forgot" onclick="showNextCard()">mot de passe oublié ?</div>
 
       <div class="error">
-        <?php if (isset($hasError) && $hasError && $error_card == 4): ?>
+        <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
         <?php endif; ?>
       </div>
 
-      <div class="next-btn" role="group" aria-label="Suivant action">
-        <span class="next-text">Terminer</span>
-             <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
-              <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)"
-                 class="btn-arrow" aria-hidden="true">
-            </button>
+
+      <div class="connex-btn" role="group" aria-label="Suivant action">
+          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+            Terminer
+          </button>
       </div>
-    
-      </form>
+      <div class= "debutant" > Débutant sur Alizon ? <a href= "../register/index.php"><strong >Démarrer →</strong></a></div>
+      <div class= "footer">
+        <p>Aide</p><p>Confidentialité</p><p>Conditions</p>
+      </div>
+    </div>
+
+      <div class="error">
+        <?php if (isset($hasError) && $hasError && $error_card == 2): ?>
+          <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
+        <?php endif; ?>
+      </div>
+
+  </form>
 
   <script>
-    // Minimal script: delegate behavior to the module `js/registerPass.js` which
-    // exposes the required functions as globals. Only show the server-side error
-    // card if the server flagged one.
-    <?php if (isset($hasError) && $hasError && $error_card): ?>
-    window.addEventListener('DOMContentLoaded', function() {
+
+    // Retourne un message de validation en français pour l'élément fourni
+    function getFieldValidationMessage(el) {
+      if (!el) return 'Veuillez remplir ce champ correctement.';
       try {
-        if (typeof showCard === 'function') {
-          // server uses 1-based card indexes in PHP; module expects an ID
-          showCard('<?php echo $error_card; ?>');
+        if (el.validity) {
+          if (el.validity.valueMissing) return 'Ce champ est requis.';
+          if (el.validity.typeMismatch) {
+            if (el.type === 'email') return 'Adresse mail ou mot de passe incorrecte.';
+            if (el.type === 'url') return 'Adresse mail ou mot de passe incorrecte.';
+            return 'Adresse mail ou mot de passe incorrecte.';
+          }
         }
-      } catch (e) { /* non-blocking */ }
-    });
-    <?php endif; ?>
+      } catch (e) {}
+      return el.validationMessage || 'Veuillez remplir ce champ correctement.';
+    }
+
+    window.finishRegistration = function () {
+      console.log('[register] finishRegistration called');
+      var form = document.getElementById('multiForm');
+      if (!form) return;
+      if (!form.checkValidity()) {
+        var invalid = form.querySelector(':invalid');
+        if (invalid) {
+          var card = invalid.closest('.card');
+          var cards = Array.from(document.querySelectorAll('.card'));
+          var idx = card ? cards.indexOf(card) : 0;
+          if (typeof showCardByIndex === 'function') showCardByIndex(idx);
+          var errDiv = card ? card.querySelector('.error') : null;
+          var message = getFieldValidationMessage(invalid);
+          try { invalid.setCustomValidity(message); } catch (e) {}
+          if (errDiv) {
+            errDiv.textContent = message;
+            errDiv.classList.remove('hidden');
+          } else {
+            alert(message);
+          }
+          invalid.focus();
+        }
+        return;
+      }
+      try {
+        window.__allow_submit = true;
+        try { window.__submission_confirmed = false; } catch (e) {}
+        console.log('[register] calling requestSubmit (or form.submit fallback)');
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.submit();
+        }
+        setTimeout(function () {
+          try {
+            if (!window.__submission_confirmed) {
+              console.warn('[register] no submit event detected within timeout — using fallback form.submit()');
+              window.__allow_submit = true;
+              form.submit();
+            }
+          } catch (e) { console.error('[register] fallback submit failed', e); }
+        }, 600);
+      } catch (e) {
+        window.__allow_submit = false;
+        form.submit();
+      }
+    }
   </script>
 
-  <script type="module" src="../../../js/registerPass.js" ></script>
-
+  <script type="module" src="../../js/registerPass.js"></script>
 </body>
 
 </html>

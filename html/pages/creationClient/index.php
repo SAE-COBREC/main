@@ -13,6 +13,7 @@
 
 <?php
 $interdit = "bleu";
+
 $interditmail = "a@a.a";
 // When the form is submitted (Terminer), display the submitted PHP variables server-side
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
