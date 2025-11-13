@@ -430,10 +430,10 @@ $id_panier = 8;
                                 <div>
                                     <span>
                                         <?php if ($aUneRemise): ?>
-                                            <?= number_format($produit['p_prix'], 0, ',', ' ') ?>€
+                                            <?= number_format($produit['p_prix'], 2, ',', ' ') ?>€
                                         <?php endif; ?>
                                     </span>
-                                    <span><?= number_format($prixFinal, 0, ',', ' ') ?>€</span>
+                                    <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                                 </div>
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
                                     onclick="event.stopPropagation(); ajouterAuPanier(<?= $produit['id_produit'] ?>)">
