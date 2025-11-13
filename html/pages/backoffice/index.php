@@ -24,6 +24,7 @@
             p.p_stock,
             p.p_prix,
             i.i_lien AS image_url,
+            (SELECT STRING_AGG(cp.nom_categorie, ', ')
             c.nom_categorie AS categorie
         FROM cobrec1._produit p
         LEFT JOIN cobrec1._fait_partie_de fpd 
