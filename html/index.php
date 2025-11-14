@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $idProduit = $_POST['idProduit'] ?? null;
     $quantite = $_POST['quantite'] ?? 1;
-    $idPanier = $idClient; //utilise l'ID du panier actuel 
+    $idPanier = $idClient; //utilise l'ID client actuel 
 
     if ($idProduit) {
         $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
