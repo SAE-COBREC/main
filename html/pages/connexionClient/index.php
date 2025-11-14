@@ -70,41 +70,27 @@ session_start();
             error_log('[connexion] warning: no id-like column found in _compte row: ' . json_encode(array_keys($row)));
           }
           // Attempt to map compte id -> vendeur id and store vendeur id in session instead
+          $sessionIdToStore = $userId;
           try {
-            if ($userId === null) {
-              // no compte id found -> treat as authentication failure
-              $hasError = true;
-              $error_card = 1;
-              $error_message = 'Erreur interne: identifiant de compte introuvable.';
-            } else {
-              $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte', 'id'];
+            if ($userId !== null) {
+              $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte'];
               $foundVendeur = null;
               foreach ($candidates as $col) {
-                $q = "SELECT id_vendeur FROM _vendeur WHERE " . $col . " = :cid LIMIT 1";
+                $q = "SELECT id_client FROM _client WHERE " . $col . " = :cid LIMIT 1";
                 try {
                   $st2 = $pdo->prepare($q);
                   $st2->execute([':cid' => $userId]);
                   $r2 = $st2->fetch(PDO::FETCH_ASSOC);
-                  if ($r2 && isset($r2['id_vendeur'])) { $foundVendeur = (int)$r2['id_vendeur']; break; }
-                } catch (Throwable $t) { /* ignore and try next candidate */ }
+                  if ($r2 && isset($r2['id_client'])) { $foundVendeur = (int)$r2['id_client']; break; }
+                } catch (Throwable $t) { }
               }
-              if ($foundVendeur === null) {
-                // If no vendeur linked to this compte, treat as failed login per requirement
-                $hasError = true;
-                $error_card = 1;
-                $error_message = 'Ce compte n\'est pas lié à un vendeur.';
-              } else {
-                // Store vendeur id in session; also keep compte id if needed
-                $_SESSION['id'] = $foundVendeur; // vendeur id used across backoffice
+              if ($foundVendeur !== null) {
+                $sessionIdToStore = $foundVendeur;
                 $_SESSION['compte_id'] = $userId;
               }
             }
-          } catch (Throwable $t) {
-            // On exception treat as auth error
-            $hasError = true;
-            $error_card = 1;
-            $error_message = 'Erreur lors de la vérification des identifiants.';
-          }
+          } catch (Throwable $t) { }
+          $_SESSION['id'] = $sessionIdToStore;
         }
       }
     } catch (Exception $e) {
