@@ -158,7 +158,7 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
                 ':prixUnitaire' => $prixUnitaire,
                 ':remiseUnitaire' => $remiseUnitaire,
                 ':fraisDePort' => $fraisDePort,
-                ':tva' => $tva 
+                ':tva' => $tva
             ]);
             if ($aAjouter < $quantite) {
                 return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
