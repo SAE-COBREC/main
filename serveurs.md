@@ -88,3 +88,6 @@ http://10.253.5.101/index.php
 ### 🔌 Connexion SSH
 
 ssh sae@10.253.5.101
+
+01@dbadmin-sae.com
+kira13
