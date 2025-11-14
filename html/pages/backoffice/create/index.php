@@ -5,6 +5,7 @@
     $pdo->exec("SET search_path to cobrec1");
     session_start();
     const NB_IMGS_MAX = 3;
+    const EMPLACEMENT_DEF_IMGS = 'html/img/Photo';
 ?>
 
 
@@ -21,8 +22,11 @@
 <pre>
 <?php
 
-
-
+// foreach ($_SESSION["id_image"] as $key => $value) {
+//     print_r("\n");
+//     print_r($value);
+//     print_r("\n");
+// }
 $_SESSION["creerArticle"]["warn"]= 0;
 //print_r($_SESSION["creerArticle"]["warn"]);
 $warnPromo = false;
@@ -47,7 +51,7 @@ if ($_POST !== []) {
     //print_r("\n");
 
     function decalage($aDecaler){
-        unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
+        //unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
         if ($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler] === null){
             //L'image $aDecaler n'existe pas. Décalage interrompu. Suppression de l'image $aDecaler-1.
             unset($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
@@ -65,7 +69,7 @@ if ($_POST !== []) {
     }
 
     function supprDeDef(){
-        unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
+        //unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
         unset($_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
         unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][NB_IMGS_MAX-1]);
     }
@@ -139,6 +143,10 @@ if ($_POST !== []) {
     $_POST["pourcentage"] =null;
     $_POST["debut"] =null;
     $_POST["fin"] =null;
+    $_POST["tva"] =null;
+    // $_POST["couleur"] =null;
+    $_POST["poids"] =null;
+    $_POST["volume"] =null;
 
 }
 
@@ -160,22 +168,30 @@ if ($_POST !== []) {
                     <h3>Ajouter un produit</h3>
                     <article>
                         <!-- Texte avec label -->
-                        <label for="titre">Titre</label>
-                        <br>
-                        <input style="<?php 
+                         <!-- <pre> -->
+                        <?php
+                        $titre_pour_bdd = str_replace("'","''",$_POST['titre']);
+                        $titre_pour_bdd = str_replace('"','""',$titre_pour_bdd);
                             try {
-                                $sql = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . "'" . $_POST['titre'] ."'";
+                                $sql = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . "'" . $titre_pour_bdd ."'";
                                 $stmt = $pdo->query($sql);
                                 $titre = $stmt->fetch(PDO::FETCH_ASSOC);
                                 //print_r('Resultat : ' . $result);
                             } catch (Exception $e) {
                                 //print_r($e);
                             }
+                            //print_r("Tite =: " . $titre);
+                        ?>
+<!-- </pre> -->
+                        <label for="titre">Titre</label>
+                        <br>
+                        <input style="<?php 
+                            
                             if (($titre != '') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
                         
                         ?>"
                             maxlength="100"
-                            pattern="[\[\]\(\)&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
+                            pattern="[\[\]\(\)\'\x22&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
                             required />
                             <?php
                         if($titre != ''){
@@ -213,6 +229,7 @@ if ($_POST !== []) {
                         echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] . '/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0];
                         ?>" />
                         <?php
+                        
                         $i = count($_SESSION["creerArticle"]["_FILES"]["name"]);
                         $i = NB_IMGS_MAX;
                         if (($_SESSION["creerArticle"]["_FILES"]["name"] === [])) {
@@ -261,27 +278,99 @@ if ($_POST !== []) {
                     </article>
 
                     <article>
+                        <label for="poids">Poids (en kg)</label>
+                        <br>
+                        <input type="number" id="poids" name="poids" value="<?php echo $_POST["poids"]; ?>" step="0.01"
+                            min="0.01" placeholder="0.01" required><small> kg</small>
+                        <br />
+                    </article>
+
+                    <article>
+                        <label for="volume">Volume (en m<sup>3</sup>)</label>
+                        <br>
+                        <input type="number" id="volume" name="volume" value="<?php echo $_POST["volume"]; ?>" step="0.01"
+                            min="0.01" placeholder="0.01" required><small> m<sup>3</sup></small>
+                        <br />
+                    </article>
+
+                    <article>
+                        <!-- Liste déroulante -->
+                        <label for="tva">TVA</label>
+                        <br>
+                        <select id="tva" name="tva" >
+                            <?php
+                                try {
+                                    $sql = 'SELECT * FROM cobrec1._tva';
+                                    $stmt = $pdo->query($sql);
+                                    $tva = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                } catch (Exception $e) {
+                                    print_r($e);
+                                }
+
+                                foreach ($tva as $value) {
+                            ?>
+                            <option value="<?php echo $value['id_tva']; ?>" <?php if ($_POST["tva"] == $value['id_tva']){echo 'selected';} ?>>
+                                <?php echo $value['montant_tva'] . ' (' . $value['libelle_tva'] . ')'?>
+                            </option>
+                            <?php } ?>
+                        </select>
+                        <br />
+                    </article>
+
+                    <article>
                         <!-- Liste déroulante -->
                         <label for="categorie">Catégorie</label>
                         <br>
-                        <select id="categorie" value="<?php echo $_POST["categorie"]; ?>" name="categorie">
+                        <select id="categorie" name="categorie" required>
+                        <option value=''></option>
                             <?php
                                 try {
                                     $sql = 'SELECT nom_categorie FROM cobrec1._categorie_produit';
                                     $stmt = $pdo->query($sql);
                                     $categorie = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                    print_r($categorie);
+                                    //print_r($categorie);
                                 } catch (Exception $e) {
                                     //print_r($e);
                                 }
 
                                 foreach ($categorie as $value) {
                             ?>
-                            <option value=<?php echo $value['nom_categorie'] ?>><?php echo $value['nom_categorie'] ?></option>
+                            <option 
+                            value="<?php echo $value['nom_categorie'] ?>" <?php if ($_POST["categorie"] === $value['nom_categorie']){echo 'selected';} ?>>
+                            <?php echo $value['nom_categorie'] ?>
+                            </option>
                             <?php } ?>
                         </select>
                         <br />
                     </article>
+
+                    <!-- <article>
+                        
+                        <label for="couleur">Couleur</label>
+                        <br>
+                        <select id="couleur" name="couleur" >
+                        <option value=''></option>
+                            <?php
+                                // try {
+                                //     $sql = 'SELECT * FROM cobrec1._couleur';
+                                //     $stmt = $pdo->query($sql);
+                                //     $tva = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                // } catch (Exception $e) {
+                                //     print_r($e);
+                                // }
+
+                                // foreach ($tva as $value) {
+                            ?>
+                            <option value="<?php 
+                            //echo $value['code_hexa']; ?>
+                            " <?php 
+                            //if ($_POST["couleur"] == $value['code_hexa']){echo 'selected';} ?>>
+                                <?php //if($value['type_couleur'] != ''){echo $value['nom'] . ' (' . $value['type_couleur'] . ')';}else{echo $value['nom'];}?>
+                            </option>
+                            <?php //} ?>
+                        </select>
+                        <br />
+                    </article> -->
 
                 </section>
 
@@ -358,63 +447,158 @@ if ($_POST !== []) {
 
             function sauvegarder(){//si clic sur sauvegarder et pas de warnings
                 confirm("Votre article a bien été sauvegardé.");
-                //document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
             }
 
             function publier(){//si clic sur publier et pas de warnings
                 confirm("Votre article a bien été publié.");
-                //document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
             }
         </script>
             <pre>
                 <?php 
-                    //print_r($_SESSION["creerArticle"]["warn"]); 
-                    if (($_SESSION["creerArticle"]["warn"]=== 0) && ($_POST["titre"] !== '') && (($_POST["sauvegarder"] == "Sauvegarder")) || ($_POST["publier"] == "Publier")){
-                        // print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
-                        // print_r("OK");
-                        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
-                            mkdir('temp_banque_images/' . $_POST["titre"]);
-                            rename('temp_/' . $value, 'temp_banque_images/' . $_POST["titre"] . '/' . $value );
-                        }
-                        //print_r("  FIN");
-                        $id_vendeur  = 1;
-                        $taille  = 'M';
-                        try {
+                    if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '') && (($_POST["sauvegarder"] == "Sauvegarder") || ($_POST["publier"] == "Publier"))){
+                        print_r("WARNS : " . $_SESSION["creerArticle"]["warn"]);
+                        print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
+                        
+                        $svg_titre = $_POST['titre'];
+                        $svg_desc = $_POST['description'];
+                        $_POST['titre'] = str_replace("'","''",$_POST['titre']);
+                        $_POST['titre'] = str_replace('"','""',$_POST['titre']);
+                        $_POST['description'] = str_replace("'","''",$_POST['description']);
+                        $_POST['description'] = str_replace('"','""',$_POST['description']);
+                        $id_vendeur  = 1; //à changer quand Léo aura fini de faire ce qu'il faut pour gérer l'id
+                        $taille  = 'M';  //à ne pas incorporer
+                        try {//création de l'objet produit dans la base
                             $sql = '
-                            INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_nom,p_description,p_poids,p_volume,p_frais_de_port,p_prix,p_stock,p_taille,date_arrivee_stock_recent,p_statut)
-VALUES ((SELECT id_TVA FROM cobrec1._tva WHERE montant_tva = 20.00), ' . $id_vendeur .', ' . "'" . $_POST['titre'] ."'" .', ' . "'" . $_POST["description"] ."'" .', 0.0, 0.0, 0.0, ' . $_POST['prix'] .',' . $_POST['stock'] .',' . "'" . $taille ."'" .', CURRENT_TIMESTAMP, ' . "'" . 'Ébauche' ."'" .');
+                            INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,p_taille,date_arrivee_stock_recent)
+                            VALUES (
+                            ' . "'" . $_POST['tva'] ."'" .', 
+                            ' . $id_vendeur .', 
+                            ' . "'" . $_POST['titre'] ."'" .', 
+                            ' . "'" . $_POST["description"] ."'" .', 
+                            ' . "'" . $_POST["poids"] ."'" .', 
+                            ' . "'" . $_POST["volume"] ."'" .',
+                            ' . $_POST['prix'] .',
+                            ' . $_POST['stock'] .',
+                            ' . "'" . $taille ."'" .', 
+                            CURRENT_TIMESTAMP
+                            );
                             ';
                             $stmt = $pdo->prepare($sql);
                             $stmt->execute();
                         } catch (Exception $e) {
+                            print_r("création de l'objet produit dans la base");
                             print_r($e);
                         }
-                        /*
-                        INSERT INTO cobrec1._fait_partie_de(id_produit,id_categorie)
-VALUES ((SELECT id_produit FROM cobrec1._produit WHERE p_nom = 'NOM'), (SELECT id_categorie FROM cobrec1._categorie_produit WHERE nom_categorie = 'Livres'));
 
-INSERT INTO cobrec1._est_dote_de(id_produit,code_hexa)
-VALUES ((SELECT id_produit FROM cobrec1._produit WHERE p_nom = 'NOM'), '#000000');
+                        try {//création de l'affiliation entre catégorie et produit
+                            $sql = '
+                            INSERT INTO cobrec1._fait_partie_de(id_produit,id_categorie)
+                            VALUES (
+                            (SELECT id_produit FROM cobrec1._produit WHERE p_nom = ' . "'" . $_POST['titre'] . "'". '), 
+                            (SELECT id_categorie FROM cobrec1._categorie_produit WHERE nom_categorie = ' . "'" . $_POST['categorie'] . "'". ')
+                            );
+                            ';
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                        } catch (Exception $e) {
+                            print_r("création de l'affiliation entre catégorie et produit");
+                            print_r($e);
+                        }
 
---reduction non prise en compte pour le sprint 1
+                        // try {//création de l'affiliation entre couleur et produit
+                        //     $sql = '
+                        //     INSERT INTO cobrec1._est_dote_de(id_produit,code_hexa)
+                        //     VALUES (
+                        //     (SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'),' 
+                        //     . "'" . $_POST['couleur'] . "'". '
+                        //     );
+                        //     ';
+                        //     $stmt = $pdo->prepare($sql);
+                        //     $stmt->execute();
+                        // } catch (Exception $e) {
+                        //     print_r($e);
+                        // }
 
-INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
-VALUES ('html/img/Photo/','TITLE', '');
+                        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+                            try {//création des images
+                                $sql = '
+                                INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
+                                VALUES (
+                                ' . "'" . 'html/img/Photo/' . $_POST['titre'] . '/' . $value ."'" .', '
+                                . "'" . $value . "'". ','
+                                . "'" . 'Photo du produit ' . $_POST["titre"] . "'". '
+                                );
+                                ';
+                                $stmt = $pdo->prepare($sql);
+                                $stmt->execute();
+                            } catch (Exception $e) {
+                                print_r("création des images");
+                                print_r($e);
+                            }
 
-SELECT id_image FROM cobrec1._image WHERE i_title = 'TITLE';
 
-INSERT INTO cobrec1._represente_produit(id_produit,id_image)
-VALUES ((SELECT id_produit FROM cobrec1._produit WHERE p_nom = 'NOM'), (SELECT id_image FROM cobrec1._image WHERE i_title = 'TITLE'));
+                            try {//création de l'affiliation entre images et produit
+                                $sql = '
+                                INSERT INTO cobrec1._represente_produit(id_produit,id_image)
+                                VALUES (
+                                (SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'), 
+                                (SELECT id_image FROM cobrec1._image WHERE i_title = ' . "'" . $value ."'" .')
+                                );
+                                ';
+                                $stmt = $pdo->prepare($sql);
+                                $stmt->execute();
+                            } catch (Exception $e) {
+                                print_r("création de l'affiliation entre images et produit");
+                                print_r($_POST["titre"]);
+                                print_r($e);
+                            }
 
-UPDATE cobrec1._image SET i_lien = 'lien' WHERE i_title = 'TITLE';
-UPDATE cobrec1._image SET i_title = 'titre' WHERE i_title = 'TITLE';
-*/
+                            try {//maj du lien et du titre de l'image
+                                $sql = '
+                                SELECT id_image FROM cobrec1._image 
+                                WHERE i_title = ' . "'" . $value ."'" .'
+                                ;
+                                ';
+                                $stmt = $pdo->query($sql);
+                                $id_image = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $id_image = $id_image['id_image'];
+                                // $value = $id_image . '_' . $value;
+                                // $_SESSION["creerArticle"]["_FILES"]["temp_name"][$key] = 'html/img/Photo/' . $value;
+
+                                // $sql = '
+                                // UPDATE cobrec1._image 
+                                // SET i_lien = ' . "'" . $_SESSION["creerArticle"]["_FILES"]["temp_name"][$key] . "' ". ',
+                                // i_title = ' . "'" . $value . "'" . '
+                                // WHERE id_image = ' . $id_image . ';'
+                                // ;
+                                // $stmt = $pdo->prepare($sql);
+                                // $stmt->execute();
+                            } catch (Exception $e) {
+                                print_r("maj du lien et du titre de l'image");
+                                print_r($e);
+                            }
+
+
+
+                            
+                            mkdir('../../../img/Photo/' . $_POST['titre']);
+                            rename('temp_/' . $value, '../../../img/Photo/' . $_POST['titre'] . '/' . $value);
+                        }
+                        
+
+                        //ne pas faire réduction, hors must du Sprint 1
                         
                         
-                        // $_POST = [];
-                        // $_SESSION["creerArticle"] = [];
-                        // $_FILES = [];
                         
+                        $svg_titre = $_POST['titre'];
+                        $svg_desc = $_POST['description'];
+
+                        $fichiers = glob('/temp_*');
+                        foreach ($fichiers as $key => $value) {
+                            unlink('temp_/' . $value);
+                        }
                         if ($_POST["sauvegarder"] == "Sauvegarder"){
                             //Vive les if du php
                             
@@ -424,19 +608,37 @@ UPDATE cobrec1._image SET i_title = 'titre' WHERE i_title = 'TITLE';
                     sauvegarder();
                 </script>
                 <?php }else if ($_POST["publier"] == "Publier"){
-                   
+                    
                 ?>
                 <script>
                     publier();
                 </script>
 
 <?php
+                    try {//mise en ligne du produit
+                        $sql = '
+                        UPDATE cobrec1._produit 
+                        SET p_statut = ' . "'" . 'En ligne' . "' ". '
+                        WHERE p_nom = '. "'" . $_POST['titre'] . "'"
+                        ;
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute();
+                    } catch (Exception $e) {
+                        print_r("mise en ligne du produit");
+                        print_r($e);
+                    }
                 }
             }
-            for ($i = 0; (($i < NB_IMGS_MAX) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++){
-                //déplace les fichiers dans un dossier pour que l'utilisateur puisse voir les imgs
-                move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i], 
-                'temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$i]);
+            if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '') && (($_POST["sauvegarder"] == "Sauvegarder") || ($_POST["publier"] == "Publier"))){
+                $_POST = [];
+                $_SESSION["creerArticle"] = [];
+                $_FILES = [];
+            }else{
+                for ($i = 0; (($i < NB_IMGS_MAX) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++){
+                    //déplace les fichiers dans un dossier pour que l'utilisateur puisse voir les imgs
+                    move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i], 
+                    'temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$i]);
+                }
             }
             $sth = null ;
             $dbh = null ;
