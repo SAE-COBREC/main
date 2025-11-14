@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-include __DIR__ . '/selectBDD.php';
+include '../../selectBDD.php';
 
-$pdo->exec("SET search_path TO cobrec1, public");
+$pdo->exec("SET search_path TO cobrec1");
 
 //fonction pour récupérer les infos du client
 function recupererInfosClient($pdo, $idClient)
