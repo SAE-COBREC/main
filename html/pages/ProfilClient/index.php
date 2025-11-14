@@ -162,13 +162,13 @@ function changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePass
 }
 
 //vérifier si le client est connecté
-if (!isset($_SESSION['client_id'])) {
+if (!isset($_SESSION['id'])) {
     header("Location: /pages/connexionClient/index.php");
     exit;
 }
 
 //récupérer l'id du client
-$idClient = (int)$_SESSION['client_id'];
+$idClient = (int)$_SESSION['id'];
 
 //gestion de la déconnexion
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
