@@ -1,14 +1,11 @@
 <?php
 session_start();
-include '../../../selectBDD.php';
-
-// Exemple : ID du vendeur connecté (à récupérer depuis $_SESSION normalement)
-//$vendeur_id = $_SESSION['id'];
+include '../../../selectBDD.php'; 
 
 $compte_id = 2;
 
 try {
-    $query = "
+     $query = "
         SELECT 
             v.raison_sociale AS Rsociale,
             v.siren AS SIREN,
@@ -16,23 +13,25 @@ try {
             c.num_telephone AS telephone,
             a.a_adresse AS adresse,
             a.a_code_postal AS codeP,
-            a.a_ville AS ville
-        FROM cobrec1._vendeur v
-        LEFT JOIN cobrec1._compte c on v.id_compte = c.id_compte
-        LEFT JOIN cobrec1._adresse a ON c.id_compte = a.id_compte
-        WHERE v.$compte_id = :$compte_id
+            a.a_ville AS ville,
+            a.a_complement AS complement
+        FROM cobrec1._compte c
+        LEFT JOIN cobrec1._vendeur v ON c.id_compte = v.id_compte
+        LEFT JOIN cobrec1._adresse a ON v.id_compte = a.id_compte
+        WHERE c.id_compte = :id_compte
     ";
+
 
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_compte' => $compte_id]);
     $vendeur = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$vendeur) {
-        die("Vendeur non trouvé.");
-    }
-
 } catch (PDOException $e) {
     die("Erreur lors de la récupération des informations : " . htmlspecialchars($e->getMessage()));
+}
+
+function safe($value, $default = "NULL") {
+    return htmlspecialchars($value ?? $default);
 }
 ?>
 <!doctype html>
@@ -41,7 +40,7 @@ try {
   <meta charset="utf-8">
   <meta name="viewport" content="width=1440, height=1024">
   <title>Profil Vendeur - Alizon</title>
-  <link rel="stylesheet" href="../../../styles/ProfilVendeur/profilVendeur.css">
+  <link rel="stylesheet" href="/styles/ProfilVendeur/profil.css">
 </head>
 <body>
   <div class="app">
@@ -55,13 +54,14 @@ try {
       <div class="profil-card">
         <h2 class="profil-card__title">Informations du compte</h2>
         <dl class="profil-details">
-          <dt>Raison sociale</dt><dd><?= htmlspecialchars($vendeur['Rsociale']); ?></dd>
-          <dt>Numéro de SIREN</dt><dd><?= htmlspecialchars($vendeur['SIREN']); ?></dd>
-          <dt>Email</dt><dd><?= htmlspecialchars($vendeur['email']); ?></dd>
-          <dt>Téléphone</dt><dd><?= htmlspecialchars($vendeur['telephone']); ?></dd>
-          <dt>Rue</dt><dd><?= htmlspecialchars($vendeur['ville']); ?></dd>
-          <dt>Code Postal</dt><dd><?= htmlspecialchars($vendeur['codeP']); ?></dd>
-          <dt>Commune</dt><dd><?= htmlspecialchars($vendeur['commune']); ?></dd>
+          <dt>Raison sociale</dt><dd><?=  htmlspecialchars(safe($vendeur['Rsociale'])); ?></dd>
+          <dt>Numéro de SIREN</dt><dd><?= htmlspecialchars(safe($vendeur['SIREN'])); ?></dd>
+          <dt>Email</dt><dd><?= htmlspecialchars(safe($vendeur['email'])); ?></dd>
+          <dt>Téléphone</dt><dd><?= htmlspecialchars(safe($vendeur['telephone'])); ?></dd>
+          <dt>Adresse</dt><dd><?= htmlspecialchars(safe($vendeur['adresse'])); ?></dd>
+          <dt>Ville</dt><dd><?= htmlspecialchars(safe($vendeur['ville'])); ?></dd>
+          <dt>Code Postal</dt><dd><?= htmlspecialchars(safe($vendeur['codeP'])); ?></dd>
+          <dt>Complement</dt><dd><?= htmlspecialchars(safe($vendeur['complement'])); ?></dd>
         </dl>
 
         <div class="profil-actions">

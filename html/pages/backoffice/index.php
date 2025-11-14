@@ -1,14 +1,6 @@
 <?php session_start(); ?>
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=1440, height=1024" />
-  <title>Alizon - Page Accueil Vendeur</title>
-  <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
-</head>
-<body>
-  <?php
+
+<?php
     include '../../selectBDD.php';
 
     // ID du vendeur connecté (à adapter dynamiquement via la session)
@@ -48,6 +40,15 @@
     }
 
   ?>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1440, height=1024" />
+  <title>Alizon - Page Accueil Vendeur</title>
+  <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
+</head>
+<body>
   <div class="app">
     <?php
     include __DIR__ . '/../../partials/aside.html';
