@@ -69,28 +69,40 @@ session_start();
           if ($userId === null) {
             error_log('[connexion] warning: no id-like column found in _compte row: ' . json_encode(array_keys($row)));
           }
-          // Attempt to map compte id -> vendeur id and store vendeur id in session instead
-          $sessionIdToStore = $userId;
+          // Require that this compte is linked to a client (id_client). If not, fail authentication.
           try {
-            if ($userId !== null) {
-              $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte'];
-              $foundVendeur = null;
+            if ($userId === null) {
+              $hasError = true;
+              $error_card = 1;
+              $error_message = 'Erreur interne: identifiant de compte introuvable.';
+            } else {
+              $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte', 'id'];
+              $foundClient = null;
               foreach ($candidates as $col) {
                 $q = "SELECT id_client FROM _client WHERE " . $col . " = :cid LIMIT 1";
                 try {
                   $st2 = $pdo->prepare($q);
                   $st2->execute([':cid' => $userId]);
                   $r2 = $st2->fetch(PDO::FETCH_ASSOC);
-                  if ($r2 && isset($r2['id_client'])) { $foundVendeur = (int)$r2['id_client']; break; }
-                } catch (Throwable $t) { }
+                  if ($r2 && isset($r2['id_client'])) { $foundClient = (int)$r2['id_client']; break; }
+                } catch (Throwable $t) { /* ignore and try next */ }
               }
-              if ($foundVendeur !== null) {
-                $sessionIdToStore = $foundVendeur;
+              if ($foundClient === null) {
+                // No linked client -> authentication must fail per requirement
+                $hasError = true;
+                $error_card = 1;
+                $error_message = 'Ce compte n\'est pas lié à un client.';
+              } else {
+                // store client id in session and keep compte id for reference
+                $_SESSION['id'] = $foundClient;
                 $_SESSION['compte_id'] = $userId;
-              } 
+              }
             }
-          } catch (Throwable $t) { }
-          $_SESSION['id'] = $sessionIdToStore;
+          } catch (Throwable $t) {
+            $hasError = true;
+            $error_card = 1;
+            $error_message = 'Erreur lors de la vérification des identifiants.';
+          }
         }
       }
     } catch (Exception $e) {
