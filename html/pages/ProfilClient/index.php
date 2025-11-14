@@ -1,6 +1,6 @@
 <?php
 //démarrer la session utilisateur
-session_start();
+//session_start();
 
 //inclure le fichier de connexion à la base de données
 include '../../selectBDD.php';
