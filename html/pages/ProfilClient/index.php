@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
     <?php
-    include __DIR__ . '/../partials/header.html';
+    include __DIR__ . '/../../partials//header.html';
     ?>
 
     <main>
@@ -445,7 +445,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
     <?php
-    include __DIR__ . '/../partials/footer.html';
+    include __DIR__ . '/../../partials/footer.html';
     ?>
 
 </body>
