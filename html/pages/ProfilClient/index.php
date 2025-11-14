@@ -31,6 +31,17 @@ $stmtClient = $pdo->prepare("
 $stmtClient->execute([$clientId]);
 $client = $stmtClient->fetch(PDO::FETCH_ASSOC);
 
+//gestion de la déconnexion
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    // destruction de la session
+    session_unset();
+    session_destroy();
+
+    //même redirection que ton bouton "retours"
+    header('Location: /pages/connexionClient/index.php');
+    exit;
+}
+
 //vérifier que le client existe
 if (!$client) {
     die("Client introuvable avec l'ID : " . htmlspecialchars($clientId));
@@ -421,6 +432,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </main>
                 </article>
             </section>
+
+            <form method="get" style="margin-top: 1rem; text-align: center;">
+                <button type="submit" name="action" value="logout">
+                    Déconnexion
+                </button>
+            </form>
+
 
         </div>
     </main>
