@@ -39,7 +39,7 @@ function recupererIdCompte($pdo, $idClient)
         $stmt->execute([$idClient]);
         $idCompte = $stmt->fetchColumn();
 
-        return $idCompte !== false ? (int)$idCompte : null;
+        return $idCompte !== false ? (int) $idCompte : null;
     } catch (Exception $e) {
         return null;
     }
@@ -132,6 +132,11 @@ function changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePass
         $stmt->execute([$idCompte]);
         $motDePasseHashe = $stmt->fetchColumn();
 
+        echo ($motDePasseActuel);
+        echo ($motDePasseHashe);
+        echo ($nouveauMotDePasse);
+        echo ($confirmationMotDePasse);
+
         if ($motDePasseHashe === false) {
             return ['success' => false, 'message' => "Compte introuvable."];
         }
@@ -168,7 +173,7 @@ if (!isset($_SESSION['id'])) {
 }
 
 //récupérer l'id du client
-$idClient = (int)$_SESSION['id'];
+$idClient = (int) $_SESSION['id'];
 
 //gestion de la déconnexion
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
@@ -185,7 +190,7 @@ $idCompte = recupererIdCompte($pdo, $idClient);
 
 //vérifier que le compte existe
 if ($idCompte === null) {
-    die("Compte introuvable pour le client : " . htmlspecialchars((string)$idClient));
+    die("Compte introuvable pour le client : " . htmlspecialchars((string) $idClient));
 }
 
 //traitement des formulaires
@@ -229,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $client = recupererInfosClient($pdo, $idClient);
 
 if (!$client) {
-    die("Client introuvable avec l'ID : " . htmlspecialchars((string)$idClient));
+    die("Client introuvable avec l'ID : " . htmlspecialchars((string) $idClient));
 }
 
 $adresses = recupererAdressesClient($pdo, $idCompte);
@@ -332,7 +337,7 @@ $commandes = recupererDernieresCommandes($pdo, $idClient);
                                 </label>
                             </div>
 
-                            <button type="submit" name="updateinfo">
+                            <button type="submit" name="update_info">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -499,7 +504,8 @@ $commandes = recupererDernieresCommandes($pdo, $idClient);
                                 </label>
                             </div>
 
-                            <button type="submit" name="changepassword" onclick="return confirm('Confirmer le changement de mot de passe ?');">
+                            <button type="submit" name="change_password"
+                                onclick="return confirm('Confirmer le changement de mot de passe ?');">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
