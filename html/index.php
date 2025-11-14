@@ -89,26 +89,28 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
             WHERE p.id_produit = :idProduit
         ";
-        
+
         $stmtProduit = $pdo->prepare($sqlProduit);
         $stmtProduit->execute([':idProduit' => $idProduit]);
         $produit = $stmtProduit->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$produit) {
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
-        
+
         // normaliser la quantité demandée
         $quantite = (int) $quantite;
-        if ($quantite < 1) { $quantite = 1; }
-        
+        if ($quantite < 1) {
+            $quantite = 1;
+        }
+
         //calculer le prix avec remise
         $prixUnitaire = $produit['p_prix'];
         $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
         $fraisDePort = $produit['p_frais_de_port'];
         $tva = $produit['tva'];
-        $stock = (int)($produit['p_stock'] ?? 0);
-        
+        $stock = (int) ($produit['p_stock'] ?? 0);
+
         //vérifier si l'article existe déjà dans le panier
         $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
         $stmtCheck = $pdo->prepare($sqlCheck);
@@ -118,7 +120,7 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
         ]);
 
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-        $quantiteExistante = $existe ? (int)$existe['quantite'] : 0;
+        $quantiteExistante = $existe ? (int) $existe['quantite'] : 0;
         $disponible = max(0, $stock - $quantiteExistante);
 
         if ($disponible <= 0) {
@@ -168,13 +170,15 @@ function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
     }
 }
 
+$idClient = (int)$_SESSION['id'];
+
 //gérer l'ajout au panier via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
     header('Content-Type: application/json');
 
     $idProduit = $_POST['idProduit'] ?? null;
     $quantite = $_POST['quantite'] ?? 1;
-    $idPanier = 8; //utilise l'ID du panier actuel (à adapter selon votre système de session)
+    $idPanier = $idClient; //utilise l'ID du panier actuel 
 
     if ($idProduit) {
         $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
@@ -498,26 +502,26 @@ $id_panier = 8;
             formData.append('action', 'ajouter_panier');
             formData.append('idProduit', idProduit);
             formData.append('quantite', 1);
-            
+
             //envoyer la requête AJAX
             fetch('index.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('✓ ' + data.message);
-                    //optionnel : mettre à jour le compteur du panier
-                    //mettreAJourCompteurPanier();
-                } else {
-                    alert('✗ ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur lors de l\'ajout au panier');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('✓ ' + data.message);
+                        //optionnel : mettre à jour le compteur du panier
+                        //mettreAJourCompteurPanier();
+                    } else {
+                        alert('✗ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de l\'ajout au panier');
+                });
         }
 
         //fonction pour réinitialiser tous les filtres
