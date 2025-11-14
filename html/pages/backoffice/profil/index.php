@@ -20,7 +20,7 @@ try {
         FROM cobrec1._vendeur v
         LEFT JOIN cobrec1._compte c on v.id_compte = c.id_compte
         LEFT JOIN cobrec1._adresse a ON c.id_compte = a.id_compte
-        WHERE v.id_vendeur = :id_vendeur
+        WHERE v.$compte_id = :$compte_id
     ";
 
     $stmt = $pdo->prepare($query);
