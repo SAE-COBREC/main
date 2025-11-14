@@ -2,17 +2,17 @@
 session_start();
 include '../../../selectBDD.php'; 
 
-$compte_id = 2;
+$compte_id = $_SESSION['compte_id'];
 
 try {
      $query = "
         SELECT 
-            v.raison_sociale AS Rsociale,
-            v.siren AS SIREN,
+            v.raison_sociale AS rsociale,
+            v.siren AS siren,
             c.email AS email,
             c.num_telephone AS telephone,
             a.a_adresse AS adresse,
-            a.a_code_postal AS codeP,
+            a.a_code_postal AS codep,
             a.a_ville AS ville,
             a.a_complement AS complement
         FROM cobrec1._compte c
@@ -30,9 +30,10 @@ try {
     die("Erreur lors de la récupération des informations : " . htmlspecialchars($e->getMessage()));
 }
 
-function safe($value, $default = "NULL") {
-    return htmlspecialchars($value ?? $default);
+function safe($array, $key, $default = "NULL") {
+    return htmlspecialchars(isset($array[$key]) && $array[$key] !== "" ? $array[$key] : $default);
 }
+
 ?>
 <!doctype html>
 <html lang="fr">
@@ -54,14 +55,15 @@ function safe($value, $default = "NULL") {
       <div class="profil-card">
         <h2 class="profil-card__title">Informations du compte</h2>
         <dl class="profil-details">
-          <dt>Raison sociale</dt><dd><?=  htmlspecialchars(safe($vendeur['Rsociale'])); ?></dd>
-          <dt>Numéro de SIREN</dt><dd><?= htmlspecialchars(safe($vendeur['SIREN'])); ?></dd>
-          <dt>Email</dt><dd><?= htmlspecialchars(safe($vendeur['email'])); ?></dd>
-          <dt>Téléphone</dt><dd><?= htmlspecialchars(safe($vendeur['telephone'])); ?></dd>
-          <dt>Adresse</dt><dd><?= htmlspecialchars(safe($vendeur['adresse'])); ?></dd>
-          <dt>Ville</dt><dd><?= htmlspecialchars(safe($vendeur['ville'])); ?></dd>
-          <dt>Code Postal</dt><dd><?= htmlspecialchars(safe($vendeur['codeP'])); ?></dd>
-          <dt>Complement</dt><dd><?= htmlspecialchars(safe($vendeur['complement'])); ?></dd>
+          <dt>Raison sociale</dt><dd><?= safe($vendeur, 'rsociale'); ?></dd>
+          <dt>Numéro de SIREN</dt><dd><?= safe($vendeur, 'siren'); ?></dd>
+          <dt>Email</dt><dd><?= safe($vendeur, 'email'); ?></dd>
+          <dt>Téléphone</dt><dd><?= safe($vendeur, 'telephone'); ?></dd>
+          <dt>Adresse</dt><dd><?= safe($vendeur, 'adresse'); ?></dd>
+          <dt>Ville</dt><dd><?= safe($vendeur, 'ville'); ?></dd>
+          <dt>Code Postal</dt><dd><?= safe($vendeur, 'codep'); ?></dd>
+          <dt>Complément</dt><dd><?= safe($vendeur, 'complement'); ?></dd>
+
         </dl>
 
         <div class="profil-actions">
