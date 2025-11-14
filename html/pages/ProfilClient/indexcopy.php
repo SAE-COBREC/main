@@ -10,7 +10,7 @@ $pdo->exec("SET search_path TO cobrec1, public");
 
 //vérifier si le client est connecté
 if (!isset($_SESSION['client_id'])) {
-    header("Location: /pages/connexionClient/indexcopy.php");
+    header("Location: /pages/connexionClient/index.php");
     exit;
 }
 
