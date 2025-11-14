@@ -142,7 +142,7 @@ function changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePass
         }
 
         //vérifier le mot de passe actuel
-        if (!password_verify($motDePasseActuel, $motDePasseHashe)) {
+        if ($motDePasseActuel != $motDePasseHashe){
             return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
         }
 
@@ -152,7 +152,7 @@ function changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePass
         }
 
         //hasher et mettre à jour
-        $nouveauMotDePasseHashe = password_hash($nouveauMotDePasse, PASSWORD_DEFAULT);
+        $nouveauMotDePasseHashe = $nouveauMotDePasse;
         $sqlUpdate = "UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?";
         $stmtUpdate = $pdo->prepare($sqlUpdate);
         $stmtUpdate->execute([$nouveauMotDePasseHashe, $idCompte]);
