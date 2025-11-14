@@ -87,7 +87,7 @@ session_start();
               if ($foundVendeur !== null) {
                 $sessionIdToStore = $foundVendeur;
                 $_SESSION['compte_id'] = $userId;
-              }
+              } 
             }
           } catch (Throwable $t) { }
           $_SESSION['id'] = $sessionIdToStore;
