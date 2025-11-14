@@ -37,7 +37,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
 
-    header('Location: /html/pages/ProfilClient/index.phpindex.php');
+    header('Location: /html/pages/ProfilClient/index.php');
     exit;
 }
 
