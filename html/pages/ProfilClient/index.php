@@ -1,6 +1,6 @@
 <?php
 //démarrer la session utilisateur
-//session_start();
+session_start();
 
 //inclure le fichier de connexion à la base de données
 include '../../selectBDD.php';
@@ -9,14 +9,13 @@ include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1, public");
 
 //vérifier si le client est connecté
-// if (!isset($_SESSION['client_id'])) {
-//     header("Location: /pages/connexionClient/index.php");
-//     exit;
-// }
+if (!isset($_SESSION['client_id'])) {
+    header("Location: /pages/connexionClient/index.php");
+    exit;
+}
 
 //récupérer l'id du client depuis la session
-//$clientId = $_SESSION['client_id'];
-$clientId = 1;
+$clientId = $_SESSION['client_id'];
 
 //requête SQL pour obtenir les informations du client (nom, prénom, email, téléphone)
 $stmtClient = $pdo->prepare("
