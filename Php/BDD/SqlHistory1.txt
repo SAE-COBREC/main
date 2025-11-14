@@ -12,4 +12,4 @@
 \n\nCREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion\nAFTER INSERT on _produit\nFOR EACH ROW\nEXECUTE PROCEDURE maj_moyenne_notes_produit_apres_insertion()
 \n\nCREATE TRIGGER tgr_moyenne_notes_produit_apres_modification\nAFTER UPDATE on _produit\nFOR EACH ROW\nEXECUTE PROCEDURE maj_moyenne_notes_produit_apres_modification()
 \n\nCREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression\nAFTER DELETE on _produit\nFOR EACH ROW\nEXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression()
-\n\n\nSELECT * from _compte
+\n\n\nSELECT * FROM _compte
