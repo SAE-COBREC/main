@@ -1,52 +1,16 @@
-# 1. Image de base : PHP-FPM avec Alpine pour la légèreté
-FROM php:8.2-fpm-alpine
+# Utilise une image de base officielle PHP avec Apache
+FROM php:8.2-apache
 
-# --- Installation des extensions PHP et des dépendances système ---
+# Copie les fichiers de votre projet (dossiers 'html' et 'Php')
+# vers le dossier web du serveur dans le conteneur
+COPY html/ /var/www/html/
+COPY Php/ /var/www/html/Php/
 
-# 2. Installer les dépendances système nécessaires
-RUN apk add --no-cache \
-    libxml2-dev \
-    mysql-client \
-    icu-dev
-    # Ajoutez d'autres paquets système ici si besoin
-    
-# 3. Installer les extensions PHP
-RUN docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    mysqli \
-    opcache \
-    intl
-    # Ajoutez toutes les extensions PHP dont votre site a besoin
+# (Optionnel) Il y a peut-être d'autres commandes ici,
+# comme l'installation d'extensions PHP (par exemple pour MySQL)
+RUN docker-php-ext-install pdo pdo_mysql mysqli
 
-# --- Configuration du Code ---
-
-# 4. Définir le répertoire de travail interne du conteneur
-WORKDIR /var/www/html
-
-# 5. Copier le contenu du site web
-# On copie UNIQUEMENT le contenu de 'html/' du dépôt vers /var/www/html.
-COPY html/ .
-
-# 6. Gérer les permissions (Crucial pour l'exécution et la sécurité)
-# L'utilisateur 'www-data' est celui sous lequel PHP-FPM tourne.
-RUN chown -R www-data:www-data /var/www/html
-
-# --- Démarrage ---
-
-# 7. Exposer le port par défaut de PHP-FPM
-EXPOSE 9000
-
-# 8. Commande de démarrage (Lance le service PHP-FPM)
-CMD ["php-fpm"]
-
-# Configuration pour que PHP-FPM écoute sur le port 5001 (au lieu du 9000)
-# Ce fichier est généralement lu par FPM pour écraser les configs par défaut.
-RUN echo "[global]" > /usr/local/etc/php-fpm.d/zz-docker.conf && \
-    echo "daemonize = no" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
-    echo "" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
-    echo "[www]" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
-    echo "listen = 0.0.0.0:5001" >> /usr/local/etc/php-fpm.d/zz-docker.conf
-
-# Ajoutez le port 5001 comme port exposé (seulement pour la documentation)
+# L'image de base 'php:8.2-apache' expose
+# automatiquement le port 80.
+# La ligne EXPOSE 80 peut être là ou être implicite.
 EXPOSE 5001
