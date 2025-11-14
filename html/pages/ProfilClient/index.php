@@ -1,16 +1,23 @@
 <?php
+//démarrer la session utilisateur
 session_start();
 
+//inclure le fichier de connexion à la base de données
 include '../../selectBDD.php';
 
+//définir le schéma PostgreSQL utilisé pour les requêtes
 $pdo->exec("SET search_path TO cobrec1, public");
 
+//vérifier si le client est connecté
 if (!isset($_SESSION['client_id'])) {
     header("Location: /pages/connexionClient/index.php");
     exit;
 }
+
+//récupérer l'id du client depuis la session
 $clientId = $_SESSION['client_id'];
 
+//requête SQL pour obtenir les informations du client (nom, prénom, email, téléphone)
 $stmtClient = $pdo->prepare("
     SELECT 
         cl.c_nom, 
@@ -24,13 +31,17 @@ $stmtClient = $pdo->prepare("
 $stmtClient->execute([$clientId]);
 $client = $stmtClient->fetch(PDO::FETCH_ASSOC);
 
+//vérifier que le client existe
 if (!$client) {
     die("Client introuvable avec l'ID : " . htmlspecialchars($clientId));
 }
+
+//requête SQL pour récupérer l'id du compte associé au client
 $stmtIdCompte = $pdo->prepare("SELECT id_compte FROM cobrec1._client WHERE id_client = ?");
 $stmtIdCompte->execute([$clientId]);
 $idCompte = $stmtIdCompte->fetchColumn();
 
+//requête SQL pour récupérer toutes les adresses du client
 $stmtAdresses = $pdo->prepare("
     SELECT 
         id_adresse, 
@@ -45,6 +56,7 @@ $stmtAdresses = $pdo->prepare("
 $stmtAdresses->execute([$idCompte]);
 $adresses = $stmtAdresses->fetchAll(PDO::FETCH_ASSOC);
 
+//requête SQL pour récupérer les 5 dernières commandes du client
 $stmtCommandes = $pdo->prepare("
     SELECT 
         p.id_panier, 
@@ -61,14 +73,18 @@ $stmtCommandes = $pdo->prepare("
 $stmtCommandes->execute([$clientId]);
 $commandes = $stmtCommandes->fetchAll(PDO::FETCH_ASSOC);
 
+//traitement du formulaire si une requête POST est envoyée
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    //mise à jour des informations personnelles si le formulaire est soumis
     if (isset($_POST['update_info'])) {
+        //récupérer et sécuriser les données du formulaire
         $nom = htmlspecialchars($_POST['nom']);
         $prenom = htmlspecialchars($_POST['prenom']);
         $email = htmlspecialchars($_POST['email']);
         $telephone = htmlspecialchars($_POST['telephone']);
 
         try {
+            //requête SQL pour mettre à jour les données dans _client
             $stmtUpdateClient = $pdo->prepare("
                 UPDATE cobrec1._client 
                 SET c_nom = ?, c_prenom = ?
@@ -76,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $stmtUpdateClient->execute([$nom, $prenom, $clientId]);
 
+            //requête SQL pour mettre à jour l'email et le téléphone dans _compte
             $stmtUpdateCompte = $pdo->prepare("
                 UPDATE cobrec1._compte 
                 SET email = ?, num_telephone = ?
@@ -83,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $stmtUpdateCompte->execute([$email, $telephone, $idCompte]);
 
+            //redirection après la mise à jour
             header('Location: index.php?success=info_updated');
             exit();
         } catch (Exception $e) {
@@ -90,23 +108,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    //changement du mot de passe si le formulaire est soumis
     if (isset($_POST['change_password'])) {
+        //récupérer les valeurs des champs mot de passe
         $currentPassword = $_POST['current_password'];
         $newPassword = $_POST['new_password'];
         $confirmPassword = $_POST['confirm_password'];
 
         try {
-
+            //vérifier le mot de passe actuel avec celui stocké dans la BDD
             $stmtCheckPwd = $pdo->prepare("SELECT mdp FROM cobrec1._compte WHERE id_compte = ?");
             $stmtCheckPwd->execute([$idCompte]);
             $hashedPassword = $stmtCheckPwd->fetchColumn();
 
+            //test du mot de passe actuel
             if (password_verify($currentPassword, $hashedPassword)) {
+                //vérifier que les nouveaux mots de passe correspondent
                 if ($newPassword === $confirmPassword) {
+                    //hasher le nouveau mot de passe et l'enregistrer dans la BDD
                     $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
                     $stmtUpdatePwd = $pdo->prepare("UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?");
                     $stmtUpdatePwd->execute([$newHashedPassword, $idCompte]);
 
+                    //redirection après la modification du mot de passe
                     header('Location: index.php?success=password_changed');
                     exit();
                 } else {
