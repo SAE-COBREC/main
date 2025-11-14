@@ -3,7 +3,9 @@ session_start();
 include '../../../selectBDD.php';
 
 // Exemple : ID du vendeur connecté (à récupérer depuis $_SESSION normalement)
-$vendeur_id = $_SESSION['id'];
+//$vendeur_id = $_SESSION['id'];
+
+$vendeur_id = 2;
 
 try {
     $query = "
