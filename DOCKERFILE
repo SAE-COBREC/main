@@ -1,63 +1,47 @@
-# Utiliser une image PHP-FPM officielle (Alpine est légère)
+# 1. Image de base : PHP-FPM avec Alpine pour la légèreté
 FROM php:8.2-fpm-alpine
 
-# --- Installation des dépendances et outils ---
+# --- Installation des extensions PHP et des dépendances système ---
 
-# 1. Installer les dépendances du système (Exemple pour MySQL et Intl)
+# 2. Installer les dépendances système nécessaires
+# Utilisez 'apk add --no-cache' pour garder l'image petite.
 RUN apk add --no-cache \
     libxml2-dev \
     mysql-client \
     icu-dev \
-    # Ajoutez d'autres dépendances système ici si nécessaire
+    # Ajoutez d'autres paquets système ici si besoin
+    # Ex: curl, git, ou des bibliothèques pour des extensions PHP spécifiques.
+    && rm -rf /var/cache/apk/*
 
-# 2. Installer les extensions PHP courantes
+# 3. Installer les extensions PHP
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     mysqli \
     opcache \
     intl \
-    # Ajoutez d'autres extensions dont votre application a besoin (ex: gd, zip, bcmath)
-
-# 3. Installer Composer globalement (si vous gérez les dépendances)
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+    # Ajoutez toutes les extensions PHP dont votre site a besoin (séparées par un espace)
 
 # --- Configuration du Code ---
 
-# 4. Définir le répertoire de travail (la racine web du conteneur)
+# 4. Définir le répertoire de travail interne du conteneur
 WORKDIR /var/www/html
 
-# 5. Copier les fichiers du site web
-# C'est la modification clé : on copie le contenu de votre dossier 'html/' (local)
-# vers le répertoire de travail '.' (qui est /var/www/html dans le conteneur).
+# 5. Copier le contenu du site web
+# C'est l'étape clé : on copie UNIQUEMENT le contenu de 'html/'
+# du dépôt vers la racine du conteneur (/var/www/html).
 COPY html/ .
 
-# 6. Gérer les dépendances Composer (si votre 'composer.json' est à l'extérieur)
-# SI votre 'composer.json' est à la racine de votre dépôt (et non dans 'html/'):
-# Vous avez besoin de copier le dossier 'vendor' généré quelque part d'accessible.
-# Le plus simple est de le laisser à la racine du code :
+# 6. Gérer les permissions (Crucial pour l'exécution et la sécurité)
+# L'utilisateur 'www-data' est celui sous lequel PHP-FPM tourne.
+RUN chown -R www-data:www-data /var/www/html
+# Si PHP doit écrire (logs, uploads, sessions), rendre le(s) dossier(s) inscriptible:
+# Ex: RUN chmod -R 775 /var/www/html/uploads
 
-# Créer un dossier pour les dépendances
-RUN mkdir /var/www/vendor
+# --- Démarrage ---
 
-# Copier les fichiers Composer à la racine pour l'installation
-COPY composer.json composer.lock /var/www/
-
-# Installer les dépendances
-RUN composer install --no-dev --optimize-autoloader -d /var/www/
-
-# Déplacer le dossier vendor généré au bon endroit (si votre application le cherche dans /var/www/vendor)
-# Le dossier 'vendor' est généré dans /var/www/ par la commande précédente. C'est prêt.
-
-# 7. Gérer les permissions (IMPORTANT)
-# S'assurer que les fichiers appartiennent à l'utilisateur sous lequel PHP-FPM tourne.
-RUN chown -R www-data:www-data /var/www/html \
-    && chown -R www-data:www-data /var/www/vendor \
-    # Si vous utilisez un framework, assurez-vous que les dossiers de cache/logs sont inscriptibles
-    && chmod -R 775 /var/www/html/cache
-
-# 8. Exposer le port de PHP-FPM
+# 7. Exposer le port par défaut de PHP-FPM
 EXPOSE 9000
 
-# 9. Commande de démarrage par défaut
+# 8. Commande de démarrage (Lance le service PHP-FPM)
 CMD ["php-fpm"]
