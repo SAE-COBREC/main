@@ -316,8 +316,6 @@ $produits_filtres = filtrerProduits($produits, $filtres);
 $produits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($categories);
 
-$id_panier = 8;
-
 ?>
 
 
