@@ -2,7 +2,6 @@
 session_start();
 
 include '../../selectBDD.php';
-;
 
 $pdo->exec("SET search_path TO cobrec1, public");
 
