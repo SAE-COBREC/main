@@ -5,7 +5,7 @@ include '../../../selectBDD.php';
 // Exemple : ID du vendeur connecté (à récupérer depuis $_SESSION normalement)
 //$vendeur_id = $_SESSION['id'];
 
-$compte_id = $_SESSION['compte_id'];
+$compte_id = 2;
 
 try {
     $query = "
