@@ -333,9 +333,10 @@ $id_panier = 8;
 </head>
 
 <body>
-    <audio id="bg-music" src="/img/Photo/disney-junior.mp3" loop></audio>
-
+    <audio id="bg-music-1" src="/img/Photo/disney-junior.mp3" loop></audio>
+    <audio id="bg-music-2" src="/img/Photo/musique.mp3" loop></audio>
     <button type="button" id="play-music"></button>
+
 
     <?php
     include __DIR__ . '/partials/header.html';
@@ -598,13 +599,16 @@ $id_panier = 8;
 
 
         //pour éthan
-        const audio = document.getElementById('bg-music');
+        const audio1 = document.getElementById('bg-music-1');
+        const audio2 = document.getElementById('bg-music-2');
         const btn = document.getElementById('play-music');
 
         btn.addEventListener('click', () => {
-            audio.play();
-            btn.style.display = 'none'; // on cache le bouton après clic
+            audio1.play();
+            audio2.play();
+            btn.style.display = 'none';
         });
+
     </script>
 </body>
 
