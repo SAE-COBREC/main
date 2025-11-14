@@ -426,7 +426,7 @@ $id_panier = 8;
                             ? $produit['p_prix'] * (1 - $produit['pourcentage_reduction'] / 100)
                             : $produit['p_prix'];
                         //arrondit la note moyenne
-                        $note = $produit['note_moyenne'] ? round($produit['note_moyenne']) : 0;
+                        $note = $produit['p_avis'];
                         ?>
                         <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
                             onclick="window.location.href='/pages/produit/index.php?id=<?= $produit['id_produit'] ?>'">
