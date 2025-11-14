@@ -1,8 +1,12 @@
 # Liste des bugs
 ## Panier
-- Augmenter la quantite depuis le panier partir et revenir n'update pas la bdd
+- Augmenter la quantité depuis le panier partir et revenir n'update pas la bdd
 
 
 
 ## Ajout Panier 
-- Si on est pas co ca marche pas 
+- Si on n'est pas connecté ça ne marche pas 
+
+
+## Profil
+- édite les infos marche pas.
