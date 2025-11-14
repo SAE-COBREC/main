@@ -11,7 +11,7 @@ try {
             v.raison_sociale AS Rsociale,
             v.siren AS SIREN,
             c.email AS email,
-            v.telephone AS telephone,
+            c.num_telephone AS telephone,
             a.a_adresse AS adresse,
             a.a_code_postal AS codeP,
             a.a_ville AS ville
