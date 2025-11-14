@@ -72,7 +72,7 @@ function chargerProduitsBDD($pdo)
 }
 
 //fonction pour ajouter un article au panier dans la BDD
-function ajouterArticleBDD($pdo, $idProduit, $sqlPanierCLient, $quantite = 1)
+function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 {
     try {
         //récupérer les informations du produit (prix, TVA, frais de port, remise)
@@ -116,7 +116,7 @@ function ajouterArticleBDD($pdo, $idProduit, $sqlPanierCLient, $quantite = 1)
         $stmtCheck = $pdo->prepare($sqlCheck);
         $stmtCheck->execute([
             ':idProduit' => $idProduit,
-            ':idPanier' => $sqlPanierCLient
+            ':idPanier' => $panier
         ]);
 
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
@@ -137,7 +137,7 @@ function ajouterArticleBDD($pdo, $idProduit, $sqlPanierCLient, $quantite = 1)
             $stmtUpdate->execute([
                 ':quantite' => $aAjouter,
                 ':idProduit' => $idProduit,
-                ':idPanier' => $sqlPanierCLient
+                ':idPanier' => $panier
             ]);
             if ($aAjouter < $quantite) {
                 return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
@@ -153,7 +153,7 @@ function ajouterArticleBDD($pdo, $idProduit, $sqlPanierCLient, $quantite = 1)
             $stmtInsert = $pdo->prepare($sqlInsert);
             $stmtInsert->execute([
                 ':idProduit' => $idProduit,
-                ':idPanier' => $sqlPanierCLient,
+                ':idPanier' => $panier,
                 ':quantite' => $aAjouter,
                 ':prixUnitaire' => $prixUnitaire,
                 ':remiseUnitaire' => $remiseUnitaire,
@@ -169,16 +169,35 @@ function ajouterArticleBDD($pdo, $idProduit, $sqlPanierCLient, $quantite = 1)
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
+
 $idClient = (int) $_SESSION['id'];
 
-$sqlPanierCLient = "SELECT * 
-FROM _panier_commande
-JOIN _contient ON _contient.id_panier = _panier_commande.id_panier
-WHERE timestamp_commande IS NULL AND id_client = :idClient;";
-$sqlPanierCLient = $pdo->prepare($sqlInsert);
-$sqlPanierCLient->execute([":idClient" => $idClient]);
+$sqlPanierClient = "
+    SELECT id_panier
+    FROM _panier_commande
+    WHERE timestamp_commande IS NULL
+      AND id_client = :idClient
+    LIMIT 1
+";
+$stmtPanier = $pdo->prepare($sqlPanierClient);
+$stmtPanier->execute([":idClient" => $idClient]);
+$panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
 
-$_SESSION["panierEnCours"] = $sqlPanierCLient;
+if ($panier) {
+    $idPanier = (int) $panier['id_panier'];
+} else {
+    $sqlCreatePanier = "
+        INSERT INTO _panier_commande (id_client, timestamp_commande)
+        VALUES (:idClient, NULL)
+        RETURNING id_panier
+    ";
+    $stmtCreate = $pdo->prepare($sqlCreatePanier);
+    $stmtCreate->execute([":idClient" => $idClient]);
+    $idPanier = (int) $stmtCreate->fetchColumn();
+}
+
+$_SESSION["panierEnCours"] = $idPanier;
+
 
 //gérer l'ajout au panier via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
@@ -186,16 +205,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $idProduit = $_POST['idProduit'] ?? null;
     $quantite = $_POST['quantite'] ?? 1;
-    $idPanier = $idClient; //utilise l'ID client actuel 
+    $idPanier = $_SESSION["panierEnCours"] ?? null;
+
+    if (!$idPanier) {
+        echo json_encode(['success' => false, 'message' => 'Aucun panier en cours pour ce client']);
+        exit;
+    }
 
     if ($idProduit) {
-        $resultat = ajouterArticleBDD($pdo, $idProduit, $sqlPanierCLient, $quantite);
+        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
         echo json_encode($resultat);
     } else {
         echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
     }
     exit;
 }
+
 
 //fonction pour récupérer le prix maximum parmi tous les produits
 function getPrixMaximum($pdo)
