@@ -4,23 +4,20 @@ FROM php:8.2-fpm-alpine
 # --- Installation des extensions PHP et des dépendances système ---
 
 # 2. Installer les dépendances système nécessaires
-# Utilisez 'apk add --no-cache' pour garder l'image petite.
 RUN apk add --no-cache \
     libxml2-dev \
     mysql-client \
-    icu-dev \
+    icu-dev
     # Ajoutez d'autres paquets système ici si besoin
-    # Ex: curl, git, ou des bibliothèques pour des extensions PHP spécifiques.
-    && rm -rf /var/cache/apk/*
-
+    
 # 3. Installer les extensions PHP
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     mysqli \
     opcache \
-    intl \
-    # Ajoutez toutes les extensions PHP dont votre site a besoin (séparées par un espace)
+    intl
+    # Ajoutez toutes les extensions PHP dont votre site a besoin
 
 # --- Configuration du Code ---
 
@@ -28,15 +25,12 @@ RUN docker-php-ext-install \
 WORKDIR /var/www/html
 
 # 5. Copier le contenu du site web
-# C'est l'étape clé : on copie UNIQUEMENT le contenu de 'html/'
-# du dépôt vers la racine du conteneur (/var/www/html).
+# On copie UNIQUEMENT le contenu de 'html/' du dépôt vers /var/www/html.
 COPY html/ .
 
 # 6. Gérer les permissions (Crucial pour l'exécution et la sécurité)
 # L'utilisateur 'www-data' est celui sous lequel PHP-FPM tourne.
 RUN chown -R www-data:www-data /var/www/html
-# Si PHP doit écrire (logs, uploads, sessions), rendre le(s) dossier(s) inscriptible:
-# Ex: RUN chmod -R 775 /var/www/html/uploads
 
 # --- Démarrage ---
 
