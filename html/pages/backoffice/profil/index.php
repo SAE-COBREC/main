@@ -10,7 +10,7 @@ try {
         SELECT 
             v.raison_sociale AS Rsociale,
             v.siren AS SIREN,
-            v.email AS email,
+            c.email AS email,
             v.telephone AS telephone,
             a.a_adresse AS adresse,
             a.a_code_postal AS codeP,
