@@ -2,9 +2,10 @@
 include '../../selectBDD.php';
 
 session_start();
-
 $id_client = $_SESSION['id'];
+
 $pdo->exec("SET search_path TO cobrec1");
+
 
 $requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
                 FROM _contient
@@ -63,7 +64,6 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                                     <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
                                     <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
                                         <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
-                                        <input type="hidden" name="id_panier" value="<?php echo $id_panier; ?>"> <!--stock l'id du panier pour la suppression-->
                                         <!--bouton pour envoyer le formulaire-->
                                         <button type="submit" id="supprimerArticle" class="supprimerArticle"><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
                                     </form>
@@ -91,7 +91,6 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 
                 <!--FORMULAIRE POUR VIDER LE PANIER-->
                 <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php">
-                    <input type="hidden" name="id_panier_a_vider" value="<?php echo $id_panier; ?>">
                     <button type="submit" id="viderPanier" class>Vider le panier</button>
                 </form>
             </aside>
