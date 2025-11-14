@@ -39,3 +39,14 @@ EXPOSE 9000
 
 # 8. Commande de démarrage (Lance le service PHP-FPM)
 CMD ["php-fpm"]
+
+# Configuration pour que PHP-FPM écoute sur le port 5001 (au lieu du 9000)
+# Ce fichier est généralement lu par FPM pour écraser les configs par défaut.
+RUN echo "[global]" > /usr/local/etc/php-fpm.d/zz-docker.conf && \
+    echo "daemonize = no" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
+    echo "" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
+    echo "[www]" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
+    echo "listen = 0.0.0.0:5001" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# Ajoutez le port 5001 comme port exposé (seulement pour la documentation)
+EXPOSE 5001
