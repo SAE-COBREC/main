@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-include '../../selectBDD.php';
+include __DIR__ . '/selectBDD.php';
 
 $pdo->exec("SET search_path TO cobrec1, public");
 
 //fonction pour récupérer les infos du client
-function getClientInfo($pdo, $clientId)
+function recupererInfosClient($pdo, $idClient)
 {
     try {
         $sql = "
@@ -21,7 +21,7 @@ function getClientInfo($pdo, $clientId)
             WHERE cl.id_client = ?
         ";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$clientId]);
+        $stmt->execute([$idClient]);
         $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $client ?: null;
@@ -31,12 +31,12 @@ function getClientInfo($pdo, $clientId)
 }
 
 //fonction pour récupérer l'id du compte associé
-function getCompteId($pdo, $clientId)
+function recupererIdCompte($pdo, $idClient)
 {
     try {
         $sql = "SELECT id_compte FROM cobrec1._client WHERE id_client = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$clientId]);
+        $stmt->execute([$idClient]);
         $idCompte = $stmt->fetchColumn();
 
         return $idCompte !== false ? (int)$idCompte : null;
@@ -46,7 +46,7 @@ function getCompteId($pdo, $clientId)
 }
 
 //fonction pour récupérer les adresses du client
-function getAdressesClient($pdo, $idCompte)
+function recupererAdressesClient($pdo, $idCompte)
 {
     try {
         $sql = "
@@ -69,7 +69,7 @@ function getAdressesClient($pdo, $idCompte)
 }
 
 //fonction pour récupérer les dernières commandes
-function getDernieresCommandes($pdo, $clientId)
+function recupererDernieresCommandes($pdo, $idClient)
 {
     try {
         $sql = "
@@ -89,7 +89,7 @@ function getDernieresCommandes($pdo, $clientId)
             LIMIT 5
         ";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$clientId]);
+        $stmt->execute([$idClient]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     } catch (Exception $e) {
         return [];
@@ -97,7 +97,7 @@ function getDernieresCommandes($pdo, $clientId)
 }
 
 //fonction pour mettre à jour les infos du client et du compte
-function updateClientInfo($pdo, $clientId, $idCompte, $nom, $prenom, $email, $telephone)
+function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $email, $telephone)
 {
     try {
         $sqlClient = "
@@ -106,7 +106,7 @@ function updateClientInfo($pdo, $clientId, $idCompte, $nom, $prenom, $email, $te
             WHERE id_client = ?
         ";
         $stmtClient = $pdo->prepare($sqlClient);
-        $stmtClient->execute([$nom, $prenom, $clientId]);
+        $stmtClient->execute([$nom, $prenom, $idClient]);
 
         $sqlCompte = "
             UPDATE cobrec1._compte 
@@ -123,34 +123,34 @@ function updateClientInfo($pdo, $clientId, $idCompte, $nom, $prenom, $email, $te
 }
 
 //fonction pour changer le mot de passe
-function changePassword($pdo, $idCompte, $currentPassword, $newPassword, $confirmPassword)
+function changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationMotDePasse)
 {
     try {
         //récupérer le mot de passe actuel
         $sqlSelect = "SELECT mdp FROM cobrec1._compte WHERE id_compte = ?";
         $stmt = $pdo->prepare($sqlSelect);
         $stmt->execute([$idCompte]);
-        $hashedPassword = $stmt->fetchColumn();
+        $motDePasseHashe = $stmt->fetchColumn();
 
-        if ($hashedPassword === false) {
+        if ($motDePasseHashe === false) {
             return ['success' => false, 'message' => "Compte introuvable."];
         }
 
         //vérifier le mot de passe actuel
-        if (!password_verify($currentPassword, $hashedPassword)) {
+        if (!password_verify($motDePasseActuel, $motDePasseHashe)) {
             return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
         }
 
         //vérifier la confirmation
-        if ($newPassword !== $confirmPassword) {
+        if ($nouveauMotDePasse !== $confirmationMotDePasse) {
             return ['success' => false, 'message' => "Les mots de passe ne correspondent pas."];
         }
 
         //hasher et mettre à jour
-        $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $nouveauMotDePasseHashe = password_hash($nouveauMotDePasse, PASSWORD_DEFAULT);
         $sqlUpdate = "UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?";
         $stmtUpdate = $pdo->prepare($sqlUpdate);
-        $stmtUpdate->execute([$newHashedPassword, $idCompte]);
+        $stmtUpdate->execute([$nouveauMotDePasseHashe, $idCompte]);
 
         return ['success' => true, 'message' => "Mot de passe modifié avec succès."];
     } catch (Exception $e) {
@@ -168,7 +168,7 @@ if (!isset($_SESSION['client_id'])) {
 }
 
 //récupérer l'id du client
-$clientId = (int)$_SESSION['client_id'];
+$idClient = (int)$_SESSION['client_id'];
 
 //gestion de la déconnexion
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
@@ -181,13 +181,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 $error = null;
 
 //récupérer l'id du compte
-$idCompte = getCompteId($pdo, $clientId);
+$idCompte = recupererIdCompte($pdo, $idClient);
 
 //vérifier que le compte existe
 if ($idCompte === null) {
-    die("Compte introuvable pour le client : " . htmlspecialchars((string)$clientId));
+    die("Compte introuvable pour le client : " . htmlspecialchars((string)$idClient));
 }
-
 
 //traitement des formulaires
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -199,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = htmlspecialchars($_POST['email'] ?? '');
         $telephone = htmlspecialchars($_POST['telephone'] ?? '');
 
-        $successUpdate = updateClientInfo($pdo, $clientId, $idCompte, $nom, $prenom, $email, $telephone);
+        $successUpdate = mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $email, $telephone);
 
         if ($successUpdate) {
             header('Location: index.php?success=info_updated');
@@ -211,31 +210,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //changement du mot de passe
     if (isset($_POST['change_password'])) {
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
+        $motDePasseActuel = $_POST['current_password'] ?? '';
+        $nouveauMotDePasse = $_POST['new_password'] ?? '';
+        $confirmationMotDePasse = $_POST['confirm_password'] ?? '';
 
-        $result = changePassword($pdo, $idCompte, $currentPassword, $newPassword, $confirmPassword);
+        $resultat = changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationMotDePasse);
 
-        if ($result['success']) {
+        if ($resultat['success']) {
             header('Location: index.php?success=password_changed');
             exit;
         } else {
-            $error = $result['message'];
+            $error = $resultat['message'];
         }
     }
 }
 
-
 //chargement des données pour l'affichage
-$client = getClientInfo($pdo, $clientId);
+$client = recupererInfosClient($pdo, $idClient);
 
 if (!$client) {
-    die("Client introuvable avec l'ID : " . htmlspecialchars((string)$clientId));
+    die("Client introuvable avec l'ID : " . htmlspecialchars((string)$idClient));
 }
 
-$adresses = getAdressesClient($pdo, $idCompte);
-$commandes = getDernieresCommandes($pdo, $clientId);
+$adresses = recupererAdressesClient($pdo, $idCompte);
+$commandes = recupererDernieresCommandes($pdo, $idClient);
 ?>
 
 <!DOCTYPE html>
