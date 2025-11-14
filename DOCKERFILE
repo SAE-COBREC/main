@@ -1,0 +1,63 @@
+# Utiliser une image PHP-FPM officielle (Alpine est légère)
+FROM php:8.2-fpm-alpine
+
+# --- Installation des dépendances et outils ---
+
+# 1. Installer les dépendances du système (Exemple pour MySQL et Intl)
+RUN apk add --no-cache \
+    libxml2-dev \
+    mysql-client \
+    icu-dev \
+    # Ajoutez d'autres dépendances système ici si nécessaire
+
+# 2. Installer les extensions PHP courantes
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    mysqli \
+    opcache \
+    intl \
+    # Ajoutez d'autres extensions dont votre application a besoin (ex: gd, zip, bcmath)
+
+# 3. Installer Composer globalement (si vous gérez les dépendances)
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+# --- Configuration du Code ---
+
+# 4. Définir le répertoire de travail (la racine web du conteneur)
+WORKDIR /var/www/html
+
+# 5. Copier les fichiers du site web
+# C'est la modification clé : on copie le contenu de votre dossier 'html/' (local)
+# vers le répertoire de travail '.' (qui est /var/www/html dans le conteneur).
+COPY html/ .
+
+# 6. Gérer les dépendances Composer (si votre 'composer.json' est à l'extérieur)
+# SI votre 'composer.json' est à la racine de votre dépôt (et non dans 'html/'):
+# Vous avez besoin de copier le dossier 'vendor' généré quelque part d'accessible.
+# Le plus simple est de le laisser à la racine du code :
+
+# Créer un dossier pour les dépendances
+RUN mkdir /var/www/vendor
+
+# Copier les fichiers Composer à la racine pour l'installation
+COPY composer.json composer.lock /var/www/
+
+# Installer les dépendances
+RUN composer install --no-dev --optimize-autoloader -d /var/www/
+
+# Déplacer le dossier vendor généré au bon endroit (si votre application le cherche dans /var/www/vendor)
+# Le dossier 'vendor' est généré dans /var/www/ par la commande précédente. C'est prêt.
+
+# 7. Gérer les permissions (IMPORTANT)
+# S'assurer que les fichiers appartiennent à l'utilisateur sous lequel PHP-FPM tourne.
+RUN chown -R www-data:www-data /var/www/html \
+    && chown -R www-data:www-data /var/www/vendor \
+    # Si vous utilisez un framework, assurez-vous que les dossiers de cache/logs sont inscriptibles
+    && chmod -R 775 /var/www/html/cache
+
+# 8. Exposer le port de PHP-FPM
+EXPOSE 9000
+
+# 9. Commande de démarrage par défaut
+CMD ["php-fpm"]
