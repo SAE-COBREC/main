@@ -5,7 +5,7 @@ include '../../../selectBDD.php';
 // Exemple : ID du vendeur connecté (à récupérer depuis $_SESSION normalement)
 //$vendeur_id = $_SESSION['id'];
 
-$vendeur_id = 2;
+$compte_id = $_SESSION['compte_id'];
 
 try {
     $query = "
@@ -24,7 +24,7 @@ try {
     ";
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute(['id_vendeur' => $vendeur_id]);
+    $stmt->execute(['id_compte' => $compte_id]);
     $vendeur = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$vendeur) {
@@ -59,7 +59,7 @@ try {
           <dt>Numéro de SIREN</dt><dd><?= htmlspecialchars($vendeur['SIREN']); ?></dd>
           <dt>Email</dt><dd><?= htmlspecialchars($vendeur['email']); ?></dd>
           <dt>Téléphone</dt><dd><?= htmlspecialchars($vendeur['telephone']); ?></dd>
-          <dt>Rue</dt><dd><?= htmlspecialchars($vendeur['rue']); ?></dd>
+          <dt>Rue</dt><dd><?= htmlspecialchars($vendeur['ville']); ?></dd>
           <dt>Code Postal</dt><dd><?= htmlspecialchars($vendeur['codeP']); ?></dd>
           <dt>Commune</dt><dd><?= htmlspecialchars($vendeur['commune']); ?></dd>
         </dl>

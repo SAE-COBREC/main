@@ -170,6 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
+    <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
 </head>
 
 <body>
@@ -254,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </label>
                             </div>
 
-                            <button type="submit" name="updateinfo" onclick="return confirm('Confirmer la modification de vos informations personnelles ?');">
+                            <button type="submit" name="updateinfo">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
