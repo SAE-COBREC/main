@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../selectBDD.php';
+include '../../config.php';
 $pageError = false;
 $produit = null;
 

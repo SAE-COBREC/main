@@ -1,23 +1,29 @@
 <?php 
-include '../../selectBDD.php';
+    include '../../selectBDD.php';
 
-session_start();
-$id_client = $_SESSION['id'];
-echo $_SESSION['id'];
-$pdo->exec("SET search_path TO cobrec1");
+    session_start();
+    $id_client = $_SESSION['id'];
+    echo $_SESSION['id'];
+    $pdo->exec("SET search_path TO cobrec1");
 
-$requetePanier = "SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
-                FROM _contient
-                JOIN _produit ON _produit.id_produit = _contient.id_produit
-                JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
-                JOIN _image ON _represente_produit.id_image = _image.id_image
-                JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
-                WHERE id_client = ". $id_client . " AND _panier_commande.id_panier = " . $_SESSION['panierEnCours'] . ";"; //gestion de la requête en fonction du login à terminer
+    $requetePanier = "
+        SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
+        FROM _contient
+        JOIN _produit ON _produit.id_produit = _contient.id_produit
+        JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
+        JOIN _image ON _represente_produit.id_image = _image.id_image
+        JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
+        WHERE id_client = :id_client
+        AND _panier_commande.id_panier = :id_panier;
+    ";
 
+    $stmt = $pdo->prepare($requetePanier);
+    $stmt->execute([
+        ':id_client' => $id_client,
+        ':id_panier' => $_SESSION['panierEnCours']
+    ]);
 
-$stmt = $pdo->query($requetePanier);
-
-$articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
+    $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -121,6 +127,16 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 }
                 return val;
             }
+
+            //fonction qui sauvegarde la quantite avec methode AJAX
+            function saveQuantite(id_produit, quantite) {
+                $.post('/pages/panier/updateQuantitePanier.php', {
+                    id_produit: id_produit,
+                    quantite: quantite
+                });
+                console.log("update de la quantité");
+            }
+
             //fonction pour mettre a jour le recap de la commande
             function updateRecap() {
                 const articles = document.querySelectorAll('.unArticleP'); //recupere tous les articles et les mets dans une liste
@@ -155,13 +171,14 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                 document.getElementById('listeProduits').innerHTML = produitEnHTML;
             }
 
-            //gestion des boutons + et -
+            //gestion des boutons + et - et  supp pour chaque élément dans le panier
             document.querySelectorAll('.unArticleP').forEach(article => {
                 const input = article.querySelector('.quantite_input_entre');
                 const btnPlus = article.querySelector('.btn_plus');
                 const btnMoins = article.querySelector('.btn_moins');
                 const formSupp = article.querySelector('.suppArt');
                 const stockMax = parseInt(article.dataset.stock); //récup la quantité max en stock
+                const idProduit = article.querySelector('input[name="id_produit"]').value;
                 
 
                 //bouton +
@@ -171,6 +188,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                     value = verifieStockMax(value, stockMax);
                     input.value = value;
                     updateRecap(); //appel de la fonction updateRecap
+                    saveQuantite(idProduit, value);//update la quantité avec la fonction 
                 });
                 
                 //bouton -
@@ -179,6 +197,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                     if  (value > 1){ //l'utilisateur ne dépasse pas 1 il sera jamais a 0
                         input.value = value - 1;
                         updateRecap();
+                        saveQuantite(idProduit, value);//update la quantité avec la fonction 
                     }
                 });
                 
@@ -202,6 +221,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stoc
                     
                     event.target.value = value; //met a jour la valeur de l'input
                     updateRecap(); //appele la fonction update récap
+                    saveQuantite(idProduit, value);//update la quantité avec la fonction 
                 });
                 
                 //empeche l’utilisateur de taper des caractères interdits comme les lettres directement.
