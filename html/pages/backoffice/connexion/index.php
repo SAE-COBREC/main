@@ -85,8 +85,9 @@ session_start();
                 } catch (Throwable $t) { }
               }
               if ($foundVendeur !== null) {
-                $sessionIdToStore = $foundVendeur;
-                $_SESSION['compte_id'] = $userId;
+                $hasError = true;
+                $error_card = 1;
+                $error_message = 'Adresse mail ou mot de passe incorrecte.';
               }
             }
           } catch (Throwable $t) { }

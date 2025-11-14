@@ -89,12 +89,10 @@ session_start();
                 } catch (Throwable $t) { /* ignore and try next */ }
               }
               if ($foundClient === null) {
-                // No linked client -> authentication must fail per requirement
                 $hasError = true;
                 $error_card = 1;
                 $error_message = 'Adresse mail ou mot de passe incorrecte.';
               } else {
-                // store client id in session and keep compte id for reference
                 $_SESSION['id'] = $foundClient;
                 $_SESSION['compte_id'] = $userId;
               } 
