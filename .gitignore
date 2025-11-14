@@ -1,3 +1,5 @@
 *.css.map
 config.php
 html/index.php
+html/config1.php
+html/selectBDD.php
