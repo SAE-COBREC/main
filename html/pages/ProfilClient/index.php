@@ -254,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </label>
                             </div>
 
-                            <button type="submit" name="update_info">
+                            <button type="submit" name="updateinfo" onclick="return confirm('Confirmer la modification de vos informations personnelles ?');">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -421,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </label>
                             </div>
 
-                            <button type="submit" name="change_password">
+                            <button type="submit" name="changepassword" onclick="return confirm('Confirmer le changement de mot de passe ?');">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
