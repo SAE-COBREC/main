@@ -1,5 +1,11 @@
 @use "../variable" as *;
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: $font-family-secondaire;
   background: $secondary-color-rose-claire;
@@ -9,21 +15,23 @@ body {
 .app {
   display: grid;
   grid-template-columns: 240px 1fr;
-  height: 100vh;
+  height: 1024px;
   background: $primary-color-blanc;
 }
 
 .main {
   background: $secondary-color-rose-claire;
   padding: 32px 40px;
-  overflow-y: auto;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 1024px;
 }
 
 .header__title {
   font-size: 24px;
   font-weight: 700;
   color: $primary-color-noir;
-  margin-bottom: 24px;
 }
 
 .profil-card {
