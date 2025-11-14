@@ -37,8 +37,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
 
-    //même redirection que ton bouton "retours"
-    header('Location: /pages/connexionClient/index.php');
+    header('Location: /index.php');
     exit;
 }
 
