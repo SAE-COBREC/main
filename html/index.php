@@ -333,7 +333,7 @@ $id_panier = 8;
 </head>
 
 <body>
-    <audio id="bg-music" src="/img/Photo/musique.mp3" loop></audio>
+    <audio id="bg-music" src="/img/Photo/disney-junior.mp3" loop></audio>
 
     <button type="button" id="play-music"></button>
 
