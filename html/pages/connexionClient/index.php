@@ -74,7 +74,7 @@ session_start();
             if ($userId === null) {
               $hasError = true;
               $error_card = 1;
-              $error_message = 'Erreur interne: identifiant de compte introuvable.';
+              $error_message = 'Adresse mail ou mot de passe incorrecte.';
             } else {
               $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte', 'id'];
               $foundClient = null;
@@ -91,12 +91,12 @@ session_start();
                 // No linked client -> authentication must fail per requirement
                 $hasError = true;
                 $error_card = 1;
-                $error_message = 'Ce compte n\'est pas lié à un client.';
+                $error_message = 'Adresse mail ou mot de passe incorrecte.';
               } else {
                 // store client id in session and keep compte id for reference
                 $_SESSION['id'] = $foundClient;
                 $_SESSION['compte_id'] = $userId;
-              }
+              } 
             }
           } catch (Throwable $t) {
             $hasError = true;
