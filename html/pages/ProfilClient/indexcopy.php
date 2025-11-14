@@ -9,13 +9,13 @@ include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1, public");
 
 //vérifier si le client est connecté
-if (!isset($_SESSION['client_id'])) {
+if (!isset($_SESSION['id'])) {
     header("Location: /pages/connexionClient/index.php");
     exit;
 }
 
 //récupérer l'id du client depuis la session
-$clientId = $_SESSION['client_id'];
+$clientId = $_SESSION['id'];
 
 //requête SQL pour obtenir les informations du client (nom, prénom, email, téléphone)
 $stmtClient = $pdo->prepare("
