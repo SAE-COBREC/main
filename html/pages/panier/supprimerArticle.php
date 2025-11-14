@@ -1,5 +1,5 @@
 <?php
-include '../../selectBDD.php';
+    include '../../selectBDD.php';
     session_start();
     $id_client = $_SESSION['id'];
 
@@ -9,12 +9,9 @@ include '../../selectBDD.php';
         $pdo->exec("SET search_path TO cobrec1");
         
         //requete pour supprimer l'article du panier
-        $requeteSuppression = "DELETE FROM _contient WHERE id_produit = :id_produit AND id_panier = (SELECT id_panier FROM _panier_commande WHERE id_client = :id_client);";
+        $requeteSuppression = "DELETE FROM _contient WHERE id_produit = " . $id_produit . " AND id_panier = " . $_SESSION['panierEnCours'];
         $stmt = $pdo->prepare($requeteSuppression);
-        $stmt->execute([
-            ':id_produit' => $id_produit, //ermplace id_produit par la varibale lors de l'éxectution
-            ':id_client' => $id_client //ermplace id_produit par la varibale lors de l'éxectution
-        ]);
+        $stmt->execute();
         
         //redirection vers la page du panier
         header('Location: index.php');
