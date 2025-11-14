@@ -1,165 +1,12 @@
 <?php
+//démarrer la session utilisateur
 session_start();
 
+//inclure le fichier de connexion à la base de données
 include '../../selectBDD.php';
 
+//définir le schéma PostgreSQL utilisé pour les requêtes
 $pdo->exec("SET search_path TO cobrec1, public");
-
-//fonction pour récupérer les infos du client
-function getClientInfo($pdo, $clientId)
-{
-    try {
-        $sql = "
-            SELECT 
-                cl.c_nom,
-                cl.c_prenom,
-                co.email,
-                co.num_telephone
-            FROM cobrec1._client cl
-            INNER JOIN cobrec1._compte co 
-                ON cl.id_compte = co.id_compte
-            WHERE cl.id_client = ?
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$clientId]);
-        $client = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $client ?: null;
-    } catch (Exception $e) {
-        return null;
-    }
-}
-
-//fonction pour récupérer l'id du compte associé
-function getCompteId($pdo, $clientId)
-{
-    try {
-        $sql = "SELECT id_compte FROM cobrec1._client WHERE id_client = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$clientId]);
-        $idCompte = $stmt->fetchColumn();
-
-        return $idCompte !== false ? (int)$idCompte : null;
-    } catch (Exception $e) {
-        return null;
-    }
-}
-
-//fonction pour récupérer les adresses du client
-function getAdressesClient($pdo, $idCompte)
-{
-    try {
-        $sql = "
-            SELECT 
-                id_adresse,
-                a_adresse,
-                a_ville,
-                a_code_postal,
-                a_complement
-            FROM cobrec1._adresse
-            WHERE id_compte = ?
-            ORDER BY id_adresse DESC
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$idCompte]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-    } catch (Exception $e) {
-        return [];
-    }
-}
-
-//fonction pour récupérer les dernières commandes
-function getDernieresCommandes($pdo, $clientId)
-{
-    try {
-        $sql = "
-            SELECT 
-                p.id_panier,
-                p.timestamp_commande,
-                COALESCE(f.f_total_ttc, 0) as montant_total,
-                COALESCE(l.etat_livraison, 'En attente') as statut
-            FROM cobrec1._panier_commande p
-            LEFT JOIN cobrec1._facture f 
-                ON p.id_panier = f.id_panier
-            LEFT JOIN cobrec1._livraison l 
-                ON f.id_facture = l.id_facture
-            WHERE p.id_client = ?
-              AND p.timestamp_commande IS NOT NULL
-            ORDER BY p.timestamp_commande DESC
-            LIMIT 5
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$clientId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-    } catch (Exception $e) {
-        return [];
-    }
-}
-
-//fonction pour mettre à jour les infos du client et du compte
-function updateClientInfo($pdo, $clientId, $idCompte, $nom, $prenom, $email, $telephone)
-{
-    try {
-        $sqlClient = "
-            UPDATE cobrec1._client 
-            SET c_nom = ?, c_prenom = ?
-            WHERE id_client = ?
-        ";
-        $stmtClient = $pdo->prepare($sqlClient);
-        $stmtClient->execute([$nom, $prenom, $clientId]);
-
-        $sqlCompte = "
-            UPDATE cobrec1._compte 
-            SET email = ?, num_telephone = ?
-            WHERE id_compte = ?
-        ";
-        $stmtCompte = $pdo->prepare($sqlCompte);
-        $stmtCompte->execute([$email, $telephone, $idCompte]);
-
-        return true;
-    } catch (Exception $e) {
-        return false;
-    }
-}
-
-//fonction pour changer le mot de passe
-function changePassword($pdo, $idCompte, $currentPassword, $newPassword, $confirmPassword)
-{
-    try {
-        //récupérer le mot de passe actuel
-        $sqlSelect = "SELECT mdp FROM cobrec1._compte WHERE id_compte = ?";
-        $stmt = $pdo->prepare($sqlSelect);
-        $stmt->execute([$idCompte]);
-        $hashedPassword = $stmt->fetchColumn();
-
-        if ($hashedPassword === false) {
-            return ['success' => false, 'message' => "Compte introuvable."];
-        }
-
-        //vérifier le mot de passe actuel
-        if (!password_verify($currentPassword, $hashedPassword)) {
-            return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
-        }
-
-        //vérifier la confirmation
-        if ($newPassword !== $confirmPassword) {
-            return ['success' => false, 'message' => "Les mots de passe ne correspondent pas."];
-        }
-
-        //hasher et mettre à jour
-        $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        $sqlUpdate = "UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?";
-        $stmtUpdate = $pdo->prepare($sqlUpdate);
-        $stmtUpdate->execute([$newHashedPassword, $idCompte]);
-
-        return ['success' => true, 'message' => "Mot de passe modifié avec succès."];
-    } catch (Exception $e) {
-        return [
-            'success' => false,
-            'message' => "Erreur lors du changement de mot de passe : " . $e->getMessage()
-        ];
-    }
-}
 
 //vérifier si le client est connecté
 if (!isset($_SESSION['client_id'])) {
@@ -167,75 +14,146 @@ if (!isset($_SESSION['client_id'])) {
     exit;
 }
 
-//récupérer l'id du client
-$clientId = (int)$_SESSION['client_id'];
+//récupérer l'id du client depuis la session
+$clientId = $_SESSION['client_id'];
+
+//requête SQL pour obtenir les informations du client (nom, prénom, email, téléphone)
+$stmtClient = $pdo->prepare("
+    SELECT 
+        cl.c_nom, 
+        cl.c_prenom, 
+        co.email, 
+        co.num_telephone 
+    FROM cobrec1._client cl
+    INNER JOIN cobrec1._compte co ON cl.id_compte = co.id_compte
+    WHERE cl.id_client = ?
+");
+$stmtClient->execute([$clientId]);
+$client = $stmtClient->fetch(PDO::FETCH_ASSOC);
 
 //gestion de la déconnexion
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    // destruction de la session
     session_unset();
     session_destroy();
-    header('Location: /index.php');
+
+    header('Location: /html/pages/ProfilClient/index.phpindex.php');
     exit;
 }
 
-$error = null;
-
-//récupérer l'id du compte
-$idCompte = getCompteId($pdo, $clientId);
-
-//vérifier que le compte existe
-if ($idCompte === null) {
-    die("Compte introuvable pour le client : " . htmlspecialchars((string)$clientId));
-}
-
-
-//traitement des formulaires
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    //mise à jour des infos perso
-    if (isset($_POST['update_info'])) {
-        $nom = htmlspecialchars($_POST['nom'] ?? '');
-        $prenom = htmlspecialchars($_POST['prenom'] ?? '');
-        $email = htmlspecialchars($_POST['email'] ?? '');
-        $telephone = htmlspecialchars($_POST['telephone'] ?? '');
-
-        $successUpdate = updateClientInfo($pdo, $clientId, $idCompte, $nom, $prenom, $email, $telephone);
-
-        if ($successUpdate) {
-            header('Location: index.php?success=info_updated');
-            exit;
-        } else {
-            $error = "Erreur lors de la mise à jour des informations personnelles.";
-        }
-    }
-
-    //changement du mot de passe
-    if (isset($_POST['change_password'])) {
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
-
-        $result = changePassword($pdo, $idCompte, $currentPassword, $newPassword, $confirmPassword);
-
-        if ($result['success']) {
-            header('Location: index.php?success=password_changed');
-            exit;
-        } else {
-            $error = $result['message'];
-        }
-    }
-}
-
-
-//chargement des données pour l'affichage
-$client = getClientInfo($pdo, $clientId);
-
+//vérifier que le client existe
 if (!$client) {
-    die("Client introuvable avec l'ID : " . htmlspecialchars((string)$clientId));
+    die("Client introuvable avec l'ID : " . htmlspecialchars($clientId));
 }
 
-$adresses = getAdressesClient($pdo, $idCompte);
-$commandes = getDernieresCommandes($pdo, $clientId);
+//requête SQL pour récupérer l'id du compte associé au client
+$stmtIdCompte = $pdo->prepare("SELECT id_compte FROM cobrec1._client WHERE id_client = ?");
+$stmtIdCompte->execute([$clientId]);
+$idCompte = $stmtIdCompte->fetchColumn();
+
+//requête SQL pour récupérer toutes les adresses du client
+$stmtAdresses = $pdo->prepare("
+    SELECT 
+        id_adresse, 
+        a_adresse, 
+        a_ville, 
+        a_code_postal, 
+        a_complement 
+    FROM cobrec1._adresse 
+    WHERE id_compte = ? 
+    ORDER BY id_adresse DESC
+");
+$stmtAdresses->execute([$idCompte]);
+$adresses = $stmtAdresses->fetchAll(PDO::FETCH_ASSOC);
+
+//requête SQL pour récupérer les 5 dernières commandes du client
+$stmtCommandes = $pdo->prepare("
+    SELECT 
+        p.id_panier, 
+        p.timestamp_commande,
+        COALESCE(f.f_total_ttc, 0) as montant_total,
+        COALESCE(l.etat_livraison, 'En attente') as statut
+    FROM cobrec1._panier_commande p
+    LEFT JOIN cobrec1._facture f ON p.id_panier = f.id_panier
+    LEFT JOIN cobrec1._livraison l ON f.id_facture = l.id_facture
+    WHERE p.id_client = ? AND p.timestamp_commande IS NOT NULL
+    ORDER BY p.timestamp_commande DESC 
+    LIMIT 5
+");
+$stmtCommandes->execute([$clientId]);
+$commandes = $stmtCommandes->fetchAll(PDO::FETCH_ASSOC);
+
+//traitement du formulaire si une requête POST est envoyée
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    //mise à jour des informations personnelles si le formulaire est soumis
+    if (isset($_POST['update_info'])) {
+        //récupérer et sécuriser les données du formulaire
+        $nom = htmlspecialchars($_POST['nom']);
+        $prenom = htmlspecialchars($_POST['prenom']);
+        $email = htmlspecialchars($_POST['email']);
+        $telephone = htmlspecialchars($_POST['telephone']);
+
+        try {
+            //requête SQL pour mettre à jour les données dans _client
+            $stmtUpdateClient = $pdo->prepare("
+                UPDATE cobrec1._client 
+                SET c_nom = ?, c_prenom = ?
+                WHERE id_client = ?
+            ");
+            $stmtUpdateClient->execute([$nom, $prenom, $clientId]);
+
+            //requête SQL pour mettre à jour l'email et le téléphone dans _compte
+            $stmtUpdateCompte = $pdo->prepare("
+                UPDATE cobrec1._compte 
+                SET email = ?, num_telephone = ?
+                WHERE id_compte = ?
+            ");
+            $stmtUpdateCompte->execute([$email, $telephone, $idCompte]);
+
+            //redirection après la mise à jour
+            header('Location: index.php?success=info_updated');
+            exit();
+        } catch (Exception $e) {
+            $error = "Erreur lors de la mise à jour : " . $e->getMessage();
+        }
+    }
+
+    //changement du mot de passe si le formulaire est soumis
+    if (isset($_POST['change_password'])) {
+        //récupérer les valeurs des champs mot de passe
+        $currentPassword = $_POST['current_password'];
+        $newPassword = $_POST['new_password'];
+        $confirmPassword = $_POST['confirm_password'];
+
+        try {
+            //vérifier le mot de passe actuel avec celui stocké dans la BDD
+            $stmtCheckPwd = $pdo->prepare("SELECT mdp FROM cobrec1._compte WHERE id_compte = ?");
+            $stmtCheckPwd->execute([$idCompte]);
+            $hashedPassword = $stmtCheckPwd->fetchColumn();
+
+            //test du mot de passe actuel
+            if (password_verify($currentPassword, $hashedPassword)) {
+                //vérifier que les nouveaux mots de passe correspondent
+                if ($newPassword === $confirmPassword) {
+                    //hasher le nouveau mot de passe et l'enregistrer dans la BDD
+                    $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+                    $stmtUpdatePwd = $pdo->prepare("UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?");
+                    $stmtUpdatePwd->execute([$newHashedPassword, $idCompte]);
+
+                    //redirection après la modification du mot de passe
+                    header('Location: index.php?success=password_changed');
+                    exit();
+                } else {
+                    $error = "Les mots de passe ne correspondent pas.";
+                }
+            } else {
+                $error = "Mot de passe actuel incorrect.";
+            }
+        } catch (Exception $e) {
+            $error = "Erreur lors du changement de mot de passe : " . $e->getMessage();
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
