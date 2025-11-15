@@ -12,7 +12,7 @@ function chargerProduitsBDD($pdo)
     $categories = [];
 
     try {
-        //requête SQL pour récupérer tous les produits avec leurs informations
+        //requête SQL pur récupérer tous les produits avec leurs informations
         $sql = "
         SELECT 
             p.id_produit,
@@ -170,33 +170,37 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
     }
 }
 
-$idClient = (int) $_SESSION['id'];
-
-$sqlPanierClient = "
-    SELECT id_panier
-    FROM _panier_commande
-    WHERE timestamp_commande IS NULL
-      AND id_client = :idClient
-    LIMIT 1
-";
-$stmtPanier = $pdo->prepare($sqlPanierClient);
-$stmtPanier->execute([":idClient" => $idClient]);
-$panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
-
-if ($panier) {
-    $idPanier = (int) $panier['id_panier'];
-} else {
-    $sqlCreatePanier = "
-        INSERT INTO _panier_commande (id_client, timestamp_commande)
-        VALUES (:idClient, NULL)
-        RETURNING id_panier
+$idClient = (int) $_SESSION['id'] ?? NULL; //si l'utilisateur n'est pas connecté on met null
+if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un panier vide
+    $panier = [];
+} else { //sinon on récupère l'id de son panier courant (celui qui est en train d'etre remplit pas ceux qui ont déjà été commandé).
+    $sqlPanierClient = "
+        SELECT id_panier
+        FROM _panier_commande
+        WHERE timestamp_commande IS NULL
+        AND id_client = :idClient
     ";
-    $stmtCreate = $pdo->prepare($sqlCreatePanier);
-    $stmtCreate->execute([":idClient" => $idClient]);
-    $idPanier = (int) $stmtCreate->fetchColumn();
+    $stmtPanier = $pdo->prepare($sqlPanierClient);
+    $stmtPanier->execute([":idClient" => $idClient]);
+    $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
+    if ($panier) {
+        $idPanier = (int) $panier['id_panier'];
+    } else {
+        $sqlCreatePanier = "
+            INSERT INTO _panier_commande (id_client, timestamp_commande)
+            VALUES (:idClient, NULL)
+            RETURNING id_panier
+        ";
+        $stmtCreate = $pdo->prepare($sqlCreatePanier);
+        $stmtCreate->execute([":idClient" => $idClient]);
+        $idPanier = (int) $stmtCreate->fetchColumn();
+    }
+
+    $_SESSION["panierEnCours"] = $idPanier;
 }
 
-$_SESSION["panierEnCours"] = $idPanier;
+
+
 
 
 //gérer l'ajout au panier via AJAX
@@ -364,11 +368,6 @@ $categories_affichage = preparercategories_affichage($categories);
 </head>
 
 <body>
-    <audio id="bg-music-1" src="/img/Photo/disney-junior.mp3" loop></audio>
-    <audio id="bg-music-2" src="/img/Photo/musique.mp3" loop></audio>
-    <button type="button" id="play-music"></button>
-
-
     <?php
     include __DIR__ . '/partials/header.html';
     ?>
@@ -627,19 +626,6 @@ $categories_affichage = preparercategories_affichage($categories);
                 });
             }
         });
-
-
-        //pour éthan
-        const audio1 = document.getElementById('bg-music-1');
-        const audio2 = document.getElementById('bg-music-2');
-        const btn = document.getElementById('play-music');
-
-        btn.addEventListener('click', () => {
-            audio1.play();
-            audio2.play();
-            btn.style.display = 'none';
-        });
-
     </script>
 </body>
 

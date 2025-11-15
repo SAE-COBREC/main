@@ -5,3 +5,5 @@ html/config1.php
 html/selectBDD.php
 html/config1.php
 html/selectBDD.php
+html/pages/ProfilClient/index.php
+html/pages/produit/index.php
