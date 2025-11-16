@@ -23,6 +23,120 @@
         if($id_vendeur == ''){//REMPLACER PAR != UNE FOIS PB CONNEXION VENDEUR RÉSOLU !!!!!!!!
             $id_vendeur = 1; // A VIRER APRES
 
+            if ($_GET['modifier'] != null){
+                //si US modifier produit
+                print_r("detect modif\n");
+                if($_SESSION["creerArticle"]['_GET'] == null){
+                    print_r('1');
+                    //si premier passage
+                    try {//Affiliation id_utilisateur id_vendeur
+                        $sql = '
+                        SELECT * FROM cobrec1._produit 
+                        WHERE id_produit = ' . $_GET['modifier'] . ';'
+                        ;
+                        $stmt = $pdo->query($sql);
+                        $_SESSION["creerArticle"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        $_SESSION["creerArticle"]['_GET'] = $_SESSION["creerArticle"]['_GET'][0];
+                        
+                        $sql = '
+                        SELECT id_categorie FROM cobrec1._fait_partie_de 
+                        WHERE id_produit = ' . $_GET['modifier'] . ';'
+                        ;
+                        $stmt = $pdo->query($sql);
+                        $_SESSION["creerArticle"]['_GET']['id_categorie'] = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $_SESSION["creerArticle"]['_GET']['id_categorie'] = $_SESSION["creerArticle"]['_GET']['id_categorie']['id_categorie'];
+                        
+                        $sql = '
+                        SELECT id_image FROM cobrec1._represente_produit
+                        WHERE id_produit = ' . $_GET['modifier'] . ';'
+                        ;
+                        $stmt = $pdo->query($sql);
+                        $_SESSION["creerArticle"]['_GET']['imgs'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        
+                        foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
+                            $sql = '
+                            SELECT * FROM cobrec1._image 
+                            WHERE id_image = ' . $value['id_image'] . ';'
+                            ;
+                            $stmt = $pdo->query($sql);
+                            $_SESSION["creerArticle"]['_GET']['imgs'][$key] = $stmt->fetch(PDO::FETCH_ASSOC);
+                        }
+                        
+                    
+                    } catch (Exception $e) {
+                        $_SESSION["creerArticle"]['_GET'] = null;
+                    ?>
+
+                    <script>
+                        alert("La valeur du produit renseigné dans l'URL n'est pas valide. Vous allez être redirigé vers votre catalogue.");
+                        document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                    </script>
+
+                    <?php
+                    }
+                    if($_SESSION["creerArticle"]['_GET']['id_produit'] == null){
+                        $_SESSION["creerArticle"]['_GET'] = null;
+                        ?>
+
+                    <script>
+                        alert("La valeur du produit renseigné dans l'URL ne correspond à aucun produit. Vous allez être redirigé vers votre catalogue.");
+                        document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                    </script>
+
+                    <?php
+                    }else if ($_SESSION["creerArticle"]['_GET']['id_vendeur'] != $id_vendeur){
+                        $_SESSION["creerArticle"]['_GET'] = null;
+                        ?>
+
+                    <script>
+                        alert("Le produit que vous essayez de modifier ne vous appartient pas. Vous allez être redirigé vers votre catalogue.");
+                        document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                    </script>
+
+                    <?php
+                    }else{//tout est bon
+                        //peuplement de _post et de creerArticle
+                        print_r("peuplement\n");
+                        $_FILES["photo"]["name"] = [];
+                        $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
+                        $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
+                        foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
+                            $_SESSION["creerArticle"]["_FILES"]['name'][] = $value['i_title'];
+                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][] = 'html/img/Photo/';
+                        }
+                        $_POST = [];
+                        $_POST["titre"] = $_SESSION["creerArticle"]['_GET']['p_nom'];
+                        $_POST["description"] = $_SESSION["creerArticle"]['_GET']['p_description'];
+                        $_POST["photo"] ='';
+                        $_POST["pourcentage"] =null;
+                        $_POST["debut"] =null;
+                        $_POST["fin"] =null;
+                        $_POST["tva"] = $_SESSION["creerArticle"]['_GET']['id_tva'];
+                        $_POST["categorie"] = $_SESSION["creerArticle"]['_GET']['id_categorie'];
+                        // $_POST["couleur"] =null;
+                        $_POST["poids"] = $_SESSION["creerArticle"]['_GET']['p_poids'];
+                        $_POST["volume"] = $_SESSION["creerArticle"]['_GET']['p_volume'];
+                        $_POST["stock"] = $_SESSION["creerArticle"]['_GET']['p_stock'];
+                        $_POST["prix"] = $_SESSION["creerArticle"]['_GET']['p_prix'];
+
+                    }
+                }else if($_SESSION["creerArticle"]['_GET']['id_produit'] != $_GET['modifier']){
+                    //si l'utilisateur a changé l'url
+                    print_r('changement');
+                    $_POST = [];
+                    $_SESSION["creerArticle"] = [];
+                    $_FILES["photo"]["name"] = [];
+                    ?>
+                    <script>
+                        //recharge la page afin de remplir les chamspa vec les nouvelles valeurs
+                        location.reload();
+                    </script>
+
+                    <?php
+                }
+                
+            }
+
             function RemplacerCaracteresProblematiquesDansChampsTextes($contenuChamp){
                 $contenuChamp = str_replace("'", "''",$contenuChamp);
                 $contenuChamp = str_replace('"', '""',$contenuChamp);
@@ -44,7 +158,10 @@
 <pre>
 <?php
 
-
+// print_r($_GET['modifier']);
+// print_r($_SESSION["creerArticle"]['_GET']);
+// print_r($_POST);
+// print_r($_SESSION["creerArticle"]);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
 $warnPromo = false;
 if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
@@ -168,15 +285,50 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     include __DIR__ . '/../../../partials/aside.html';
     ?>
     <main>
-        <h2>Ébauche de produit</h2>
-        <form action="index.php" method="post" enctype="multipart/form-data">
+        <h2><?php 
+        if(($_SESSION["creerArticle"]['_GET'] == null) || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
+            echo 'Ébauche de produit';
+        }else if(($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne')){
+            echo 'Produit hors ligne';
+        }else{
+            echo 'Produit en ligne';
+        }
+        ?>
+        </h2>
+        <form action="index.php<?php 
+            if($_SESSION["creerArticle"]["_GET"] != null){
+                echo '?modifier=' . $_SESSION["creerArticle"]["_GET"]['id_produit'];
+            }
+        ?>" method="post" enctype="multipart/form-data">
             <!-- Boutons de soumission principaux -->
             <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
+            <?php
+            if($_SESSION["creerArticle"]['_GET'] != null){
+                if (($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne') || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
+
+                
+                ?>
+                <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
+            <?php
+                }else{
+                    ?>
+                    <input class="orange" type="submit" name="horsLigne"title="Un article hors ligne n'est plus visible que vous." value="Mettre hors ligne" />
+                <?php
+                }
+            }else{
+                ?>
             <input type="submit" name="sauvegarder" title="Un article sauvegardé est inscrit dans la base de données mais n'est visible que par vous." value="Sauvegarder l'ébauche" />
-            <input type="submit" name="publier"title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier le produit dans le catalogue client" />
+            <input class="orange" type="submit" name="publier"title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier le produit dans le catalogue client" />
+            <?php } ?>
             <div>
                 <section>
-                    <h3>Ajouter un produit</h3>
+                    <h3><?php 
+                        if($_SESSION["creerArticle"]['_GET'] == null){
+                            echo 'Ajouter un produit';
+                        }else{
+                            echo 'Modifier un produit';
+                        }
+                        ?></h3>
                     <article>
                         <!-- Texte avec label -->
                          <!-- <pre> -->
@@ -185,6 +337,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         $titre_pour_bdd = str_replace("'","''",$_POST['titre']);
                         $titre_pour_bdd = str_replace('"','""',$titre_pour_bdd);
 
+                        if(($_SESSION["creerArticle"]['_GET'] != null) && (($_SESSION["creerArticle"]['_GET']['p_nom'] == $_POST['titre']) || ($_SESSION["creerArticle"]['_GET']['p_nom'] == $titre_pour_bdd))){
+                            $titre = '';
+                        }else{
                             try {//cherche dans la BDD pour voir si le nom n'est pas déjà pris
                                 $sql = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . "'" . $titre_pour_bdd ."'";
                                 $stmt = $pdo->query($sql);
@@ -194,6 +349,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 //print_r($e);
                             }
                             //print_r("Tite =: " . $titre);
+                        }
                         ?>
 <!-- </pre> -->
                         <label for="titre">Titre</label>
@@ -262,12 +418,18 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <small><?php echo count($_SESSION["creerArticle"]["_FILES"]["name"]) ?>/<?php echo NB_IMGS_MAX;?></small>
                         
                         <?php
+                        if($_SESSION["creerArticle"]['_GET'] != null){
+                            $lien = '../../../img/Photo';
+                        }else{
+                            $lien = 'temp_/';
+                        }
+                        
                         foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
                             //
                             
                             ?><br>
                             <small>
-                                <img src="temp_/<?php echo $value ?>" height="25">
+                                <img src="<?php echo $lien . $value ?>" height="25">
                                 <?php echo $value; ?>
                                 <input type="submit" name="btn_moins<?php echo $key?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
@@ -478,193 +640,204 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
         </script>
             <pre>
                 <?php 
-                    if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '') && (($_POST["sauvegarder"] == "Sauvegarder l'ébauche") || ($_POST["publier"] == "Publier le produit dans le catalogue client"))){
-                    //Si pas de warning et formulaire soumis via le bouton Sauvegarder ou le bouton Annuler
+                    if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '')){
                         // print_r("WARNS : " . $_SESSION["creerArticle"]["warn"]);
-                        // print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
-                        
-                        $svg_titre = $_POST['titre'];
-                        $svg_desc = $_POST['description'];
-                        //fonction là pour éviter des problèmes à l'insertions dans la BDD
-                        $_POST['titre'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['titre']);
-                        $_POST['description'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['description']);
-                        $taille  = 'M';  //à ne pas incorporer
-
-
-                        try {//création de l'objet produit dans la base
-                            $sql = '
-                            INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,p_taille,date_arrivee_stock_recent)
-                            VALUES (
-                            ' . "'" . $_POST['tva'] ."'" .', 
-                            ' . $id_vendeur .', 
-                            ' . "'" . $_POST['titre'] ."'" .', 
-                            ' . "'" . $_POST["description"] ."'" .', 
-                            ' . "'" . $_POST["poids"] ."'" .', 
-                            ' . "'" . $_POST["volume"] ."'" .',
-                            ' . $_POST['prix'] .',
-                            ' . $_POST['stock'] .',
-                            ' . "'" . $taille ."'" .', 
-                            CURRENT_TIMESTAMP
-                            );
-                            ';
-                            $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
-                        } catch (Exception $e) {
-                            //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet produit dans la base";
-                            $time = time();
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                        }
-
-                        try {//création de l'affiliation entre catégorie et produit
-                            $sql = '
-                            INSERT INTO cobrec1._fait_partie_de(id_produit,id_categorie)
-                            VALUES (
-                            (SELECT id_produit FROM cobrec1._produit WHERE p_nom = ' . "'" . $_POST['titre'] . "'". '), 
-                            ' . "'" . $_POST['tva'] ."'" .'
-                            );
-                            ';
-                            $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
-                        } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre catégorie et produit";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                        }
-
-                        // try {//création de l'affiliation entre couleur et produit
-                        //     $sql = '
-                        //     INSERT INTO cobrec1._est_dote_de(id_produit,code_hexa)
-                        //     VALUES (
-                        //     (SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'),' 
-                        //     . "'" . $_POST['couleur'] . "'". '
-                        //     );
-                        //     ';
-                        //     $stmt = $pdo->prepare($sql);
-                        //     $stmt->execute();
-                        // } catch (Exception $e) {
-                        //     print_r($e);
-                        // }
-                        try{//SELEC de id_produit
-                            $sql = '
-                                SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'
-                                ;
-                                ';
-                                $stmt = $pdo->query($sql);
-                                $id_produit = $stmt->fetch(PDO::FETCH_ASSOC);
-                                $id_produit = $id_produit['id_produit'];
-                        }catch(Exception $e){
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="SELEC de id_produit";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                        }
-                        
-                        
-                        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+                            // print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
                             
-                            move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key], 
-                                'temp_/' . $value);
+                            $svg_titre = $_POST['titre'];
+                            $svg_desc = $_POST['description'];
+                            //fonction là pour éviter des problèmes à l'insertions dans la BDD
+                            $_POST['titre'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['titre']);
+                            $_POST['description'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['description']);
+                            $taille  = 'M';  //à ne pas incorporer
+                        if (($_POST["sauvegarder"] == "Sauvegarder l'ébauche") || ($_POST["publier"] == "Publier le produit dans le catalogue client")){
 
-                            try {//création des images
+                            
+                        //Si pas de warning et formulaire soumis via le bouton Sauvegarder ou le bouton Annuler
+                            
+
+
+                            try {//création de l'objet produit dans la base
                                 $sql = '
-                                INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
+                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,p_taille,date_arrivee_stock_recent)
                                 VALUES (
-                                ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value . "'" .', '
-                                . "'" . $id_produit . '_' . $value . "'". ','
-                                . "'" . 'Photo du produit ' . $_POST["titre"] . "'". '
+                                ' . "'" . $_POST['tva'] ."'" .', 
+                                ' . $id_vendeur .', 
+                                ' . "'" . $_POST['titre'] ."'" .', 
+                                ' . "'" . $_POST["description"] ."'" .', 
+                                ' . "'" . $_POST["poids"] ."'" .', 
+                                ' . "'" . $_POST["volume"] ."'" .',
+                                ' . $_POST['prix'] .',
+                                ' . $_POST['stock'] .',
+                                ' . "'" . $taille ."'" .', 
+                                CURRENT_TIMESTAMP
                                 );
                                 ';
                                 $stmt = $pdo->prepare($sql);
                                 $stmt->execute();
                             } catch (Exception $e) {
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images";
+                                //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
+                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet produit dans la base";
+                                $time = time();
                                 $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
 
-
-                            try {//création de l'affiliation entre images et produit
+                            try {//création de l'affiliation entre catégorie et produit
                                 $sql = '
-                                INSERT INTO cobrec1._represente_produit(id_produit,id_image)
+                                INSERT INTO cobrec1._fait_partie_de(id_produit,id_categorie)
                                 VALUES (
-                                ' . $id_produit .', 
-                                (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value ."'" .')
+                                (SELECT id_produit FROM cobrec1._produit WHERE p_nom = ' . "'" . $_POST['titre'] . "'". '), 
+                                ' . "'" . $_POST['tva'] ."'" .'
                                 );
                                 ';
                                 $stmt = $pdo->prepare($sql);
                                 $stmt->execute();
                             } catch (Exception $e) {
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
+                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre catégorie et produit";
                                 $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                                //print_r($_POST["titre"]);
                             }
 
-                            // try {//maj du lien et du titre de l'image                                
+                            // try {//création de l'affiliation entre couleur et produit
                             //     $sql = '
-                            //     UPDATE cobrec1._image 
-                            //     SET i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value . "' ". ',
-                            //     i_title = ' . "'" . $id_produit . '_' . $value . "'" . '
-                            //     WHERE id_image = 
-                            //     (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $_POST['titre'] . '/' . $value ."'" .');'
-                            //     ;
+                            //     INSERT INTO cobrec1._est_dote_de(id_produit,code_hexa)
+                            //     VALUES (
+                            //     (SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'),' 
+                            //     . "'" . $_POST['couleur'] . "'". '
+                            //     );
+                            //     ';
                             //     $stmt = $pdo->prepare($sql);
                             //     $stmt->execute();
                             // } catch (Exception $e) {
-                            //     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                            //     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="maj du lien et du titre de l'image";
+                            //     print_r($e);
                             // }
-
-
-
+                            try{//SELEC de id_produit
+                                $sql = '
+                                    SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'
+                                    ;
+                                    ';
+                                    $stmt = $pdo->query($sql);
+                                    $id_produit = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    $id_produit = $id_produit['id_produit'];
+                            }catch(Exception $e){
+                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="SELEC de id_produit";
+                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            }
                             
                             
-                            //déplacement du fichier vers le dossier img/Photo
-                            rename('temp_/' . $value, '../../../img/Photo/'. $value);
-                            //renommage du fichier
-                            rename('../../../img/Photo/'. $value, '../../../img/Photo/'. $id_produit . '_' . $value);
-                        }
+                            foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+                                
+                                move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key], 
+                                    'temp_/' . $value);
 
-                        //ne pas faire réduction, hors must du Sprint 1
+                                try {//création des images
+                                    $sql = '
+                                    INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
+                                    VALUES (
+                                    ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value . "'" .', '
+                                    . "'" . $id_produit . '_' . $value . "'". ','
+                                    . "'" . 'Photo du produit ' . $_POST["titre"] . "'". '
+                                    );
+                                    ';
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute();
+                                } catch (Exception $e) {
+                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images";
+                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                }
 
 
-                        //Supprime les fichiers de temp_
-                        $fichiers = glob('temp_/*');
-                        foreach ($fichiers as $value) {
-                            unlink($value);
-                        }
-                        
-                        
-                        //Sert pour des tests
-                        $svg_titre = $_POST['titre'];
-                        $svg_desc = $_POST['description'];
+                                try {//création de l'affiliation entre images et produit
+                                    $sql = '
+                                    INSERT INTO cobrec1._represente_produit(id_produit,id_image)
+                                    VALUES (
+                                    ' . $id_produit .', 
+                                    (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value ."'" .')
+                                    );
+                                    ';
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute();
+                                } catch (Exception $e) {
+                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
+                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                    //print_r($_POST["titre"]);
+                                }
 
-                        
-                        if ($_POST["sauvegarder"] == "Sauvegarder l'ébauche"){
-                            //Vive les if du php
+                                // try {//maj du lien et du titre de l'image                                
+                                //     $sql = '
+                                //     UPDATE cobrec1._image 
+                                //     SET i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value . "' ". ',
+                                //     i_title = ' . "'" . $id_produit . '_' . $value . "'" . '
+                                //     WHERE id_image = 
+                                //     (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $_POST['titre'] . '/' . $value ."'" .');'
+                                //     ;
+                                //     $stmt = $pdo->prepare($sql);
+                                //     $stmt->execute();
+                                // } catch (Exception $e) {
+                                //     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                //     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="maj du lien et du titre de l'image";
+                                // }
+
+
+
+                                
+                                
+                                //déplacement du fichier vers le dossier img/Photo
+                                rename('temp_/' . $value, '../../../img/Photo/'. $value);
+                                //renommage du fichier
+                                rename('../../../img/Photo/'. $value, '../../../img/Photo/'. $id_produit . '_' . $value);
+                            }
+
+                            //ne pas faire réduction, hors must du Sprint 1
+
+
+                            //Supprime les fichiers de temp_
+                            $fichiers = glob('temp_/*');
+                            foreach ($fichiers as $value) {
+                                unlink($value);
+                            }
                             
-                
-                ?>
-                <script>
-                    sauvegarder();
-                </script>
-                <?php }else if ($_POST["publier"] == "Publier le produit dans le catalogue client"){
+                            
+                            
+
+                            
+                            if ($_POST["sauvegarder"] == "Sauvegarder l'ébauche"){
+                                //Vive les if du php
+                                
                     
-                ?>
-                <script>
-                    publier();
-                </script>
+                    ?>
+                    <script>
+                        sauvegarder();
+                    </script>
+                    <?php }else if ($_POST["publier"] == "Publier le produit dans le catalogue client"){
+                        
+                    ?>
+                    <script>
+                        publier();
+                    </script>
 
-<?php
-                    try {//mise en ligne du produit
-                        $sql = '
-                        UPDATE cobrec1._produit 
-                        SET p_statut = ' . "'" . 'En ligne' . "' ". '
-                        WHERE p_nom = '. "'" . $_POST['titre'] . "'"
-                        ;
-                        $stmt = $pdo->prepare($sql);
-                        $stmt->execute();
-                    } catch (Exception $e) {
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+    <?php
+                        try {//mise en ligne du produit
+                            $sql = '
+                            UPDATE cobrec1._produit 
+                            SET p_statut = ' . "'" . 'En ligne' . "' ". '
+                            WHERE p_nom = '. "'" . $_POST['titre'] . "'"
+                            ;
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                        } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        }
                     }
+                    
+                }else if (($_POST["horsLigne"] == "Mettre hors ligne") || ($_POST["enLigne"] == "Mettre en ligne")){
+                    //Si pas de warning et formulaire soumis via le bouton Mettre en ligne/hors ligne
+                
+                
+                
                 }
+
+
                 //Sert pour consulter les erreurs de la BDD via un fichier dédié
                 $fp = fopen('file.csv', 'w');
 
@@ -673,6 +846,12 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 }
 
                 fclose($fp);
+
+
+                //Sert pour des tests
+                $svg_titre = $_POST['titre'];
+                $svg_desc = $_POST['description'];
+
             }
             if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '') && (($_POST["sauvegarder"] == "Sauvegarder l'ébauche") || ($_POST["publier"] == "Publier le produit dans le catalogue client"))){
                 //nettoyage

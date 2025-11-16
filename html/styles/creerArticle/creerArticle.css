@@ -23,7 +23,7 @@ body main form > input {
   color: #030212;
   margin-bottom: 2em;
 }
-body main form > input:nth-of-type(3) {
+body main form > .orange {
   background: #CD7F32;
   color: #fff;
   box-shadow: 0 4px 0.1em rgba(205, 127, 50, 0.12);
