@@ -183,6 +183,7 @@ CREATE TABLE cobrec1._produit (
     date_arrivee_stock_recent timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     p_nb_ventes integer DEFAULT 0,
     p_statut varchar(20) DEFAULT 'Ébauche',
+    p_origine varchar(40) DEFAULT 'Inconnue',
     CONSTRAINT verif_produit_frais_de_port CHECK (p_frais_de_port >= 0.00),
     CONSTRAINT verif_produit_volume CHECK (p_volume >= 0.00),
     CONSTRAINT verif_produit_poids CHECK (p_poids >= 0.00),
@@ -191,7 +192,8 @@ CREATE TABLE cobrec1._produit (
     CONSTRAINT verif_produit_stock CHECK (p_stock >= 0),
     CONSTRAINT verif_produit_nb_signalements CHECK (p_nb_signalements >= 0),
     CONSTRAINT verif_produit_nb_ventes CHECK (p_nb_ventes >= 0),
-    CONSTRAINT verif_produit_statut CHECK (p_statut IN ('Ébauche', 'En ligne', 'Hors ligne', 'Supprimé'))
+    CONSTRAINT verif_produit_statut CHECK (p_statut IN ('Ébauche', 'En ligne', 'Hors ligne', 'Supprimé')),
+    CONSTRAINT verif_produit_origine CHECK (p_origine IN ('Bretagne', 'France', 'Union Européenne', 'Hors Union Européenne', 'Inconnue'))
 );
 
 ALTER TABLE ONLY cobrec1._produit

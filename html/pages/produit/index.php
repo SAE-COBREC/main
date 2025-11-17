@@ -573,7 +573,7 @@ $noteEntiere = (int)floor($note);
                         <li>Catégorie : <?= htmlspecialchars($firstCategory) ?></li>
                         <li>Référence : #<?= $produit['id_produit'] ?></li>
                         <li>Statut : <?= htmlspecialchars($produit['p_statut']) ?></li>
-                        <li>Made in <?= htmlspecialchars($produit['p_pays_origine'] ?? 'Inconnu') ?></li>
+                        <li>Made in <?= htmlspecialchars($produit['p_origine'] ?? 'Inconnu') ?></li>
                     </ul>
                 </div>
 
