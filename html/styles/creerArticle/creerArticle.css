@@ -12,7 +12,7 @@ body main {
 }
 body main form > input {
   position: relative;
-  left: 71%;
+  left: 49%;
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 700;
@@ -23,7 +23,7 @@ body main form > input {
   color: #030212;
   margin-bottom: 2em;
 }
-body main form > input:nth-of-type(3) {
+body main form > .orange {
   background: #CD7F32;
   color: #fff;
   box-shadow: 0 4px 0.1em rgba(205, 127, 50, 0.12);
@@ -66,6 +66,12 @@ body main section article > input, body main section article textarea {
   font-size: 15px;
   width: 40em;
   padding: 0.6em;
+}
+body main section:nth-of-type(4) {
+  background: #FFF7F1;
+}
+body main section:nth-of-type(4) input {
+  background: #FFF7F1;
 }
 body main .warn {
   color: red;

@@ -199,10 +199,6 @@ if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un pa
     $_SESSION["panierEnCours"] = $idPanier;
 }
 
-
-
-
-
 //gérer l'ajout au panier via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
     header('Content-Type: application/json');
