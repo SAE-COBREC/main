@@ -59,8 +59,9 @@ function safe($array, $key, $default = "NULL") {
       <div class="profil-card">
         <h2 class="profil-card__title">Informations du compte</h2>
         <div class="profil-photo">
-          <img src="<?php echo htmlspecialchars($vendeur['photo']); ?>" alt="Photo du vendeur">
+          <img src="<?php echo htmlspecialchars($vendeur['image']); ?>" alt="Photo du vendeur">
         </div>
+
         <dl class="profil-details">
           <dt>Pseudo</dt><dd><?= safe($vendeur, 'pseudo'); ?></dd>
           <dt>Raison sociale</dt><dd><?= safe($vendeur, 'rsociale'); ?></dd>

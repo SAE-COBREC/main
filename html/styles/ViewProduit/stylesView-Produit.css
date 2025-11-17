@@ -448,6 +448,6 @@ footer > div > div:last-child span:hover {
 }
 .disabled {
   background: #EFEFEF !important;
-  cursor: not-allowed !important;
+  cursor: !important;
   pointer-events: none !important;
 }/*# sourceMappingURL=stylesView-Produit.css.map */
