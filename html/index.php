@@ -425,7 +425,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                     <h4>Note minimum</h4>
                     <?php for ($i = 5; $i >= 1; $i--): ?>
                         <div onclick="definirNote(<?= $i ?>)">
-                            <span><?= str_repeat('<img src="/img/svg/star-full.svg" alt="★" width="24">', $i) . str_repeat('<img src="/img/svg/star-empty.svg" alt="☆" width="24">', 5 - $i) ?></span>
+                            <span><?= str_repeat('<img src="/img/svg/star-full.svg" alt="★" width="16" style="margin-right:3px;">', $i) . str_repeat('<img src="/img/svg/star-empty.svg" alt="☆" width="16">', 5 - $i) ?></span>
                             <span><?= $i ?> et plus</span>
                         </div>
                     <?php endfor; ?>
@@ -482,7 +482,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                             <div>
                                 <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
                                 <div>
-                                    <span><?= str_repeat('<img src="/img/svg/star-full.svg" alt="★" width="24">', $noteArrondie) . str_repeat('<img src="/img/svg/star-empty.svg" alt="☆" width="24">', 5 - $noteArrondie) ?></span>
+                                    <span><?= str_repeat('<img src="/img/svg/star-yellow-full.svg" alt="★" width="16" style="margin-right:3px;">', $noteArrondie) . str_repeat('<img src="/img/svg/star-yellow-empty.svg" alt="☆" width="16">', 5 - $noteArrondie) ?></span>
                                     <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
                                 </div>
                                 <div>
