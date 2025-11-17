@@ -1,6 +1,4 @@
-# File Tree: main
-
-**Generated:** 13/11/2025 16:02:00
+# Structure du Repo
 
 ```
 ├── 📁 Php
