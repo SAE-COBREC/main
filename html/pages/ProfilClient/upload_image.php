@@ -1,6 +1,5 @@
 <?php
 session_start();
-header('Content-Type: application/json');
 
 // Vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['idClient'])) {
