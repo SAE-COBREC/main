@@ -83,45 +83,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <style>
   body {
     background: linear-gradient(to bottom right, #CD7F32, #D4183D);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
   }
-    
-  .footer{
-    margin-left: 40px;
-    margin-bottom: 10px;
-    width: 55%;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    font-size: 20px;
-    > p{
-      font-size: 20px;
-      color: #CD7F32;
-    }
-  }
-      .card {
-        margin: 0 auto;
-      }
-
   .debutant {
-    font-size: 20px;
-      margin-left: 40px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    text-align: left;
     a {
-      margin-left: 10px;
       color: #CD7F32;
-      outline: none;
-      text-decoration: none;
     }
-
-
   }
-
+  .footer{
+    > p{
+      color: #CD7F32;
+    }
+  }
+  .connex-btn {
+    > button {
+      &:hover {
+        background: #CD7F32;
+        color: black;
+      }
+    }
+  }
 </style>
 
 <body>

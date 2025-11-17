@@ -434,10 +434,6 @@ body {
     height: 50px;
     border-radius: $border-radius-primary;
     margin-bottom: 10px;
-    &:hover {
-      background: $primary-color-bleu;
-      color: $primary-color-noir;
-    }
   }
 }
 .footer{
@@ -450,7 +446,6 @@ body {
     font-size: 20px;
     > p{
       font-size: 20px;
-      color: #7171A3;
     }
   }
       .card {
@@ -464,7 +459,6 @@ body {
     margin-top: 10px;
     text-align: left;
     a {
-      color: #7171A3;
       outline: none;
       text-decoration: none;
     }

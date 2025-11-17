@@ -91,8 +91,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   body {
     background: linear-gradient(to bottom right, #7171A3, #030212);
   }
-  
-
+  .debutant {
+    a {
+      color: #7171A3;
+    }
+  }
+  .footer{
+    > p{
+      color: #7171A3;
+    }
+  }
+  .connex-btn {
+    > button {
+      &:hover {
+        background: #7171A3;
+        color: $primary-color-noir;
+      }
+    }
+  }
 </style>
 
 <body>
