@@ -4,7 +4,9 @@
     include '../../selectBDD.php';
 
     // ID du vendeur connecté (à adapter dynamiquement via la session)
-    $vendeur_id = $_SESSION['id'];
+    $vendeur_id = $_SESSION['vendeur_id'];
+
+    $_SESSION['creerArticle'] = [];
 
     try {
     // Récupération des produits depuis la BDD avec leurs catégories
@@ -105,18 +107,18 @@
           <thead>
             <tr>
               <th class="products-table__head-cell products-table__head-cell--checkbox"></th>
-              <th class="products-table__head-cell">Produit</th>
-              <th class="products-table__head-cell">Statut</th>
-              <th class="products-table__head-cell">Stock</th>
-              <th class="products-table__head-cell">Catégorie</th>
-              <th class="products-table__head-cell">Description</th>
+              <th class="products-table__head-cell--produit">Produit</th>
+              <th class="products-table__head-cell--statut">Statut</th>
+              <th class="products-table__head-cell--stock">Stock</th>
+              <th class="products-table__head-cell--cate">Catégorie</th>
+              <th class="products-table__head-cell--des">Description</th>
             </tr>
           </thead>
           <tbody>
           <?php if (!empty($articles)): ?>
             <?php foreach ($articles as $article): ?>
               <tr class="products-table__row">
-                <td class="products-table__cell">
+                <td class="products-table__cell--checkbox">
                   <div class="checkbox"></div>
                 </td>
                 <td class="products-table__cell">
@@ -165,6 +167,7 @@
                   row.classList.remove('selected');
                   checkbox.classList.remove('checkbox--active');
                   addButton.textContent = "Ajouter un produit"; // revenir à l'état initial
+                  addButton.setAttribute('href', 'create/index.php')
                 } else {
                   // Sinon on désélectionne les autres
                   rows.forEach(r => {
@@ -175,7 +178,8 @@
                   // Et on sélectionne celui-ci
                   row.classList.add('selected');
                   checkbox.classList.add('checkbox--active');
-                  addButton.textContent = "Modifier le produit"; // changer le texte
+                  addButton.textContent = "Modifier le produit";
+                  addButton.setAttribute('href', ...) // changer le texte
                 }
               });
             });

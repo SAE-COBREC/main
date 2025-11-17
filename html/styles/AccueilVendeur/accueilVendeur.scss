@@ -123,9 +123,9 @@ body {
     color: $primary-color-noir;
     margin-bottom: 16px;
   }
+
   .products-table {
     width: 100%;
-    border-collapse: collapse;
     overflow-y: auto;
     display: block;
     max-height: 810px;
@@ -139,9 +139,43 @@ body {
 
   .products-table thead,
   .products-table tbody tr {
-    display: table;
-    width: 100%;
+    display: table table-row;
     table-layout: fixed;
+  }
+
+  td{
+    max-width: 300px;
+    text-align: left;
+  }
+  .products-table__head-cell{
+    &--produit{
+      width: 300px;
+    }
+
+    &--statut{
+      width: 120px  ;
+    }
+
+    &--stock{
+      width: 65px;
+    }
+
+    &--cate{
+      width: 300px;
+    }
+
+    &--cate{
+      width: 300px;
+    }
+
+    &--des{
+      width: 300px;
+    }
+  }
+
+  .products-table__head-cell--checkbox,
+  .products-table__cell--checkbox{
+      width: 50px;
   }
 
   .products-table thead {
@@ -192,21 +226,17 @@ body {
 
 // Products Table
 .products-table {
-  width: 100%;
+  width: 200px;
   border-collapse: collapse;
 
   &__head-cell {
     text-align: left;
-    padding: 16px 24px;
+    padding: 20px 24px;
     font-size: 13px;
     font-weight: 600;
     color: $primary-color-noir;
     background: $primary-color-blanc;
     border-bottom: 1px solid $secondary-color-orange-clair;
-
-    &--checkbox {
-      width: 40px;
-    }
   }
 
   &__row {
@@ -236,11 +266,13 @@ body {
 .checkbox {
   width: 18px;
   height: 18px;
+  max-width: 40px;
   border: 2px solid $secondary-color-orange-clair;
   border-radius: $border-radius-mini;
   display: inline-block;
   cursor: pointer;
   transition: 0.2s;
+  margin-left: 25px;
   &--active {
     background-color: $secondary-color-bronze-clair;
     border-color: $secondary-color-bronze-clair;
