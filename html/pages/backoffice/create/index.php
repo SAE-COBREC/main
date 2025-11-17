@@ -1,7 +1,7 @@
 <?php
     $sth = null ;
     $dbh = null ;
-    include '../../../../../config.php';
+    include '../../../selectBDD.php';
     $pdo->exec("SET search_path to cobrec1");
     session_start();
     const NB_IMGS_MAX = 3;
