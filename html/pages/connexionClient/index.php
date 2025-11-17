@@ -20,7 +20,7 @@ session_start();
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
+  $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
 
   $hasError = false;
@@ -30,28 +30,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   try {
 
     //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :email");
-    $stmt->execute([':email' => $email]);
+    $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :login");
+    $stmt->execute([':login' => $login]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    //verification que l'aresse mail existe dans la bdd
     if (!$row) {
-      
-      $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte JOIN _client ON c_pseudo = :pseudo");
-      $stmt->execute([':pseudo' => $email]);
+      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
+      $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    }
+    //verification que le pseudo existe dans la bdd
+    if (!$row) {
       $hasError = true;
       $error_card = 1;
-      $error_message = 'Adresse mail ou mot de passe incorrecte.';
+      $error_message = 'Adresse mail, pseudo ou mot de passe .';
     } else {
-      
+
+
       //verification que le mdp corespondant a ce mail existe
       if (!($row['mdp'] === $mdp)) {
         $hasError = true;
         $error_card = 1;
-        $error_message = 'Adresse mail ou mot de passe incorrecte.';
+        $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
       } else {
-
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
@@ -59,17 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($client) {
           $clientId = (int)$client['id_client'];
         }
-        
+
         //verification que le compte est un compte client
         if (!$clientId) {
           $hasError = true;
           $error_card = 1;
-          $error_message = 'Adresse mail ou mot de passe incorrecte.';
+          $error_message = ' mail, pseudo ou mot de passe incorrecte.';
         } else {
-
           //ajout des identifiant a la session
+
           $_SESSION['idClient'] = $clientId;
-          
           //redirige sur la page d'acceuil
           header('Location: ../../index.php');
           exit;
@@ -89,44 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <style>
   body {
     background: linear-gradient(to bottom right, #7171A3, #030212);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
   }
-    
-  .footer{
-    margin-left: 40px;
-    margin-bottom: 10px;
-    width: 55%;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    font-size: 20px;
-    > p{
-      font-size: 20px;
-      color: #7171A3;
-    }
-  }
-      .card {
-        margin: 0 auto;
-      }
-
-  .debutant {
-    font-size: 20px;
-    margin-left: 40px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    text-align: left;
-    a {
-      margin-left: 10px;
-      color: #7171A3;
-      outline: none;
-      text-decoration: none;
-    }
-
-
-  }
+  
 
 </style>
 
@@ -140,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h1>Connexion</h1>
 
       <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" required>
+        <label for="email">Email/Pseudonyme</label>
+        <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
 
       <div>

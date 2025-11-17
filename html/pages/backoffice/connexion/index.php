@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   .debutant {
     font-size: 20px;
-    margin-left: 40px;
+      margin-left: 40px;
     margin-bottom: 10px;
     margin-top: 10px;
     text-align: left;
