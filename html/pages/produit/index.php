@@ -806,16 +806,16 @@ $noteEntiere = (int)floor($note);
             })
             .then(data => {
                 if (data.success) {
-                    alert('✓ ' + data.message);
+                    if (window.notify) notify(data.message || 'Article ajouté au panier', 'success');
                     //optionnel : mettre à jour le compteur du panier
                     //mettreAJourCompteurPanier();
                 } else {
-                    alert('✗ ' + data.message);
+                    if (window.showError) showError('Erreur', data.message || 'Impossible d\'ajouter l\'article.');
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('Erreur lors de l\'ajout au panier: ' + (error && error.message ? error.message : 'inconnue'));
+                if (window.showError) showError('Erreur', 'Erreur lors de l\'ajout au panier: ' + (error && error.message ? error.message : 'inconnue'));
             });
         }
 
@@ -959,13 +959,13 @@ $noteEntiere = (int)floor($note);
             inlineSubmit.addEventListener('click', () => {
                 const commentaire = (inlineComment.value || '').trim();
                 const selectedNote = parseFloat(inlineNote.value || '0') || 0;
-                if (!commentaire) { alert('Veuillez saisir un commentaire.'); return; }
-                if (selectedNote <= 0) { alert('Veuillez choisir une note (cliquez sur une étoile).'); return; }
+                if (!commentaire) { if (window.showError) showError('Erreur', 'Veuillez saisir un commentaire.'); return; }
+                if (selectedNote <= 0) { if (window.showError) showError('Erreur', 'Veuillez choisir une note (cliquez sur une étoile).'); return; }
                 inlineSubmit.disabled = true;
                 postAvis(productId, commentaire, selectedNote)
                     .then(data => {
                         if (!data || !data.success) {
-                            alert((data && data.message) || 'Erreur');
+                            if (window.showError) showError('Erreur', (data && data.message) || 'Erreur');
                             return;
                         }
                         const safeComment = escapeHtml(commentaire);
@@ -987,7 +987,7 @@ $noteEntiere = (int)floor($note);
                         if (inlineNote) inlineNote.value = '0';
                         const starContainer = document.getElementById('inlineStarInput');
                         if (starContainer) starContainer.dispatchEvent(new Event('mouseleave'));
-                        alert(data.message || 'Avis envoyé');
+                        if (window.notify) notify(data.message || 'Avis envoyé', 'success');
                         // Mise à jour immédiate (nouveau système simplifié)
                         if (typeof data.avg !== 'undefined') {
                             const avg = parseFloat(data.avg) || 0;
@@ -1017,7 +1017,7 @@ $noteEntiere = (int)floor($note);
                             fetchRating(productId); // fallback
                         }
                     })
-                    .catch(err => { console.error(err); alert('Erreur réseau'); })
+                        .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); })
                     .finally(() => { inlineSubmit.disabled = false; });
             });
         }
@@ -1083,7 +1083,7 @@ $noteEntiere = (int)floor($note);
                             if (likeSpan) likeSpan.textContent = likeN;
                             if (dislikeSpan) dislikeSpan.textContent = dislikeN;
                             buttons.forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-type') === current ? 'true' : 'false'));
-                            alert((data && data.message) || 'Erreur');
+                            if (window.showError) showError('Erreur', (data && data.message) || 'Erreur');
                         }
                     })
                     .catch(err => {
@@ -1091,7 +1091,7 @@ $noteEntiere = (int)floor($note);
                         if (likeSpan) likeSpan.textContent = likeN;
                         if (dislikeSpan) dislikeSpan.textContent = dislikeN;
                         buttons.forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-type') === current ? 'true' : 'false'));
-                        alert('Erreur réseau');
+                        if (window.showError) showError('Erreur', 'Erreur réseau');
                     })
                     .finally(() => { t.disabled = false; });
             });
@@ -1183,14 +1183,14 @@ $noteEntiere = (int)floor($note);
                 });
                 btnSave.addEventListener('click', () => {
                     const nv = ta.value.trim();
-                    if (!nv) { alert('Le commentaire ne peut pas être vide'); return; }
+                    if (!nv) { if (window.showError) showError('Erreur', 'Le commentaire ne peut pas être vide'); return; }
                     const newNote = parseFloat(editNoteHidden.value || '0') || 0;
                     if (newNote <= 0) { if (!confirm('Sauvegarder sans note ?')) return; }
                     btnSave.disabled = true;
                     const formNote = newNote > 0 ? newNote : '';
                     postEditAvis(productId, avisId, nv, formNote)
                         .then(data => {
-                            if (!data || !data.success) { alert((data && data.message) || 'Erreur'); return; }
+                            if (!data || !data.success) { if (window.showError) showError('Erreur', (data && data.message) || 'Erreur'); return; }
                             contentEl.textContent = nv;
                             ta.replaceWith(contentEl);
                             noteWrap.remove();
@@ -1213,7 +1213,7 @@ $noteEntiere = (int)floor($note);
                             }
                             fetchRating(productId); // Recalcul global
                         })
-                        .catch(err => { console.error(err); alert('Erreur réseau'); })
+                        .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); })
                         .finally(() => { btnSave.disabled = false; });
                 });
             });
@@ -1238,10 +1238,10 @@ $noteEntiere = (int)floor($note);
                             // Mettre à jour la note moyenne et le compteur après suppression
                             fetchRating(productId);
                         } else {
-                            alert((data && data.message) || 'Erreur suppression');
+                            if (window.showError) showError('Erreur', (data && data.message) || 'Erreur suppression');
                         }
                     })
-                    .catch(err => { console.error(err); alert('Erreur réseau'); })
+                    .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); })
                     .finally(() => { delBtn.disabled = false; });
             });
             // Initialiser l'état visuel des votes en fonction des votes déjà enregistrés (localStorage)
@@ -1260,6 +1260,7 @@ $noteEntiere = (int)floor($note);
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/js/HL_import.js"></script>
+    <script src="/js/notifications.js"></script>
 </body>
 
 </html>
