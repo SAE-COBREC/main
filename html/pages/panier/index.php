@@ -2,7 +2,7 @@
     include '../../selectBDD.php';
 
     session_start();
-    $id_client = $_SESSION['idClient'];
+    $id_client = $_SESSION['idClient']; //récup de l'id du client
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
@@ -15,7 +15,7 @@
         JOIN _tva ON _produit.id_tva = _tva.id_tva 
         WHERE id_client = :id_client
         AND _panier_commande.id_panier = :id_panier;
-    ";
+    "; 
 
     $stmt = $pdo->prepare($requetePanier);
     $stmt->execute([
