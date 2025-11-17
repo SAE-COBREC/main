@@ -101,6 +101,7 @@ function validerFormatMotDePasse($motDePasse)
     return preg_match($regexMotDePasse, $motDePasse) === 1;
 }
 
+
 //fonction pour récupérer les informations complètes du client
 function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClient)
 {
@@ -289,7 +290,7 @@ function mettreAJourProfilCompletClient(
 
         return ['success' => true, 'message' => "Profil mis à jour avec succès."];
     } catch (Exception $erreurException) {
-        return ['success' => false, 'message' => "Erreur lors de la mise à jour" ];//. $erreurException->getMessage()];
+        return ['success' => false, 'message' => "Erreur lors de la mise à jour"];//. $erreurException->getMessage()];
     }
 }
 
@@ -760,10 +761,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <?php endif; ?>
             </section>
 
-            <!-- Section : Sécurité -->
+            <!-- Section Sécurité -->
             <section>
                 <h2>Sécurité</h2>
-
                 <article>
                     <header>
                         <div>
@@ -777,7 +777,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             </svg>
                         </span>
                     </header>
-
                     <main>
                         <!-- Formulaire de changement de mot de passe -->
                         <form method="POST">
@@ -787,23 +786,26 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                     <input type="password" name="current_password" required>
                                 </label>
                             </div>
-
                             <div>
                                 <label>
                                     <span>Nouveau mot de passe</span>
-                                    <input type="password" name="new_password" required>
+                                    <input type="password" name="new_password"
+                                        pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$"
+                                        title="Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère parmi : . ! @ # $ % ^ & *"
+                                        required>
                                 </label>
                             </div>
-
                             <div>
                                 <label>
                                     <span>Confirmer le mot de passe</span>
-                                    <input type="password" name="confirm_password" required>
+                                    <input type="password" name="confirm_password"
+                                        pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$"
+                                        title="Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère parmi : . ! @ # $ % ^ & *"
+                                        required>
                                 </label>
                             </div>
-
                             <button type="submit" name="change_password"
-                                onclick="return confirm('Confirmer le changement de mot de passe ?');">
+                                onclick="return confirm('Confirmer le changement de mot de passe ?')">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -815,6 +817,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     </main>
                 </article>
             </section>
+
 
             <!-- Formulaire de déconnexion -->
             <form method="get" class="logout-form">
