@@ -11,156 +11,166 @@ $connexionBaseDeDonnees = $pdo;
 //définir le schéma de la base de données à utiliser
 $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
-//fonction pour récupérer les informations complètes du client
-function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClient)
-{
+//fonction pour vérifier l'unicité du pseudo
+function verifierUnicitePseudo($connexionBaseDeDonnees, $pseudo, $idClientExclure = null) {
     try {
-        //préparer la requête SQL pour joindre les tables client et compte
+        $requeteSQL = "SELECT COUNT(*) FROM cobrec1._client WHERE c_pseudo = ?";
+        $params = [$pseudo];
+        
+        //exclure l'id du client actuel si fourni (pour les mises à jour)
+        if ($idClientExclure !== null) {
+            $requeteSQL .= " AND id_client != ?";
+            $params[] = $idClientExclure;
+        }
+        
+        $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
+        $requetePreparee->execute($params);
+        $count = $requetePreparee->fetchColumn();
+        
+        return $count == 0; //retourne true si le pseudo est unique
+    } catch (Exception $erreurException) {
+        return false;
+    }
+}
+
+//fonction pour valider l'email selon le regex de la BDD
+function validerFormatEmail($email) {
+    $regexEmail = '/^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/';
+    return preg_match($regexEmail, $email) === 1;
+}
+
+//fonction pour valider le numéro de téléphone selon le regex de la BDD
+function validerFormatTelephone($telephone) {
+    $regexTelephone = '/^0[3-7]([0-9]{2}){4}$|^0[3-7]([-. ]?[0-9]{2}){4}$/';
+    return preg_match($regexTelephone, $telephone) === 1;
+}
+
+//fonction pour valider le mot de passe selon le regex de la BDD
+function validerFormatMotDePasse($motDePasse) {
+    $regexMotDePasse = '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$/';
+    return preg_match($regexMotDePasse, $motDePasse) === 1;
+}
+
+//fonction pour récupérer les informations complètes du client
+function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClient) {
+    try {
         $requeteSQL = "
-            SELECT 
-                cl.c_nom,
-                cl.c_prenom,
-                cl.c_pseudo,
-                co.email,
-                co.num_telephone
+            SELECT cl.c_nom, cl.c_prenom, cl.c_pseudo, co.email, co.num_telephone
             FROM cobrec1._client cl
-            INNER JOIN cobrec1._compte co 
-                ON cl.id_compte = co.id_compte
+            INNER JOIN cobrec1._compte co ON cl.id_compte = co.id_compte
             WHERE cl.id_client = ?
         ";
-        
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute([$identifiantClient]);
         $donneesClient = $requetePreparee->fetch(PDO::FETCH_ASSOC);
-
-        //retourner les données ou null si aucun résultat
         return $donneesClient ?: null;
     } catch (Exception $erreurException) {
-        //en cas d'erreur, retourner null
         return null;
     }
 }
 
 //fonction pour récupérer l'identifiant du compte associé au client
-function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClient)
-{
+function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClient) {
     try {
-        //rechercher l'id_compte à partir de l'id_client
         $requeteSQL = "SELECT id_compte FROM cobrec1._client WHERE id_client = ?";
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute([$identifiantClient]);
         $identifiantCompte = $requetePreparee->fetchColumn();
-
-        //retourner l'identifiant converti en entier ou null si non trouvé
         return $identifiantCompte !== false ? (int) $identifiantCompte : null;
     } catch (Exception $erreurException) {
-        //en cas d'erreur, retourner null
         return null;
     }
 }
 
 //fonction pour récupérer toutes les adresses du client
-function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompte)
-{
+function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompte) {
     try {
-        //sélectionner toutes les adresses associées au compte
         $requeteSQL = "
-            SELECT 
-                id_adresse,
-                a_adresse,
-                a_ville,
-                a_code_postal,
-                a_complement
+            SELECT id_adresse, a_adresse, a_ville, a_code_postal, a_complement
             FROM cobrec1._adresse
             WHERE id_compte = ?
             ORDER BY id_adresse DESC
         ";
-        
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute([$identifiantCompte]);
-        
-        //retourner un tableau des adresses ou un tableau vide
         return $requetePreparee->fetchAll(PDO::FETCH_ASSOC) ?: [];
     } catch (Exception $erreurException) {
-        //en cas d'erreur, retourner un tableau vide
         return [];
     }
 }
 
 //fonction pour récupérer l'historique des dernières commandes
-function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifiantClient)
-{
+function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifiantClient) {
     try {
-        //joindre les tables panier, facture et livraison pour l'historique complet
         $requeteSQL = "
-            SELECT 
-                p.id_panier,
-                p.timestamp_commande,
-                COALESCE(f.f_total_ttc, 0) as montant_total,
-                COALESCE(l.etat_livraison, 'En attente') as statut
+            SELECT p.id_panier, p.timestamp_commande,
+                   COALESCE(f.f_total_ttc, 0) as montant_total,
+                   COALESCE(l.etat_livraison, 'En attente') as statut
             FROM cobrec1._panier_commande p
-            LEFT JOIN cobrec1._facture f 
-                ON p.id_panier = f.id_panier
-            LEFT JOIN cobrec1._livraison l 
-                ON f.id_facture = l.id_facture
-            WHERE p.id_client = ?
-              AND p.timestamp_commande IS NOT NULL
+            LEFT JOIN cobrec1._facture f ON p.id_panier = f.id_panier
+            LEFT JOIN cobrec1._livraison l ON f.id_facture = l.id_facture
+            WHERE p.id_client = ? AND p.timestamp_commande IS NOT NULL
             ORDER BY p.timestamp_commande DESC
             LIMIT 5
         ";
-        
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute([$identifiantClient]);
-        
-        //retourner les 5 dernières commandes ou un tableau vide
         return $requetePreparee->fetchAll(PDO::FETCH_ASSOC) ?: [];
     } catch (Exception $erreurException) {
-        //en cas d'erreur, retourner un tableau vide
         return [];
     }
 }
 
 //fonction pour récupérer l'image de profil du compte
-function recupererImageProfilCompte($connexionBaseDeDonnees, $identifiantCompte)
-{
+function recupererImageProfilCompte($connexionBaseDeDonnees, $identifiantCompte) {
     try {
-        //joindre les tables image et represente_compte pour récupérer l'image
         $requeteSQL = "
             SELECT i.id_image, i.i_lien, i.i_title, i.i_alt
             FROM cobrec1._image i
             INNER JOIN cobrec1._represente_compte rc ON i.id_image = rc.id_image
             WHERE rc.id_compte = ?
         ";
-        
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute([$identifiantCompte]);
-        
-        //retourner les données de l'image ou null si aucune image
         return $requetePreparee->fetch(PDO::FETCH_ASSOC) ?: null;
     } catch (Exception $erreurException) {
-        //en cas d'erreur, retourner null
         return null;
     }
 }
 
 //fonction pour mettre à jour le profil complet (client, compte et image)
 function mettreAJourProfilCompletClient(
-    $connexionBaseDeDonnees, 
-    $identifiantClient, 
-    $identifiantCompte, 
-    $nomFamille, 
-    $prenomClient, 
-    $pseudonymeClient, 
-    $adresseEmail, 
-    $numeroTelephone, 
-    $cheminLienImage = null, 
-    $titreImage = null, 
+    $connexionBaseDeDonnees,
+    $identifiantClient,
+    $identifiantCompte,
+    $nomFamille,
+    $prenomClient,
+    $pseudonymeClient,
+    $adresseEmail,
+    $numeroTelephone,
+    $cheminLienImage = null,
+    $titreImage = null,
     $texteAlternatifImage = null
 ) {
     try {
+        //validation du pseudo unique
+        if (!verifierUnicitePseudo($connexionBaseDeDonnees, $pseudonymeClient, $identifiantClient)) {
+            return ['success' => false, 'message' => "Ce pseudo est déjà utilisé."];
+        }
+        
+        //validation du format de l'email
+        if (!validerFormatEmail($adresseEmail)) {
+            return ['success' => false, 'message' => "Format d'email invalide."];
+        }
+        
+        //validation du format du numéro de téléphone
+        if (!validerFormatTelephone($numeroTelephone)) {
+            return ['success' => false, 'message' => "Format de numéro de téléphone invalide (ex: 0612345678 ou 06 12 34 56 78)."];
+        }
+        
         //mise à jour des informations du client dans la table _client
         $requeteMiseAJourClient = "
-            UPDATE cobrec1._client 
+            UPDATE cobrec1._client
             SET c_nom = ?, c_prenom = ?, c_pseudo = ?
             WHERE id_client = ?
         ";
@@ -169,7 +179,7 @@ function mettreAJourProfilCompletClient(
 
         //mise à jour des informations du compte dans la table _compte
         $requeteMiseAJourCompte = "
-            UPDATE cobrec1._compte 
+            UPDATE cobrec1._compte
             SET email = ?, num_telephone = ?
             WHERE id_compte = ?
         ";
@@ -178,57 +188,52 @@ function mettreAJourProfilCompletClient(
 
         //si une image est fournie, la mettre à jour ou l'insérer
         if ($cheminLienImage !== null && $cheminLienImage !== '') {
-            //vérifier si une image existe déjà pour ce compte
             $requeteVerificationImageExistante = "SELECT id_image FROM cobrec1._represente_compte WHERE id_compte = ?";
             $requetePrepareeVerification = $connexionBaseDeDonnees->prepare($requeteVerificationImageExistante);
             $requetePrepareeVerification->execute([$identifiantCompte]);
             $donneesImageExistante = $requetePrepareeVerification->fetch(PDO::FETCH_ASSOC);
 
             if ($donneesImageExistante) {
-                //mettre à jour l'image existante dans la table _image
                 $requeteModificationImage = "
-                    UPDATE cobrec1._image 
-                    SET i_lien = ?, i_title = ?, i_alt = ? 
+                    UPDATE cobrec1._image
+                    SET i_lien = ?, i_title = ?, i_alt = ?
                     WHERE id_image = ?
                 ";
                 $requetePrepareeModification = $connexionBaseDeDonnees->prepare($requeteModificationImage);
                 $requetePrepareeModification->execute([
-                    $cheminLienImage, 
-                    $titreImage, 
-                    $texteAlternatifImage, 
+                    $cheminLienImage,
+                    $titreImage,
+                    $texteAlternatifImage,
                     $donneesImageExistante['id_image']
                 ]);
             } else {
-                //créer une nouvelle entrée d'image dans la table _image
                 $requeteInsertionNouvelleImage = "
-                    INSERT INTO cobrec1._image (i_lien, i_title, i_alt) 
-                    VALUES (?, ?, ?) RETURNING id_image
+                    INSERT INTO cobrec1._image (i_lien, i_title, i_alt)
+                    VALUES (?, ?, ?)
+                    RETURNING id_image
                 ";
                 $requetePrepareeInsertion = $connexionBaseDeDonnees->prepare($requeteInsertionNouvelleImage);
                 $requetePrepareeInsertion->execute([$cheminLienImage, $titreImage, $texteAlternatifImage]);
                 $identifiantNouvelleImage = $requetePrepareeInsertion->fetchColumn();
 
-                //lier la nouvelle image au compte dans la table _represente_compte
                 $requeteLiaisonImageCompte = "INSERT INTO cobrec1._represente_compte (id_image, id_compte) VALUES (?, ?)";
                 $requetePrepareeLiaison = $connexionBaseDeDonnees->prepare($requeteLiaisonImageCompte);
                 $requetePrepareeLiaison->execute([$identifiantNouvelleImage, $identifiantCompte]);
             }
         }
 
-        //retourner true si toutes les opérations ont réussi
-        return true;
+        return ['success' => true, 'message' => "Profil mis à jour avec succès."];
     } catch (Exception $erreurException) {
-        //en cas d'erreur, retourner false
-        return false;
+        return ['success' => false, 'message' => "Erreur lors de la mise à jour : " . $erreurException->getMessage()];
     }
 }
 
 //fonction pour modifier le mot de passe du compte
 function modifierMotDePasseCompte(
-    $connexionBaseDeDonnees, 
-    $identifiantCompte, 
-    $motDePasseActuel, 
-    $nouveauMotDePasse, 
+    $connexionBaseDeDonnees,
+    $identifiantCompte,
+    $motDePasseActuel,
+    $nouveauMotDePasse,
     $confirmationNouveauMotDePasse
 ) {
     try {
@@ -252,17 +257,20 @@ function modifierMotDePasseCompte(
         if ($nouveauMotDePasse !== $confirmationNouveauMotDePasse) {
             return ['success' => false, 'message' => "Les mots de passe ne correspondent pas."];
         }
+        
+        //validation du format du nouveau mot de passe
+        if (!validerFormatMotDePasse($nouveauMotDePasse)) {
+            return ['success' => false, 'message' => "Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère spécial."];
+        }
 
-        //hasher et mettre à jour le nouveau mot de passe
+        //mettre à jour le nouveau mot de passe
         $nouveauMotDePasseHashe = $nouveauMotDePasse;
         $requeteMiseAJourMotDePasse = "UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?";
         $requetePrepareeMiseAJour = $connexionBaseDeDonnees->prepare($requeteMiseAJourMotDePasse);
         $requetePrepareeMiseAJour->execute([$nouveauMotDePasseHashe, $identifiantCompte]);
 
-        //retourner succès avec un message
         return ['success' => true, 'message' => "Mot de passe modifié avec succès."];
     } catch (Exception $erreurException) {
-        //en cas d'erreur, retourner un message d'erreur
         return [
             'success' => false,
             'message' => "Erreur lors du changement de mot de passe : " . $erreurException->getMessage()
@@ -272,7 +280,6 @@ function modifierMotDePasseCompte(
 
 //vérifier si le client est connecté via la session
 if (!isset($_SESSION['idClient'])) {
-    //rediriger vers la page de connexion si non connecté
     header("Location: /pages/connexionClient/index.php");
     exit;
 }
@@ -282,10 +289,8 @@ $identifiantClientConnecte = (int) $_SESSION['idClient'];
 
 //gestion de la déconnexion
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-    //détruire toutes les variables de session
     session_unset();
     session_destroy();
-    //rediriger vers la page d'accueil
     header('Location: /index.php');
     exit;
 }
@@ -303,7 +308,6 @@ if ($identifiantCompteClient === null) {
 
 //traitement des formulaires soumis en POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     //mise à jour des informations personnelles (avec image optionnelle)
     if (isset($_POST['update_info'])) {
         //récupérer et sécuriser les données du formulaire
@@ -315,32 +319,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //récupération des données de l'image si fournies
         $cheminLienImageSaisi = !empty($_POST['lien_image']) ? htmlspecialchars($_POST['lien_image']) : null;
-        
+
         //générer le titre et l'alt de l'image avec le prénom du client
         $titreImageGenere = "Avatar " . $prenomClientSaisi;
         $texteAlternatifImageGenere = "Photo de profil " . $prenomClientSaisi;
 
         //appeler la fonction de mise à jour du profil
-        $succesModificationProfil = mettreAJourProfilCompletClient(
-            $connexionBaseDeDonnees, 
-            $identifiantClientConnecte, 
-            $identifiantCompteClient, 
-            $nomFamilleSaisi, 
-            $prenomClientSaisi, 
-            $pseudonymeClientSaisi, 
-            $adresseEmailSaisie, 
-            $numeroTelephoneSaisi, 
-            $cheminLienImageSaisi, 
-            $titreImageGenere, 
+        $resultatModificationProfil = mettreAJourProfilCompletClient(
+            $connexionBaseDeDonnees,
+            $identifiantClientConnecte,
+            $identifiantCompteClient,
+            $nomFamilleSaisi,
+            $prenomClientSaisi,
+            $pseudonymeClientSaisi,
+            $adresseEmailSaisie,
+            $numeroTelephoneSaisi,
+            $cheminLienImageSaisi,
+            $titreImageGenere,
             $texteAlternatifImageGenere
         );
 
         //rediriger avec un message de succès ou afficher une erreur
-        if ($succesModificationProfil) {
+        if ($resultatModificationProfil['success']) {
             header('Location: index.php?success=info_updated');
             exit;
         } else {
-            $messageErreur = "Erreur lors de la mise à jour des informations personnelles.";
+            $messageErreur = $resultatModificationProfil['message'];
         }
     }
 
@@ -353,10 +357,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //appeler la fonction de modification du mot de passe
         $resultatModificationMotDePasse = modifierMotDePasseCompte(
-            $connexionBaseDeDonnees, 
-            $identifiantCompteClient, 
-            $motDePasseActuelSaisi, 
-            $nouveauMotDePasseSaisi, 
+            $connexionBaseDeDonnees,
+            $identifiantCompteClient,
+            $motDePasseActuelSaisi,
+            $nouveauMotDePasseSaisi,
             $confirmationMotDePasseSaisie
         );
 
@@ -397,7 +401,6 @@ $requeteSQLVerificationImagePresente = "
 $requetePrepareeVerificationImage = $connexionBaseDeDonnees->prepare($requeteSQLVerificationImagePresente);
 $requetePrepareeVerificationImage->execute([$identifiantCompteClient]);
 $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSOC) ?: null;
-
 ?>
 
 <!DOCTYPE html>
