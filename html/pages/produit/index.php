@@ -107,6 +107,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
 
     try {
         if ($action === 'add_avis') {
+            // Vérification connexion
+            if (!$idClient) {
+                echo json_encode(['success' => false, 'message' => 'Vous devez être connecté pour laisser un avis.']);
+                exit;
+            }
+            // Vérification achat du produit (commande validée)
+            $stmtVerifAchat = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
+            $stmtVerifAchat->execute([':cid' => $idClient, ':pid' => $id_produit_post]);
+            $aAchete = (bool) $stmtVerifAchat->fetchColumn();
+            if (!$aAchete) {
+                echo json_encode(['success' => false, 'message' => 'Vous devez avoir acheté ce produit pour noter ou commenter.']);
+                exit;
+            }
             $commentaire_post = isset($_POST['commentaire']) ? trim($_POST['commentaire']) : '';
             $note_post = isset($_POST['note']) ? (float) $_POST['note'] : 0.0;
             // Validation basique de la note (intervalle et pas de 0.5)
@@ -366,6 +379,16 @@ try {
 }
 $ownerTokenServer = isset($_COOKIE['alizon_owner']) ? $_COOKIE['alizon_owner'] : '';
 $avisTextes = [];
+$reponsesMap = [];
+$clientConnecte = (bool)$idClient;
+$clientAachete = false;
+if ($clientConnecte) {
+    try {
+        $stmtVerifAchatDisplay = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
+        $stmtVerifAchatDisplay->execute([':cid' => $idClient, ':pid' => $idProduit]);
+        $clientAachete = (bool)$stmtVerifAchatDisplay->fetchColumn();
+    } catch (Throwable $e) { $clientAachete = false; }
+}
 try {
     // Récupère les avis et, si existantes, les notes liées (moyenne par avis)
     $stmtAvis = $pdo->prepare("
@@ -405,6 +428,16 @@ try {
 } catch (Exception $e) {
     $avisTextes = [];
 }
+
+// Récupérer les réponses vendeur (liaison _reponse)
+try {
+    $stmtRep = $pdo->prepare("SELECT r.id_avis_parent, a.id_avis, a.a_texte, TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt FROM _reponse r JOIN _avis a ON r.id_avis = a.id_avis WHERE a.id_produit = :pid");
+    $stmtRep->execute([':pid' => $idProduit]);
+    $rowsRep = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($rowsRep as $r) {
+        $reponsesMap[(int)$r['id_avis_parent']] = $r; // une réponse par avis parent (contrainte unique)
+    }
+} catch (Throwable $e) { /* silencieux */ }
 
 // Nouveau système simplifié pour l'affichage: 2 requêtes (moyenne et compteur)
 try {
@@ -492,8 +525,8 @@ $noteEntiere = (int)floor($note);
                         style="min-width:36px;text-align:center;background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #f0f2f6"
                         value="1" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
                     <button class="ghost" id="qty-increase" aria-label="Augmenter quantité">+</button>
-                    <button class="btn" <?= $estEnRupture ? 'disabled' : '' ?>
-                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
+                    <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
+                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)"    >
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
                 </div>
@@ -568,41 +601,53 @@ $noteEntiere = (int)floor($note);
             </div>
 
             <!-- Formulaire avis (carte) -->
-            <div class="review new-review-card" id="newReviewCard">
-                <div class="review-head">
-                    <div class="review-head-left">
-                        <div class="avatar">V</div>
-                        <div class="review-head-texts">
-                            <div class="review-author">Vous</div>
-                            <div class="review-subtitle">Laisser un avis</div>
+            <?php if ($clientConnecte && $clientAachete): ?>
+                <div class="review new-review-card" id="newReviewCard">
+                    <div class="review-head">
+                        <div class="review-head-left">
+                            <div class="avatar">V</div>
+                            <div class="review-head-texts">
+                                <div class="review-author">Vous</div>
+                                <div class="review-subtitle">Laisser un avis</div>
+                            </div>
+                        </div>
+                        <div class="review-head-right">
+                            <div class="star-input" id="inlineStarInput"
+                                title="Sélectionnez une note (achat vérifié)">
+                                <button type="button" data-value="1" aria-label="1 étoile"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="2" aria-label="2 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="3" aria-label="3 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="4" aria-label="4 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="5" aria-label="5 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                            </div>
+                            <input type="hidden" id="inlineNote" name="note" value="0">
                         </div>
                     </div>
-                    <div class="review-head-right">
-                        <div class="star-input" id="inlineStarInput"
-                            title="Survolez pour voir la note (la soumission de note est réservée aux achats vérifiés)">
-                            <button type="button" data-value="1" aria-label="1 étoile"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="2" aria-label="2 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="3" aria-label="3 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="4" aria-label="4 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="5" aria-label="5 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
+                    <form id="inlineReviewForm" class="review-form">
+                        <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
+                            placeholder="Partagez votre avis (texte)..."></textarea>
+                        <div class="review-actions">
+                            <small class="review-hint">Merci de rester courtois.</small>
+                            <button type="button" class="btn" id="inlineSubmit">Publier</button>
                         </div>
-                        <input type="hidden" id="inlineNote" name="note" value="0">
+                    </form>
+                </div>
+            <?php else: ?>
+                <div class="review new-review-card" style="background:#f3f4f7;opacity:.85">
+                    <div style="padding:12px 16px;font-size:14px;color:#555">
+                        <?php if(!$clientConnecte): ?>
+                            Connectez-vous pour laisser un avis sur ce produit.
+                        <?php elseif(!$clientAachete): ?>
+                            Vous devez avoir acheté ce produit pour laisser un avis.
+                        <?php endif; ?>
                     </div>
                 </div>
-                <form id="inlineReviewForm" class="review-form">
-                    <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
-                        placeholder="Partagez votre avis (texte)..."></textarea>
-                    <div class="review-actions">
-                        <small class="review-hint">La notation est réservée aux achats vérifiés.</small>
-                        <button type="button" class="btn" id="inlineSubmit">Publier</button>
-                    </div>
-                </form>
-            </div>
+            <?php endif; ?>
 
             <!-- Liste des avis -->
             <div id="listeAvisProduit">
@@ -657,6 +702,20 @@ $noteEntiere = (int)floor($note);
                                         style="margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;">Supprimer</button>
                                 <?php endif; ?>
                             </div>
+                            <?php if(isset($reponsesMap[(int)$ta['id_avis']])): $rep = $reponsesMap[(int)$ta['id_avis']]; ?>
+                                <div class="review" style="margin:12px 0 4px 48px;padding:10px 12px;background:#fff6e6;border:1px solid #ffe0a3;border-radius:8px">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                                        <div style="width:32px;height:32px;border-radius:50%;background:#ffc860;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#7a4d00">V</div>
+                                        <div style="font-weight:600;color:#7a4d00">Réponse du vendeur</div>
+                                        <span style="margin-left:auto;font-size:11px;color:#b07200;">
+                                            <?= htmlspecialchars($rep['a_timestamp_fmt'] ?? '') ?>
+                                        </span>
+                                    </div>
+                                    <div style="font-size:13px;color:#7a4d00;line-height:1.4">
+                                        <?= htmlspecialchars($rep['a_texte']) ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>

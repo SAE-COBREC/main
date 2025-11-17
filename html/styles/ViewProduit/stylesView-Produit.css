@@ -445,4 +445,9 @@ footer > div > div:last-child span:hover {
   .section.reviews .btn, .section.reviews .ghost {
     width: 100%;
   }
+}
+.disabled {
+  background: #EFEFEF !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
 }/*# sourceMappingURL=stylesView-Produit.css.map */
