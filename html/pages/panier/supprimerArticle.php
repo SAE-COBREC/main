@@ -4,7 +4,7 @@
     $id_client = $_SESSION['idClient'];
 
     if (isset($_POST['id_produit'])) {
-        $id_produit = intval($_POST['id_produit']); //onverti en entier
+        $id_produit = intval($_POST['id_produit']); //converti en entier
         
         $pdo->exec("SET search_path TO cobrec1");
         
