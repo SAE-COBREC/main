@@ -1,6 +1,6 @@
 <?php 
+//connexion a la bdd 
 include '../../selectBDD.php';
-
 $pdo->exec("SET search_path TO cobrec1");
 session_start();
  ?>
@@ -11,7 +11,7 @@ session_start();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Créer un compte - Alizon</title>
-  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
+  <link rel="icon" type="image/png" href="../../img/favicon.svg">
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
     rel="stylesheet">
@@ -28,45 +28,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $error_message = '';
   
   try {
+
+    //récuperation des données de compte
     $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :email");
     $stmt->execute([':email' => $email]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    //verification que l'aresse mail existe dans la bdd
     if (!$row) {
       $hasError = true;
       $error_card = 1;
       $error_message = 'Adresse mail ou mot de passe incorrecte.';
     } else {
       
+      //verification que le mdp corespondant a ce mail existe
       if (!($row['mdp'] === $mdp)) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Adresse mail ou mot de passe incorrecte.';
       } else {
-  $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
+
+        //récuperation des données client
+        $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
         $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
         if ($client) {
           $clientId = (int)$client['id_client'];
         }
         
+        //verification que le compte est un compte client
         if (!$clientId) {
           $hasError = true;
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
+
+          //ajout des identifiant a la session
           $_SESSION['id'] = $clientId;
           $_SESSION['compte_id'] = $compteId;
           
-          echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);text-align:center;\">";
-          echo "<h2 style=\"margin-top:0;\">Connexion réussie</h2>";
-          echo "<p style=\"margin:18px 0;\">Cliquez pour accéder au backoffice :</p>";
-          echo "<p><a href=\"../../index.php\" style=\"display:inline-block;padding:10px 14px;background:#fff;color:#000;border-radius:8px;text-decoration:none;border:1px solid rgba(0,0,0,0.12);\">Aller au backoffice</a></p>";
-          echo "</div>";
+          //redirige sur la page d'acceuil
+          header('Location: ../../index.php');
           exit;
         }
       }
     }
+  //message en cas de probleme de verif dans le code
   } catch (Exception $e) {
     $hasError = true;
     $error_card = 1;
@@ -98,7 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       color: #7171A3;
     }
   }
-      /* ensure the card is centered inside the flex body */
       .card {
         margin: 0 auto;
       }
@@ -140,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <input type="password" id="mdp" name="mdp" placeholder="***********" required>
       </div>
       <div class="forgot" onclick="showNextCard()">mot de passe oublié ?</div>
-
+      <!-- affichage des erreurs de saisi -->
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
@@ -158,32 +164,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>Aide</p><p>Confidentialité</p><p>Conditions</p>
       </div>
     </div>
-
-      <div class="error">
-        <?php if (isset($hasError) && $hasError && $error_card == 2): ?>
-          <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
-        <?php endif; ?>
-      </div>
-
   </form>
 
   <script>
 
-    // Retourne un message de validation en français pour l'élément fourni
-    function getFieldValidationMessage(el) {
-      if (!el) return 'Veuillez remplir ce champ correctement.';
-      try {
-        if (el.validity) {
-          if (el.validity.valueMissing) return 'Ce champ est requis.';
-          if (el.validity.typeMismatch) {
-            if (el.type === 'email') return 'Adresse mail ou mot de passe incorrecte.';
-            if (el.type === 'url') return 'Adresse mail ou mot de passe incorrecte.';
-            return 'Adresse mail ou mot de passe incorrecte.';
-          }
-        }
-      } catch (e) {}
-      return el.validationMessage || 'Veuillez remplir ce champ correctement.';
-    }
 
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');
@@ -233,7 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
   </script>
-
   <script type="module" src="../../js/registerPass.js"></script>
 </body>
 
