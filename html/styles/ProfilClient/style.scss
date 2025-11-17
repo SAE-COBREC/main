@@ -1031,3 +1031,62 @@ footer {
         height: 60px;
     }
 }
+
+#drop-zone {
+    border: 2px dashed #ccc;
+    padding: 30px;
+    text-align: center;
+    margin: 15px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    @include transition();
+    background-color: #f9f9f9;
+
+    &:hover {
+        border-color: #7171A3;
+        background-color: #f0f0f5;
+    }
+
+    &.drag-over {
+        background-color: #e3f2fd;
+        border-color: #2196F3;
+        transform: scale(1.02);
+    }
+
+    p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+    }
+}
+
+#preview-zone {
+    text-align: center;
+    margin: 15px 0;
+
+    img {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.upload-status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+
+    &.success {
+        background-color: #d4edda;
+        color: #155724;
+        display: block;
+    }
+
+    &.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        display: block;
+    }
+}
