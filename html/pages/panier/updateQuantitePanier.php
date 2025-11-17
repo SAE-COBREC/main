@@ -4,7 +4,7 @@
 
     $pdo->exec("SET search_path TO cobrec1");
 
-    $id_client = $_SESSION['id'];
+    $id_client = $_SESSION['idClient'];
 
     $id_produit = $_POST['id_produit'];
     $quantite = intval($_POST['quantite']);

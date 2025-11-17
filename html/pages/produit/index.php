@@ -5,7 +5,7 @@ $pageError = false;
 $produit = null;
 
 // Harmonisation avec la page d'accueil: gestion du panier en session
-$idClient = isset($_SESSION['id']) ? (int) $_SESSION['id'] : null;
+$idClient = isset($_SESSION['idClient']) ? (int) $_SESSION['idClient'] : null;
 if ($idClient) {
     // récupérer le panier courant (non commandé)
     try {
