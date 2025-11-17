@@ -98,7 +98,8 @@ function recupererDernieresCommandes($pdo, $idClient)
 }
 
 //fonction pour récupérer l'image du compte
-function recupererImageCompte($pdo, $idCompte) {
+function recupererImageCompte($pdo, $idCompte)
+{
     try {
         $sql = "
             SELECT i.id_image, i.i_lien, i.i_title, i.i_alt
@@ -143,7 +144,7 @@ function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseu
             $stmtCheck = $pdo->prepare($sqlCheck);
             $stmtCheck->execute([$idCompte]);
             $existingImage = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($existingImage) {
                 //mettre à jour l'image existante
                 $sqlUpdate = "
@@ -162,7 +163,7 @@ function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseu
                 $stmtInsert = $pdo->prepare($sqlInsertImage);
                 $stmtInsert->execute([$lienImage, $title, $alt]);
                 $newImageId = $stmtInsert->fetchColumn();
-                
+
                 // Lier l'image au compte
                 $sqlLink = "INSERT INTO cobrec1._represente_compte (id_image, id_compte) VALUES (?, ?)";
                 $stmtLink = $pdo->prepare($sqlLink);
@@ -257,11 +258,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pseudo = htmlspecialchars($_POST['pseudo'] ?? '');
         $email = htmlspecialchars($_POST['email'] ?? '');
         $telephone = htmlspecialchars($_POST['telephone'] ?? '');
-        
+
         // Récupération des données de l'image si fournies
         $lienImage = !empty($_POST['lien_image']) ? htmlspecialchars($_POST['lien_image']) : null;
-        $title = htmlspecialchars($_POST['title_image'] ?? 'Photo de profil');
-        $alt = htmlspecialchars($_POST['alt_image'] ?? 'Avatar utilisateur');
+        $title = "Avatar " . $prenom;
+        $alt = "Photo de profil " . $prenom;
 
         $successUpdate = mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseudo, $email, $telephone, $lienImage, $title, $alt);
 
@@ -370,10 +371,10 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                         <!-- Affichage de l'image de profil -->
                         <div class="profile-image-container">
                             <?php if ($imageCompte): ?>
-                                <img src="<?php echo htmlspecialchars($imageCompte['i_lien']); ?>" 
-                                     alt="<?php echo htmlspecialchars($imageCompte['i_alt'] ?? 'Photo de profil'); ?>" 
-                                     title="<?php echo htmlspecialchars($imageCompte['i_title'] ?? ''); ?>"
-                                     class="profile-image">
+                                <img src="<?php echo htmlspecialchars($imageCompte['i_lien']); ?>"
+                                    alt="<?php echo htmlspecialchars($imageCompte['i_alt'] ?? 'Photo de profil'); ?>"
+                                    title="<?php echo htmlspecialchars($imageCompte['i_title'] ?? ''); ?>"
+                                    class="profile-image">
                             <?php else: ?>
                                 <div class="profile-image-placeholder">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
@@ -390,9 +391,9 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                             <div>
                                 <label>
                                     <span>URL de l'image de profil (optionnel)</span>
-                                    <input type="text" name="lien_image" 
-                                           value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>" 
-                                           placeholder="https://exemple.com/image.jpg">
+                                    <input type="text" name="lien_image"
+                                        value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>"
+                                        placeholder="https://exemple.com/image.jpg">
                                 </label>
                             </div>
 
