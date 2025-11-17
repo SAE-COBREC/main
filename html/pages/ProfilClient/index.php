@@ -12,47 +12,98 @@ $connexionBaseDeDonnees = $pdo;
 $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 //fonction pour vérifier l'unicité du pseudo
-function verifierUnicitePseudo($connexionBaseDeDonnees, $pseudo, $idClientExclure = null) {
+function verifierUnicitePseudo($connexionBaseDeDonnees, $pseudo, $idClientExclure = null)
+{
     try {
         $requeteSQL = "SELECT COUNT(*) FROM cobrec1._client WHERE c_pseudo = ?";
         $params = [$pseudo];
-        
+
         //exclure l'id du client actuel si fourni (pour les mises à jour)
         if ($idClientExclure !== null) {
             $requeteSQL .= " AND id_client != ?";
             $params[] = $idClientExclure;
         }
-        
+
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute($params);
         $count = $requetePreparee->fetchColumn();
-        
+
         return $count == 0; //retourne true si le pseudo est unique
     } catch (Exception $erreurException) {
         return false;
     }
 }
 
+//fonction pour vérifier l'unicité de l'email
+function verifierUniciteEmail($connexionBaseDeDonnees, $email, $idCompteExclure = null)
+{
+    try {
+        $requeteSQL = "SELECT COUNT(*) FROM cobrec1._compte WHERE email = ?";
+        $params = [$email];
+
+        //exclure l'id du compte actuel si fourni (pour les mises à jour)
+        if ($idCompteExclure !== null) {
+            $requeteSQL .= " AND id_compte != ?";
+            $params[] = $idCompteExclure;
+        }
+
+        $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
+        $requetePreparee->execute($params);
+        $count = $requetePreparee->fetchColumn();
+
+        return $count == 0; //retourne true si l'email est unique
+    } catch (Exception $erreurException) {
+        return false;
+    }
+}
+
+//fonction pour vérifier l'unicité du numéro de téléphone
+function verifierUniciteTelephone($connexionBaseDeDonnees, $telephone, $idCompteExclure = null)
+{
+    try {
+        $requeteSQL = "SELECT COUNT(*) FROM cobrec1._compte WHERE num_telephone = ?";
+        $params = [$telephone];
+
+        //exclure l'id du compte actuel si fourni (pour les mises à jour)
+        if ($idCompteExclure !== null) {
+            $requeteSQL .= " AND id_compte != ?";
+            $params[] = $idCompteExclure;
+        }
+
+        $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
+        $requetePreparee->execute($params);
+        $count = $requetePreparee->fetchColumn();
+
+        return $count == 0; //retourne true si le téléphone est unique
+    } catch (Exception $erreurException) {
+        return false;
+    }
+}
+
 //fonction pour valider l'email selon le regex de la BDD
-function validerFormatEmail($email) {
+function validerFormatEmail($email)
+{
     $regexEmail = '/^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/';
     return preg_match($regexEmail, $email) === 1;
 }
 
 //fonction pour valider le numéro de téléphone selon le regex de la BDD
-function validerFormatTelephone($telephone) {
+function validerFormatTelephone($telephone)
+{
     $regexTelephone = '/^0[3-7]([0-9]{2}){4}$|^0[3-7]([-. ]?[0-9]{2}){4}$/';
     return preg_match($regexTelephone, $telephone) === 1;
 }
 
 //fonction pour valider le mot de passe selon le regex de la BDD
-function validerFormatMotDePasse($motDePasse) {
+function validerFormatMotDePasse($motDePasse)
+{
     $regexMotDePasse = '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$/';
     return preg_match($regexMotDePasse, $motDePasse) === 1;
 }
 
 //fonction pour récupérer les informations complètes du client
-function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClient) {
+function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClient)
+{
     try {
         $requeteSQL = "
             SELECT cl.c_nom, cl.c_prenom, cl.c_pseudo, co.email, co.num_telephone
@@ -70,7 +121,8 @@ function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifi
 }
 
 //fonction pour récupérer l'identifiant du compte associé au client
-function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClient) {
+function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClient)
+{
     try {
         $requeteSQL = "SELECT id_compte FROM cobrec1._client WHERE id_client = ?";
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
@@ -83,7 +135,8 @@ function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantC
 }
 
 //fonction pour récupérer toutes les adresses du client
-function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompte) {
+function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompte)
+{
     try {
         $requeteSQL = "
             SELECT id_adresse, a_adresse, a_ville, a_code_postal, a_complement
@@ -100,7 +153,8 @@ function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantComp
 }
 
 //fonction pour récupérer l'historique des dernières commandes
-function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifiantClient) {
+function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifiantClient)
+{
     try {
         $requeteSQL = "
             SELECT p.id_panier, p.timestamp_commande,
@@ -122,7 +176,8 @@ function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifi
 }
 
 //fonction pour récupérer l'image de profil du compte
-function recupererImageProfilCompte($connexionBaseDeDonnees, $identifiantCompte) {
+function recupererImageProfilCompte($connexionBaseDeDonnees, $identifiantCompte)
+{
     try {
         $requeteSQL = "
             SELECT i.id_image, i.i_lien, i.i_title, i.i_alt
@@ -155,19 +210,29 @@ function mettreAJourProfilCompletClient(
     try {
         //validation du pseudo unique
         if (!verifierUnicitePseudo($connexionBaseDeDonnees, $pseudonymeClient, $identifiantClient)) {
-            return ['success' => false, 'message' => "Ce pseudo est déjà utilisé."];
+            return ['success' => false, 'message' => "Ce pseudo est déjà utilisé par un autre compte."];
         }
-        
+
         //validation du format de l'email
         if (!validerFormatEmail($adresseEmail)) {
             return ['success' => false, 'message' => "Format d'email invalide."];
         }
-        
+
+        //validation de l'unicité de l'email
+        if (!verifierUniciteEmail($connexionBaseDeDonnees, $adresseEmail, $identifiantCompte)) {
+            return ['success' => false, 'message' => "Cette adresse email est déjà utilisée par un autre compte."];
+        }
+
         //validation du format du numéro de téléphone
         if (!validerFormatTelephone($numeroTelephone)) {
             return ['success' => false, 'message' => "Format de numéro de téléphone invalide (ex: 0612345678 ou 06 12 34 56 78)."];
         }
-        
+
+        //validation de l'unicité du numéro de téléphone
+        if (!verifierUniciteTelephone($connexionBaseDeDonnees, $numeroTelephone, $identifiantCompte)) {
+            return ['success' => false, 'message' => "Ce numéro de téléphone est déjà utilisé par un autre compte."];
+        }
+
         //mise à jour des informations du client dans la table _client
         $requeteMiseAJourClient = "
             UPDATE cobrec1._client
@@ -257,7 +322,7 @@ function modifierMotDePasseCompte(
         if ($nouveauMotDePasse !== $confirmationNouveauMotDePasse) {
             return ['success' => false, 'message' => "Les mots de passe ne correspondent pas."];
         }
-        
+
         //validation du format du nouveau mot de passe
         if (!validerFormatMotDePasse($nouveauMotDePasse)) {
             return ['success' => false, 'message' => "Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère spécial."];
@@ -316,6 +381,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pseudonymeClientSaisi = htmlspecialchars($_POST['pseudo'] ?? '');
         $adresseEmailSaisie = htmlspecialchars($_POST['email'] ?? '');
         $numeroTelephoneSaisi = htmlspecialchars($_POST['telephone'] ?? '');
+        $numeroTelephoneSaisi = str_replace(' ', '', $numeroTelephoneSaisi);
 
         //récupération des données de l'image si fournies
         $cheminLienImageSaisi = !empty($_POST['lien_image']) ? htmlspecialchars($_POST['lien_image']) : null;
@@ -519,7 +585,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                 <label>
                                     <span>Nom</span>
                                     <input type="text" name="nom" id="nom"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_nom'] ?? ''); ?>" required>
+                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_nom'] ?? ''); ?>"
+                                        required>
                                 </label>
                             </div>
 
@@ -527,7 +594,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                 <label>
                                     <span>Prénom</span>
                                     <input type="text" name="prenom" id="prenom"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_prenom'] ?? ''); ?>" required>
+                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_prenom'] ?? ''); ?>"
+                                        required>
                                 </label>
                             </div>
 
@@ -535,7 +603,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                 <label>
                                     <span>Pseudo</span>
                                     <input type="text" name="pseudo"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_pseudo'] ?? ''); ?>" required>
+                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_pseudo'] ?? ''); ?>"
+                                        required>
                                 </label>
                             </div>
 
@@ -543,7 +612,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                 <label>
                                     <span>Email</span>
                                     <input type="email" name="email"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['email'] ?? ''); ?>" required>
+                                        value="<?php echo htmlspecialchars($donneesInformationsClient['email'] ?? ''); ?>"
+                                        required>
                                 </label>
                             </div>
 
@@ -651,7 +721,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                     <span>Commande</span>
                                     <strong>#<?php echo htmlspecialchars($commandeIndividuelle['id_panier']); ?></strong>
                                 </div>
-                                <span data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
+                                <span
+                                    data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
                                     <?php echo htmlspecialchars($commandeIndividuelle['statut']); ?>
                                 </span>
                             </header>
@@ -668,7 +739,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                         <span><?php echo date('d/m/Y', strtotime($commandeIndividuelle['timestamp_commande'])); ?></span>
                                     </div>
                                     <div>
-                                        <em><?php echo number_format($commandeIndividuelle['montant_total'], 2, ',', ' '); ?> €</em>
+                                        <em><?php echo number_format($commandeIndividuelle['montant_total'], 2, ',', ' '); ?>
+                                            €</em>
                                     </div>
                                 </div>
                             </main>
@@ -804,7 +876,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
             //tester si l'image se charge correctement
             const imageTest = new Image();
-            
+
             //si l'image se charge avec succès
             imageTest.onload = function () {
                 //mettre à jour l'affichage de l'image
@@ -913,7 +985,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             lecteurFichier.onload = (evenement) => {
                 //afficher l'aperçu dans la zone dédiée
                 zoneApercuImage.innerHTML = `<img src="${evenement.target.result}" alt="Aperçu">`;
-                
+
                 //mettre à jour l'image de profil actuelle si elle existe
                 const elementImageActuelle = document.getElementById('current-profile-image');
                 if (elementImageActuelle) {
