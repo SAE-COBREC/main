@@ -51,12 +51,7 @@ if ($idProduit > 0) {
                 (SELECT STRING_AGG(cp.nom_categorie, ', ')
                    FROM _fait_partie_de fpd
                    JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-                  WHERE fpd.id_produit = p.id_produit) AS categories,
-                (SELECT i.i_lien
-                   FROM _represente_produit rp
-                   JOIN _image i ON rp.id_image = i.id_image
-                  WHERE rp.id_produit = p.id_produit
-                  LIMIT 1) AS image_url
+                  WHERE fpd.id_produit = p.id_produit) AS categories
             FROM _produit p
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
@@ -64,6 +59,21 @@ if ($idProduit > 0) {
             LIMIT 1");
         $stmtProd->execute([':pid' => $idProduit]);
         $produit = $stmtProd->fetch(PDO::FETCH_ASSOC) ?: null;
+        // Charger toutes les images du produit (carrousel)
+        $images = [];
+        if ($produit) {
+            $stmtImgs = $pdo->prepare("SELECT i.i_lien
+                                         FROM _represente_produit rp
+                                         JOIN _image i ON rp.id_image = i.id_image
+                                        WHERE rp.id_produit = :pid
+                                     ORDER BY rp.id_image ASC");
+            $stmtImgs->execute([':pid' => $idProduit]);
+            $images = $stmtImgs->fetchAll(PDO::FETCH_COLUMN) ?: [];
+            // Nettoyage basique des URLs et dédoublonnage
+            $images = array_values(array_unique(array_map(function ($u) {
+                return is_string($u) && $u !== '' ? $u : '/img/Photo/default.png';
+            }, $images)));
+        }
     } catch (Throwable $e) {
         $produit = null;
     }
@@ -455,6 +465,10 @@ try {
 
 // Partie entière pour rendu des étoiles
 $noteEntiere = (int)floor($note);
+// Images pour l'affichage
+$images = isset($images) && is_array($images) ? $images : [];
+$hasMultipleImages = count($images) > 1;
+$mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_url'] ?? '/img/Photo/default.png'));
 ?>
 <!doctype html>
 <html lang="fr">
@@ -473,22 +487,20 @@ $noteEntiere = (int)floor($note);
     <div id="header"></div>
 
     <main class="container">
-        <div class="product-row">
+        <div class="product-row <?= $hasMultipleImages ? '' : 'no-thumbs' ?>">
             <!-- Vignettes -->
-            <aside class="thumbs" aria-hidden="true">
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 1"
-                    loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 2"
-                    loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 3"
-                    loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 4"
-                    loading="lazy" />
+            <?php if ($hasMultipleImages): ?>
+            <aside class="thumbs" aria-label="Vignettes du produit">
+                <?php foreach ($images as $idx => $imgUrl): ?>
+                    <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>" alt="Vignette <?= $idx + 1 ?>"
+                         loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>" />
+                <?php endforeach; ?>
             </aside>
+            <?php endif; ?>
 
             <!-- Image principale -->
             <section class="main-image">
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>"
+                <img id="productMainImage" src="<?= htmlspecialchars($mainImage) ?>"
                     alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
             </section>
 
@@ -740,6 +752,24 @@ $noteEntiere = (int)floor($note);
             const dec = document.getElementById('qty-decrease');
             const inc = document.getElementById('qty-increase');
             const input = document.getElementById('qtyInput');
+            // Carrousel vignettes -> image principale + effet de surblanchiment
+            const thumbsEl = document.querySelector('.thumbs');
+            const mainImg = document.getElementById('productMainImage');
+            if (thumbsEl && mainImg) {
+                thumbsEl.addEventListener('click', function (e) {
+                    const t = e.target.closest('img.thumb');
+                    if (!t) return;
+                    const newSrc = t.getAttribute('data-src') || t.getAttribute('src');
+                    if (newSrc && mainImg.getAttribute('src') !== newSrc) {
+                        mainImg.setAttribute('src', newSrc);
+                    }
+                    // Etat actif + flash (surblanchiment léger)
+                    thumbsEl.querySelectorAll('img.thumb').forEach(img => img.classList.remove('is-active'));
+                    t.classList.add('is-active');
+                    t.classList.add('flash');
+                    setTimeout(() => t.classList.remove('flash'), 220);
+                });
+            }
             if (!input) return;
 
             const parseStep = (v) => {
