@@ -808,6 +808,150 @@ footer {
     }
 }
 
+// =============================================================================
+// DRAG AND DROP STYLES
+// =============================================================================
+
+#drop-zone {
+    border: 2px dashed #ccc;
+    padding: 30px;
+    text-align: center;
+    margin: 15px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    @include transition();
+    background-color: #f9f9f9;
+
+    &:hover {
+        border-color: #7171A3;
+        background-color: #f0f0f5;
+    }
+
+    &.drag-over {
+        background-color: #e3f2fd;
+        border-color: #2196F3;
+        transform: scale(1.02);
+    }
+
+    p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+    }
+}
+
+#preview-zone {
+    text-align: center;
+    margin: 15px 0;
+
+    img {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.upload-status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+
+    &.success {
+        background-color: #d4edda;
+        color: #155724;
+        display: block;
+    }
+
+    &.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        display: block;
+    }
+}
+
+// =============================================================================
+// PROFILE IMAGE STYLES
+// =============================================================================
+
+.profile-image-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-image {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image-placeholder {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #f0f0f5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+
+    svg {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+.no-profile-image {
+    color: #999;
+    font-size: 14px;
+}
+
+// =============================================================================
+// ADDITIONAL FORM STYLES
+// =============================================================================
+
+.image-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-separator {
+    margin: 1.5rem 0;
+    border: none;
+    border-top: 1px solid #DEDEDE;
+}
+
+.error-message {
+    color: #721c24;
+    padding: 10px;
+    background: #f8d7da;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+}
+
+.success-message {
+    color: #155724;
+    padding: 10px;
+    background: #d4edda;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #c3e6cb;
+}
+
+.logout-form {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+// =============================================================================
+// RESPONSIVE STYLES
+// =============================================================================
+
 @media (max-width: 768px) {
     body {
         padding: 1em;
@@ -874,6 +1018,22 @@ footer {
             padding: 1.5em;
         }
     }
+
+    // Responsive for image fields and profile images
+    .image-fields-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-image,
+    .profile-image-placeholder {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .profile-image-placeholder svg {
+        width: 60px;
+        height: 60px;
+    }
 }
 
 @media (max-width: 428px) {
@@ -935,99 +1095,5 @@ footer {
     footer > div > div:last-child {
         flex-direction: column;
         gap: 1rem;
-    }
-}
-
-/* Styles pour l'image de profil */
-.profile-image-container {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.profile-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #7171A3;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.profile-image-placeholder {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: #EFEFEF;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 3px solid #7171A3;
-}
-
-.profile-image-placeholder svg {
-    width: 80px;
-    height: 80px;
-}
-
-.no-profile-image {
-    color: #999;
-    margin-top: 1rem;
-    font-size: 0.9em;
-}
-
-/* Grid pour les champs image */
-.image-fields-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-/* Séparateur de formulaire */
-.form-separator {
-    margin: 1.5rem 0;
-    border: none;
-    border-top: 1px solid #DEDEDE;
-}
-
-/* Messages de succès et d'erreur */
-.error-message {
-    color: #721c24;
-    padding: 10px;
-    background: #f8d7da;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid #f5c6cb;
-}
-
-.success-message {
-    color: #155724;
-    padding: 10px;
-    background: #d4edda;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid #c3e6cb;
-}
-
-/* Formulaire de déconnexion */
-.logout-form {
-    margin-top: 1rem;
-    text-align: center;
-}
-
-/* Responsive pour les champs image */
-@media (max-width: 768px) {
-    .image-fields-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .profile-image,
-    .profile-image-placeholder {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .profile-image-placeholder svg {
-        width: 60px;
-        height: 60px;
     }
 }
