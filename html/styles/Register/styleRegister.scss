@@ -13,6 +13,10 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 
   &.centered {
     align-items: center;
@@ -430,6 +434,60 @@ body {
     height: 50px;
     border-radius: $border-radius-primary;
     margin-bottom: 10px;
+    &:hover {
+      background: $primary-color-bleu;
+      color: $primary-color-noir;
+    }
+  }
+}
+.footer{
+    margin-left: 50px;
+    margin-bottom: 10px;
+    width: 500px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    font-size: 20px;
+    > p{
+      font-size: 20px;
+      color: #7171A3;
+    }
+  }
+      .card {
+        margin: 0 auto;
+      }
 
+  .debutant {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    text-align: left;
+    a {
+      color: #7171A3;
+      outline: none;
+      text-decoration: none;
+    }
+  }
+@media #{$mobile} {
+  .connex-btn {
+    > button {
+      width: 300px;
+    }
+  }
+  .forgot{
+    margin-left: 15px;
+  }  
+  .footer{
+    width: 320px;
+    margin-left: 0px;
+  }
+  .debutant{
+    margin-left: 0px;
+    >a{
+      &:hover {
+        color: $primary-color-noir;
+      }
+    }
   }
 }
