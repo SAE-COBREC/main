@@ -105,8 +105,8 @@
                             $_SESSION["creerArticle"]["_FILES"]['tmp_name'][] = 'html/img/Photo/';
                         }
                         $_POST = [];
-                        $_POST["titre"] = $_SESSION["creerArticle"]['_GET']['p_nom'];
-                        $_POST["description"] = $_SESSION["creerArticle"]['_GET']['p_description'];
+                        $_POST["titre"] = str_replace("''","'", $_SESSION["creerArticle"]['_GET']['p_nom']);
+                        $_POST["description"] = str_replace("''","'", $_SESSION["creerArticle"]['_GET']['p_description']);
                         $_POST["photo"] ='';
                         $_POST["pourcentage"] =null;
                         $_POST["debut"] =null;
@@ -832,7 +832,53 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     
                 }else if (($_POST["horsLigne"] == "Mettre hors ligne") || ($_POST["enLigne"] == "Mettre en ligne")){
                     //Si pas de warning et formulaire soumis via le bouton Mettre en ligne/hors ligne
-                
+                    
+                    try {//modif de l'objet produit dans la base
+                        $sql = '
+                        UPDATE cobrec1._produit
+                        SET id_tva =' . $_POST['tva'] . ', 
+                        p_nom ='. "'" . $_POST['titre'] . "'" . ', 
+                        p_description ='. "'" . $_POST['description'] . "'" . ', 
+                        p_poids =' . $_POST['poids'] . ', 
+                        p_volume =' . $_POST['volume'] . ', 
+                        p_prix =' . $_POST['prix'] . ', 
+                        p_stock =' . $_POST['stock'] . ' 
+                        WHERE id_produit =' . $_SESSION["creerArticle"]['_GET']['id_produit'] .';
+                        ';
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute();
+
+                        $_SESSION["creerArticle"]['_GET']['p_nom'] = $_POST['titre'];
+                    } catch (Exception $e) {
+                        //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
+                        $time = time();
+                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'objet produit dans la base";
+                        print_r($_POST);
+                        foreach ($_POST as $value) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $key . ' : ' ;
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $value ;
+                        }
+                        
+                        
+                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                    }
+
+                    if ($_SESSION["creerArticle"]['_GET']['id_categorie'] != $_POST['categorie']){
+                        try {//modif de l'affiliation entre catégorie et produit
+                            $sql = '
+                            UPDATE cobrec1._fait_partie_de 
+                            SET id_categorie = ' . $_POST['categorie'] . ' 
+                            WHERE id_produit =' . $_SESSION["creerArticle"]['_GET']['id_produit'] .';
+                            ';
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                        } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre catégorie et produit";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        }
+                    }
+
+                    
                 
                 
                 }
