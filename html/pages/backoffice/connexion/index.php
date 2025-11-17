@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
 
           //ajout des identifiant a la session
-          $_SESSION['id'] = $vendeurId;
+          $_SESSION['vendeur_id'] = $vendeurId;
           
           //redirige sur la page d'acceuil
           header('Location: ../index.php');
