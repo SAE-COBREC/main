@@ -76,45 +76,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error_message = 'Les mots de passe doivent correspondre et contenir au moins 8 caractères.';
   }
 
-  // If passed validation, continue with normal processing (placeholder)
-  // For now we simply show a recap; further processing (save to CSV/DB) can go here.
   if (!$hasError) {
-    // persist into DB: insert into _compte, then _client, then _adresse (optional)
-    try {
-      $pdo->beginTransaction();
+    try {//création de l'objet produit dans la base
+      $sql = '
+      INSERT INTO cobrec1._compte(id_compte,email,num_telephone,mdp)
+      VALUES (
+      ' . "'" . $id_client ."'" .', 
+      ' . $email .', 
+      ' . "'" . $num_telephone ."'" .', 
+      ' . "'" . $mdp ."'" .', 
+      CURRENT_TIMESTAMP
+      );
+      ';
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute();
+  } catch (Exception $e) {
+    $hasError = true;
+    $error_card = 4; 
+    $error_message = 'info invalide a inserer .';
+  }
 
-      // hash password before storing and insert compte
-      $hashedMdp = password_hash($mdp, PASSWORD_DEFAULT);
-      $insCompte = $pdo->prepare("INSERT INTO cobrec1._compte (email, mdp, num_telephone) VALUES (:email, :mdp, :telephone) RETURNING id_compte");
-      $insCompte->execute([
-        ':email' => $email,
-        ':mdp' => $hashedMdp,
-        ':telephone' => $telephone
-      ]);
-      $id_compte = $insCompte->fetchColumn();
-      if ($id_compte === false) throw new Exception('Impossible de créer le compte');
-
-      // insert client
-      $insClient = $pdo->prepare("INSERT INTO cobrec1._client (c_nom, c_prenom, id_compte) VALUES (:nom, :prenom, :id_compte) RETURNING id_client");
-      $insClient->execute([':nom' => $nom, ':prenom' => $prenom, ':id_compte' => $id_compte]);
-      $id_client = $insClient->fetchColumn();
-      if ($id_client === false) throw new Exception('Impossible de créer le client');
-
-      // insert address if provided
-      if (!empty($rue) || !empty($codeP) || !empty($commune)) {
-        $insAddr = $pdo->prepare("INSERT INTO cobrec1._adresse (id_compte, a_adresse, a_ville, a_code_postal, a_complement) VALUES (:id_compte, :adresse, :ville, :cp, :complement)");
-        $insAddr->execute([
-          ':id_compte' => $id_compte,
-          ':adresse' => $rue,
-          ':ville' => $commune,
-          ':cp' => $codeP,
-          ':complement' => null
-        ]);
-      }
-
-      $pdo->commit();
-
-      // show simple recap with created ids
       echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
       echo "<h2 style=\"margin-top:0;\">Compte créé</h2>";
       echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
@@ -127,12 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo "</div>";
       echo "</div>";
       exit;
-    } catch (Exception $e) {
-      try { $pdo->rollBack(); } catch (Throwable $t) { /* ignore */ }
-      $hasError = true;
-      $error_card = 4;
-      $error_message = 'Erreur lors de la création du compte : ' . $e->getMessage();
-    }
   }
 }
 ?>
