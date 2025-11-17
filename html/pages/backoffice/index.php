@@ -65,7 +65,7 @@
             <span class="search-bar__icon"><img src="../../img/svg/loupe.svg" alt="loupe"></span>
             <input type="search" placeholder="Rechercher des produits..." />
           </div>
-          <a href="/pages/backoffice/create/index.php"><button class="btn btn--primary">Ajouter un produit</button></a>
+          <a href="create/index.php"><button class="btn btn--primary">Ajouter un produit</button></a>
         </div>
       </div>
 
