@@ -2,23 +2,29 @@
 session_start();
 header('Content-Type: application/json');
 
-//vérifier que l'utilisateur est connecté
+// Vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['idClient'])) {
     echo json_encode(['success' => false, 'message' => 'Non autorisé']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
-    $prenom = htmlspecialchars($_POST['prenom'] ?? 'Client');
+    $idClient = isset($_POST['id_client']) ? (int)$_POST['id_client'] : 0;
     $file = $_FILES['image'];
     
-    //vérifier les erreurs d'upload
+    // Vérifier que l'ID client est valide
+    if ($idClient <= 0) {
+        echo json_encode(['success' => false, 'message' => 'ID client invalide']);
+        exit;
+    }
+    
+    // Vérifier les erreurs d'upload
     if ($file['error'] !== UPLOAD_ERR_OK) {
         echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'upload du fichier']);
         exit;
     }
     
-    //vérifier que c'est une image
+    // Vérifier que c'est une image
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = finfo_file($finfo, $file['tmp_name']);
@@ -29,16 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         exit;
     }
     
-    //vérifier la taille (max 5MB)
+    // Vérifier la taille (max 5MB)
     if ($file['size'] > 5 * 1024 * 1024) {
         echo json_encode(['success' => false, 'message' => 'Fichier trop volumineux (max 5 MB)']);
         exit;
     }
     
-    //récupérer l'extension
+    // Récupérer l'extension
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
     if (empty($extension)) {
-        //déterminer l'extension depuis le type MIME
+        // Déterminer l'extension depuis le type MIME
         $extensions = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
@@ -48,17 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         $extension = $extensions[$mimeType] ?? 'jpg';
     }
     
-    //créer le nom de fichier basé sur i_alt (Photo de profil [prenom])
-    $alt = "Photo de profil " . $prenom;
-    $filename = $alt . '.' . $extension;
+    // Créer le nom de fichier basé sur l'ID client
+    // Format: Photo_de_profil_[id_client].extension
+    $filename = "Photo_de_profil_id-" . $idClient . "." . $extension;
     
-    //nettoyer le nom de fichier (enlever les caractères spéciaux)
-    $filename = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $filename);
-    
-    //définir le répertoire de destination (chemin absolu depuis la racine du projet)
+    // Définir le répertoire de destination (chemin absolu depuis la racine du projet)
     $uploadDir = __DIR__ . '/../../img/clients/';
     
-    //créer le répertoire s'il n'existe pas
+    // Créer le répertoire s'il n'existe pas
     if (!file_exists($uploadDir)) {
         if (!mkdir($uploadDir, 0755, true)) {
             echo json_encode(['success' => false, 'message' => 'Impossible de créer le répertoire de destination']);
@@ -68,17 +71,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     
     $uploadPath = $uploadDir . $filename;
     
-    //supprimer l'ancienne image si elle existe avec un nom différent
-    $pattern = $uploadDir . 'Photo_de_profil_' . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $prenom) . '.*';
+    // Supprimer l'ancienne image si elle existe avec un nom différent (autre extension)
+    $pattern = $uploadDir . 'Photo_de_profil_id-' . $idClient . '.*';
     foreach (glob($pattern) as $oldFile) {
-        if ($oldFile !== $uploadPath) {
+        if ($oldFile !== $uploadPath && is_file($oldFile)) {
             unlink($oldFile);
         }
     }
     
-    //séplacer le fichier uploadé
+    // Déplacer le fichier uploadé
     if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-        //retourner le chemin relatif pour la base de données
+        // Retourner le chemin relatif pour la base de données
         $relativePath = '/img/clients/' . $filename;
         echo json_encode([
             'success' => true,

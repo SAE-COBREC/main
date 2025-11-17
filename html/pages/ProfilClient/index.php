@@ -384,7 +384,8 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                         <form method="POST" id="profile-form">
                             <!-- Zone de drag and drop pour l'image -->
                             <div id="drop-zone">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="48" height="48" style="margin-bottom: 10px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="48" height="48"
+                                    style="margin-bottom: 10px;">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="17 8 12 3 7 8"></polyline>
                                     <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -393,12 +394,13 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                                 <p style="font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner un fichier</p>
                                 <input type="file" id="file-input" accept="image/*" style="display: none;">
                             </div>
-                            
+
                             <div id="preview-zone"></div>
                             <div id="upload-status" class="upload-status"></div>
 
                             <!-- Champ caché pour stocker le chemin de l'image -->
-                            <input type="hidden" name="lien_image" id="lien_image" value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>">
+                            <input type="hidden" name="lien_image" id="lien_image"
+                                value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>">
 
                             <!-- Champs existants -->
                             <div>
@@ -636,13 +638,76 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
     ?>
 
     <script>
+        // Gestion des onglets
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.getAttribute('data-tab');
+
+                // Désactiver tous les onglets
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // Activer l'onglet sélectionné
+                btn.classList.add('active');
+                document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+
+        // Prévisualisation de l'image depuis URL
+        function previewUrlImage() {
+            const urlInput = document.getElementById('url_image_input');
+            const lienImageInput = document.getElementById('lien_image');
+            const currentImage = document.getElementById('current-profile-image');
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                alert('Veuillez saisir une URL d\'image');
+                return;
+            }
+
+            // Vérifier si l'URL est valide
+            try {
+                new URL(url);
+            } catch (e) {
+                alert('URL invalide. Veuillez saisir une URL complète (ex: https://exemple.com/image.jpg)');
+                return;
+            }
+
+            // Tester si l'image se charge correctement
+            const testImg = new Image();
+            testImg.onload = function () {
+                // L'image est valide, mettre à jour l'affichage
+                if (currentImage) {
+                    currentImage.src = url;
+                } else {
+                    // Créer l'image si elle n'existe pas
+                    const container = document.querySelector('.profile-image-container');
+                    container.innerHTML = `<img src="${url}" alt="Photo de profil" class="profile-image" id="current-profile-image">`;
+                }
+
+                // Mettre à jour le champ caché
+                lienImageInput.value = url;
+
+                alert('Image chargée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.');
+            };
+
+            testImg.onerror = function () {
+                alert('Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.');
+            };
+
+            testImg.src = url;
+        }
+
         // JavaScript pour le drag and drop
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const previewZone = document.getElementById('preview-zone');
         const uploadStatus = document.getElementById('upload-status');
         const lienImageInput = document.getElementById('lien_image');
-        const prenomInput = document.getElementById('prenom');
+        const idClient = <?php echo $idClient; ?>; // ID du client depuis PHP
 
         // Clic sur la zone pour ouvrir le sélecteur de fichier
         dropZone.addEventListener('click', () => fileInput.click());
@@ -704,7 +769,7 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
 
             const formData = new FormData();
             formData.append('image', file);
-            formData.append('prenom', prenomInput.value || 'Client');
+            formData.append('id_client', idClient); // Envoyer l'ID client au lieu du prénom
 
             // Afficher un aperçu
             const reader = new FileReader();
@@ -725,26 +790,26 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Mettre à jour le champ caché avec le chemin local
-                    lienImageInput.value = data.path;
-                    showStatus('Image uploadée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.', 'success');
-                } else {
-                    showStatus('Erreur: ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                showStatus('Erreur lors de l\'upload', 'error');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mettre à jour le champ caché avec le chemin local
+                        lienImageInput.value = data.path;
+                        showStatus('Image uploadée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.', 'success');
+                    } else {
+                        showStatus('Erreur: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    showStatus('Erreur lors de l\'upload', 'error');
+                });
         }
 
         function showStatus(message, type) {
             uploadStatus.textContent = message;
             uploadStatus.className = 'upload-status ' + type;
-            
+
             if (type === 'success') {
                 setTimeout(() => {
                     uploadStatus.style.display = 'none';
@@ -752,6 +817,7 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
             }
         }
     </script>
+
 
 </body>
 
