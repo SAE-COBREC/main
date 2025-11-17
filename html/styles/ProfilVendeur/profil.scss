@@ -39,13 +39,15 @@ body {
   border-radius: $border-radius-primary;
   border: 1px solid $secondary-color-orange-clair;
   padding: 32px;
-  max-width: 700px;
+  max-width: 1000px;  
+  width: 100%;       
   margin: 0 auto;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-top: 10px;
 
   &__title {
     font-family: $font-family-primaire;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
     color: $primary-color-bronze;
     margin-bottom: 24px;
@@ -55,9 +57,10 @@ body {
 
 .profil-details {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 12px 24px;
-  font-size: 15px;
+  grid-template-columns: 250px 1fr;
+  gap: 25px 100px;
+  margin-left: 150px;
+  font-size: 20px;
   color: $primary-color-noir;
 
   dt {
@@ -79,8 +82,9 @@ body {
   padding: 10px 20px;
   border-radius: $border-radius-primary;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 20px;
   cursor: pointer;
+  margin-top: 10px;
 
   &--primary {
     background: $primary-color-bronze;
