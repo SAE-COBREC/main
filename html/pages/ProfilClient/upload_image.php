@@ -56,9 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     
     // Créer le nom de fichier basé sur l'ID client
     // Format: Photo_de_profil_[id_client].extension
-    $filename = "Photo_de_profil_id-" . $idClient . "." . $extension;
+    $filename = "Photo_de_profil_" . $idClient . "." . $extension;
     
     // Définir le répertoire de destination (chemin absolu depuis la racine du projet)
+    // On remonte de 2 niveaux depuis /pages/ProfilClient/
     $uploadDir = __DIR__ . '/../../img/clients/';
     
     // Créer le répertoire s'il n'existe pas
@@ -72,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $uploadPath = $uploadDir . $filename;
     
     // Supprimer l'ancienne image si elle existe avec un nom différent (autre extension)
-    $pattern = $uploadDir . 'Photo_de_profil_id-' . $idClient . '.*';
+    $pattern = $uploadDir . 'Photo_de_profil_' . $idClient . '.*';
     foreach (glob($pattern) as $oldFile) {
         if ($oldFile !== $uploadPath && is_file($oldFile)) {
             unlink($oldFile);
@@ -81,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     
     // Déplacer le fichier uploadé
     if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-        // Retourner le chemin relatif pour la base de données
+        // IMPORTANT : Retourner le chemin depuis la RACINE WEB avec un slash au début
         $relativePath = '/img/clients/' . $filename;
         echo json_encode([
             'success' => true,
