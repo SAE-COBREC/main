@@ -289,7 +289,7 @@ function mettreAJourProfilCompletClient(
 
         return ['success' => true, 'message' => "Profil mis à jour avec succès."];
     } catch (Exception $erreurException) {
-        return ['success' => false, 'message' => "Erreur lors de la mise à jour : " . $erreurException->getMessage()];
+        return ['success' => false, 'message' => "Erreur lors de la mise à jour" ];//. $erreurException->getMessage()];
     }
 }
 
@@ -338,7 +338,7 @@ function modifierMotDePasseCompte(
     } catch (Exception $erreurException) {
         return [
             'success' => false,
-            'message' => "Erreur lors du changement de mot de passe : " . $erreurException->getMessage()
+            'message' => "Erreur lors du changement de mot de passe"// . $erreurException->getMessage()
         ];
     }
 }
@@ -784,21 +784,21 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div>
                                 <label>
                                     <span>Mot de passe actuel</span>
-                                    <input type="password" name="current_password" placeholder="••••••••" required>
+                                    <input type="password" name="current_password" required>
                                 </label>
                             </div>
 
                             <div>
                                 <label>
                                     <span>Nouveau mot de passe</span>
-                                    <input type="password" name="new_password" placeholder="••••••••" required>
+                                    <input type="password" name="new_password" required>
                                 </label>
                             </div>
 
                             <div>
                                 <label>
                                     <span>Confirmer le mot de passe</span>
-                                    <input type="password" name="confirm_password" placeholder="••••••••" required>
+                                    <input type="password" name="confirm_password" required>
                                 </label>
                             </div>
 
