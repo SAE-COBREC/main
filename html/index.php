@@ -98,7 +98,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
 
-        // normaliser la quantité demandée
+        //normaliser la quantité demandée
         $quantite = (int) $quantite;
         if ($quantite < 1) {
             $quantite = 1;
@@ -127,7 +127,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
             return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
         }
 
-        // quantité réellement ajoutée (ne dépasse pas le disponible)
+        //quantité réellement ajoutée (ne dépasse pas le disponible)
         $aAjouter = min($quantite, $disponible);
 
         if ($existe) {
