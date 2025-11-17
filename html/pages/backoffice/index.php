@@ -122,7 +122,7 @@
                 <td class="products-table__cell">
                   <div class="product">
                     <div class="product__image">
-                      <img src="<?php echo htmlspecialchars($article['image_url']); ?>" width="50" height="50" alt="<?php echo htmlspecialchars($article['nom_article']); ?>">
+                      <img src="<?php echo htmlspecialchars($article['image_url']); ?>" width="50" height="50">
                     </div>
                     <div class="product__info">
                       <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
