@@ -23,14 +23,7 @@ CREATE TABLE cobrec1._compte (
     etat_A2F boolean DEFAULT FALSE,
     CONSTRAINT verif_compte_email CHECK (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
     CONSTRAINT verif_compte_num_telephone CHECK (num_telephone ~ '^(0|\+33|0033)[1-9][0-9]{8}$'),
-    -- The original constraint enforced complexity on the stored value (8-16 chars,
-    -- must contain upper, lower, digit and special). That breaks when we store
-    -- a bcrypt hash (stored length ~60). Accept either a raw-compliant password
-    -- OR a bcrypt-style hash. The bcrypt pattern allows $2a/$2b/$2y prefixes.
-    CONSTRAINT verif_compte_mdp CHECK (
-        mdp ~ '^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$'
-        OR mdp ~ '^\$2[aby]\$[0-9]{2}\$[A-Za-z0-9./]{53}$'
-    )
+    CONSTRAINT verif_compte_mdp CHECK (mdp ~ '^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$')
 );
 
 ALTER TABLE ONLY cobrec1._compte
@@ -710,7 +703,7 @@ INSERT INTO _TVA (montant_TVA, libelle_TVA) VALUES
 -- 9. RÉDUCTIONS (futures)
 INSERT INTO _reduction (reduction_pourcentage, reduction_debut, reduction_fin) VALUES
 (10.00, '2025-12-01 00:00:00', '2025-12-31 23:59:59'),
-(15.00, '2025-11-15 00:00:00', '2025-11-30 23:59:59'),
+(15.00, '2025-11-18 00:00:00', '2025-11-30 23:59:59'),
 (20.00, '2026-01-01 00:00:00', '2026-01-15 23:59:59'),
 (25.00, '2025-12-20 00:00:00', '2025-12-26 23:59:59'),
 (30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59'),
