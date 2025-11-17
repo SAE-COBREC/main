@@ -2,8 +2,7 @@
 session_start();
 include '../../../selectBDD.php'; 
 
-//$compte_id = $_SESSION['compte_id'];
-$compte_id = 2;
+$compte_id = $_SESSION['vendeur_id'];
 
 try {
      $query = "

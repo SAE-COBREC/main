@@ -7,7 +7,7 @@
       </div>
 
       <nav class="nav">
-        <a href="/pages/backoffice/index.php" class="nav__item nav__item--active">
+        <a href="/pages/backoffice/index.php" class="nav__item">
           <img class="nav__icon" src="/img/svg/home.svg" alt="home">
           <span class="nav__label">Accueil</span>
         </a>
@@ -45,27 +45,20 @@
       <script>
       const navItems = document.querySelectorAll(".nav__item");
 
+      // Récupère le chemin actuel, ex : "/pages/backoffice/index.php"
+      const currentPath = window.location.pathname;
+
+      // Parcourt les liens du menu
       navItems.forEach(item => {
-        item.addEventListener("click", () => {
-          const link = item.getAttribute("href");
+        const link = item.getAttribute("href");
 
-          localStorage.setItem("activeLink", link);
-        });
-      });
-
-      window.addEventListener("DOMContentLoaded", () => {
-        const activeLink = localStorage.getItem("activeLink");
-
-        if (!activeLink) return;
-
-        navItems.forEach(item => {
+        // Si le href est égal au pathname → c’est la page actuelle
+        if (link === currentPath) {
+          item.classList.add("nav__item--active");
+        } else {
           item.classList.remove("nav__item--active");
-
-          if (item.getAttribute("href") === activeLink) {
-            item.classList.add("nav__item--active");
-          }
-        });
-      });
+        }
+      }); 
       </script>
       <button class="preview-btn">Tout Prévisualiser</button>
     </aside>
