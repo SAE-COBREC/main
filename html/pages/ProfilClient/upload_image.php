@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     
     // Créer le nom de fichier basé sur l'ID client
     // Format: Photo_de_profil_[id_client].extension
-    $filename = "Photo_de_profil_" . $idClient . "." . $extension;
+    $filename = "Photo_de_profil_id_" . $idClient . "." . $extension;
     
     // Définir le répertoire de destination (chemin absolu depuis la racine du projet)
     // On remonte de 2 niveaux depuis /pages/ProfilClient/
