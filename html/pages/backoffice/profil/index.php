@@ -6,7 +6,8 @@ $compte_id = $_SESSION['vendeur_id'];
 
 try {
      $query = "
-        SELECT 
+        SELECT
+          v.denomination AS pseudo,
             v.raison_sociale AS rsociale,
             v.siren AS siren,
             c.email AS email,
@@ -18,6 +19,8 @@ try {
         FROM cobrec1._compte c
         LEFT JOIN cobrec1._vendeur v ON c.id_compte = v.id_compte
         LEFT JOIN cobrec1._adresse a ON v.id_compte = a.id_compte
+        LEFT JOIN cobrec1._represente_compte r ON c.id_compte = r.id_compte
+        LEFT JOIN cobrec1._image i ON r.id_image = i.id_image  
         WHERE c.id_compte = :id_compte
     ";
 
@@ -55,7 +58,11 @@ function safe($array, $key, $default = "NULL") {
 
       <div class="profil-card">
         <h2 class="profil-card__title">Informations du compte</h2>
+        <div class="profil-photo">
+          <img src="<?php echo htmlspecialchars($vendeur['photo']); ?>" alt="Photo du vendeur">
+        </div>
         <dl class="profil-details">
+          <dt>Pseudo</dt><dd><?= safe($vendeur, 'pseudo'); ?></dd>
           <dt>Raison sociale</dt><dd><?= safe($vendeur, 'rsociale'); ?></dd>
           <dt>Numéro de SIREN</dt><dd><?= safe($vendeur, 'siren'); ?></dd>
           <dt>Email</dt><dd><?= safe($vendeur, 'email'); ?></dd>

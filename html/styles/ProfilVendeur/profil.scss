@@ -95,4 +95,23 @@ body {
       background: rgba($secondary-color-bronze-clair, 0.9);
     }
   }
+
+  .profil-photo {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 25px auto;
+  border: 3px solid $primary-color-bronze;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
 }
