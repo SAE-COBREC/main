@@ -479,7 +479,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
 }
 
 .site-header {
-  grid-column: 1/-1;
+  grid-column: 1 / -1;
   background-color: #FFFFFF;
   color: #030212;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
@@ -491,16 +491,17 @@ main section:nth-of-type(4) article input[type=password]:focus {
   height: 72px;
   border-bottom: 1px solid #EFEFEF;
   margin-bottom: 10px;
-}
-.site-header .header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  height: 72px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  box-sizing: border-box;
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
 }
 
 .logo-container {
@@ -511,8 +512,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
 }
 
 .logo {
-  -o-object-fit: contain;
-     object-fit: contain;
+  object-fit: contain;
   height: 40px;
 }
 
@@ -545,20 +545,15 @@ main section:nth-of-type(4) article input[type=password]:focus {
   padding: 8px 12px;
   box-sizing: border-box;
   margin-right: 8px;
-}
-.search-form .search-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 14px;
-  color: #030212;
-}
-.search-form .search-input::-moz-placeholder {
-  color: #7171A3;
-}
-.search-form .search-input::placeholder {
-  color: #7171A3;
+
+  .search-input {
+    &::-webkit-input-placeholder,
+    &::-moz-placeholder,
+    &:-ms-input-placeholder,
+    &::placeholder {
+      color: #7171A3;
+    }
+  }
 }
 
 .loupe-icon {
@@ -575,19 +570,29 @@ main section:nth-of-type(4) article input[type=password]:focus {
   cursor: pointer;
 }
 
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #030212;
+}
+
 .icons-container {
   display: flex;
   align-items: center;
   gap: 3em;
   min-width: 120px;
   justify-content: flex-end;
-}
-.icons-container img {
-  width: 35px;
+
+  img {
+    width: 35px;
+  }
 }
 
 .icon-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -596,6 +601,30 @@ main section:nth-of-type(4) article input[type=password]:focus {
   color: #030212;
   text-decoration: none;
   font-size: 18px;
+}
+
+@media screen and (max-width: 900px) {
+  .brand-name {
+    display: none;
+  }
+
+  .search-container {
+    padding: 0 8px;
+  }
+
+  .search-form {
+    max-width: 480px;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .search-container {
+    display: none;
+  }
+
+  .icons-container {
+    gap: 10px;
+  }
 }
 
 footer {
