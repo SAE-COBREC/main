@@ -46,6 +46,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1440, height=1024" />
   <title>Alizon - Page Accueil Vendeur</title>
+  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
   <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
 <body>

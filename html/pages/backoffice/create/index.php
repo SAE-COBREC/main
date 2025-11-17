@@ -154,6 +154,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="../../../../styles/creerArticle/creerArticle.css" media="screen">
     <title>Ébauche de produit</title>
+    <link rel="icon" type="image/png" href="../../../img/favicon.svg">
 </head>
 <pre>
 <?php
