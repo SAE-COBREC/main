@@ -6,12 +6,13 @@
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
-        SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite
+        SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite, montant_tva
         FROM _contient
         JOIN _produit ON _produit.id_produit = _contient.id_produit
         JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
         JOIN _image ON _represente_produit.id_image = _image.id_image
         JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
+        JOIN _tva ON _produit.id_tva = _tva.id_tva 
         WHERE id_client = :id_client
         AND _panier_commande.id_panier = :id_panier;
     ";
@@ -53,7 +54,8 @@
                 <!--UN ARTICLE DANS LE PANIER-->
                 <?php foreach ($articles as $article): ?> 
                     <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
-                                                data-stock="<?php echo intval($article['p_stock'])?>">
+                                                data-stock="<?php echo intval($article['p_stock'])?>"
+                                                data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                         <div class="imageArticleP">
                             <img src="<?php echo htmlspecialchars($article['i_lien']) ?>"
                                 alt="<?php echo htmlspecialchars($article['p_nom']) ?>" 
@@ -89,7 +91,7 @@
                     <div id="listeProduits"></div> <!--es tremplit avec le js-->
                 </div>
                 <div class="recapTotal">
-                    <h3>Prix total :</h3> <!--es tremplit avec le js-->
+                    <h3>Prix TTC :</h3> <!--es tremplit avec le js-->
                     <h3 class="prixTotal" id="prixTotal"></h3>
                 </div>
                 <button class="finaliserCommande">Finaliser commande</button>
@@ -151,13 +153,14 @@
                     console.log(quantiteEntre);
                     const quantite = parseInt(quantiteEntre.value); //converti en int et récupère la valeur dans l'input
                     const titre = article.querySelector('.articleTitreP').textContent; //récupère le titre pour pouvoir l'affiché dans le récap de la commande
-                    
+                    const tva = parseFloat(article.dataset.tva); //récupère la tva
+
 
                     if (quantite > 0) {
-                        PrixTotal += prix * quantite; 
+                        PrixTotal += (prix * quantite) + (prix * (tva / 100) * quantite); 
                         console.log(PrixTotal);
                         nbArticles += quantite; //pour le nombre de produit total
-                        produitEnHTML += `<p>${titre} <span>x${quantite}</span></p>`; //pour ajouter dans le récap
+                        produitEnHTML += `<p>${titre} <span>x${quantite}</span>, tva: <span>${tva}</span>%</p>`; //pour ajouter dans le récap
                     }
                 });
                 
