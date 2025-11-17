@@ -204,7 +204,7 @@
                     }
                 });
                 
-                formSupp.addEventListener('submit', (event) => {
+                formSupp.addEventListener('submit', (event) => { //si le client annule la suppression dans le panier
                     if (!confirm(`Souhaitez-vous vraiment supprimer l'article du panier ?`)) {
                         event.preventDefault(); //empeche la soumission du formulaire
                     }

@@ -68,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $error_message = ' mail, pseudo ou mot de passe incorrecte.';
         } else {
           //ajout des identifiant a la session
-          $_SESSION['id'] = $clientId;
+
+          $_SESSION['idClient'] = $clientId;
 
           //redirige sur la page d'acceuil
           header('Location: ../../index.php');
