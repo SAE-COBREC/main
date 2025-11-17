@@ -151,15 +151,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
-
+    /**
+     * @description Termine le processus d'inscription en validant le formulaire et en le soumettant si toutes les validations sont réussies.
+     * @returns {void}
+     */
 
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');
       var form = document.getElementById('multiForm');
-      if (!form) return;
+      if (!form) return; // Ne fini le formulaire que si il existe
       if (!form.checkValidity()) {
+        // Ne termine l'inscription que si le formulaire est valide (Tout les champs sont correctement remplis)
         var invalid = form.querySelector(':invalid');
         if (invalid) {
+          // Trouve la carte parente de l'élément invalide
           var card = invalid.closest('.card');
           var cards = Array.from(document.querySelectorAll('.card'));
           var idx = card ? cards.indexOf(card) : 0;
@@ -168,27 +173,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           var message = getFieldValidationMessage(invalid);
           try { invalid.setCustomValidity(message); } catch (e) {}
           if (errDiv) {
+            // Affiche le message d'erreur dans la carte parente
             errDiv.textContent = message;
             errDiv.classList.remove('hidden');
           } else {
-            alert(message);
+            // Fallback: popup d'erreur standard
+            if (window.showError) {
+              showError('Champ invalide', message);
+            } else {
+              alert(message);
+            }
           }
-          invalid.focus();
+          invalid.focus(); // Met le focus sur le champ invalide
         }
         return;
       }
-      try {
+      try { // Soumet le formulaire
         window.__allow_submit = true;
-        try { window.__submission_confirmed = false; } catch (e) {}
+        try { window.__submission_confirmed = false; } catch (e) {} // Réinitialise le suivi de soumission
         console.log('[register] calling requestSubmit (or form.submit fallback)');
         if (typeof form.requestSubmit === 'function') {
-          form.requestSubmit();
+          form.requestSubmit(); // Préférer requestSubmit pour déclencher les événements de soumission
         } else {
-          form.submit();
+          form.submit(); // Fallback si requestSubmit n'est pas disponible
         }
-        setTimeout(function () {
+        setTimeout(function () { // Fallback en cas d'absence d'événement de soumission
           try {
-            if (!window.__submission_confirmed) {
+            if (!window.__submission_confirmed) { // Vérifie si la soumission a été confirmée
               console.warn('[register] no submit event detected within timeout — using fallback form.submit()');
               window.__allow_submit = true;
               form.submit();

@@ -72,7 +72,8 @@ CREATE TABLE cobrec1._client (
     c_pseudo varchar(100),
     c_nb_produits_achetes integer DEFAULT 0,
     c_depense_totale double precision DEFAULT 0.0,
-    c_cloture boolean DEFAULT FALSE
+    c_cloture boolean DEFAULT FALSE,
+    c_datenaissance date NOT NULL
 );
 
 ALTER TABLE ONLY cobrec1._client
