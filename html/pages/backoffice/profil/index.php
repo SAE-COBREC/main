@@ -7,6 +7,7 @@ if (!isset($_SESSION['vendeur_id'])) {
 }
 
 $compte_id = $_SESSION['vendeur_id'];
+$_SESSION['creerArticle'] = [];
 
 
 // -----------------------
