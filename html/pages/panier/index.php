@@ -2,7 +2,7 @@
     include '../../selectBDD.php';
 
     session_start();
-    $id_client = $_SESSION['id'];
+    $id_client = $_SESSION['idClient'];
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
