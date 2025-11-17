@@ -12,7 +12,6 @@ body main {
 }
 body main form > input {
   position: relative;
-  left: 49%;
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 700;
