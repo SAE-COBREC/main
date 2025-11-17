@@ -34,8 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([':email' => $email]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    //verification que l'aresse mail existe dans la bdd
     if (!$row) {
+      
+      $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte JOIN _client ON c_pseudo = :pseudo");
+      $stmt->execute([':pseudo' => $email]);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
       $hasError = true;
       $error_card = 1;
       $error_message = 'Adresse mail ou mot de passe incorrecte.';
@@ -65,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           //ajout des identifiant a la session
           $_SESSION['id'] = $clientId;
-          $_SESSION['compte_id'] = $compteId;
           
           //redirige sur la page d'acceuil
           header('Location: ../../index.php');
