@@ -312,8 +312,6 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    
-    
 </head>
 
 <body>
@@ -396,6 +394,9 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                                 <input type="file" id="file-input" accept="image/*" style="display: none;">
                             </div>
                             
+                            <div id="preview-zone"></div>
+                            <div id="upload-status" class="upload-status"></div>
+
                             <!-- Champ caché pour stocker le chemin de l'image -->
                             <input type="hidden" name="lien_image" id="lien_image" value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>">
 
