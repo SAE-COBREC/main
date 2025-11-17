@@ -5,7 +5,8 @@ $pageError = false;
 $produit = null;
 
 // Harmonisation avec la page d'accueil: gestion du panier en session
-$idClient = isset($_SESSION['idClient']) ? (int) $_SESSION['idClient'] : null;
+// Supporte les deux clés possibles 'idClient' (utilisée sur index) et 'id'
+$idClient = isset($_SESSION['idClient']) ? (int) $_SESSION['idClient'] : (isset($_SESSION['id']) ? (int) $_SESSION['id'] : null);
 if ($idClient) {
     // récupérer le panier courant (non commandé)
     try {
@@ -113,7 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
                 exit;
             }
             // Vérification achat du produit (commande validée)
-            $stmtVerifAchat = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
+            // Condition renforcée: panier commandé + facture + paiement
+            $stmtVerifAchat = $pdo->prepare("SELECT 1 FROM _contient c \n+                JOIN _panier_commande pc ON c.id_panier = pc.id_panier\n+                JOIN _facture f ON f.id_panier = pc.id_panier\n+                JOIN _paiement pa ON pa.id_facture = f.id_facture\n+                WHERE pc.id_client = :cid AND c.id_produit = :pid LIMIT 1");
             $stmtVerifAchat->execute([':cid' => $idClient, ':pid' => $id_produit_post]);
             $aAchete = (bool) $stmtVerifAchat->fetchColumn();
             if (!$aAchete) {
@@ -294,60 +296,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
 // -> Demande utilisateur: la page produit doit aussi gérer directement l'ajout en BDD.
 
 //fonction pour ajouter un article au panier dans la BDD (identique à index.php)
-function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
+function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 {
     try {
-        $sqlProduit = "SELECT p.p_prix, p.p_frais_de_port, p.p_stock, COALESCE(t.montant_tva,0) AS tva, COALESCE(r.reduction_pourcentage,0) AS pourcentage_reduction
-                       FROM _produit p
-                       LEFT JOIN _tva t ON p.id_tva = t.id_tva
-                       LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-                       LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
-                       WHERE p.id_produit = :idProduit";
+        $sqlProduit = "SELECT 
+                p.p_prix, 
+                p.p_frais_de_port, 
+                p.p_stock,
+                COALESCE(t.montant_tva, 0) as tva,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
+            FROM _produit p
+            LEFT JOIN _tva t ON p.id_tva = t.id_tva
+            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            WHERE p.id_produit = :idProduit";
         $stmtProduit = $pdo->prepare($sqlProduit);
         $stmtProduit->execute([':idProduit' => $idProduit]);
-        $produit = $stmtProduit->fetch(PDO::FETCH_ASSOC);
-        if (!$produit) {
+        $produitCourant = $stmtProduit->fetch(PDO::FETCH_ASSOC);
+
+        if (!$produitCourant) {
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
-        $quantite = max(1, (int) $quantite);
-        $prixUnitaire = $produit['p_prix'];
-        $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
-        $fraisDePort = $produit['p_frais_de_port'];
-        $tva = $produit['tva'];
-        $stock = (int) ($produit['p_stock'] ?? 0);
 
-        $stmtCheck = $pdo->prepare("SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier");
-        $stmtCheck->execute([':idProduit' => $idProduit, ':idPanier' => $idPanier]);
+        $quantite = (int) $quantite;
+        if ($quantite < 1) $quantite = 1;
+
+        $prixUnitaire = $produitCourant['p_prix'];
+        $remiseUnitaire = ($produitCourant['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $fraisDePort = $produitCourant['p_frais_de_port'];
+        $tva = $produitCourant['tva'];
+        $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
+
+        $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
+        $stmtCheck = $pdo->prepare($sqlCheck);
+        $stmtCheck->execute([':idProduit' => $idProduit, ':idPanier' => $panier]);
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
         $quantiteExistante = $existe ? (int) $existe['quantite'] : 0;
-        $disponible = max(0, $stock - $quantiteExistante);
+        $disponible = max(0, $quantiteEnStock - $quantiteExistante);
+
         if ($disponible <= 0) {
             return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
         }
+
         $aAjouter = min($quantite, $disponible);
+
         if ($existe) {
-            $stmtUpdate = $pdo->prepare("UPDATE _contient SET quantite = quantite + :q WHERE id_produit = :idProduit AND id_panier = :idPanier");
-            $stmtUpdate->execute([':q' => $aAjouter, ':idProduit' => $idProduit, ':idPanier' => $idPanier]);
+            $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
+            $stmtUpdate = $pdo->prepare($sqlUpdate);
+            $stmtUpdate->execute([
+                ':quantite' => $aAjouter,
+                ':idProduit' => $idProduit,
+                ':idPanier' => $panier
+            ]);
             if ($aAjouter < $quantite) {
-                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ajoutés (stock limité).'];
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
             }
-            return ['success' => true, 'message' => 'Quantité mise à jour'];
+            return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
         }
-        $stmtInsert = $pdo->prepare("INSERT INTO _contient (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) VALUES (:idProduit, :idPanier, :q, :pu, :ru, :fdp, :tva)");
+
+        $sqlInsert = "INSERT INTO _contient (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) VALUES (:idProduit, :idPanier, :quantite, :prixUnitaire, :remiseUnitaire, :fraisDePort, :tva)";
+        $stmtInsert = $pdo->prepare($sqlInsert);
         $stmtInsert->execute([
             ':idProduit' => $idProduit,
-            ':idPanier' => $idPanier,
-            ':q' => $aAjouter,
-            ':pu' => $prixUnitaire,
-            ':ru' => $remiseUnitaire,
-            ':fdp' => $fraisDePort,
+            ':idPanier' => $panier,
+            ':quantite' => $aAjouter,
+            ':prixUnitaire' => $prixUnitaire,
+            ':remiseUnitaire' => $remiseUnitaire,
+            ':fraisDePort' => $fraisDePort,
             ':tva' => $tva
         ]);
         if ($aAjouter < $quantite) {
-            return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ajoutés (stock limité).'];
+            return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
         }
         return ['success' => true, 'message' => 'Article ajouté au panier'];
-    } catch (Throwable $e) {
+    } catch (Exception $e) {
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
@@ -384,7 +406,7 @@ $clientConnecte = (bool)$idClient;
 $clientAachete = false;
 if ($clientConnecte) {
     try {
-        $stmtVerifAchatDisplay = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
+        $stmtVerifAchatDisplay = $pdo->prepare("SELECT 1 FROM _contient c \n+            JOIN _panier_commande pc ON c.id_panier = pc.id_panier\n+            JOIN _facture f ON f.id_panier = pc.id_panier\n+            JOIN _paiement pa ON pa.id_facture = f.id_facture\n+            WHERE pc.id_client = :cid AND c.id_produit = :pid LIMIT 1");
         $stmtVerifAchatDisplay->execute([':cid' => $idClient, ':pid' => $idProduit]);
         $clientAachete = (bool)$stmtVerifAchatDisplay->fetchColumn();
     } catch (Throwable $e) { $clientAachete = false; }
@@ -497,13 +519,17 @@ $noteEntiere = (int)floor($note);
                 <div class="title"><?= htmlspecialchars($produit['p_nom']) ?></div>
                 <div class="rating">
                     <span class="stars" id="summaryStars" aria-hidden="true">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <?php if ($i <= $noteEntiere): ?>
+                        <?php
+                        $hasHalfSummary = ($note - $noteEntiere) >= 0.5 && $noteEntiere < 5;
+                        for ($i = 1; $i <= 5; $i++):
+                            if ($i <= $noteEntiere): ?>
                                 <img src="/img/svg/star-full.svg" alt="Etoile" width="20">
+                            <?php elseif ($hasHalfSummary && $i === $noteEntiere + 1): ?>
+                                <img src="/img/svg/star-alf.svg" alt="Demi-étoile" width="20">
                             <?php else: ?>
-                                <img src="/img/svg/star-empty.svg" alt="Etoile" width="20">
-                            <?php endif; ?>
-                        <?php endfor; ?>
+                                <img src="/img/svg/star-empty.svg" alt="Etoile vide" width="20">
+                            <?php endif;
+                        endfor; ?>
                     </span>
                     <span id="summaryRatingValue"
                         style="color:var(--muted);font-weight:600"><?= number_format($note, 1) ?></span>
@@ -547,6 +573,7 @@ $noteEntiere = (int)floor($note);
                         <li>Catégorie : <?= htmlspecialchars($firstCategory) ?></li>
                         <li>Référence : #<?= $produit['id_produit'] ?></li>
                         <li>Statut : <?= htmlspecialchars($produit['p_statut']) ?></li>
+                        <li>Made in <?= htmlspecialchars($produit['p_pays_origine'] ?? 'Inconnu') ?></li>
                     </ul>
                 </div>
 
@@ -586,10 +613,15 @@ $noteEntiere = (int)floor($note);
                     <div>
                         <div class="stars" id="reviewsStars">
                             <?php
-                            // Rendu visuel des étoiles : plein / vide (pas de demi asset disponible)
+                            $hasHalfReviews = ($note - $noteEntiere) >= 0.5 && $noteEntiere < 5;
                             for ($i = 1; $i <= 5; $i++) {
-                                $src = $i <= $noteEntiere ? '/img/svg/star-full.svg' : '/img/svg/star-empty.svg';
-                                echo '<img src="' . $src . '" alt="Etoile" width="16">';
+                                if ($i <= $noteEntiere) {
+                                    echo '<img src="/img/svg/star-full.svg" alt="Etoile" width="16">';
+                                } elseif ($hasHalfReviews && $i === $noteEntiere + 1) {
+                                    echo '<img src="/img/svg/star-alf.svg" alt="Demi-étoile" width="16">';
+                                } else {
+                                    echo '<img src="/img/svg/star-empty.svg" alt="Etoile vide" width="16">';
+                                }
                             }
                             ?>
                         </div>
@@ -658,6 +690,7 @@ $noteEntiere = (int)floor($note);
                         <?php
                         $avisNote = isset($ta['avis_note']) ? (float) $ta['avis_note'] : 0.0;
                         $avisNoteEntiere = (int) floor($avisNote);
+                        $avisHasHalf = ($avisNote - $avisNoteEntiere) >= 0.5 && $avisNoteEntiere < 5;
                         ?>
                         <div class="review" data-avis-id="<?= (int) $ta['id_avis'] ?>" style="margin-bottom:12px;">
                             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
@@ -672,8 +705,10 @@ $noteEntiere = (int)floor($note);
                                             <?php for ($i = 1; $i <= 5; $i++): ?>
                                                 <?php if ($i <= $avisNoteEntiere): ?>
                                                     <img src="/img/svg/star-full.svg" alt="Etoile" width="16">
+                                                <?php elseif ($avisHasHalf && $i === $avisNoteEntiere + 1): ?>
+                                                    <img src="/img/svg/star-alf.svg" alt="Demi-étoile" width="16">
                                                 <?php else: ?>
-                                                    <img src="/img/svg/star-empty.svg" alt="Etoile" width="16">
+                                                    <img src="/img/svg/star-empty.svg" alt="Etoile vide" width="16">
                                                 <?php endif; ?>
                                             <?php endfor; ?>
                                         </span>
@@ -735,6 +770,29 @@ $noteEntiere = (int)floor($note);
                 throw new Error('Réponse non JSON (' + resp.status + '): ' + text.slice(0, 300));
             }
             return resp.json();
+        }
+
+        // Helpers étoiles: support plein / demi / vide
+        function generateStarsHtml(value, size, fullSvg = '/img/svg/star-full.svg', halfSvg = '/img/svg/star-alf.svg', emptySvg = '/img/svg/star-empty.svg') {
+            const v = isNaN(value) ? 0 : Math.max(0, Math.min(5, Number(value)));
+            const full = Math.floor(v);
+            const hasHalf = (v - full) >= 0.5 && full < 5;
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= full) {
+                    html += '<img src="' + fullSvg + '" alt="Etoile" width="' + size + '">';
+                } else if (hasHalf && i === full + 1) {
+                    html += '<img src="' + halfSvg + '" alt="Demi-étoile" width="' + size + '">';
+                } else {
+                    html += '<img src="' + emptySvg + '" alt="Etoile vide" width="' + size + '">';
+                }
+            }
+            return html;
+        }
+
+        function renderStars(targetEl, value, size, fullSvg = '/img/svg/star-full.svg', halfSvg = '/img/svg/star-alf.svg', emptySvg = '/img/svg/star-empty.svg') {
+            if (!targetEl) return;
+            targetEl.innerHTML = generateStarsHtml(value, size, fullSvg, halfSvg, emptySvg);
         }
         document.addEventListener('DOMContentLoaded', function () {
             const dec = document.getElementById('qty-decrease');
@@ -900,17 +958,8 @@ $noteEntiere = (int)floor($note);
                 if (summaryCount) summaryCount.textContent = '(' + countAvis + ')';
                 if (reviewsValue) reviewsValue.textContent = avg.toFixed(1);
                 if (reviewsCount) reviewsCount.textContent = 'Basé sur ' + countAvis + ' avis';
-                const fullCount = Math.floor(avg);
-                function renderStars(target, fullSvg, emptySvg) {
-                    if (!target) return;
-                    let html = '';
-                    for (let i = 1; i <= 5; i++) {
-                        html += '<img src="' + (i <= fullCount ? fullSvg : emptySvg) + '" alt="Etoile" width="' + (target.id === 'summaryStars' ? '20' : '16') + '">';
-                    }
-                    target.innerHTML = html;
-                }
-                renderStars(summaryStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
-                renderStars(reviewsStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
+                renderStars(summaryStars, avg, 20, '/img/svg/star-full.svg', '/img/svg/star-alf.svg', '/img/svg/star-empty.svg');
+                renderStars(reviewsStars, avg, 16, '/img/svg/star-full.svg', '/img/svg/star-alf.svg', '/img/svg/star-empty.svg');
             }).catch(() => { /* silencieux */ });
         }
 
@@ -971,8 +1020,7 @@ $noteEntiere = (int)floor($note);
                         const safeComment = escapeHtml(commentaire);
                         const when = data.created_at_fmt || data.created_at || new Date().toISOString();
                         const note = typeof data.note !== 'undefined' ? (parseFloat(data.note) || 0) : selectedNote;
-                        const fullCount = Math.floor(note);
-                        const starImgs = Array.from({ length: 5 }).map((_, i) => i < fullCount ? '<img src=\"/img/svg/star-full.svg\" alt=\"Etoile\" width=\"16\">' : '<img src=\"/img/svg/star-empty.svg\" alt=\"Etoile\" width=\"16\">').join('');
+                        const starImgs = generateStarsHtml(note, 16, '/img/svg/star-full.svg', '/img/svg/star-alf.svg', '/img/svg/star-empty.svg');
                         const newHtml = `<div class=\"review\" data-avis-id=\"${data.id_avis}\" style=\"margin-bottom:12px;\">\n                            <div style=\"display:flex;align-items:center;gap:12px;margin-bottom:8px\">\n                                <div style=\"width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)\">U</div>\n                                <div>\n                                    <div style=\"font-weight:700\">Utilisateur</div>\n                                    <div style=\"color:var(--muted);font-size:13px\">Avis</div>\n                                    <div style=\"display:flex;align-items:center;gap:6px;margin-top:4px\">\n                                        <span class=\"stars\" aria-hidden=\"true\">${starImgs}</span>\n                                        <span style=\"color:var(--muted);font-weight:600;\">${note.toFixed(1)}</span>\n                                    </div>\n                                </div>\n                            </div>\n                            <div class=\"review-content\" style=\"color:var(--muted)\">${safeComment}</div>\n                            <div class=\"review-votes\" style=\"display:flex;align-items:center;gap:10px;margin-top:8px\">\n                                <button class=\"ghost btn-vote\" data-type=\"plus\" aria-label=\"Vote plus\" aria-pressed=\"false\"><img src=\"/img/svg/plus.svg\" alt=\"Plus\" width=\"16\" height=\"16\"> <span class=\"like-count\">0</span></button>\n                                <button class=\"ghost btn-vote\" data-type=\"minus\" aria-label=\"Vote moins\" aria-pressed=\"false\"><img src=\"/img/svg/minus.svg\" alt=\"Moins\" width=\"16\" height=\"16\"> <span class=\"dislike-count\">0</span></button>\n                                <span style=\"font-size:12px;color:#888;margin-left:auto;\">${when}</span>\n                                <button class=\"ghost btn-edit-review\" style=\"margin-left:8px;font-size:12px;padding:4px 8px;\">Modifier</button>\n                                <button class=\"ghost btn-delete-review\" style=\"margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;\">Supprimer</button>\n                            </div>\n                        </div>`;
 
                         // Si liste vide (paragraphe "Aucun avis"), remplacer; sinon prepend
@@ -1002,17 +1050,8 @@ $noteEntiere = (int)floor($note);
                             if (summaryCount) summaryCount.textContent = '(' + count + ')';
                             if (reviewsValue) reviewsValue.textContent = avg.toFixed(1);
                             if (reviewsCount) reviewsCount.textContent = 'Basé sur ' + count + ' avis';
-                            const fullCount = Math.floor(avg);
-                            function renderStars(target, fullSvg, emptySvg) {
-                                if (!target) return;
-                                let html = '';
-                                for (let i = 1; i <= 5; i++) {
-                                    html += '<img src="' + (i <= fullCount ? fullSvg : emptySvg) + '" alt="Etoile" width="' + (target.id === 'summaryStars' ? '20' : '16') + '">';
-                                }
-                                target.innerHTML = html;
-                            }
-                            renderStars(summaryStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
-                            renderStars(reviewsStars, '/img/svg/star-full.svg', '/img/svg/star-empty.svg');
+                            renderStars(summaryStars, avg, 20, '/img/svg/star-full.svg', '/img/svg/star-alf.svg', '/img/svg/star-empty.svg');
+                            renderStars(reviewsStars, avg, 16, '/img/svg/star-full.svg', '/img/svg/star-alf.svg', '/img/svg/star-empty.svg');
                         } else {
                             fetchRating(productId); // fallback
                         }
@@ -1203,12 +1242,8 @@ $noteEntiere = (int)floor($note);
                             if (typeof data.note !== 'undefined') {
                                 const starsSpan = reviewEl.querySelector('.stars');
                                 if (starsSpan) {
-                                    const fullCount = Math.floor(parseFloat(data.note) || 0);
-                                    let html = '';
-                                    for (let i = 1; i <= 5; i++) {
-                                        html += '<img src="' + (i <= fullCount ? starFull : starEmpty) + '" alt="Etoile" width="16">';
-                                    }
-                                    starsSpan.innerHTML = html;
+                                    const avgVal = parseFloat(data.note) || 0;
+                                    starsSpan.innerHTML = generateStarsHtml(avgVal, 16, starFull, '/img/svg/star-alf.svg', starEmpty);
                                 }
                             }
                             fetchRating(productId); // Recalcul global
