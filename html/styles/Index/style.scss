@@ -1,11 +1,5 @@
-// =============================================
-// IMPORTS ET VARIABLES
-// =============================================
 @use "../variable" as *;
 
-// =============================================
-// MIXINS
-// =============================================
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -45,9 +39,6 @@
   transform: translate(-50%, -50%);
 }
 
-// =============================================
-// RÉINITIALISATION ET STYLES DE BASE
-// =============================================
 * {
   margin: 0;
   padding: 0;
@@ -63,9 +54,6 @@ body {
   min-height: 100vh;
 }
 
-// =============================================
-// LAYOUT PRINCIPAL
-// =============================================
 .container {
   grid-column: 1 / -1;
   display: grid;
@@ -74,9 +62,6 @@ body {
   position: relative;
 }
 
-// =============================================
-// COMPOSANT ASIDE (FILTRES)
-// =============================================
 aside {
   background: $primary-color-blanc;
   padding: 1.5rem;
@@ -211,9 +196,6 @@ aside {
   }
 }
 
-// =============================================
-// COMPOSANT MAIN (PRODUITS)
-// =============================================
 main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
@@ -233,9 +215,6 @@ main {
   }
 }
 
-// =============================================
-// COMPOSANT ARTICLE (CARTE PRODUIT)
-// =============================================
 article {
   background: $primary-color-blanc;
   border-radius: 12px;
@@ -369,9 +348,6 @@ article {
   }
 }
 
-// =============================================
-// COMPOSANT FOOTER
-// =============================================
 footer {
   grid-column: 1 / -1;
   background: $primary-color-noir;
@@ -464,10 +440,6 @@ footer {
     }
   }
 }
-
-// =============================================
-// RESPONSIVE DESIGN
-// =============================================
 
 // Tablette et desktop moyen
 @media (min-width: 429px) and (max-width: 1440px) {

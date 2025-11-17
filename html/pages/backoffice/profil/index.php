@@ -2,7 +2,8 @@
 session_start();
 include '../../../selectBDD.php'; 
 
-$compte_id = $_SESSION['compte_id'];
+//$compte_id = $_SESSION['compte_id'];
+$compte_id = 2;
 
 try {
      $query = "
@@ -41,6 +42,7 @@ function safe($array, $key, $default = "NULL") {
   <meta charset="utf-8">
   <meta name="viewport" content="width=1440, height=1024">
   <title>Profil Vendeur - Alizon</title>
+  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
   <link rel="stylesheet" href="/styles/ProfilVendeur/profil.css">
 </head>
 <body>

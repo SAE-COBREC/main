@@ -1,6 +1,6 @@
-<?php 
+<?php
+//connexion a la bdd 
 include '../../../selectBDD.php';
-
 $pdo->exec("SET search_path TO cobrec1");
 session_start();
  ?>
@@ -10,7 +10,8 @@ session_start();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Créer un compte - Alizon</title>
+  <title>Connexion - Alizon</title>
+  <link rel="icon" type="image/png" href="../../img/favicon.svg">
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
     rel="stylesheet">
@@ -18,101 +19,68 @@ session_start();
 </head>
 
 <?php
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
-    $mdp = $_POST['mdp'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $hasError = false;
-    $error_card = null;
-    $error_message = '';
-    
-    // Récupérer l'entrée correspondant à l'email soumis et vérifier le mot de passe
-    try {
-      $stmt = $pdo->prepare("SELECT * FROM _compte WHERE email = :email LIMIT 1");
-      $stmt->execute([':email' => $email]);
-      $row = $stmt->fetch(PDO::FETCH_ASSOC);
-      if (!$row) {
+  $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
+  $mdp = $_POST['mdp'] ?? '';
+
+  $hasError = false;
+  $error_card = null;
+  $error_message = '';
+
+  try {
+    //récuperation des données de compte
+    $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :email");
+    $stmt->execute([':email' => $email]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    //verification que l'aresse mail existe dans la bdd
+    if (!$row) {
+      $hasError = true;
+      $error_card = 1;
+      $error_message = 'Adresse mail ou mot de passe incorrecte.';
+    } else {
+
+      //verification que le mdp corespondant a ce mail existe
+      if (!($row['mdp'] === $mdp)) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Adresse mail ou mot de passe incorrecte.';
       } else {
-        if (!array_key_exists('mdp', $row)) {
-          error_log('[connexion] error: mdp column not found in _compte row: ' . json_encode(array_keys($row)));
-          $hasError = true;
-          $error_card = 1;
-          $error_message = 'Erreur interne lors de la vérification des identifiants.';
-          $row = null;
+
+        //récuperation des données vendeur
+        $vendeurStmt = $pdo->prepare("SELECT id_vendeur FROM _vendeur WHERE id_compte = :id");
+        $vendeurStmt->execute([':id' => (int)$row['id_compte']]);
+        $vendeur = $vendeurStmt->fetch(PDO::FETCH_ASSOC);
+        if ($vendeur) {
+          $vendeurId = (int)$vendeur['id_vendeur'];
         }
-        $stored = $row['mdp'];
-        $passwordOk = false;
-        if (function_exists('password_verify')) {
-          $passwordOk = password_verify($mdp, $stored);
-        }
-        if (!$passwordOk && $stored === $mdp) {
-          $passwordOk = true;
-        }
-        if (!$passwordOk) {
+
+        //verification que le compte est un compte vendeur
+        if (!$vendeurId) {
           $hasError = true;
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
-          $userId = null;
-          foreach ($row as $colName => $colVal) {
-            if (preg_match('/^id(_|[A-Za-z0-9_])*$/i', $colName) && is_numeric($colVal)) {
-              $userId = (int)$colVal;
-              break;
-            }
-          }
-          if ($userId === null && array_key_exists('id', $row)) {
-            $userId = (int)$row['id'];
-          }
-          if ($userId === null) {
-            error_log('[connexion] warning: no id-like column found in _compte row: ' . json_encode(array_keys($row)));
-          }
-          // Attempt to map compte id -> vendeur id and store vendeur id in session instead
-          $sessionIdToStore = $userId;
-          try {
-            if ($userId !== null) {
-              $candidates = ['id_compte', 'compte_id', 'id_compte_fk', 'fk_id_compte'];
-              $foundVendeur = null;
-              foreach ($candidates as $col) {
-                $q = "SELECT id_vendeur FROM _vendeur WHERE " . $col . " = :cid LIMIT 1";
-                try {
-                  $st2 = $pdo->prepare($q);
-                  $st2->execute([':cid' => $userId]);
-                  $r2 = $st2->fetch(PDO::FETCH_ASSOC);
-                  if ($r2 && isset($r2['id_vendeur'])) { $foundVendeur = (int)$r2['id_vendeur']; break; }
-                } catch (Throwable $t) { }
-              }
-              if ($foundVendeur !== null) {
-                $hasError = true;
-                $error_card = 1;
-                $error_message = 'Adresse mail ou mot de passe incorrecte.';
-              }
-            }
-          } catch (Throwable $t) { }
-          $_SESSION['id'] = $sessionIdToStore;
+
+          //ajout des identifiant a la session
+          $_SESSION['id'] = $vendeurId;
+          $_SESSION['vendeur_id'] = $vendeurId;
+          
+          //redirige sur la page d'acceuil
+          header('Location: ../index.php');
+          exit;
         }
       }
-    } catch (Exception $e) {
-      $hasError = true;
-      $error_card = 1;
-      $error_message = 'Erreur lors de la vérification des identifiants.';
     }
-
-    if (!$hasError) {
-      // Instead of showing a server recap, present a simple link to the backoffice index
-      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);text-align:center;\">";
-      echo "<h2 style=\"margin-top:0;\">Connexion réussie</h2>";
-      echo "<p style=\"margin:18px 0;\">Cliquez pour accéder au backoffice :</p>";
-      echo "<p><a href=\"../index.php\" style=\"display:inline-block;padding:10px 14px;background:#fff;color:#000;border-radius:8px;text-decoration:none;border:1px solid rgba(0,0,0,0.12);\">Aller au backoffice</a></p>";
-      echo "</div>";
-      exit;
-    }
+    //message en cas de probleme de verif dans le code
+  } catch (Exception $e) {
+    $hasError = true;
+    $error_card = 1;
+    $error_message = 'Erreur lors de la vérification des identifiants.';
   }
-
+}
 ?>
-
 <style>
   body {
     background: linear-gradient(to bottom right, #CD7F32, #D4183D);
@@ -135,7 +103,6 @@ session_start();
       color: #CD7F32;
     }
   }
-      /* ensure the card is centered inside the flex body */
       .card {
         margin: 0 auto;
       }
@@ -174,10 +141,11 @@ session_start();
 
       <div>
         <label for="mdp">Mot de passe</label>
-  <input type="password" id="mdp" name="mdp" placeholder="***********" required>
+  <input type="password" id="mdp" name="mdp" placeholder="***********" required >
       </div>
       <div class="forgot" onclick="showNextCard()">mot de passe oublié ?</div>
 
+      <!-- affichage des erreurs de saisi -->
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
@@ -196,32 +164,9 @@ session_start();
       </div>
     </div>
 
-      <div class="error">
-        <?php if (isset($hasError) && $hasError && $error_card == 2): ?>
-          <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
-        <?php endif; ?>
-      </div>
-
   </form>
 
   <script>
-
-    // Retourne un message de validation en français pour l'élément fourni
-    function getFieldValidationMessage(el) {
-      if (!el) return 'Veuillez remplir ce champ correctement.';
-      try {
-        if (el.validity) {
-          if (el.validity.valueMissing) return 'Ce champ est requis.';
-          if (el.validity.typeMismatch) {
-            if (el.type === 'email') return 'Adresse mail ou mot de passe incorrecte.';
-            if (el.type === 'url') return 'Adresse mail ou mot de passe incorrecte.';
-            return 'Adresse mail ou mot de passe incorrecte.';
-          }
-        }
-      } catch (e) {}
-      return el.validationMessage || 'Veuillez remplir ce champ correctement.';
-    }
-
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');
       var form = document.getElementById('multiForm');

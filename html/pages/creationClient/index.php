@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Créer un compte - Alizon</title>
+  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
     rel="stylesheet">
@@ -12,6 +13,10 @@
 </head>
 
 <?php
+// database connection
+include __DIR__ . '/../../selectBDD.php';
+try { $pdo->exec("SET search_path TO cobrec1"); } catch (Throwable $t) { /* ignore */ }
+
 $interdit = "bleu";
 
 $interditmail = "a@a.a";
@@ -46,6 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error_message = 'Ce mail n\'est pas autorisé.';
   }
 
+  // Server-side email format check (matches DB constraint pattern)
+  if (!$hasError && !preg_match('/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/', $email)) {
+    $hasError = true;
+    $error_card = 2; // show error on card 2
+    $error_message = 'Veuillez saisir une adresse e-mail valide.';
+  }
+
   if (!$hasError && !preg_match('/(0|\\+33|0033)[1-9][0-9]{8}/', $telephone)) {
     $hasError = true;
     $error_card = 2; // show error on card 2
@@ -57,40 +69,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error_card = 3; // show error on card 3
     $error_message = 'Le code postal doit contenir exactement 5 chiffres.';
   }
-  // Server-side password confirmation check
-  if (!$hasError && $mdp !== $Cmdp || $mdp == NULL) {
+  // Server-side password confirmation check: ensure grouping is correct and reject empty/weak passwords
+  if (!$hasError && (empty($mdp) || $mdp !== $Cmdp || strlen($mdp) < 8)) {
     $hasError = true;
     $error_card = 4; // show error on card 4
-    $error_message = 'Les mots de passe ne correspondent pas. Veuillez vérifier la saisie.';
+    $error_message = 'Les mots de passe doivent correspondre et contenir au moins 8 caractères.';
   }
 
   // If passed validation, continue with normal processing (placeholder)
   // For now we simply show a recap; further processing (save to CSV/DB) can go here.
   if (!$hasError) {
-    $mdp = htmlspecialchars($mdp, ENT_QUOTES, 'UTF-8');
-    $Cmdp = htmlspecialchars($Cmdp, ENT_QUOTES, 'UTF-8');
+    // persist into DB: insert into _compte, then _client, then _adresse (optional)
+    try {
+      $pdo->beginTransaction();
 
-    echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
-    echo "<h2 style=\"margin-top:0;\">Récapitulatif (côté serveur)</h2>";
-    echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-    echo "<dt>Nom</dt><dd>{$nom}</dd>";
-    echo "<dt>Prénom</dt><dd>{$prenom}</dd>";
-    echo "<dt>Pseudonyme</dt><dd>{$pseudo}</dd>";
-    echo "<dt>Email</dt><dd>{$email}</dd>";
-    echo "<dt>Téléphone</dt><dd>{$telephone}</dd>";
-    echo "<dt>Naissance</dt><dd>{$naissance}</dd>";
-    echo "<dt>Rue</dt><dd>{$rue}</dd>";
-    echo "<dt>Code Postal</dt><dd>{$codeP}</dd>";
-    echo "<dt>Commune</dt><dd>{$commune}</dd>";
-    echo "<dt>mdp</dt><dd>{$mdp}</dd>";
-    echo "<dt>Confirmation mdp</dt><dd>{$Cmdp}</dd>";
-    echo "</dl>";
-    echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
-    echo "<a href=\"index.php\" style=\"display:inline-block;padding:8px 12px;border-radius:8px;border:1px solid #030212;color:#030212;text-decoration:none;\">Retour</a>";
-    echo "</div>";
-    echo "</div>";
+      // hash password before storing and insert compte
+      $hashedMdp = password_hash($mdp, PASSWORD_DEFAULT);
+      $insCompte = $pdo->prepare("INSERT INTO cobrec1._compte (email, mdp, num_telephone) VALUES (:email, :mdp, :telephone) RETURNING id_compte");
+      $insCompte->execute([
+        ':email' => $email,
+        ':mdp' => $hashedMdp,
+        ':telephone' => $telephone
+      ]);
+      $id_compte = $insCompte->fetchColumn();
+      if ($id_compte === false) throw new Exception('Impossible de créer le compte');
 
-    exit;
+      // insert client
+      $insClient = $pdo->prepare("INSERT INTO cobrec1._client (c_nom, c_prenom, id_compte) VALUES (:nom, :prenom, :id_compte) RETURNING id_client");
+      $insClient->execute([':nom' => $nom, ':prenom' => $prenom, ':id_compte' => $id_compte]);
+      $id_client = $insClient->fetchColumn();
+      if ($id_client === false) throw new Exception('Impossible de créer le client');
+
+      // insert address if provided
+      if (!empty($rue) || !empty($codeP) || !empty($commune)) {
+        $insAddr = $pdo->prepare("INSERT INTO cobrec1._adresse (id_compte, a_adresse, a_ville, a_code_postal, a_complement) VALUES (:id_compte, :adresse, :ville, :cp, :complement)");
+        $insAddr->execute([
+          ':id_compte' => $id_compte,
+          ':adresse' => $rue,
+          ':ville' => $commune,
+          ':cp' => $codeP,
+          ':complement' => null
+        ]);
+      }
+
+      $pdo->commit();
+
+      // show simple recap with created ids
+      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
+      echo "<h2 style=\"margin-top:0;\">Compte créé</h2>";
+      echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
+      echo "<dt>ID compte</dt><dd>" . htmlspecialchars((string)$id_compte, ENT_QUOTES, 'UTF-8') . "</dd>";
+      echo "<dt>ID client</dt><dd>" . htmlspecialchars((string)$id_client, ENT_QUOTES, 'UTF-8') . "</dd>";
+      echo "<dt>Email</dt><dd>" . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . "</dd>";
+      echo "</dl>";
+      echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
+      echo "<a href=\"index.php\" style=\"display:inline-block;padding:8px 12px;border-radius:8px;border:1px solid #030212;color:#030212;text-decoration:none;\">Retour</a>";
+      echo "</div>";
+      echo "</div>";
+      exit;
+    } catch (Exception $e) {
+      try { $pdo->rollBack(); } catch (Throwable $t) { /* ignore */ }
+      $hasError = true;
+      $error_card = 4;
+      $error_message = 'Erreur lors de la création du compte : ' . $e->getMessage();
+    }
   }
 }
 ?>

@@ -1,8 +1,32 @@
 <?php
 session_start();
-include '../../config.php';
+require_once '../../selectBDD.php';
 $pageError = false;
 $produit = null;
+
+// Harmonisation avec la page d'accueil: gestion du panier en session
+$idClient = isset($_SESSION['id']) ? (int) $_SESSION['id'] : null;
+if ($idClient) {
+    // récupérer le panier courant (non commandé)
+    try {
+        $sqlPanierClient = "SELECT id_panier FROM _panier_commande WHERE timestamp_commande IS NULL AND id_client = :idClient";
+        $stmtPanier = $pdo->prepare($sqlPanierClient);
+        $stmtPanier->execute([':idClient' => $idClient]);
+        $panierRow = $stmtPanier->fetch(PDO::FETCH_ASSOC);
+        if ($panierRow) {
+            $idPanier = (int) $panierRow['id_panier'];
+        } else {
+            // créer un nouveau panier vide pour ce client
+            $sqlCreatePanier = "INSERT INTO _panier_commande (id_client, timestamp_commande) VALUES (:idClient, NULL) RETURNING id_panier";
+            $stmtCreate = $pdo->prepare($sqlCreatePanier);
+            $stmtCreate->execute([':idClient' => $idClient]);
+            $idPanier = (int) $stmtCreate->fetchColumn();
+        }
+        $_SESSION['panierEnCours'] = $idPanier;
+    } catch (Throwable $e) {
+        // échec silencieux: l'ajout au panier renverra une erreur côté /index.php
+    }
+}
 
 // Récupérer l'ID du produit depuis l'URL et charger depuis la base
 $idProduit = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -250,117 +274,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
     }
 }
 
-//fonction pour ajouter un article au panier dans la BDD
+
+// Suppression de la logique locale d'ajout au panier: désormais délégué à /index.php
+// La page produit s'assure seulement que le panier de session existe (ci-dessus) et
+// utilise fetch('/index.php') côté client pour l'ajout.
+// -> Demande utilisateur: la page produit doit aussi gérer directement l'ajout en BDD.
+
+//fonction pour ajouter un article au panier dans la BDD (identique à index.php)
 function ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite = 1)
 {
     try {
-        //récupérer les informations du produit (prix, TVA, frais de port, remise)
-        $sqlProduit = "
-            SELECT 
-                p.p_prix, 
-                p.p_frais_de_port, 
-                p.p_stock,
-                COALESCE(t.montant_tva, 0) as tva,
-                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
-            FROM _produit p
-            LEFT JOIN _tva t ON p.id_tva = t.id_tva
-            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
-            WHERE p.id_produit = :idProduit
-        ";
-        
+        $sqlProduit = "SELECT p.p_prix, p.p_frais_de_port, p.p_stock, COALESCE(t.montant_tva,0) AS tva, COALESCE(r.reduction_pourcentage,0) AS pourcentage_reduction
+                       FROM _produit p
+                       LEFT JOIN _tva t ON p.id_tva = t.id_tva
+                       LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+                       LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+                       WHERE p.id_produit = :idProduit";
         $stmtProduit = $pdo->prepare($sqlProduit);
         $stmtProduit->execute([':idProduit' => $idProduit]);
         $produit = $stmtProduit->fetch(PDO::FETCH_ASSOC);
-        
         if (!$produit) {
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
-        
-        // normaliser la quantité demandée
-        $quantite = (int) $quantite;
-        if ($quantite < 1) { $quantite = 1; }
-        
-        //calculer le prix avec remise
+        $quantite = max(1, (int) $quantite);
         $prixUnitaire = $produit['p_prix'];
         $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
         $fraisDePort = $produit['p_frais_de_port'];
         $tva = $produit['tva'];
-        $stock = (int)($produit['p_stock'] ?? 0);
-        
-        //vérifier si l'article existe déjà dans le panier
-        $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
-        $stmtCheck = $pdo->prepare($sqlCheck);
-        $stmtCheck->execute([
-            ':idProduit' => $idProduit,
-            ':idPanier' => $idPanier
-        ]);
+        $stock = (int) ($produit['p_stock'] ?? 0);
 
+        $stmtCheck = $pdo->prepare("SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier");
+        $stmtCheck->execute([':idProduit' => $idProduit, ':idPanier' => $idPanier]);
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-        $quantiteExistante = $existe ? (int)$existe['quantite'] : 0;
+        $quantiteExistante = $existe ? (int) $existe['quantite'] : 0;
         $disponible = max(0, $stock - $quantiteExistante);
-
         if ($disponible <= 0) {
             return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
         }
-
-        // quantité réellement ajoutée (ne dépasse pas le disponible)
         $aAjouter = min($quantite, $disponible);
-
         if ($existe) {
-            //si l'article existe déjà, augmenter la quantité
-            $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
-            $stmtUpdate = $pdo->prepare($sqlUpdate);
-            $stmtUpdate->execute([
-                ':quantite' => $aAjouter,
-                ':idProduit' => $idProduit,
-                ':idPanier' => $idPanier
-            ]);
+            $stmtUpdate = $pdo->prepare("UPDATE _contient SET quantite = quantite + :q WHERE id_produit = :idProduit AND id_panier = :idPanier");
+            $stmtUpdate->execute([':q' => $aAjouter, ':idProduit' => $idProduit, ':idPanier' => $idPanier]);
             if ($aAjouter < $quantite) {
-                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ajoutés (stock limité).'];
             }
-            return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
-        } else {
-            //sinon, insérer un nouvel article avec toutes les informations
-            $sqlInsert = "
-                INSERT INTO _contient 
-                (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) 
-                VALUES (:idProduit, :idPanier, :quantite, :prixUnitaire, :remiseUnitaire, :fraisDePort, :tva)
-            ";
-            $stmtInsert = $pdo->prepare($sqlInsert);
-            $stmtInsert->execute([
-                ':idProduit' => $idProduit,
-                ':idPanier' => $idPanier,
-                ':quantite' => $aAjouter,
-                ':prixUnitaire' => $prixUnitaire,
-                ':remiseUnitaire' => $remiseUnitaire,
-                ':fraisDePort' => $fraisDePort,
-                ':tva' => $tva
-            ]);
-            if ($aAjouter < $quantite) {
-                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
-            }
-            return ['success' => true, 'message' => 'Article ajouté au panier'];
+            return ['success' => true, 'message' => 'Quantité mise à jour'];
         }
-    } catch (Exception $e) {
+        $stmtInsert = $pdo->prepare("INSERT INTO _contient (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) VALUES (:idProduit, :idPanier, :q, :pu, :ru, :fdp, :tva)");
+        $stmtInsert->execute([
+            ':idProduit' => $idProduit,
+            ':idPanier' => $idPanier,
+            ':q' => $aAjouter,
+            ':pu' => $prixUnitaire,
+            ':ru' => $remiseUnitaire,
+            ':fdp' => $fraisDePort,
+            ':tva' => $tva
+        ]);
+        if ($aAjouter < $quantite) {
+            return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ajoutés (stock limité).'];
+        }
+        return ['success' => true, 'message' => 'Article ajouté au panier'];
+    } catch (Throwable $e) {
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
 
-//gérer l'ajout au panier via AJAX
+// Handler local pour ajout panier (optionnel: duplication avec index.php mais répond à la demande)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
-    header('Content-Type: application/json');
-
-    $idProduit = $_POST['idProduit'] ?? null;
-    $quantite = $_POST['quantite'] ?? 1;
-    $idPanier = 8; //utilise l'ID du panier actuel (à adapter selon votre système de session)
-
-    if ($idProduit) {
-        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
-        echo json_encode($resultat);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
+    header('Content-Type: application/json; charset=utf-8');
+    $idProduitPost = $_POST['idProduit'] ?? null;
+    $quantitePost = $_POST['quantite'] ?? 1;
+    $idPanierSession = $_SESSION['panierEnCours'] ?? null;
+    if (!$idPanierSession) {
+        echo json_encode(['success' => false, 'message' => 'Aucun panier actif (connectez-vous).']);
+        exit;
     }
+    if (!$idProduitPost) {
+        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
+        exit;
+    }
+    $result = ajouterArticleBDD($pdo, (int)$idProduitPost, (int)$idPanierSession, (int)$quantitePost);
+    echo json_encode($result);
     exit;
 }
 
@@ -436,6 +430,7 @@ $noteEntiere = (int)floor($note);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title><?= htmlspecialchars($produit['p_nom']) ?> – Alizon</title>
+    <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
@@ -734,7 +729,7 @@ $noteEntiere = (int)floor($note);
             });
         });
 
-        //fonction pour ajouter au panier avec requête AJAX vers la base de données (endpoint racine)
+        //fonction pour ajouter au panier avec requête AJAX vers la base de données (endpoint local produit)
         function ajouterAuPanier(idProduit) {
             //créer les données du formulaire
             const formData = new FormData();
@@ -743,9 +738,9 @@ $noteEntiere = (int)floor($note);
             const qtyEl = document.getElementById('qtyInput');
             const qty = qtyEl ? Math.max(1, Math.min(parseInt(qtyEl.value || '1', 10) || 1, parseInt(qtyEl.getAttribute('max') || '9999', 10) || 9999)) : 1;
             formData.append('quantite', qty);
-            
-            //envoyer la requête AJAX (cible: /index.php à la racine)
-            fetchJson('/index.php', {
+            const url = '/pages/produit/index.php?id=' + encodeURIComponent(idProduit);
+            //envoyer la requête AJAX vers la page produit pour utiliser son handler local
+            fetchJson(url, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: formData
