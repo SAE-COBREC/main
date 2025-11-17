@@ -13,6 +13,7 @@ function recupererInfosClient($pdo, $idClient)
             SELECT 
                 cl.c_nom,
                 cl.c_prenom,
+                cl.c_pseudo,
                 co.email,
                 co.num_telephone
             FROM cobrec1._client cl
@@ -97,16 +98,16 @@ function recupererDernieresCommandes($pdo, $idClient)
 }
 
 //fonction pour mettre à jour les infos du client et du compte
-function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $email, $telephone)
+function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom,$pseudo , $email, $telephone)
 {
     try {
         $sqlClient = "
             UPDATE cobrec1._client 
-            SET c_nom = ?, c_prenom = ?
+            SET c_nom = ?, c_prenom = ?, c_pseudo = ?
             WHERE id_client = ?
         ";
         $stmtClient = $pdo->prepare($sqlClient);
-        $stmtClient->execute([$nom, $prenom, $idClient]);
+        $stmtClient->execute([$nom, $prenom,$pseudo, $idClient]);
 
         $sqlCompte = "
             UPDATE cobrec1._compte 
@@ -142,7 +143,7 @@ function changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePass
         }
 
         //vérifier le mot de passe actuel
-        if ($motDePasseActuel != $motDePasseHashe){
+        if ($motDePasseActuel != $motDePasseHashe) {
             return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
         }
 
@@ -200,10 +201,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_info'])) {
         $nom = htmlspecialchars($_POST['nom'] ?? '');
         $prenom = htmlspecialchars($_POST['prenom'] ?? '');
+        $pseudo = htmlspecialchars($_POST['pseudo'] ?? '');
         $email = htmlspecialchars($_POST['email'] ?? '');
         $telephone = htmlspecialchars($_POST['telephone'] ?? '');
 
-        $successUpdate = mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $email, $telephone);
+        $successUpdate = mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom,$pseudo, $email, $telephone);
 
         if ($successUpdate) {
             header('Location: index.php?success=info_updated');
@@ -319,6 +321,14 @@ $commandes = recupererDernieresCommandes($pdo, $idClient);
                                     <span>Prénom</span>
                                     <input type="text" name="prenom"
                                         value="<?php echo htmlspecialchars($client['c_prenom'] ?? ''); ?>" required>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label>
+                                    <span>Pseudo</span>
+                                    <input type="text" name="pseudo"
+                                        value="<?php echo htmlspecialchars($client['c_pseudo'] ?? ''); ?>" required>
                                 </label>
                             </div>
 
