@@ -10,6 +10,10 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 body.centered {
   align-items: center;
@@ -392,4 +396,58 @@ body.centered {
   height: 50px;
   border-radius: 14px;
   margin-bottom: 10px;
+}
+.connex-btn > button:hover {
+  background: #7171A3;
+  color: #030212;
+}
+
+.footer {
+  margin-left: 50px;
+  margin-bottom: 10px;
+  width: 500px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  font-size: 20px;
+}
+.footer > p {
+  font-size: 20px;
+  color: #7171A3;
+}
+
+.card {
+  margin: 0 auto;
+}
+
+.debutant {
+  font-size: 20px;
+  margin-left: 40px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  text-align: left;
+}
+.debutant a {
+  color: #7171A3;
+  outline: none;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 508px ) {
+  .connex-btn > button {
+    width: 300px;
+  }
+  .forgot {
+    margin-left: 15px;
+  }
+  .footer {
+    width: 320px;
+    margin-left: 0px;
+  }
+  .debutant {
+    margin-left: 0px;
+  }
+  .debutant > a:hover {
+    color: #030212;
+  }
 }/*# sourceMappingURL=styleRegister.css.map */
