@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     // Déplacer le fichier uploadé
     if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
         // IMPORTANT : Retourner le chemin depuis la RACINE WEB avec un slash au début
-        $relativePath = '/img/clients/' . $filename;
+        $relativePath = '/../../img/clients/' . $filename;
         echo json_encode([
             'success' => true,
             'path' => $relativePath,
