@@ -1,7 +1,7 @@
 <?php
     include '../../selectBDD.php';
     session_start();
-    $id_client = $_SESSION['id'];
+    $id_client = $_SESSION['idClient'];
 
     if (isset($_POST['id_produit'])) {
         $id_produit = intval($_POST['id_produit']); //onverti en entier
