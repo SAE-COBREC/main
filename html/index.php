@@ -8,12 +8,12 @@ $pdo->exec("SET search_path TO cobrec1");
 //fonction pour charger tous les produits depuis la base de données
 function chargerProduitsBDD($pdo)
 {
-    $produits = [];
-    $categories = [];
+    $listeProduits = [];
+    $listeCategories = [];
 
     try {
         //requête SQL pur récupérer tous les produits avec leurs informations
-        $sql = "
+        $requeteSQL = "
         SELECT 
             p.id_produit,
             p.p_nom,
@@ -44,8 +44,8 @@ function chargerProduitsBDD($pdo)
         ) avis ON p.id_produit = avis.id_produit
     ";
 
-        $stmt = $pdo->query($sql);
-        $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $requetePrepare = $pdo->query($requeteSQL);
+        $listeProduits = $requetePrepare->fetchAll(PDO::FETCH_ASSOC);
 
         //requête pour compter les produits par catégorie
         $sqlCategories = "
@@ -61,14 +61,14 @@ function chargerProduitsBDD($pdo)
         $categoriesResult = $stmtCategories->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($categoriesResult as $cat) {
-            $categories[$cat['category']] = $cat['count'];
+            $listeCategories[$cat['category']] = $cat['count'];
         }
 
     } catch (Exception $e) {
         echo "<p style='color: red;'>Erreur lors du chargement des produits : " . $e->getMessage() . "</p>";
     }
 
-    return ['produits' => $produits, 'categories' => $categories];
+    return ['produits' => $listeProduits, 'categories' => $listeCategories];
 }
 
 //fonction pour ajouter un article au panier dans la BDD
@@ -92,9 +92,9 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 
         $stmtProduit = $pdo->prepare($sqlProduit);
         $stmtProduit->execute([':idProduit' => $idProduit]);
-        $produit = $stmtProduit->fetch(PDO::FETCH_ASSOC);
+        $produitCourant = $stmtProduit->fetch(PDO::FETCH_ASSOC);
 
-        if (!$produit) {
+        if (!$produitCourant) {
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
 
@@ -105,11 +105,11 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
         }
 
         //calculer le prix avec remise
-        $prixUnitaire = $produit['p_prix'];
-        $remiseUnitaire = ($produit['pourcentage_reduction'] / 100) * $prixUnitaire;
-        $fraisDePort = $produit['p_frais_de_port'];
-        $tva = $produit['tva'];
-        $stock = (int) ($produit['p_stock'] ?? 0);
+        $prixUnitaire = $produitCourant['p_prix'];
+        $remiseUnitaire = ($produitCourant['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $fraisDePort = $produitCourant['p_frais_de_port'];
+        $tva = $produitCourant['tva'];
+        $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
 
         //vérifier si l'article existe déjà dans le panier
         $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
@@ -121,7 +121,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 
         $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
         $quantiteExistante = $existe ? (int) $existe['quantite'] : 0;
-        $disponible = max(0, $stock - $quantiteExistante);
+        $disponible = max(0, $quantiteEnStock - $quantiteExistante);
 
         if ($disponible <= 0) {
             return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
@@ -226,11 +226,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 function getPrixMaximum($pdo)
 {
     try {
-        $sql = "SELECT MAX(p_prix) AS prix_maximum 
+        $requeteSQL = "SELECT MAX(p_prix) AS prix_maximum 
             FROM _produit";
 
-        $stmt = $pdo->query($sql);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $requetePrepare = $pdo->query($requeteSQL);
+        $result = $requetePrepare->fetch(PDO::FETCH_ASSOC);
 
         return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
     } catch (Exception $e) {
@@ -239,57 +239,57 @@ function getPrixMaximum($pdo)
 }
 
 //fonction pour filtrer les produits selon les critères choisis
-function filtrerProduits($produits, $filtres)
+function filtrerProduits($listeProduits, $filtres)
 {
     $produits_filtres = [];
 
-    foreach ($produits as $produit) {
-        if (($produit['p_prix'] ?? 0) > $filtres['prixMaximum']) {
+    foreach ($listeProduits as $produitCourant) {
+        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum']) {
             continue;
         }
 
         if ($filtres['categorieFiltre'] !== 'all') {
-            $categoriesProduit = explode(', ', $produit['categories'] ?? '');
+            $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
             if (!in_array($filtres['categorieFiltre'], $categoriesProduit)) {
                 continue;
             }
         }
 
-        if ($filtres['enStockSeulement'] && ($produit['p_stock'] ?? 0) <= 0) {
+        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0) {
             continue;
         }
 
-        if (($produit['note_moyenne'] ?? 0) < $filtres['noteMinimum']) {
+        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum']) {
             continue;
         }
 
-        $produits_filtres[] = $produit;
+        $produits_filtres[] = $produitCourant;
     }
 
     return $produits_filtres;
 }
 
 //fonction pour trier les produits selon le critère choisi
-function trierProduits($produits, $tri_par)
+function trierProduits($listeProduits, $tri_par)
 {
     switch ($tri_par) {
         case 'meilleures_ventes':
-            usort($produits, function ($a, $b) {
+            usort($listeProduits, function ($a, $b) {
                 return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
             });
             break;
         case 'prix_croissant':
-            usort($produits, function ($a, $b) {
+            usort($listeProduits, function ($a, $b) {
                 return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
             });
             break;
         case 'prix_decroissant':
-            usort($produits, function ($a, $b) {
+            usort($listeProduits, function ($a, $b) {
                 return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
             });
             break;
         case 'note':
-            usort($produits, function ($a, $b) {
+            usort($listeProduits, function ($a, $b) {
                 $noteA = $a['note_moyenne'] ?? 0;
                 $noteB = $b['note_moyenne'] ?? 0;
                 return $noteB - $noteA;
@@ -297,16 +297,16 @@ function trierProduits($produits, $tri_par)
             break;
     }
 
-    return $produits;
+    return $listeProduits;
 }
 
 //fonction pour préparer les catégories pour l'affichage
-function preparercategories_affichage($categories)
+function preparercategories_affichage($listeCategories)
 {
     $categories_affichage = [];
     $total_produits = 0;
 
-    foreach ($categories as $nomCategorie => $compte) {
+    foreach ($listeCategories as $nomCategorie => $compte) {
         $categories_affichage[] = [
             'category' => $nomCategorie,
             'count' => $compte
@@ -323,10 +323,10 @@ function preparercategories_affichage($categories)
 
 //chargement des données depuis la base de données
 $donnees = chargerProduitsBDD($pdo);
-$produits = $donnees['produits'];
-$categories = $donnees['categories'];
+$listeProduits = $donnees['produits'];
+$listeCategories = $donnees['categories'];
 
-$tousLesProduits = count($produits);
+$tousLesProduits = count($listeProduits);
 
 $prixMaximumDynamique = getPrixMaximum($pdo);
 
@@ -345,9 +345,9 @@ $filtres = [
 ];
 
 //application des filtres et du tri
-$produits_filtres = filtrerProduits($produits, $filtres);
-$produits = trierProduits($produits_filtres, $tri_par);
-$categories_affichage = preparercategories_affichage($categories);
+$produits_filtres = filtrerProduits($listeProduits, $filtres);
+$listeProduits = trierProduits($produits_filtres, $tri_par);
+$categories_affichage = preparercategories_affichage($listeCategories);
 
 ?>
 
@@ -397,11 +397,11 @@ $categories_affichage = preparercategories_affichage($categories);
                         <span>Tous les produits</span>
                         <span><?= $tousLesProduits ?></span>
                     </div>
-                    <?php foreach ($categories_affichage as $categorie): ?>
-                        <?php if ($categorie['category'] !== 'all'): ?>
-                            <div onclick="definirCategorie('<?= htmlspecialchars($categorie['category']) ?>')">
-                                <span><?= htmlspecialchars($categorie['category']) ?></span>
-                                <span><?= $categorie['count'] ?></span>
+                    <?php foreach ($categories_affichage as $categorieCourante): ?>
+                        <?php if ($categorieCourante['category'] !== 'all'): ?>
+                            <div onclick="definirCategorie('<?= htmlspecialchars($categorieCourante['category']) ?>')">
+                                <span><?= htmlspecialchars($categorieCourante['category']) ?></span>
+                                <span><?= $categorieCourante['count'] ?></span>
                             </div>
                         <?php endif; ?>
                     <?php endforeach; ?>
@@ -447,53 +447,53 @@ $categories_affichage = preparercategories_affichage($categories);
 
         <main>
             <div>
-                <?php if (empty($produits)): ?>
+                <?php if (empty($listeProduits)): ?>
                     <p>Aucun produit ne correspond à vos critères de recherche.</p>
                 <?php else: ?>
-                    <?php foreach ($produits as $produit): ?>
+                    <?php foreach ($listeProduits as $produitCourant): ?>
                         <?php
                         //détermine si le produit est en rupture de stock
-                        $estEnRupture = $produit['p_stock'] <= 0;
+                        $estEnRupture = $produitCourant['p_stock'] <= 0;
                         //vérifie si le produit a une remise
-                        $aUneRemise = !empty($produit['pourcentage_reduction']) && $produit['pourcentage_reduction'] > 0;
+                        $possedePourcentageRemise = !empty($produitCourant['pourcentage_reduction']) && $produitCourant['pourcentage_reduction'] > 0;
                         //calcule le prix final (avec remise si applicable)
-                        $prixFinal = $aUneRemise
-                            ? $produit['p_prix'] * (1 - $produit['pourcentage_reduction'] / 100)
-                            : $produit['p_prix'];
+                        $prixApresRemise = $possedePourcentageRemise
+                            ? $produitCourant['p_prix'] * (1 - $produitCourant['pourcentage_reduction'] / 100)
+                            : $produitCourant['p_prix'];
                         //arrondit la note moyenne
-                        $note = $produit['note_moyenne'] ? round($produit['note_moyenne']) : 0;
+                        $noteArrondie = $produitCourant['note_moyenne'] ? round($produitCourant['note_moyenne']) : 0;
                         ?>
                         <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
-                            onclick="window.location.href='/pages/produit/index.php?id=<?= $produit['id_produit'] ?>'">
+                            onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
                             <div>
                                 <div>
-                                    <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/default-product.jpg') ?>"
-                                        alt="<?= htmlspecialchars($produit['p_nom']) ?>"
+                                    <img src="<?= htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg') ?>"
+                                        alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>"
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
-                                <?php if ($aUneRemise): ?>
-                                    <span class="badge-reduction">-<?= round($produit['pourcentage_reduction']) ?>%</span>
+                                <?php if ($possedePourcentageRemise): ?>
+                                    <span class="badge-reduction">-<?= round($produitCourant['pourcentage_reduction']) ?>%</span>
                                 <?php endif; ?>
                                 <?php if ($estEnRupture): ?>
                                     <div class="rupture-stock">Rupture de stock</div>
                                 <?php endif; ?>
                             </div>
                             <div>
-                                <h3><?= htmlspecialchars($produit['p_nom']) ?></h3>
+                                <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
                                 <div>
-                                    <span><?= str_repeat('★', $note) . str_repeat('☆', 5 - $note) ?></span>
-                                    <span>(<?= $produit['nombre_avis'] ?>)</span>
+                                    <span><?= str_repeat('★', $noteArrondie) . str_repeat('☆', 5 - $noteArrondie) ?></span>
+                                    <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
                                 </div>
                                 <div>
                                     <span>
-                                        <?php if ($aUneRemise): ?>
-                                            <?= number_format($produit['p_prix'], 2, ',', ' ') ?>€
+                                        <?php if ($possedePourcentageRemise): ?>
+                                            <?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€
                                         <?php endif; ?>
                                     </span>
-                                    <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
+                                    <span><?= number_format($prixApresRemise, 2, ',', ' ') ?>€</span>
                                 </div>
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
-                                    onclick="event.stopPropagation(); ajouterAuPanier(<?= $produit['id_produit'] ?>)">
+                                    onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
                                     <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
                                 </button>
                             </div>
