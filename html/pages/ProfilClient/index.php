@@ -127,7 +127,7 @@ function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseu
         $stmtClient = $pdo->prepare($sqlClient);
         $stmtClient->execute([$nom, $prenom, $pseudo, $idClient]);
 
-        // Mise à jour des informations du compte
+        //mise à jour des informations du compte
         $sqlCompte = "
             UPDATE cobrec1._compte 
             SET email = ?, num_telephone = ?
@@ -136,7 +136,7 @@ function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseu
         $stmtCompte = $pdo->prepare($sqlCompte);
         $stmtCompte->execute([$email, $telephone, $idCompte]);
 
-        // Si une image est fournie, la mettre à jour
+        //si une image est fournie, la mettre à jour
         if ($lienImage !== null && $lienImage !== '') {
             // Vérifier si une image existe déjà
             $sqlCheck = "SELECT id_image FROM cobrec1._represente_compte WHERE id_compte = ?";
@@ -145,7 +145,7 @@ function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseu
             $existingImage = $stmtCheck->fetch(PDO::FETCH_ASSOC);
             
             if ($existingImage) {
-                // Mettre à jour l'image existante
+                //mettre à jour l'image existante
                 $sqlUpdate = "
                     UPDATE cobrec1._image 
                     SET i_lien = ?, i_title = ?, i_alt = ? 
@@ -395,7 +395,7 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                                            placeholder="https://exemple.com/image.jpg">
                                 </label>
                             </div>
-                            
+
                             <!-- Champs existants -->
                             <div>
                                 <label>
