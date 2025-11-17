@@ -3,7 +3,6 @@
 
     session_start();
     $id_client = $_SESSION['id'];
-    echo $_SESSION['id'];
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
@@ -70,7 +69,7 @@
                                     <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
                                         <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
                                         <!--bouton pour envoyer le formulaire-->
-                                        <button type="submit" id="supprimerArticle" class="supprimerArticle"><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
+                                        <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
                                     </form>
                                     <button class="btn_moins">-</button>
                                     <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
