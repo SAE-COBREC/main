@@ -187,11 +187,6 @@ function changerMotDePasse($pdo, $idCompte, $motDePasseActuel, $nouveauMotDePass
         $stmt->execute([$idCompte]);
         $motDePasseHashe = $stmt->fetchColumn();
 
-        echo ($motDePasseActuel);
-        echo ($motDePasseHashe);
-        echo ($nouveauMotDePasse);
-        echo ($confirmationMotDePasse);
-
         if ($motDePasseHashe === false) {
             return ['success' => false, 'message' => "Compte introuvable."];
         }
@@ -317,12 +312,14 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    
+    
 </head>
 
 <body>
 
     <?php
-    include __DIR__ . '/../../partials//header.html';
+    include __DIR__ . '/../../partials/header.html';
     ?>
 
     <main>
@@ -374,7 +371,7 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                                 <img src="<?php echo htmlspecialchars($imageCompte['i_lien']); ?>"
                                     alt="<?php echo htmlspecialchars($imageCompte['i_alt'] ?? 'Photo de profil'); ?>"
                                     title="<?php echo htmlspecialchars($imageCompte['i_title'] ?? ''); ?>"
-                                    class="profile-image">
+                                    class="profile-image" id="current-profile-image">
                             <?php else: ?>
                                 <div class="profile-image-placeholder">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
@@ -386,22 +383,30 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                             <?php endif; ?>
                         </div>
 
-                        <form method="POST">
-                            <!-- Champs pour l'image de profil -->
-                            <div>
-                                <label>
-                                    <span>URL de l'image de profil (optionnel)</span>
-                                    <input type="text" name="lien_image"
-                                        value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>"
-                                        placeholder="https://exemple.com/image.jpg">
-                                </label>
+                        <form method="POST" id="profile-form">
+                            <!-- Zone de drag and drop pour l'image -->
+                            <div id="drop-zone">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="48" height="48" style="margin-bottom: 10px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <p><strong>Glissez-déposez votre image ici</strong></p>
+                                <p style="font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner un fichier</p>
+                                <input type="file" id="file-input" accept="image/*" style="display: none;">
                             </div>
+                            
+                            <div id="preview-zone"></div>
+                            <div id="upload-status" class="upload-status"></div>
+
+                            <!-- Champ caché pour stocker le chemin de l'image -->
+                            <input type="hidden" name="lien_image" id="lien_image" value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>">
 
                             <!-- Champs existants -->
                             <div>
                                 <label>
                                     <span>Nom</span>
-                                    <input type="text" name="nom"
+                                    <input type="text" name="nom" id="nom"
                                         value="<?php echo htmlspecialchars($client['c_nom'] ?? ''); ?>" required>
                                 </label>
                             </div>
@@ -409,7 +414,7 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
                             <div>
                                 <label>
                                     <span>Prénom</span>
-                                    <input type="text" name="prenom"
+                                    <input type="text" name="prenom" id="prenom"
                                         value="<?php echo htmlspecialchars($client['c_prenom'] ?? ''); ?>" required>
                                 </label>
                             </div>
@@ -631,6 +636,124 @@ $imageCompte = recupererImageCompte($pdo, $idCompte);
     <?php
     include __DIR__ . '/../../partials/footer.html';
     ?>
+
+    <script>
+        // JavaScript pour le drag and drop
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewZone = document.getElementById('preview-zone');
+        const uploadStatus = document.getElementById('upload-status');
+        const lienImageInput = document.getElementById('lien_image');
+        const prenomInput = document.getElementById('prenom');
+
+        // Clic sur la zone pour ouvrir le sélecteur de fichier
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Empêcher le comportement par défaut du navigateur
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Effet visuel lors du drag
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('drag-over');
+            });
+        });
+
+        // Gestion du drop
+        dropZone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleDrop(e) {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                uploadFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                uploadFile(files[0]);
+            }
+        }
+
+        function uploadFile(file) {
+            // Vérifier que c'est bien une image
+            if (!file.type.startsWith('image/')) {
+                showStatus('Veuillez sélectionner une image valide (JPEG, PNG, GIF, WebP)', 'error');
+                return;
+            }
+
+            // Vérifier la taille (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showStatus('L\'image est trop volumineuse (max 5 MB)', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('prenom', prenomInput.value || 'Client');
+
+            // Afficher un aperçu
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewZone.innerHTML = `<img src="${e.target.result}" alt="Aperçu">`;
+                // Mettre à jour l'image de profil actuelle si elle existe
+                const currentImage = document.getElementById('current-profile-image');
+                if (currentImage) {
+                    currentImage.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+
+            showStatus('Upload en cours...', 'success');
+
+            // Envoyer le fichier au serveur
+            fetch('upload_image.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mettre à jour le champ caché avec le chemin local
+                    lienImageInput.value = data.path;
+                    showStatus('Image uploadée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.', 'success');
+                } else {
+                    showStatus('Erreur: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showStatus('Erreur lors de l\'upload', 'error');
+            });
+        }
+
+        function showStatus(message, type) {
+            uploadStatus.textContent = message;
+            uploadStatus.className = 'upload-status ' + type;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    uploadStatus.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
 
 </body>
 
