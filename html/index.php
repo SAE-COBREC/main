@@ -3,10 +3,14 @@ session_start();
 
 include __DIR__ . '/selectBDD.php';
 
-$pdo->exec("SET search_path TO cobrec1");
+//récupérer la connexion PDO depuis le fichier de configuration
+$connexionBaseDeDonnees = $pdo;
+
+//définir le schéma de la base de données à utiliser
+$connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 //fonction pour charger tous les produits depuis la base de données
-function chargerProduitsBDD($pdo)
+function chargerProduitsBDD($connexionBaseDeDonnees)
 {
     $listeProduits = [];
     $listeCategories = [];
@@ -44,8 +48,8 @@ function chargerProduitsBDD($pdo)
         ) avis ON p.id_produit = avis.id_produit
     ";
 
-        $requetePrepare = $pdo->query($requeteSQL);
-        $listeProduits = $requetePrepare->fetchAll(PDO::FETCH_ASSOC);
+        $requetePrepare = $connexionBaseDeDonnees->query($requeteSQL);
+        $listeProduits = $requetePrepare->fetchAll(connexionBaseDeDonnees::FETCH_ASSOC);
 
         //requête pour compter les produits par catégorie
         $sqlCategories = "
@@ -57,8 +61,8 @@ function chargerProduitsBDD($pdo)
         GROUP BY cp.nom_categorie
     ";
 
-        $stmtCategories = $pdo->query($sqlCategories);
-        $categoriesResult = $stmtCategories->fetchAll(PDO::FETCH_ASSOC);
+        $stmtCategories = $connexionBaseDeDonnees->query($sqlCategories);
+        $categoriesResult = $stmtCategories->fetchAll(connexionBaseDeDonnees::FETCH_ASSOC);
 
         foreach ($categoriesResult as $cat) {
             $listeCategories[$cat['category']] = $cat['count'];
@@ -72,7 +76,7 @@ function chargerProduitsBDD($pdo)
 }
 
 //fonction pour ajouter un article au panier dans la BDD
-function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
+function ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $panier, $quantite = 1)
 {
     try {
         //récupérer les informations du produit (prix, TVA, frais de port, remise)
@@ -90,9 +94,9 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
             WHERE p.id_produit = :idProduit
         ";
 
-        $stmtProduit = $pdo->prepare($sqlProduit);
+        $stmtProduit = $connexionBaseDeDonnees->prepare($sqlProduit);
         $stmtProduit->execute([':idProduit' => $idProduit]);
-        $produitCourant = $stmtProduit->fetch(PDO::FETCH_ASSOC);
+        $produitCourant = $stmtProduit->fetch(connexionBaseDeDonnees::FETCH_ASSOC);
 
         if (!$produitCourant) {
             return ['success' => false, 'message' => 'Produit introuvable'];
@@ -113,13 +117,13 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 
         //vérifier si l'article existe déjà dans le panier
         $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
-        $stmtCheck = $pdo->prepare($sqlCheck);
+        $stmtCheck = $connexionBaseDeDonnees->prepare($sqlCheck);
         $stmtCheck->execute([
             ':idProduit' => $idProduit,
             ':idPanier' => $panier
         ]);
 
-        $existe = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $existe = $stmtCheck->fetch(connexionBaseDeDonnees::FETCH_ASSOC);
         $quantiteExistante = $existe ? (int) $existe['quantite'] : 0;
         $disponible = max(0, $quantiteEnStock - $quantiteExistante);
 
@@ -133,7 +137,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
         if ($existe) {
             //si l'article existe déjà, augmenter la quantité
             $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
-            $stmtUpdate = $pdo->prepare($sqlUpdate);
+            $stmtUpdate = $connexionBaseDeDonnees->prepare($sqlUpdate);
             $stmtUpdate->execute([
                 ':quantite' => $aAjouter,
                 ':idProduit' => $idProduit,
@@ -150,7 +154,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
                 (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) 
                 VALUES (:idProduit, :idPanier, :quantite, :prixUnitaire, :remiseUnitaire, :fraisDePort, :tva)
             ";
-            $stmtInsert = $pdo->prepare($sqlInsert);
+            $stmtInsert = $connexionBaseDeDonnees->prepare($sqlInsert);
             $stmtInsert->execute([
                 ':idProduit' => $idProduit,
                 ':idPanier' => $panier,
@@ -180,9 +184,9 @@ if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un pa
         WHERE timestamp_commande IS NULL
         AND id_client = :idClient
     ";
-    $stmtPanier = $pdo->prepare($sqlPanierClient);
+    $stmtPanier = $connexionBaseDeDonnees->prepare($sqlPanierClient);
     $stmtPanier->execute([":idClient" => $idClient]);
-    $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
+    $panier = $stmtPanier->fetch(connexionBaseDeDonnees::FETCH_ASSOC);
     if ($panier) {
         $idPanier = (int) $panier['id_panier'];
     } else {
@@ -191,7 +195,7 @@ if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un pa
             VALUES (:idClient, NULL)
             RETURNING id_panier
         ";
-        $stmtCreate = $pdo->prepare($sqlCreatePanier);
+        $stmtCreate = $connexionBaseDeDonnees->prepare($sqlCreatePanier);
         $stmtCreate->execute([":idClient" => $idClient]);
         $idPanier = (int) $stmtCreate->fetchColumn();
     }
@@ -213,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     if ($idProduit) {
-        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
+        $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
         echo json_encode($resultat);
     } else {
         echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
@@ -223,14 +227,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 
 //fonction pour récupérer le prix maximum parmi tous les produits
-function getPrixMaximum($pdo)
+function getPrixMaximum($connexionBaseDeDonnees)
 {
     try {
         $requeteSQL = "SELECT MAX(p_prix) AS prix_maximum 
             FROM _produit";
 
-        $requetePrepare = $pdo->query($requeteSQL);
-        $result = $requetePrepare->fetch(PDO::FETCH_ASSOC);
+        $requetePrepare = $connexionBaseDeDonnees->query($requeteSQL);
+        $result = $requetePrepare->fetch(connexionBaseDeDonnees::FETCH_ASSOC);
 
         return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
     } catch (Exception $e) {
@@ -322,13 +326,13 @@ function preparercategories_affichage($listeCategories)
 }
 
 //chargement des données depuis la base de données
-$donnees = chargerProduitsBDD($pdo);
+$donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
 
 $tousLesProduits = count($listeProduits);
 
-$prixMaximumDynamique = getPrixMaximum($pdo);
+$prixMaximumDynamique = getPrixMaximum($connexionBaseDeDonnees);
 
 //récupère les valeurs des filtres depuis le formulaire
 $categorieFiltre = $_POST['category'] ?? 'all';
