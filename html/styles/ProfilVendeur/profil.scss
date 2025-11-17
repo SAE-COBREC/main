@@ -97,8 +97,6 @@ body {
   }
 
   .profil-photo {
-  width: 130px;
-  height: 130px;
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto 25px auto;
@@ -108,8 +106,8 @@ body {
   justify-content: center;
 
   img {
-    width: 100%;
-    height: 100%;
+    width: 130px;
+    height: 130px;
     object-fit: cover;
   }
 }

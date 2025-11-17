@@ -88,4 +88,19 @@ body {
 }
 .btn--primary:hover {
   background: rgba(230, 169, 110, 0.9);
+}
+.btn .profil-photo {
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 25px auto;
+  border: 3px solid #CD7F32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn .profil-photo img {
+  width: 130px;
+  height: 130px;
+  -o-object-fit: cover;
+     object-fit: cover;
 }/*# sourceMappingURL=profil.css.map */
