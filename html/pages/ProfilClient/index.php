@@ -97,18 +97,37 @@ function recupererDernieresCommandes($pdo, $idClient)
     }
 }
 
-//fonction pour mettre à jour les infos du client et du compte
-function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom,$pseudo , $email, $telephone)
+//fonction pour récupérer l'image du compte
+function recupererImageCompte($pdo, $idCompte) {
+    try {
+        $sql = "
+            SELECT i.id_image, i.i_lien, i.i_title, i.i_alt
+            FROM cobrec1._image i
+            INNER JOIN cobrec1._represente_compte rc ON i.id_image = rc.id_image
+            WHERE rc.id_compte = ?
+        ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$idCompte]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+//fonction pour mettre à jour les infos du client, du compte ET l'image
+function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseudo, $email, $telephone, $lienImage = null, $title = null, $alt = null)
 {
     try {
+        // Mise à jour des informations du client
         $sqlClient = "
             UPDATE cobrec1._client 
             SET c_nom = ?, c_prenom = ?, c_pseudo = ?
             WHERE id_client = ?
         ";
         $stmtClient = $pdo->prepare($sqlClient);
-        $stmtClient->execute([$nom, $prenom,$pseudo, $idClient]);
+        $stmtClient->execute([$nom, $prenom, $pseudo, $idClient]);
 
+        // Mise à jour des informations du compte
         $sqlCompte = "
             UPDATE cobrec1._compte 
             SET email = ?, num_telephone = ?
@@ -116,6 +135,40 @@ function mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom,$pseud
         ";
         $stmtCompte = $pdo->prepare($sqlCompte);
         $stmtCompte->execute([$email, $telephone, $idCompte]);
+
+        // Si une image est fournie, la mettre à jour
+        if ($lienImage !== null && $lienImage !== '') {
+            // Vérifier si une image existe déjà
+            $sqlCheck = "SELECT id_image FROM cobrec1._represente_compte WHERE id_compte = ?";
+            $stmtCheck = $pdo->prepare($sqlCheck);
+            $stmtCheck->execute([$idCompte]);
+            $existingImage = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+            
+            if ($existingImage) {
+                // Mettre à jour l'image existante
+                $sqlUpdate = "
+                    UPDATE cobrec1._image 
+                    SET i_lien = ?, i_title = ?, i_alt = ? 
+                    WHERE id_image = ?
+                ";
+                $stmtUpdate = $pdo->prepare($sqlUpdate);
+                $stmtUpdate->execute([$lienImage, $title, $alt, $existingImage['id_image']]);
+            } else {
+                // Créer une nouvelle image
+                $sqlInsertImage = "
+                    INSERT INTO cobrec1._image (i_lien, i_title, i_alt) 
+                    VALUES (?, ?, ?) RETURNING id_image
+                ";
+                $stmtInsert = $pdo->prepare($sqlInsertImage);
+                $stmtInsert->execute([$lienImage, $title, $alt]);
+                $newImageId = $stmtInsert->fetchColumn();
+                
+                // Lier l'image au compte
+                $sqlLink = "INSERT INTO cobrec1._represente_compte (id_image, id_compte) VALUES (?, ?)";
+                $stmtLink = $pdo->prepare($sqlLink);
+                $stmtLink->execute([$newImageId, $idCompte]);
+            }
+        }
 
         return true;
     } catch (Exception $e) {
@@ -197,15 +250,20 @@ if ($idCompte === null) {
 //traitement des formulaires
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    //mise à jour des infos perso
+    //mise à jour des infos perso (avec image optionnelle)
     if (isset($_POST['update_info'])) {
         $nom = htmlspecialchars($_POST['nom'] ?? '');
         $prenom = htmlspecialchars($_POST['prenom'] ?? '');
         $pseudo = htmlspecialchars($_POST['pseudo'] ?? '');
         $email = htmlspecialchars($_POST['email'] ?? '');
         $telephone = htmlspecialchars($_POST['telephone'] ?? '');
+        
+        // Récupération des données de l'image si fournies
+        $lienImage = !empty($_POST['lien_image']) ? htmlspecialchars($_POST['lien_image']) : null;
+        $title = htmlspecialchars($_POST['title_image'] ?? 'Photo de profil');
+        $alt = htmlspecialchars($_POST['alt_image'] ?? 'Avatar utilisateur');
 
-        $successUpdate = mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom,$pseudo, $email, $telephone);
+        $successUpdate = mettreAJourInfosClient($pdo, $idClient, $idCompte, $nom, $prenom, $pseudo, $email, $telephone, $lienImage, $title, $alt);
 
         if ($successUpdate) {
             header('Location: index.php?success=info_updated');
@@ -241,6 +299,8 @@ if (!$client) {
 
 $adresses = recupererAdressesClient($pdo, $idCompte);
 $commandes = recupererDernieresCommandes($pdo, $idClient);
+$imageCompte = recupererImageCompte($pdo, $idCompte);
+
 ?>
 
 <!DOCTYPE html>
@@ -273,13 +333,13 @@ $commandes = recupererDernieresCommandes($pdo, $idClient);
             <h1>Mon Profil</h1>
 
             <?php if (isset($error)): ?>
-                <div style="color: red; padding: 10px; background: #fee; margin-bottom: 20px;">
+                <div class="error-message">
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['success'])): ?>
-                <div style="color: green; padding: 10px; background: #efe; margin-bottom: 20px;">
+                <div class="success-message">
                     <?php
                     if ($_GET['success'] === 'info_updated')
                         echo "Informations mises à jour avec succès.";
@@ -307,7 +367,36 @@ $commandes = recupererDernieresCommandes($pdo, $idClient);
                     </header>
 
                     <main>
+                        <!-- Affichage de l'image de profil -->
+                        <div class="profile-image-container">
+                            <?php if ($imageCompte): ?>
+                                <img src="<?php echo htmlspecialchars($imageCompte['i_lien']); ?>" 
+                                     alt="<?php echo htmlspecialchars($imageCompte['i_alt'] ?? 'Photo de profil'); ?>" 
+                                     title="<?php echo htmlspecialchars($imageCompte['i_title'] ?? ''); ?>"
+                                     class="profile-image">
+                            <?php else: ?>
+                                <div class="profile-image-placeholder">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <p class="no-profile-image">Aucune photo de profil</p>
+                            <?php endif; ?>
+                        </div>
+
                         <form method="POST">
+                            <!-- Champs pour l'image de profil -->
+                            <div>
+                                <label>
+                                    <span>URL de l'image de profil (optionnel)</span>
+                                    <input type="text" name="lien_image" 
+                                           value="<?php echo htmlspecialchars($imageCompte['i_lien'] ?? ''); ?>" 
+                                           placeholder="https://exemple.com/image.jpg">
+                                </label>
+                            </div>
+                            
+                            <!-- Champs existants -->
                             <div>
                                 <label>
                                     <span>Nom</span>
@@ -529,12 +618,11 @@ $commandes = recupererDernieresCommandes($pdo, $idClient);
                 </article>
             </section>
 
-            <form method="get" style="margin-top: 1rem; text-align: center;">
+            <form method="get" class="logout-form">
                 <button type="submit" name="action" value="logout">
                     Déconnexion
                 </button>
             </form>
-
 
         </div>
     </main>
