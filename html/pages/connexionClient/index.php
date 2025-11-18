@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           //ajout des identifiant a la session
 
           $_SESSION['idClient'] = $clientId;
-
+          $_SESSION['idCompte'] = (int)$row['id_compte'];
           //redirige sur la page d'acceuil
           header('Location: ../../index.php');
           exit;
