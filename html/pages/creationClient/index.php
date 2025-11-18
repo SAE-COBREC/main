@@ -41,26 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $error_message = '';
   $bdd_errors = [];
 
-  // Vérifier si l'email existe déjà
-  if (!$hasError) {
-    try {
-      $stmt = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._compte WHERE email = :email');
-      $stmt->execute(['email' => $email]);
-      $count = $stmt->fetchColumn();
-      
-      if ($count > 0) {
-        $hasError = true;
-        $error_card = 2; // Card de l'email
-        $error_message = 'Cette adresse email est déjà utilisée.';
-      }
-    } catch (Exception $e) {
-      $hasError = true;
-      $error_card = 2;
-      $error_message = 'Erreur lors de la vérification de l\'email.';
-      $bdd_errors[] = [$e->getMessage()];
-    }
-  }
-
   if (!$hasError) {
     try {
       // Utiliser des requêtes préparées pour la sécurité
@@ -70,13 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->execute([
         'email' => $email,
         'telephone' => $telephone,
-        'mdp' => password_hash($mdp, PASSWORD_DEFAULT) // Hacher le mot de passe !
+        'mdp' => password_hash($mdp, PASSWORD_DEFAULT)
       ]);
 
     } catch (Exception $e) {
       $hasError = true;
-      $error_card = 4; 
-      $error_message = 'Informations invalides à insérer.';
+      $error_card = 2; 
+      $error_message = 'Cette adresse email est déjà utilisée.';
       $bdd_errors[] = [$e->getMessage()];
     }
 
@@ -337,7 +317,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script>
 
     window.__existingPseudos = <?php echo json_encode($__existing_pseudos, JSON_UNESCAPED_UNICODE); ?> || [];
+    
     function currentCard() { return document.querySelector('.card:not(.hidden)'); }
+    
     function showCardByIndex(idx) {
       const cards = Array.from(document.querySelectorAll('.card'));
       cards.forEach((c, i) => c.classList.toggle('hidden', i !== idx));
@@ -395,7 +377,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
     }
 
-    window.showNextCard = function () {
+    async function checkEmailExists(email) {
+      try {
+        const formData = new FormData();
+        formData.append('action', 'check_email');
+        formData.append('email', email);
+        
+        const response = await fetch('check_email.php', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        return data.exists;
+      } catch (e) {
+        console.error('Erreur lors de la vérification de l\'email:', e);
+        return false;
+      }
+    }
+
+    window.showNextCard = async function () {
       const cards = Array.from(document.querySelectorAll('.card'));
       const visible = cards.findIndex(c => !c.classList.contains('hidden'));
       const activeCard = cards[visible];
@@ -412,6 +413,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           return;
         }
       } catch (e) { console.warn('Validation HTML5 non disponible ou erreur', e); }
+
+      // Vérification de l'email à la card 2
+      if (visible === 1) {
+        const emailInput = document.getElementById('email');
+        if (emailInput && emailInput.value.trim()) {
+          const emailExists = await checkEmailExists(emailInput.value.trim());
+          if (emailExists) {
+            const err = errorEl || document.querySelector('.card#2 .error');
+            if (err) { 
+              err.classList.remove('hidden'); 
+              err.innerHTML = '<strong>Erreur</strong> : Cette adresse email est déjà utilisée.'; 
+            } else {
+              alert('Erreur : Cette adresse email est déjà utilisée.');
+            }
+            return;
+          }
+        }
+      }
 
       if (visible < cards.length - 1) showCardByIndex(visible + 1);
     };
@@ -479,3 +498,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       });
     <?php endif; ?>
   </script>
+</body>
+</html>
