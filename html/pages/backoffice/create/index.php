@@ -7,10 +7,10 @@
     const NB_IMGS_MAX = 3;
     const EMPLACEMENT_DES_IMGS = 'html/img/photo/';
 
-    if($_SESSION['id'] != null){
+    if($_SESSION['vendeur_id'] != null){
         try {//Affiliation id_utilisateur id_vendeur
             $sql = '
-            SELECT id_vendeur FROM cobrec1._vendeur WHERE id_compte = ' . $_SESSION['id'] . ';'
+            SELECT id_vendeur FROM cobrec1._vendeur WHERE id_compte = ' . $_SESSION['vendeur_id'] . ';'
             ;
             $stmt = $pdo->query($sql);
             $id_vendeur = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -103,7 +103,7 @@
                         $_SESSION["creerArticle"]["_FILES"]['name'] = [];
                         foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
                             $_SESSION["creerArticle"]["_FILES"]['name'][$key] = $value['i_title'];
-                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = '../../../img/photo/';
+                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace('html/img/photo', '../../../img/photo/',$value['i_lien']);
                             $_SESSION["creerArticle"]["_FILES"]['name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['name'][$key]);
                             copy($_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] . $_SESSION["creerArticle"]["_FILES"]['name'][$key], 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['name'][$key]);
                         }
@@ -163,10 +163,10 @@
 <pre>
 <?php
 
-// print_r($_GET['modifier']);
-// print_r($_SESSION["creerArticle"]['_GET']);
-// print_r($_POST);
-// print_r($_SESSION["creerArticle"]);
+print_r($_GET['modifier']);
+print_r($_SESSION["creerArticle"]['_GET']);
+print_r($_POST);
+print_r($_SESSION["creerArticle"]);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
 $warnPromo = false;
 if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
@@ -280,6 +280,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     // $_POST["couleur"] =null;
     $_POST["poids"] =null;
     $_POST["volume"] =null;
+    $_POST["origine"] =null;
+    $_POST["categorie"] =null;
 
 }
 
@@ -442,9 +444,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
                             ?><br>
                             <small>
-                                <img src="<?php echo 'temp_/' . $value ?>" height="25">
-                                <?php echo $value; ?>
-                                <input type="submit" name="btn_moins<?php echo $key?>" title="Permets de supprimer l'image qui est en face." value="-" />
+                                <img src="<?php 
+                                if ((str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'https://')) || (str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'http://'))){
+                                    echo $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key];
+                                }else{
+                                    echo 'temp_/' . $value;
+                                }
+                                
+
+                                ?>" height="25">
+                                <?php echo $value . var_dump(str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'https://')); ?>
+                                <input type="submit" name="btn_moins<?php echo $key ?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
                             <?php
                         }
