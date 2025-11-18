@@ -1,8 +1,8 @@
 <?php
+
 // connexion a la bdd
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
-session_start();
 // Précharge les pseudos existants pour comparaison côté client (interdits)
 $__existing_pseudos = [];
 
@@ -39,51 +39,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $hasError = false;
   $error_card = null;
   $error_message = '';
+  $bdd_errors = [];
 
-$bdd_errors = [];
+  // Vérifier si l'email existe déjà
   if (!$hasError) {
-
     try {
-      $sql = '
-      INSERT INTO cobrec1._compte(email,num_telephone,mdp,timestamp_inscription)
-      VALUES (
-      ' . "'" . $email ."'" .', 
-      ' . "'" . $telephone ."'" .', 
-      ' . "'" . $mdp ."'" .', 
-      CURRENT_TIMESTAMP
-      );
-      ';
-      $stmt = $pdo->prepare($sql);
-      $stmt->execute();
-
-  } catch (Exception $e) {
-    $hasError = true;
-    $error_card = 4; 
-    $error_message = 'info invalide a inserer .';
-    $bdd_errors[] =  [$e];
+      $stmt = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._compte WHERE email = :email');
+      $stmt->execute(['email' => $email]);
+      $count = $stmt->fetchColumn();
+      
+      if ($count > 0) {
+        $hasError = true;
+        $error_card = 2; // Card de l'email
+        $error_message = 'Cette adresse email est déjà utilisée.';
+      }
+    } catch (Exception $e) {
+      $hasError = true;
+      $error_card = 2;
+      $error_message = 'Erreur lors de la vérification de l\'email.';
+      $bdd_errors[] = [$e->getMessage()];
+    }
   }
 
-  $fp = fopen('file.csv', 'w');
+  if (!$hasError) {
+    try {
+      // Utiliser des requêtes préparées pour la sécurité
+      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription)
+              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP)';
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute([
+        'email' => $email,
+        'telephone' => $telephone,
+        'mdp' => password_hash($mdp, PASSWORD_DEFAULT) // Hacher le mot de passe !
+      ]);
 
-                foreach ($bdd_errors as $fields) {
-                    fputcsv($fp, $fields, ',', '"', '');
-                }
+    } catch (Exception $e) {
+      $hasError = true;
+      $error_card = 4; 
+      $error_message = 'Informations invalides à insérer.';
+      $bdd_errors[] = [$e->getMessage()];
+    }
 
-                fclose($fp);
-
-      // Ensure we have sensible values to display and avoid undefined variable notices
-      try {
-        $row = $pdo->lastInsertId();
-      } catch (Exception $e) {
-        $row = '';
+    if (!empty($bdd_errors)) {
+      $fp = fopen('file.csv', 'w');
+      foreach ($bdd_errors as $fields) {
+        fputcsv($fp, $fields, ',', '"', '');
       }
-      $id_client = $row;
+      fclose($fp);
+    }
+
+    if (!$hasError) {
+      try {
+        $id_compte = $pdo->lastInsertId();
+      } catch (Exception $e) {
+        $id_compte = '';
+      }
 
       echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
       echo "<h2 style=\"margin-top:0;\">Compte créé</h2>";
       echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-      echo "<dt>ID compte</dt><dd>" . htmlspecialchars((string)$row, ENT_QUOTES, 'UTF-8') . "</dd>";
-      echo "<dt>ID client</dt><dd>" . htmlspecialchars((string)$id_client, ENT_QUOTES, 'UTF-8') . "</dd>";
+      echo "<dt>ID compte</dt><dd>" . htmlspecialchars((string)$id_compte, ENT_QUOTES, 'UTF-8') . "</dd>";
       echo "<dt>Email</dt><dd>" . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . "</dd>";
       echo "</dl>";
       echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
@@ -91,6 +106,7 @@ $bdd_errors = [];
       echo "</div>";
       echo "</div>";
       exit;
+    }
   }
 }
 ?>
