@@ -1,7 +1,8 @@
 <?php 
+    session_start();
     include '../../selectBDD.php';
 
-    session_start();
+    
     $id_client = $_SESSION['idClient'];
     $pdo->exec("SET search_path TO cobrec1");
 
