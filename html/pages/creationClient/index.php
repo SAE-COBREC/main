@@ -413,28 +413,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
       } catch (e) { console.warn('Validation HTML5 non disponible ou erreur', e); }
 
-      if (visible === 0) {
-        const pseudoInput = document.getElementById('pseudo');
-        const interdit = '<?php echo $interdit; ?>';
-        if (pseudoInput && pseudoInput.value.trim().toLowerCase() === interdit.toLowerCase()) {
-          const err = errorEl || document.querySelector('.card#1 .error');
-          if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Ce pseudonyme n\'est pas autorisé.'; }
-          else alert('Erreur : Ce pseudonyme n\'est pas autorisé.');
-          return;
-        }
-      }
-
-      if (visible === 1) {
-        const emailInput = document.getElementById('email');
-        const interditMail = '<?php echo $interditmail; ?>';
-        if (emailInput && emailInput.value.trim().toLowerCase() === interditMail.toLowerCase()) {
-          const err = errorEl || document.querySelector('.card#2 .error');
-          if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Cet email n\'est pas autorisé.'; }
-          else alert('Erreur : Cet email n\'est pas autorisé.');
-          return;
-        }
-      }
-
       if (visible < cards.length - 1) showCardByIndex(visible + 1);
     };
 
