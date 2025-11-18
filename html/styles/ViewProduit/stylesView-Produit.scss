@@ -7,6 +7,24 @@ body {
     color: vars.$primary-color-noir;
 }
 
+/* Lien retour catalogue */
+.page-breadcrumb {
+    margin: 12px auto -12px;
+    max-width: 1150px;
+    padding: 0 24px;
+}
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: vars.$primary-color-noir;
+    text-decoration: none;
+    background: vars.$primary-color-blanc;
+    border: 1px solid vars.$secondary-color-gris-clair;
+    padding: 8px 12px;
+    border-radius: 999px;
+}
+.back-link:hover { background: #fff; box-shadow: 0 2px 10px rgba(30,30,60,.06); }
 .container {
     max-width: 1150px;
     margin: 36px auto;
@@ -111,6 +129,36 @@ body {
             align-items: center;
             gap: 8px;
             margin: 14px 0;
+            .qty-control {
+                display: inline-flex;
+                align-items: center;
+                gap: 16px;
+                padding: 10px 16px;
+                border-radius: 999px;
+                background: vars.$secondary-color-bleu-clair;
+                border: 1px solid vars.$secondary-color-gris-clair;
+                button.ghost {
+                    background: transparent;
+                    border: 0;
+                    color: vars.$primary-color-noir;
+                    width: 28px;
+                    height: 28px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 700;
+                    border-radius: 999px;
+                }
+                input[type="number"] {
+                    background: transparent;
+                    border: 0;
+                    min-width: 40px;
+                    text-align: center;
+                    font-weight: 700;
+                    color: vars.$primary-color-noir;
+                    padding: 0;
+                }
+            }
         }
 
         .meta {
@@ -422,6 +470,7 @@ footer>div>div:last-child span:hover {
     .product-row { display: flex; flex-direction: column; }
     .product-row .main-image { order: 1; min-height: 240px; }
     .product-row .thumbs { order: 2; }
+    .product-row .summary { order: 3; }
 
     .thumbs {
         flex-direction: row;
