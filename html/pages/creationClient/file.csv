@@ -1,0 +1,5 @@
+"PDOException: SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint ""_compte_email_key""
+DETAIL:  Key (email)=(client1@gmail.com) already exists. in /home/leo/Documents/GitHub/main/html/pages/creationClient/index.php:57
+Stack trace:
+#0 /home/leo/Documents/GitHub/main/html/pages/creationClient/index.php(57): PDOStatement->execute()
+#1 {main}"

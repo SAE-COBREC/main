@@ -1,4 +1,5 @@
 <?php 
+session_start();
 //connexion a la bdd 
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");

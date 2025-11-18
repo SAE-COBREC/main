@@ -5,20 +5,7 @@ $pdo->exec("SET search_path TO cobrec1");
 session_start();
 // Précharge les pseudos existants pour comparaison côté client (interdits)
 $__existing_pseudos = [];
-try {
-  $sql = 'SELECT c_pseudo FROM cobrec1._client';
-  $stmt = $pdo->query($sql);
-  if ($stmt) {
-    $__existing_pseudos = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
-    if (!is_array($__existing_pseudos)) $__existing_pseudos = [];
-    // normaliser en minuscules et filtrer les valeurs vides, garder unique
-    $__existing_pseudos = array_values(array_unique(array_filter(array_map(function($v){
-      return mb_strtolower((string)$v, 'UTF-8');
-    }, $__existing_pseudos), function($v){ return $v !== ''; })));
-  }
-} catch (Exception $e) {
-  $__existing_pseudos = [];
-}
+
 ?>
 
 <!DOCTYPE html>
@@ -84,10 +71,18 @@ $bdd_errors = [];
 
                 fclose($fp);
 
+      // Ensure we have sensible values to display and avoid undefined variable notices
+      try {
+        $row = $pdo->lastInsertId();
+      } catch (Exception $e) {
+        $row = '';
+      }
+      $id_client = $row;
+
       echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
       echo "<h2 style=\"margin-top:0;\">Compte créé</h2>";
       echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-      echo "<dt>ID compte</dt><dd>" . $row . "</dd>";
+      echo "<dt>ID compte</dt><dd>" . htmlspecialchars((string)$row, ENT_QUOTES, 'UTF-8') . "</dd>";
       echo "<dt>ID client</dt><dd>" . htmlspecialchars((string)$id_client, ENT_QUOTES, 'UTF-8') . "</dd>";
       echo "<dt>Email</dt><dd>" . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . "</dd>";
       echo "</dl>";
@@ -324,6 +319,7 @@ $bdd_errors = [];
   </form>
 
   <script>
+
     window.__existingPseudos = <?php echo json_encode($__existing_pseudos, JSON_UNESCAPED_UNICODE); ?> || [];
     function currentCard() { return document.querySelector('.card:not(.hidden)'); }
     function showCardByIndex(idx) {
@@ -346,6 +342,19 @@ $bdd_errors = [];
       try {
         if (el && el.validity) {
           if (el.validity.valueMissing) return 'Ce champ est requis.';
+
+            // Vérification d'âge : la date de naissance doit indiquer au moins 18 ans
+            if (el.id === 'naissance') {
+              var dobStr = (el.value || '').trim();
+              if (!dobStr) return 'Ce champ est requis.';
+              var dob = new Date(dobStr);
+              if (isNaN(dob.getTime())) return 'Date de naissance invalide.';
+              var today = new Date();
+              var age = today.getFullYear() - dob.getFullYear();
+              var m = today.getMonth() - dob.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+              if (age < 18) return 'Vous devez avoir au moins 18 ans.';
+            }
 
           if (el.type === 'password') {
             var val = (el.value || '').trim();
@@ -370,31 +379,6 @@ $bdd_errors = [];
       return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
     }
 
-    if (visible === 0) {
-        const pseudoInput = document.getElementById('pseudo');
-        if (pseudoInput) {
-          const val = (pseudoInput.value || '').trim().toLowerCase();
-          if (val && Array.isArray(window.__existingPseudos) && window.__existingPseudos.indexOf(val) !== -1) {
-            const err = errorEl || document.querySelector('.card#1 .error');
-            if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Ce pseudonyme n\'est pas autorisé.'; }
-            else alert('Erreur : Ce pseudonyme n\'est pas autorisé.');
-            try { pseudoInput.focus(); } catch (e) { }
-            return;
-          }
-        }
-      }
-
-      if (visible === 1) {
-        const emailInput = document.getElementById('email');
-        const interditMail = '<?php echo $interditmail; ?>';
-        if (emailInput && emailInput.value.trim().toLowerCase() === interditMail.toLowerCase()) {
-          const err = errorEl || document.querySelector('.card#2 .error');
-          if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Cet email n\'est pas autorisé.'; }
-          else alert('Erreur : Cet email n\'est pas autorisé.');
-          return;
-        }
-      }
-
     window.showNextCard = function () {
       const cards = Array.from(document.querySelectorAll('.card'));
       const visible = cards.findIndex(c => !c.classList.contains('hidden'));
@@ -413,6 +397,27 @@ $bdd_errors = [];
         }
       } catch (e) { console.warn('Validation HTML5 non disponible ou erreur', e); }
 
+      if (visible === 0) {
+        const pseudoInput = document.getElementById('pseudo');
+        const interdit = '<?php echo $interdit; ?>';
+        if (pseudoInput && pseudoInput.value.trim().toLowerCase() === interdit.toLowerCase()) {
+          const err = errorEl || document.querySelector('.card#1 .error');
+          if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Ce pseudonyme n\'est pas autorisé.'; }
+          else alert('Erreur : Ce pseudonyme n\'est pas autorisé.');
+          return;
+        }
+      }
+
+      if (visible === 1) {
+        const emailInput = document.getElementById('email');
+        const interditMail = '<?php echo $interditmail; ?>';
+        if (emailInput && emailInput.value.trim().toLowerCase() === interditMail.toLowerCase()) {
+          const err = errorEl || document.querySelector('.card#2 .error');
+          if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Cet email n\'est pas autorisé.'; }
+          else alert('Erreur : Cet email n\'est pas autorisé.');
+          return;
+        }
+      }
 
       if (visible < cards.length - 1) showCardByIndex(visible + 1);
     };
