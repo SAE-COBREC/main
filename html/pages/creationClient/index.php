@@ -1,3 +1,26 @@
+<?php
+// connexion a la bdd
+include '../../selectBDD.php';
+$pdo->exec("SET search_path TO cobrec1");
+session_start();
+// Précharge les pseudos existants pour comparaison côté client (interdits)
+$__existing_pseudos = [];
+try {
+  $sql = 'SELECT c_pseudo FROM cobrec1._client';
+  $stmt = $pdo->query($sql);
+  if ($stmt) {
+    $__existing_pseudos = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    if (!is_array($__existing_pseudos)) $__existing_pseudos = [];
+    // normaliser en minuscules et filtrer les valeurs vides, garder unique
+    $__existing_pseudos = array_values(array_unique(array_filter(array_map(function($v){
+      return mb_strtolower((string)$v, 'UTF-8');
+    }, $__existing_pseudos), function($v){ return $v !== ''; })));
+  }
+} catch (Exception $e) {
+  $__existing_pseudos = [];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -13,14 +36,6 @@
 </head>
 
 <?php
-// database connection
-include __DIR__ . '/../../selectBDD.php';
-try { $pdo->exec("SET search_path TO cobrec1"); } catch (Throwable $t) { /* ignore */ }
-
-$interdit = "bleu";
-
-$interditmail = "a@a.a";
-// When the form is submitted (Terminer), display the submitted PHP variables server-side
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $nom = htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8');
   $prenom = htmlspecialchars($_POST['prenom'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -34,72 +49,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $mdp = $_POST['mdp'] ?? '';
   $Cmdp = $_POST['Cmdp'] ?? '';
 
-  // prepare error state
   $hasError = false;
   $error_card = null;
   $error_message = '';
 
-  // Server-side pseudo check
-  if (strtolower($pseudo) === strtolower($interdit)) {
-    $hasError = true;
-    $error_card = 1; // show error on card 1
-    $error_message = 'Ce pseudonyme n\'est pas autorisé.';
-  }
-  if (strtolower($email) === strtolower($interditmail)) {
-    $hasError = true;
-    $error_card = 2; // show error on card 1
-    $error_message = 'Ce mail n\'est pas autorisé.';
-  }
-
-  // Server-side email format check (matches DB constraint pattern)
-  if (!$hasError && !preg_match('/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/', $email)) {
-    $hasError = true;
-    $error_card = 2; // show error on card 2
-    $error_message = 'Veuillez saisir une adresse e-mail valide.';
-  }
-
-  if (!$hasError && !preg_match('/(0|\\+33|0033)[1-9][0-9]{8}/', $telephone)) {
-    $hasError = true;
-    $error_card = 2; // show error on card 2
-    $error_message = 'Veuillez saisir un numéro de téléphone valide .';
-  }
-  // code postal: expect exactly 5 digits server-side (client already enforces this)
-  if (!$hasError && !preg_match('/^[0-9]{5}$/', $codeP)) {
-    $hasError = true;
-    $error_card = 3; // show error on card 3
-    $error_message = 'Le code postal doit contenir exactement 5 chiffres.';
-  }
-  // Server-side password confirmation check: ensure grouping is correct and reject empty/weak passwords
-  if (!$hasError && (empty($mdp) || $mdp !== $Cmdp || strlen($mdp) < 8)) {
-    $hasError = true;
-    $error_card = 4; // show error on card 4
-    $error_message = 'Les mots de passe doivent correspondre et contenir au moins 8 caractères.';
-  }
-
+$bdd_errors = [];
   if (!$hasError) {
-    try {//création de l'objet produit dans la base
+
+    try {
       $sql = '
-      INSERT INTO cobrec1._compte(id_compte,email,num_telephone,mdp)
+      INSERT INTO cobrec1._compte(email,num_telephone,mdp,timestamp_inscription)
       VALUES (
-      ' . "'" . $id_client ."'" .', 
-      ' . $email .', 
-      ' . "'" . $num_telephone ."'" .', 
+      ' . "'" . $email ."'" .', 
+      ' . "'" . $telephone ."'" .', 
       ' . "'" . $mdp ."'" .', 
       CURRENT_TIMESTAMP
       );
       ';
       $stmt = $pdo->prepare($sql);
       $stmt->execute();
+
   } catch (Exception $e) {
     $hasError = true;
     $error_card = 4; 
     $error_message = 'info invalide a inserer .';
+    $bdd_errors[] =  [$e];
   }
+
+  $fp = fopen('file.csv', 'w');
+
+                foreach ($bdd_errors as $fields) {
+                    fputcsv($fp, $fields, ',', '"', '');
+                }
+
+                fclose($fp);
 
       echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
       echo "<h2 style=\"margin-top:0;\">Compte créé</h2>";
       echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-      echo "<dt>ID compte</dt><dd>" . htmlspecialchars((string)$id_compte, ENT_QUOTES, 'UTF-8') . "</dd>";
+      echo "<dt>ID compte</dt><dd>" . $row . "</dd>";
       echo "<dt>ID client</dt><dd>" . htmlspecialchars((string)$id_client, ENT_QUOTES, 'UTF-8') . "</dd>";
       echo "<dt>Email</dt><dd>" . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . "</dd>";
       echo "</dl>";
@@ -167,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="step">étape 1 / 4</div>
 
+      
       <div class="next-btn" role="group" aria-label="Suivant action">
         <span class="next-text">Suivant</span>
         <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
@@ -190,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" required>
+        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide.">
       </div>
 
       <div>
@@ -299,12 +288,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="mdp">Mot de passe</label>
-        <input type="password" id="mdp" name="mdp" placeholder="***********" value="" required>
+        <input type="password" id="mdp" name="mdp" placeholder="***********" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
       </div>
 
       <div>
         <label for="Cmdp">Confirmer le mot de passe</label>
-        <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" value="" required>
+        <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
       </div>
 
       <div class="error">
@@ -335,281 +324,159 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
-    function currentCard() {
-      return document.querySelector('.card:not(.hidden)');
-    }
+    window.__existingPseudos = <?php echo json_encode($__existing_pseudos, JSON_UNESCAPED_UNICODE); ?> || [];
+    function currentCard() { return document.querySelector('.card:not(.hidden)'); }
     function showCardByIndex(idx) {
       const cards = Array.from(document.querySelectorAll('.card'));
-      cards.forEach((c, i) => {
-        c.classList.toggle('hidden', i !== idx);
-      });
-      // adjust body alignment depending on card height vs viewport
+      cards.forEach((c, i) => c.classList.toggle('hidden', i !== idx));
       try { if (typeof updateBodyAlignment === 'function') updateBodyAlignment(); } catch (e) { /* ignore */ }
     }
 
-    // Keep the card vertically centered when it fits the viewport, otherwise align top.
     function updateBodyAlignment() {
       try {
         var card = document.querySelector('.card:not(.hidden)');
         if (!card) return;
         var rect = card.getBoundingClientRect();
-        var needed = rect.height + 48; // small buffer for spacing
-        if (needed <= window.innerHeight) {
-          document.body.classList.add('centered');
-        } else {
-          document.body.classList.remove('centered');
-        }
-      } catch (e) { /* non-blocking */ }
+        var needed = rect.height + 48;
+        if (needed <= window.innerHeight) document.body.classList.add('centered'); else document.body.classList.remove('centered');
+      } catch (e) { /* ignore */ }
     }
-    // Retourne un message de validation en français pour l'élément fourni
+
     function getFieldValidationMessage(el) {
-      if (!el) return 'Veuillez remplir ce champ correctement.';
       try {
-        if (el.validity) {
+        if (el && el.validity) {
           if (el.validity.valueMissing) return 'Ce champ est requis.';
-          if (el.validity.typeMismatch) {
-            if (el.type === 'email') return 'Veuillez saisir une adresse e-mail valide.';
-            if (el.type === 'url') return 'Veuillez saisir une URL valide.';
-            return 'Le format de la valeur est invalide.';
+
+          if (el.type === 'password') {
+            var val = (el.value || '').trim();
+            if (val.length === 0) return 'Ce champ est requis.';
+            if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
+            if (val.length > 16) return 'Le mot de passe doit contenir au maximum 16 caractères.';
+            if (!/[0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un chiffre.';
+            if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';
+            if (!/[a-z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre minuscule.';
+            if (!/[^A-Za-z0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un caractère spécial.';
+            if (el.validity.patternMismatch) return 'Le mot de passe ne respecte pas le format requis.';
           }
-          if (el.validity.patternMismatch) return el.getAttribute('title') || 'Le format saisi est incorrect.';
-          if (el.validity.tooLong) return 'La valeur est trop longue.';
-          if (el.validity.tooShort) return 'La valeur est trop courte.';
-          if (el.validity.rangeUnderflow) return 'La valeur est trop faible.';
-          if (el.validity.rangeOverflow) return 'La valeur est trop élevée.';
-          if (el.validity.stepMismatch) return "La valeur n'est pas un pas valide.";
-          if (el.validity.badInput) return 'Saisie invalide.';
+
+          if (el.validity.patternMismatch) {
+            if (el.type === 'email') return 'Veuillez saisir une adresse e-mail valide.';
+            if (el.id === 'telephone') return 'Le numéro de téléphone n\'a pas le bon format.';
+            if (el.id === 'codeP') return 'Le code postal doit contenir 5 chiffres.';
+            return 'Le format de ce champ est invalide.';
+          }
         }
       } catch (e) { /* ignore */ }
-      return el.validationMessage || 'Veuillez remplir ce champ correctement.';
+      return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
     }
-    window.showNextCard = function () {
-      const cards = Array.from(document.querySelectorAll('.card'));
-      const visible = cards.findIndex(c => !c.classList.contains('hidden'));
 
-      const activeCard = cards[visible];
-      const errorEl = activeCard ? activeCard.querySelector('.error') : null;
-
-      // Prefer HTML5 validation for inputs inside the active card: find the first invalid field
-      try {
-        const invalid = activeCard ? activeCard.querySelector(':invalid') : null;
-        if (invalid) {
-          const message = getFieldValidationMessage(invalid);
-          try { invalid.setCustomValidity(message); } catch (e) { /* ignore */ }
-          if (errorEl) {
-            errorEl.innerHTML = '<strong>Erreur</strong> : ' + message;
-            errorEl.classList.remove('hidden');
-          } else {
-            if (typeof invalid.reportValidity === 'function') {
-              invalid.reportValidity();
-            } else {
-              alert(message);
-            }
-          }
-          try { invalid.focus(); } catch (e) { /* ignore */ }
-          return; // block navigation to next card
-        }
-      } catch (e) {
-        console.warn('Validation HTML5 non disponible ou erreur', e);
-      }
-
-      // Vérification du pseudo interdit sur la card 1 (après validation HTML5)
-      if (visible === 0) {
+    if (visible === 0) {
         const pseudoInput = document.getElementById('pseudo');
-        const interdit = '<?php echo $interdit; ?>';
-        if (pseudoInput && pseudoInput.value.trim().toLowerCase() === interdit.toLowerCase()) {
-          const err = errorEl || document.querySelector('.card#1 .error');
-          if (err) {
-            err.classList.remove('hidden');
-            err.innerHTML = '<strong>Erreur</strong> : Ce pseudonyme n\'est pas autorisé.';
-          } else {
-            alert('Erreur : Ce pseudonyme n\'est pas autorisé.');
+        if (pseudoInput) {
+          const val = (pseudoInput.value || '').trim().toLowerCase();
+          if (val && Array.isArray(window.__existingPseudos) && window.__existingPseudos.indexOf(val) !== -1) {
+            const err = errorEl || document.querySelector('.card#1 .error');
+            if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Ce pseudonyme n\'est pas autorisé.'; }
+            else alert('Erreur : Ce pseudonyme n\'est pas autorisé.');
+            try { pseudoInput.focus(); } catch (e) { }
+            return;
           }
-          // keep user on card 1
-          return;
         }
       }
-      // Vérification de l'email interdit sur la card 2
+
       if (visible === 1) {
         const emailInput = document.getElementById('email');
         const interditMail = '<?php echo $interditmail; ?>';
         if (emailInput && emailInput.value.trim().toLowerCase() === interditMail.toLowerCase()) {
           const err = errorEl || document.querySelector('.card#2 .error');
-          if (err) {
-            err.classList.remove('hidden');
-            err.innerHTML = '<strong>Erreur</strong> : Cet email n\'est pas autorisé.';
-          } else {
-            alert('Erreur : Cet email n\'est pas autorisé.');
-          }
-          // keep user on card 2
+          if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Cet email n\'est pas autorisé.'; }
+          else alert('Erreur : Cet email n\'est pas autorisé.');
           return;
         }
       }
 
+    window.showNextCard = function () {
+      const cards = Array.from(document.querySelectorAll('.card'));
+      const visible = cards.findIndex(c => !c.classList.contains('hidden'));
+      const activeCard = cards[visible];
+      const errorEl = activeCard ? activeCard.querySelector('.error') : null;
+
+      try {
+        const invalid = activeCard ? activeCard.querySelector(':invalid') : null;
+        if (invalid) {
+          const message = getFieldValidationMessage(invalid);
+          try { invalid.setCustomValidity(message); } catch (e) { /* ignore */ }
+          if (errorEl) { errorEl.innerHTML = '<strong>Erreur</strong> : ' + message; errorEl.classList.remove('hidden'); }
+          else if (typeof invalid.reportValidity === 'function') invalid.reportValidity(); else alert(message);
+          try { invalid.focus(); } catch (e) { /* ignore */ }
+          return;
+        }
+      } catch (e) { console.warn('Validation HTML5 non disponible ou erreur', e); }
+
+
       if (visible < cards.length - 1) showCardByIndex(visible + 1);
-    }
+    };
+
     window.showPreviousCard = function () {
       const cards = Array.from(document.querySelectorAll('.card'));
       const visible = cards.findIndex(c => !c.classList.contains('hidden'));
       if (visible > 0) showCardByIndex(visible - 1);
-    }
+    };
+
     window.finishRegistration = function () {
-      console.log('[register] finishRegistration called');
-      // Validate HTML5 required fields first
-      var form = document.getElementById('multiForm');
-      if (!form) return;
+      var form = document.getElementById('multiForm'); if (!form) return;
       if (!form.checkValidity()) {
         var invalid = form.querySelector(':invalid');
         if (invalid) {
-          // show the card containing the invalid field
-          var card = invalid.closest('.card');
-          var cards = Array.from(document.querySelectorAll('.card'));
-          var idx = card ? cards.indexOf(card) : 0;
+          var card = invalid.closest('.card'); var cards = Array.from(document.querySelectorAll('.card')); var idx = card ? cards.indexOf(card) : 0;
           if (typeof showCardByIndex === 'function') showCardByIndex(idx);
-          var errDiv = card ? card.querySelector('.error') : null;
-          var message = getFieldValidationMessage(invalid);
+          var errDiv = card ? card.querySelector('.error') : null; var message = getFieldValidationMessage(invalid);
           try { invalid.setCustomValidity(message); } catch (e) { /* ignore */ }
-          if (errDiv) {
-            errDiv.textContent = message;
-            errDiv.classList.remove('hidden');
-          } else {
-            alert(message);
-          }
+          if (errDiv) { errDiv.textContent = message; errDiv.classList.remove('hidden'); } else alert(message);
           invalid.focus();
         }
         return;
       }
 
-      // Client-side password confirmation check
-      const mdpEl = document.getElementById('mdp');
-      const cmdpEl = document.getElementById('Cmdp');
-      const mdp = mdpEl ? (mdpEl.value || '') : '';
-      const cmdp = cmdpEl ? (cmdpEl.value || '') : '';
-      if (mdp !== cmdp) {
-        // Show card 4 and display error
-        showCardByIndex(3);
-        const err = document.querySelector('.card#\\34  .error');
-        if (err) {
-          err.classList.remove('hidden');
-          err.innerHTML = '<strong>Erreur</strong> : Les mots de passe ne correspondent pas.';
-        } else {
-          alert('Erreur : Les mots de passe ne correspondent pas.');
-        }
-        return;
-      }
+      const mdpEl = document.getElementById('mdp'); const cmdpEl = document.getElementById('Cmdp');
+      const mdp = mdpEl ? (mdpEl.value || '') : ''; const cmdp = cmdpEl ? (cmdpEl.value || '') : '';
+      if (mdp !== cmdp) { showCardByIndex(3); const err = document.querySelector('.card#\\34  .error'); if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Les mots de passe ne correspondent pas.'; } else alert('Erreur : Les mots de passe ne correspondent pas.'); return; }
 
-      // All checks passed — perform a real submission that triggers HTML5 validation
-      try {
-        // Allow the submit handler to let this programmatic submit through
-        window.__allow_submit = true;
-        // mark that we are attempting submission (used by the debug fallback below)
-        try { window.__submission_confirmed = false; } catch (e) { /* ignore */ }
-        console.log('[register] calling requestSubmit (or form.submit fallback)');
-        if (typeof form.requestSubmit === 'function') {
-          form.requestSubmit();
-        } else {
-          form.submit();
-        }
-        // If no submit event completes within 600ms, attempt a direct submit as a fallback
-        setTimeout(function () {
-          try {
-            if (!window.__submission_confirmed) {
-              console.warn('[register] no submit event detected within timeout — using fallback form.submit()');
-              // ensure the guard is set so submit listener allows it
-              window.__allow_submit = true;
-              form.submit();
-            }
-          } catch (e) { console.error('[register] fallback submit failed', e); }
-        }, 600);
-      } catch (e) {
-        window.__allow_submit = false;
-        // fallback to native submit
-        form.submit();
-      }
-    }
+      try { window.__allow_submit = true; try { window.__submission_confirmed = false; } catch (e) { /* ignore */ } if (typeof form.requestSubmit === 'function') form.requestSubmit(); else form.submit(); setTimeout(function () { try { if (!window.__submission_confirmed) { window.__allow_submit = true; form.submit(); } } catch (e) { } }, 600); } catch (e) { window.__allow_submit = false; form.submit(); }
+    };
 
-    // Si une erreur PHP est détectée, afficher la carte concernée au chargement
     <?php if (isset($hasError) && $hasError && $error_card): ?>
-      window.addEventListener('DOMContentLoaded', function () {
-        showCardByIndex(<?php echo $error_card - 1; ?>); // -1 car les index commencent à 0
-      });
+      window.addEventListener('DOMContentLoaded', function () { showCardByIndex(<?php echo $error_card - 1; ?>); });
     <?php endif; ?>
-    // Intercept native form submit (enter key) to ensure we run finishRegistration()
+
     document.addEventListener('DOMContentLoaded', function () {
       var form = document.getElementById('multiForm');
       if (form) {
         form.addEventListener('submit', function (e) {
-          console.log('[register] form submit event (allow flag =', !!window.__allow_submit, ')');
-          // If this submit was allowed by the page code, mark confirmation and allow it
-          if (window.__allow_submit) {
-            // signal that submission actually happened so the caller's fallback doesn't re-submit
-            try { window.__submission_confirmed = true; } catch (e) { /* ignore */ }
-            window.__allow_submit = false;
-            return; // allow native submit to proceed
-          }
-          // otherwise prevent default and run our validation
-          e.preventDefault();
-          try {
-            if (typeof window.finishRegistration === 'function') window.finishRegistration();
-          } catch (err) {
-            console.error('finishRegistration error', err);
-          }
+          if (window.__allow_submit) { try { window.__submission_confirmed = true; } catch (e) { } window.__allow_submit = false; return; }
+          e.preventDefault(); try { if (typeof window.finishRegistration === 'function') window.finishRegistration(); } catch (err) { console.error('finishRegistration error', err); }
         });
       }
     });
 
     <?php if (!isset($hasError) || !$hasError): ?>
-      // On a fresh page load (no server validation error), clear saved draft and reset fields
-
-      // Attach invalid/input handlers to elements to provide French messages
       document.addEventListener('DOMContentLoaded', function () {
         try {
           var formEl = document.getElementById('multiForm');
           if (formEl) {
             var elems = formEl.querySelectorAll('input, textarea, select');
             elems.forEach(function (el) {
-              el.addEventListener('invalid', function (ev) {
-                try { el.setCustomValidity(getFieldValidationMessage(el)); } catch (e) { /* ignore */ }
-              });
-              el.addEventListener('input', function () {
-                try { el.setCustomValidity(''); } catch (e) { /* ignore */ }
-              });
+              el.addEventListener('invalid', function (ev) { try { el.setCustomValidity(getFieldValidationMessage(el)); } catch (e) { } });
+              el.addEventListener('input', function () { try { el.setCustomValidity(''); } catch (e) { } });
             });
           }
-        } catch (e) { /* ignore */ }
-      });
-      document.addEventListener('DOMContentLoaded', function () {
-        try {
-          if (window.clearSavedRegistration) {
-            window.clearSavedRegistration();
-          } else if (window.localStorage) {
-            Object.keys(localStorage).filter(k => k.startsWith('register:')).forEach(k => localStorage.removeItem(k));
-          }
-        } catch (e) { /* ignore */ }
+        } catch (e) { }
 
-        // Also clear any form values that the browser may have restored on reload
-        var form = document.getElementById('multiForm');
-        if (form) {
-          Array.from(form.elements).forEach(function (el) {
-            try {
-              var tag = (el.tagName || '').toLowerCase();
-              if (tag === 'input' || tag === 'textarea' || tag === 'select') {
-                if (el.type === 'checkbox' || el.type === 'radio') {
-                  el.checked = false;
-                } else {
-                  el.value = '';
-                }
-              }
-            } catch (e) { /* ignore individual element errors */ }
-          });
-          // ensure the first card is visible
-          if (typeof showCardByIndex === 'function') showCardByIndex(0);
-        }
+        try {
+          if (window.clearSavedRegistration) { window.clearSavedRegistration(); } else if (window.localStorage) { Object.keys(localStorage).filter(k => k.startsWith('register:')).forEach(k => localStorage.removeItem(k)); }
+        } catch (e) { }
+
+        var form = document.getElementById('multiForm'); if (form) { Array.from(form.elements).forEach(function (el) { try { var tag = (el.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea' || tag === 'select') { if (el.type === 'checkbox' || el.type === 'radio') el.checked = false; else el.value = ''; } } catch (e) { } }); if (typeof showCardByIndex === 'function') showCardByIndex(0); }
       });
     <?php endif; ?>
   </script>
-
-  <script type="module" src="../../js/registerPass.js"></script>
-</body>
-
-</html>
