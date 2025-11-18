@@ -484,7 +484,16 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
 </head>
 
 <body>
-    <div id="header"></div>
+    <?php
+        include __DIR__ . '/partials/header.html';
+    ?>
+
+    <nav class="page-breadcrumb">
+        <a class="back-link" href="/index.php" onclick="if (history.length>1) { history.back(); return false; }">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Retour au catalogue
+        </a>
+    </nav>
 
     <main class="container">
         <div class="product-row <?= $hasMultipleImages ? '' : 'no-thumbs' ?>">
@@ -532,13 +541,14 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
                 </div>
 
                 <div class="qty">
-                    <button class="ghost" id="qty-decrease" aria-label="Réduire quantité">−</button>
-                    <input type="number" id="qtyInput" min="1" step="1" max="<?= (int)($produit['p_stock'] ?? 0) ?>"
-                        style="min-width:36px;text-align:center;background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #f0f2f6"
-                        value="1" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
-                    <button class="ghost" id="qty-increase" aria-label="Augmenter quantité">+</button>
+                    <div class="qty-control" role="group" aria-label="Choisir la quantité">
+                        <button class="ghost" id="qty-decrease" aria-label="Réduire quantité">−</button>
+                        <input type="number" id="qtyInput" min="1" step="1" max="<?= (int)($produit['p_stock'] ?? 0) ?>"
+                            value="1" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
+                        <button class="ghost" id="qty-increase" aria-label="Augmenter quantité">+</button>
+                    </div>
                     <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
-                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)"    >
+                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
                 </div>

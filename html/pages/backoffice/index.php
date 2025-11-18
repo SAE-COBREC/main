@@ -167,7 +167,6 @@
                   row.classList.remove('selected');
                   checkbox.classList.remove('checkbox--active');
                   addButton.textContent = "Ajouter un produit"; // revenir à l'état initial
-                  addButton.setAttribute('href', 'create/index.php')
                 } else {
                   // Sinon on désélectionne les autres
                   rows.forEach(r => {

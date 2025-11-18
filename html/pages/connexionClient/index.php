@@ -1,8 +1,8 @@
 <?php 
+session_start();
 //connexion a la bdd 
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
-session_start();
  ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           //ajout des identifiant a la session
 
           $_SESSION['idClient'] = $clientId;
-
+          $_SESSION['idCompte'] = (int)$row['id_compte'];
           //redirige sur la page d'acceuil
           header('Location: ../../index.php');
           exit;

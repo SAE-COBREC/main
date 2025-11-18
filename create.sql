@@ -648,13 +648,14 @@ INSERT INTO _vendeur (id_compte, SIREN, raison_sociale, denomination, nb_produit
 (10, '456789123', 'SportPro EURL', 'SportPro', 2);
 
 -- 4. CLIENTS
-INSERT INTO _client (id_compte, c_prenom, c_nom, c_pseudo, c_nb_produits_achetes, c_depense_totale, c_cloture) VALUES
-(4, 'Jean', 'Dupont', 'jdupont', 2, 907.18, FALSE),
-(5, 'Marie', 'Martin', 'mmartin', 3, 124.75, FALSE),
-(6, 'Pierre', 'Durand', 'pdurand', 1, 1091.98, FALSE),
-(7, 'Sophie', 'Bernard', 'sbernard', 2, 298.76, FALSE),
-(8, 'Lucas', 'Petit', 'lpetit', 0, 0.0, FALSE),
-(9, 'Emma', 'Lefebvre', 'elefebvre', 1, 179.98, FALSE);
+INSERT INTO _client (id_compte, c_prenom, c_nom, c_pseudo, c_nb_produits_achetes, c_depense_totale, c_cloture, c_datenaissance) VALUES
+(4, 'Jean', 'Dupont', 'jdupont', 2, 907.18, FALSE, '1985-03-15'),
+(5, 'Marie', 'Martin', 'mmartin', 3, 124.75, FALSE, '1990-07-22'),
+(6, 'Pierre', 'Durand', 'pdurand', 1, 1091.98, FALSE, '1988-11-10'),
+(7, 'Sophie', 'Bernard', 'sbernard', 2, 298.76, FALSE, '1995-05-30'),
+(8, 'Lucas', 'Petit', 'lpetit', 0, 0.0, FALSE, '2000-01-18'),
+(9, 'Emma', 'Lefebvre', 'elefebvre', 1, 179.98, FALSE, '1992-09-25');
+
 
 -- 5. ADRESSES
 INSERT INTO _adresse (id_compte, a_adresse, a_ville, a_code_postal, a_complement) VALUES
