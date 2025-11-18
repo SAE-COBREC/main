@@ -135,11 +135,15 @@
                 </td>
                 <td class="products-table__cell">
                   <?php if ($article['p_statut'] == 'En ligne'): ?>
-                    <span class="badge badge--live">En ligne</span>
-                  <?php elseif ($article['p_statut'] != 'Hors ligne'): ?>
-                        <span class="badge badge--other">Autre statut</span>
-                  <?php else: ?>
-                        <span class="badge badge--out">Hors ligne</span>
+                    <?php if ($article['p_stock'] <= 0): ?>
+                      <span class="badge badge--out">Épuisé</span>
+                    <?php else: ?>
+                      <span class="badge badge--live">En ligne</span>
+                    <?php endif; ?>
+                  <?php elseif ($article['p_statut'] == 'Hors ligne'): ?>
+                    <span class="badge badge--hors">Hors ligne</span>
+                  <?php elseif ($article['p_statut'] == 'Ébauche'): ?>
+                      <span class="badge badge--eb">Ébauche</span>
                   <?php endif; ?>
                 </td>
                 <td class="products-table__cell products-table__cell--stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
@@ -147,9 +151,6 @@
                 <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['p_description']); ?></td>
               </tr>
             <?php endforeach; ?>
-            <tr>
-              <td colspan="6" style="text-align:center;">Aucun article pour ce vendeur</td>
-            </tr>
           <?php endif; ?>
         </tbody>
         </table>
