@@ -170,7 +170,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
     }
 }
 
-if (isset($_GET['idClient'])) {
+if (isset($_SESSION['idClient'])) {
     $idClient = (int) $_SESSION['idClient']; //si l'utilisateur n'est pas connecté on met null
 } else {
     $id_client = NULL;
