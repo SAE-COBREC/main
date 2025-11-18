@@ -368,7 +368,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
 
 <body>
     <?php
-    include __DIR__ . '/partials/header.php';
+    include __DIR__ . '/partials/header.html';
     ?>
 
     <div class="container">

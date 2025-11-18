@@ -127,36 +127,45 @@ body {
         .qty {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             margin: 14px 0;
+            .btn { flex: 1 1 auto; height: 46px; font-weight: 700; }
             .qty-control {
                 display: inline-flex;
                 align-items: center;
-                gap: 16px;
-                padding: 10px 16px;
+                gap: 12px;
+                padding: 6px 12px;
                 border-radius: 999px;
                 background: vars.$secondary-color-bleu-clair;
                 border: 1px solid vars.$secondary-color-gris-clair;
+                height: 44px;
                 button.ghost {
                     background: transparent;
                     border: 0;
                     color: vars.$primary-color-noir;
-                    width: 28px;
-                    height: 28px;
+                    width: 32px;
+                    height: 32px;
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
                     font-weight: 700;
+                    font-size: 18px;
+                    line-height: 1;
                     border-radius: 999px;
+                    padding: 0;
                 }
                 input[type="number"] {
                     background: transparent;
                     border: 0;
-                    min-width: 40px;
+                    min-width: 36px;
                     text-align: center;
                     font-weight: 700;
+                    font-size: 18px;
                     color: vars.$primary-color-noir;
                     padding: 0;
+                    margin: 0;
+                    line-height: 1;
+                    font-variant-numeric: tabular-nums;
                 }
             }
         }
@@ -558,6 +567,6 @@ footer>div>div:last-child span:hover {
 
 .disabled {
     background: vars.$secondary-color-gris-clair !important;
-    cursor: !important;
+    cursor: not-allowed !important;
     pointer-events: none !important;
 }

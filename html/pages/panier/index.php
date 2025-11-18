@@ -1,7 +1,8 @@
 <?php 
+    session_start();
     include '../../selectBDD.php';
 
-    session_start();
+    
     $id_client = $_SESSION['idClient'];
     $pdo->exec("SET search_path TO cobrec1");
 
@@ -38,7 +39,7 @@
     </head>
 
     <?php
-    include __DIR__ . '/../../partials/header.php';
+    include __DIR__ . '/../../partials/header.html';
     ?>
     <body>
 

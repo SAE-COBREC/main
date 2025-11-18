@@ -17,6 +17,7 @@
         p.p_description,
         p.p_stock,
         p.p_prix,
+        p.p_statut,
         i.i_lien AS image_url,
         STRING_AGG(c.nom_categorie, ', ') AS categories
     FROM cobrec1._produit p
@@ -117,7 +118,7 @@
           <tbody>
           <?php if (!empty($articles)): ?>
             <?php foreach ($articles as $article): ?>
-              <tr class="products-table__row">
+              <tr class="products-table__row" data-id="<?php echo $article['id_produit']; ?>">
                 <td class="products-table__cell--checkbox">
                   <div class="checkbox"></div>
                 </td>
@@ -133,10 +134,12 @@
                   </div>
                 </td>
                 <td class="products-table__cell">
-                  <?php if ($article['p_stock'] > 0): ?>
+                  <?php if ($article['p_statut'] == 'En ligne'): ?>
                     <span class="badge badge--live">En ligne</span>
+                  <?php elseif ($article['p_statut'] != 'Hors ligne'): ?>
+                        <span class="badge badge--other">Autre statut</span>
                   <?php else: ?>
-                    <span class="badge badge--out">Épuisé</span>
+                        <span class="badge badge--out">Hors ligne</span>
                   <?php endif; ?>
                 </td>
                 <td class="products-table__cell products-table__cell--stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
@@ -144,7 +147,6 @@
                 <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['p_description']); ?></td>
               </tr>
             <?php endforeach; ?>
-          <?php else: ?>
             <tr>
               <td colspan="6" style="text-align:center;">Aucun article pour ce vendeur</td>
             </tr>
@@ -154,36 +156,42 @@
         <script>
           document.addEventListener('DOMContentLoaded', () => {
             const rows = document.querySelectorAll('.products-table__row');
-            const addButton = document.querySelector('.btn--primary');
+            const addButtonLink = document.querySelector('.search-bar a'); // <a href="...">
+            const addButton = document.querySelector('.btn--primary'); // <button>
 
             rows.forEach(row => {
               const checkbox = row.querySelector('.checkbox');
 
               row.addEventListener('click', () => {
                 const isSelected = row.classList.contains('selected');
+                const productID = row.dataset.id; // récupère l'id du produit
 
-                // Si déjà sélectionné → on désélectionne tout
                 if (isSelected) {
+                  // Désélection si on reclique
                   row.classList.remove('selected');
                   checkbox.classList.remove('checkbox--active');
-                  addButton.textContent = "Ajouter un produit"; // revenir à l'état initial
+
+                  addButton.textContent = "Ajouter un produit";
+                  addButtonLink.href = "create/index.php"; 
                 } else {
-                  // Sinon on désélectionne les autres
+                  // On désélectionne tous les autres
                   rows.forEach(r => {
                     r.classList.remove('selected');
                     r.querySelector('.checkbox').classList.remove('checkbox--active');
                   });
 
-                  // Et on sélectionne celui-ci
+                  // On sélectionne celui-ci
                   row.classList.add('selected');
                   checkbox.classList.add('checkbox--active');
+
+                  // Modification bouton + lien
                   addButton.textContent = "Modifier le produit";
-                  addButton.setAttribute('href', ...) // changer le texte
+                  addButtonLink.href = "create/index.php?modifier=" + productID;
                 }
               });
             });
           });
-        </script>
+          </script>
       </div>
     </main>
   </div>
