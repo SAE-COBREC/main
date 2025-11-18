@@ -27,6 +27,9 @@ body main form > .orange {
   color: #fff;
   box-shadow: 0 4px 0.1em rgba(205, 127, 50, 0.12);
 }
+body main form > *:disabled {
+  background: #c0c0c0;
+}
 body main div {
   display: grid;
   gap: 2em;
