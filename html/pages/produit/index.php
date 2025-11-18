@@ -484,7 +484,9 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
 </head>
 
 <body>
-    <div id="header"></div>
+    <?php
+        include __DIR__ . '/partials/header.php';
+    ?>
 
     <nav class="page-breadcrumb">
         <a class="back-link" href="/index.php" onclick="if (history.length>1) { history.back(); return false; }">

@@ -489,7 +489,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     <?php
     //inclure l'en-tête du site
-    include __DIR__ . '/../../partials/header.html';
+    include __DIR__ . '/../../partials/header.php';
     ?>
 
     <main>
