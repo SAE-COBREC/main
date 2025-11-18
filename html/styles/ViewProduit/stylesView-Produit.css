@@ -21,6 +21,9 @@ body {
   gap: 28px;
   align-items: start;
 }
+.product-row.no-thumbs {
+  grid-template-columns: 1fr 360px;
+}
 .product-row .thumbs {
   display: flex;
   flex-direction: column;
@@ -35,6 +38,17 @@ body {
   border: 2px solid #FFFFFF;
   box-shadow: 0 4px 10px rgba(30, 30, 60, 0.06);
   cursor: pointer;
+  transition: filter 0.15s ease, border-color 0.15s ease, transform 0.06s ease;
+}
+.product-row .thumbs img:active {
+  transform: scale(0.98);
+}
+.product-row .thumbs img.is-active {
+  border-color: #7171A3;
+  filter: brightness(1.06);
+}
+.product-row .thumbs img.flash {
+  animation: thumb-flash 0.25s ease;
 }
 .product-row .main-image {
   background: linear-gradient(180deg, #FFFFFF, #F7F7FB);
@@ -43,10 +57,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 420px;
 }
 .product-row .main-image img {
-  max-width: 100%;
-  height: 420px;
+  width: 100%;
+  height: 100%;
   -o-object-fit: contain;
      object-fit: contain;
   border-radius: 6px;
@@ -350,16 +365,27 @@ footer > div > div:last-child span:hover {
   color: #FFFFFF;
 }
 
+@keyframes thumb-flash {
+  0% {
+    filter: brightness(1.35);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
 @media screen and (max-width: 980px) {
   .product-row {
     grid-template-columns: 60px 1fr;
     grid-template-rows: auto auto 1fr;
   }
+  .product-row.no-thumbs {
+    grid-template-columns: 1fr;
+  }
   .product-row .summary {
     grid-column: 1/-1;
   }
-  .product-row .main-image img {
-    height: 300px;
+  .product-row .main-image {
+    min-height: 300px;
   }
   .container {
     margin: 18px;
@@ -368,21 +394,27 @@ footer > div > div:last-child span:hover {
 }
 @media screen and (max-width: 560px) {
   .product-row {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+  .product-row .main-image {
+    order: 1;
+    min-height: 240px;
+  }
+  .product-row .thumbs {
+    order: 2;
   }
   .thumbs {
     flex-direction: row;
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 6px;
+    margin-top: 8px;
     /* évite que les vignettes prennent trop de place */
   }
   .thumbs img {
     width: 56px;
     height: 56px;
-  }
-  .main-image img {
-    height: 220px;
   }
 }
 /* Affinage responsive supplémentaire */
@@ -429,8 +461,8 @@ footer > div > div:last-child span:hover {
   .product-row {
     gap: 16px;
   }
-  .product-row .main-image img {
-    height: 200px;
+  .product-row .main-image {
+    min-height: 200px;
   }
   .product-row .summary .qty {
     gap: 6px;
@@ -445,4 +477,9 @@ footer > div > div:last-child span:hover {
   .section.reviews .btn, .section.reviews .ghost {
     width: 100%;
   }
+}
+.disabled {
+  background: #EFEFEF !important;
+  cursor: !important;
+  pointer-events: none !important;
 }/*# sourceMappingURL=stylesView-Produit.css.map */

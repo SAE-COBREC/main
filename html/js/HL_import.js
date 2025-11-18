@@ -12,4 +12,16 @@ $(function () {
      */
     $("#header").load("/partials/header.html");
     $("#footer").load("/partials/footer.html");
+
+    // Charger les partials de notifications (toasts + modale)
+    try {
+        if (!document.getElementById('toast-container')) {
+            const tMount = $('<div id="toast-partials" aria-hidden="true"></div>').appendTo('body');
+            tMount.load('/partials/toast.html');
+        }
+        if (!document.getElementById('modal-overlay')) {
+            const mMount = $('<div id="modal-partials" aria-hidden="true"></div>').appendTo('body');
+            mMount.load('/partials/modal.html');
+        }
+    } catch (e) { /* silencieux */ }
 });

@@ -111,7 +111,6 @@ body {
 }
 .content-section .products-table {
   width: 100%;
-  border-collapse: collapse;
   overflow-y: auto;
   display: block;
   max-height: 810px;
@@ -123,9 +122,34 @@ body {
 }
 .content-section .products-table thead,
 .content-section .products-table tbody tr {
-  display: table;
-  width: 100%;
+  display: table table-row;
   table-layout: fixed;
+}
+.content-section td {
+  max-width: 300px;
+  text-align: left;
+}
+.content-section .products-table__head-cell--produit {
+  width: 300px;
+}
+.content-section .products-table__head-cell--statut {
+  width: 120px;
+}
+.content-section .products-table__head-cell--stock {
+  width: 65px;
+}
+.content-section .products-table__head-cell--cate {
+  width: 300px;
+}
+.content-section .products-table__head-cell--cate {
+  width: 300px;
+}
+.content-section .products-table__head-cell--des {
+  width: 300px;
+}
+.content-section .products-table__head-cell--checkbox,
+.content-section .products-table__cell--checkbox {
+  width: 50px;
 }
 .content-section .products-table thead {
   position: sticky;
@@ -168,20 +192,17 @@ body {
 }
 
 .products-table {
-  width: 100%;
+  width: 200px;
   border-collapse: collapse;
 }
 .products-table__head-cell {
   text-align: left;
-  padding: 16px 24px;
+  padding: 20px 24px;
   font-size: 13px;
   font-weight: 600;
   color: #030212;
   background: #FFFFFF;
   border-bottom: 1px solid #E5D5C5;
-}
-.products-table__head-cell--checkbox {
-  width: 40px;
 }
 .products-table__row {
   border-bottom: 1px solid #F5F5F4;
@@ -205,11 +226,13 @@ body {
 .checkbox {
   width: 18px;
   height: 18px;
+  max-width: 40px;
   border: 2px solid #E5D5C5;
   border-radius: 4px;
   display: inline-block;
   cursor: pointer;
   transition: 0.2s;
+  margin-left: 25px;
 }
 .checkbox--active {
   background-color: #E6A96E;
@@ -230,10 +253,7 @@ body {
 .product__image {
   width: 48px;
   height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
+  font-size: 15px;
 }
 .product__image img {
   border-radius: 14px;

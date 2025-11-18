@@ -51,12 +51,7 @@ if ($idProduit > 0) {
                 (SELECT STRING_AGG(cp.nom_categorie, ', ')
                    FROM _fait_partie_de fpd
                    JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-                  WHERE fpd.id_produit = p.id_produit) AS categories,
-                (SELECT i.i_lien
-                   FROM _represente_produit rp
-                   JOIN _image i ON rp.id_image = i.id_image
-                  WHERE rp.id_produit = p.id_produit
-                  LIMIT 1) AS image_url
+                  WHERE fpd.id_produit = p.id_produit) AS categories
             FROM _produit p
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
@@ -64,6 +59,21 @@ if ($idProduit > 0) {
             LIMIT 1");
         $stmtProd->execute([':pid' => $idProduit]);
         $produit = $stmtProd->fetch(PDO::FETCH_ASSOC) ?: null;
+        // Charger toutes les images du produit (carrousel)
+        $images = [];
+        if ($produit) {
+            $stmtImgs = $pdo->prepare("SELECT i.i_lien
+                                         FROM _represente_produit rp
+                                         JOIN _image i ON rp.id_image = i.id_image
+                                        WHERE rp.id_produit = :pid
+                                     ORDER BY rp.id_image ASC");
+            $stmtImgs->execute([':pid' => $idProduit]);
+            $images = $stmtImgs->fetchAll(PDO::FETCH_COLUMN) ?: [];
+            // Nettoyage basique des URLs et dédoublonnage
+            $images = array_values(array_unique(array_map(function ($u) {
+                return is_string($u) && $u !== '' ? $u : '/img/Photo/default.png';
+            }, $images)));
+        }
     } catch (Throwable $e) {
         $produit = null;
     }
@@ -107,6 +117,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
 
     try {
         if ($action === 'add_avis') {
+            // Vérification connexion
+            if (!$idClient) {
+                echo json_encode(['success' => false, 'message' => 'Vous devez être connecté pour laisser un avis.']);
+                exit;
+            }
+            // Vérification achat du produit (commande validée)
+            $stmtVerifAchat = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
+            $stmtVerifAchat->execute([':cid' => $idClient, ':pid' => $id_produit_post]);
+            $aAchete = (bool) $stmtVerifAchat->fetchColumn();
+            if (!$aAchete) {
+                echo json_encode(['success' => false, 'message' => 'Vous devez avoir acheté ce produit pour noter ou commenter.']);
+                exit;
+            }
             $commentaire_post = isset($_POST['commentaire']) ? trim($_POST['commentaire']) : '';
             $note_post = isset($_POST['note']) ? (float) $_POST['note'] : 0.0;
             // Validation basique de la note (intervalle et pas de 0.5)
@@ -366,6 +389,16 @@ try {
 }
 $ownerTokenServer = isset($_COOKIE['alizon_owner']) ? $_COOKIE['alizon_owner'] : '';
 $avisTextes = [];
+$reponsesMap = [];
+$clientConnecte = (bool)$idClient;
+$clientAachete = false;
+if ($clientConnecte) {
+    try {
+        $stmtVerifAchatDisplay = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
+        $stmtVerifAchatDisplay->execute([':cid' => $idClient, ':pid' => $idProduit]);
+        $clientAachete = (bool)$stmtVerifAchatDisplay->fetchColumn();
+    } catch (Throwable $e) { $clientAachete = false; }
+}
 try {
     // Récupère les avis et, si existantes, les notes liées (moyenne par avis)
     $stmtAvis = $pdo->prepare("
@@ -406,6 +439,16 @@ try {
     $avisTextes = [];
 }
 
+// Récupérer les réponses vendeur (liaison _reponse)
+try {
+    $stmtRep = $pdo->prepare("SELECT r.id_avis_parent, a.id_avis, a.a_texte, TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt FROM _reponse r JOIN _avis a ON r.id_avis = a.id_avis WHERE a.id_produit = :pid");
+    $stmtRep->execute([':pid' => $idProduit]);
+    $rowsRep = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($rowsRep as $r) {
+        $reponsesMap[(int)$r['id_avis_parent']] = $r; // une réponse par avis parent (contrainte unique)
+    }
+} catch (Throwable $e) { /* silencieux */ }
+
 // Nouveau système simplifié pour l'affichage: 2 requêtes (moyenne et compteur)
 try {
     $stmtAvgDisplay = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
@@ -422,6 +465,10 @@ try {
 
 // Partie entière pour rendu des étoiles
 $noteEntiere = (int)floor($note);
+// Images pour l'affichage
+$images = isset($images) && is_array($images) ? $images : [];
+$hasMultipleImages = count($images) > 1;
+$mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_url'] ?? '/img/Photo/default.png'));
 ?>
 <!doctype html>
 <html lang="fr">
@@ -440,22 +487,20 @@ $noteEntiere = (int)floor($note);
     <div id="header"></div>
 
     <main class="container">
-        <div class="product-row">
+        <div class="product-row <?= $hasMultipleImages ? '' : 'no-thumbs' ?>">
             <!-- Vignettes -->
-            <aside class="thumbs" aria-hidden="true">
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 1"
-                    loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 2"
-                    loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 3"
-                    loading="lazy" />
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>" alt="vignette 4"
-                    loading="lazy" />
+            <?php if ($hasMultipleImages): ?>
+            <aside class="thumbs" aria-label="Vignettes du produit">
+                <?php foreach ($images as $idx => $imgUrl): ?>
+                    <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>" alt="Vignette <?= $idx + 1 ?>"
+                         loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>" />
+                <?php endforeach; ?>
             </aside>
+            <?php endif; ?>
 
             <!-- Image principale -->
             <section class="main-image">
-                <img src="<?= htmlspecialchars($produit['image_url'] ?? '/img/Photo/default.png') ?>"
+                <img id="productMainImage" src="<?= htmlspecialchars($mainImage) ?>"
                     alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
             </section>
 
@@ -492,8 +537,8 @@ $noteEntiere = (int)floor($note);
                         style="min-width:36px;text-align:center;background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #f0f2f6"
                         value="1" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
                     <button class="ghost" id="qty-increase" aria-label="Augmenter quantité">+</button>
-                    <button class="btn" <?= $estEnRupture ? 'disabled' : '' ?>
-                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
+                    <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
+                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)"    >
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
                 </div>
@@ -568,41 +613,53 @@ $noteEntiere = (int)floor($note);
             </div>
 
             <!-- Formulaire avis (carte) -->
-            <div class="review new-review-card" id="newReviewCard">
-                <div class="review-head">
-                    <div class="review-head-left">
-                        <div class="avatar">V</div>
-                        <div class="review-head-texts">
-                            <div class="review-author">Vous</div>
-                            <div class="review-subtitle">Laisser un avis</div>
+            <?php if ($clientConnecte && $clientAachete): ?>
+                <div class="review new-review-card" id="newReviewCard">
+                    <div class="review-head">
+                        <div class="review-head-left">
+                            <div class="avatar">V</div>
+                            <div class="review-head-texts">
+                                <div class="review-author">Vous</div>
+                                <div class="review-subtitle">Laisser un avis</div>
+                            </div>
+                        </div>
+                        <div class="review-head-right">
+                            <div class="star-input" id="inlineStarInput"
+                                title="Sélectionnez une note (achat vérifié)">
+                                <button type="button" data-value="1" aria-label="1 étoile"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="2" aria-label="2 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="3" aria-label="3 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="4" aria-label="4 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="5" aria-label="5 étoiles"><img
+                                        src="/img/svg/star-empty.svg" alt=""></button>
+                            </div>
+                            <input type="hidden" id="inlineNote" name="note" value="0">
                         </div>
                     </div>
-                    <div class="review-head-right">
-                        <div class="star-input" id="inlineStarInput"
-                            title="Survolez pour voir la note (la soumission de note est réservée aux achats vérifiés)">
-                            <button type="button" data-value="1" aria-label="1 étoile"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="2" aria-label="2 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="3" aria-label="3 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="4" aria-label="4 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <button type="button" data-value="5" aria-label="5 étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
+                    <form id="inlineReviewForm" class="review-form">
+                        <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
+                            placeholder="Partagez votre avis (texte)..."></textarea>
+                        <div class="review-actions">
+                            <small class="review-hint">Merci de rester courtois.</small>
+                            <button type="button" class="btn" id="inlineSubmit">Publier</button>
                         </div>
-                        <input type="hidden" id="inlineNote" name="note" value="0">
+                    </form>
+                </div>
+            <?php else: ?>
+                <div class="review new-review-card" style="background:#f3f4f7;opacity:.85">
+                    <div style="padding:12px 16px;font-size:14px;color:#555">
+                        <?php if(!$clientConnecte): ?>
+                            Connectez-vous pour laisser un avis sur ce produit.
+                        <?php elseif(!$clientAachete): ?>
+                            Vous devez avoir acheté ce produit pour laisser un avis.
+                        <?php endif; ?>
                     </div>
                 </div>
-                <form id="inlineReviewForm" class="review-form">
-                    <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
-                        placeholder="Partagez votre avis (texte)..."></textarea>
-                    <div class="review-actions">
-                        <small class="review-hint">La notation est réservée aux achats vérifiés.</small>
-                        <button type="button" class="btn" id="inlineSubmit">Publier</button>
-                    </div>
-                </form>
-            </div>
+            <?php endif; ?>
 
             <!-- Liste des avis -->
             <div id="listeAvisProduit">
@@ -657,6 +714,20 @@ $noteEntiere = (int)floor($note);
                                         style="margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;">Supprimer</button>
                                 <?php endif; ?>
                             </div>
+                            <?php if(isset($reponsesMap[(int)$ta['id_avis']])): $rep = $reponsesMap[(int)$ta['id_avis']]; ?>
+                                <div class="review" style="margin:12px 0 4px 48px;padding:10px 12px;background:#fff6e6;border:1px solid #ffe0a3;border-radius:8px">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                                        <div style="width:32px;height:32px;border-radius:50%;background:#ffc860;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#7a4d00">V</div>
+                                        <div style="font-weight:600;color:#7a4d00">Réponse du vendeur</div>
+                                        <span style="margin-left:auto;font-size:11px;color:#b07200;">
+                                            <?= htmlspecialchars($rep['a_timestamp_fmt'] ?? '') ?>
+                                        </span>
+                                    </div>
+                                    <div style="font-size:13px;color:#7a4d00;line-height:1.4">
+                                        <?= htmlspecialchars($rep['a_texte']) ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -681,6 +752,24 @@ $noteEntiere = (int)floor($note);
             const dec = document.getElementById('qty-decrease');
             const inc = document.getElementById('qty-increase');
             const input = document.getElementById('qtyInput');
+            // Carrousel vignettes -> image principale + effet de surblanchiment
+            const thumbsEl = document.querySelector('.thumbs');
+            const mainImg = document.getElementById('productMainImage');
+            if (thumbsEl && mainImg) {
+                thumbsEl.addEventListener('click', function (e) {
+                    const t = e.target.closest('img.thumb');
+                    if (!t) return;
+                    const newSrc = t.getAttribute('data-src') || t.getAttribute('src');
+                    if (newSrc && mainImg.getAttribute('src') !== newSrc) {
+                        mainImg.setAttribute('src', newSrc);
+                    }
+                    // Etat actif + flash (surblanchiment léger)
+                    thumbsEl.querySelectorAll('img.thumb').forEach(img => img.classList.remove('is-active'));
+                    t.classList.add('is-active');
+                    t.classList.add('flash');
+                    setTimeout(() => t.classList.remove('flash'), 220);
+                });
+            }
             if (!input) return;
 
             const parseStep = (v) => {
@@ -747,16 +836,16 @@ $noteEntiere = (int)floor($note);
             })
             .then(data => {
                 if (data.success) {
-                    alert('✓ ' + data.message);
+                    if (window.notify) notify(data.message || 'Article ajouté au panier', 'success');
                     //optionnel : mettre à jour le compteur du panier
                     //mettreAJourCompteurPanier();
                 } else {
-                    alert('✗ ' + data.message);
+                    if (window.showError) showError('Erreur', data.message || 'Impossible d\'ajouter l\'article.');
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('Erreur lors de l\'ajout au panier: ' + (error && error.message ? error.message : 'inconnue'));
+                if (window.showError) showError('Erreur', 'Erreur lors de l\'ajout au panier: ' + (error && error.message ? error.message : 'inconnue'));
             });
         }
 
@@ -900,13 +989,13 @@ $noteEntiere = (int)floor($note);
             inlineSubmit.addEventListener('click', () => {
                 const commentaire = (inlineComment.value || '').trim();
                 const selectedNote = parseFloat(inlineNote.value || '0') || 0;
-                if (!commentaire) { alert('Veuillez saisir un commentaire.'); return; }
-                if (selectedNote <= 0) { alert('Veuillez choisir une note (cliquez sur une étoile).'); return; }
+                if (!commentaire) { if (window.showError) showError('Erreur', 'Veuillez saisir un commentaire.'); return; }
+                if (selectedNote <= 0) { if (window.showError) showError('Erreur', 'Veuillez choisir une note (cliquez sur une étoile).'); return; }
                 inlineSubmit.disabled = true;
                 postAvis(productId, commentaire, selectedNote)
                     .then(data => {
                         if (!data || !data.success) {
-                            alert((data && data.message) || 'Erreur');
+                            if (window.showError) showError('Erreur', (data && data.message) || 'Erreur');
                             return;
                         }
                         const safeComment = escapeHtml(commentaire);
@@ -928,7 +1017,7 @@ $noteEntiere = (int)floor($note);
                         if (inlineNote) inlineNote.value = '0';
                         const starContainer = document.getElementById('inlineStarInput');
                         if (starContainer) starContainer.dispatchEvent(new Event('mouseleave'));
-                        alert(data.message || 'Avis envoyé');
+                        if (window.notify) notify(data.message || 'Avis envoyé', 'success');
                         // Mise à jour immédiate (nouveau système simplifié)
                         if (typeof data.avg !== 'undefined') {
                             const avg = parseFloat(data.avg) || 0;
@@ -958,7 +1047,7 @@ $noteEntiere = (int)floor($note);
                             fetchRating(productId); // fallback
                         }
                     })
-                    .catch(err => { console.error(err); alert('Erreur réseau'); })
+                        .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); })
                     .finally(() => { inlineSubmit.disabled = false; });
             });
         }
@@ -1024,7 +1113,7 @@ $noteEntiere = (int)floor($note);
                             if (likeSpan) likeSpan.textContent = likeN;
                             if (dislikeSpan) dislikeSpan.textContent = dislikeN;
                             buttons.forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-type') === current ? 'true' : 'false'));
-                            alert((data && data.message) || 'Erreur');
+                            if (window.showError) showError('Erreur', (data && data.message) || 'Erreur');
                         }
                     })
                     .catch(err => {
@@ -1032,7 +1121,7 @@ $noteEntiere = (int)floor($note);
                         if (likeSpan) likeSpan.textContent = likeN;
                         if (dislikeSpan) dislikeSpan.textContent = dislikeN;
                         buttons.forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-type') === current ? 'true' : 'false'));
-                        alert('Erreur réseau');
+                        if (window.showError) showError('Erreur', 'Erreur réseau');
                     })
                     .finally(() => { t.disabled = false; });
             });
@@ -1124,14 +1213,14 @@ $noteEntiere = (int)floor($note);
                 });
                 btnSave.addEventListener('click', () => {
                     const nv = ta.value.trim();
-                    if (!nv) { alert('Le commentaire ne peut pas être vide'); return; }
+                    if (!nv) { if (window.showError) showError('Erreur', 'Le commentaire ne peut pas être vide'); return; }
                     const newNote = parseFloat(editNoteHidden.value || '0') || 0;
                     if (newNote <= 0) { if (!confirm('Sauvegarder sans note ?')) return; }
                     btnSave.disabled = true;
                     const formNote = newNote > 0 ? newNote : '';
                     postEditAvis(productId, avisId, nv, formNote)
                         .then(data => {
-                            if (!data || !data.success) { alert((data && data.message) || 'Erreur'); return; }
+                            if (!data || !data.success) { if (window.showError) showError('Erreur', (data && data.message) || 'Erreur'); return; }
                             contentEl.textContent = nv;
                             ta.replaceWith(contentEl);
                             noteWrap.remove();
@@ -1154,7 +1243,7 @@ $noteEntiere = (int)floor($note);
                             }
                             fetchRating(productId); // Recalcul global
                         })
-                        .catch(err => { console.error(err); alert('Erreur réseau'); })
+                        .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); })
                         .finally(() => { btnSave.disabled = false; });
                 });
             });
@@ -1179,10 +1268,10 @@ $noteEntiere = (int)floor($note);
                             // Mettre à jour la note moyenne et le compteur après suppression
                             fetchRating(productId);
                         } else {
-                            alert((data && data.message) || 'Erreur suppression');
+                            if (window.showError) showError('Erreur', (data && data.message) || 'Erreur suppression');
                         }
                     })
-                    .catch(err => { console.error(err); alert('Erreur réseau'); })
+                    .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); })
                     .finally(() => { delBtn.disabled = false; });
             });
             // Initialiser l'état visuel des votes en fonction des votes déjà enregistrés (localStorage)
@@ -1201,6 +1290,7 @@ $noteEntiere = (int)floor($note);
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/js/HL_import.js"></script>
+    <script src="/js/notifications.js"></script>
 </body>
 
 </html>
