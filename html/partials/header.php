@@ -47,3 +47,6 @@ echo $id_compte;
 </header>
 
 <div class="separator"></div>
+
+<?php session_unset();
+    session_destroy(); ?>
