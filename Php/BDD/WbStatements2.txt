@@ -1,0 +1,338 @@
+##sqlwb.pos=2597
+##sqlwb.selStart=0
+##sqlwb.selEnd=0
+-- ============================================
+-- INSERTION DE FAUX AVIS POUR LES TESTS
+-- ============================================
+
+-- Insertion des avis
+INSERT INTO cobrec1._avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES
+(1, 'Très bon rapport qualité-prix, je suis ravi.', 16, 4, '2025-05-27 15:38:25'),
+(1, 'Produit de très bonne qualité, conforme à mes attentes.', 6, 5, '2025-07-03 15:38:25'),
+(6, 'Pas mal, mais quelques améliorations seraient les bienvenues.', 1, 2, '2025-05-25 15:38:25'),
+(5, 'Livraison rapide et produit impeccable. Je recommande !', 1, 2, '2025-08-31 15:38:25'),
+(4, 'Produit de très bonne qualité, conforme à mes attentes.', 5, 0, '2025-10-13 15:38:25'),
+(8, 'Acceptable, correspond à ce qui était annoncé.', 12, 5, '2025-07-08 15:38:25'),
+(3, 'Conforme à la description, mais j'attendais mieux.', 20, 3, '2025-10-21 15:38:25'),
+(5, 'Conforme à la description, mais j'attendais mieux.', 10, 2, '2025-06-26 15:38:25'),
+(2, 'Très bon rapport qualité-prix, je suis ravi.', 7, 2, '2025-09-16 15:38:25'),
+(10, 'Produit de très bonne qualité, conforme à mes attentes.', 2, 1, '2025-06-27 15:38:25'),
+(7, 'Produit correct, sans plus. Fait le travail.', 20, 4, '2025-09-22 15:38:25'),
+(1, 'Qualité au rendez-vous, conforme à la description.', 15, 4, '2025-07-13 15:38:25'),
+(6, 'Je ne regrette pas mon achat, produit parfait !', 9, 5, '2025-10-26 15:38:25'),
+(9, 'Produit de mauvaise qualité, je ne recommande pas.', 11, 5, '2025-10-19 15:38:25'),
+(7, 'Excellent produit, je suis très satisfait de mon achat !', 7, 1, '2025-07-30 15:38:25'),
+(8, 'Produit de mauvaise qualité, je ne recommande pas.', 16, 3, '2025-07-18 15:38:25'),
+(6, 'Rapport qualité-prix médiocre, j'ai connu mieux.', 17, 2, '2025-09-28 15:38:25'),
+(7, 'Produit top, je recommande vivement !', 17, 3, '2025-08-23 15:38:25'),
+(3, 'Exactement ce que je cherchais, très satisfait.', 7, 3, '2025-07-13 15:38:25');
+
+-- Insertion des commentaires (liaison avis-clients-livraisons)
+-- Note: Pour insérer ces commentaires, il faut d'abord avoir des livraisons valides
+-- Voici un exemple de structure:
+
+/*
+INSERT INTO cobrec1._commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client) VALUES
+(1, 5.0, 1, TRUE, 1),
+(2, 4.5, 2, TRUE, 1),
+(3, 2.5, 3, TRUE, 1),
+(4, 4.5, 4, TRUE, 5),
+(5, 4.5, 5, TRUE, 5),
+(6, 2.5, 6, TRUE, 6),
+(7, 2.5, 7, TRUE, 3),
+(8, 3.5, 8, TRUE, 4),
+(9, 5.0, 9, TRUE, 6),
+(10, 4.5, 10, TRUE, 6);
+*/
+
+-- NOTE: Ces avis sont générés automatiquement pour les tests.
+-- Les commentaires nécessitent des livraisons existantes pour être insérés.
+----------- WbStatement -----------
+##sqlwb.pos=1733
+##sqlwb.selStart=0
+##sqlwb.selEnd=0
+-- ============================================
+-- INSERTION DE FAUX AVIS POUR LES TESTS
+-- ============================================
+
+-- Insertion des avis
+INSERT INTO cobrec1._avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES
+(1, 'Très bon rapport qualité-prix, je suis ravi.', 16, 4, '2025-05-27 15:38:25'),
+(1, 'Produit de très bonne qualité, conforme à mes attentes.', 6, 5, '2025-07-03 15:38:25'),
+(6, 'Pas mal, mais quelques améliorations seraient les bienvenues.', 1, 2, '2025-05-25 15:38:25'),
+(5, 'Livraison rapide et produit impeccable. Je recommande !', 1, 2, '2025-08-31 15:38:25'),
+(4, 'Produit de très bonne qualité, conforme à mes attentes.', 5, 0, '2025-10-13 15:38:25'),
+(8, 'Acceptable, correspond à ce qui était annoncé.', 12, 5, '2025-07-08 15:38:25'),
+(3, 'Conforme à la description, mais j attendais mieux.', 20, 3, '2025-10-21 15:38:25'),
+(5, 'Conforme à la description, mais j attendais mieux.', 10, 2, '2025-06-26 15:38:25'),
+(2, 'Très bon rapport qualité-prix, je suis ravi.', 7, 2, '2025-09-16 15:38:25'),
+(10, 'Produit de très bonne qualité, conforme à mes attentes.', 2, 1, '2025-06-27 15:38:25'),
+(7, 'Produit correct, sans plus. Fait le travail.', 20, 4, '2025-09-22 15:38:25'),
+(1, 'Qualité au rendez-vous, conforme à la description.', 15, 4, '2025-07-13 15:38:25'),
+(6, 'Je ne regrette pas mon achat, produit parfait !', 9, 5, '2025-10-26 15:38:25'),
+(9, 'Produit de mauvaise qualité, je ne recommande pas.', 11, 5, '2025-10-19 15:38:25'),
+(7, 'Excellent produit, je suis très satisfait de mon achat !', 7, 1, '2025-07-30 15:38:25'),
+(8, 'Produit de mauvaise qualité, je ne recommande pas.', 16, 3, '2025-07-18 15:38:25'),
+(6, 'Rapport qualité-prix médiocre, j ai connu mieux.', 17, 2, '2025-09-28 15:38:25'),
+(7, 'Produit top, je recommande vivement !', 17, 3, '2025-08-23 15:38:25'),
+(3, 'Exactement ce que je cherchais, très satisfait.', 7, 3, '2025-07-13 15:38:25');
+
+-- Insertion des commentaires (liaison avis-clients-livraisons)
+-- Note: Pour insérer ces commentaires, il faut d'abord avoir des livraisons valides
+-- Voici un exemple de structure:
+
+/*
+INSERT INTO cobrec1._commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client) VALUES
+(1, 5.0, 1, TRUE, 1),
+(2, 4.5, 2, TRUE, 1),
+(3, 2.5, 3, TRUE, 1),
+(4, 4.5, 4, TRUE, 5),
+(5, 4.5, 5, TRUE, 5),
+(6, 2.5, 6, TRUE, 6),
+(7, 2.5, 7, TRUE, 3),
+(8, 3.5, 8, TRUE, 4),
+(9, 5.0, 9, TRUE, 6),
+(10, 4.5, 10, TRUE, 6);
+*/
+
+-- NOTE: Ces avis sont générés automatiquement pour les tests.
+-- Les commentaires nécessitent des livraisons existantes pour être insérés.
+----------- WbStatement -----------
+##sqlwb.pos=4083
+##sqlwb.selStart=0
+##sqlwb.selEnd=0
+-- ============================================
+-- INSERTION DE FAUX AVIS POUR LES TESTS
+-- ============================================
+
+-- Suppression des anciens triggers et fonctions si nécessaire
+DROP TRIGGER IF EXISTS tgr_moyenne_notes_produit_apres_insertion ON cobrec1._avis;
+DROP TRIGGER IF EXISTS tgr_moyenne_notes_produit_apres_modification ON cobrec1._avis;
+DROP TRIGGER IF EXISTS tgr_moyenne_notes_produit_apres_suppression ON cobrec1._avis;
+DROP FUNCTION IF EXISTS maj_moyenne_notes_produit_apres_insertion();
+DROP FUNCTION IF EXISTS maj_moyenne_notes_produit_apres_modification();
+DROP FUNCTION IF EXISTS maj_moyenne_notes_produit_apres_suppression();
+
+-- Recréation des fonctions corrigées
+CREATE OR REPLACE FUNCTION maj_moyenne_notes_produit_apres_insertion()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(c.a_note)::numeric, 1)
+        FROM cobrec1._commentaire c
+        INNER JOIN cobrec1._avis a ON c.id_avis = a.id_avis
+        WHERE a.id_produit = NEW.id_produit
+    )
+    WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION maj_moyenne_notes_produit_apres_modification()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(c.a_note)::numeric, 1)
+        FROM cobrec1._commentaire c
+        INNER JOIN cobrec1._avis a ON c.id_avis = a.id_avis
+        WHERE a.id_produit = NEW.id_produit
+    )
+    WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION maj_moyenne_notes_produit_apres_suppression()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(c.a_note)::numeric, 1)
+        FROM cobrec1._commentaire c
+        INNER JOIN cobrec1._avis a ON c.id_avis = a.id_avis
+        WHERE a.id_produit = OLD.id_produit
+    )
+    WHERE id_produit = OLD.id_produit;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Recréation des triggers
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion
+AFTER INSERT ON cobrec1._avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_insertion();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_modification
+AFTER UPDATE ON cobrec1._avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_modification();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
+AFTER DELETE ON cobrec1._avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
+
+-- ============================================
+-- Insertion des avis de test
+-- ============================================
+
+INSERT INTO cobrec1._avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES
+(8, 'Excellent produit, je suis très satisfait de mon achat !', 17, 0, '2025-08-03 16:23:45'),
+(2, 'Qualité au rendez-vous, conforme à la description.', 10, 4, '2025-06-11 09:15:22'),
+(10, 'Très bon rapport qualité-prix, je suis ravi.', 8, 3, '2025-06-22 14:37:09'),
+(3, 'Exactement ce que je cherchais, très satisfait.', 3, 2, '2025-08-20 11:42:18'),
+(1, 'Produit top, je recommande vivement !', 19, 1, '2025-09-29 08:56:31'),
+(7, 'Super qualité, meilleur que ce à quoi je m attendais.', 15, 0, '2025-07-15 17:29:44'),
+(5, 'Produit correct, sans plus. Fait le travail.', 5, 1, '2025-10-08 13:18:56'),
+(9, 'Bien dans l ensemble, quelques petits défauts mineurs.', 12, 2, '2025-05-27 10:05:33'),
+(4, 'Conforme à la description, mais j attendais mieux.', 7, 3, '2025-09-14 15:47:12'),
+(6, 'Pas mal, mais quelques améliorations seraient les bienvenues.', 9, 0, '2025-06-30 12:23:47'),
+(2, 'Produit standard, fait ce qu on lui demande.', 4, 4, '2025-08-11 09:34:28'),
+(8, 'Livraison rapide et produit impeccable. Je recommande !', 20, 1, '2025-07-22 16:51:09'),
+(1, 'Très bon rapport qualité-prix, je suis ravi.', 11, 2, '2025-10-19 11:08:55'),
+(10, 'Produit de très bonne qualité, conforme à mes attentes.', 16, 0, '2025-05-18 14:42:31'),
+(3, 'Je ne regrette pas mon achat, produit parfait !', 14, 1, '2025-09-05 08:19:17'),
+(5, 'Rien à redire, c est parfait pour mes besoins.', 6, 3, '2025-06-07 17:55:42'),
+(9, 'Déçu par la qualité, ne correspond pas aux attentes.', 2, 5, '2025-10-26 10:31:28'),
+(4, 'Produit de mauvaise qualité, je ne recommande pas.', 1, 4, '2025-07-03 13:46:53'),
+(7, 'Très déçu, description non conforme à la réalité.', 3, 5, '2025-08-29 09:12:06');
+
+-- ============================================
+-- NOTE IMPORTANTE
+-- ============================================
+-- Pour insérer des commentaires (qui contiennent les notes), vous devez d'abord avoir:
+-- 1. Des avis (créés ci-dessus)
+-- 2. Des livraisons valides
+-- 3. Des clients valides
+--
+-- Exemple de structure pour les commentaires:
+-- INSERT INTO cobrec1._commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client) VALUES
+-- (1, 4.5, 1, TRUE, 1),
+-- (2, 4.0, 2, TRUE, 2),
+-- ...
+--
+-- Les notes dans les commentaires seront automatiquement agrégées pour calculer
+-- la note moyenne du produit grâce aux triggers.
+----------- WbStatement -----------
+##sqlwb.pos=5046
+##sqlwb.selStart=0
+##sqlwb.selEnd=0
+-- ============================================
+-- INSERTION DE FAUX AVIS POUR LES TESTS
+-- ============================================
+
+-- Suppression des anciens triggers et fonctions si nécessaire
+DROP TRIGGER IF EXISTS tgr_moyenne_notes_produit_apres_insertion ON cobrec1._avis;
+DROP TRIGGER IF EXISTS tgr_moyenne_notes_produit_apres_modification ON cobrec1._avis;
+DROP TRIGGER IF EXISTS tgr_moyenne_notes_produit_apres_suppression ON cobrec1._avis;
+DROP FUNCTION IF EXISTS maj_moyenne_notes_produit_apres_insertion();
+DROP FUNCTION IF EXISTS maj_moyenne_notes_produit_apres_modification();
+DROP FUNCTION IF EXISTS maj_moyenne_notes_produit_apres_suppression();
+
+-- Recréation des fonctions corrigées
+CREATE OR REPLACE FUNCTION maj_moyenne_notes_produit_apres_insertion()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(c.a_note)::numeric, 1)
+        FROM cobrec1._commentaire c
+        INNER JOIN cobrec1._avis a ON c.id_avis = a.id_avis
+        WHERE a.id_produit = NEW.id_produit
+    )
+    WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION maj_moyenne_notes_produit_apres_modification()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(c.a_note)::numeric, 1)
+        FROM cobrec1._commentaire c
+        INNER JOIN cobrec1._avis a ON c.id_avis = a.id_avis
+        WHERE a.id_produit = NEW.id_produit
+    )
+    WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION maj_moyenne_notes_produit_apres_suppression()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(c.a_note)::numeric, 1)
+        FROM cobrec1._commentaire c
+        INNER JOIN cobrec1._avis a ON c.id_avis = a.id_avis
+        WHERE a.id_produit = OLD.id_produit
+    )
+    WHERE id_produit = OLD.id_produit;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Recréation des triggers
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion
+AFTER INSERT ON cobrec1._avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_insertion();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_modification
+AFTER UPDATE ON cobrec1._avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_modification();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
+AFTER DELETE ON cobrec1._avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
+
+-- ============================================
+-- Insertion des avis de test
+-- ============================================
+
+INSERT INTO cobrec1._avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES
+(8, 'Excellent produit, je suis très satisfait de mon achat !', 17, 0, '2025-08-03 16:23:45'),
+(2, 'Qualité au rendez-vous, conforme à la description.', 10, 4, '2025-06-11 09:15:22'),
+(10, 'Très bon rapport qualité-prix, je suis ravi.', 8, 3, '2025-06-22 14:37:09'),
+(3, 'Exactement ce que je cherchais, très satisfait.', 3, 2, '2025-08-20 11:42:18'),
+(1, 'Produit top, je recommande vivement !', 19, 1, '2025-09-29 08:56:31'),
+(7, 'Super qualité, meilleur que ce à quoi je m attendais.', 15, 0, '2025-07-15 17:29:44'),
+(5, 'Produit correct, sans plus. Fait le travail.', 5, 1, '2025-10-08 13:18:56'),
+(9, 'Bien dans l ensemble, quelques petits défauts mineurs.', 12, 2, '2025-05-27 10:05:33'),
+(4, 'Conforme à la description, mais j attendais mieux.', 7, 3, '2025-09-14 15:47:12'),
+(6, 'Pas mal, mais quelques améliorations seraient les bienvenues.', 9, 0, '2025-06-30 12:23:47'),
+(2, 'Produit standard, fait ce qu on lui demande.', 4, 4, '2025-08-11 09:34:28'),
+(8, 'Livraison rapide et produit impeccable. Je recommande !', 20, 1, '2025-07-22 16:51:09'),
+(1, 'Très bon rapport qualité-prix, je suis ravi.', 11, 2, '2025-10-19 11:08:55'),
+(10, 'Produit de très bonne qualité, conforme à mes attentes.', 16, 0, '2025-05-18 14:42:31'),
+(3, 'Je ne regrette pas mon achat, produit parfait !', 14, 1, '2025-09-05 08:19:17'),
+(5, 'Rien à redire, c est parfait pour mes besoins.', 6, 3, '2025-06-07 17:55:42'),
+(9, 'Déçu par la qualité, ne correspond pas aux attentes.', 2, 5, '2025-10-26 10:31:28'),
+(4, 'Produit de mauvaise qualité, je ne recommande pas.', 1, 4, '2025-07-03 13:46:53'),
+(7, 'Très déçu, description non conforme à la réalité.', 3, 5, '2025-08-29 09:12:06');
+
+-- ============================================
+-- NOTE IMPORTANTE
+-- ============================================
+-- Pour insérer des commentaires (qui contiennent les notes), vous devez d'abord avoir:
+-- 1. Des avis (créés ci-dessus)
+-- 2. Des livraisons valides
+-- 3. Des clients valides
+--
+-- Exemple de structure pour les commentaires:
+-- INSERT INTO cobrec1._commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client) VALUES
+-- (1, 4.5, 1, TRUE, 1),
+-- (2, 4.0, 2, TRUE, 2),
+-- ...
+--
+-- Les notes dans les commentaires seront automatiquement agrégées pour calculer
+-- la note moyenne du produit grâce aux triggers.
+----------- WbStatement -----------
