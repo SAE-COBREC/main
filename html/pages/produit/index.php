@@ -485,7 +485,7 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
 
 <body>
     <?php
-        include __DIR__ . '/partials/header.php';
+        include __DIR__ . '/partials/header.html';
     ?>
 
     <nav class="page-breadcrumb">
