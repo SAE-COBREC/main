@@ -5,7 +5,7 @@
     $pdo->exec("SET search_path to cobrec1");
     session_start();
     const NB_IMGS_MAX = 3;
-    const EMPLACEMENT_DES_IMGS = 'html/img/Photo/';
+    const EMPLACEMENT_DES_IMGS = 'html/img/photo/';
 
     if($_SESSION['id'] != null){
         try {//Affiliation id_utilisateur id_vendeur
@@ -25,9 +25,9 @@
 
             if ($_GET['modifier'] != null){
                 //si US modifier produit
-                print_r("detect modif\n");
+                //print_r("detect modif\n");
                 if($_SESSION["creerArticle"]['_GET'] == null){
-                    print_r('1');
+                    //print_r('1');
                     //si premier passage
                     try {//Affiliation id_utilisateur id_vendeur
                         $sql = '
@@ -96,13 +96,16 @@
                     <?php
                     }else{//tout est bon
                         //peuplement de _post et de creerArticle
-                        print_r("peuplement\n");
+                        //print_r("peuplement\n");
                         $_FILES["photo"]["name"] = [];
                         $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
                         $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
+                        $_SESSION["creerArticle"]["_FILES"]['name'] = [];
                         foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
-                            $_SESSION["creerArticle"]["_FILES"]['name'][] = $value['i_title'];
-                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][] = 'html/img/Photo/';
+                            $_SESSION["creerArticle"]["_FILES"]['name'][$key] = $value['i_title'];
+                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = '../../../img/photo/';
+                            $_SESSION["creerArticle"]["_FILES"]['name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['name'][$key]);
+                            copy($_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] . $_SESSION["creerArticle"]["_FILES"]['name'][$key], 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['name'][$key]);
                         }
                         $_POST = [];
                         $_POST["titre"] = str_replace("''","'", $_SESSION["creerArticle"]['_GET']['p_nom']);
@@ -113,6 +116,7 @@
                         $_POST["fin"] =null;
                         $_POST["tva"] = $_SESSION["creerArticle"]['_GET']['id_tva'];
                         $_POST["categorie"] = $_SESSION["creerArticle"]['_GET']['id_categorie'];
+                        $_POST["origine"] = $_SESSION["creerArticle"]['_GET']['p_origine'];
                         // $_POST["couleur"] =null;
                         $_POST["poids"] = $_SESSION["creerArticle"]['_GET']['p_poids'];
                         $_POST["volume"] = $_SESSION["creerArticle"]['_GET']['p_volume'];
@@ -122,7 +126,7 @@
                     }
                 }else if($_SESSION["creerArticle"]['_GET']['id_produit'] != $_GET['modifier']){
                     //si l'utilisateur a changé l'url
-                    print_r('changement');
+                    //print_r('changement');
                     $_POST = [];
                     $_SESSION["creerArticle"] = [];
                     $_FILES["photo"]["name"] = [];
@@ -305,15 +309,29 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
             <?php
             if($_SESSION["creerArticle"]['_GET'] != null){
+                ?>
+                <input type="submit" name="svgModif"title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" />
+                <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
+                <input class="orange" type="submit" name="horsLigne"title="Un article hors ligne n'est plus visible que vous." value="Mettre hors ligne" />
+                <script>
+                    const btnPrincipauxModif = document.querySelectorAll("input");
+                </script>
+                <?php
                 if (($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne') || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
 
-                
                 ?>
-                <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
+                
+                <script>
+                    btnPrincipauxModif[2].disabled = false;
+                    btnPrincipauxModif[3].disabled = true;
+                </script>
             <?php
                 }else{
                     ?>
-                    <input class="orange" type="submit" name="horsLigne"title="Un article hors ligne n'est plus visible que vous." value="Mettre hors ligne" />
+                    <script>
+                    btnPrincipauxModif[3].disabled = false;
+                    btnPrincipauxModif[2].disabled = true;
+                    </script>
                 <?php
                 }
             }else{
@@ -416,21 +434,15 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         
                         ?>
                         <br>
-                        <small><?php echo count($_SESSION["creerArticle"]["_FILES"]["name"]) ?>/<?php echo NB_IMGS_MAX;?></small>
+                        <small><?php echo count($_SESSION["creerArticle"]["_FILES"]["name"]);?>
+                            /<?php echo NB_IMGS_MAX;?></small>
                         
                         <?php
-                        if($_SESSION["creerArticle"]['_GET'] != null){
-                            $lien = '../../../img/Photo';
-                        }else{
-                            $lien = 'temp_/';
-                        }
                         
                         foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
-                            //
-                            
                             ?><br>
                             <small>
-                                <img src="<?php echo $lien . $value ?>" height="25">
+                                <img src="<?php echo 'temp_/' . $value ?>" height="25">
                                 <?php echo $value; ?>
                                 <input type="submit" name="btn_moins<?php echo $key?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
@@ -524,6 +536,31 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             <?php echo $value['nom_categorie'] ?>
                             </option>
                             <?php } ?>
+                        </select>
+                        <br />
+                    </article>
+                    <article>
+                        <!-- Liste déroulante -->
+                        <label for="origine">Origine</label>
+                        <br>
+                        <select id="origine" name="origine" required>
+                        <option value=''></option>
+                        <option 
+                        value="Bretagne" <?php if ($_POST["origine"] == 'Bretagne'){echo 'selected';} ?>>
+                        Bretagne
+                        </option>
+                        <option 
+                        value="France" <?php if ($_POST["origine"] == 'France'){echo 'selected';} ?>>
+                        France
+                        </option>
+                        <option 
+                        value="UE" <?php if ($_POST["origine"] == 'UE'){echo 'selected';} ?>>
+                        Union européenne
+                        </option>
+                        <option 
+                        value="Hors UE" <?php if ($_POST["origine"] == 'Hors UE'){echo 'selected';} ?>>
+                        Hors Union européenne
+                        </option>
                         </select>
                         <br />
                     </article>
@@ -624,7 +661,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             <script>
             const btnPrincipaux = document.querySelectorAll("input");
             btnPrincipaux[0].addEventListener('click', () => {//si clic sur Annuler
-                if (confirm("Êtes-vous certain de voulair annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
+                if (confirm("Êtes-vous certain de vouloir annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
                     document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
                 }
             });
@@ -637,6 +674,28 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             function publier(){//si clic sur publier et pas de warnings
                 alert("Votre article a bien été publié.");
                 document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+            }
+
+            function enLigne(){//si clic sur en ligne et pas de warnings
+                if (confirm("Votre article a bien été mis en ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
+                    btnPrincipauxModif[3].disabled = false;
+                    btnPrincipauxModif[2].disabled = true;
+                }else{document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
+                }
+            }
+
+            function horsLigne(){//si clic sur hors ligne et pas de warnings
+                if (confirm("Votre article a bien été mis hors ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
+                    btnPrincipauxModif[2].disabled = false;
+                    btnPrincipauxModif[3].disabled = true;
+                }else{document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
+                }
+            }
+
+            function svgModif(){//si clic sur svgModif et pas de warnings
+                if (confirm("Vos modifications ont bien été sauvegardées. Souhaitez-vous continuer à modifier l'article ?.")) {
+                }else{document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
+                }
             }
         </script>
             <pre>
@@ -660,10 +719,11 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                             try {//création de l'objet produit dans la base
                                 $sql = '
-                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,p_taille,date_arrivee_stock_recent)
+                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,p_taille,date_arrivee_stock_recent)
                                 VALUES (
                                 ' . "'" . $_POST['tva'] ."'" .', 
                                 ' . $id_vendeur .', 
+                                ' . "'" . $_POST['origine'] ."'" .', 
                                 ' . "'" . $_POST['titre'] ."'" .', 
                                 ' . "'" . $_POST["description"] ."'" .', 
                                 ' . "'" . $_POST["poids"] ."'" .', 
@@ -736,7 +796,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     VALUES (
                                     ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value . "'" .', '
                                     . "'" . $id_produit . '_' . $value . "'". ','
-                                    . "'" . 'Photo du produit ' . $_POST["titre"] . "'". '
+                                    . "'" . 'photo du produit ' . $_POST["titre"] . "'". '
                                     );
                                     ';
                                     $stmt = $pdo->prepare($sql);
@@ -782,10 +842,10 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                                 
                                 
-                                //déplacement du fichier vers le dossier img/Photo
-                                rename('temp_/' . $value, '../../../img/Photo/'. $value);
+                                //déplacement du fichier vers le dossier img/photo
+                                rename('temp_/' . $value, '../../../img/photo/'. $value);
                                 //renommage du fichier
-                                rename('../../../img/Photo/'. $value, '../../../img/Photo/'. $id_produit . '_' . $value);
+                                rename('../../../img/photo/'. $value, '../../../img/photo/'. $id_produit . '_' . $value);
                             }
 
                             //ne pas faire réduction, hors must du Sprint 1
@@ -831,13 +891,14 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         }
                     }
                     
-                }else if (($_POST["horsLigne"] == "Mettre hors ligne") || ($_POST["enLigne"] == "Mettre en ligne")){
+                }else if (($_POST["horsLigne"] == "Mettre hors ligne") || ($_POST["enLigne"] == "Mettre en ligne") || ($_POST["svgModif"] == "Sauvegarder les modifications")){
                     //Si pas de warning et formulaire soumis via le bouton Mettre en ligne/hors ligne
                     
                     try {//modif de l'objet produit dans la base
                         $sql = '
                         UPDATE cobrec1._produit
                         SET id_tva =' . $_POST['tva'] . ', 
+                        p_origine ='. "'" . $_POST['origine'] . "'" . ', 
                         p_nom ='. "'" . $_POST['titre'] . "'" . ', 
                         p_description ='. "'" . $_POST['description'] . "'" . ', 
                         p_poids =' . $_POST['poids'] . ', 
@@ -854,7 +915,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
                         $time = time();
                         $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'objet produit dans la base";
-                        print_r($_POST);
+                        //print_r($_POST);
                         foreach ($_POST as $value) {
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $key . ' : ' ;
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $value ;
@@ -879,9 +940,141 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         }
                     }
 
+                    try{//suppression du lien images-produit
+                        $sql = '
+                        DELETE FROM cobrec1._represente_produit
+                        WHERE id_produit = ' . $_SESSION["creerArticle"]['_GET']['id_produit'] . '
+                        ';
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute();
+                    } catch (Exception $e) {
+                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression du lien images-produit";
+                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                    }
+
+
+                    foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
+                        unlink('../../../img/Photo/' . $value['i_title']);
+                        try {//suppression des images
+                            $sql = '
+                            DELETE FROM cobrec1._image
+                            WHERE i_lien = ' . "'" .$value['i_lien'] . "'" . ';
+                            ';
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                        } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression des images";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        }
+                        unset($_SESSION["creerArticle"]['_GET']['imgs'][$key]);
+                    }
+
                     
+
+                    foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+                        move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key], 
+                                'temp_/' . $value);
+
+                        $value = str_replace($_SESSION["creerArticle"]['_GET']['id_produit'] . '_', '', $value);
+                        // $value = str_replace('.png.png', '.png', $value);
+                        // $value = str_replace('.jpg.jpg', '.jpg', $value);
+                        // $value = str_replace('.jpeg.jpeg', '.jpeg', $value);
+                        // $value = str_replace('.gif.gif', '.gif', $value);
+                        // $value = str_replace('.svg.svg', '.svg', $value);
+                        try {//création des images
+                            $sql = '
+                            INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
+                            VALUES (
+                            ' . "'" . EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value . "'" .', '
+                            . "'" . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value . "'". ','
+                            . "'" . 'photo du produit ' . $_POST["titre"] . "'". '
+                            );
+                            ';
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                            $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_lien'] = EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value;
+                            $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_title'] = $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value;
+                            $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_alt'] = 'photo du produit ' . $_POST["titre"];
+                        } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        }
+
+
+                        try {//création de l'affiliation entre images et produit
+                            $sql = '
+                            INSERT INTO cobrec1._represente_produit(id_produit,id_image)
+                            VALUES (
+                            ' . $_SESSION["creerArticle"]['_GET']['id_produit'] .', 
+                            (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value ."'" .')
+                            );
+                            ';
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                        } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            //print_r($_POST["titre"]);
+                        }
+
+                        copy('temp_/' . $value, '../../../img/photo/'. $value);
+                        //renommage du fichier
+                        rename('../../../img/photo/'. $value, '../../../img/photo/'. $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value);
+                    }
+                    //Supprime les fichiers de temp_
+                    // $fichiers = glob('temp_/*');
+                    // foreach ($fichiers as $value) {
+                    //     unlink($value);
+                    // }
+
+
+                    if ($_POST["horsLigne"] == "Mettre hors ligne"){
+                        ?>
+                    <script>
+                        horsLigne();
+                    </script>
+                    <?php 
+                    
+                        try {//mise hors ligne du produit
+                            $sql = '
+                            UPDATE cobrec1._produit 
+                            SET p_statut = ' . "'" . 'Hors ligne' . "' ". '
+                            WHERE p_nom = '. "'" . $_POST['titre'] . "'"
+                            ;
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                            $_SESSION["creerArticle"]['_GET']['p_statut'] = 'Hors ligne';
+                        } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise hors ligne du produit";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        }
                 
-                
+                    }else if ($_POST["enLigne"] == "Mettre en ligne"){
+
+                        
+                    ?>
+                    <script>
+                        enLigne();
+                    </script>
+
+    <?php
+                        try {//mise en ligne du produit
+                            $sql = '
+                            UPDATE cobrec1._produit 
+                            SET p_statut = ' . "'" . 'En ligne' . "' ". '
+                            WHERE p_nom = '. "'" . $_POST['titre'] . "'"
+                            ;
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                            $_SESSION["creerArticle"]['_GET']['p_statut'] = 'En ligne';
+                        } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        }
+                    }
+
+                    
+
                 }
 
 

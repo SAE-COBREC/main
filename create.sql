@@ -183,6 +183,7 @@ CREATE TABLE cobrec1._produit (
     date_arrivee_stock_recent timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     p_nb_ventes integer DEFAULT 0,
     p_statut varchar(20) DEFAULT 'Ébauche',
+    p_origine varchar(20) DEFAULT 'Inconnu',
     CONSTRAINT verif_produit_frais_de_port CHECK (p_frais_de_port >= 0.00),
     CONSTRAINT verif_produit_volume CHECK (p_volume >= 0.00),
     CONSTRAINT verif_produit_poids CHECK (p_poids >= 0.00),
@@ -191,7 +192,8 @@ CREATE TABLE cobrec1._produit (
     CONSTRAINT verif_produit_stock CHECK (p_stock >= 0),
     CONSTRAINT verif_produit_nb_signalements CHECK (p_nb_signalements >= 0),
     CONSTRAINT verif_produit_nb_ventes CHECK (p_nb_ventes >= 0),
-    CONSTRAINT verif_produit_statut CHECK (p_statut IN ('Ébauche', 'En ligne', 'Hors ligne', 'Supprimé'))
+    CONSTRAINT verif_produit_statut CHECK (p_statut IN ('Ébauche', 'En ligne', 'Hors ligne', 'Supprimé')),
+    CONSTRAINT verif_produit_origine CHECK (p_origine IN ('Inconnu', 'Bretagne', 'France', 'UE', 'Hors UE'))
 );
 
 ALTER TABLE ONLY cobrec1._produit
@@ -703,7 +705,7 @@ INSERT INTO _TVA (montant_TVA, libelle_TVA) VALUES
 -- 9. RÉDUCTIONS (futures)
 INSERT INTO _reduction (reduction_pourcentage, reduction_debut, reduction_fin) VALUES
 (10.00, '2025-12-01 00:00:00', '2025-12-31 23:59:59'),
-(15.00, '2025-11-18 00:00:00', '2025-11-30 23:59:59'),
+(15.00, '2025-11-28 00:00:00', '2025-11-30 23:59:59'),
 (20.00, '2026-01-01 00:00:00', '2026-01-15 23:59:59'),
 (25.00, '2025-12-20 00:00:00', '2025-12-26 23:59:59'),
 (30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59'),
@@ -970,16 +972,16 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion
-AFTER INSERT on _produit
+AFTER INSERT on _avis
 FOR EACH ROW
 EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_insertion();
 
 CREATE TRIGGER tgr_moyenne_notes_produit_apres_modification
-AFTER UPDATE on _produit
+AFTER UPDATE on _avis
 FOR EACH ROW
 EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_modification();
 
 CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
-AFTER DELETE on _produit
+AFTER DELETE on _avis
 FOR EACH ROW
 EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
