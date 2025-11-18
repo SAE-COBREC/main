@@ -170,7 +170,9 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
     }
 }
 
-$idClient = (int) $_SESSION['idClient'] ?? NULL; //si l'utilisateur n'est pas connecté on met null
+$idClient = (int) $_SESSION['idClient']; //si l'utilisateur n'est pas connecté on met null
+
+
 if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un panier vide
     $panier = [];
 } else { //sinon on récupère l'id de son panier courant (celui qui est en train d'etre remplit pas ceux qui ont déjà été commandé).
