@@ -541,11 +541,11 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
                 </div>
 
                 <div class="qty">
-                    <div class="qty-control" role="group" aria-label="Choisir la quantité">
+                    <div class="qty-control <?= $estEnRupture ? 'disabled' : '' ?>" role="group" aria-label="Choisir la quantité">
                         <button class="ghost" id="qty-decrease" aria-label="Réduire quantité">−</button>
                         <input type="number" id="qtyInput" min="1" step="1" max="<?= (int)($produit['p_stock'] ?? 0) ?>"
-                            value="1" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
-                        <button class="ghost" id="qty-increase" aria-label="Augmenter quantité">+</button>
+                            value="<?= $estEnRupture ? 0 : 1 ?>" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
+                        <button class="ghost" id="qty-increase" aria-label="Augmenter quantité" <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
                     </div>
                     <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
                         onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
