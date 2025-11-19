@@ -824,6 +824,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                     </svg>
                                     Modifier
                                 </button>
+                                
                                 <form method="post" style="display:inline;"
                                     onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">
                                     <input type="hidden" name="id_adresse"
@@ -970,7 +971,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     <div id="modalModificationAdresse"
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
         <div
-            style="position:relative; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:2em; border-radius:12px; max-width:500px; width:90%;">
+            style="position:relative; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:3em; border-radius:12px; max-width:500px; width:90%;">
             <h2>Modifier l'adresse</h2>
             <form method="post" id="formulaireModificationAdresse">
                 <input type="hidden" name="id_adresse" id="modification_id_adresse">
