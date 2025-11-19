@@ -19,7 +19,7 @@ body.centered {
   align-items: center;
   padding-top: 0;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   body {
     font-size: 16px;
   }
@@ -45,7 +45,7 @@ body.centered {
 .card.hidden {
   display: none !important;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card {
     width: 320px;
     padding: 50px 25px 25px 25px;
@@ -68,7 +68,7 @@ body.centered {
   font-size: 36px;
   color: #030212;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card h1 {
     font-size: 28px;
   }
@@ -78,7 +78,7 @@ body.centered {
   color: #030212;
   margin-bottom: 40px;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card .subtitle {
     font-size: 20px;
   }
@@ -91,7 +91,7 @@ body.centered {
   padding-left: 40px;
   margin-bottom: 6px;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card label {
     font-size: 20px;
     padding-left: 15px;
@@ -106,7 +106,7 @@ body.centered {
   font-size: 16px;
   margin: 10px;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card input {
     width: 280px;
     height: 25px;
@@ -134,7 +134,7 @@ body.centered {
   font-size: 15px;
   margin-left: 40px;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card .error {
     padding: 0;
     margin-left: 20px;
@@ -253,7 +253,7 @@ body.centered {
 .card .nav-actions .nav-label {
   font-size: 14px;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card .nav-actions .btn-prev .nav-arrow {
     width: 20px;
   }
@@ -336,12 +336,12 @@ body.centered {
   padding-left: 15px;
   margin-left: 0;
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card[id="3"] label {
     margin-left: 0;
   }
 }
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card[id="3"] .address-row {
     flex-wrap: wrap;
     align-items: stretch;
@@ -362,7 +362,7 @@ body.centered {
   }
 }
 
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .card .inline-flex {
     gap: 12px;
     justify-content: center;
@@ -427,7 +427,7 @@ body.centered {
   text-decoration: none;
 }
 
-@media screen and (max-width: 508px ) {
+@media screen and (max-width: 508px) {
   .connex-btn > button {
     width: 300px;
   }
