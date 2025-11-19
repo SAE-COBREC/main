@@ -2,7 +2,7 @@
 body {
   font-family: "Quicksand", sans-serif;
   margin: 0;
-  background: #F7F7FB;
+  background: #F0F4F8;
   color: #030212;
 }
 
@@ -75,7 +75,7 @@ body {
   animation: thumb-flash 0.25s ease;
 }
 .product-row .main-image {
-  background: linear-gradient(180deg, #FFFFFF, #F7F7FB);
+  background: linear-gradient(180deg, #FFFFFF, #F0F4F8);
   padding: 18px;
   border-radius: 10px;
   display: flex;
@@ -147,7 +147,7 @@ body {
   gap: 12px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: #F7F7FB;
+  background: #F0F4F8;
   border: 1px solid #EFEFEF;
   height: 44px;
 }
@@ -180,7 +180,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .product-row .summary .meta {
-  background: #F7F7FB;
+  background: #F0F4F8;
   padding: 12px;
   border-radius: 8px;
   margin-top: 14px;
