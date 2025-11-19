@@ -408,7 +408,9 @@ function modifierMotDePasseCompte(
 
 //vérifier si le client est connecté via la session
 if (!isset($_SESSION['idClient'])) {
-    header("Location: /pages/connexionClient/index.php");
+    //header("Location: ");
+    $url = '/pages/connexionClient/index.php';
+    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
     exit;
 }
 
