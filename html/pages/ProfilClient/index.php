@@ -584,6 +584,14 @@ $listeCommandesRecentes = recupererHistoriqueCommandesRecentes($connexionBaseDeD
 //récupérer l'image de profil du compte
 $donneesImageProfilCompte = recupererImageProfilCompte($connexionBaseDeDonnees, $identifiantCompteClient);
 
+//requête supplémentaire pour vérifier la présence d'une image
+$requeteSQLVerificationImagePresente = "
+    SELECT i.i_lien
+    FROM cobrec1._image i
+    INNER JOIN cobrec1._represente_compte rc ON i.id_image = rc.id_image
+    WHERE rc.id_compte = ?
+";
+
 $requetePrepareeVerificationImage = $connexionBaseDeDonnees->prepare($requeteSQLVerificationImagePresente);
 $requetePrepareeVerificationImage->execute([$identifiantCompteClient]);
 $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSOC) ?: null;
