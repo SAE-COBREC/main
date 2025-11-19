@@ -59,7 +59,6 @@ if ($idProduit > 0) {
             LIMIT 1");
         $stmtProd->execute([':pid' => $idProduit]);
         $produit = $stmtProd->fetch(PDO::FETCH_ASSOC) ?: null;
-        // Charger toutes les images du produit (carrousel)
         $images = [];
         if ($produit) {
             $stmtImgs = $pdo->prepare("SELECT i.i_lien
@@ -69,9 +68,15 @@ if ($idProduit > 0) {
                                      ORDER BY rp.id_image ASC");
             $stmtImgs->execute([':pid' => $idProduit]);
             $images = $stmtImgs->fetchAll(PDO::FETCH_COLUMN) ?: [];
-            // Nettoyage basique des URLs et dédoublonnage
             $images = array_values(array_unique(array_map(function ($u) {
-                return is_string($u) && $u !== '' ? $u : '/img/Photo/default.png';
+                if (!is_string($u) || $u === '') {
+                    return '/img/Photo/default.png';
+                }
+                $u = trim($u);
+                if (preg_match('#^https?://#i', $u) || strpos($u, '/') === 0) {
+                    return $u;
+                }
+                return '/' . ltrim($u, '/');
             }, $images)));
         }
     } catch (Throwable $e) {
@@ -467,7 +472,7 @@ try {
 $noteEntiere = (int)floor($note);
 // Images pour l'affichage
 $images = isset($images) && is_array($images) ? $images : [];
-$hasMultipleImages = count($images) > 1;
+$hasMultipleImages = count($images) >= 1; // afficher le carrousel même pour 1 image
 $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_url'] ?? '/img/Photo/default.png'));
 ?>
 <!doctype html>
@@ -510,6 +515,14 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
                 <img id="productMainImage" src="<?= htmlspecialchars($mainImage) ?>"
                     alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
             </section>
+
+            <script>
+                /* Debug: afficher en console les images calculées côté serveur */
+                try {
+                    console.log('DEBUG product images:', <?= json_encode($images, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) ?>);
+                    console.log('DEBUG mainImage:', '<?= htmlspecialchars($mainImage) ?>', 'hasMultipleImages:', <?= $hasMultipleImages ? 'true' : 'false' ?>);
+                } catch (e) { /* silencieux */ }
+            </script>
 
             <!-- Colonne droite - résumé produit -->
             <aside class="summary">

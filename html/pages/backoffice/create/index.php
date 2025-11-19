@@ -163,10 +163,10 @@
 <pre>
 <?php
 
-print_r($_GET['modifier']);
-print_r($_SESSION["creerArticle"]['_GET']);
-print_r($_POST);
-print_r($_SESSION["creerArticle"]);
+// print_r($_GET['modifier']);
+// print_r($_SESSION["creerArticle"]['_GET']);
+// print_r($_POST);
+// print_r($_SESSION["creerArticle"]);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
 $warnPromo = false;
 if ($_POST !== []) {//Si le formulaire a été submit au moins une fois

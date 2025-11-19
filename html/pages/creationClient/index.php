@@ -6,7 +6,6 @@ $pdo->exec("SET search_path TO cobrec1");
 
 // Gestion de la vérification de l'email
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_email') {
-    header('Content-Type: application/json');
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     try {
         //regarde si le mail saisi est déja dans la bdd
@@ -23,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Gestion de la vérification du numéro de téléphone
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_phone') {
-    header('Content-Type: application/json');
     $telephone = htmlspecialchars($_POST['telephone'] ?? '', ENT_QUOTES, 'UTF-8');
     try {
 
@@ -41,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Gestion de la vérification du pseudo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_pseudo') {
-    header('Content-Type: application/json');
     $pseudo = htmlspecialchars($_POST['pseudo'] ?? '', ENT_QUOTES, 'UTF-8');
     try {
 
@@ -91,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $hasError = false;
   $error_card = null;
   $error_message = '';
-  $bdd_errors = [];
 
   if (!$hasError && isset($_POST['action']) === false) {
     try {
@@ -111,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       } catch (Exception $e) {
         $id_compte = null;
       }
+      $_SESSION['idCompte'] = $id_compte;
 
         //insérer les informations client
         $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_prenom, c_nom)
@@ -122,6 +119,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           'prenom'    => $prenom,
           'nom'       => $nom
         ]);
+
+        try {
+        $id_client = $pdo->lastInsertId();
+      } catch (Exception $e) {
+        $id_client = null;
+      }
+      $_SESSION['idClient'] = $id_client;
       //definition du message d'erreru en cas d'erreru d'insertion  
     } catch (Exception $e) {
       $hasError = true;
@@ -129,18 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $error_message = 'Une erreur est survenue lors de la création du compte.';
       $bdd_errors[] = [$e->getMessage()];
     }
-
-    //création d'un ficher avec les info d'erreur de bdd en cas de problèmes
-    if (!empty($bdd_errors)) {
-      $fp = fopen('file.csv', 'w');
-      foreach ($bdd_errors as $fields) {
-        fputcsv($fp, $fields, ',', '"', '');
-      }
-      fclose($fp);
-    }
       //redirige sur la page d'acceuil
-                $url = '../../index.php';
-          echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+      $url = '../../index.php';
+      echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
       exit;
     }
   }
