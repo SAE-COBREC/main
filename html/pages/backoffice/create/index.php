@@ -8,7 +8,7 @@
     const EMPLACEMENT_DES_IMGS = 'html/img/photo/';
 
     if($_SESSION['vendeur_id'] != null){
-        try {//Affiliation id_utilisateur id_vendeur
+        /*try {//Affiliation id_utilisateur id_vendeur
             $sql = '
             SELECT id_vendeur FROM cobrec1._vendeur WHERE id_compte = ' . $_SESSION['vendeur_id'] . ';'
             ;
@@ -18,10 +18,10 @@
         } catch (Exception $e) {
             // print_r("création de l'objet produit dans la base");
             // print_r($e);
-        }
+        }*/
 
-        if($id_vendeur == ''){//REMPLACER PAR != UNE FOIS PB CONNEXION VENDEUR RÉSOLU !!!!!!!!
-            $id_vendeur = 1; // A VIRER APRES
+        //if($id_vendeur != ''){//REMPLACER PAR != UNE FOIS PB CONNEXION VENDEUR RÉSOLU !!!!!!!!
+            //$id_vendeur = 1; // A VIRER APRES
 
             if ($_GET['modifier'] != null){
                 //si US modifier produit
@@ -84,7 +84,7 @@
                     </script>
 
                     <?php
-                    }else if ($_SESSION["creerArticle"]['_GET']['id_vendeur'] != $id_vendeur){
+                    }else if ($_SESSION["creerArticle"]['_GET']['id_vendeur'] != $_SESSION['vendeur_id']){
                         $_SESSION["creerArticle"]['_GET'] = null;
                         ?>
 
@@ -167,6 +167,8 @@
 // print_r($_SESSION["creerArticle"]['_GET']);
 // print_r($_POST);
 // print_r($_SESSION["creerArticle"]);
+$imageTropVolumineuse = false;
+print_r($_FILES);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
 $warnPromo = false;
 if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
@@ -219,18 +221,25 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
     if ($_FILES["photo"]["name"][0] !== ''){//Si au moins un fichier a été déposé
 
-        foreach ($_FILES["photo"]["name"] as $key => $value) {
+        foreach ($_FILES["photo"]["name"] as $key => $value) {//chgt noms pour éviter pbs lors du déplacement de l'img
             $_FILES["photo"]["name"][$key] = str_replace(' ', '_',$_FILES["photo"]["name"][$key]);
             $_FILES["photo"]["name"][$key] = str_replace("'", "''",$_FILES["photo"]["name"][$key]);
             $_FILES["photo"]["name"][$key] = str_replace('"', '""',$_FILES["photo"]["name"][$key]);
+            if ($_FILES["photo"]["size"][$key] > 5 * 1024 * 1024){//si fichier trop volumineux
+                $imageTropVolumineuse = true;
+                unset($_FILES["photo"]["name"][$key]);
+                unset($_FILES["photo"]["tmp_name"][$key]);
+            }
         }
 
-        foreach ($_SESSION["creerArticle"]["tmp_file"]["name"] as $key => $value) {
+        foreach ($_SESSION["creerArticle"]["tmp_file"]["name"] as $key => $value) {//suppression de tous els éléménts de $_SESSION["creerArticle"]["tmp_file"]
+            //sert à éviter de se retrouver avec des images censées avoir été oubliées
             unset($_SESSION["creerArticle"]["tmp_file"]["name"][$key]);
             unset($_SESSION["creerArticle"]["tmp_file"]["tmp_name"][$key]);
         }
 
-        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {//repeuplement de $_SESSION["creerArticle"]["tmp_file"] avec $_SESSION["creerArticle"]["_FILES"]
+            //sert à préserver les images auparavant enregistrées 
             $_SESSION["creerArticle"]["tmp_file"]["name"][$key] = 
                 $_SESSION["creerArticle"]["_FILES"]["name"][$key];
             $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][$key] = 
@@ -432,6 +441,15 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                             <?php
+                        }else if($imageTropVolumineuse){
+                            ?>
+                            <br>
+
+                            <small class="warn"><?php
+                            echo 'Au moins une de vos images fait plus de 5MB. Les images dépassant la taille maximale ne seront pas téléversés.';
+                            $_SESSION["creerArticle"]["warn"]++;
+                            ?></small>
+                            <?php
                         }
                         
                         ?>
@@ -452,7 +470,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 }
                                 ?>" height="25">
                                 <?php 
-                                echo $value . var_dump(str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'https://')); ?>
+                                echo $value; ?>
                                 <input type="submit" name="btn_moins<?php echo $key ?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
                             <?php } ?>
@@ -728,7 +746,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,p_taille,date_arrivee_stock_recent)
                                 VALUES (
                                 ' . "'" . $_POST['tva'] ."'" .', 
-                                ' . $id_vendeur .', 
+                                ' . $_SESSION['vendeur_id'] .', 
                                 ' . "'" . $_POST['origine'] ."'" .', 
                                 ' . "'" . $_POST['titre'] ."'" .', 
                                 ' . "'" . $_POST["description"] ."'" .', 
@@ -1122,15 +1140,15 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 </html>
 
 <?php
-        }else{//si l'utilisateur est un client
+        //}else{//si l'utilisateur est un client
 ?>
 <script>
-    alert("Vous êtes connecté avec un compte client. Vous allez être redirigé vers la page d'accueil des clients.");
-    document.location.href = "/index.php"; 
+    //alert("Vous êtes connecté avec un compte client. Vous allez être redirigé vers la page d'accueil des clients.");
+    //document.location.href = "/index.php"; 
     
 </script>
 <?php
-        }
+        //}
     }else{//si l'utilisateur n'est pas connecté
 
 ?>

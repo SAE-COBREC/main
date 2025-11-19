@@ -727,32 +727,32 @@ INSERT INTO _promotion (promotion_debut, promotion_fin) VALUES
 ('2026-07-01 00:00:00', '2026-07-31 23:59:59');
 
 -- 11. PRODUITS
-INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock, p_statut, p_poids, p_volume, p_frais_de_port, p_taille, p_note, p_nb_ventes) VALUES
-(1, 1, 'Smartphone XPro', 'Smartphone dernière génération avec écran OLED 6.7 pouces, 256Go stockage, 5G', 599.99, 35, 'En ligne', 0.180, 0.01, 5.99, NULL, 4.3, 15),
-(1, 1, 'Ordinateur portable Ultra', 'PC portable 15 pouces, 16Go RAM, SSD 512Go, processeur i7', 899.99, 22, 'En ligne', 2.5, 0.03, 9.99, NULL, 4.0, 8),
-(1, 2, 'T-shirt coton bio', 'T-shirt 100% coton biologique, coupe regular, diverses couleurs', 24.99, 58, 'En ligne', 0.15, 0.5, 3.99, 'M', 5.0, 42),
-(1, 2, 'Jean slim', 'Jean coupe slim stretch, denim premium', 49.99, 62, 'En ligne', 0.00, 0.01, 4.99, 'L', NULL, 18),
-(1, 2, 'Robe d été', 'Robe légère et fluide pour l été, motifs floraux', 39.99, 48, 'En ligne', 0.30, 0.08, 4.99, 'S', NULL, 12),
-(2, 1, 'Casque audio Bluetooth', 'Casque sans fil avec réduction de bruit active, autonomie 30h', 149.99, 15, 'En ligne', 0.25, 0.02, 5.99, NULL, 4.5, 25),
-(1, 2, 'Sac à dos urbain', 'Sac à dos pour ordinateur portable, compartiments multiples, imperméable', 69.99, 35, 'En ligne', 0.60, 0.15, 6.99, NULL, NULL, 10),
-(1, 1, 'Montre connectée', 'Montre sport avec GPS, cardiofréquencemètre, étanche 50m', 199.99, 15, 'En ligne', 0.05, 0.01, 3.99, NULL, 4.7, 20),
-(1, 3, 'Chaussures running', 'Chaussures de course avec amorti premium, semelle respirante', 89.99, 54, 'En ligne', 0.40, 0.08, 5.99, NULL, 4.2, 16),
-(1, 1, 'Tablette 10 pouces', 'Tablette Android, écran Full HD, 64Go, stylet inclus', 299.99, 16, 'En ligne', 0.50, 0.02, 7.99, NULL, 3.8, 9),
-(1, 3, 'Ballon de football', 'Ballon officiel en cuir synthétique, taille 5', 29.99, 85, 'En ligne', 0.45, 0.06, 4.99, NULL, 4.6, 35),
-(1, 2, 'Veste en cuir', 'Veste en cuir véritable, coupe motard, doublure intérieure', 189.99, 15, 'En ligne', 1.20, 0.01, 8.99, 'L', NULL, 5),
-(3, 1, 'Livre cuisine française', 'Recettes traditionnelles de cuisine française, 300 pages', 24.99, 28, 'En ligne', 0.80, 0.03, 3.99, NULL, 4.8, 22),
-(1, 3, 'Tapis de yoga', 'Tapis antidérapant, épaisseur 6mm, avec sac de transport', 34.99, 52, 'En ligne', 1.10, 0.02, 5.99, NULL, 4.4, 28),
-(1, 1, 'Clavier mécanique RGB', 'Clavier gamer avec rétroéclairage RGB, switches mécaniques', 79.99, 29, 'En ligne', 0.90, 0.04, 5.99, NULL, 4.1, 11),
-(1, 1, 'Console NextGen', 'Console de jeu dernière génération, 1To SSD, 4K HDR', 499.99, 0, 'Hors ligne', 3.5, 0.02, 14.99, NULL, 4.8, 25),
-(1, 2, 'Sweat à capuche premium', 'Sweat-shirt en coton bio, coupe oversize, poche kangourou', 59.99, 0, 'Hors ligne', 0.70, 0.03, 5.99, 'L', 4.4, 18),
-(1, 3, 'Raquette de tennis pro', 'Raquette carbone, tension 25kg, grip confort', 129.99, 0, 'Hors ligne', 0.35, 0.02, 6.99, NULL, 4.7, 32),
-(1, 1, 'Écran gaming 4K 27"', 'Écran IPS 27 pouces, 144Hz, HDR400, temps de réponse 1ms', 349.99, 0, 'Hors ligne', 5.2, 0.35, 19.99, NULL, 4.6, 18),
-(1, 2, 'Baskets limited edition', 'Baskets cuir véritable, édition limitée, semelle comfort', 179.99, 0, 'Hors ligne', 0.80, 0.06, 7.99, NULL, 4.9, 65),
-(1, 3, 'Vélo de route carbone', 'Vélo course cadre carbone, groupe Shimano 105, 11 vitesses', 1299.99, 0, 'Hors ligne', 8.5, 0.15, 29.99, NULL, 4.8, 25),
-(1, 1, 'Drone professionnel 4K', 'Drone avec caméra 4K, stabilisation 3 axes, autonomie 30min', 899.99, 0, 'Hors ligne', 1.2, 0.02, 12.99, NULL, 4.6, 18),
-(1, 2, 'Manteau d hiver imperméable', 'Manteau longueur genoux, doublure polaire, coupe-vent', 179.99, 0, 'Hors ligne', 1.5, 0.01, 8.99, 'XL', 4.4, 65),
-(1, 3, 'Tente 4 places', 'Tente familiale, double toit, arceaux aluminium, imperméable', 249.99, 0, 'Hors ligne', 4.8, 0.08, 19.99, NULL, 4.7, 32),
-(1, 1, 'Enceinte Bluetooth waterproof', 'Enceinte portable, autonomie 24h, résistance IP67', 129.99, 0, 'Hors ligne', 0.9, 0.05, 6.99, NULL, 4.9, 95);
+INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock, p_statut, p_origine, p_poids, p_volume, p_frais_de_port, p_taille, p_note, p_nb_ventes) VALUES
+(1, 1, 'Smartphone XPro', 'Smartphone dernière génération avec écran OLED 6.7 pouces, 256Go stockage, 5G', 599.99, 35, 'En ligne', 'Bretagne', 0.180, 0.01, 5.99, NULL, 4.3, 15),
+(1, 1, 'Ordinateur portable Ultra', 'PC portable 15 pouces, 16Go RAM, SSD 512Go, processeur i7', 899.99, 22, 'En ligne', 'Bretagne', 2.5, 0.03, 9.99, NULL, 4.0, 8),
+(1, 2, 'T-shirt coton bio', 'T-shirt 100% coton biologique, coupe regular, diverses couleurs', 24.99, 58, 'En ligne', 'Bretagne', 0.15, 0.5, 3.99, 'M', 5.0, 42),
+(1, 2, 'Jean slim', 'Jean coupe slim stretch, denim premium', 49.99, 62, 'En ligne', 'Bretagne', 0.00, 0.01, 4.99, 'L', NULL, 18),
+(1, 2, 'Robe d été', 'Robe légère et fluide pour l été, motifs floraux', 39.99, 48, 'En ligne', 'Bretagne', 0.30, 0.08, 4.99, 'S', NULL, 12),
+(2, 1, 'Casque audio Bluetooth', 'Casque sans fil avec réduction de bruit active, autonomie 30h', 149.99, 15, 'En ligne', 'Bretagne', 0.25, 0.02, 5.99, NULL, 4.5, 25),
+(1, 2, 'Sac à dos urbain', 'Sac à dos pour ordinateur portable, compartiments multiples, imperméable', 69.99, 35, 'En ligne', 'Bretagne', 0.60, 0.15, 6.99, NULL, NULL, 10),
+(1, 1, 'Montre connectée', 'Montre sport avec GPS, cardiofréquencemètre, étanche 50m', 199.99, 15, 'En ligne', 'Bretagne', 0.05, 0.01, 3.99, NULL, 4.7, 20),
+(1, 3, 'Chaussures running', 'Chaussures de course avec amorti premium, semelle respirante', 89.99, 54, 'En ligne', 'Bretagne', 0.40, 0.08, 5.99, NULL, 4.2, 16),
+(1, 1, 'Tablette 10 pouces', 'Tablette Android, écran Full HD, 64Go, stylet inclus', 299.99, 16, 'En ligne', 'Bretagne', 0.50, 0.02, 7.99, NULL, 3.8, 9),
+(1, 3, 'Ballon de football', 'Ballon officiel en cuir synthétique, taille 5', 29.99, 85, 'En ligne', 'Bretagne', 0.45, 0.06, 4.99, NULL, 4.6, 35),
+(1, 2, 'Veste en cuir', 'Veste en cuir véritable, coupe motard, doublure intérieure', 189.99, 15, 'En ligne', 'Bretagne', 1.20, 0.01, 8.99, 'L', NULL, 5),
+(3, 1, 'Livre cuisine française', 'Recettes traditionnelles de cuisine française, 300 pages', 24.99, 28, 'En ligne', 'Bretagne', 0.80, 0.03, 3.99, NULL, 4.8, 22),
+(1, 3, 'Tapis de yoga', 'Tapis antidérapant, épaisseur 6mm, avec sac de transport', 34.99, 52, 'En ligne', 'Bretagne', 1.10, 0.02, 5.99, NULL, 4.4, 28),
+(1, 1, 'Clavier mécanique RGB', 'Clavier gamer avec rétroéclairage RGB, switches mécaniques', 79.99, 29, 'En ligne', 'Bretagne', 0.90, 0.04, 5.99, NULL, 4.1, 11),
+(1, 1, 'Console NextGen', 'Console de jeu dernière génération, 1To SSD, 4K HDR', 499.99, 0, 'Hors ligne', 'France', 3.5, 0.02, 14.99, NULL, 4.8, 25),
+(1, 2, 'Sweat à capuche premium', 'Sweat-shirt en coton bio, coupe oversize, poche kangourou', 59.99, 0, 'Hors ligne', 'France', 0.70, 0.03, 5.99, 'L', 4.4, 18),
+(1, 3, 'Raquette de tennis pro', 'Raquette carbone, tension 25kg, grip confort', 129.99, 0, 'Hors ligne', 'France', 0.35, 0.02, 6.99, NULL, 4.7, 32),
+(1, 1, 'Écran gaming 4K 27"', 'Écran IPS 27 pouces, 144Hz, HDR400, temps de réponse 1ms', 349.99, 0, 'Hors ligne', 'France', 5.2, 0.35, 19.99, NULL, 4.6, 18),
+(1, 2, 'Baskets limited edition', 'Baskets cuir véritable, édition limitée, semelle comfort', 179.99, 0, 'Hors ligne', 'France', 0.80, 0.06, 7.99, NULL, 4.9, 65),
+(1, 3, 'Vélo de route carbone', 'Vélo course cadre carbone, groupe Shimano 105, 11 vitesses', 1299.99, 0, 'Hors ligne', 'UE', 8.5, 0.15, 29.99, NULL, 4.8, 25),
+(1, 1, 'Drone professionnel 4K', 'Drone avec caméra 4K, stabilisation 3 axes, autonomie 30min', 899.99, 0, 'Hors ligne', 'UE', 1.2, 0.02, 12.99, NULL, 4.6, 18),
+(1, 2, 'Manteau d hiver imperméable', 'Manteau longueur genoux, doublure polaire, coupe-vent', 179.99, 0, 'Hors ligne', 'UE', 1.5, 0.01, 8.99, 'XL', 4.4, 65),
+(1, 3, 'Tente 4 places', 'Tente familiale, double toit, arceaux aluminium, imperméable', 249.99, 0, 'Hors ligne', 'Hors UE', 4.8, 0.08, 19.99, NULL, 4.7, 32),
+(1, 1, 'Enceinte Bluetooth waterproof', 'Enceinte portable, autonomie 24h, résistance IP67', 129.99, 0, 'Hors ligne', 'Hors UE', 0.9, 0.05, 6.99, NULL, 4.9, 95);
 
 -- 12. IMAGES
 INSERT INTO _image (i_lien, i_title, i_alt) VALUES
