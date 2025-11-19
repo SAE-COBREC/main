@@ -450,16 +450,12 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 }else{
                                     echo 'temp_/' . $value;
                                 }
-                                
-
                                 ?>" height="25">
-                                <?php echo $value . var_dump(str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'https://')); ?>
+                                <?php 
+                                echo $value . var_dump(str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'https://')); ?>
                                 <input type="submit" name="btn_moins<?php echo $key ?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
-                            <?php
-                        }
-
-                        ?>
+                            <?php } ?>
                         <br>
                         <input type="submit" name="btn_maj" title="Cliquez ici pour voir les images que vous avez déposées !" value="Voir les images ayant été déposées" />
                         <br />
