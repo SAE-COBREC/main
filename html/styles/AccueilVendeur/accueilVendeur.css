@@ -276,15 +276,19 @@ body {
   font-size: 12px;
   font-weight: 600;
 }
-.badge--draft {
-  background: #FFF4E6;
-  color: #E67E22;
-}
 .badge--live {
   background: #CD7F32;
   color: #FFFFFF;
 }
 .badge--out {
+  background: #D4183D;
+  color: #FFFFFF;
+}
+.badge--eb {
+  background: #E6A96E;
+  color: #FFFFFF;
+}
+.badge--hors {
   background: #8B5A2B;
   color: #FFFFFF;
 }

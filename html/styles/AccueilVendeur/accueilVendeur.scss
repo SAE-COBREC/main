@@ -322,17 +322,22 @@ body {
   font-size: 12px;
   font-weight: 600;
 
-  &--draft {
-    background: #FFF4E6;
-    color: #E67E22;
-  }
-
   &--live {
     background: $primary-color-bronze;
     color: $primary-color-blanc;
   }
 
   &--out {
+    background: $secondary-color-rouge;
+    color: $primary-color-blanc;
+  }
+
+  &--eb {
+    background: $secondary-color-bronze-clair;
+    color: $primary-color-blanc;
+  }
+
+  &--hors {
     background: $secondary-color-marron;
     color: $primary-color-blanc;
   }

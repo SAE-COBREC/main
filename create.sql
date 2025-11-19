@@ -987,3 +987,7 @@ CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
 AFTER DELETE on _avis
 FOR EACH ROW
 EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
+
+
+UPDATE cobrec1._produit SET p_note = 0;
+UPDATE cobrec1._commentaire SET a_note = 0.0;

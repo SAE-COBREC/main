@@ -7,7 +7,7 @@
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
-        SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite, montant_tva
+        SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite, montant_tva, i_title, i_alt
         FROM _contient
         JOIN _produit ON _produit.id_produit = _contient.id_produit
         JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
@@ -58,9 +58,9 @@
                                                 data-stock="<?php echo intval($article['p_stock'])?>"
                                                 data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                         <div class="imageArticleP">
-                            <img src="<?php echo htmlspecialchars($article['i_lien']) ?>"
-                                alt="<?php echo htmlspecialchars($article['p_nom']) ?>" 
-                                title="<?php echo htmlspecialchars($article['p_nom'])?>">
+                            <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
+                                alt="<?php echo htmlspecialchars($article['i_alt']) ?>" 
+                                title="<?php echo htmlspecialchars($article['i_title'])?>">
                         </div>
                         <div class="articleDetailP">
                             <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
@@ -123,6 +123,7 @@
 
     <!--vérifie qu'il y ait minimun un élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
     <?php if (count($articles) > 0):?>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!--pour ajax-->
         <script>
             function verifieStockMax(val, stock){
                 console.log(val, stock);
@@ -256,6 +257,4 @@
             updateRecap();
         </script>
     <?php endif;?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="/js/HL_import.js"></script>
 </html>
