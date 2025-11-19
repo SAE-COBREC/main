@@ -3,11 +3,60 @@
 // connexion a la bdd
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
-// Précharge les pseudos existants pour comparaison côté client (interdits)
-$__existing_pseudos = [];
 
+// Gestion de la vérification de l'email
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_email') {
+    header('Content-Type: application/json');
+    $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
+    try {
+        //regarde si le mail saisi est déja dans la bdd
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._compte WHERE email = :email');
+        $stmt->execute(['email' => $email]);
+        $count = $stmt->fetchColumn();
+        
+        echo json_encode(['exists' => ($count > 0)]);
+    } catch (Exception $e) {
+        echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// Gestion de la vérification du numéro de téléphone
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_phone') {
+    header('Content-Type: application/json');
+    $telephone = htmlspecialchars($_POST['telephone'] ?? '', ENT_QUOTES, 'UTF-8');
+    try {
+
+      //regarde si le numéro saisi est déja dans la bdd
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._compte WHERE num_telephone = :telephone');
+        $stmt->execute(['telephone' => $telephone]);
+        $count = $stmt->fetchColumn();
+        
+        echo json_encode(['exists' => ($count > 0)]);
+    } catch (Exception $e) {
+        echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// Gestion de la vérification du pseudo
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_pseudo') {
+    header('Content-Type: application/json');
+    $pseudo = htmlspecialchars($_POST['pseudo'] ?? '', ENT_QUOTES, 'UTF-8');
+    try {
+
+      //regarde si le numéro saisi est déja dans la bdd
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._client WHERE c_pseudo = :pseudo');
+        $stmt->execute(['pseudo' => $pseudo]);
+        $count = $stmt->fetchColumn();
+        
+        echo json_encode(['exists' => ($count > 0)]);
+    } catch (Exception $e) {
+        echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
+    }
+    exit;
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -23,6 +72,8 @@ $__existing_pseudos = [];
 </head>
 
 <?php
+
+//récuperation des données du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $nom = htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8');
   $prenom = htmlspecialchars($_POST['prenom'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -36,30 +87,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $mdp = $_POST['mdp'] ?? '';
   $Cmdp = $_POST['Cmdp'] ?? '';
 
+  //inintialisation des données d'erreur
   $hasError = false;
   $error_card = null;
   $error_message = '';
   $bdd_errors = [];
 
-  if (!$hasError) {
+  if (!$hasError && isset($_POST['action']) === false) {
     try {
-      // Utiliser des requêtes préparées pour la sécurité
+      //insertion dans la bdd des données de compte
       $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription)
               VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP)';
       $stmt = $pdo->prepare($sql);
       $stmt->execute([
         'email' => $email,
         'telephone' => $telephone,
-        'mdp' => password_hash($mdp, PASSWORD_DEFAULT)
+        'mdp' => $mdp
       ]);
 
+      // Récupérer l'id du compte créé
+      try {
+        $id_compte = $pdo->lastInsertId();
+      } catch (Exception $e) {
+        $id_compte = null;
+      }
+
+        //insérer les informations client
+        $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_prenom, c_nom)
+                VALUES (:id_compte, :pseudo, :prenom, :nom)';
+        $stmtClient = $pdo->prepare($sqlClient);
+        $stmtClient->execute([
+          'id_compte' => $id_compte,
+          'pseudo'    => $pseudo,
+          'prenom'    => $prenom,
+          'nom'       => $nom
+        ]);
+      //definition du message d'erreru en cas d'erreru d'insertion  
     } catch (Exception $e) {
       $hasError = true;
-      $error_card = 2; 
-      $error_message = 'Cette adresse email est déjà utilisée.';
+      $error_card = 4; 
+      $error_message = 'Une erreur est survenue lors de la création du compte.';
       $bdd_errors[] = [$e->getMessage()];
     }
 
+    //création d'un ficher avec les info d'erreur de bdd en cas de problèmes
     if (!empty($bdd_errors)) {
       $fp = fopen('file.csv', 'w');
       foreach ($bdd_errors as $fields) {
@@ -67,28 +138,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       fclose($fp);
     }
-
-    if (!$hasError) {
-      try {
-        $id_compte = $pdo->lastInsertId();
-      } catch (Exception $e) {
-        $id_compte = '';
-      }
-
-      echo "<div class=\"server-summary\" style=\"max-width:700px;margin:24px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.12);\">";
-      echo "<h2 style=\"margin-top:0;\">Compte créé</h2>";
-      echo "<dl style=\"display:grid;grid-template-columns:120px 1fr;gap:8px 16px;\">";
-      echo "<dt>ID compte</dt><dd>" . htmlspecialchars((string)$id_compte, ENT_QUOTES, 'UTF-8') . "</dd>";
-      echo "<dt>Email</dt><dd>" . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . "</dd>";
-      echo "</dl>";
-      echo "<div style=\"margin-top:16px;display:flex;gap:12px;justify-content:flex-end;\">";
-      echo "<a href=\"index.php\" style=\"display:inline-block;padding:8px 12px;border-radius:8px;border:1px solid #030212;color:#030212;text-decoration:none;\">Retour</a>";
-      echo "</div>";
-      echo "</div>";
+      //redirige sur la page d'acceuil
+      header('Location: ../index.php');
       exit;
     }
   }
-}
 ?>
 
 <style>
@@ -124,17 +178,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="nom">Nom</label>
-        <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
+        <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required>
       </div>
 
       <div>
         <label for="prenom">Prénom</label>
-        <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required>
+        <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required>
       </div>
 
       <div>
         <label for="pseudo">Pseudonyme</label>
-        <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" required>
+        <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required>
       </div>
 
 
@@ -158,7 +212,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Card2 -->
 
-
     <div class="card hidden" id="2">
       <div class="logo">
         <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
@@ -170,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide.">
+        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide.">
       </div>
 
       <div>
@@ -231,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
-          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^[0-9]{5}$" maxlength="5"
+          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$" maxlength="5"
             placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
         </div>
 
@@ -284,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="Cmdp">Confirmer le mot de passe</label>
-        <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
+        <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" value="" required>
       </div>
 
       <div class="error">
@@ -315,46 +368,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
-
-    window.__existingPseudos = <?php echo json_encode($__existing_pseudos, JSON_UNESCAPED_UNICODE); ?> || [];
-    
     function currentCard() { return document.querySelector('.card:not(.hidden)'); }
     
     function showCardByIndex(idx) {
       const cards = Array.from(document.querySelectorAll('.card'));
       cards.forEach((c, i) => c.classList.toggle('hidden', i !== idx));
-      try { if (typeof updateBodyAlignment === 'function') updateBodyAlignment(); } catch (e) { /* ignore */ }
     }
 
-    function updateBodyAlignment() {
-      try {
-        var card = document.querySelector('.card:not(.hidden)');
-        if (!card) return;
-        var rect = card.getBoundingClientRect();
-        var needed = rect.height + 48;
-        if (needed <= window.innerHeight) document.body.classList.add('centered'); else document.body.classList.remove('centered');
-      } catch (e) { /* ignore */ }
+    // Fonction de validation d'âge
+    function validateAge(dateInput) {
+      const dobStr = (dateInput.value || '').trim();
+      if (!dobStr) {
+        dateInput.setCustomValidity('');
+        return true;
+      }
+      
+      const dob = new Date(dobStr);
+      if (isNaN(dob.getTime())) {
+        dateInput.setCustomValidity('Date de naissance invalide.');
+        return false;
+      }
+      
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      
+      if (age < 18) {
+        dateInput.setCustomValidity('Vous devez avoir au moins 18 ans.');
+        return false;
+      }
+      
+      dateInput.setCustomValidity('');
+      return true;
     }
 
+    // gestion de la validation des différents champs
     function getFieldValidationMessage(el) {
       try {
         if (el && el.validity) {
+          //cas ou aucune valeur n'est entrée
           if (el.validity.valueMissing) return 'Ce champ est requis.';
 
-            // Vérification d'âge : la date de naissance doit indiquer au moins 18 ans
-            if (el.id === 'naissance') {
-              var dobStr = (el.value || '').trim();
-              if (!dobStr) return 'Ce champ est requis.';
-              var dob = new Date(dobStr);
-              if (isNaN(dob.getTime())) return 'Date de naissance invalide.';
-              var today = new Date();
-              var age = today.getFullYear() - dob.getFullYear();
-              var m = today.getMonth() - dob.getMonth();
-              if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-              if (age < 18) return 'Vous devez avoir au moins 18 ans.';
+          // Vérification d'âge
+          if (el.id === 'naissance') {
+            if (el.validity.customError) {
+              return el.validationMessage;
             }
-
-          if (el.type === 'password') {
+          }
+          //verification du mdp
+          if (el.id === 'mdp') {
             var val = (el.value || '').trim();
             if (val.length === 0) return 'Ce champ est requis.';
             if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
@@ -365,11 +430,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!/[^A-Za-z0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un caractère spécial.';
             if (el.validity.patternMismatch) return 'Le mot de passe ne respecte pas le format requis.';
           }
-
+          //verif des REGEX
           if (el.validity.patternMismatch) {
             if (el.type === 'email') return 'Veuillez saisir une adresse e-mail valide.';
             if (el.id === 'telephone') return 'Le numéro de téléphone n\'a pas le bon format.';
-            if (el.id === 'codeP') return 'Le code postal doit contenir 5 chiffres.';
+            if (el.id === 'codeP') return 'Le code postal est incorrecte.';
             return 'Le format de ce champ est invalide.';
           }
         }
@@ -377,17 +442,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
     }
 
+    //verif des mail
     async function checkEmailExists(email) {
       try {
         const formData = new FormData();
         formData.append('action', 'check_email');
         formData.append('email', email);
         
-        const response = await fetch('check_email.php', {
+        const response = await fetch('index.php', {
           method: 'POST',
           body: formData
         });
         
+        if (!response.ok) return false;
         const data = await response.json();
         return data.exists;
       } catch (e) {
@@ -395,37 +462,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         return false;
       }
     }
-
+    //verif du téléphone
+    async function checkPhoneExists(telephone) {
+      try {
+        const formData = new FormData();
+        formData.append('action', 'check_phone');
+        formData.append('telephone', telephone);
+        
+        const response = await fetch('index.php', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) return false;
+        const data = await response.json();
+        return data.exists;
+      } catch (e) {
+        console.error('Erreur lors de la vérification du téléphone:', e);
+        return false;
+      }
+    }
+    //verif du pseudo
+    async function checkPseudoExists(pseudo) {
+      try {
+        const formData = new FormData();
+        formData.append('action', 'check_pseudo');
+        formData.append('pseudo', pseudo);
+        
+        const response = await fetch('index.php', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) return false;
+        const data = await response.json();
+        return data.exists;
+      } catch (e) {
+        console.error('Erreur lors de la vérification du pseudo:', e);
+        return false;
+      }
+    }
+    //fonction pour passage a la suite du formulaire
     window.showNextCard = async function () {
       const cards = Array.from(document.querySelectorAll('.card'));
       const visible = cards.findIndex(c => !c.classList.contains('hidden'));
       const activeCard = cards[visible];
       const errorEl = activeCard ? activeCard.querySelector('.error') : null;
 
-      try {
-        const invalid = activeCard ? activeCard.querySelector(':invalid') : null;
-        if (invalid) {
-          const message = getFieldValidationMessage(invalid);
-          try { invalid.setCustomValidity(message); } catch (e) { /* ignore */ }
-          if (errorEl) { errorEl.innerHTML = '<strong>Erreur</strong> : ' + message; errorEl.classList.remove('hidden'); }
-          else if (typeof invalid.reportValidity === 'function') invalid.reportValidity(); else alert(message);
-          try { invalid.focus(); } catch (e) { /* ignore */ }
-          return;
+      const invalid = activeCard ? activeCard.querySelector(':invalid') : null;
+      if (invalid) {
+        const message = getFieldValidationMessage(invalid);
+        if (errorEl) { 
+          errorEl.innerHTML = '<strong>Erreur</strong> : ' + message; 
+          errorEl.classList.remove('hidden'); 
         }
-      } catch (e) { console.warn('Validation HTML5 non disponible ou erreur', e); }
+        invalid.focus();
+        return;
+      }
 
-      // Vérification de l'email à la card 2
+      // Vérification du pseudo à la card 1
+      if (visible === 0) {
+        const pseudoInput = document.getElementById('pseudo');
+        if (pseudoInput && pseudoInput.value.trim()) {
+          const pseudoExists = await checkPseudoExists(pseudoInput.value.trim());
+          if (pseudoExists) {
+            if (errorEl) { 
+              errorEl.classList.remove('hidden'); 
+              errorEl.innerHTML = '<strong>Erreur</strong> : Ce pseudonyme est déjà utilisé.'; 
+            }
+            return;
+          }
+        }
+      }
+
+      // Vérification du mail à la card 2
       if (visible === 1) {
         const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('telephone');
+        
         if (emailInput && emailInput.value.trim()) {
           const emailExists = await checkEmailExists(emailInput.value.trim());
           if (emailExists) {
-            const err = errorEl || document.querySelector('.card#2 .error');
-            if (err) { 
-              err.classList.remove('hidden'); 
-              err.innerHTML = '<strong>Erreur</strong> : Cette adresse email est déjà utilisée.'; 
-            } else {
-              alert('Erreur : Cette adresse email est déjà utilisée.');
+            if (errorEl) { 
+              errorEl.classList.remove('hidden'); 
+              errorEl.innerHTML = '<strong>Erreur</strong> : Cette adresse email est déjà utilisée.'; 
+            }
+            return;
+          }
+        }
+        
+        // Vérification du téléphone à la card 2
+        if (phoneInput && phoneInput.value.trim()) {
+          const phoneExists = await checkPhoneExists(phoneInput.value.trim());
+          if (phoneExists) {
+            if (errorEl) { 
+              errorEl.classList.remove('hidden'); 
+              errorEl.innerHTML = '<strong>Erreur</strong> : Ce numéro de téléphone est déjà utilisé.'; 
             }
             return;
           }
@@ -435,68 +567,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (visible < cards.length - 1) showCardByIndex(visible + 1);
     };
 
+    // fonction bouton page précédante
     window.showPreviousCard = function () {
       const cards = Array.from(document.querySelectorAll('.card'));
       const visible = cards.findIndex(c => !c.classList.contains('hidden'));
       if (visible > 0) showCardByIndex(visible - 1);
     };
 
+    // fonction pour la bouton de confirmation
     window.finishRegistration = function () {
-      var form = document.getElementById('multiForm'); if (!form) return;
+      const form = document.getElementById('multiForm');
+      if (!form) return;
+      
       if (!form.checkValidity()) {
-        var invalid = form.querySelector(':invalid');
+        const invalid = form.querySelector(':invalid');
         if (invalid) {
-          var card = invalid.closest('.card'); var cards = Array.from(document.querySelectorAll('.card')); var idx = card ? cards.indexOf(card) : 0;
-          if (typeof showCardByIndex === 'function') showCardByIndex(idx);
-          var errDiv = card ? card.querySelector('.error') : null; var message = getFieldValidationMessage(invalid);
-          try { invalid.setCustomValidity(message); } catch (e) { /* ignore */ }
-          if (errDiv) { errDiv.textContent = message; errDiv.classList.remove('hidden'); } else alert(message);
+          const card = invalid.closest('.card');
+          const cards = Array.from(document.querySelectorAll('.card'));
+          const idx = card ? cards.indexOf(card) : 0;
+          showCardByIndex(idx);
+          const errDiv = card ? card.querySelector('.error') : null;
+          const message = getFieldValidationMessage(invalid);
+          if (errDiv) { 
+            errDiv.innerHTML = '<strong>Erreur</strong> : ' + message;
+            errDiv.classList.remove('hidden'); 
+          }
           invalid.focus();
         }
         return;
       }
 
-      const mdpEl = document.getElementById('mdp'); const cmdpEl = document.getElementById('Cmdp');
-      const mdp = mdpEl ? (mdpEl.value || '') : ''; const cmdp = cmdpEl ? (cmdpEl.value || '') : '';
-      if (mdp !== cmdp) { showCardByIndex(3); const err = document.querySelector('.card#\\34  .error'); if (err) { err.classList.remove('hidden'); err.innerHTML = '<strong>Erreur</strong> : Les mots de passe ne correspondent pas.'; } else alert('Erreur : Les mots de passe ne correspondent pas.'); return; }
-
-      try { window.__allow_submit = true; try { window.__submission_confirmed = false; } catch (e) { /* ignore */ } if (typeof form.requestSubmit === 'function') form.requestSubmit(); else form.submit(); setTimeout(function () { try { if (!window.__submission_confirmed) { window.__allow_submit = true; form.submit(); } } catch (e) { } }, 600); } catch (e) { window.__allow_submit = false; form.submit(); }
+      const mdpEl = document.getElementById('mdp');
+      const cmdpEl = document.getElementById('Cmdp');
+      const mdp = mdpEl ? mdpEl.value : '';
+      const cmdp = cmdpEl ? cmdpEl.value : '';
+      
+      if (mdp !== cmdp) {
+        showCardByIndex(3);
+        const err = document.querySelector('.card#\\34  .error');
+        if (err) {
+          err.classList.remove('hidden');
+          err.innerHTML = '<strong>Erreur</strong> : Les mots de passe ne correspondent pas.';
+        }
+        return;
+      }
+      form.submit();
     };
 
+    //affichage des message d'erreur
     <?php if (isset($hasError) && $hasError && $error_card): ?>
-      window.addEventListener('DOMContentLoaded', function () { showCardByIndex(<?php echo $error_card - 1; ?>); });
+      window.addEventListener('DOMContentLoaded', function () {
+        showCardByIndex(<?php echo $error_card - 1; ?>);
+      });
     <?php endif; ?>
 
     document.addEventListener('DOMContentLoaded', function () {
-      var form = document.getElementById('multiForm');
+      // Validation d'âge sur le champ de date de naissance
+      const naissanceInput = document.getElementById('naissance');
+      if (naissanceInput) {
+        naissanceInput.addEventListener('change', function() {
+          validateAge(this);
+        });
+        naissanceInput.addEventListener('blur', function() {
+          validateAge(this);
+        });
+      }
+
+      const form = document.getElementById('multiForm');
       if (form) {
-        form.addEventListener('submit', function (e) {
-          if (window.__allow_submit) { try { window.__submission_confirmed = true; } catch (e) { } window.__allow_submit = false; return; }
-          e.preventDefault(); try { if (typeof window.finishRegistration === 'function') window.finishRegistration(); } catch (err) { console.error('finishRegistration error', err); }
+        const elems = form.querySelectorAll('input, textarea, select');
+        elems.forEach(function (el) {
+          el.addEventListener('invalid', function (ev) {
+            ev.preventDefault();
+          });
+          el.addEventListener('input', function () {
+            const card = el.closest('.card');
+            const errorDiv = card ? card.querySelector('.error') : null;
+            if (errorDiv) errorDiv.classList.add('hidden');
+          });
         });
       }
     });
-
-    <?php if (!isset($hasError) || !$hasError): ?>
-      document.addEventListener('DOMContentLoaded', function () {
-        try {
-          var formEl = document.getElementById('multiForm');
-          if (formEl) {
-            var elems = formEl.querySelectorAll('input, textarea, select');
-            elems.forEach(function (el) {
-              el.addEventListener('invalid', function (ev) { try { el.setCustomValidity(getFieldValidationMessage(el)); } catch (e) { } });
-              el.addEventListener('input', function () { try { el.setCustomValidity(''); } catch (e) { } });
-            });
-          }
-        } catch (e) { }
-
-        try {
-          if (window.clearSavedRegistration) { window.clearSavedRegistration(); } else if (window.localStorage) { Object.keys(localStorage).filter(k => k.startsWith('register:')).forEach(k => localStorage.removeItem(k)); }
-        } catch (e) { }
-
-        var form = document.getElementById('multiForm'); if (form) { Array.from(form.elements).forEach(function (el) { try { var tag = (el.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea' || tag === 'select') { if (el.type === 'checkbox' || el.type === 'radio') el.checked = false; else el.value = ''; } } catch (e) { } }); if (typeof showCardByIndex === 'function') showCardByIndex(0); }
-      });
-    <?php endif; ?>
   </script>
 </body>
 </html>

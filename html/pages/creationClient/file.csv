@@ -1,5 +1,2 @@
-"PDOException: SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint ""_compte_email_key""
-DETAIL:  Key (email)=(client1@gmail.com) already exists. in /home/leo/Documents/GitHub/main/html/pages/creationClient/index.php:57
-Stack trace:
-#0 /home/leo/Documents/GitHub/main/html/pages/creationClient/index.php(57): PDOStatement->execute()
-#1 {main}"
+"SQLSTATE[23514]: Check violation: 7 ERROR:  new row for relation ""_compte"" violates check constraint ""verif_compte_mdp""
+DETAIL:  Failing row contains (26, dsv@sdv.com, 0999999999, 0, 0, 0, 0, 2025-11-19 10:02:45.067629, $2y$10$17Cv728dYgZAMvvy6j8VXO4JdAHtqLI/JfpF/L/TbSAKHhqOqjx2a, f)."
