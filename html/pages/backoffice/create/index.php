@@ -69,7 +69,7 @@
 
                     <script>
                         alert("La valeur du produit renseigné dans l'URL n'est pas valide. Vous allez être redirigé vers votre catalogue.");
-                        document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                        document.location.href = "/pages/backoffice/index.php"; 
                     </script>
 
                     <?php
@@ -80,7 +80,7 @@
 
                     <script>
                         alert("La valeur du produit renseigné dans l'URL ne correspond à aucun produit. Vous allez être redirigé vers votre catalogue.");
-                        document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                        document.location.href = "/pages/backoffice/index.php"; 
                     </script>
 
                     <?php
@@ -90,7 +90,7 @@
 
                     <script>
                         alert("Le produit que vous essayez de modifier ne vous appartient pas. Vous allez être redirigé vers votre catalogue.");
-                        document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                        document.location.href = "/pages/backoffice/index.php"; 
                     </script>
 
                     <?php
@@ -668,25 +668,25 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             const btnPrincipaux = document.querySelectorAll("input");
             btnPrincipaux[0].addEventListener('click', () => {//si clic sur Annuler
                 if (confirm("Êtes-vous certain de vouloir annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
-                    document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
+                    document.location.href="/pages/backoffice/index.php"; 
                 }
             });
 
             function sauvegarder(){//si clic sur sauvegarder et pas de warnings
                 alert("Votre article a bien été sauvegardé.");
-                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                document.location.href = "/pages/backoffice/index.php"; 
             }
 
             function publier(){//si clic sur publier et pas de warnings
                 alert("Votre article a bien été publié.");
-                document.location.href = "http://localhost:8888/pages/backoffice/index.php"; 
+                document.location.href = "/pages/backoffice/index.php"; 
             }
 
             function enLigne(){//si clic sur en ligne et pas de warnings
                 if (confirm("Votre article a bien été mis en ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
                     btnPrincipauxModif[3].disabled = false;
                     btnPrincipauxModif[2].disabled = true;
-                }else{document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
+                }else{document.location.href="/pages/backoffice/index.php"; 
                 }
             }
 
@@ -694,13 +694,13 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 if (confirm("Votre article a bien été mis hors ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
                     btnPrincipauxModif[2].disabled = false;
                     btnPrincipauxModif[3].disabled = true;
-                }else{document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
+                }else{document.location.href="/pages/backoffice/index.php"; 
                 }
             }
 
             function svgModif(){//si clic sur svgModif et pas de warnings
                 if (confirm("Vos modifications ont bien été sauvegardées. Souhaitez-vous continuer à modifier l'article ?.")) {
-                }else{document.location.href="http://localhost:8888/pages/backoffice/index.php"; 
+                }else{document.location.href="/pages/backoffice/index.php"; 
                 }
             }
         </script>
@@ -1126,7 +1126,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 ?>
 <script>
     alert("Vous êtes connecté avec un compte client. Vous allez être redirigé vers la page d'accueil des clients.");
-    document.location.href = "http://localhost:8888/index.php"; 
+    document.location.href = "/index.php"; 
     
 </script>
 <?php
@@ -1137,7 +1137,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
 <script>
     alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion");
-    document.location.href = "http://localhost:8888/pages/backoffice/connexion/index.php"; 
+    document.location.href = "/pages/backoffice/connexion/index.php"; 
 
             
 </script>
