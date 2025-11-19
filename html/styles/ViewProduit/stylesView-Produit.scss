@@ -7,7 +7,6 @@ body {
     color: vars.$primary-color-noir;
 }
 
-/* Lien retour catalogue */
 .page-breadcrumb {
     margin: 12px auto -12px;
     max-width: 1150px;
@@ -63,24 +62,28 @@ body {
 
     .main-image {
         background: linear-gradient(180deg, vars.$primary-color-blanc, vars.$secondary-color-bleu-clair);
-        padding: 18px;
+        padding: 12px;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 420px;
+        overflow: hidden;
+        aspect-ratio: 16/9;
+        min-height: 240px;
 
         img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            object-position: center center;
             border-radius: 6px;
+            display: block;
+            transition: opacity 180ms ease-in-out;
+            opacity: 1;
         }
     }
 
     .summary {
-        padding: 6px 12px;
-
         .title {
             font-size: 20px;
             font-weight: 700;
@@ -131,9 +134,9 @@ body {
             margin: 14px 0;
             .btn { flex: 1 1 auto; height: 46px; font-weight: 700; }
             .qty-control {
-                display: inline-flex;
+                display: flex;
                 align-items: center;
-                gap: 12px;
+                gap: 0;
                 padding: 6px 12px;
                 border-radius: 999px;
                 background: vars.$secondary-color-bleu-clair;
@@ -143,16 +146,30 @@ body {
                     background: transparent;
                     border: 0;
                     color: vars.$primary-color-noir;
-                    width: 32px;
-                    height: 32px;
+                    flex: 1 1 auto;
+                    min-width: 48px;
+                    height: 100%;
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
                     font-weight: 700;
                     font-size: 18px;
                     line-height: 1;
-                    border-radius: 999px;
+                    border-radius: 0;
                     padding: 0;
+                    box-sizing: border-box;
+                    touch-action: manipulation;
+                }
+
+                button.ghost:active, button.ghost:focus {
+                    background: rgba(0,0,0,0.03);
+                    outline: none;
+                }
+
+                input[type="number"] {
+                    flex: 0 0 64px;
+                    width: 64px;
+                    text-align: center;
                 }
                 input[type="number"] {
                     background: transparent;
@@ -181,7 +198,6 @@ body {
     }
 }
 
-/* Masquer les contrôles spinner des input[type=number] */
 input[type="number"] {
 
     &::-webkit-outer-spin-button,
@@ -358,7 +374,6 @@ input[type="number"] {
     }
 }
 
-/* Footer (déplacé depuis la page) */
 footer {
     grid-column: 1/-1;
     background: #030212;
@@ -476,10 +491,10 @@ footer>div>div:last-child span:hover {
 }
 
 @media screen and (max-width: 560px) {
-    .product-row { display: flex; flex-direction: column; }
-    .product-row .main-image { order: 1; min-height: 240px; }
+    .product-row { display: flex; flex-direction: column; align-items: stretch; width: 100%; }
+    .product-row .main-image { order: -1; min-height: 240px; position: relative; z-index: 3; }
     .product-row .thumbs { order: 2; }
-    .product-row .summary { order: 3; }
+    .product-row .summary { order: 3; width: 100%; }
 
     .thumbs {
         flex-direction: row;
@@ -487,15 +502,59 @@ footer>div>div:last-child span:hover {
         overflow-x: auto;
         padding-bottom: 6px;
         margin-top: 8px;
-        /* évite que les vignettes prennent trop de place */
+
         img {
             width: 56px;
             height: 56px;
         }
     }
+
+    .product-row .summary {
+        .qty {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+
+            .qty-control {
+                width: 100%;
+                justify-content: center;
+                padding: 8px 12px;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                flex: none;
+                display: block;
+                box-sizing: border-box;
+            }
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+            margin-top: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            align-items: stretch;
+
+            .ghost {
+                width: 100%;
+                max-width: none;
+                box-sizing: border-box;
+                display: block;
+                text-align: center;
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+    }
 }
 
-/* Affinage responsive supplémentaire */
 @media screen and (max-width: 768px) {
     .product-row .summary {
         .title {

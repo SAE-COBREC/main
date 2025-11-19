@@ -484,9 +484,7 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
 </head>
 
 <body>
-    <?php
-        include __DIR__ . '/partials/header.html';
-    ?>
+    <div id="header"></div>
 
     <nav class="page-breadcrumb">
         <a class="back-link" href="/index.php" onclick="if (history.length>1) { history.back(); return false; }">
@@ -502,7 +500,7 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
             <aside class="thumbs" aria-label="Vignettes du produit">
                 <?php foreach ($images as $idx => $imgUrl): ?>
                     <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>" alt="Vignette <?= $idx + 1 ?>"
-                         loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>" />
+                         loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>" role="button" tabindex="0" aria-label="Afficher l'image <?= $idx + 1 ?>" />
                 <?php endforeach; ?>
             </aside>
             <?php endif; ?>
@@ -553,7 +551,7 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
                     </button>
                 </div>
 
-                <div style="display:flex;gap:10px;margin-top:8px">
+                <div class="summary-actions">
                     <button class="ghost">Ajouter aux favoris</button>
                     <button class="ghost">Partager</button>
                 </div>
@@ -766,18 +764,36 @@ $mainImage = $hasMultipleImages ? $images[0] : ($images[0] ?? ($produit['image_u
             const thumbsEl = document.querySelector('.thumbs');
             const mainImg = document.getElementById('productMainImage');
             if (thumbsEl && mainImg) {
+                // Click sur une vignette -> mise à jour de l'image principale
                 thumbsEl.addEventListener('click', function (e) {
                     const t = e.target.closest('img.thumb');
                     if (!t) return;
                     const newSrc = t.getAttribute('data-src') || t.getAttribute('src');
                     if (newSrc && mainImg.getAttribute('src') !== newSrc) {
-                        mainImg.setAttribute('src', newSrc);
+                        // fondu lors du changement
+                        mainImg.style.opacity = '0';
+                        setTimeout(() => {
+                            mainImg.setAttribute('src', newSrc);
+                            // mettre à jour l'alt si disponible
+                            if (t.alt) mainImg.setAttribute('alt', t.alt);
+                            mainImg.style.opacity = '1';
+                        }, 120);
                     }
                     // Etat actif + flash (surblanchiment léger)
                     thumbsEl.querySelectorAll('img.thumb').forEach(img => img.classList.remove('is-active'));
                     t.classList.add('is-active');
                     t.classList.add('flash');
                     setTimeout(() => t.classList.remove('flash'), 220);
+                });
+
+                // Clavier: Enter ou Espace active la vignette
+                thumbsEl.addEventListener('keydown', function (e) {
+                    const t = e.target.closest('img.thumb');
+                    if (!t) return;
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        t.click();
+                    }
                 });
             }
             if (!input) return;
