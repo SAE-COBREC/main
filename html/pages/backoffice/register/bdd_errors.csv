@@ -1,0 +1,4 @@
+"SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column ""denomination"" of relation ""_vendeur"" violates not-null constraint
+DETAIL:  Failing row contains (9, 24, 783783783, iom, null, 0)."
+"SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column ""denomination"" of relation ""_vendeur"" violates not-null constraint
+DETAIL:  Failing row contains (10, 25, 785785785, zeafzfe, null, 0)."

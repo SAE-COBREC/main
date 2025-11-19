@@ -88,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $hasError = false;
   $error_card = null;
   $error_message = '';
-
   if (!$hasError && isset($_POST['action']) === false) {
     try {
       //insertion dans la bdd des données de compte
@@ -136,6 +135,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $error_message = 'Une erreur est survenue lors de la création du compte.';
       $bdd_errors[] = [$e->getMessage()];
     }
+
+    if (!empty($bdd_errors)) {
+      $fp = fopen('file.csv', 'w');
+      foreach ($bdd_errors as $fields) {
+      }
+      fclose($fp);
+      }
       //redirige sur la page d'acceuil
       $url = '../../index.php';
       echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
