@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paiement - Alizon</title>
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link rel="stylesheet" href="../../styles/Register/....css">
+  <link rel="stylesheet" href="/styles/finaliserCommande/StyleFinaliserCommande.css">
 </head>
 
 <body>

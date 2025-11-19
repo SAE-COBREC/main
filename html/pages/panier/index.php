@@ -5,9 +5,10 @@
     
     $id_client = $_SESSION['idClient'];
     $pdo->exec("SET search_path TO cobrec1");
-
     $requetePanier = "
-        SELECT p_nom, p_description, p_prix, i_lien, _produit.id_produit, p_stock, quantite, montant_tva, i_title, i_alt
+        SELECT DISTINCT ON (_produit.id_produit)
+        _produit.id_produit,
+        p_nom, p_description, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt
         FROM _contient
         JOIN _produit ON _produit.id_produit = _contient.id_produit
         JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
