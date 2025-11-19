@@ -420,7 +420,8 @@ $identifiantClientConnecte = (int) $_SESSION['idClient'];
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
-    header('Location: /index.php');
+    $url = '/index.php';
+    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
     exit;
 }
 
