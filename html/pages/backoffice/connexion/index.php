@@ -68,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $_SESSION['vendeur_id'] = $vendeurId;
           
           //redirige sur la page d'acceuil
-          header('Location: ../index.php');
+          $url = '../index.php';
+          echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
       }
