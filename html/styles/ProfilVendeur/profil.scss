@@ -22,10 +22,9 @@ body {
 .main {
   background: $secondary-color-rose-claire;
   padding: 32px 40px;
-  overflow-y: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  height: 1024px;
 }
 
 .header__title {
@@ -39,11 +38,10 @@ body {
   border-radius: $border-radius-primary;
   border: 1px solid $secondary-color-orange-clair;
   padding: 32px;
-  max-width: 1000px;  
-  width: 100%;       
-  margin: 0 auto;
+  max-width: 1000px;
+  width: 100%;
+  margin: 20px auto 0 auto;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  margin-top: 10px;
 
   &__title {
     font-family: $font-family-primaire;
@@ -55,26 +53,70 @@ body {
   }
 }
 
-.profil-details {
-  display: grid;
-  grid-template-columns: 250px 1fr;
-  gap: 25px 100px;
-  margin-left: 150px;
-  font-size: 20px;
-  color: $primary-color-noir;
+.profil-photo {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 25px auto;
 
-  dt {
-    font-weight: 600;
-  }
-
-  dd {
-    font-weight: 400;
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid $primary-color-bronze;
   }
 }
 
-.profil-actions {
-  margin-top: 32px;
-  text-align: center;
+.edit-form {
+  margin-top: 10px;
+  background: $secondary-color-rose-claire;
+  border: 1px solid $secondary-color-orange-clair;
+  border-radius: $border-radius-primary;
+  padding: 30px 40px;
+  width: 85%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  animation: fadeIn 0.3s ease-out;
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  label {
+    font-size: 18px;
+    font-weight: 600;
+    color: $primary-color-noir;
+  }
+
+  input {
+    padding: 12px 16px;
+    border-radius: $border-radius-primary;
+    border: 1px solid $secondary-color-orange-clair;
+    background: $primary-color-blanc;
+    font-size: 16px;
+    font-family: $font-family-secondaire;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color-bronze;
+      box-shadow: 0 0 0 2px rgba($primary-color-bronze, 0.2);
+    }
+  }
+
+  button[type="submit"] {
+    margin-top: 10px;
+    width: 50%;
+    align-self: center;
+  }
 }
 
 .btn {
@@ -84,7 +126,6 @@ body {
   font-weight: 600;
   font-size: 20px;
   cursor: pointer;
-  margin-top: 10px;
 
   &--primary {
     background: $primary-color-bronze;
@@ -94,5 +135,16 @@ body {
     &:hover {
       background: rgba($secondary-color-bronze-clair, 0.9);
     }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
