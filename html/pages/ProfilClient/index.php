@@ -409,7 +409,7 @@ function modifierMotDePasseCompte(
 //vérifier si le client est connecté via la session
 if (!isset($_SESSION['idClient'])) {
     $url = '/pages/connexionClient/index.php';
-    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 
@@ -421,7 +421,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
     $url = '/index.php';
-    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 
@@ -472,7 +472,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationProfil['success']) {
-            header('Location: index.php?success=info_updated');
+            $url = 'index.php?success=info_updated';
+            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
         } else {
             $messageErreur = $resultatModificationProfil['message'];
@@ -497,7 +498,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationMotDePasse['success']) {
-            header('Location: index.php?success=password_changed');
+            $url = 'index.php?success=password_changed';
+            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
         } else {
             $messageErreur = $resultatModificationMotDePasse['message'];
@@ -523,7 +525,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($resultatMiseAJourAdresse['success']) {
-            header('Location: index.php?success=address_updated');
+            $url = 'index.php?success=address_updated';
+            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
         } else {
             $messageErreur = $resultatMiseAJourAdresse['message'];
@@ -537,7 +540,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultatSuppressionAdresse = supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $identifiantCompteClient);
 
         if ($resultatSuppressionAdresse['success']) {
-            header('Location: index.php?success=address_deleted');
+            $url = 'index.php?success=address_deleted';
+            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
         } else {
             $messageErreur = $resultatSuppressionAdresse['message'];
@@ -561,7 +565,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($resultatAjoutAdresse['success']) {
-            header('Location: index.php?success=address_added');
+            $url = 'index.php?success=address_added';
+            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
         } else {
             $messageErreur = $resultatAjoutAdresse['message'];
@@ -623,7 +628,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     <main>
         <div>
-            <button onclick="history.back()">
+            <button class="back-button" onclick="window.location.href='/index.php';">
                 ← Retour
             </button>
 
@@ -677,7 +682,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <main>
                         <!-- Conteneur de l'image de profil -->
                         <div class="profile-image-container">
-                            <?php if ($donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
+                            <?php if ($donneesImageProfilCompte !== null && $donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
                                 <!-- Afficher l'image de profil si elle existe -->
                                 <img src="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien']); ?>"
                                     alt="<?php echo htmlspecialchars($donneesImageProfilCompte['i_alt'] ?? 'Photo de profil'); ?>"
