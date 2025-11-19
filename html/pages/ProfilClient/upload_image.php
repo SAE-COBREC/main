@@ -1,11 +1,4 @@
 <?php
-
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-error_log("=== DEBUT UPLOAD ===");
-error_log("Upload error code: " . $_FILES['image']['error']);
-error_log("Destination: " . __DIR__ . '/../../img/clients/');
-
 //démarrer la session pour vérifier l'authentification
 session_start();
 
