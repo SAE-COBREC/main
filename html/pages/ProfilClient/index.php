@@ -682,7 +682,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <main>
                         <!-- Conteneur de l'image de profil -->
                         <div class="profile-image-container">
-                            <?php if ($donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
+                            <?php if ($donneesImageProfilCompte !== null && $donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
                                 <!-- Afficher l'image de profil si elle existe -->
                                 <img src="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien']); ?>"
                                     alt="<?php echo htmlspecialchars($donneesImageProfilCompte['i_alt'] ?? 'Photo de profil'); ?>"
