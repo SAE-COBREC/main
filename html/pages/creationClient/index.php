@@ -107,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       } catch (Exception $e) {
         $id_compte = null;
       }
+      $_SESSION['idCompte'] = $id_compte;
 
         //insérer les informations client
         $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_prenom, c_nom)
@@ -118,6 +119,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           'prenom'    => $prenom,
           'nom'       => $nom
         ]);
+
+        try {
+        $id_client = $pdo->lastInsertId();
+      } catch (Exception $e) {
+        $id_client = null;
+      }
+      $_SESSION['idClient'] = $id_client;
       //definition du message d'erreru en cas d'erreru d'insertion  
     } catch (Exception $e) {
       $hasError = true;
