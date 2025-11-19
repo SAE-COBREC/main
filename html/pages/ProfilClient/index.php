@@ -628,7 +628,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     <main>
         <div>
-            <button onclick="history.back()">
+            <button class="back-button" onclick="window.location.href='/index.php';">
                 ← Retour
             </button>
 
