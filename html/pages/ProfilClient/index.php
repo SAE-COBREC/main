@@ -101,7 +101,6 @@ function validerFormatMotDePasse($motDePasse)
     return preg_match($regexMotDePasse, $motDePasse) === 1;
 }
 
-
 //fonction pour récupérer les informations complètes du client
 function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClient)
 {
@@ -150,6 +149,69 @@ function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantComp
         return $requetePreparee->fetchAll(PDO::FETCH_ASSOC) ?: [];
     } catch (Exception $erreurException) {
         return [];
+    }
+}
+
+//fonction pour mettre à jour une adresse existante
+function mettreAJourAdresse($connexionBaseDeDonnees, $idAdresse, $idCompte, $adresse, $ville, $codePostal, $complement = '')
+{
+    try {
+        //vérifier que l'adresse appartient bien au compte
+        $requeteVerification = "SELECT id_adresse FROM cobrec1._adresse WHERE id_adresse = ? AND id_compte = ?";
+        $requetePrepareeVerification = $connexionBaseDeDonnees->prepare($requeteVerification);
+        $requetePrepareeVerification->execute([$idAdresse, $idCompte]);
+
+        if (!$requetePrepareeVerification->fetch()) {
+            return ['success' => false, 'message' => "Adresse non trouvée ou non autorisée."];
+        }
+
+        //mise à jour de l'adresse
+        $requeteMiseAJour = "
+            UPDATE cobrec1._adresse 
+            SET a_adresse = ?, 
+                a_ville = ?, 
+                a_code_postal = ?, 
+                a_complement = ? 
+            WHERE id_adresse = ? AND id_compte = ?
+        ";
+
+        $requetePrepareeMiseAJour = $connexionBaseDeDonnees->prepare($requeteMiseAJour);
+        $requetePrepareeMiseAJour->execute([$adresse, $ville, $codePostal, $complement, $idAdresse, $idCompte]);
+
+        return ['success' => true, 'message' => "Adresse mise à jour avec succès."];
+    } catch (Exception $erreurException) {
+        return ['success' => false, 'message' => "Erreur lors de la mise à jour de l'adresse."];
+    }
+}
+
+//fonction pour supprimer une adresse
+function supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $idCompte)
+{
+    try {
+        $requeteSQL = "DELETE FROM cobrec1._adresse WHERE id_adresse = ? AND id_compte = ?";
+        $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
+        $requetePreparee->execute([$idAdresse, $idCompte]);
+
+        return ['success' => true, 'message' => "Adresse supprimée avec succès."];
+    } catch (Exception $erreurException) {
+        return ['success' => false, 'message' => "Erreur lors de la suppression."];
+    }
+}
+
+// AJOUT ADRESSE - fonction pour ajouter une nouvelle adresse
+function ajouterNouvelleAdresse($connexionBaseDeDonnees, $idCompte, $adresse, $ville, $codePostal, $complement = '')
+{
+    try {
+        $requeteSQL = "
+            INSERT INTO cobrec1._adresse (id_compte, a_adresse, a_ville, a_code_postal, a_complement)
+            VALUES (?, ?, ?, ?, ?)
+        ";
+        $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
+        $requetePreparee->execute([$idCompte, $adresse, $ville, $codePostal, $complement]);
+
+        return ['success' => true, 'message' => "Adresse ajoutée avec succès."];
+    } catch (Exception $erreurException) {
+        return ['success' => false, 'message' => "Erreur lors de l'ajout de l'adresse."];
     }
 }
 
@@ -290,7 +352,7 @@ function mettreAJourProfilCompletClient(
 
         return ['success' => true, 'message' => "Profil mis à jour avec succès."];
     } catch (Exception $erreurException) {
-        return ['success' => false, 'message' => "Erreur lors de la mise à jour"];//. $erreurException->getMessage()];
+        return ['success' => false, 'message' => "Erreur lors de la mise à jour"];
     }
 }
 
@@ -339,7 +401,7 @@ function modifierMotDePasseCompte(
     } catch (Exception $erreurException) {
         return [
             'success' => false,
-            'message' => "Erreur lors du changement de mot de passe"// . $erreurException->getMessage()
+            'message' => "Erreur lors du changement de mot de passe"
         ];
     }
 }
@@ -439,6 +501,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $messageErreur = $resultatModificationMotDePasse['message'];
         }
     }
+
+    //mise à jour d'une adresse
+    if (isset($_POST['update_address'])) {
+        $idAdresse = (int) $_POST['id_adresse'];
+        $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
+        $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
+        $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
+        $complementSaisi = htmlspecialchars($_POST['complement'] ?? '');
+
+        $resultatMiseAJourAdresse = mettreAJourAdresse(
+            $connexionBaseDeDonnees,
+            $idAdresse,
+            $identifiantCompteClient,
+            $adresseSaisie,
+            $villeSaisie,
+            $codePostalSaisi,
+            $complementSaisi
+        );
+
+        if ($resultatMiseAJourAdresse['success']) {
+            header('Location: index.php?success=address_updated');
+            exit;
+        } else {
+            $messageErreur = $resultatMiseAJourAdresse['message'];
+        }
+    }
+
+    //suppression d'une adresse
+    if (isset($_POST['delete_address'])) {
+        $idAdresse = (int) $_POST['id_adresse'];
+
+        $resultatSuppressionAdresse = supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $identifiantCompteClient);
+
+        if ($resultatSuppressionAdresse['success']) {
+            header('Location: index.php?success=address_deleted');
+            exit;
+        } else {
+            $messageErreur = $resultatSuppressionAdresse['message'];
+        }
+    }
+
+    // AJOUT ADRESSE - traitement POST pour l'ajout d'une nouvelle adresse
+    if (isset($_POST['add_address'])) {
+        $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
+        $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
+        $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
+        $complementSaisi = htmlspecialchars($_POST['complement'] ?? '');
+
+        $resultatAjoutAdresse = ajouterNouvelleAdresse(
+            $connexionBaseDeDonnees,
+            $identifiantCompteClient,
+            $adresseSaisie,
+            $villeSaisie,
+            $codePostalSaisi,
+            $complementSaisi
+        );
+
+        if ($resultatAjoutAdresse['success']) {
+            header('Location: index.php?success=address_added');
+            exit;
+        } else {
+            $messageErreur = $resultatAjoutAdresse['message'];
+        }
+    }
 }
 
 //chargement des données pour l'affichage de la page
@@ -516,6 +642,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         echo "Informations mises à jour avec succès.";
                     if ($_GET['success'] === 'password_changed')
                         echo "Mot de passe changé avec succès.";
+                    if ($_GET['success'] === 'address_updated')
+                        echo "Adresse mise à jour avec succès.";
+                    if ($_GET['success'] === 'address_deleted')
+                        echo "Adresse supprimée avec succès.";
+                    // AJOUT ADRESSE - message de succès
+                    if ($_GET['success'] === 'address_added')
+                        echo "Adresse ajoutée avec succès.";
                     ?>
                 </div>
             <?php endif; ?>
@@ -643,7 +776,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             <section>
                 <div>
                     <h2>Mes adresses</h2>
-                    <button type="button" onclick="location.href='ajouter-adresse.php'">
+                    <!-- AJOUT ADRESSE - bouton modifié pour ouvrir le modal -->
+                    <button type="button" onclick="ouvrirModalAjoutAdresse()">
                         + Ajouter une adresse
                     </button>
                 </div>
@@ -683,23 +817,27 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                             <footer>
                                 <button type="button"
-                                    onclick="location.href='modifier-adresse.php?id=<?php echo $adresseIndividuelle['id_adresse']; ?>'">
+                                    onclick="ouvrirModalModificationAdresse(<?php echo $adresseIndividuelle['id_adresse']; ?>, '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_code_postal'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_complement'], ENT_QUOTES); ?>')">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                     </svg>
                                     Modifier
                                 </button>
-                                <button type="button"
-                                    onclick="if(confirm('Supprimer cette adresse ?')) location.href='supprimer-adresse.php?id=<?php echo $adresseIndividuelle['id_adresse']; ?>'">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                        </path>
-                                    </svg>
-                                    Supprimer
-                                </button>
+                                <form method="post" style="display:inline;"
+                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">
+                                    <input type="hidden" name="id_adresse"
+                                        value="<?php echo $adresseIndividuelle['id_adresse']; ?>">
+                                    <button type="submit" name="delete_address">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg>
+                                        Supprimer
+                                    </button>
+                                </form>
                             </footer>
                         </article>
                     <?php endforeach; ?>
@@ -818,7 +956,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 </article>
             </section>
 
-
             <!-- Formulaire de déconnexion -->
             <form method="get" class="logout-form">
                 <button type="submit" name="action" value="logout">
@@ -828,6 +965,74 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
         </div>
     </main>
+
+    <!-- Modal pour éditer une adresse -->
+    <div id="modalModificationAdresse"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div
+            style="position:relative; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:2em; border-radius:12px; max-width:500px; width:90%;">
+            <h2>Modifier l'adresse</h2>
+            <form method="post" id="formulaireModificationAdresse">
+                <input type="hidden" name="id_adresse" id="modification_id_adresse">
+
+                <label>
+                    <span>Adresse</span>
+                    <input type="text" name="adresse" id="modification_adresse" required>
+                </label>
+
+                <label>
+                    <span>Ville</span>
+                    <input type="text" name="ville" id="modification_ville" required>
+                </label>
+
+                <label>
+                    <span>Code postal</span>
+                    <input type="text" name="code_postal" id="modification_code_postal" required>
+                </label>
+
+                <label>
+                    <span>Complément (optionnel)</span>
+                    <input type="text" name="complement" id="modification_complement">
+                </label>
+
+                <button type="submit" name="update_address">Mettre à jour</button>
+                <button type="button" onclick="fermerModalModificationAdresse()">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- AJOUT ADRESSE - Modal pour ajouter une adresse -->
+    <div id="modalAjoutAdresse"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div
+            style="position:relative; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:2em; border-radius:12px; max-width:500px; width:90%;">
+            <h2>Ajouter une adresse</h2>
+            <form method="post" id="formulaireAjoutAdresse">
+                <label>
+                    <span>Adresse</span>
+                    <input type="text" name="adresse" id="ajout_adresse" required>
+                </label>
+
+                <label>
+                    <span>Ville</span>
+                    <input type="text" name="ville" id="ajout_ville" required>
+                </label>
+
+                <label>
+                    <span>Code postal</span>
+                    <input type="text" name="code_postal" id="ajout_code_postal" required>
+                </label>
+
+                <label>
+                    <span>Complément (optionnel)</span>
+                    <input type="text" name="complement" id="ajout_complement">
+                </label>
+
+                <button type="submit" name="add_address">Ajouter</button>
+                <button type="button" onclick="fermerModalAjoutAdresse()">Annuler</button>
+            </form>
+        </div>
+    </div>
 
     <?php
     //inclure le pied de page du site
@@ -854,6 +1059,36 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 document.getElementById(nomOnglet + '-tab').classList.add('active');
             });
         });
+
+        //fonction pour ouvrir le modal de modification d'adresse
+        function ouvrirModalModificationAdresse(id, adresse, ville, codePostal, complement) {
+            document.getElementById('modification_id_adresse').value = id;
+            document.getElementById('modification_adresse').value = adresse;
+            document.getElementById('modification_ville').value = ville;
+            document.getElementById('modification_code_postal').value = codePostal;
+            document.getElementById('modification_complement').value = complement;
+            document.getElementById('modalModificationAdresse').style.display = 'block';
+        }
+
+        //fonction pour fermer le modal de modification d'adresse
+        function fermerModalModificationAdresse() {
+            document.getElementById('modalModificationAdresse').style.display = 'none';
+        }
+
+        // AJOUT ADRESSE - fonction pour ouvrir le modal d'ajout d'adresse
+        function ouvrirModalAjoutAdresse() {
+            //réinitialiser les champs du formulaire
+            document.getElementById('ajout_adresse').value = '';
+            document.getElementById('ajout_ville').value = '';
+            document.getElementById('ajout_code_postal').value = '';
+            document.getElementById('ajout_complement').value = '';
+            document.getElementById('modalAjoutAdresse').style.display = 'block';
+        }
+
+        // AJOUT ADRESSE - fonction pour fermer le modal d'ajout d'adresse
+        function fermerModalAjoutAdresse() {
+            document.getElementById('modalAjoutAdresse').style.display = 'none';
+        }
 
         //fonction pour prévisualiser l'image depuis une URL
         function previsualiserImageDepuisURL() {
