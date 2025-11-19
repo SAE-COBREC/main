@@ -88,7 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Créer un compte vendeur - Alizon</title>
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Local fonts: Baloo 2 and Quicksand */
+    @font-face { font-family: 'Baloo 2'; src: url('../../fonts/baloo.regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 300; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+  </style>
   <link rel="stylesheet" href="../../../styles/Register/styleRegister.css">
 </head>
 
@@ -154,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if ($vendeur) {
         $vendeurId = (int)$vendeur['id_vendeur'];
       }
-      $_SESSION['idVendeur'] = $vendeurId;
+      $_SESSION['vendeur_id'] = $vendeurId;
       
     } catch (Exception $e) {
       $hasError = true;
@@ -261,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="telephone">Numéro de téléphone</label>
-        <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres">
+        <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
       </div>
 
       <div class="error">
@@ -305,7 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
-          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$" maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
+          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$" maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,5)">
         </div>
 
         <div class="culumn-flex">
@@ -680,8 +685,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const errorDiv = card ? card.querySelector('.error') : null;
             if (errorDiv) errorDiv.classList.add('hidden');
           });
+
+          // Avancer à la carte suivante quand l'utilisateur appuie sur Entrée
+          el.addEventListener('keydown', function (ev) {
+            if (ev.key !== 'Enter') return;
+            const tag = (el.tagName || '').toLowerCase();
+            if (tag === 'textarea') return; // laisser Entrée dans textarea
+            // empêcher le comportement par défaut (soumission)
+            ev.preventDefault();
+            try {
+              const cards = Array.from(document.querySelectorAll('.card'));
+              const visible = cards.findIndex(c => !c.classList.contains('hidden'));
+              if (visible === -1) return;
+              if (visible >= cards.length - 1) {
+                // dernière carte -> valider / terminer
+                if (typeof finishRegistration === 'function') finishRegistration();
+              } else {
+                if (typeof showNextCard === 'function') showNextCard();
+              }
+            } catch (e) { /* ignore */ }
+          });
         });
       }
+
+      // Formatage automatique du SIREN : ajouter un espace toutes les 3 chiffres
+      (function () {
+        const sirenEl = document.getElementById('SIREN');
+        if (!sirenEl) return;
+
+        function formatSirenDigits(digits) {
+          // limite à 9 chiffres
+          digits = digits.replace(/\D/g, '').slice(0, 9);
+          return digits.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+        }
+
+        function setCaretFromDigitCount(el, digitsBefore) {
+          const val = el.value;
+          let seen = 0;
+          for (let i = 0; i < val.length; i++) {
+            if (/\d/.test(val[i])) seen++;
+            if (seen >= digitsBefore) {
+              // place cursor after this character
+              const pos = i + 1;
+              el.setSelectionRange(pos, pos);
+              return;
+            }
+          }
+          // otherwise put at end
+          el.setSelectionRange(val.length, val.length);
+        }
+
+        sirenEl.addEventListener('input', function (ev) {
+          const el = ev.target;
+          const raw = el.value;
+          const selStart = el.selectionStart || 0;
+          // count digits before caret
+          const digitsBefore = (raw.slice(0, selStart).match(/\d/g) || []).length;
+          const formatted = formatSirenDigits(raw);
+          if (formatted !== raw) {
+            el.value = formatted;
+          }
+          // restore caret position according to digit count
+          setCaretFromDigitCount(el, digitsBefore);
+        });
+
+        // Ensure on paste we format correctly
+        sirenEl.addEventListener('paste', function (ev) {
+          setTimeout(function () {
+            const formatted = formatSirenDigits(sirenEl.value);
+            sirenEl.value = formatted;
+          }, 0);
+        });
+
+        // On form submit, strip spaces so server receives only digits
+        if (form) {
+          form.addEventListener('submit', function () {
+            if (sirenEl && sirenEl.value) {
+              sirenEl.value = (sirenEl.value || '').replace(/\s+/g, '');
+            }
+          });
+        }
+      })();
     });
   </script>
 </body>

@@ -62,9 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Créer un compte - Alizon</title>
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
-    rel="stylesheet">
+  <style>
+    /* Local fonts: Baloo 2 and Quicksand */
+    @font-face { font-family: 'Baloo 2'; src: url('../../fonts/baloo.regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 300; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+  </style>
   <link rel="stylesheet" href="../../styles/Register/styleRegister.css">
 </head>
 
@@ -155,6 +158,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     background: linear-gradient(to bottom right, #7171A3, #030212);
   }
 
+  /* style pour entourer en rouge les champs qui ont une erreur */
+  .field-error {
+    border-color: #dc143c !important;
+    box-shadow: 0 0 0 4px rgba(220,20,60,0.18);
+    transition: box-shadow 120ms ease-in-out, border-color 120ms ease-in-out;
+  }
+
   .card[id="3"] {
     label {
       margin-left: 20px;
@@ -234,7 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div>
         <label for="telephone">Numéro de téléphone</label>
         <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}"
-          maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres">
+          maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
       </div>
 
       <div>
@@ -248,7 +258,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
         <?php endif; ?>
       </div>
-
       <div class="step">étape 2 / 4</div>
 
       <div class="inline-flex">
@@ -289,8 +298,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
+          <!-- Forcer uniquement des chiffres : inputmode + oninput nettoyant les caractères non numériques. Pattern conservé pour valider les codes postaux français. -->
           <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$" maxlength="5"
-            placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
+            placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,5)">
         </div>
 
         <div class="culumn-flex">
@@ -636,6 +646,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         naissanceInput.addEventListener('blur', function() {
           validateAge(this);
         });
+        
       }
 
       const form = document.getElementById('multiForm');
@@ -650,6 +661,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const errorDiv = card ? card.querySelector('.error') : null;
             if (errorDiv) errorDiv.classList.add('hidden');
           });
+
+          // Avancer à la carte suivante quand l'utilisateur appuie sur Entrée
+          el.addEventListener('keydown', function (ev) {
+            if (ev.key !== 'Enter') return;
+            const tag = (el.tagName || '').toLowerCase();
+            if (tag === 'textarea') return; // laisser Entrée dans textarea
+            // empêcher le comportement par défaut (soumission)
+            ev.preventDefault();
+            try {
+              const cards = Array.from(document.querySelectorAll('.card'));
+              const visible = cards.findIndex(c => !c.classList.contains('hidden'));
+              if (visible === -1) return;
+              if (visible >= cards.length - 1) {
+                // dernière carte -> valider / terminer
+                if (typeof finishRegistration === 'function') finishRegistration();
+              } else {
+                if (typeof showNextCard === 'function') showNextCard();
+              }
+            } catch (e) { /* ignore */ }
+          });
+        });
+
+        // Global Enter handler as a fallback: advance on Enter when focus is inside the form
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key !== 'Enter') return;
+          if (ev.shiftKey || ev.ctrlKey || ev.altKey || ev.metaKey) return;
+          const active = document.activeElement;
+          if (!active || !active.closest) return;
+          if (!active.closest('#multiForm')) return;
+          const tag = (active.tagName || '').toLowerCase();
+          if (tag === 'textarea') return;
+          if (active.type === 'submit' || active.type === 'button') return;
+          ev.preventDefault();
+          try {
+            const cards = Array.from(document.querySelectorAll('.card'));
+            const visible = cards.findIndex(c => !c.classList.contains('hidden'));
+            if (visible === -1) return;
+            if (visible >= cards.length - 1) {
+              if (typeof finishRegistration === 'function') finishRegistration();
+            } else {
+              if (typeof showNextCard === 'function') showNextCard();
+            }
+          } catch (e) { /* ignore */ }
         });
       }
     });

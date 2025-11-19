@@ -13,6 +13,8 @@ $_SESSION['creeArticle']=[];
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion - Alizon</title>
   <link rel="icon" type="image/png" href="../../img/favicon.svg">
+  <link
+    rel="stylesheet">
   <style>
     /* Local fonts: Baloo 2 and Quicksand */
     @font-face { font-family: 'Baloo 2'; src: url('../../fonts/baloo.regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
@@ -216,27 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           if (typeof showNextCard === 'function') showNextCard();
         }
       } catch (e) { /* ignore */ }
-      });
-    </script>
-
-    <script>
-      // Nettoyage d'un ancien snippet erroné et ajout du gestionnaire Entrée sécurisé
-      document.addEventListener('DOMContentLoaded', function () {
-        var form = document.getElementById('multiForm');
-        if (!form) return;
-        var elems = form.querySelectorAll('input, textarea, select');
-        elems.forEach(function (el) {
-          el.addEventListener('keydown', function (ev) {
-            if (ev.key !== 'Enter') return;
-            if (ev.shiftKey || ev.ctrlKey || ev.altKey || ev.metaKey) return;
-            var tag = (el.tagName || '').toLowerCase();
-            if (tag === 'textarea') return;
-            if (el.type === 'submit' || el.type === 'button') return;
-            ev.preventDefault();
-            try { if (typeof finishRegistration === 'function') finishRegistration(); } catch (e) { form.submit(); }
-          });
-        });
-      });
+    });
   </script>
 
   <script type="module" src="../../js/registerPass.js"></script>

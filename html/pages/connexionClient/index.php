@@ -10,11 +10,34 @@ $pdo->exec("SET search_path TO cobrec1");
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    // Ajoute un comportement Entrée : soumet le formulaire quand Enter est pressé dans un champ (sauf textarea)
+    document.addEventListener('DOMContentLoaded', function () {
+      var form = document.getElementById('multiForm');
+      if (!form) return;
+      var elems = form.querySelectorAll('input, textarea, select');
+      elems.forEach(function (el) {
+        el.addEventListener('keydown', function (ev) {
+          if (ev.key !== 'Enter') return;
+          if (ev.shiftKey || ev.ctrlKey || ev.altKey || ev.metaKey) return;
+          var tag = (el.tagName || '').toLowerCase();
+          if (tag === 'textarea') return; // laisser Entrée dans textarea
+          // empêcher le comportement par défaut (soumission réelle du formulaire par le navigateur)
+          ev.preventDefault();
+          // appeler la logique existante qui gère la validation & la soumission
+          try { if (typeof finishRegistration === 'function') finishRegistration(); } catch (e) { form.submit(); }
+        });
+      });
+    });
+  </script>
   <title>Créer un compte - Alizon</title>
   <link rel="icon" type="image/png" href="../../img/favicon.svg">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Quicksand:wght@300;400;500;700&display=swap"
-    rel="stylesheet">
+  <style>
+    /* Local fonts: Baloo 2 and Quicksand */
+    @font-face { font-family: 'Baloo 2'; src: url('../../fonts/baloo.regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 300; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+  </style>
   <link rel="stylesheet" href="../../styles/Register/styleRegister.css">
 </head>
 
@@ -130,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="mdp">Mot de passe</label>
   <input type="password" id="mdp" name="mdp" placeholder="***********" required>
       </div>
-      <div class="forgot" onclick="showNextCard()">mot de passe oublié ?</div>
+  <div class="forgot" onclick="window.location.href='../resetPassword/index.php'">Mot de passe oublié ?</div>
       <!-- affichage des erreurs de saisi -->
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
