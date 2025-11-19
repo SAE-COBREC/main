@@ -71,8 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           $_SESSION['idClient'] = $clientId;
           $_SESSION['idCompte'] = (int)$row['id_compte'];
-          //redirige sur la page d'acceuil
-          header('Location: ../../index.php');
+          // Redirection sans header() (serveur peut bloquer header)
+          $url = '../../index.php';
+          echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+          echo '<script>window.location.href="'.$url.'";</script></head><body>Si vous n\'êtes pas redirigé automatiquement, <a href="'.$url.'">cliquez ici</a>.</body></html>';
           exit;
         }
       }
