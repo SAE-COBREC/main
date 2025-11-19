@@ -19,7 +19,7 @@
         <a href="/pages/panier/index.php" id="retourPanier">Panier</a>
         <section class="infoPaiement">
             <h2><img src="/img/svg/logo.svg"/>Alizon</h2>
-            <form>
+            <form id="payerPanier" method="POST" action="/pages/finaliserCommande/payerPanier.php">
                 <label>Numéro de carte</label>
                 <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19" placeholder="1111 2222 3333 4444"/>
                 <!--maxlenght pour avoir une premiere vérification et minlenght pareil à 19 car il fuat compter les espaces-->
@@ -96,18 +96,6 @@
             let valeur = this.value; //stock la valeur de l'input
             //on remplace tout sauf les chiffres
             valeur = valeur.replace(/\D/g, "");
-
-
-            this.value = valeur;
-        });
-        
-        //récup l'input du pays
-        const cvcInput = document.getElementById("pays");
-
-        //pour chaque entré dans l'input
-        paysInput.addEventListener("input", function () {
-            let valeur = this.value; //stock la valeur de l'input
-            valeur = valeur.replace(/[]/g, "");
 
 
             this.value = valeur;
