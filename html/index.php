@@ -470,7 +470,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                             onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
                             <div>
                                 <div>
-                                    <img src="<?= htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg') ?>"
+                                    <img src="<?= str_replace("html/img/photo", "/img/photo" , htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg') )?>"
                                         alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>"
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
