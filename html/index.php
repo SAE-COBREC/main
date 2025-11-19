@@ -41,7 +41,7 @@ function chargerProduitsBDD($pdo)
             SELECT id_produit, COUNT(*) as nombre_avis 
             FROM _avis 
             GROUP BY id_produit
-        ) avis ON p.id_produit = avis.id_produit
+        ) avis ON p.id_produit = avis.id_produit WHERE p.p_statut = 'En ligne'
     ";
 
         $requetePrepare = $pdo->query($requeteSQL);
@@ -54,6 +54,7 @@ function chargerProduitsBDD($pdo)
         FROM _produit p
         JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
         JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+        WHERE p.p_statut = 'En ligne'
         GROUP BY cp.nom_categorie
     ";
 
@@ -172,7 +173,6 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 
 $idClient = (int) $_SESSION['idClient']; //si l'utilisateur n'est pas connecté on met null
 
-
 if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un panier vide
     $panier = [];
 } else { //sinon on récupère l'id de son panier courant (celui qui est en train d'etre remplit pas ceux qui ont déjà été commandé).
@@ -222,7 +222,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
     exit;
 }
-
 
 //fonction pour récupérer le prix maximum parmi tous les produits
 function getPrixMaximum($pdo)
@@ -352,7 +351,6 @@ $listeProduits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($listeCategories);
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -546,8 +544,6 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 .then(data => {
                     if (data.success) {
                         alert('✓ ' + data.message);
-                        //optionnel : mettre à jour le compteur du panier
-                        //mettreAJourCompteurPanier();
                     } else {
                         alert('✗ ' + data.message);
                     }
