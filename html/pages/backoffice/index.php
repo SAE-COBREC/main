@@ -1,15 +1,20 @@
-<?php session_start(); ?>
+<?php 
+// Démarrage de la session PHP pour accéder aux variables de session
+session_start(); 
+?>
 
 <?php
-    include '../../selectBDD.php';
+// Inclusion du fichier de connexion à la base de données
+include '../../selectBDD.php';
 
-    // ID du vendeur connecté (à adapter dynamiquement via la session)
-    $vendeur_id = $_SESSION['vendeur_id'];
+// Récupération de l'ID du vendeur connecté depuis la session
+$vendeur_id = $_SESSION['vendeur_id'];
 
-    $_SESSION['creerArticle'] = [];
+// Initialisation d'un tableau vide pour stocker éventuellement de nouveaux articles
+$_SESSION['creerArticle'] = [];
 
-    try {
-    // Récupération des produits depuis la BDD avec leurs catégories
+try {
+    // Requête SQL pour récupérer les produits du vendeur avec leurs catégories et images
     $query = "
     SELECT 
         p.id_produit,
@@ -34,15 +39,20 @@
         p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, i.i_lien
     ORDER BY p.id_produit ASC
   ";
+
+    // Préparation de la requête pour éviter les injections SQL
     $stmt = $pdo->prepare($query);
+    // Exécution de la requête avec l'ID du vendeur
     $stmt->execute(['id_vendeur' => $vendeur_id]);
+    // Récupération de tous les résultats sous forme de tableau associatif
     $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    } catch (PDOException $e) {
-        die("Erreur de connexion ou de requête : " . htmlspecialchars($e->getMessage()));
-    }
+} catch (PDOException $e) {
+    // En cas d'erreur de connexion ou de requête, affichage d'un message sécurisé
+    die("Erreur de connexion ou de requête : " . htmlspecialchars($e->getMessage()));
+}
+?>
 
-  ?>
 <!doctype html>
 <html lang="fr">
 <head>
@@ -55,10 +65,11 @@
 <body>
   <div class="app">
     <?php
+    // Inclusion du menu latéral (aside)
     include __DIR__ . '/../../partials/aside.html';
     ?>
     
-    <!-- Main Content -->
+    <!-- Contenu principal -->
     <main class="main">
       <div class="header">
         <h1 class="header__title">Page accueil vendeur</h1>
@@ -68,6 +79,7 @@
             <span class="search-bar__icon"><img src="../../img/svg/loupe.svg" alt="loupe"></span>
             <input type="search" placeholder="Rechercher des produits..." />
           </div>
+          <!-- Bouton pour ajouter un produit -->
           <a href="create/index.php"><button class="btn btn--primary">Ajouter un produit</button></a>
         </div>
       </div>
@@ -76,27 +88,28 @@
         <div class="content-section__header">
           <h2 class="content-section__title">Articles en lignes</h2>
 
+          <!-- Onglets pour filtrer les produits par statut -->
           <div class="tabs">
             <div class="tabs__item tabs__item--active">Toutes</div>
             <div class="tabs__item">Actif</div>
             <div class="tabs__item">Brouillon</div>
             <div class="tabs__item">Archivé</div>
           </div>
-          <script>
-            // Sélectionne tous les éléments avec la classe .tabs__item
-            const tabs = document.querySelectorAll('.tabs__item');
 
+          <script>
+            // Script pour gérer la sélection des onglets
+            const tabs = document.querySelectorAll('.tabs__item');
             tabs.forEach(tab => {
               tab.addEventListener('click', () => {
-                // Retire la classe active sur tous les onglets
+                // Retire la classe active de tous les onglets
                 tabs.forEach(t => t.classList.remove('tabs__item--active'));
-
-                // Ajoute la classe active sur celui cliqué
+                // Ajoute la classe active à l'onglet cliqué
                 tab.classList.add('tabs__item--active');
               });
             });
           </script>
 
+          <!-- Filtres supplémentaires -->
           <div class="filters">
             <div class="filters__item">Filtrer les produits</div>
             <div class="filters__item">Vendeur du produit ▾</div>
@@ -104,6 +117,7 @@
           </div>
         </div>
 
+        <!-- Tableau des produits -->
         <table class="products-table">
           <thead>
             <tr>
@@ -119,9 +133,11 @@
           <?php if (!empty($articles)): ?>
             <?php foreach ($articles as $article): ?>
               <tr class="products-table__row" data-id="<?php echo $article['id_produit']; ?>">
+                <!-- Checkbox pour sélectionner un produit -->
                 <td class="products-table__cell--checkbox">
                   <div class="checkbox"></div>
                 </td>
+                <!-- Colonne produit avec image, nom et prix -->
                 <td class="products-table__cell">
                   <div class="product">
                     <div class="product__image">
@@ -133,6 +149,7 @@
                     </div>
                   </div>
                 </td>
+                <!-- Statut du produit avec badge -->
                 <td class="products-table__cell">
                   <?php if ($article['p_statut'] == 'En ligne'): ?>
                     <?php if ($article['p_stock'] <= 0): ?>
@@ -146,19 +163,24 @@
                       <span class="badge badge--eb">Ébauche</span>
                   <?php endif; ?>
                 </td>
+                <!-- Stock du produit -->
                 <td class="products-table__cell products-table__cell--stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
+                <!-- Catégories -->
                 <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['categories']); ?></td>
+                <!-- Description -->
                 <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['p_description']); ?></td>
               </tr>
             <?php endforeach; ?>
           <?php endif; ?>
         </tbody>
         </table>
+
         <script>
+          // Script pour gérer la sélection d'une ligne et le bouton Ajouter/Modifier
           document.addEventListener('DOMContentLoaded', () => {
             const rows = document.querySelectorAll('.products-table__row');
-            const addButtonLink = document.querySelector('.search-bar a'); // <a href="...">
-            const addButton = document.querySelector('.btn--primary'); // <button>
+            const addButtonLink = document.querySelector('.search-bar a'); // lien du bouton
+            const addButton = document.querySelector('.btn--primary'); // bouton réel
 
             rows.forEach(row => {
               const checkbox = row.querySelector('.checkbox');
@@ -168,31 +190,31 @@
                 const productID = row.dataset.id; // récupère l'id du produit
 
                 if (isSelected) {
-                  // Désélection si on reclique
+                  // Si la ligne était sélectionnée, désélectionner
                   row.classList.remove('selected');
                   checkbox.classList.remove('checkbox--active');
 
                   addButton.textContent = "Ajouter un produit";
                   addButtonLink.href = "create/index.php"; 
                 } else {
-                  // On désélectionne tous les autres
+                  // Désélectionner toutes les autres lignes
                   rows.forEach(r => {
                     r.classList.remove('selected');
                     r.querySelector('.checkbox').classList.remove('checkbox--active');
                   });
 
-                  // On sélectionne celui-ci
+                  // Sélectionner la ligne cliquée
                   row.classList.add('selected');
                   checkbox.classList.add('checkbox--active');
 
-                  // Modification bouton + lien
+                  // Modifier le bouton et le lien pour "Modifier le produit"
                   addButton.textContent = "Modifier le produit";
                   addButtonLink.href = "create/index.php?modifier=" + productID;
                 }
               });
             });
           });
-          </script>
+        </script>
       </div>
     </main>
   </div>
