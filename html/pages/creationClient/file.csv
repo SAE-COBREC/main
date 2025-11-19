@@ -1,2 +1,2 @@
-"SQLSTATE[23514]: Check violation: 7 ERROR:  new row for relation ""_compte"" violates check constraint ""verif_compte_mdp""
-DETAIL:  Failing row contains (26, dsv@sdv.com, 0999999999, 0, 0, 0, 0, 2025-11-19 10:02:45.067629, $2y$10$17Cv728dYgZAMvvy6j8VXO4JdAHtqLI/JfpF/L/TbSAKHhqOqjx2a, f)."
+"SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column ""c_datenaissance"" of relation ""_client"" violates not-null constraint
+DETAIL:  Failing row contains (9, 13, dsvsdv, dvsdsv, dsvdsvdsv, 0, 0, f, null)."

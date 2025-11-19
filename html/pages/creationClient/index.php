@@ -110,23 +110,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['idCompte'] = $id_compte;
 
         //insérer les informations client
-        $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_prenom, c_nom)
-                VALUES (:id_compte, :pseudo, :prenom, :nom)';
+        $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_prenom, c_nom, c_datenaissance)
+                VALUES (:id_compte, :pseudo, :prenom, :nom, :datenaissance)';
         $stmtClient = $pdo->prepare($sqlClient);
         $stmtClient->execute([
           'id_compte' => $id_compte,
           'pseudo'    => $pseudo,
           'prenom'    => $prenom,
-          'nom'       => $nom
+          'nom'       => $nom,
+          'datenaissance' => $naissance
         ]);
 
-        try {
-        $id_client = $pdo->lastInsertId();
-      } catch (Exception $e) {
-        $id_client = null;
-      }
-      $_SESSION['idClient'] = $id_client;
-      //definition du message d'erreru en cas d'erreru d'insertion  
+      $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
+        $clientStmt->execute([':id' => $id_compte]);
+        $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
+        if ($client) {
+          $clientId = (int)$client['id_client'];
+        }
+      $_SESSION['idClient'] = $clientId;
+      //definition du message d'erreru en cas d'erreur d'insertion  
     } catch (Exception $e) {
       $hasError = true;
       $error_card = 4; 
