@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 // connexion a la bdd
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
@@ -121,6 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           'datenaissance' => $naissance
         ]);
 
+          //recuperation idClient
       $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => $id_compte]);
         $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
@@ -128,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $clientId = (int)$client['id_client'];
         }
       $_SESSION['idClient'] = $clientId;
-      //definition du message d'erreru en cas d'erreur d'insertion  
+      //definition du message d'erreur en cas d'erreur d'insertion  
     } catch (Exception $e) {
       $hasError = true;
       $error_card = 4; 

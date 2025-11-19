@@ -368,7 +368,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
     <?php
     include __DIR__ . '/partials/header.html';
     ?>
-
+    
     <div class="container">
         <aside>
             <form method="POST" action="" id="filterForm">
