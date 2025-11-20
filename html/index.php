@@ -16,6 +16,7 @@ function chargerProduitsBDD($pdo)
         $requeteSQL = "
         SELECT 
             DISTINCT ON (p.id_produit)
+            p.id_produit,
             p.p_nom,
             p.p_description,
             p.p_prix,
@@ -99,7 +100,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
             return ['success' => false, 'message' => 'Produit introuvable'];
         }
 
-        // normaliser la quantité demandée
+        //normaliser la quantité demandée
         $quantite = (int) $quantite;
         if ($quantite < 1) {
             $quantite = 1;
@@ -171,11 +172,120 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
     }
 }
 
-$idClient = (int) $_SESSION['idClient']; //si l'utilisateur n'est pas connecté on met null
+//fonction pour ajouter un article au panier temporaire (SESSION) pour utilisateurs non connectés
+function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
+{
+    try {
+        //récupérer les informations du produit (prix, TVA, frais de port, remise, nom)
+        $sqlProduit = "
+            SELECT 
+                p.p_nom,
+                p.p_prix, 
+                p.p_frais_de_port, 
+                p.p_stock,
+                COALESCE(t.montant_tva, 0) as tva,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
+            FROM _produit p
+            LEFT JOIN _tva t ON p.id_tva = t.id_tva
+            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            WHERE p.id_produit = :idProduit
+        ";
 
-if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un panier vide
-    $panier = [];
-} else { //sinon on récupère l'id de son panier courant (celui qui est en train d'etre remplit pas ceux qui ont déjà été commandé).
+        $stmtProduit = $pdo->prepare($sqlProduit);
+        $stmtProduit->execute([':idProduit' => $idProduit]);
+        $produitCourant = $stmtProduit->fetch(PDO::FETCH_ASSOC);
+
+        if (!$produitCourant) {
+            return ['success' => false, 'message' => 'Produit introuvable'];
+        }
+
+        //normaliser la quantité demandée
+        $quantite = (int) $quantite;
+        if ($quantite < 1) {
+            $quantite = 1;
+        }
+
+        //calculer le prix avec remise
+        $prixUnitaire = $produitCourant['p_prix'];
+        $remiseUnitaire = ($produitCourant['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $fraisDePort = $produitCourant['p_frais_de_port'];
+        $tva = $produitCourant['tva'];
+        $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
+
+        //initialiser le panier temporaire s'il n'existe pas
+        if (!isset($_SESSION['panierTemp'])) {
+            $_SESSION['panierTemp'] = array();
+        }
+
+        //vérifier si l'article existe déjà dans le panier temporaire
+        if (isset($_SESSION['panierTemp'][$idProduit])) {
+            $quantiteExistante = (int) $_SESSION['panierTemp'][$idProduit]['quantite'];
+        } else {
+            $quantiteExistante = 0;
+        }
+
+        $disponible = max(0, $quantiteEnStock - $quantiteExistante);
+
+        if ($disponible === 0) {
+            return ['success' => false, 'message' => 'Stock insuffisant: quantité maximale déjà atteinte dans votre panier'];
+        }
+
+        //quantité réellement ajoutée (ne dépasse pas le disponible)
+        $aAjouter = min($quantite, $disponible);
+
+        //ajouter ou mettre à jour l'article dans le panier temporaire
+        if (isset($_SESSION['panierTemp'][$idProduit])) {
+            $_SESSION['panierTemp'][$idProduit]['quantite'] += $aAjouter;
+        } else {
+            $_SESSION['panierTemp'][$idProduit] = [
+                'id_produit' => $idProduit,
+                'nom' => $produitCourant['p_nom'],
+                'quantite' => $aAjouter,
+                'prix_unitaire' => $prixUnitaire,
+                'remise_unitaire' => $remiseUnitaire,
+                'frais_de_port' => $fraisDePort,
+                'tva' => $tva
+            ];
+        }
+
+        if ($aAjouter < $quantite) {
+            return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+        }
+
+        return ['success' => true, 'message' => 'Article ajouté au panier'];
+
+    } catch (Exception $e) {
+        return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
+    }
+}
+
+//fonction pour transférer le panier temporaire vers la BDD lors de la connexion
+function transfererPanierTempVersDB($pdo, $idPanier)
+{
+    if (!isset($_SESSION['panierTemp']) || empty($_SESSION['panierTemp'])) {
+        return;
+    }
+
+    foreach ($_SESSION['panierTemp'] as $article) {
+        ajouterArticleBDD($pdo, $article['id_produit'], $idPanier, $article['quantite']);
+    }
+
+    //vider le panier temporaire après transfert
+    unset($_SESSION['panierTemp']);
+}
+
+//récupérer l'ID client si connecté
+$idClient = $_SESSION['idClient'] ?? null;
+
+if ($idClient === null) {
+    //si l'utilisateur n'est pas connecté, on utilise un panier temporaire en SESSION
+    if (!isset($_SESSION['panierTemp'])) {
+        $_SESSION['panierTemp'] = array();
+    }
+    $panier = null; //pas de panier en BDD
+} else {
+    //sinon on récupère l'id de son panier courant (celui qui est en train d'être rempli)
     $sqlPanierClient = "
         SELECT id_panier
         FROM _panier_commande
@@ -185,6 +295,7 @@ if ($idClient ==  NULL){ //si l'utilisateur n'est pas connecté on lui met un pa
     $stmtPanier = $pdo->prepare($sqlPanierClient);
     $stmtPanier->execute([":idClient" => $idClient]);
     $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
+    
     if ($panier) {
         $idPanier = (int) $panier['id_panier'];
     } else {
@@ -207,19 +318,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $idProduit = $_POST['idProduit'] ?? null;
     $quantite = $_POST['quantite'] ?? 1;
-    $idPanier = $_SESSION["panierEnCours"] ?? null;
+    $idClient = $_SESSION['idClient'] ?? null;
 
-    if (!$idPanier) {
-        echo json_encode(['success' => false, 'message' => 'Aucun panier en cours pour ce client']);
+    if (!$idProduit) {
+        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
         exit;
     }
 
-    if ($idProduit) {
-        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
-        echo json_encode($resultat);
+    if ($idClient === null) {
+        //utilisateur non connecté : utiliser le panier temporaire en SESSION
+        $resultat = ajouterArticleSession($pdo, $idProduit, $quantite);
     } else {
-        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
+        //utilisateur connecté : utiliser le panier en BDD
+        $idPanier = $_SESSION['panierEnCours'] ?? null;
+
+        if (!$idPanier) {
+            echo json_encode(['success' => false, 'message' => 'Aucun panier en cours pour ce client']);
+            exit;
+        }
+
+        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
     }
+
+    echo json_encode($resultat);
     exit;
 }
 
