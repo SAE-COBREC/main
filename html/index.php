@@ -15,7 +15,7 @@ function chargerProduitsBDD($pdo)
         //requête SQL pur récupérer tous les produits avec leurs informations
         $requeteSQL = "
         SELECT 
-            p.id_produit,
+            DISTINCT ON (p.id_produit)
             p.p_nom,
             p.p_description,
             p.p_prix,
