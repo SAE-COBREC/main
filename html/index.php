@@ -500,40 +500,6 @@ $produits_filtres = filtrerProduits($listeProduits, $filtres);
 $listeProduits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($listeCategories);
 
-
-//session_start();
-
-echo "<h2>Contenu du panier temporaire</h2>";
-
-if (isset($_SESSION['panierTemp']) && !empty($_SESSION['panierTemp'])) {
-    echo "<pre>";
-    print_r($_SESSION['panierTemp']);
-    echo "</pre>";
-
-    echo "<h3>Détails par produit :</h3>";
-    foreach ($_SESSION['panierTemp'] as $idProduit => $article) {
-        echo "<div style='border: 1px solid #ccc; padding: 10px; margin: 10px 0;'>";
-        echo "<strong>ID Produit :</strong> " . $idProduit . "<br>";
-        echo "<strong>Nom :</strong> " . htmlspecialchars($article['nom']) . "<br>";
-        echo "<strong>Quantité :</strong> " . $article['quantite'] . "<br>";
-        echo "<strong>Prix unitaire :</strong> " . number_format($article['prix_unitaire'], 2) . "€<br>";
-        echo "<strong>Stock :</strong> " . number_format($article['stock'], 0) . "<br>";
-        echo "<strong>Frais de port :</strong> " . number_format($article['frais_de_port'], 2) . "€<br>";
-        echo "<strong>TVA :</strong> " . $article['tva'] . "<br>";
-        echo "</div>";
-    }
-} else {
-    echo "<p>Le panier temporaire est vide.</p>";
-}
-
-echo "<h3>Toutes les variables de session :</h3>";
-echo "<pre>";
-var_dump($_SESSION);
-echo "</pre>"; 
-
-session_unset();
-session_destroy();
-
 ?>
 
 <!DOCTYPE html>
