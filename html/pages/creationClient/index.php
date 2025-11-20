@@ -292,7 +292,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
-          <!-- Forcer uniquement des chiffres : inputmode + oninput nettoyant les caractères non numériques. Pattern conservé pour valider les codes postaux français. -->
           <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$" maxlength="5"
             placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,5)">
         </div>

@@ -15,7 +15,7 @@ $_SESSION['creeArticle']=[];
   <link rel="icon" type="image/png" href="../../img/favicon.svg">
   <link
     rel="stylesheet">
-  <link rel="stylesheet" href="../../../styles/Register/styleRegister.css">
+  <link rel="stylesheet" href="../../../styles/Connexion_Creation/styleCoCrea.css">>
 </head>
 
 <?php
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
   $mdp = $_POST['mdp'] ?? '';
-
+  
   $hasError = false;
   $error_card = null;
   $error_message = '';

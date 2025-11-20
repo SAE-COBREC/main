@@ -30,7 +30,7 @@ $pdo->exec("SET search_path TO cobrec1");
       });
     });
   </script>
-  <title>Créer un compte - Alizon</title>
+  <title>Connexion - Alizon</title>
   <link rel="icon" type="image/png" href="../../img/favicon.svg">
   <link rel="stylesheet" href="../../styles/Connexion_Creation/styleCoCrea.css">
 </head>

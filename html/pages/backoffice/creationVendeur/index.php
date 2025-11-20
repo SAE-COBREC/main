@@ -401,7 +401,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           // Vérification du mot de passe
           if (el.id === 'mdp') {
             var val = (el.value || '').trim();
-            if (val.length === 0) return 'Ce champ est requis.';
             if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
             if (val.length > 16) return 'Le mot de passe doit contenir au maximum 16 caractères.';
             if (!/[0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un chiffre.';

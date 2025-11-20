@@ -96,6 +96,7 @@ body {
     padding-left: 40px;
     margin-bottom: 6px;
 
+
     @media #{$mobile} {
       font-size: 20px;
       padding-left: 15px;
@@ -125,7 +126,7 @@ body {
     &#codeP {
       width: 140px;
       margin-left: 55px;
-    }
+    } 
 
     &#commune {
       width: 325px;
@@ -359,15 +360,10 @@ body {
 // Ajustements spécifiques pour la card 3
 .card[id="3"] {
   label {
-    margin-left: 20px;
-
-    &[for="commune"] {
-      padding-left: 15px;
-      margin-left: 0;
-    }
-
     @media #{$mobile} {
-      margin-left: 0;
+      /* supprimer marges et padding spécifiques pour les labels de la carte 3 uniquement sur mobile */
+      margin-left: 0 !important;
+      padding-left: 15px !important;
     }
   }
 
@@ -380,13 +376,12 @@ body {
         flex: 0 0 100%;
         max-width: 100%;
         box-sizing: border-box;
-        padding: 0 15px;
       }
     }
 
     input#codeP,
     input#commune {
-      width: 100%;
+      width: 280px;
       margin-left: 0;
     }
 
@@ -399,7 +394,6 @@ body {
 // Ajustements mobile pour inline-flex
 @media #{$mobile} {
   .card .inline-flex {
-    gap: 12px;
     justify-content: center;
 
     > .next-btn,

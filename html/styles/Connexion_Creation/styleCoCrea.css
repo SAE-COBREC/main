@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   font-family: "Quicksand", sans-serif;
 }
@@ -329,16 +330,11 @@ body.centered {
   cursor: pointer;
 }
 
-.card[id="3"] label {
-  margin-left: 20px;
-}
-.card[id="3"] label[for=commune] {
-  padding-left: 15px;
-  margin-left: 0;
-}
 @media screen and (max-width: 508px) {
   .card[id="3"] label {
-    margin-left: 0;
+    /* supprimer marges et padding spécifiques pour les labels de la carte 3 uniquement sur mobile */
+    margin-left: 0 !important;
+    padding-left: 15px !important;
   }
 }
 @media screen and (max-width: 508px) {
@@ -350,11 +346,10 @@ body.centered {
     flex: 0 0 100%;
     max-width: 100%;
     box-sizing: border-box;
-    padding: 0 15px;
   }
   .card[id="3"] input#codeP,
   .card[id="3"] input#commune {
-    width: 100%;
+    width: 280px;
     margin-left: 0;
   }
   .card[id="3"] .error {
@@ -364,7 +359,6 @@ body.centered {
 
 @media screen and (max-width: 508px) {
   .card .inline-flex {
-    gap: 12px;
     justify-content: center;
   }
   .card .inline-flex > .next-btn,
