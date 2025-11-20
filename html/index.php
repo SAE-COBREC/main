@@ -521,7 +521,7 @@ if (isset($_SESSION['panierTemp']) && !empty($_SESSION['panierTemp'])) {
 echo "<h3>Toutes les variables de session :</h3>";
 echo "<pre>";
 var_dump($_SESSION);
-echo "</pre>";
+echo "</pre>"; 
 
 ?>
 
