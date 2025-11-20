@@ -22,11 +22,10 @@
 
         //if($id_vendeur != ''){//REMPLACER PAR != UNE FOIS PB CONNEXION VENDEUR RÉSOLU !!!!!!!!
             //$id_vendeur = 1; // A VIRER APRES
-
-            if ($_GET['modifier'] != null){
+            if (empty($_GET['modifier']) === false){
                 //si US modifier produit
                 //print_r("detect modif\n");
-                if($_SESSION["creerArticle"]['_GET'] == null){
+                if ((empty($_SESSION["creerArticle"]['_GET'])) || ($_SESSION["creerArticle"]['_GET']['id_produit'] != $_GET['modifier'])){
                     //print_r('1');
                     //si premier passage
                     try {//Affiliation id_utilisateur id_vendeur
@@ -128,21 +127,22 @@
                         $_POST["prix"] = $_SESSION["creerArticle"]['_GET']['p_prix'];
 
                     }
-                }else if($_SESSION["creerArticle"]['_GET']['id_produit'] != $_GET['modifier']){
+                }//else if($_SESSION["creerArticle"]['_GET']['id_produit'] != $_GET['modifier']){
                     //si l'utilisateur a changé l'url
                     //print_r('changement');
-                    $_POST = [];
-                    $_SESSION["creerArticle"] = [];
-                    $_FILES["photo"]["name"] = [];
+                    // $_POST = [];
+                    // $_SESSION["creerArticle"] = [];
+                    // $_FILES["photo"]["name"] = [];
                     ?>
                     <script>
                         //recharge la page afin de remplir les chamspa vec les nouvelles valeurs
-                        location.reload();
+                        //location.reload();
                     </script>
 
                     <?php
-                }
-                
+                //}
+           
+            
             }
 
             function RemplacerCaracteresProblematiquesDansChampsTextes($contenuChamp){
@@ -167,18 +167,18 @@
 <pre>
 <?php
 
-print_r($_GET['modifier']);
-print_r($_SESSION["creerArticle"]['_GET']);
-print_r($_POST);
-print_r($_SESSION["creerArticle"]);
-print_r($_FILES);
+// print_r($_GET);
+// print_r($_SESSION["creerArticle"]['_GET']);
+// print_r($_POST);
+// print_r($_SESSION["creerArticle"]);
+// print_r($_FILES);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
 $warnPromo = false;
 if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
     function decalage($aDecaler){
         //unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
-        if ($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler] === null){
+        if (empty($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler])){
             //L'image $aDecaler n'existe pas. Décalage interrompu. Suppression de l'image $aDecaler-1.
             unset($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
             unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$aDecaler-1]);
@@ -199,7 +199,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
         unset($_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
         unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][NB_IMGS_MAX-1]);
     }
-    if ($_POST["btn_moins0"] == '-'){
+    if (empty($_POST["btn_moins0"]) != false){
         //suppression de l'image 0 dans $_SESSION["creerArticle"]["tmp_file"]
         supprDeTemp(0);
         //écrasement de l'image 0 originale par l'image 1
@@ -208,20 +208,23 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
         decalage(2);
         //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
         supprDeDef();
-    }elseif ($_POST["btn_moins1"] === '-'){
+    }elseif (empty($_POST["btn_moins1"]) != false){
         //suppression de l'image 1 dans $_SESSION["creerArticle"]["tmp_file"]
         supprDeTemp(1);
         //écrasement de l'image 1 originale par l'image 2
         decalage(2);
         //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
         supprDeDef();
-    }elseif ($_POST["btn_moins2"] === '-'){
+    }elseif (empty($_POST["btn_moins2"]) != false){
         //suppression de l'image 2 dans $_SESSION["creerArticle"]["tmp_file"]
         supprDeTemp(2);
         //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
         supprDeDef();
     }
 
+    if (empty($_FILES["photo"]["name"][0])){
+        $_FILES["photo"]["name"][0] = '';
+    }
     if ($_FILES["photo"]["name"][0] !== ''){//Si au moins un fichier a été déposé
 
         foreach ($_FILES["photo"]["name"] as $key => $value) {//chgt noms pour éviter pbs lors du déplacement de l'img
@@ -282,6 +285,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
     $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
     $_SESSION["creerArticle"]["_FILES"]['tmp_name'] = [];
+    $_SESSION['creerArticle']['imageTropVolumineuse'] = false;
     $_POST["titre"] = '';
     $_POST["description"] ='';
     $_POST["photo"] ='';
@@ -294,6 +298,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     $_POST["volume"] =null;
     $_POST["origine"] =null;
     $_POST["categorie"] =null;
+    $_POST["btn_maj"] =null;
+    $_POST["stock"] =null;
+    $_POST["prix"] =null;
 
 }
 
@@ -305,6 +312,12 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     ?>
     <main>
         <h2><?php 
+        if (empty($_SESSION["creerArticle"]['_GET']['id_produit'])){
+            //si id_produit n'est pas connu alors on paramètre les autres var du _GET afind 'éviter des warnings php
+            $_SESSION["creerArticle"]['_GET']['p_statut'] = '';
+            $_SESSION["creerArticle"]['_GET']['p_nom'] = '';
+            $_SESSION["creerArticle"]['_GET']['id_produit'] = '';
+        }
         if(($_SESSION["creerArticle"]['_GET'] == null) || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
             echo 'Ébauche de produit';
         }else if(($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne')){
@@ -430,7 +443,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <h3>Photo(s)</h3>
                         <label for="photo[]">Sélectionner un fichier</label>
                         <br>
-                         <input style="<?php if ((($_SESSION["creerArticle"]["_FILES"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
+                         <input style="<?php 
+                        if (empty($_POST["btn_maj"])){
+                            $_POST["btn_maj"] = '';
+                        }
+                        if ((($_SESSION["creerArticle"]["_FILES"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
+                        if (empty($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0])){
+                            $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] = 0;
+                        }
+                        if (empty($_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0])){
+                            $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0] = 0;
+                        }
                         echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] . '/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0];
                         ?>" />
                         <?php
@@ -444,7 +467,11 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                             <?php
-                        }if($_SESSION['creerArticle']['imageTropVolumineuse']){
+                        }
+                        if (empty($_SESSION['creerArticle']['imageTropVolumineuse'])){
+                            $_SESSION['creerArticle']['imageTropVolumineuse'] = '';
+                        }
+                        if($_SESSION['creerArticle']['imageTropVolumineuse']){
                             ?>
                             <br>
 
@@ -635,6 +662,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     }
                 ?>">
                     <article>
+                        <p><strong>(Zone facultative)</strong></p>
                         <?php 
                             if ($warnPromo){
                         ?>
@@ -678,8 +706,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
                             value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
                         <br />
-                        <br>
-                        <small> (Zone facultative)</small>
                     </article>
                 </section>
 
@@ -738,7 +764,24 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $_POST['titre'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['titre']);
                             $_POST['description'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['description']);
                             $taille  = 'M';  //à ne pas incorporer
-                        if (($_POST["sauvegarder"] == "Sauvegarder l'ébauche") || ($_POST["publier"] == "Publier le produit dans le catalogue client")){
+
+                            //sert à ne pas avoir de warnings php sur le serv
+                            if (empty($_POST["sauvegarder"])){
+                                $_POST["sauvegarder"] = '';
+                            }
+                            if (empty($_POST["publier"])){
+                                $_POST["publier"] = '';
+                            }
+                            if (empty($_POST["horsLigne"])){
+                                $_POST["horsLigne"] = '';
+                            }
+                            if (empty($_POST["enLigne"])){
+                                $_POST["enLigne"] = '';
+                            }
+                            if (empty($_POST["svgModif"])){
+                                $_POST["svgModif"] = '';
+                            }
+                            if (($_POST["sauvegarder"] == "Sauvegarder l'ébauche") || ($_POST["publier"] == "Publier le produit dans le catalogue client")){
 
                             
                         //Si pas de warning et formulaire soumis via le bouton Sauvegarder ou le bouton Annuler
@@ -1105,15 +1148,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                 }
 
+                if (empty($_SESSION['bdd_errors']) !== true){
+                    //Sert pour consulter les erreurs de la BDD via un fichier dédié
+                    $fp = fopen('file.csv', 'w');
 
-                //Sert pour consulter les erreurs de la BDD via un fichier dédié
-                $fp = fopen('file.csv', 'w');
+                    foreach ($_SESSION['bdd_errors'] as $fields) {
+                        fputcsv($fp, $fields, ',', '"', '');
+                    }
 
-                foreach ($_SESSION['bdd_errors'] as $fields) {
-                    fputcsv($fp, $fields, ',', '"', '');
+                    fclose($fp);
                 }
-
-                fclose($fp);
+                
 
 
                 //Sert pour des tests
@@ -1159,7 +1204,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
 <script>
     alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion");
-    document.location.href = "/pages/backoffice/connexion/index.php"; 
+    document.location.href = "/pages/backoffice/connexionVendeur/index.php"; 
 
             
 </script>
