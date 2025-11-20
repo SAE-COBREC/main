@@ -176,15 +176,21 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
 {
     try {
-        //récupérer les informations du produit (prix, TVA, frais de port, remise, nom)
+        //récupérer les informations du produit (prix, TVA, frais de port, remise, nom, description, image)
         $sqlProduit = "
             SELECT 
                 p.p_nom,
+                p.p_description,
                 p.p_prix, 
                 p.p_frais_de_port, 
                 p.p_stock,
                 COALESCE(t.montant_tva, 0) as tva,
-                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
+                (SELECT i.i_lien 
+                    FROM _represente_produit rp 
+                    JOIN _image i ON rp.id_image = i.id_image
+                    WHERE rp.id_produit = p.id_produit 
+                    LIMIT 1) as image_url
             FROM _produit p
             LEFT JOIN _tva t ON p.id_tva = t.id_tva
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
@@ -241,6 +247,8 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
             $_SESSION['panierTemp'][$idProduit] = [
                 'id_produit' => $idProduit,
                 'nom' => $produitCourant['p_nom'],
+                'description' => $produitCourant['p_description'],
+                'image_url' => str_replace("html/img/photo", "/img/photo", $produitCourant['image_url'] ?? '/img/default-product.jpg'),
                 'quantite' => $aAjouter,
                 'prix_unitaire' => $prixUnitaire,
                 'remise_unitaire' => $remiseUnitaire,
@@ -259,6 +267,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
+
 
 //fonction pour transférer le panier temporaire vers la BDD lors de la connexion
 function transfererPanierTempVersDB($pdo, $idPanier)
@@ -470,6 +479,37 @@ $filtres = [
 $produits_filtres = filtrerProduits($listeProduits, $filtres);
 $listeProduits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($listeCategories);
+
+
+//session_start();
+
+echo "<h2>Contenu du panier temporaire</h2>";
+
+if (isset($_SESSION['panierTemp']) && !empty($_SESSION['panierTemp'])) {
+    echo "<pre>";
+    print_r($_SESSION['panierTemp']);
+    echo "</pre>";
+    
+    echo "<h3>Détails par produit :</h3>";
+    foreach ($_SESSION['panierTemp'] as $idProduit => $article) {
+        echo "<div style='border: 1px solid #ccc; padding: 10px; margin: 10px 0;'>";
+        echo "<strong>ID Produit :</strong> " . $idProduit . "<br>";
+        echo "<strong>Nom :</strong> " . htmlspecialchars($article['nom']) . "<br>";
+        echo "<strong>Quantité :</strong> " . $article['quantite'] . "<br>";
+        echo "<strong>Prix unitaire :</strong> " . number_format($article['prix_unitaire'], 2) . "€<br>";
+        echo "<strong>Remise unitaire :</strong> " . number_format($article['remise_unitaire'], 2) . "€<br>";
+        echo "<strong>Frais de port :</strong> " . number_format($article['frais_de_port'], 2) . "€<br>";
+        echo "<strong>TVA :</strong> " . $article['tva'] . "<br>";
+        echo "</div>";
+    }
+} else {
+    echo "<p>Le panier temporaire est vide.</p>";
+}
+
+echo "<h3>Toutes les variables de session :</h3>";
+echo "<pre>";
+var_dump($_SESSION);
+echo "</pre>";
 
 ?>
 
