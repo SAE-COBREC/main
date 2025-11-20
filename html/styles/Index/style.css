@@ -1,4 +1,3 @@
-@charset "UTF-8";
 * {
   margin: 0;
   padding: 0;
@@ -419,16 +418,28 @@ footer > div > div:last-child span:hover {
     overflow: visible;
   }
   aside::before {
-    content: "📂 Filtres";
+    content: "Filtres";
     display: block;
     font-weight: bold;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
+    background-image: url("../../img/svg/filtre.png");
+    background-repeat: no-repeat;
+    background-size: 1.1em 1.1em;
+    background-position: left center;
+    padding-left: 1.5em;
+    font-size: 1.1em;
+    margin-bottom: 1.5rem;
     color: #7171A3;
   }
   aside.open::before {
-    content: "📂 Masquer les filtres";
+    content: "Masquer les filtres";
+    background-image: url("../../img/svg/filtre.png");
+    background-repeat: no-repeat;
+    background-size: 1.1em 1.1em;
+    background-position: left center;
+    padding-left: 1.5em;
+    font-size: 1.1em;
     margin-bottom: 1.5rem;
+    color: #7171A3;
   }
   aside form > div:first-child select {
     padding: 15px;
