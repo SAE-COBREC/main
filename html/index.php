@@ -1,11 +1,18 @@
 <?php
+//démarrer la session pour récupérer les informations du client
 session_start();
 
+//inclure le fichier de configuration pour la connexion à la base de données
 include __DIR__ . '/selectBDD.php';
-include __DIR__ . '/pages/functions.php'; //inclure les fonctions utilitaires
 
-$pdo->exec("SET search_path TO cobrec1");
+//inclure les fonctions utilitaires
+include __DIR__ . '/pages/functions.php'; 
 
+//récupérer la connexion PDO depuis le fichier de configuration
+$connexionBaseDeDonnees = $pdo;
+
+//définir le schéma de la base de données à utiliser
+$connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 //récupérer l'ID client si connecté
 $idClient = $_SESSION['idClient'] ?? null;
