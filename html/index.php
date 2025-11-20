@@ -214,7 +214,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
 
         //calculer le prix avec remise
         $prixUnitaire = $produitCourant['p_prix'];
-        $remiseUnitaire = ($produitCourant['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $stock = $produitCourant['p_stock'];
         $fraisDePort = $produitCourant['p_frais_de_port'];
         $tva = $produitCourant['tva'];
         $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
@@ -251,7 +251,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'image_url' => str_replace("html/img/photo", "/img/photo", $produitCourant['image_url'] ?? '/img/default-product.jpg'),
                 'quantite' => $aAjouter,
                 'prix_unitaire' => $prixUnitaire,
-                'remise_unitaire' => $remiseUnitaire,
+                'stock' => $stock,
                 'frais_de_port' => $fraisDePort,
                 'tva' => $tva
             ];
@@ -304,7 +304,7 @@ if ($idClient === null) {
     $stmtPanier = $pdo->prepare($sqlPanierClient);
     $stmtPanier->execute([":idClient" => $idClient]);
     $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
-    
+
     if ($panier) {
         $idPanier = (int) $panier['id_panier'];
     } else {
@@ -489,7 +489,7 @@ if (isset($_SESSION['panierTemp']) && !empty($_SESSION['panierTemp'])) {
     echo "<pre>";
     print_r($_SESSION['panierTemp']);
     echo "</pre>";
-    
+
     echo "<h3>Détails par produit :</h3>";
     foreach ($_SESSION['panierTemp'] as $idProduit => $article) {
         echo "<div style='border: 1px solid #ccc; padding: 10px; margin: 10px 0;'>";
@@ -497,7 +497,7 @@ if (isset($_SESSION['panierTemp']) && !empty($_SESSION['panierTemp'])) {
         echo "<strong>Nom :</strong> " . htmlspecialchars($article['nom']) . "<br>";
         echo "<strong>Quantité :</strong> " . $article['quantite'] . "<br>";
         echo "<strong>Prix unitaire :</strong> " . number_format($article['prix_unitaire'], 2) . "€<br>";
-        echo "<strong>Remise unitaire :</strong> " . number_format($article['remise_unitaire'], 2) . "€<br>";
+        echo "<strong>Stock :</strong> " . number_format($article['stock'], 2) . "€<br>";
         echo "<strong>Frais de port :</strong> " . number_format($article['frais_de_port'], 2) . "€<br>";
         echo "<strong>TVA :</strong> " . $article['tva'] . "<br>";
         echo "</div>";
@@ -529,7 +529,7 @@ echo "</pre>";
     <?php
     include __DIR__ . '/partials/header.html';
     ?>
-    
+
     <div class="container">
         <aside>
             <form method="POST" action="" id="filterForm">
@@ -629,7 +629,7 @@ echo "</pre>";
                             onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
                             <div>
                                 <div>
-                                    <img src="<?= str_replace("html/img/photo", "/img/photo" , htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg') )?>"
+                                    <img src="<?= str_replace("html/img/photo", "/img/photo", htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg')) ?>"
                                         alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>"
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>
