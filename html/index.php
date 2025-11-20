@@ -339,6 +339,8 @@ if ($idClient === null) {
     }
 
     $_SESSION["panierEnCours"] = $idPanier;
+
+    transfererPanierTempVersDB($pdo, $idPanier);
 }
 
 //gérer l'ajout au panier via AJAX
