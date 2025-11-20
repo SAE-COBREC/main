@@ -179,23 +179,33 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         //récupérer les informations du produit (prix, TVA, frais de port, remise, nom, description, image)
         $sqlProduit = "
             SELECT 
-                p.p_nom,
-                p.p_description,
-                p.p_prix, 
-                p.p_frais_de_port, 
-                p.p_stock,
-                COALESCE(t.montant_tva, 0) as tva,
-                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
-                (SELECT i.i_lien 
-                    FROM _represente_produit rp 
-                    JOIN _image i ON rp.id_image = i.id_image
-                    WHERE rp.id_produit = p.id_produit 
-                    LIMIT 1) as image_url
-            FROM _produit p
-            LEFT JOIN _tva t ON p.id_tva = t.id_tva
-            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
-            WHERE p.id_produit = :idProduit
+            p.p_nom,
+            p.p_description,
+            p.p_prix, 
+            p.p_frais_de_port, 
+            p.p_stock,
+            COALESCE(t.montant_tva, 0) as tva,
+            COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
+            (SELECT i.i_lien
+                FROM _represente_produit rp 
+                JOIN _image i ON rp.id_image = i.id_image
+                WHERE rp.id_produit = p.id_produit 
+                LIMIT 1) as image_url,
+            (SELECT i.i_alt
+                FROM _represente_produit rp 
+                JOIN _image i ON rp.id_image = i.id_image
+                WHERE rp.id_produit = p.id_produit 
+                LIMIT 1) as image_alt,
+            (SELECT i.i_title
+                FROM _represente_produit rp 
+                JOIN _image i ON rp.id_image = i.id_image
+                WHERE rp.id_produit = p.id_produit 
+                LIMIT 1) as image_title
+        FROM _produit p
+        LEFT JOIN _tva t ON p.id_tva = t.id_tva
+        LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+        LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+        WHERE p.id_produit = :idProduit
         ";
 
         $stmtProduit = $pdo->prepare($sqlProduit);
@@ -249,6 +259,8 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'nom' => $produitCourant['p_nom'],
                 'description' => $produitCourant['p_description'],
                 'image_url' => str_replace("html/img/photo", "/img/photo", $produitCourant['image_url'] ?? '/img/default-product.jpg'),
+                'image_alt' => $produitCourant['image_alt'],
+                'image_title' => $produitCourant['image_title'],
                 'quantite' => $aAjouter,
                 'prix_unitaire' => $prixUnitaire,
                 'stock' => $stock,
