@@ -1,30 +1,36 @@
 <?php
     session_start();
     include '../../selectBDD.php';
+    if (isset($_SESSION['idClient'])){ //si le client est connecté
+        $pdo->exec("SET search_path TO cobrec1");
 
-    $pdo->exec("SET search_path TO cobrec1");
+        //récup des informations nécessaires à la mise à jour de la quantité
+        $id_client = $_SESSION['idClient'];
+        $id_produit = $_POST['id_produit'];
+        $quantite = intval($_POST['quantite']);
+        $id_panier = $_SESSION['panierEnCours'];
 
-    $id_client = $_SESSION['idClient'];
+        if (!$id_client || !$id_panier) { //si l'une des deux valeurs n'est pas renseigné alors erreur;
+            echo json_encode(["success" => false]);
+            exit;
+        }
 
-    $id_produit = $_POST['id_produit'];
-    $quantite = intval($_POST['quantite']);
-    $id_panier = $_SESSION['panierEnCours'];
+        $sql = "UPDATE _contient 
+                SET quantite = :quantite 
+                WHERE id_panier = :id_panier AND id_produit = :id_produit"; //requête pour update la quantite dans le panier
 
-    if (!$id_client || !$id_panier) {
-        echo json_encode(["success" => false]);
-        exit;
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':quantite' => $quantite,
+            ':id_panier' => $id_panier,
+            ':id_produit' => $id_produit
+        ]);//execute la quantité
+
+        echo json_encode(["success" => true]);
+    } else {//sinon
+        $id_produit = intval($_POST['id_produit']); //récup l'id du produit 
+        $quantite = intval($_POST['quantite']); //récup la nouvelle quantité
+        $_SESSION['panierTemp'][$id_produit]['quantite'] = $quantite;//met à jour la quantité dans le panier temporaire
     }
 
-    $sql = "UPDATE _contient 
-            SET quantite = :quantite 
-            WHERE id_panier = :id_panier AND id_produit = :id_produit";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':quantite' => $quantite,
-        ':id_panier' => $id_panier,
-        ':id_produit' => $id_produit
-    ]);
-
-    echo json_encode(["success" => true]);
 ?>

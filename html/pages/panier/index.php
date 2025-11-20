@@ -31,7 +31,8 @@
         
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
     } else {
-        $panierTemp = $_SESSION['panierTemp'];   
+        $panierTemp = $_SESSION['panierTemp'];  // stock le panier temporaire
+        $articles = $panierTemp;
     }
 
 ?>
@@ -61,7 +62,7 @@
                 <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
                 <div>
                     
-                    <!--UN ARTICLE DANS LE PANIER-->
+                    <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
                     <?php foreach ($articles as $article): ?> 
                         <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
                                                     data-stock="<?php echo intval($article['p_stock'])?>"
@@ -114,7 +115,7 @@
                     </form>
                 </aside>
 
-            <!-- SI LE CLIENT N'EST PAS CONNECTÉ -->
+            <!-- SI LE CLIENT N'EST PAS CONNECTÉ PARCOURS CHAQUE ARTICLES, et affiche son contenu-->
             <?php elseif (count($panierTemp) > 0): ?>
 
                 <div>
@@ -186,7 +187,8 @@
     include __DIR__ . '/../../partials/footer.html';
     ?>
 
-    <!--vérifie qu'il y ait minimun un élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
+
+    <!--vérifie qu'il y ait minimun 1 élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
     <?php if (count($articles) > 0):?>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!--pour ajax-->
         <script>

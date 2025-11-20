@@ -11,42 +11,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paiement - Alizon</title>
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link rel="stylesheet" href="/styles/finaliserCommande/StyleFinaliserCommande.css">
+  <link rel="stylesheet" href="/styles/finaliserCommande/styleFinaliserCommande.css">
 </head>
 
 <body>
-    <div class="englobePaiement">
-        <a href="/pages/panier/index.php" id="retourPanier">Panier</a>
-        <section class="infoPaiement">
-            <h2><img src="/img/svg/logo.svg"/>Alizon</h2>
-            <form id="payerPanier" method="POST" action="/pages/finaliserCommande/payerPanier.php">
-                <label>Numéro de carte</label>
-                <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19" placeholder="1111 2222 3333 4444"/>
-                <!--maxlenght pour avoir une premiere vérification et minlenght pareil à 19 car il fuat compter les espaces-->
+    <h1><a href="/pages/panier/index.php" id="retourPanier">◀ Panier</a></h1>
+    <section class="infoPaiement">
+        <h2><img src="/img/svg/logo.svg"/>Alizon</h2>
+        <form id="payerPanier" method="POST" action="/pages/finaliserCommande/payerPanier.php">
+            <label>Numéro de carte</label>
+            <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19" placeholder="1111 2222 3333 4444"/>
+            <!--maxlenght pour avoir une premiere vérification et minlenght pareil à 19 car il fuat compter les espaces-->
 
-                <div class="dateCode">
+            <div class="dateCode">
+                <div>
                     <label>Date d'expriation</label>
                     <input name="dateExpiration" id="dateExpiration" type="text" required maxlength="5" minlength="5" placeholder="MM/AA"/>
-
+                </div>
+                <div>
                     <label>Code de sécurité</label>
                     <input name="cvc" id="cvc" type="text" required maxlength="3" minlength="3" placeholder="CVC"/>
                 </div>
-                <h3>Adresse de facturation</h3>
+            </div>
+            <h2>Adresse de facturation</h2>
 
-                <label>Nom</label>
-                <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"/>
+            <label>Nom</label>
+            <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"/>
 
-                <label>Pays</label>
-                <input name="pays" id="pays" type="text" required maxlength="100" placeholder="ex: France"/>
+            <label>Pays</label>
+            <input name="pays" id="pays" type="text" required maxlength="100" placeholder="ex: France"/>
 
-                <input name="saveDonneePaiement" id="saveDonneePaiement" type="checkbox" required/>
-                <label>J'accepte de sauvegarder mes informations de paiement pour de futurs achats</label>
-
-                <input name="conditions" id="conditions" type="checkbox" required/>
-                <label>J'accepte les conditions de service et que mon mode de paiement soit utilisé pour cette transaction.</label>
-
-                <button>Payer: <?php echo $_SESSION['totalPanier']?></button>
-            <form>
+            <div class="checkBox">
+                <div>
+                    <input name="saveDonneePaiement" id="saveDonneePaiement" type="checkbox"/>
+                    <label>J'accepte de sauvegarder mes informations de paiement pour de futurs achats</label>
+                </div>
+                <div>
+                    <input name="conditions" id="conditions" type="checkbox" required/>
+                    <label>J'accepte les conditions de service et que mon mode de paiement soit utilisé pour cette transaction.</label>
+                </div>
+            </div>
+            <button>Payer: <?php echo $_SESSION['totalPanier']?>€</button>
+        <form>
     </section>
     <script>
         //récup l'input du numéro de la carte

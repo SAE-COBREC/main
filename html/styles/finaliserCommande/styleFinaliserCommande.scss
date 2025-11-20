@@ -1,0 +1,108 @@
+@import "../_variable.scss";
+
+html {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, $primary-color-bleu 0%, $primary-color-noir 100%);
+    font-family: $font-family-secondaire;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+}
+
+img {
+    border-radius: $border-radius-mini;
+}
+
+h1,
+h2,
+h3,
+label {
+    font-family: $font-family-primaire;
+}
+
+h2 {
+    font-size: 19px;
+}
+
+body a {
+    font-family: $font-family-secondaire;
+}
+
+body a {
+    text-decoration: none;
+    color: $primary-color-blanc;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.infoPaiement {
+    background-color: $primary-color-blanc;
+    border-radius: $border-radius-primary;
+    width: 460px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+    display: flex;
+    flex-direction: column;
+
+    h2 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.5rem;
+
+        img {
+            width: 32px;
+        }
+    }
+
+    /* Input par défaut */
+    input[type="text"] {
+        height: 45px;
+        border: 1px $secondary-color-gris-fonce solid;
+        border-radius: $border-radius-primary;
+        width: 100%;
+        margin: 0.5em 0 1.5em 0;
+        font-size: 1.13em;
+    }
+
+    //date + CVC 
+    .dateCode {
+        display: grid;
+        grid-template-columns: 1fr 1fr; //partage la largeur en 2
+        gap: 15px;
+    }
+
+    //Checkboxe
+    .checkBox {
+        display: flex;
+        flex-direction: column;
+
+        input[type="checkbox"] {
+            accent-color: $primary-color-bleu;
+            cursor: pointer;
+            height: 1.4em;
+            width: 1.4em;
+        }
+    }
+
+    //bouton payer
+    button {
+        width: 100%;
+        margin-top: 1em;
+        padding: 0.6em;
+        background: $primary-color-noir;
+        color: $primary-color-blanc;
+        border: none;
+        border-radius: $border-radius-primary;
+        font-size: 1.3rem;
+        cursor: pointer;
+        text-align: center;
+
+        &:hover {
+            background-color: $primary-color-bleu;
+        }
+    }
+}

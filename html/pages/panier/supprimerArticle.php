@@ -1,20 +1,25 @@
 <?php
     include '../../selectBDD.php';
     session_start();
-    $id_client = $_SESSION['idClient'];
+    if (isset($_SESSION['idClient'])) {//regarde si le client est connecté
+        $id_client = $_SESSION['idClient'];
 
-    if (isset($_POST['id_produit'])) {
-        $id_produit = intval($_POST['id_produit']); //converti en entier
-        
-        $pdo->exec("SET search_path TO cobrec1");
-        
-        //requete pour supprimer l'article du panier
-        $requeteSuppression = "DELETE FROM _contient WHERE id_produit = " . $id_produit . " AND id_panier = " . $_SESSION['panierEnCours'];
-        $stmt = $pdo->prepare($requeteSuppression);
-        $stmt->execute();
-        
-        //redirection vers la page du panier
-        header('Location: index.php');
-        exit();
+        if (isset($_POST['id_produit'])) {
+            $id_produit = intval($_POST['id_produit']); //converti en entier
+            
+            $pdo->exec("SET search_path TO cobrec1");
+            
+            //requete pour supprimer l'article du panier
+            $requeteSuppression = "DELETE FROM _contient WHERE id_produit = " . $id_produit . " AND id_panier = " . $_SESSION['panierEnCours'];
+            $stmt = $pdo->prepare($requeteSuppression);
+            $stmt->execute();
+        }
+    } else {
+        $id_produit = intval($_POST['id_produit']);
+        unset($_SESSION['panierTemp'][$id_produit]);
     }
+
+    //redirection vers la page du panier
+    header('Location: index.php');
+    exit();
 ?>

@@ -1,0 +1,95 @@
+@charset "UTF-8";
+html {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #7171A3 0%, #030212 100%);
+  font-family: "Quicksand", sans-serif;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+}
+
+img {
+  border-radius: 4px;
+}
+
+h1,
+h2,
+h3,
+label {
+  font-family: "Baloo", sans-serif;
+}
+
+h2 {
+  font-size: 19px;
+}
+
+body a {
+  font-family: "Quicksand", sans-serif;
+}
+
+body a {
+  text-decoration: none;
+  color: #FFFFFF;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.infoPaiement {
+  background-color: #FFFFFF;
+  border-radius: 14px;
+  width: 460px;
+  padding: 30px;
+  margin-top: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  /* Input par défaut */
+}
+.infoPaiement h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+}
+.infoPaiement h2 img {
+  width: 32px;
+}
+.infoPaiement input[type=text] {
+  height: 45px;
+  border: 1px #c0c0c0 solid;
+  border-radius: 14px;
+  width: 100%;
+  margin: 0.5em 0 1.5em 0;
+  font-size: 1.13em;
+}
+.infoPaiement .dateCode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+.infoPaiement .checkBox {
+  display: flex;
+  flex-direction: column;
+}
+.infoPaiement .checkBox input[type=checkbox] {
+  accent-color: #7171A3;
+  cursor: pointer;
+  height: 1.4em;
+  width: 1.4em;
+}
+.infoPaiement button {
+  width: 100%;
+  margin-top: 1em;
+  padding: 0.6em;
+  background: #030212;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  text-align: center;
+}
+.infoPaiement button:hover {
+  background-color: #7171A3;
+}/*# sourceMappingURL=styleFinaliserCommande.css.map */

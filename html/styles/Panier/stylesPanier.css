@@ -13,13 +13,11 @@ h3 {
   font-family: "Baloo", sans-serif;
 }
 
-img,
-.unArticleP {
+.unArticleP img {
   border-radius: 14px;
 }
 @media screen and (max-width: 428px) {
-  img,
-  .unArticleP {
+  .unArticleP img {
     border-radius: 8px;
   }
 }
@@ -38,6 +36,7 @@ img,
 
 button {
   border: none;
+  cursor: pointer;
 }
 
 .unArticleP {

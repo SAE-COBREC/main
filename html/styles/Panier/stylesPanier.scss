@@ -17,8 +17,8 @@ h3 {
 }
 
 
-img,
-.unArticleP {
+
+.unArticleP img {
   border-radius: $border-radius-primary;
 
   @media screen and (max-width: 428px) {
@@ -41,6 +41,7 @@ img,
 
 button {
   border: none;
+  cursor: pointer;
 }
 
 .unArticleP {
