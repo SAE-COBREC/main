@@ -124,8 +124,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($client) {
           $clientId = (int)$client['id_client'];
         }
-      $_SESSION['idClient'] = $clientId;
-      //definition du message d'erreur en cas d'erreur d'insertion  
+      $_SESSION['idClient'] = $clientId; 
+      $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_adresse, a_ville, a_code_postal)
+                VALUES (:id_compte, :adresse, :ville, :code_postal)';
+        $stmtAdrss = $pdo->prepare($sqlAdrss);
+        $stmtAdrss->execute([
+          'id_compte' => $id_compte,
+          'adresse' => $rue,
+          'ville'    => $commune,
+          'code_postal'    => $codeP
+        ]);
+
+    //definition du message d'erreur en cas d'erreur d'insertion 
     } catch (Exception $e) {
       $hasError = true;
       $error_card = 4; 

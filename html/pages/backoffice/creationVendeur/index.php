@@ -161,6 +161,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       $_SESSION['vendeur_id'] = $vendeurId;
       
+      $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_adresse, a_ville, a_code_postal)
+                VALUES (:id_compte, :adresse, :ville, :code_postal)';
+        $stmtAdrss = $pdo->prepare($sqlAdrss);
+        $stmtAdrss->execute([
+          'id_compte' => $id_compte,
+          'adresse' => $rue,
+          'ville'    => $commune,
+          'code_postal'    => $codeP
+        ]);
     } catch (Exception $e) {
       $hasError = true;
       $error_card = 4; 
@@ -221,12 +230,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="Rsociale">Raison sociale</label>
-        <input type="text" id="Rsociale" name="Rsociale" placeholder="Votre Raison sociale" maxlength="99" required>
+        <input type="text" id="Rsociale" name="Rsociale" placeholder="Votre Raison sociale" maxlength="254" required>
       </div>
 
        <div>
         <label for="Denomination">Denomination</label>
-        <input type="text" id="Denomination" name="Denomination" placeholder="Votre Denomination" maxlength="99" required>
+        <input type="text" id="Denomination" name="Denomination" placeholder="Votre Denomination" maxlength="254" required>
       </div>
 
       <div>
@@ -310,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
-          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$" maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,5)">
+          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$" maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
         </div>
 
         <div class="culumn-flex">
