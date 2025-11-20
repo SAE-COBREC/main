@@ -523,6 +523,9 @@ echo "<pre>";
 var_dump($_SESSION);
 echo "</pre>"; 
 
+//session_unset();
+//session_destroy();
+
 ?>
 
 <!DOCTYPE html>
