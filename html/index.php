@@ -6,7 +6,7 @@ session_start();
 include __DIR__ . '/selectBDD.php';
 
 //inclure les fonctions utilitaires
-include __DIR__ . '/pages/functions.php'; 
+include __DIR__ . '/pages/fonctions.php'; 
 
 //récupérer la connexion PDO depuis le fichier de configuration
 $connexionBaseDeDonnees = $pdo;
