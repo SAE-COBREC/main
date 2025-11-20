@@ -1,10 +1,9 @@
-poids image
 voir ce que les produits créées donnent sur les pages des autres
 
 Jira : poids image
 Jira : type de fichier invalide
 
-faire calcul frais de port en bdd
+
 essayer sur serv
 dimensions images
 créer et modif promo
