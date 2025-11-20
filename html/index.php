@@ -235,7 +235,9 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         }
 
         //vérifier si l'article existe déjà dans le panier temporaire
-        if (isset($_SESSION['panierTemp'][$idProduit])) {
+        $existe = isset($_SESSION['panierTemp'][$idProduit]);
+        
+        if ($existe) {
             $quantiteExistante = (int) $_SESSION['panierTemp'][$idProduit]['quantite'];
         } else {
             $quantiteExistante = 0;
@@ -251,8 +253,14 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         $aAjouter = min($quantite, $disponible);
 
         //ajouter ou mettre à jour l'article dans le panier temporaire
-        if (isset($_SESSION['panierTemp'][$idProduit])) {
+        if ($existe) {
             $_SESSION['panierTemp'][$idProduit]['quantite'] += $aAjouter;
+            
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
+            return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
+            
         } else {
             $_SESSION['panierTemp'][$idProduit] = [
                 'id_produit' => $idProduit,
@@ -267,18 +275,18 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'frais_de_port' => $fraisDePort,
                 'tva' => $tva
             ];
+            
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
+            return ['success' => true, 'message' => 'Article ajouté au panier'];
         }
-
-        if ($aAjouter < $quantite) {
-            return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
-        }
-
-        return ['success' => true, 'message' => 'Article ajouté au panier'];
 
     } catch (Exception $e) {
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
+
 
 
 //fonction pour transférer le panier temporaire vers la BDD lors de la connexion
