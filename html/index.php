@@ -517,7 +517,7 @@ if (isset($_SESSION['panierTemp']) && !empty($_SESSION['panierTemp'])) {
         echo "<strong>Nom :</strong> " . htmlspecialchars($article['nom']) . "<br>";
         echo "<strong>Quantité :</strong> " . $article['quantite'] . "<br>";
         echo "<strong>Prix unitaire :</strong> " . number_format($article['prix_unitaire'], 2) . "€<br>";
-        echo "<strong>Stock :</strong> " . number_format($article['stock'], 2) . "€<br>";
+        echo "<strong>Stock :</strong> " . number_format($article['stock'], 0) . "<br>";
         echo "<strong>Frais de port :</strong> " . number_format($article['frais_de_port'], 2) . "€<br>";
         echo "<strong>TVA :</strong> " . $article['tva'] . "<br>";
         echo "</div>";
@@ -531,8 +531,8 @@ echo "<pre>";
 var_dump($_SESSION);
 echo "</pre>"; 
 
-//session_unset();
-//session_destroy();
+session_unset();
+session_destroy();
 
 ?>
 
