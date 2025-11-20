@@ -1,12 +1,8 @@
-poids image
-voir ce que les produits créées donnent sur les pages des autres
-
 Jira : poids image
 Jira : type de fichier invalide
 
-faire calcul frais de port en bdd
+
 essayer sur serv
-dimensions images
 créer et modif promo
 
 Pour les @Etudiant·e·s FI qui ont des pb avec move_uploaded_file(), c'est certainement un pb de droits. Vous devez donner à l'utilisateur www-data (id 33), la propriété du dossier destination de vos images (ou autres fichiers) uploadées par formulaire. En effet, vos scripts s'exécutent sous l'identité du serveur Web qui est www-data, il faut donc que cet utilisateur puisse écrire dans le dossier des images uploadées. S'il est propriétaire du dossier ça marchera, et... non... un chmod 777 n'est pas la solution.

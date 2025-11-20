@@ -179,23 +179,33 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         //récupérer les informations du produit (prix, TVA, frais de port, remise, nom, description, image)
         $sqlProduit = "
             SELECT 
-                p.p_nom,
-                p.p_description,
-                p.p_prix, 
-                p.p_frais_de_port, 
-                p.p_stock,
-                COALESCE(t.montant_tva, 0) as tva,
-                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
-                (SELECT i.i_lien 
-                    FROM _represente_produit rp 
-                    JOIN _image i ON rp.id_image = i.id_image
-                    WHERE rp.id_produit = p.id_produit 
-                    LIMIT 1) as image_url
-            FROM _produit p
-            LEFT JOIN _tva t ON p.id_tva = t.id_tva
-            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
-            WHERE p.id_produit = :idProduit
+            p.p_nom,
+            p.p_description,
+            p.p_prix, 
+            p.p_frais_de_port, 
+            p.p_stock,
+            COALESCE(t.montant_tva, 0) as tva,
+            COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
+            (SELECT i.i_lien
+                FROM _represente_produit rp 
+                JOIN _image i ON rp.id_image = i.id_image
+                WHERE rp.id_produit = p.id_produit 
+                LIMIT 1) as image_url,
+            (SELECT i.i_alt
+                FROM _represente_produit rp 
+                JOIN _image i ON rp.id_image = i.id_image
+                WHERE rp.id_produit = p.id_produit 
+                LIMIT 1) as image_alt,
+            (SELECT i.i_title
+                FROM _represente_produit rp 
+                JOIN _image i ON rp.id_image = i.id_image
+                WHERE rp.id_produit = p.id_produit 
+                LIMIT 1) as image_title
+        FROM _produit p
+        LEFT JOIN _tva t ON p.id_tva = t.id_tva
+        LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
+        LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+        WHERE p.id_produit = :idProduit
         ";
 
         $stmtProduit = $pdo->prepare($sqlProduit);
@@ -214,7 +224,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
 
         //calculer le prix avec remise
         $prixUnitaire = $produitCourant['p_prix'];
-        $remiseUnitaire = ($produitCourant['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $stock = $produitCourant['p_stock'];
         $fraisDePort = $produitCourant['p_frais_de_port'];
         $tva = $produitCourant['tva'];
         $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
@@ -225,7 +235,9 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         }
 
         //vérifier si l'article existe déjà dans le panier temporaire
-        if (isset($_SESSION['panierTemp'][$idProduit])) {
+        $existe = isset($_SESSION['panierTemp'][$idProduit]);
+        
+        if ($existe) {
             $quantiteExistante = (int) $_SESSION['panierTemp'][$idProduit]['quantite'];
         } else {
             $quantiteExistante = 0;
@@ -241,32 +253,40 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         $aAjouter = min($quantite, $disponible);
 
         //ajouter ou mettre à jour l'article dans le panier temporaire
-        if (isset($_SESSION['panierTemp'][$idProduit])) {
+        if ($existe) {
             $_SESSION['panierTemp'][$idProduit]['quantite'] += $aAjouter;
+            
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
+            return ['success' => true, 'message' => 'Quantité mise à jour dans le panier'];
+            
         } else {
             $_SESSION['panierTemp'][$idProduit] = [
                 'id_produit' => $idProduit,
                 'nom' => $produitCourant['p_nom'],
                 'description' => $produitCourant['p_description'],
                 'image_url' => str_replace("html/img/photo", "/img/photo", $produitCourant['image_url'] ?? '/img/default-product.jpg'),
+                'image_alt' => $produitCourant['image_alt'],
+                'image_title' => $produitCourant['image_title'],
                 'quantite' => $aAjouter,
                 'prix_unitaire' => $prixUnitaire,
-                'remise_unitaire' => $remiseUnitaire,
+                'stock' => $stock,
                 'frais_de_port' => $fraisDePort,
                 'tva' => $tva
             ];
+            
+            if ($aAjouter < $quantite) {
+                return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
+            }
+            return ['success' => true, 'message' => 'Article ajouté au panier'];
         }
-
-        if ($aAjouter < $quantite) {
-            return ['success' => true, 'message' => 'Seuls ' . $aAjouter . ' article(s) ont pu être ajouté(s) (stock limité).'];
-        }
-
-        return ['success' => true, 'message' => 'Article ajouté au panier'];
 
     } catch (Exception $e) {
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
+
 
 
 //fonction pour transférer le panier temporaire vers la BDD lors de la connexion
@@ -304,7 +324,7 @@ if ($idClient === null) {
     $stmtPanier = $pdo->prepare($sqlPanierClient);
     $stmtPanier->execute([":idClient" => $idClient]);
     $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
-    
+
     if ($panier) {
         $idPanier = (int) $panier['id_panier'];
     } else {
@@ -480,37 +500,6 @@ $produits_filtres = filtrerProduits($listeProduits, $filtres);
 $listeProduits = trierProduits($produits_filtres, $tri_par);
 $categories_affichage = preparercategories_affichage($listeCategories);
 
-
-//session_start();
-
-echo "<h2>Contenu du panier temporaire</h2>";
-
-if (isset($_SESSION['panierTemp']) && !empty($_SESSION['panierTemp'])) {
-    echo "<pre>";
-    print_r($_SESSION['panierTemp']);
-    echo "</pre>";
-    
-    echo "<h3>Détails par produit :</h3>";
-    foreach ($_SESSION['panierTemp'] as $idProduit => $article) {
-        echo "<div style='border: 1px solid #ccc; padding: 10px; margin: 10px 0;'>";
-        echo "<strong>ID Produit :</strong> " . $idProduit . "<br>";
-        echo "<strong>Nom :</strong> " . htmlspecialchars($article['nom']) . "<br>";
-        echo "<strong>Quantité :</strong> " . $article['quantite'] . "<br>";
-        echo "<strong>Prix unitaire :</strong> " . number_format($article['prix_unitaire'], 2) . "€<br>";
-        echo "<strong>Remise unitaire :</strong> " . number_format($article['remise_unitaire'], 2) . "€<br>";
-        echo "<strong>Frais de port :</strong> " . number_format($article['frais_de_port'], 2) . "€<br>";
-        echo "<strong>TVA :</strong> " . $article['tva'] . "<br>";
-        echo "</div>";
-    }
-} else {
-    echo "<p>Le panier temporaire est vide.</p>";
-}
-
-echo "<h3>Toutes les variables de session :</h3>";
-echo "<pre>";
-var_dump($_SESSION);
-echo "</pre>";
-
 ?>
 
 <!DOCTYPE html>
@@ -529,7 +518,7 @@ echo "</pre>";
     <?php
     include __DIR__ . '/partials/header.html';
     ?>
-    
+
     <div class="container">
         <aside>
             <form method="POST" action="" id="filterForm">
@@ -629,7 +618,7 @@ echo "</pre>";
                             onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
                             <div>
                                 <div>
-                                    <img src="<?= str_replace("html/img/photo", "/img/photo" , htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg') )?>"
+                                    <img src="<?= str_replace("html/img/photo", "/img/photo", htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg')) ?>"
                                         alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>"
                                         class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                                 </div>

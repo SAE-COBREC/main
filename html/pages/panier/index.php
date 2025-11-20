@@ -56,105 +56,128 @@
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
         <section class="articlesPrixP">
 
-        <?php if (isset($_SESSION['idClient']) && count(isset($articles)) > 0):?>
-            
-            <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
-            <div>
-                
-                <!--UN ARTICLE DANS LE PANIER-->
-                <?php foreach ($articles as $article): ?> 
-                    <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
-                                                data-stock="<?php echo intval($article['p_stock'])?>"
-                                                data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
-                        <div class="imageArticleP">
-                            <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
-                                alt="<?php echo htmlspecialchars($article['i_alt']) ?>" 
-                                title="<?php echo htmlspecialchars($article['i_title'])?>">
-                        </div>
-                        <div class="articleDetailP">
-                            <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                            <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
-                            <div class="basArticleP">
-                                <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
-                                <div class="quantite">
+            <?php if (isset($_SESSION['idClient']) && count($articles) > 0):?>
 
-                                    <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
-                                    <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
-                                        <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
-                                        <!--bouton pour envoyer le formulaire-->
-                                        <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
-                                    </form>
-                                    <button class="btn_moins">-</button>
-                                    <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
-                                    <button class="btn_plus">+</button>
+                <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
+                <div>
+                    
+                    <!--UN ARTICLE DANS LE PANIER-->
+                    <?php foreach ($articles as $article): ?> 
+                        <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
+                                                    data-stock="<?php echo intval($article['p_stock'])?>"
+                                                    data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
+                            <div class="imageArticleP">
+                                <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
+                                    alt="<?php echo htmlspecialchars($article['i_alt']) ?>" 
+                                    title="<?php echo htmlspecialchars($article['i_title'])?>">
+                            </div>
+                            <div class="articleDetailP">
+                                <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                                <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
+                                <div class="basArticleP">
+                                    <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
+                                    <div class="quantite">
+
+                                        <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
+                                        <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
+                                            <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
+                                            <!--bouton pour envoyer le formulaire-->
+                                            <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
+                                        </form>
+                                        <button class="btn_moins">-</button>
+                                        <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
+                                        <button class="btn_plus">+</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </article>
-                <?php endforeach;?>
+                        </article>
+                    <?php endforeach;?>
+                </div>
+
+                <!-- BLOCK DU RECAP DE LA COMMANDE -->
+                <aside class="recapCommande">
+                    <div class="recapTete">
+                        <h3 id="totalArticles"></h3> <!--es tremplit avec le js-->
+                        <div id="listeProduits"></div> <!--es tremplit avec le js-->
+                    </div>
+                    <div class="recapTotal">
+                        <h3>Prix TTC :</h3> <!--es tremplit avec le js-->
+                        <h3 class="prixTotal" id="prixTotal"></h3>
+                    </div>
+                    <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
+                        <button class="finaliserCommande">Finaliser commande</button>
+                    </form>
+                    
+                    <!--FORMULAIRE POUR VIDER LE PANIER-->
+                    <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php">
+                        <button type="submit" id="viderPanier" class>Vider le panier</button>
+                    </form>
+                </aside>
+
+            <!-- SI LE CLIENT N'EST PAS CONNECTÉ -->
+            <?php elseif (count($panierTemp) > 0): ?>
+
+                <div>
+                    <?php foreach ($panierTemp as $idProduit => $article): ?>
+                        <article class="unArticleP" data-prix="<?php echo number_format($article['prix_unitaire'], 2, '.')?>"
+                                                        data-stock="<?php echo intval($article['stock'])?>"
+                                                        data-tva="<?php echo number_format($article['tva'], 2, '.')?>">
+                            <div class="imageArticleP">
+                                <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])) ?>"
+                                    alt="<?php echo htmlspecialchars($article['image_alt']) ?>" 
+                                    title="<?php echo htmlspecialchars($article['image_title'])?>">
+                            </div>
+                            <div class="articleDetailP">
+                                <h2 class="articleTitreP"><?php echo htmlspecialchars($article['nom'])?></h2>
+                                <p class="articleDescP"><?php echo htmlspecialchars($article['description'])?></p>
+                                <div class="basArticleP">
+                                    <p class="articlePrix"><?php echo  number_format($article['prix_unitaire'], 2, '.')?>€</p>
+                                    <div class="quantite">
+
+                                        <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
+                                        <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
+                                            <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
+                                            <!--bouton pour envoyer le formulaire-->
+                                            <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
+                                        </form>
+                                        <button class="btn_moins">-</button>
+                                        <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
+                                        <button class="btn_plus">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                    <?php endforeach;?>
+                </div>
+
+                <!-- BLOCK DU RECAP DE LA COMMANDE -->
+                <aside class="recapCommande">
+                    <div class="recapTete">
+                        <h3 id="totalArticles"></h3> <!--es tremplit avec le js-->
+                        <div id="listeProduits"></div> <!--es tremplit avec le js-->
+                    </div>
+                    <div class="recapTotal">
+                        <h3>Prix TTC :</h3> <!--es tremplit avec le js-->
+                        <h3 class="prixTotal" id="prixTotal"></h3>
+                    </div>
+                    <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
+                        <button class="finaliserCommande">Finaliser commande</button>
+                    </form>
+                    
+                    <!--FORMULAIRE POUR VIDER LE PANIER-->
+                    <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php">
+                        <button type="submit" id="viderPanier" class>Vider le panier</button>
+                    </form>
+                </aside>
+            
+            <?php else: ?>
+            <div id="panierVide">
+                <img id="panierVide" src="/img/svg/panier-empty.svg"/> 
+                <a href="/" id="retourAchat">Continuer mes achats</a>
             </div>
 
-            <!-- BLOCK DU RECAP DE LA COMMANDE -->
-            <aside class="recapCommande">
-                <div class="recapTete">
-                    <h3 id="totalArticles"></h3> <!--es tremplit avec le js-->
-                    <div id="listeProduits"></div> <!--es tremplit avec le js-->
-                </div>
-                <div class="recapTotal">
-                    <h3>Prix TTC :</h3> <!--es tremplit avec le js-->
-                    <h3 class="prixTotal" id="prixTotal"></h3>
-                </div>
-                <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
-                    <button class="finaliserCommande">Finaliser commande</button>
-                </form>
-                
-                <!--FORMULAIRE POUR VIDER LE PANIER-->
-                <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php">
-                    <button type="submit" id="viderPanier" class>Vider le panier</button>
-                </form>
-            </aside>
-
-        <!-- SI LE CLIENT N'EST PAS CONNECTÉ -->
-        <?php elseif (count($panierTemp)): ?>
-            <?php foreach ($panierTemp as $article): ?>
-                <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
-                                                data-stock="<?php echo intval($article['p_stock'])?>"
-                                                data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
-                    <div class="imageArticleP">
-                        <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
-                            alt="<?php echo htmlspecialchars($article['i_alt']) ?>" 
-                            title="<?php echo htmlspecialchars($article['i_title'])?>">
-                    </div>
-                    <div class="articleDetailP">
-                        <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                        <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
-                        <div class="basArticleP">
-                            <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
-                            <div class="quantite">
-
-                                <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
-                                <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
-                                    <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
-                                    <!--bouton pour envoyer le formulaire-->
-                                    <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
-                                </form>
-                                <button class="btn_moins">-</button>
-                                <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
-                                <button class="btn_plus">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-            <?php endforeach;?>
-        
-        <?php else: ?>
-        <div id="panierVide">
-            <img id="panierVide" src="/img/svg/panier-empty.svg"/> 
-            <a href="/" id="retourAchat">Continuer mes achats</a>
-        </div>
-
-        <?php endif;?>  
+            <?php endif;?>  
         </section>
 
         

@@ -8,65 +8,6 @@ if (!isset($_SESSION['vendeur_id'])) {
 
 $compte_id = $_SESSION['vendeur_id'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    try {
-        // Update vendeur
-        $sqlVendeur = "
-            UPDATE cobrec1._vendeur
-            SET denomination = :pseudo,
-                raison_sociale = :rsociale,
-                siren = :siren
-            WHERE id_compte = :id
-        ";
-        $stmt = $pdo->prepare($sqlVendeur);
-        $stmt->execute([
-            'pseudo' => $_POST['pseudo'],
-            'rsociale' => $_POST['rsociale'],
-            'siren' => $_POST['siren'],
-            'id' => $compte_id
-        ]);
-
-        // Update compte
-        $sqlCompte = "
-            UPDATE cobrec1._compte
-            SET email = :email,
-                num_telephone = :tel
-            WHERE id_compte = :id
-        ";
-        $stmt = $pdo->prepare($sqlCompte);
-        $stmt->execute([
-            'email' => $_POST['email'],
-            'tel' => $_POST['telephone'],
-            'id' => $compte_id
-        ]);
-
-        // Update adresse
-        $sqlAdresse = "
-            UPDATE cobrec1._adresse
-            SET a_adresse = :adresse,
-                a_code_postal = :codep,
-                a_ville = :ville,
-                a_complement = :complement
-            WHERE id_compte = :id
-        ";
-        $stmt = $pdo->prepare($sqlAdresse);
-        $stmt->execute([
-            'adresse' => $_POST['adresse'],
-            'codep' => $_POST['codep'],
-            'ville' => $_POST['ville'],
-            'complement' => $_POST['complement'],
-            'id' => $compte_id
-        ]);
-
-    } catch (PDOException $e) {
-        die("Erreur lors de la mise à jour : " . htmlspecialchars($e->getMessage()));
-    }
-
-    header("Location: profil.php?success=1");
-    exit;
-}
-
 try {
     $query = "
         SELECT
@@ -90,10 +31,123 @@ try {
 
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id' => $compte_id]);
-    $vendeur = $stmt->fetch(PDO::FETCH_ASSOC);
+    $old = $stmt->fetch(PDO::FETCH_ASSOC); // récupère la ligne unique
+
+    if (!$old) {
+        die("Impossible de récupérer les informations du vendeur.");
+    }
+
+    $vendeur = $old; // utiliser pour préremplir le formulaire
+
 
 } catch (PDOException $e) {
     die("Erreur lors de la récupération des informations : " . htmlspecialchars($e->getMessage()));
+}
+
+/* ---------------------------------------------------------
+   TRAITEMENT DU FORMULAIRE
+--------------------------------------------------------- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Liste des champs par table
+    $mapVendeur = [
+        'pseudo'   => 'denomination',
+        'rsociale' => 'raison_sociale',
+        'siren'    => 'siren'
+    ];
+
+    $mapCompte = [
+        'email'     => 'email',
+        'telephone' => 'num_telephone'
+    ];
+
+    $mapAdresse = [
+        'adresse'   => 'a_adresse',
+        'codep'     => 'a_code_postal',
+        'ville'     => 'a_ville',
+        'complement'=> 'a_complement'
+    ];
+
+    // --- Fonction pour générer automatiquement les champs modifiés ---
+    function getModifiedFields($post, $old, $mapping) {
+        $changes = [];
+        foreach ($mapping as $postKey => $dbField) {
+            if (isset($post[$postKey]) && $post[$postKey] !== $old[$postKey]) {
+                $changes[$dbField] = $post[$postKey];
+            }
+        }
+        return $changes;
+    }
+
+    $chgVendeur = getModifiedFields($_POST, $old, $mapVendeur);
+    $chgCompte  = getModifiedFields($_POST, $old, $mapCompte);
+    $chgAdresse = getModifiedFields($_POST, $old, $mapAdresse);
+
+    try {
+
+        /* ----------------------------
+           Vérification email unique
+        ---------------------------- */
+        if (isset($chgCompte['email'])) {
+            $check = $pdo->prepare("
+                SELECT 1 FROM cobrec1._compte 
+                WHERE email = :email AND id_compte <> :id
+            ");
+            $check->execute([
+                'email' => $chgCompte['email'],
+                'id' => $compte_id
+            ]);
+
+            if ($check->fetch()) {
+                die("Cet email est déjà utilisé par un autre compte.");
+            }
+        }
+
+        /* ----------------------------
+           UPDATE vendeur (si modifié)
+        ---------------------------- */
+        if (!empty($chgVendeur)) {
+            $sql = "UPDATE cobrec1._vendeur SET ";
+            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($chgVendeur)));
+            $sql .= " WHERE id_compte = :id";
+
+            $stmt = $pdo->prepare($sql);
+            $chgVendeur['id'] = $compte_id;
+            $stmt->execute($chgVendeur);
+        }
+
+        /* ----------------------------
+           UPDATE compte (si modifié)
+        ---------------------------- */
+        if (!empty($chgCompte)) {
+            $sql = "UPDATE cobrec1._compte SET ";
+            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($chgCompte)));
+            $sql .= " WHERE id_compte = :id";
+
+            $stmt = $pdo->prepare($sql);
+            $chgCompte['id'] = $compte_id;
+            $stmt->execute($chgCompte);
+        }
+
+        /* ----------------------------
+           UPDATE adresse (si modifié)
+        ---------------------------- */
+        if (!empty($chgAdresse)) {
+            $sql = "UPDATE cobrec1._adresse SET ";
+            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($chgAdresse)));
+            $sql .= " WHERE id_compte = :id";
+
+            $stmt = $pdo->prepare($sql);
+            $chgAdresse['id'] = $compte_id;
+            $stmt->execute($chgAdresse);
+        }
+
+    } catch (PDOException $e) {
+        die("Erreur lors de la mise à jour : " . htmlspecialchars($e->getMessage()));
+    }
+
+    header("Location: index.php");
+    exit;
 }
 
 function safe($array, $key, $default = "") {
@@ -128,7 +182,7 @@ function safe($array, $key, $default = "") {
         <h2 class="profil-card__title">Modifier mes informations</h2>
 
         <div class="profil-photo">
-          <img src="<?= str_replace("/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>" alt="Photo vendeur">
+          <img src="<?= str_replace("html/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>" alt="Photo vendeur">
         </div>
 
         <form id="edit-form" class="edit-form" action="" method="POST">

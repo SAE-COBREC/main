@@ -16,7 +16,7 @@ $_SESSION['creerArticle'] = [];
 try {
     // Requête SQL pour récupérer les produits du vendeur avec leurs catégories et images
     $query = "
-    SELECT 
+    SELECT DISTINCT on (id_produit)
         p.id_produit,
         p.p_nom AS nom_article,
         p.p_description,

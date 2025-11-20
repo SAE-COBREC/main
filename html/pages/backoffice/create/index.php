@@ -5,7 +5,7 @@
     $pdo->exec("SET search_path to cobrec1");
     session_start();
     const NB_IMGS_MAX = 3;
-    const EMPLACEMENT_DES_IMGS = 'html/img/photo/';
+    const EMPLACEMENT_DES_IMGS = '/img/photo/';
 
     if($_SESSION['vendeur_id'] != null){
         /*try {//Affiliation id_utilisateur id_vendeur
@@ -103,9 +103,13 @@
                         $_SESSION["creerArticle"]["_FILES"]['name'] = [];
                         foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
                             $_SESSION["creerArticle"]["_FILES"]['name'][$key] = $value['i_title'];
-                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace('html/img/photo', '../../../img/photo/',$value['i_lien']);
-                            $_SESSION["creerArticle"]["_FILES"]['name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['name'][$key]);
-                            copy($_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] . $_SESSION["creerArticle"]["_FILES"]['name'][$key], 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['name'][$key]);
+                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace('/img/photo', '../../../img/photo',$value['i_lien']);
+                            // $_SESSION["creerArticle"]["_FILES"]['name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['name'][$key]);
+                            // $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key]);
+                            $_SESSION["creerArticle"]["_FILES"]['name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['name'][$key]);
+                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key]);
+                            copy($_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key], 
+                            'temp_/' . $_SESSION["creerArticle"]["_FILES"]['name'][$key]);
                         }
                         $_POST = [];
                         $_POST["titre"] = str_replace("''","'", $_SESSION["creerArticle"]['_GET']['p_nom']);
@@ -163,11 +167,10 @@
 <pre>
 <?php
 
-// print_r($_GET['modifier']);
-// print_r($_SESSION["creerArticle"]['_GET']);
-// print_r($_POST);
-// print_r($_SESSION["creerArticle"]);
-$imageTropVolumineuse = false;
+print_r($_GET['modifier']);
+print_r($_SESSION["creerArticle"]['_GET']);
+print_r($_POST);
+print_r($_SESSION["creerArticle"]);
 print_r($_FILES);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
 $warnPromo = false;
@@ -223,10 +226,10 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
         foreach ($_FILES["photo"]["name"] as $key => $value) {//chgt noms pour éviter pbs lors du déplacement de l'img
             $_FILES["photo"]["name"][$key] = str_replace(' ', '_',$_FILES["photo"]["name"][$key]);
-            $_FILES["photo"]["name"][$key] = str_replace("'", "''",$_FILES["photo"]["name"][$key]);
-            $_FILES["photo"]["name"][$key] = str_replace('"', '""',$_FILES["photo"]["name"][$key]);
+            $_FILES["photo"]["name"][$key] = str_replace("'", "_",$_FILES["photo"]["name"][$key]);
+            $_FILES["photo"]["name"][$key] = str_replace('"', '_',$_FILES["photo"]["name"][$key]);
             if ($_FILES["photo"]["size"][$key] > 5 * 1024 * 1024){//si fichier trop volumineux
-                $imageTropVolumineuse = true;
+                $_SESSION['creerArticle']['imageTropVolumineuse'] = true;
                 unset($_FILES["photo"]["name"][$key]);
                 unset($_FILES["photo"]["tmp_name"][$key]);
             }
@@ -441,13 +444,14 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $_SESSION["creerArticle"]["warn"]++;
                             ?></small>
                             <?php
-                        }else if($imageTropVolumineuse){
+                        }if($_SESSION['creerArticle']['imageTropVolumineuse']){
                             ?>
                             <br>
 
                             <small class="warn"><?php
                             echo 'Au moins une de vos images fait plus de 5MB. Les images dépassant la taille maximale ne seront pas téléversés.';
                             $_SESSION["creerArticle"]["warn"]++;
+                            $_SESSION['creerArticle']['imageTropVolumineuse'] = false;
                             ?></small>
                             <?php
                         }
