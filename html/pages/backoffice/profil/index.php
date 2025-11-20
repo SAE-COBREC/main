@@ -68,83 +68,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'complement'=> 'a_complement'
     ];
 
-    // --- Fonction pour générer automatiquement les champs modifiés ---
     function getModifiedFields($post, $old, $mapping) {
-        $changes = [];
-        foreach ($mapping as $postKey => $dbField) {
-            if (isset($post[$postKey]) && $post[$postKey] !== $old[$postKey]) {
-                $changes[$dbField] = $post[$postKey];
-            }
-        }
-        return $changes;
-    }
+      $changes = [];
+      foreach ($mapping as $postKey => $dbField) {
+          $postVal = isset($post[$postKey]) ? trim($post[$postKey]) : "";
+          $oldVal  = isset($old[$postKey]) ? trim((string)$old[$postKey]) : "";
+
+          if ($postVal !== $oldVal) {
+              $changes[$dbField] = $postVal;
+          }
+      }
+      return $changes;
+  }
+
+
 
     $chgVendeur = getModifiedFields($_POST, $old, $mapVendeur);
     $chgCompte  = getModifiedFields($_POST, $old, $mapCompte);
     $chgAdresse = getModifiedFields($_POST, $old, $mapAdresse);
 
     try {
-
+      
         /* ----------------------------
-           Vérification email unique
-        ---------------------------- */
-        if (isset($chgCompte['email'])) {
-            $check = $pdo->prepare("
-                SELECT 1 FROM cobrec1._compte 
-                WHERE email = :email AND id_compte <> :id
-            ");
-            $check->execute([
-                'email' => $chgCompte['email'],
-                'id' => $compte_id
-            ]);
-
-            if ($check->fetch()) {
-                die("Cet email est déjà utilisé par un autre compte.");
-            }
-        }
-
-        /* ----------------------------
-           UPDATE vendeur (si modifié)
+          UPDATE vendeur (si modifié)
         ---------------------------- */
         if (!empty($chgVendeur)) {
+            $fields = $chgVendeur;
+            unset($fields['id']); // retire 'id' pour la partie SET
+
             $sql = "UPDATE cobrec1._vendeur SET ";
-            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($chgVendeur)));
+            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($fields)));
             $sql .= " WHERE id_compte = :id";
 
             $stmt = $pdo->prepare($sql);
-            $chgVendeur['id'] = $compte_id;
-            $stmt->execute($chgVendeur);
+
+            $params = $fields; // champs à mettre à jour
+            $params['id'] = $chgVendeur['id']; // ajouter id pour le WHERE
+            $stmt->execute($params);
         }
 
         /* ----------------------------
-           UPDATE compte (si modifié)
+          UPDATE compte (si modifié)
         ---------------------------- */
         if (!empty($chgCompte)) {
+            $fields = $chgCompte;
+            unset($fields['id']); // retire 'id' pour la partie SET
+
             $sql = "UPDATE cobrec1._compte SET ";
-            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($chgCompte)));
+            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($fields)));
             $sql .= " WHERE id_compte = :id";
 
             $stmt = $pdo->prepare($sql);
-            $chgCompte['id'] = $compte_id;
-            $stmt->execute($chgCompte);
+
+            $params = $fields;
+            $params['id'] = $chgCompte['id'];
+            $stmt->execute($params);
         }
 
         /* ----------------------------
-           UPDATE adresse (si modifié)
+          UPDATE adresse (si modifié)
         ---------------------------- */
         if (!empty($chgAdresse)) {
+            $fields = $chgAdresse;
+            unset($fields['id']); // retire 'id' pour la partie SET
+
             $sql = "UPDATE cobrec1._adresse SET ";
-            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($chgAdresse)));
+            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($fields)));
             $sql .= " WHERE id_compte = :id";
 
             $stmt = $pdo->prepare($sql);
-            $chgAdresse['id'] = $compte_id;
-            $stmt->execute($chgAdresse);
+
+            $params = $fields;
+            $params['id'] = $chgAdresse['id'];
+            $stmt->execute($params);
         }
 
     } catch (PDOException $e) {
         die("Erreur lors de la mise à jour : " . htmlspecialchars($e->getMessage()));
     }
+
 
     header("Location: index.php");
     exit;
@@ -185,7 +187,7 @@ function safe($array, $key, $default = "") {
           <img src="<?= str_replace("html/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>" alt="Photo vendeur">
         </div>
 
-        <form id="edit-form" class="edit-form" action="" method="POST">
+        <form id="edit-form" class="edit-form" action="" method="POST" onsubmit="alert('form envoyé');">
 
           <div class="form-row">
             <label>Pseudo</label>
