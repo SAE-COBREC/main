@@ -2,30 +2,38 @@
     session_start();
     include '../../selectBDD.php';
 
-    
-    $id_client = $_SESSION['idClient'];
-    $pdo->exec("SET search_path TO cobrec1");
-    $requetePanier = "
-        SELECT DISTINCT ON (_produit.id_produit)
-        _produit.id_produit,
-        p_nom, p_description, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt
-        FROM _contient
-        JOIN _produit ON _produit.id_produit = _contient.id_produit
-        JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
-        JOIN _image ON _represente_produit.id_image = _image.id_image
-        JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
-        JOIN _tva ON _produit.id_tva = _tva.id_tva 
-        WHERE id_client = :id_client
-        AND _panier_commande.id_panier = :id_panier;
-    ";
+    if (isset($_SESSION['idClient'])){
+        $id_client = $_SESSION['idClient'];
 
-    $stmt = $pdo->prepare($requetePanier);
-    $stmt->execute([
-        ':id_client' => $id_client,
-        ':id_panier' => $_SESSION['panierEnCours']
-    ]);
+        $pdo->exec("SET search_path TO cobrec1");
+        
+        $requetePanier = "
+            SELECT DISTINCT ON (_produit.id_produit)
+            _produit.id_produit,
+            p_nom, p_description, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt
+            FROM _contient
+            JOIN _produit ON _produit.id_produit = _contient.id_produit
+            JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
+            JOIN _image ON _represente_produit.id_image = _image.id_image
+            JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
+            JOIN _tva ON _produit.id_tva = _tva.id_tva 
+            WHERE id_client = :id_client
+            AND _panier_commande.id_panier = :id_panier;
+        ";
 
-    $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
+        $stmt = $pdo->prepare($requetePanier);
+        
+        $stmt->execute([
+            ':id_client' => $id_client,
+            ':id_panier' => $_SESSION['panierEnCours']
+        ]);
+
+        
+        $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
+    } else {
+        $panierTemp = $_SESSION['panierTemp'];   
+    }
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -47,8 +55,8 @@
         
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
         <section class="articlesPrixP">
-            
-        <?php if (count($articles) > 0):?>
+
+        <?php if (isset($_SESSION['idClient']) && count(isset($articles)) > 0):?>
             
             <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
             <div>
@@ -106,8 +114,41 @@
                 </form>
             </aside>
 
-        <?php else:?>
+        <!-- SI LE CLIENT N'EST PAS CONNECTÉ -->
+        <?php elseif (count($panierTemp)): ?>
+            <?php foreach ($panierTemp as $article): ?>
+                <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
+                                                data-stock="<?php echo intval($article['p_stock'])?>"
+                                                data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
+                    <div class="imageArticleP">
+                        <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
+                            alt="<?php echo htmlspecialchars($article['i_alt']) ?>" 
+                            title="<?php echo htmlspecialchars($article['i_title'])?>">
+                    </div>
+                    <div class="articleDetailP">
+                        <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                        <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
+                        <div class="basArticleP">
+                            <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
+                            <div class="quantite">
 
+                                <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
+                                <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
+                                    <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>"> <!--stock l'id du produit pour la suppression-->
+                                    <!--bouton pour envoyer le formulaire-->
+                                    <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg" alt="Supprimer"/></button>
+                                </form>
+                                <button class="btn_moins">-</button>
+                                <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
+                                <button class="btn_plus">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            <?php endforeach;?>
+        
+        <?php else: ?>
         <div id="panierVide">
             <img id="panierVide" src="/img/svg/panier-empty.svg"/> 
             <a href="/" id="retourAchat">Continuer mes achats</a>
@@ -201,7 +242,7 @@
                     value = verifieStockMax(value, stockMax);
                     input.value = value;
                     updateRecap(); //appel de la fonction updateRecap
-                    saveQuantite(idProduit, value);//update la quantité avec la fonction 
+                    saveQuantite(idProduit, input.value);//update la quantité avec la fonction 
                 });
                 
                 //bouton -
@@ -210,7 +251,7 @@
                     if  (value > 1){ //l'utilisateur ne dépasse pas 1 il sera jamais a 0
                         input.value = value - 1;
                         updateRecap();
-                        saveQuantite(idProduit, value);//update la quantité avec la fonction 
+                        saveQuantite(idProduit, input.value);//update la quantité avec la fonction 
                     }
                 });
                 
