@@ -15,12 +15,6 @@ $_SESSION['creeArticle']=[];
   <link rel="icon" type="image/png" href="../../img/favicon.svg">
   <link
     rel="stylesheet">
-  <style>
-    /* Local fonts: Baloo 2 and Quicksand */
-    @font-face { font-family: 'Baloo 2'; src: url('../../fonts/baloo.regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
-    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 300; font-style: normal; font-display: swap; }
-    @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
-  </style>
   <link rel="stylesheet" href="../../../styles/Register/styleRegister.css">
 </head>
 

@@ -1,5 +1,5 @@
 * {
-  font-family: "Quicksand";
+  font-family: "Quicksand", sans-serif;
 }
 
 body {
@@ -64,7 +64,7 @@ body.centered {
   margin-right: 8px;
 }
 .card h1 {
-  font-family: "Baloo 2", cursive;
+  font-family: "Baloo", sans-serif;
   font-size: 36px;
   color: #030212;
 }
@@ -444,4 +444,4 @@ body.centered {
   .debutant > a:hover {
     color: #030212;
   }
-}/*# sourceMappingURL=styleRegister.css.map */
+}/*# sourceMappingURL=styleCoCrea.css.map */

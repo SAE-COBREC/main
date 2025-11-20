@@ -2,13 +2,13 @@
 @use "../variable" as *;
 
 * {
-  font-family: "Quicksand";
+  font-family: $font-family-secondaire;
 }
 
 body {
   min-height: 100vh;
   font-size: 24px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: $font-family-secondaire;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -69,7 +69,7 @@ body {
   }
 
   h1 {
-    font-family: 'Baloo 2', cursive;
+    font-family: $font-family-primaire;
     font-size: 36px;
     color: $primary-color-noir;
 

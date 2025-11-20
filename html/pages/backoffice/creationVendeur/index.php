@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 300; font-style: normal; font-display: swap; }
     @font-face { font-family: 'Quicksand'; src: url('../../fonts/quicksand.light-regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
   </style>
-  <link rel="stylesheet" href="../../../styles/Register/styleRegister.css">
+  <link rel="stylesheet" href="../../../styles/Connexion_Creation/styleCoCrea.css">
 </head>
 
 <?php
