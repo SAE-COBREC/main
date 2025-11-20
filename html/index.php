@@ -31,7 +31,7 @@ if ($idClient === null) {
         WHERE timestamp_commande IS NULL
         AND id_client = :idClient
     ";
-    $stmtPanier = $pdo->prepare($sqlPanierClient);
+    $stmtPanier = $connexionBaseDeDonnees->prepare($sqlPanierClient);
     $stmtPanier->execute([":idClient" => $idClient]);
     $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
 
@@ -43,14 +43,14 @@ if ($idClient === null) {
             VALUES (:idClient, NULL)
             RETURNING id_panier
         ";
-        $stmtCreate = $pdo->prepare($sqlCreatePanier);
+        $stmtCreate = $connexionBaseDeDonnees->prepare($sqlCreatePanier);
         $stmtCreate->execute([":idClient" => $idClient]);
         $idPanier = (int) $stmtCreate->fetchColumn();
     }
 
     $_SESSION["panierEnCours"] = $idPanier;
 
-    transfererPanierTempVersBDD($pdo, $idPanier);
+    transfererPanierTempVersBDD($connexionBaseDeDonnees, $idPanier);
 }
 
 //gérer l'ajout au panier via AJAX
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     if ($idClient === null) {
         //utilisateur non connecté : utiliser le panier temporaire en SESSION
-        $resultat = ajouterArticleSession($pdo, $idProduit, $quantite);
+        $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
     } else {
         //utilisateur connecté : utiliser le panier en BDD
         $idPanier = $_SESSION['panierEnCours'] ?? null;
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             exit;
         }
 
-        $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
+        $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
     }
 
     echo json_encode($resultat);
@@ -170,13 +170,13 @@ function preparercategories_affichage($listeCategories)
 }
 
 //chargement des données depuis la base de données
-$donnees = chargerProduitsBDD($pdo);
+$donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
 
 $tousLesProduits = count($listeProduits);
 
-$prixMaximumDynamique = getPrixMaximum($pdo);
+$prixMaximumDynamique = getPrixMaximum($connexionBaseDeDonnees);
 
 //récupère les valeurs des filtres depuis le formulaire
 $categorieFiltre = $_POST['category'] ?? 'all';
