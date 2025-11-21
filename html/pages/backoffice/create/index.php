@@ -211,6 +211,11 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 unset($_FILES["photo"]["name"][$key]);
                 unset($_FILES["photo"]["tmp_name"][$key]);
             }
+            if (str_starts_with($_FILES["photo"]["type"][$key], 'image/') == false){
+                unset($_FILES["photo"]["name"][$key]);
+                unset($_FILES["photo"]["tmp_name"][$key]);
+                $_SESSION['creerArticle']['pasImage'] = true;
+            }
         }
 
         foreach ($_SESSION["creerArticle"]["tmp_file"]["name"] as $key => $value) {//suppression de tous les éléménts de $_SESSION["creerArticle"]["tmp_file"]
@@ -261,6 +266,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
     $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'] = [];
     $_SESSION['creerArticle']['imageTropVolumineuse'] = false;
+    $_SESSION['creerArticle']['pasImage'] = false;
     $_POST["titre"] = '';
     $_POST["description"] ='';
     $_POST["photo"] ='';
@@ -445,7 +451,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             <?php
                         }
                         if (empty($_SESSION['creerArticle']['imageTropVolumineuse'])){
-                            $_SESSION['creerArticle']['imageTropVolumineuse'] = '';
+                            $_SESSION['creerArticle']['imageTropVolumineuse'] = false;
                         }
                         if($_SESSION['creerArticle']['imageTropVolumineuse']){
                             ?>
@@ -455,6 +461,21 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             echo 'Au moins une de vos images fait plus de 5MB. Les images dépassant la taille maximale ne seront pas téléversés.';
                             $_SESSION["creerArticle"]["warn"]++;
                             $_SESSION['creerArticle']['imageTropVolumineuse'] = false;
+                            ?></small>
+                            <?php
+                        }
+                        
+                        if (empty($_SESSION['creerArticle']['pasImage'])){
+                            $_SESSION['creerArticle']['pasImage'] = false;
+                        }
+                        if($_SESSION['creerArticle']['pasImage']){
+                            ?>
+                            <br>
+
+                            <small class="warn"><?php
+                            echo "Au moins un de vos fichiers n'est pas une image." . " Les fichiers n'étant pas des images" . ' ne seront pas téléversés.';
+                            $_SESSION["creerArticle"]["warn"]++;
+                            $_SESSION['creerArticle']['pasImage'] = false;
                             ?></small>
                             <?php
                         }
@@ -1154,7 +1175,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
 <script>
     alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
-    //document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+    document.location.href = "/pages/backoffice/connexionVendeur/index.php";
 </script>
 <?php
     }

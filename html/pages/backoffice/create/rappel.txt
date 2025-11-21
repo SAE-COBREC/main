@@ -9,4 +9,4 @@ créer et modif promo
                     //     unlink($value);
                     // }
 
-^ dans page ctaalogue vendeur
+^ dans page catalogue vendeur

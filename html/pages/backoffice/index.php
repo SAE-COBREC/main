@@ -12,6 +12,10 @@ $vendeur_id = $_SESSION['vendeur_id'];
 
 // Initialisation d'un tableau vide pour stocker éventuellement de nouveaux articles
 $_SESSION['creerArticle'] = [];
+$fichiers = glob('create/temp_/*');
+foreach ($fichiers as $value) {
+  unlink($value);
+}
 
 try {
     // Requête SQL pour récupérer les produits du vendeur avec leurs catégories et images
