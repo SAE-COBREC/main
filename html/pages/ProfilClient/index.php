@@ -604,7 +604,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Code postal</span>
-                    <input type="text" name="code_postal" id="modification_code_postal" pattern="(?:0[1-9]|[1-8]\d|9[0-8])\d{3}"  required>
+                    <input type="text" name="code_postal" id="modification_code_postal" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
+            placeholder="ex: 22300" required>
                 </label>
 
                 <label>
@@ -635,9 +636,10 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <input type="text" name="ville" id="ajout_ville" required>
                 </label>
 
-                <label>
+                <label>2em
                     <span>Code postal</span>
-                    <input type="text" name="code_postal" id="ajout_code_postal" pattern="(?:0[1-9]|[1-8]\d|9[0-8])\d{3}"  required>
+                    <input type="text" name="code_postal" id="ajout_code_postal" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
+            placeholder="ex: 22300" required>
                 </label>
 
                 <label>
