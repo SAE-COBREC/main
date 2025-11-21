@@ -15,6 +15,7 @@ try {
             v.raison_sociale AS rsociale,
             v.siren AS siren,
             c.id_compte AS compte,
+            c.mdp,
             c.email AS email,
             c.num_telephone AS telephone,
             a.a_adresse AS adresse,
@@ -92,6 +93,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'val' => trim($_POST['siren']),
             'id'  => $vendeur_id
         ]);
+    }
+
+    /* ---------------------------------------------------------
+      TRAITEMENT DU CHANGEMENT DE MDP (en clair)
+    --------------------------------------------------------- */
+    if (isset($_POST['change_password'])) {
+
+        $old = trim($_POST['old_password']);
+        $new = trim($_POST['new_password']);
+        $confirm = trim($_POST['confirm_password']);
+
+        // Récupération du mot de passe actuel en BDD
+        $stmt = $pdo->prepare("SELECT mdp FROM cobrec1._compte WHERE id_compte = :id");
+        $stmt->execute(['id' => $vendeur['compte']]);
+        $oldPasswordDB = $stmt->fetchColumn();
+
+        // Vérif ancien mot de passe
+        if ($old !== $oldPasswordDB) {
+            $error = "L'ancien mot de passe est incorrect.";
+        }
+        // Vérif correspondance nouveau/conf
+        elseif ($new !== $confirm) {
+            $error = "Les nouveaux mots de passe ne correspondent pas.";
+        }
+        // Mise à jour
+        else {
+            $stmt = $pdo->prepare("
+                UPDATE cobrec1._compte
+                SET mdp = :new
+                WHERE id_compte = :id
+            ");
+            $stmt->execute([
+                'new' => $new,
+                'id'  => $vendeur['compte']
+            ]);
+
+            header("Location: index.php?password_success=1");
+            exit;
+        }
     }
 
 
@@ -188,38 +228,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* ---------------------------------------------------------
       4. Mise à jour de l'image du vendeur
-      --------------------------------------------------------- */
-      if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    --------------------------------------------------------- */
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 
-          // Dossier cible
-          $uploadDir = "../../../img/photo/";
-          
-          // Nom unique
-          $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-          $filename = "vendeur_" . $vendeur['compte'] . "_" . time() . "." . $ext;
+        // Dossier cible
+        $uploadDir = "../../../img/photo/";
 
-          // Chemin final
-          $filePath = $uploadDir . $filename;
+        // Nom unique
+        $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $filename = "vendeur_id_" . $vendeur['compte'] . "." . $ext;
 
-          // Déplace le fichier
-          if (move_uploaded_file($_FILES['image']['tmp_name'], $filePath)) {
+        // Chemin final disque
+        $filePath = $uploadDir . $filename;
 
-              // Nettoyage pour le chemin dans la BDD
-              $dbPath = "html/img/photo/" . $filename;
-              $ImageId = $vendeur['id_image'];
+        // Déplace le fichier
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $filePath)) {
 
-              /* ---- 1) Insérer l'image dans _image ---- */
-              $stmt = $pdo->prepare("
-                  UPDATE cobrec1._image
-                  SET id_image = :lien
-                  WHERE id_image = :img
-              ");
+            // Chemin à enregistrer dans la BDD
+            $dbPath = "html/img/photo/" . $filename;
 
-              $stmt->execute([
-                    'img' => $ImageId,
-                    'lien' => $dbPath
-              ]);
-      }
+            // Récupérer ancienne image pour la supprimer
+            $oldImagePathDB = $vendeur['image'];  
+            $oldImagePathDisk = str_replace("html/img/photo", "../../../img/photo", $oldImagePathDB);
+
+            // Supprimer l'ancienne image si elle existe ET si ce n’est pas une image par défaut
+            if (!empty($oldImagePathDB) && file_exists($oldImagePathDisk)) {
+                unlink($oldImagePathDisk);
+            }
+
+            // Mise à jour du lien dans _image
+            $stmt = $pdo->prepare("
+                UPDATE cobrec1._image
+                SET i_lien = :lien
+                WHERE id_image = :img
+            ");
+            $stmt->execute([
+                'lien' => $dbPath,
+                'img'  => $vendeur['id_image']
+            ]);
+        }
     }
 
     /* ---------------------------------------------------------
@@ -273,55 +320,201 @@ function safe($array, $key, $default = "") {
 
           <div class="form-row">
             <label>Pseudo</label>
-            <input type="text" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>">
+            <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
+            <span class="error" id="error-pseudo"></span>
           </div>
 
           <div class="form-row">
             <label>Raison sociale</label>
-            <input type="text" name="rsociale" value="<?= safe($vendeur, 'rsociale') ?>">
+            <input type="text" id="rsociale" name="rsociale" value="<?= safe($vendeur, 'rsociale') ?>" required>
+            <span class="error" id="error-rsociale"></span>
           </div>
 
           <div class="form-row">
             <label>SIREN</label>
-            <input type="text" name="siren" value="<?= safe($vendeur, 'siren') ?>">
+            <input type="text" id="siren" name="siren" value="<?= safe($vendeur, 'siren') ?>" required>
+            <span class="error" id="error-siren"></span>
           </div>
 
           <div class="form-row">
             <label>Email</label>
-            <input type="email" name="email" value="<?= safe($vendeur, 'email') ?>">
+            <input type="email" id="email" name="email" value="<?= safe($vendeur, 'email') ?>" required>
+            <span class="error" id="error-email"></span>
           </div>
 
           <div class="form-row">
             <label>Téléphone</label>
-            <input type="text" name="telephone" value="<?= safe($vendeur, 'telephone') ?>">
+            <input type="text" id="telephone" name="telephone" value="<?= safe($vendeur, 'telephone') ?>" required>
+            <span class="error" id="error-telephone"></span>
           </div>
 
           <div class="form-row">
             <label>Adresse</label>
-            <input type="text" name="adresse" value="<?= safe($vendeur, 'adresse') ?>">
+            <input type="text" id="adresse" name="adresse" value="<?= safe($vendeur, 'adresse') ?>" required>
+            <span class="error" id="error-adresse"></span>
           </div>
 
           <div class="form-row">
             <label>Ville</label>
-            <input type="text" name="ville" value="<?= safe($vendeur, 'ville') ?>">
+            <input type="text" id="ville" name="ville" value="<?= safe($vendeur, 'ville') ?>" required>
+            <span class="error" id="error-ville"></span>
           </div>
 
           <div class="form-row">
             <label>Code postal</label>
-            <input type="text" name="codep" value="<?= safe($vendeur, 'codep') ?>">
+            <input type="text" id="codep" name="codep" value="<?= safe($vendeur, 'codep') ?>" required>
+            <span class="error" id="error-codep"></span>
           </div>
 
           <div class="form-row">
             <label>Complément</label>
-            <input type="text" name="complement" value="<?= safe($vendeur, 'complement') ?>">
+            <input type="text" id="complement" name="complement" value="<?= safe($vendeur, 'complement') ?>">
+            <span class="error" id="error-complement"></span>
           </div>
 
           <button class="btn btn--primary" type="submit">Enregistrer</button>
         </form>
-
       </div>
+
+      <!-- ===== FORMULAIRE DE MODIFICATION DU MOT DE PASSE ===== -->
+
+      <?php if (isset($_GET['success_pwd'])): ?>
+        <div class="alert-success">Mot de passe modifié avec succès !</div>
+      <?php endif; ?>
+
+      <div class="profil-card mt-4">
+
+        <h2 class="profil-card__title">Modifier mon mot de passe</h2>
+
+        <form id="form-password" method="POST" class="edit-form">
+
+            <div class="form-row">
+                <label for="old_password">Ancien mot de passe</label>
+                <input type="password" id="old_password" name="old_password" required>
+                <span class="error" id="error-old_password"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="new_password">Nouveau mot de passe</label>
+                <input type="password" id="new_password" name="new_password" required>
+                <span class="error" id="error-new_password"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="confirm_password">Confirmer le mot de passe</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+                <span class="error" id="error-confirm_password"></span>
+            </div>
+
+            <button class="btn btn--primary" type="submit">Modifier mon mot de passe</button>
+
+        </form>
+      </div>
+
 
     </main>
   </div>
+  <script>
+    // REGEX
+    const regex = {
+        pseudo: /^[a-zA-Z0-9 _-]{2,30}$/,
+        rsociale: /^[a-zA-Z0-9À-ÿ' -]{2,50}$/,
+        siren: /^[0-9]{9}$/,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        telephone: /^(?:\+33|0)[1-9](?:[0-9]{8})$/,
+        adresse: /^[0-9a-zA-ZÀ-ÿ,' .-]{3,80}$/,
+        ville: /^[a-zA-ZÀ-ÿ' -]{2,50}$/,
+        codep: /^[0-9]{5}$/,
+        complement: /^[0-9a-zA-ZÀ-ÿ,' .-]{0,80}$/
+    };
+
+    // Fonction de validation pour un champ
+    function validateField(id) {
+        const field = document.getElementById(id);
+        const error = document.getElementById("error-" + id);
+        const pattern = regex[id];
+
+        if (!field) return;
+
+        const value = field.value.trim();
+
+        // Si champ vide → pas d’erreur visuelle
+        if (value === "") {
+            field.classList.remove("invalid", "valid");
+            error.textContent = "";
+            return;
+        }
+
+        // Si correspond
+        if (pattern.test(value)) {
+            field.classList.remove("invalid");
+            field.classList.add("valid");
+            error.textContent = "";
+        } 
+        else {
+            field.classList.remove("valid");
+            field.classList.add("invalid");
+            error.textContent = "Valeur invalide pour " + id;
+        }
+    }
+
+    // Liste des champs à vérifier
+    const fields = [
+        "pseudo",
+        "rsociale",
+        "siren",
+        "email",
+        "telephone",
+        "adresse",
+        "ville",
+        "codep",
+        "complement"
+    ];
+
+    // Activation de la validation live
+    fields.forEach(id => {
+        let field = document.getElementById(id);
+        if (field) {
+            field.addEventListener("input", () => validateField(id));
+        }
+    });
+
+    // REGEX pour mot de passe sécurisé : 1 maj, 1 min, 1 chiffre, 8+ caractères
+    const regexPwd = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$/; 
+
+    // Validation du nouveau mot de passe
+    document.getElementById("new_password").addEventListener("input", function () {
+        const field = this;
+        const error = document.getElementById("error-new_password");
+
+        if (regexPwd.test(field.value)) {
+            field.classList.add("valid");
+            field.classList.remove("invalid");
+            error.textContent = "";
+        } else {
+            field.classList.remove("valid");
+            field.classList.add("invalid");
+            error.textContent =
+                "Min 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et un caractère spéciale.";
+        }
+    });
+
+    // Validation de la confirmation
+    document.getElementById("confirm_password").addEventListener("input", function () {
+        const newPwd = document.getElementById("new_password").value;
+        const field = this;
+        const error = document.getElementById("error-confirm_password");
+
+        if (field.value === newPwd && field.value !== "") {
+            field.classList.add("valid");
+            field.classList.remove("invalid");
+            error.textContent = "";
+        } else {
+            field.classList.remove("valid");
+            field.classList.add("invalid");
+            error.textContent = "Les mots de passe ne correspondent pas.";
+        }
+    });
+  </script>
 </body>
 </html>

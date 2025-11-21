@@ -148,3 +148,16 @@ body {
     transform: translateY(0);
   }
 }
+
+.error {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 2px;
+    display: block;
+}
+.valid {
+    border: 2px solid #4CAF50 !important;
+}
+.invalid {
+    border: 2px solid red !important;
+}
