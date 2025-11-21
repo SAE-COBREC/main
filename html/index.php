@@ -49,15 +49,16 @@ if ($idClient === null) {
     }
 
     $_SESSION["panierEnCours"] = $idPanier;
+
     transfererPanierTempVersBDD($connexionBaseDeDonnees, $idPanier);
 }
 
-// GESTION AJOUT AU PANIER VIA AJAX : CORRECTION
+//gérer l'ajout au panier via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
-    // Correction : désactiver l'affichage des erreurs PHP
+    //désactiver l'affichage des erreurs PHP
     ini_set('display_errors', 0);
     error_reporting(0);
-    // Nettoyer les buffers (par sécurité)
+    //nettoyer les buffers (par sécurité)
     while (ob_get_level()) { ob_end_clean(); }
     header('Content-Type: application/json');
 
@@ -70,13 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
 
-    // Correction : envelopper l'appel dans un try-catch
+    //envelopper l'appel dans un try-catch
     try {
         if ($idClient === null) {
-            // utilisateur non connecté : utiliser le panier temporaire en SESSION
+            //utilisateur non connecté : utiliser le panier temporaire en SESSION
             $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
         } else {
-            // utilisateur connecté : utiliser le panier en BDD
+            //utilisateur connecté : utiliser le panier en BDD
             $idPanier = $_SESSION['panierEnCours'] ?? null;
             if (!$idPanier) {
                 echo json_encode(['success' => false, 'message' => 'Aucun panier en cours pour ce client']);
