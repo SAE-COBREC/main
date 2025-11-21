@@ -6,7 +6,7 @@ session_start();
 include '../../selectBDD.php';
 
 //inclure les fonctions utilitaires
-include '../fonctions.php'; 
+include '../fonctions.php';
 
 //récupérer la connexion PDO depuis le fichier de configuration
 $connexionBaseDeDonnees = $pdo;
@@ -370,8 +370,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div>
                                 <label>
                                     <span>Téléphone</span>
-                                    <input type="tel" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}"
-          maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+                                    <input type="tel" name="telephone" inputmode="numeric"
+                                        pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10"
+                                        placeholder="ex: 0615482649" required
+                                        title="Le numéro de télephone doit contenir 10 chiffres"
+                                        oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
                                         value="<?php echo htmlspecialchars($donneesInformationsClient['num_telephone'] ?? ''); ?>">
                                 </label>
                             </div>
@@ -605,8 +608,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Code postal</span>
-                    <input type="text" name="code_postal" id="modification_code_postal" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
-            placeholder="ex: 22300" required>
+                    <input type="text" name="code_postal" id="modification_code_postal" inputmode="numeric"
+                        pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
+                        placeholder="ex: 22300" required>
                 </label>
 
                 <label>
@@ -639,8 +643,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>2em
                     <span>Code postal</span>
-                    <input type="text" name="code_postal" id="ajout_code_postal" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
-            placeholder="ex: 22300" required>
+                    <input type="text" name="code_postal" id="ajout_code_postal" inputmode="numeric"
+                        pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
+                        placeholder="ex: 22300" required>
                 </label>
 
                 <label>
