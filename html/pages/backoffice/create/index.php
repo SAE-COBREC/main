@@ -7,7 +7,7 @@
     const NB_IMGS_MAX = 3;
     const EMPLACEMENT_DES_IMGS = '/img/photo/';
 
-    if($_SESSION['vendeur_id'] != null){
+    if(empty($_SESSION['vendeur_id']) === false){
         /*try {//Affiliation id_utilisateur id_vendeur
             $sql = '
             SELECT id_vendeur FROM cobrec1._vendeur WHERE id_compte = ' . $_SESSION['vendeur_id'] . ';'
@@ -99,16 +99,16 @@
                         $_FILES["photo"]["name"] = [];
                         $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
                         $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
-                        $_SESSION["creerArticle"]["_FILES"]['name'] = [];
+                        $_SESSION["creerArticle"]["_FILES"]['photo']['name'] = [];
                         foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
-                            $_SESSION["creerArticle"]["_FILES"]['name'][$key] = $value['i_title'];
-                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace('/img/photo', '../../../img/photo',$value['i_lien']);
-                            // $_SESSION["creerArticle"]["_FILES"]['name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['name'][$key]);
-                            // $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key]);
-                            $_SESSION["creerArticle"]["_FILES"]['name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['name'][$key]);
-                            $_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key]);
-                            copy($_SESSION["creerArticle"]["_FILES"]['tmp_name'][$key], 
-                            'temp_/' . $_SESSION["creerArticle"]["_FILES"]['name'][$key]);
+                            $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] = $value['i_title'];
+                            $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace('/img/photo', '../../../img/photo',$value['i_lien']);
+                            // $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
+                            // $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key]);
+                            $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
+                            $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key]);
+                            copy($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key], 
+                            'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
                         }
                         $_POST = [];
                         $_POST["titre"] = str_replace("''","'", $_SESSION["creerArticle"]['_GET']['p_nom']);
@@ -177,29 +177,29 @@ $warnPromo = false;
 if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
     function decalage($aDecaler){
-        //unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
-        if (empty($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler])){
+        //unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$aDecaler-1]);
+        if (empty($_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$aDecaler])){
             //L'image $aDecaler n'existe pas. Décalage interrompu. Suppression de l'image $aDecaler-1.
-            unset($_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1]);
-            unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$aDecaler-1]);
+            unset($_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$aDecaler-1]);
+            unset($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$aDecaler-1]);
         }else{
             //L'image $aDecaler existe. Décalage. L'image $aDecaler-1 originale est écrasée.
-            $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler-1] = $_SESSION["creerArticle"]["_FILES"]["name"][$aDecaler];
-            $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$aDecaler-1] = $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$aDecaler];
+            $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$aDecaler-1] = $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$aDecaler];
+            $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$aDecaler-1] = $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$aDecaler];
         }
     }
 
     function supprDeTemp($aSuppr){
-        unset($_SESSION["creerArticle"]["tmp_file"]["tmp_name"][array_search($_SESSION["creerArticle"]["_FILES"]["name"][$aSuppr], $_SESSION["creerArticle"]["tmp_file"]["name"])]);
-        unset($_SESSION["creerArticle"]["tmp_file"]["name"][array_search($_SESSION["creerArticle"]["_FILES"]["name"][$aSuppr], $_SESSION["creerArticle"]["tmp_file"]["name"])]);
+        unset($_SESSION["creerArticle"]["tmp_file"]["tmp_name"][array_search($_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$aSuppr], $_SESSION["creerArticle"]["tmp_file"]["name"])]);
+        unset($_SESSION["creerArticle"]["tmp_file"]["name"][array_search($_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$aSuppr], $_SESSION["creerArticle"]["tmp_file"]["name"])]);
     }
 
     function supprDeDef(){
-        //unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
-        unset($_SESSION["creerArticle"]["_FILES"]["name"][NB_IMGS_MAX-1]);
-        unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][NB_IMGS_MAX-1]);
+        //unlink('temp_/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][NB_IMGS_MAX-1]);
+        unset($_SESSION["creerArticle"]["_FILES"]["photo"]["name"][NB_IMGS_MAX-1]);
+        unset($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][NB_IMGS_MAX-1]);
     }
-    if (empty($_POST["btn_moins0"]) != false){
+    if (empty($_POST["btn_moins0"]) == false){
         //suppression de l'image 0 dans $_SESSION["creerArticle"]["tmp_file"]
         supprDeTemp(0);
         //écrasement de l'image 0 originale par l'image 1
@@ -208,24 +208,24 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
         decalage(2);
         //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
         supprDeDef();
-    }elseif (empty($_POST["btn_moins1"]) != false){
+    }elseif (empty($_POST["btn_moins1"]) == false){
         //suppression de l'image 1 dans $_SESSION["creerArticle"]["tmp_file"]
         supprDeTemp(1);
         //écrasement de l'image 1 originale par l'image 2
         decalage(2);
         //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
         supprDeDef();
-    }elseif (empty($_POST["btn_moins2"]) != false){
+    }elseif (empty($_POST["btn_moins2"]) == false){
         //suppression de l'image 2 dans $_SESSION["creerArticle"]["tmp_file"]
         supprDeTemp(2);
         //L'image 2 est supprimée pour éviter toute duplication résultante du décalage.
         supprDeDef();
     }
 
-    if (empty($_FILES["photo"]["name"][0])){
-        $_FILES["photo"]["name"][0] = '';
-    }
-    if ($_FILES["photo"]["name"][0] !== ''){//Si au moins un fichier a été déposé
+    // if (empty($_FILES["photo"]["name"][0])){
+    //     $_FILES["photo"]["name"][0] = '';
+    // }
+    if (empty($_FILES["photo"]["name"][0]) == false){//Si au moins un fichier a été déposé
 
         foreach ($_FILES["photo"]["name"] as $key => $value) {//chgt noms pour éviter pbs lors du déplacement de l'img
             $_FILES["photo"]["name"][$key] = str_replace(' ', '_',$_FILES["photo"]["name"][$key]);
@@ -238,18 +238,18 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             }
         }
 
-        foreach ($_SESSION["creerArticle"]["tmp_file"]["name"] as $key => $value) {//suppression de tous els éléménts de $_SESSION["creerArticle"]["tmp_file"]
+        foreach ($_SESSION["creerArticle"]["tmp_file"]["name"] as $key => $value) {//suppression de tous les éléménts de $_SESSION["creerArticle"]["tmp_file"]
             //sert à éviter de se retrouver avec des images censées avoir été oubliées
             unset($_SESSION["creerArticle"]["tmp_file"]["name"][$key]);
             unset($_SESSION["creerArticle"]["tmp_file"]["tmp_name"][$key]);
         }
 
-        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {//repeuplement de $_SESSION["creerArticle"]["tmp_file"] avec $_SESSION["creerArticle"]["_FILES"]
+        foreach ($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] as $key => $value) {//repeuplement de $_SESSION["creerArticle"]["tmp_file"] avec $_SESSION["creerArticle"]["_FILES"]
             //sert à préserver les images auparavant enregistrées 
             $_SESSION["creerArticle"]["tmp_file"]["name"][$key] = 
-                $_SESSION["creerArticle"]["_FILES"]["name"][$key];
+                $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$key];
             $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][$key] = 
-                $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key];
+                $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key];
         }
 
         for ($i=0; (($i<NB_IMGS_MAX) && ($i < count($_FILES["photo"]["name"]))) ; ) {//transfert des 3 dernières images de _FILES
@@ -262,29 +262,29 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
         $i=0;
         foreach ($_SESSION["creerArticle"]["tmp_file"]["name"] as $key => $value) {//transfert des 3 dernières images de $_SESSION["creerArticle"]["tmp_file"]
             //permet d'éviter problèmes causés par suppression d'images
-            $_SESSION["creerArticle"]["_FILES"]["name"][(count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i) % NB_IMGS_MAX] = 
+            $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][(count($_SESSION["creerArticle"]["tmp_file"]["name"])-1-$i) % NB_IMGS_MAX] = 
                 $value;
-            $_SESSION["creerArticle"]["_FILES"]["tmp_name"][(count($_SESSION["creerArticle"]["tmp_file"]["tmp_name"])-1-$i) % NB_IMGS_MAX] = 
+            $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][(count($_SESSION["creerArticle"]["tmp_file"]["tmp_name"])-1-$i) % NB_IMGS_MAX] = 
                 $_SESSION["creerArticle"]["tmp_file"]["tmp_name"][$key];
             $i++;
             $i %= NB_IMGS_MAX;
         }
             
         
-        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+        foreach ($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] as $key => $value) {
             if ($value === null){//permet d'avoir un affichage qui ne parait pas bizarre
-                unset($_SESSION["creerArticle"]["_FILES"]["name"][$key]);
-                unset($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key]);
+                unset($_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$key]);
+                unset($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key]);
             }
         }
     }
 
 } else {//Initialisation des tablaux pour éviter problèmes de comparaison avec des valeurs nulls
     $_FILES["photo"]["name"] = [];
-    $_SESSION["creerArticle"]["_FILES"]['name'] = [];
+    $_SESSION["creerArticle"]["_FILES"]['photo']['name'] = [];
     $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
     $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
-    $_SESSION["creerArticle"]["_FILES"]['tmp_name'] = [];
+    $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'] = [];
     $_SESSION['creerArticle']['imageTropVolumineuse'] = false;
     $_POST["titre"] = '';
     $_POST["description"] ='';
@@ -303,7 +303,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     $_POST["prix"] =null;
 
 }
-
 ?></pre>
 <body>
     <?php
@@ -447,7 +446,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         if (empty($_POST["btn_maj"])){
                             $_POST["btn_maj"] = '';
                         }
-                        if ((($_SESSION["creerArticle"]["_FILES"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
+                        if ((($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
                         if (empty($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0])){
                             $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] = 0;
                         }
@@ -458,7 +457,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         ?>" />
                         <?php
                         
-                        if (($_SESSION["creerArticle"]["_FILES"]["name"] === [])) {
+                        if (($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] === [])) {
                             ?>
                             <br>
 
@@ -485,17 +484,23 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         
                         ?>
                         <br>
-                        <small><?php echo count($_SESSION["creerArticle"]["_FILES"]["name"]);?>
+                        <small><?php 
+                            if(empty($_SESSION["creerArticle"]["_FILES"]["photo"]["name"])){
+                                echo 0;
+                            }else{
+                                echo count($_SESSION["creerArticle"]["_FILES"]["photo"]["name"]);
+                            }
+                        ?>
                             /<?php echo NB_IMGS_MAX;?></small>
                         
                         <?php
                         
-                        foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+                        foreach ($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] as $key => $value) {
                             ?><br>
                             <small>
                                 <img src="<?php 
-                                if ((str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'https://')) || (str_starts_with($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key],'http://'))){
-                                    echo $_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key];
+                                if ((str_starts_with($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key],'https://')) || (str_starts_with($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key],'http://'))){
+                                    echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key];
                                 }else{
                                     echo 'temp_/' . $value;
                                 }
@@ -756,7 +761,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 <?php 
                     if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '')){
                         // print_r("WARNS : " . $_SESSION["creerArticle"]["warn"]);
-                            // print_r($_SESSION["creerArticle"]["_FILES"]["name"]);
+                            // print_r($_SESSION["creerArticle"]["_FILES"]["photo"]["name"]);
                             
                             $svg_titre = $_POST['titre'];
                             $svg_desc = $_POST['description'];
@@ -856,9 +861,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             }
                             
                             
-                            foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
+                            foreach ($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] as $key => $value) {
                                 
-                                move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key], 
+                                move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key], 
                                     'temp_/' . $value);
 
                                 try {//création des images
@@ -1042,8 +1047,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                     
 
-                    foreach ($_SESSION["creerArticle"]["_FILES"]["name"] as $key => $value) {
-                        move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$key], 
+                    foreach ($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] as $key => $value) {
+                        move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key], 
                                 'temp_/' . $value);
 
                         $value = str_replace($_SESSION["creerArticle"]['_GET']['id_produit'] . '_', '', $value);
@@ -1173,11 +1178,11 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 $_FILES = [];
             }else{
                 
-                for ($i = 0; (($i < NB_IMGS_MAX) && ($i < count($_SESSION["creerArticle"]["_FILES"]["name"]))) ; $i++){
+                for ($i = 0; (($i < NB_IMGS_MAX) && ($i < count($_SESSION["creerArticle"]["_FILES"]["photo"]["name"]))) ; $i++){
                     //déplace les fichiers dans un dossier pour que l'utilisateur puisse voir les imgs
                     
-                    move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["tmp_name"][$i], 
-                    'temp_/' . $_SESSION["creerArticle"]["_FILES"]["name"][$i]);
+                    move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$i], 
+                    'temp_/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$i]);
                 }
             }
             $sth = null ;
