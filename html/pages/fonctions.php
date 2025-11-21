@@ -259,16 +259,16 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         } else {
             $_SESSION['panierTemp'][$idProduit] = [
                 'id_produit' => $idProduit,
-                'nom' => $produitCourant['p_nom'],
-                'description' => $produitCourant['p_description'],
-                'image_url' => str_replace("html/img/photo", "/img/photo", $produitCourant['image_url'] ?? '/img/default-product.jpg'),
-                'image_alt' => $produitCourant['image_alt'],
-                'image_title' => $produitCourant['image_title'],
+                'p_nom' => $produitCourant['p_nom'],
+                'p_description' => $produitCourant['p_description'],
+                'i_lien' => str_replace("html/img/photo", "/img/photo", $produitCourant['image_url'] ?? '/img/default-product.jpg'),
+                'i_alt' => $produitCourant['image_alt'],
+                'i_title' => $produitCourant['image_title'],
                 'quantite' => $aAjouter,
-                'prix_unitaire' => $prixUnitaire,
-                'stock' => $stock,
-                'frais_de_port' => $fraisDePort,
-                'tva' => $tva
+                'p_prix' => $prixUnitaire,
+                'p_stock' => $stock,
+                'p_frais_de_port' => $fraisDePort,
+                'id_tva' => $tva
             ];
 
             if ($aAjouter < $quantite) {
