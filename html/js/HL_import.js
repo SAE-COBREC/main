@@ -10,7 +10,7 @@ $(function () {
      * // <div id="header"></div>
      * // <div id="footer"></div>
      */
-    $("#header").load("/partials/header.html");
+    $("#header").load("/partials/header.php");
     $("#footer").load("/partials/footer.html");
 
     // Charger les partials de notifications (toasts + modale)

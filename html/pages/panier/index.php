@@ -49,7 +49,7 @@
     </head>
 
     <?php
-    include __DIR__ . '/../../partials/header.html';
+    include __DIR__ . '/../../partials/header.php';
     ?>
     <body>
 
@@ -120,19 +120,19 @@
 
                 <div>
                     <?php foreach ($panierTemp as $idProduit => $article): ?>
-                        <article class="unArticleP" data-prix="<?php echo number_format($article['prix_unitaire'], 2, '.')?>"
-                                                        data-stock="<?php echo intval($article['stock'])?>"
-                                                        data-tva="<?php echo number_format($article['tva'], 2, '.')?>">
+                        <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
+                                                        data-stock="<?php echo intval($article['p_stock'])?>"
+                                                        data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                             <div class="imageArticleP">
-                                <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])) ?>"
-                                    alt="<?php echo htmlspecialchars($article['image_alt']) ?>" 
-                                    title="<?php echo htmlspecialchars($article['image_title'])?>">
+                                <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
+                                    alt="<?php echo htmlspecialchars($article['i_alt']) ?>" 
+                                    title="<?php echo htmlspecialchars($article['i_title'])?>">
                             </div>
                             <div class="articleDetailP">
-                                <h2 class="articleTitreP"><?php echo htmlspecialchars($article['nom'])?></h2>
-                                <p class="articleDescP"><?php echo htmlspecialchars($article['description'])?></p>
+                                <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                                <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
                                 <div class="basArticleP">
-                                    <p class="articlePrix"><?php echo  number_format($article['prix_unitaire'], 2, '.')?>€</p>
+                                    <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
                                     <div class="quantite">
 
                                         <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->

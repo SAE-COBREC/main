@@ -25,7 +25,6 @@ body {
   border: 1px solid #EFEFEF;
   padding: 8px 12px;
   border-radius: 999px;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .back-link:hover {
