@@ -107,8 +107,10 @@
                             // $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key]);
                             $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
                             $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key]);
-                            copy($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key], 
-                            'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
+                            if (file_exists($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key])){
+                                copy($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key], 
+                                'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
+                            }
                         }
                         $_POST = [];
                         $_POST["titre"] = str_replace("''","'", $_SESSION["creerArticle"]['_GET']['p_nom']);
@@ -906,9 +908,13 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 
                                 
                                 //déplacement du fichier vers le dossier img/photo
-                                rename('temp_/' . $value, '../../../img/photo/'. $value);
+                                if (file_exists('temp_/' . $value)){
+                                     rename('temp_/' . $value, '../../../img/photo/'. $value);
+                                }
                                 //renommage du fichier
-                                rename('../../../img/photo/'. $value, '../../../img/photo/'. $id_produit . '_' . $value);
+                                if (file_exists('../../../img/photo/'. $value)){
+                                    rename('../../../img/photo/'. $value, '../../../img/photo/'. $id_produit . '_' . $value);
+                                }
                             }
 
                             //ne pas faire réduction, hors must du Sprint 1
@@ -1017,7 +1023,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
 
                     foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
-                        unlink('../../../img/Photo/' . $value['i_title']);
+                        if (file_exists('../../../img/Photo/' . $value['i_title'])){
+                            unlink('../../../img/Photo/' . $value['i_title']);
+                        }
                         try {//suppression des images
                             $sql = '
                             DELETE FROM cobrec1._image
@@ -1080,7 +1088,10 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             //print_r($_POST["titre"]);
                         }
 
-                        copy('temp_/' . $value, '../../../img/photo/'. $value);
+                        if (file_exists('temp_/' . $value)){
+                            copy('temp_/' . $value, '../../../img/photo/'. $value);
+                        }
+                        
                         //renommage du fichier
                         rename('../../../img/photo/'. $value, '../../../img/photo/'. $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value);
                     }
