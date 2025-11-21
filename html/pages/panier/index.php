@@ -32,7 +32,8 @@
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
     } else {
         $panierTemp = $_SESSION['panierTemp'];  // stock le panier temporaire
-        $articles = $panierTemp;
+        $articles = $panierTemp; /*ULTRA IMPORTANT POUR LE JAVA NE PAS ENLEVER cette ligne sert à savoir si il y a des c
+                                    hoses dans le panier pour lancer ou non le javascript*/
     }
 
 ?>
@@ -116,7 +117,7 @@
                 </aside>
 
             <!-- SI LE CLIENT N'EST PAS CONNECTÉ PARCOURS CHAQUE ARTICLES, et affiche son contenu-->
-            <?php elseif (count($panierTemp) > 0): ?>
+            <?php elseif (isset($panierTemp) && count($panierTemp) > 0): ?>
 
                 <div>
                     <?php foreach ($panierTemp as $idProduit => $article): ?>

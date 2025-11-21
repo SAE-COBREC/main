@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) {
+if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) { //on se protège du riquiered
 
     $numCarte = str_replace(' ', '', $_POST['numCarte']);
     $totalNumCarte = 0;
