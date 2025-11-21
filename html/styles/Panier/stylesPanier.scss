@@ -18,7 +18,8 @@ h3 {
 
 
 
-.unArticleP img {
+.unArticleP img,
+.unArticleP {
   border-radius: $border-radius-primary;
 
   @media screen and (max-width: 428px) {
