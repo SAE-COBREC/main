@@ -49,7 +49,7 @@
     </head>
 
     <?php
-    include __DIR__ . '/../../partials/header.html';
+    include __DIR__ . '/../../partials/header.php';
     ?>
     <body>
 

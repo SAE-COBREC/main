@@ -190,7 +190,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
 
 <body>
     <?php
-    include __DIR__ . '/partials/header.html';
+    include __DIR__ . '/partials/header.php';
     ?>
 
     <div class="container">
