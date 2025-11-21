@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="mdp">Mot de passe</label>
   <input type="password" id="mdp" name="mdp" placeholder="***********" required>
       </div>
-  <div class="forgot" onclick="window.location.href='../resetPassword/index.php'">Mot de passe oublié ?</div>
+  <div class="forgot" onclick="window.location.href='../MDPoublie/index.php'">Mot de passe oublié ?</div>
       <!-- affichage des erreurs de saisi -->
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>

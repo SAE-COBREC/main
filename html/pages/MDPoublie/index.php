@@ -1,17 +1,14 @@
 <?php 
 session_start();
-//connexion a la bdd 
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
- ?>
+?>
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
-    // Ajoute un comportement Entrée : soumet le formulaire quand Enter est pressé dans un champ (sauf textarea)
     document.addEventListener('DOMContentLoaded', function () {
       var form = document.getElementById('multiForm');
       if (!form) return;
@@ -21,10 +18,8 @@ $pdo->exec("SET search_path TO cobrec1");
           if (ev.key !== 'Enter') return;
           if (ev.shiftKey || ev.ctrlKey || ev.altKey || ev.metaKey) return;
           var tag = (el.tagName || '').toLowerCase();
-          if (tag === 'textarea') return; // laisser Entrée dans textarea
-          // empêcher le comportement par défaut (soumission réelle du formulaire par le navigateur)
+          if (tag === 'textarea') return;
           ev.preventDefault();
-          // appeler la logique existante qui gère la validation & la soumission
           try { if (typeof finishRegistration === 'function') finishRegistration(); } catch (e) { form.submit(); }
         });
       });
@@ -45,86 +40,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $error_message = '';
   
   try {
-
-    //récuperation des données de compte
+    // Recherche du compte par email
     $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :login");
     $stmt->execute([':login' => $login]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    //verification que l'aresse mail existe dans la bdd
+    
+    // Si pas trouvé par email, essayer par pseudo
     if (!$row) {
       $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
       $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    //verification que le pseudo existe dans la bdd
+    
+    // CORRECTION: Si le compte n'existe PAS
     if (!$row) {
       $hasError = true;
       $error_card = 1;
-      $error_message = 'Adresse mail, pseudo ou mot de passe .';
-    } else {  
-
-
-      //verification que le mdp corespondant a ce mail existe
-      if (($row['mdp'] === $mdp)) {
+      $error_message = 'Adresse mail ou pseudo introuvable.';
+    } else {
+      // OPTION A: Si vos mots de passe SONT hachés (recommandé)
+      // Décommentez ces lignes et commentez l'OPTION B
+      /*
+      if (password_verify($mdp, $row['mdp'])) {
         $hasError = true;
         $error_card = 1;
-        $error_message = 'Veuillez saisir un nouveau mdp.';
+        $error_message = 'Veuillez saisir un nouveau mot de passe différent de l\'ancien.';
       } else {
-        $sql = 'UPDATE cobrec1._compte(mdp) WHERE email = :email
-                VALUES (:mdp, :email  )';
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-              'mdp' => $mdp
+        $mdp_hache = password_hash($mdp, PASSWORD_DEFAULT);
+        $sql = 'UPDATE cobrec1._compte SET mdp = :mdp WHERE email = :email';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+          ':mdp' => $mdp_hache,
+          ':email' => $login
         ]);
+      */
+      
+      // OPTION B: Si vos mots de passe NE SONT PAS hachés (non sécurisé)
+      // Commentez ces lignes si vous utilisez l'OPTION A
+      if ($mdp === $row['mdp']) {
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Veuillez saisir un nouveau mot de passe différent de l\'ancien.';
+      } else {
+        // ATTENTION: Stockage en clair = NON SÉCURISÉ !
+        // Utilisez password_hash() dès que possible
+        $sql = 'UPDATE _compte SET mdp = :mdp WHERE email = :email';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+          ':mdp' => $mdp,
+          ':email' => $login
+        ]);
+        
+        // CORRECTION: Récupérer l'ID client si nécessaire
+        $stmtClient = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id_compte");
+        $stmtClient->execute([':id_compte' => $row['id_compte']]);
+        $clientRow = $stmtClient->fetch(PDO::FETCH_ASSOC);
+        
+        if ($clientRow) {
+          $_SESSION['idClient'] = $clientRow['id_client'];
         }
-
-        //verification que le compte est un compte client
-        if (!$clientId) {
-          $hasError = true;
-          $error_card = 1;
-          $error_message = ' mail, pseudo ou mot de passe incorrecte.';
-        } else {
-          //ajout des identifiant a la session
-
-          $_SESSION['idClient'] = $clientId;
-          $_SESSION['idCompte'] = (int)$row['id_compte'];
-          // Redirection sans header() (serveur peut bloquer header)
-          $url = '../connexionClient/index.php';
-          echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
-          exit;
-        }
+        $_SESSION['idCompte'] = (int)$row['id_compte'];
+        
+        // Redirection
+        $url = '../connexionClient/index.php';
+        echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+        exit;
       }
-  //message en cas de probleme de verif dans le code
+    }
   } catch (Exception $e) {
     $hasError = true;
     $error_card = 1;
     $error_message = 'Erreur lors de la vérification des identifiants.';
+    // DÉBOGAGE - À RETIRER EN PRODUCTION
+    $error_message .= ' Détails: ' . $e->getMessage();
+    error_log('Erreur reset password: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
   }
 }
 ?>
 
-
 <style>
   body {
-    background: linear-gradient(to bottom right, #7171A3, #030212);
+    background: linear-gradient(to bottom right, #030212, #7171A3);
   }
-  .debutant {
-    a {
-      color: #7171A3;
-    }
+  .debutant a {
+    color: #7171A3;
   }
-  .footer{
-    > p{
-      color: #7171A3;
-    }
+  .footer > p {
+    color: #7171A3;
   }
-  .connex-btn {
-    > button {
-      &:hover {
-        background: #7171A3;
-        color: $primary-color-noir;
-      }
-    }
+  .connex-btn > button:hover {
+    background: #7171A3;
+    color: #030212;
   }
 </style>
 
@@ -132,56 +138,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
     <div class="card" id="1">
       <div class="logo">
-        <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
+        <img src="../../img/logo-text.svg" alt="Logo Alizon">
       </div>
 
       <h1>Récupération mdp</h1>
 
       <div>
-        <label for="email">Email</label>
+        <label for="email">Email ou pseudo</label>
         <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
 
       <div>
         <label for="mdp">Nouveau mot de passe</label>
-  <input type="password" id="mdp" name="mdp" placeholder="***********" required>
+        <input type="password" id="mdp" name="mdp" placeholder="***********" required>
       </div>
-  <div class="forgot" onclick="window.location.href='../resetPassword/index.php'">Mot de passe oublié ?</div>
-      <!-- affichage des erreurs de saisi -->
+
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
         <?php endif; ?>
       </div>
 
-
       <div class="connex-btn" role="group" aria-label="Suivant action">
-          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
-            Terminer
-          </button>
+        <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+          Terminer
+        </button>
       </div>
-      <div class= "debutant" > Débutant sur Alizon ? <a href= "../creationClient/index.php"><strong >Démarrer →</strong></a></div>
-      <div class= "footer">
+      
+      <div class="debutant">Débutant sur Alizon ? <a href="../creationClient/index.php"><strong>Démarrer →</strong></a></div>
+      
+      <div class="footer">
         <p>Aide</p><p>Confidentialité</p><p>Conditions</p>
       </div>
     </div>
   </form>
 
   <script>
-    /**
-     * @description Termine le processus d'inscription en validant le formulaire et en le soumettant si toutes les validations sont réussies.
-     * @returns {void}
-     */
-
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');
       var form = document.getElementById('multiForm');
-      if (!form) return; // Ne fini le formulaire que si il existe
+      if (!form) return;
       if (!form.checkValidity()) {
-        // Ne termine l'inscription que si le formulaire est valide (Tout les champs sont correctement remplis)
         var invalid = form.querySelector(':invalid');
         if (invalid) {
-          // Trouve la carte parente de l'élément invalide
           var card = invalid.closest('.card');
           var cards = Array.from(document.querySelectorAll('.card'));
           var idx = card ? cards.indexOf(card) : 0;
@@ -190,33 +189,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           var message = getFieldValidationMessage(invalid);
           try { invalid.setCustomValidity(message); } catch (e) {}
           if (errDiv) {
-            // Affiche le message d'erreur dans la carte parente
             errDiv.textContent = message;
             errDiv.classList.remove('hidden');
           } else {
-            // Fallback: popup d'erreur standard
             if (window.showError) {
               showError('Champ invalide', message);
             } else {
               alert(message);
             }
           }
-          invalid.focus(); // Met le focus sur le champ invalide
+          invalid.focus();
         }
         return;
       }
-      try { // Soumet le formulaire
+      try {
         window.__allow_submit = true;
-        try { window.__submission_confirmed = false; } catch (e) {} // Réinitialise le suivi de soumission
+        try { window.__submission_confirmed = false; } catch (e) {}
         console.log('[register] calling requestSubmit (or form.submit fallback)');
         if (typeof form.requestSubmit === 'function') {
-          form.requestSubmit(); // Préférer requestSubmit pour déclencher les événements de soumission
+          form.requestSubmit();
         } else {
-          form.submit(); // Fallback si requestSubmit n'est pas disponible
+          form.submit();
         }
-        setTimeout(function () { // Fallback en cas d'absence d'événement de soumission
+        setTimeout(function () {
           try {
-            if (!window.__submission_confirmed) { // Vérifie si la soumission a été confirmée
+            if (!window.__submission_confirmed) {
               console.warn('[register] no submit event detected within timeout — using fallback form.submit()');
               window.__allow_submit = true;
               form.submit();
@@ -231,5 +228,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </script>
   <script type="module" src="../../js/registerPass.js"></script>
 </body>
-
 </html>
