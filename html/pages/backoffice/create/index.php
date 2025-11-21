@@ -1,9 +1,9 @@
 <?php
+    session_start();
     $sth = null ;
     $dbh = null ;
     include '../../../selectBDD.php';
     $pdo->exec("SET search_path to cobrec1");
-    session_start();
     const NB_IMGS_MAX = 3;
     const EMPLACEMENT_DES_IMGS = '/img/photo/';
 
