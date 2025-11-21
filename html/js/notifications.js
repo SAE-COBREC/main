@@ -54,6 +54,21 @@
          * notify('Opération réussie !', 'success', { duration: 5000 });
          */
         ensureContainers();
+
+        // Trigger cart animation if message mentions "panier"
+        if (message && typeof message === 'string' && message.toLowerCase().includes('panier')) {
+            var cartIcon = document.getElementById('cart-icon-container');
+            if (cartIcon) {
+                cartIcon.classList.remove('cart-animating');
+                // Force reflow to restart animation
+                void cartIcon.offsetWidth;
+                cartIcon.classList.add('cart-animating');
+                setTimeout(function () {
+                    if (cartIcon) cartIcon.classList.remove('cart-animating');
+                }, 1000);
+            }
+        }
+
         var container = document.getElementById('toast-container');
         if (!container) return;
         var t = document.createElement('div');
