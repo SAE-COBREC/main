@@ -2,3 +2,11 @@ Jira : type de fichier invalide
 
 
 créer et modif promo
+
+
+// $fichiers = glob('temp_/*');
+                    // foreach ($fichiers as $value) {
+                    //     unlink($value);
+                    // }
+
+^ dans page ctaalogue vendeur

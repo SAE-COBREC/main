@@ -8,27 +8,13 @@
     const EMPLACEMENT_DES_IMGS = '/img/photo/';
 
     if(empty($_SESSION['vendeur_id']) === false){
-        /*try {//Affiliation id_utilisateur id_vendeur
-            $sql = '
-            SELECT id_vendeur FROM cobrec1._vendeur WHERE id_compte = ' . $_SESSION['vendeur_id'] . ';'
-            ;
-            $stmt = $pdo->query($sql);
-            $id_vendeur = $stmt->fetch(PDO::FETCH_ASSOC);
-            $id_vendeur = $id_vendeur['id_vendeur'];
-        } catch (Exception $e) {
-            // print_r("création de l'objet produit dans la base");
-            // print_r($e);
-        }*/
-
-        //if($id_vendeur != ''){//REMPLACER PAR != UNE FOIS PB CONNEXION VENDEUR RÉSOLU !!!!!!!!
-            //$id_vendeur = 1; // A VIRER APRES
             if (empty($_GET['modifier']) === false){
                 //si US modifier produit
                 //print_r("detect modif\n");
                 if ((empty($_SESSION["creerArticle"]['_GET'])) || ($_SESSION["creerArticle"]['_GET']['id_produit'] != $_GET['modifier'])){
                     //print_r('1');
                     //si premier passage
-                    try {//Affiliation id_utilisateur id_vendeur
+                    try {//Récupération des infos du produit
                         $sql = '
                         SELECT * FROM cobrec1._produit 
                         WHERE id_produit = ' . $_GET['modifier'] . ';'
@@ -323,7 +309,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             <!-- Boutons de soumission principaux -->
             <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
             <?php
-            if($_SESSION["creerArticle"]['_GET'] != null){
+            if($_SESSION["creerArticle"]['_GET'] != null){//si la page est en mode US modification
                 ?>
                 <input type="submit" name="svgModif"title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" />
                 <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
@@ -333,19 +319,21 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 </script>
                 <?php
                 if (($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne') || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
-
+                    //si article hors ligne
                 ?>
                 
                 <script>
                     btnPrincipauxModif[2].disabled = false;
                     btnPrincipauxModif[3].disabled = true;
+                    //grisage du bouton hors ligne et dégrisage du bouton en ligne
                 </script>
             <?php
-                }else{
+                }else{//sinon
                     ?>
                     <script>
                     btnPrincipauxModif[3].disabled = false;
                     btnPrincipauxModif[2].disabled = true;
+                    //grisage du bouton en ligne et dégrisage du bouton hors ligne
                     </script>
                 <?php
                 }
@@ -378,11 +366,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 $sql = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . "'" . $titre_pour_bdd ."'";
                                 $stmt = $pdo->query($sql);
                                 $titre = $stmt->fetch(PDO::FETCH_ASSOC);
-                                //print_r('Resultat : ' . $result);
                             } catch (Exception $e) {
-                                //print_r($e);
+                                
                             }
-                            //print_r("Tite =: " . $titre);
                         }
                         ?>
 <!-- </pre> -->
@@ -437,10 +423,12 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         }
                         if ((($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
                         if (empty($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0])){
-                            $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] = 0;
+                            //si vide alors
+                            $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] = '';
                         }
                         if (empty($_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0])){
-                            $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0] = 0;
+                            //si vide alors
+                            $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0] = '';
                         }
                         echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] . '/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["full_path"][0];
                         ?>" />
@@ -475,6 +463,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <br>
                         <small><?php 
                             if(empty($_SESSION["creerArticle"]["_FILES"]["photo"]["name"])){
+                                //si aucune photo alors indiquer 0
                                 echo 0;
                             }else{
                                 echo count($_SESSION["creerArticle"]["_FILES"]["photo"]["name"]);
@@ -489,6 +478,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             <small>
                                 <img src="<?php 
                                 if ((str_starts_with($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key],'https://')) || (str_starts_with($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key],'http://'))){
+                                    //sert à bien afficher les images qui ne sont pas en local
                                     echo $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$key];
                                 }else{
                                     echo 'temp_/' . $value;
@@ -751,6 +741,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '')){
                         // print_r("WARNS : " . $_SESSION["creerArticle"]["warn"]);
                             // print_r($_SESSION["creerArticle"]["_FILES"]["photo"]["name"]);
+
+                            //Si pas de warning et formulaire soumis via le bouton Sauvegarder ou le bouton Annuler
                             
                             $svg_titre = $_POST['titre'];
                             $svg_desc = $_POST['description'];
@@ -778,7 +770,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             if (($_POST["sauvegarder"] == "Sauvegarder l'ébauche") || ($_POST["publier"] == "Publier le produit dans le catalogue client")){
 
                             
-                        //Si pas de warning et formulaire soumis via le bouton Sauvegarder ou le bouton Annuler
+                        
                             
 
 
@@ -887,25 +879,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                                     //print_r($_POST["titre"]);
                                 }
-
-                                // try {//maj du lien et du titre de l'image                                
-                                //     $sql = '
-                                //     UPDATE cobrec1._image 
-                                //     SET i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value . "' ". ',
-                                //     i_title = ' . "'" . $id_produit . '_' . $value . "'" . '
-                                //     WHERE id_image = 
-                                //     (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $_POST['titre'] . '/' . $value ."'" .');'
-                                //     ;
-                                //     $stmt = $pdo->prepare($sql);
-                                //     $stmt->execute();
-                                // } catch (Exception $e) {
-                                //     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                                //     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="maj du lien et du titre de l'image";
-                                // }
-
-
-
-                                
                                 
                                 //déplacement du fichier vers le dossier img/photo
                                 if (file_exists('temp_/' . $value)){
@@ -926,14 +899,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 unlink($value);
                             }
                             
-                            
-                            
-
-                            
                             if ($_POST["sauvegarder"] == "Sauvegarder l'ébauche"){
                                 //Vive les if du php
                                 
-                    
                     ?>
                     <script>
                         sauvegarder();
@@ -944,7 +912,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     <script>
                         publier();
                     </script>
-
     <?php
                         try {//mise en ligne du produit
                             $sql = '
@@ -989,8 +956,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $key . ' : ' ;
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $value ;
                         }
-                        
-                        
                         $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                     }
 
@@ -1047,11 +1012,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 'temp_/' . $value);
 
                         $value = str_replace($_SESSION["creerArticle"]['_GET']['id_produit'] . '_', '', $value);
-                        // $value = str_replace('.png.png', '.png', $value);
-                        // $value = str_replace('.jpg.jpg', '.jpg', $value);
-                        // $value = str_replace('.jpeg.jpeg', '.jpeg', $value);
-                        // $value = str_replace('.gif.gif', '.gif', $value);
-                        // $value = str_replace('.svg.svg', '.svg', $value);
                         try {//création des images
                             $sql = '
                             INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
@@ -1095,12 +1055,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         //renommage du fichier
                         rename('../../../img/photo/'. $value, '../../../img/photo/'. $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value);
                     }
-                    //Supprime les fichiers de temp_
-                    // $fichiers = glob('temp_/*');
-                    // foreach ($fichiers as $value) {
-                    //     unlink($value);
-                    // }
-
 
                     if ($_POST["horsLigne"] == "Mettre hors ligne"){
                         ?>
@@ -1146,23 +1100,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
                     }
-
-                    
-
                 }
 
-                if (empty($_SESSION['bdd_errors']) !== true){
-                    //Sert pour consulter les erreurs de la BDD via un fichier dédié
-                    $fp = fopen('file.csv', 'w');
-
-                    foreach ($_SESSION['bdd_errors'] as $fields) {
-                        fputcsv($fp, $fields, ',', '"', '');
-                    }
-
-                    fclose($fp);
-                }
+                // if (empty($_SESSION['bdd_errors']) !== true){
+                //     //Sert pour consulter les erreurs de la BDD via un fichier dédié
+                //     $fp = fopen('file.csv', 'w');
+                //     foreach ($_SESSION['bdd_errors'] as $fields) {
+                //         fputcsv($fp, $fields, ',', '"', '');
+                //     }
+                //     fclose($fp);
+                // }
                 
-
 
                 //Sert pour des tests
                 $svg_titre = $_POST['titre'];
@@ -1178,7 +1126,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 
                 for ($i = 0; (($i < NB_IMGS_MAX) && ($i < count($_SESSION["creerArticle"]["_FILES"]["photo"]["name"]))) ; $i++){
                     //déplace les fichiers dans un dossier pour que l'utilisateur puisse voir les imgs
-                    
                     move_uploaded_file($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][$i], 
                     'temp_/' . $_SESSION["creerArticle"]["_FILES"]["photo"]["name"][$i]);
                 }
@@ -1207,11 +1154,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
 <script>
     alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
-    //document.location.href = "/pages/backoffice/connexionVendeur/index.php"; 
-
-            
+    //document.location.href = "/pages/backoffice/connexionVendeur/index.php";
 </script>
-
 <?php
     }
 
