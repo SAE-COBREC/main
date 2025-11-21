@@ -370,7 +370,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div>
                                 <label>
                                     <span>Téléphone</span>
-                                    <input type="tel" name="telephone"
+                                    <input type="tel" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}"
+          maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
                                         value="<?php echo htmlspecialchars($donneesInformationsClient['num_telephone'] ?? ''); ?>">
                                 </label>
                             </div>
