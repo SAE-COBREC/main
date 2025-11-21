@@ -327,8 +327,11 @@ $categories_affichage = preparercategories_affichage($listeCategories);
 
     <?php
     include __DIR__ . '/partials/footer.html';
+    include __DIR__ . '/partials/toast.html';
+    include __DIR__ . '/partials/modal.html';
     ?>
 
+    <script src="/js/notifications.js"></script>
     <script>
         //fonction pour définir la catégorie et soumettre le formulaire
         function definirCategorie(categorie) {
@@ -363,14 +366,26 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('✓ ' + data.message);
+                        if (window.notify) {
+                            notify(data.message, 'success');
+                        } else {
+                            alert('✓ ' + data.message);
+                        }
                     } else {
-                        alert('✗ ' + data.message);
+                        if (window.notify) {
+                            notify(data.message, 'error');
+                        } else {
+                            alert('✗ ' + data.message);
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
-                    alert('Erreur lors de l\'ajout au panier');
+                    if (window.notify) {
+                        notify('Erreur lors de l\'ajout au panier', 'error');
+                    } else {
+                        alert('Erreur lors de l\'ajout au panier');
+                    }
                 });
         }
 
