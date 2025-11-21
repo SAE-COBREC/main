@@ -204,7 +204,7 @@ body {
   border-radius: 8px;
   margin-top: 14px;
   font-size: 14px;
-  color: #c0c0c0;
+  color: #030212;
 }
 
 input[type=number] {
@@ -244,7 +244,7 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
 
 .features ul {
   padding-left: 18px;
-  color: #c0c0c0;
+  color: #030212;
 }
 
 .reviews .review {

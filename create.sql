@@ -758,7 +758,7 @@ INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock,
 INSERT INTO _image (i_lien, i_title, i_alt) VALUES
 ('https://img-4.linternaute.com/0w1UnVLIlgG1eAJSuRzF-ADmwGc=/1500x/smart/c4a044e826674aeda177183ab171edc5/ccmcms-linternaute/80567150.jpg', 'Smartphone XPro.jpg', 'Image du smartphone'),
 ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-rswjgamDC5ht_mbQHVz2JUWfHy9XtaMcIQ&s', 'Ordinateur portable.jpeg', 'Image de l ordinateur'),
-('https://site-2320744.mozfiles.com/files/2320744/catitems/l/Sauvons%20les%20souris%20mangeons%20des%20chattes%20(blanc)%20Tshirt%20Noir%20DOS-ee54a411.png?7281461', 'T-shirt.png', 'Image du t-shirt'),
+('https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRiaBh_MP8bn6FaWQfJNxOBZv3K9bTNBakK893WhBsdd9_ClExaNGItnZabgbBTn0Z862f0XooMRUxpBEDgeNe-XHfxs-JHDXkYUoKFKDccEF1aNC44vW5iUg', 'T-shirt.png', 'Image du t-shirt'),
 ('https://d1fufvy4xao6k9.cloudfront.net/images/blog/posts/2021/02/pexels_karolina_grabowska_4210860.jpg', 'Jean.jpg', 'Image du jean'),
 ('https://www.apple.com/v/airpods-max/j/images/overview/welcome/max-loop_startframe__c0vn1ukmh7ma_xlarge.jpg', 'Casque audio.jpg', 'Image du casque'),
 ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoCAh3ArPWZMACcGSClM-zuXUGusvJqG4lzA&s', 'Avatar Jean.jpeg', 'Photo de profil Jean'),
@@ -787,7 +787,7 @@ INSERT INTO _image (i_lien, i_title, i_alt) VALUES
 
 -- 13. RELATIONS IMAGES-PRODUITS
 INSERT INTO _represente_produit (id_image, id_produit) VALUES
-(1, 1), (2,1), (1,2), (2, 2), (3, 3), (4, 4), (5, 6), (10, 8), (11, 7),
+(1, 1), (2,2), (3, 3), (4, 4), (5, 6), (10, 8), (11, 7),
 (12, 9), (13, 10), (14, 11), (15, 12), (16, 13), (17, 14), (18, 15),
 (19, 16), (20, 17), (21, 18), (22, 19), (23, 20),
 (24, 21), (25, 22), (26, 23), (27, 24), (28, 25);

@@ -1071,10 +1071,11 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                         if (file_exists('temp_/' . $value)){
                             copy('temp_/' . $value, '../../../img/photo/'. $value);
+                             //renommage du fichier
+                            rename('../../../img/photo/'. $value, '../../../img/photo/'. $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value);
                         }
                         
-                        //renommage du fichier
-                        rename('../../../img/photo/'. $value, '../../../img/photo/'. $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value);
+                       
                     }
 
                     if ($_POST["horsLigne"] == "Mettre hors ligne"){

@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // 4. Chargement Données
 $produit = ($idProduit > 0) ? chargerProduitBDD($pdo, $idProduit) : null;
 
-if (!$produit) {
+if (!$produit || $produit['p_statut'] != 'En ligne') {
     include __DIR__ . '/not-found.php';
     exit;
 }
