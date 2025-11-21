@@ -48,7 +48,7 @@ try {
 }
 
 /* ---------------------------------------------------------
-   TRAITEMENT DU FORMULAIRE
+   TRAITEMENT DES FORMULAIRES
 --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     /* ---------------------------------------------------------
-      TRAITEMENT DU CHANGEMENT DE MDP (en clair)
+      TRAITEMENT DU CHANGEMENT DE MDP 
     --------------------------------------------------------- */
     if (isset($_POST['change_password'])) {
 
@@ -378,9 +378,10 @@ function safe($array, $key, $default = "") {
 
       <!-- ===== FORMULAIRE DE MODIFICATION DU MOT DE PASSE ===== -->
 
-      <?php if (isset($_GET['success_pwd'])): ?>
+      <?php if (isset($_GET['password_success'])): ?>
         <div class="alert-success">Mot de passe modifié avec succès !</div>
       <?php endif; ?>
+
 
       <div class="profil-card mt-4">
 
@@ -391,7 +392,6 @@ function safe($array, $key, $default = "") {
             <div class="form-row">
                 <label for="old_password">Ancien mot de passe</label>
                 <input type="password" id="old_password" name="old_password" required>
-                <span class="error" id="error-old_password"></span>
             </div>
 
             <div class="form-row">
@@ -406,7 +406,7 @@ function safe($array, $key, $default = "") {
                 <span class="error" id="error-confirm_password"></span>
             </div>
 
-            <button class="btn btn--primary" type="submit">Modifier mon mot de passe</button>
+            <button class="btn btn--primary" type="submit" name="change_password">Modifier mon mot de passe</button>
 
         </form>
       </div>
@@ -480,7 +480,7 @@ function safe($array, $key, $default = "") {
     });
 
     // REGEX pour mot de passe sécurisé : 1 maj, 1 min, 1 chiffre, 8+ caractères
-    const regexPwd = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$/; 
+    const regexPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/; 
 
     // Validation du nouveau mot de passe
     document.getElementById("new_password").addEventListener("input", function () {
