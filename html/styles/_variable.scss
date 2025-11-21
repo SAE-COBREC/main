@@ -46,3 +46,7 @@ $breakpoint-tablette: 1024px;
 
 // Medias
 $mobile: "screen and (max-width: 508px)";
+
+* {
+    transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}

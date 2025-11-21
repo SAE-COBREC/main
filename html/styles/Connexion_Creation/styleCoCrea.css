@@ -1,5 +1,9 @@
 @charset "UTF-8";
 * {
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+* {
   font-family: "Quicksand", sans-serif;
 }
 

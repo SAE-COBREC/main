@@ -1,4 +1,8 @@
 * {
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
