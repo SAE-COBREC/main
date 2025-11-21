@@ -268,7 +268,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'p_prix' => $prixUnitaire,
                 'p_stock' => $stock,
                 'p_frais_de_port' => $fraisDePort,
-                'id_tva' => $tva
+                'montant_tva' => $tva
             ];
 
             if ($aAjouter < $quantite) {
