@@ -319,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
-          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
+          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$ " maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
         </div>
 
         <div class="culumn-flex">

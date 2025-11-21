@@ -30,14 +30,14 @@ $pdo->exec("SET search_path TO cobrec1");
       });
     });
   </script>
-  <title>Connexion - Alizon</title>
+  <title>MDP oublié - Alizon</title>
   <link rel="icon" type="image/png" href="../../img/favicon.svg">
   <link rel="stylesheet" href="../../styles/Connexion_Creation/styleCoCrea.css">
 </head>
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $login = trim($_POST['Cmdp'] ?? '');
+  $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
 
   $hasError = false;
@@ -56,13 +56,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    //verification que le pseudo existe dans la bdd
+    if (!$row) {
+      $hasError = true;
+      $error_card = 1;
+      $error_message = 'Adresse mail, pseudo ou mot de passe .';
+    } else {  
 
-        //récuperation des données client
-        $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
-        $clientStmt->execute([':id' => (int)$row['id_compte']]);
-        $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
-        if ($client) {
-          $clientId = (int)$client['id_client'];
+
+      //verification que le mdp corespondant a ce mail existe
+      if (($row['mdp'] === $mdp)) {
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Veuillez saisir un nouveau mdp.';
+      } else {
+        $sql = 'UPDATE cobrec1._compte(mdp) WHERE email = :email
+                VALUES (:mdp, :email  )';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+              'mdp' => $mdp
+        ]);
         }
 
         //verification que le compte est un compte client
@@ -71,10 +84,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $error_card = 1;
           $error_message = ' mail, pseudo ou mot de passe incorrecte.';
         } else {
-          $url = '../../index.php';
+          //ajout des identifiant a la session
+
+          $_SESSION['idClient'] = $clientId;
+          $_SESSION['idCompte'] = (int)$row['id_compte'];
+          // Redirection sans header() (serveur peut bloquer header)
+          $url = '../connexionClient/index.php';
           echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
+      }
   //message en cas de probleme de verif dans le code
   } catch (Exception $e) {
     $hasError = true;
@@ -116,12 +135,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
 
-      <h1>Mot de passe oublié</h1>
+      <h1>Récupération mdp</h1>
 
       <div>
-        <label for="email">Email de récupération</label>
+        <label for="email">Email</label>
         <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
+
+      <div>
+        <label for="mdp">Nouveau mot de passe</label>
+  <input type="password" id="mdp" name="mdp" placeholder="***********" required>
+      </div>
+  <div class="forgot" onclick="window.location.href='../resetPassword/index.php'">Mot de passe oublié ?</div>
       <!-- affichage des erreurs de saisi -->
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
@@ -132,10 +157,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="connex-btn" role="group" aria-label="Suivant action">
           <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
-            Envoyer
+            Terminer
           </button>
       </div>
-      <div class= "debutant" > Retour a la page de connexion <a href= "../creationClient/index.php"><strong >ici</strong></a></div>
+      <div class= "debutant" > Débutant sur Alizon ? <a href= "../creationClient/index.php"><strong >Démarrer →</strong></a></div>
       <div class= "footer">
         <p>Aide</p><p>Confidentialité</p><p>Conditions</p>
       </div>

@@ -11,11 +11,31 @@ $_SESSION['creeArticle']=[];
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    // Ajoute un comportement Entrée : soumet le formulaire quand Enter est pressé dans un champ (sauf textarea)
+    document.addEventListener('DOMContentLoaded', function () {
+      var form = document.getElementById('multiForm');
+      if (!form) return;
+      var elems = form.querySelectorAll('input, textarea, select');
+      elems.forEach(function (el) {
+        el.addEventListener('keydown', function (ev) {
+          if (ev.key !== 'Enter') return;
+          if (ev.shiftKey || ev.ctrlKey || ev.altKey || ev.metaKey) return;
+          var tag = (el.tagName || '').toLowerCase();
+          if (tag === 'textarea') return; // laisser Entrée dans textarea
+          // empêcher le comportement par défaut (soumission réelle du formulaire par le navigateur)
+          ev.preventDefault();
+          // appeler la logique existante qui gère la validation & la soumission
+          try { if (typeof finishRegistration === 'function') finishRegistration(); } catch (e) { form.submit(); }
+        });
+      });
+    });
+  </script>
   <title>Connexion - Alizon</title>
   <link rel="icon" type="image/png" href="../../img/favicon.svg">
   <link
     rel="stylesheet">
-  <link rel="stylesheet" href="../../../styles/Connexion_Creation/styleCoCrea.css">>
+  <link rel="stylesheet" href="../../../styles/Connexion_Creation/styleCoCrea.css">
 </head>
 
 <?php
