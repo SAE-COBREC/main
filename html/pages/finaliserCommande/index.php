@@ -1,6 +1,13 @@
 <?php
     session_start();
-    $id_client = $_SESSION['idClient'];
+    if (isset($_SESSION['idClient'])){
+        $id_client = $_SESSION['idClient'];
+    } else {
+        $_SESSION['etaitSurFinaliser'] = true;
+        header('Location: /pages/connexionClient/index.php');
+        exit();
+    }
+    
     include __DIR__ . '/../../selectBDD.php';
 ?>
 <!DOCTYPE html>
