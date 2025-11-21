@@ -49,12 +49,16 @@ if ($idClient === null) {
     }
 
     $_SESSION["panierEnCours"] = $idPanier;
-
     transfererPanierTempVersBDD($connexionBaseDeDonnees, $idPanier);
 }
 
-//gérer l'ajout au panier via AJAX
+// GESTION AJOUT AU PANIER VIA AJAX : CORRECTION
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
+    // Correction : désactiver l'affichage des erreurs PHP
+    ini_set('display_errors', 0);
+    error_reporting(0);
+    // Nettoyer les buffers (par sécurité)
+    while (ob_get_level()) { ob_end_clean(); }
     header('Content-Type: application/json');
 
     $idProduit = $_POST['idProduit'] ?? null;
@@ -66,75 +70,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
 
-    if ($idClient === null) {
-        //utilisateur non connecté : utiliser le panier temporaire en SESSION
-        $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
-    } else {
-        //utilisateur connecté : utiliser le panier en BDD
-        $idPanier = $_SESSION['panierEnCours'] ?? null;
-
-        if (!$idPanier) {
-            echo json_encode(['success' => false, 'message' => 'Aucun panier en cours pour ce client']);
-            exit;
+    // Correction : envelopper l'appel dans un try-catch
+    try {
+        if ($idClient === null) {
+            // utilisateur non connecté : utiliser le panier temporaire en SESSION
+            $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
+        } else {
+            // utilisateur connecté : utiliser le panier en BDD
+            $idPanier = $_SESSION['panierEnCours'] ?? null;
+            if (!$idPanier) {
+                echo json_encode(['success' => false, 'message' => 'Aucun panier en cours pour ce client']);
+                exit;
+            }
+            $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
         }
-
-        $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
+    } catch (Exception $e) {
+        $resultat = ['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()];
     }
 
     echo json_encode($resultat);
     exit;
 }
 
-
 //fonction pour filtrer les produits selon les critères choisis
-function filtrerProduits($listeProduits, $filtres)
-{
+function filtrerProduits($listeProduits, $filtres) {
     $produits_filtres = [];
-
     foreach ($listeProduits as $produitCourant) {
-        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum']) {
-            continue;
-        }
-
+        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum']) continue;
         if ($filtres['categorieFiltre'] !== 'all') {
             $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
-            if (!in_array($filtres['categorieFiltre'], $categoriesProduit)) {
-                continue;
-            }
+            if (!in_array($filtres['categorieFiltre'], $categoriesProduit)) continue;
         }
-
-        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0) {
-            continue;
-        }
-
-        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum']) {
-            continue;
-        }
-
+        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0) continue;
+        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum']) continue;
         $produits_filtres[] = $produitCourant;
     }
-
     return $produits_filtres;
 }
 
 //fonction pour trier les produits selon le critère choisi
-function trierProduits($listeProduits, $tri_par)
-{
+function trierProduits($listeProduits, $tri_par) {
     switch ($tri_par) {
         case 'meilleures_ventes':
-            usort($listeProduits, function ($a, $b) {
-                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
-            });
+            usort($listeProduits, function ($a, $b) { return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0); });
             break;
         case 'prix_croissant':
-            usort($listeProduits, function ($a, $b) {
-                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
-            });
+            usort($listeProduits, function ($a, $b) { return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0); });
             break;
         case 'prix_decroissant':
-            usort($listeProduits, function ($a, $b) {
-                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
-            });
+            usort($listeProduits, function ($a, $b) { return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0); });
             break;
         case 'note':
             usort($listeProduits, function ($a, $b) {
@@ -144,28 +128,23 @@ function trierProduits($listeProduits, $tri_par)
             });
             break;
     }
-
     return $listeProduits;
 }
 
 //fonction pour préparer les catégories pour l'affichage
-function preparercategories_affichage($listeCategories)
-{
+function preparercategories_affichage($listeCategories) {
     $categories_affichage = [];
     $total_produits = 0;
-
     foreach ($listeCategories as $nomCategorie => $compte) {
         $categories_affichage[] = [
             'category' => $nomCategorie,
             'count' => $compte
         ];
     }
-
     array_unshift($categories_affichage, [
         'category' => 'all',
         'count' => $total_produits
     ]);
-
     return $categories_affichage;
 }
 
@@ -173,9 +152,7 @@ function preparercategories_affichage($listeCategories)
 $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
-
 $tousLesProduits = count($listeProduits);
-
 $prixMaximumDynamique = getPrixMaximum($connexionBaseDeDonnees);
 
 //récupère les valeurs des filtres depuis le formulaire
