@@ -1,6 +1,6 @@
 <?php
 
-include("/config1.php");
+include(__DIR__ . "/config1.php");
 
 try {
     $dsn = "$driver:host=$serveur;port=$port;dbname=$dbname";

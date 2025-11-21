@@ -17,11 +17,13 @@ h3 {
   font-family: "Baloo", sans-serif;
 }
 
-.unArticleP img {
+.unArticleP img,
+.unArticleP {
   border-radius: 14px;
 }
 @media screen and (max-width: 428px) {
-  .unArticleP img {
+  .unArticleP img,
+  .unArticleP {
     border-radius: 8px;
   }
 }

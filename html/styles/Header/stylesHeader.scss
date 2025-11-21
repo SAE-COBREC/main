@@ -131,6 +131,19 @@
     color: $primary-color-noir;
     text-decoration: none;
     font-size: 18px;
+    position: relative;
+
+    .status-dot {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background-color: #23a559;
+        border-radius: 50%;
+        border: 2px solid $primary-color-blanc;
+        box-sizing: content-box;
+    }
 }
 
 #cart-icon-container {
@@ -167,16 +180,16 @@
 
 @keyframes item-pop-out {
     0% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+        transform: translate(-50%, -300%) scale(1);
     }
     50% {
         opacity: 1;
-        transform: translate(-50%, -200%) scale(1.2);
+        transform: translate(-50%, -150%) scale(1.2);
     }
     100% {
         opacity: 0;
-        transform: translate(-50%, -400%) scale(1);
+        transform: translate(-50%, -50%) scale(0.2);
     }
 }
 
