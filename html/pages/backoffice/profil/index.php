@@ -6,7 +6,7 @@ if (!isset($_SESSION['vendeur_id'])) {
     die("Vous n'êtes pas connecté.");
 }
 
-$compte_id = $_SESSION['vendeur_id'];
+$vendeur_id = $_SESSION['vendeur_id'];
 
 try {
     $query = "
@@ -14,12 +14,14 @@ try {
             v.denomination AS pseudo,
             v.raison_sociale AS rsociale,
             v.siren AS siren,
+            c.id_compte AS compte,
             c.email AS email,
             c.num_telephone AS telephone,
             a.a_adresse AS adresse,
             a.a_code_postal AS codep,
             a.a_ville AS ville,
             a.a_complement AS complement,
+            i.id_image,
             i.i_lien AS image
         FROM cobrec1._compte c
         LEFT JOIN cobrec1._vendeur v ON c.id_compte = v.id_compte
@@ -30,7 +32,7 @@ try {
     ";
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute(['id' => $compte_id]);
+    $stmt->execute(['id' => $vendeur_id]);
     $old = $stmt->fetch(PDO::FETCH_ASSOC); // récupère la ligne unique
 
     if (!$old) {
@@ -49,106 +51,181 @@ try {
 --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Liste des champs par table
-    $mapVendeur = [
-        'pseudo'   => 'denomination',
-        'rsociale' => 'raison_sociale',
-        'siren'    => 'siren'
-    ];
+    /* ---------------------------------------------------------
+       1. Mise à jour table _vendeur
+    --------------------------------------------------------- */
 
-    $mapCompte = [
-        'email'     => 'email',
-        'telephone' => 'num_telephone'
-    ];
+    // PSEUDO
+    if (isset($_POST['pseudo']) && $_POST['pseudo'] !== $old['pseudo']) {
+      $stmt = $pdo->prepare("
+            UPDATE cobrec1._vendeur
+            SET denomination = :val
+            WHERE id_vendeur = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['pseudo']),
+            'id'  => $vendeur_id
+        ]);
+    }
 
-    $mapAdresse = [
-        'adresse'   => 'a_adresse',
-        'codep'     => 'a_code_postal',
-        'ville'     => 'a_ville',
-        'complement'=> 'a_complement'
-    ];
+    // RAISON SOCIALE
+    if (isset($_POST['rsociale']) && $_POST['rsociale'] !== $old['rsociale']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._vendeur
+            SET raison_sociale = :val
+            WHERE id_vendeur = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['rsociale']),
+            'id'  => $vendeur_id
+        ]);
+    }
 
-    function getModifiedFields($post, $old, $mapping) {
-      $changes = [];
-      foreach ($mapping as $postKey => $dbField) {
-          $postVal = isset($post[$postKey]) ? trim($post[$postKey]) : "";
-          $oldVal  = isset($old[$postKey]) ? trim((string)$old[$postKey]) : "";
-
-          if ($postVal !== $oldVal) {
-              $changes[$dbField] = $postVal;
-          }
-      }
-      return $changes;
-  }
-
-
-
-    $chgVendeur = getModifiedFields($_POST, $old, $mapVendeur);
-    $chgCompte  = getModifiedFields($_POST, $old, $mapCompte);
-    $chgAdresse = getModifiedFields($_POST, $old, $mapAdresse);
-
-    try {
-      
-        /* ----------------------------
-          UPDATE vendeur (si modifié)
-        ---------------------------- */
-        if (!empty($chgVendeur)) {
-            $fields = $chgVendeur;
-            unset($fields['id']); // retire 'id' pour la partie SET
-
-            $sql = "UPDATE cobrec1._vendeur SET ";
-            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($fields)));
-            $sql .= " WHERE id_compte = :id";
-
-            $stmt = $pdo->prepare($sql);
-
-            $params = $fields; // champs à mettre à jour
-            $params['id'] = $chgVendeur['id']; // ajouter id pour le WHERE
-            $stmt->execute($params);
-        }
-
-        /* ----------------------------
-          UPDATE compte (si modifié)
-        ---------------------------- */
-        if (!empty($chgCompte)) {
-            $fields = $chgCompte;
-            unset($fields['id']); // retire 'id' pour la partie SET
-
-            $sql = "UPDATE cobrec1._compte SET ";
-            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($fields)));
-            $sql .= " WHERE id_compte = :id";
-
-            $stmt = $pdo->prepare($sql);
-
-            $params = $fields;
-            $params['id'] = $chgCompte['id'];
-            $stmt->execute($params);
-        }
-
-        /* ----------------------------
-          UPDATE adresse (si modifié)
-        ---------------------------- */
-        if (!empty($chgAdresse)) {
-            $fields = $chgAdresse;
-            unset($fields['id']); // retire 'id' pour la partie SET
-
-            $sql = "UPDATE cobrec1._adresse SET ";
-            $sql .= implode(", ", array_map(fn($f) => "$f = :$f", array_keys($fields)));
-            $sql .= " WHERE id_compte = :id";
-
-            $stmt = $pdo->prepare($sql);
-
-            $params = $fields;
-            $params['id'] = $chgAdresse['id'];
-            $stmt->execute($params);
-        }
-
-    } catch (PDOException $e) {
-        die("Erreur lors de la mise à jour : " . htmlspecialchars($e->getMessage()));
+    // SIREN
+    if (isset($_POST['siren']) && $_POST['siren'] !== $old['siren']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._vendeur
+            SET siren = :val
+            WHERE id_vendeur = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['siren']),
+            'id'  => $vendeur_id
+        ]);
     }
 
 
-    header("Location: index.php");
+
+    /* ---------------------------------------------------------
+       2. Mise à jour table _compte
+    --------------------------------------------------------- */
+
+    // EMAIL
+    if (isset($_POST['email']) && $_POST['email'] !== $old['email']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._compte
+            SET email = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['email']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+    // TÉLÉPHONE
+    if (isset($_POST['telephone']) && $_POST['telephone'] !== $old['telephone']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._compte
+            SET num_telephone = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['telephone']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+
+
+    /* ---------------------------------------------------------
+       3. Mise à jour table _adresse
+    --------------------------------------------------------- */
+
+    // ADRESSE
+    if (isset($_POST['adresse']) && $_POST['adresse'] !== $old['adresse']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._adresse
+            SET a_adresse = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['adresse']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+    // VILLE
+    if (isset($_POST['ville']) && $_POST['ville'] !== $old['ville']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._adresse
+            SET a_ville = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['ville']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+    
+
+    // CODE POSTAL
+    if (isset($_POST['codep']) && $_POST['codep'] !== $old['codep']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._adresse
+            SET a_code_postal = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['codep']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+    // COMPLEMENT
+    if (isset($_POST['complement']) && $_POST['complement'] !== $old['complement']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._adresse
+            SET a_complement = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['complement']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+
+    /* ---------------------------------------------------------
+      4. Mise à jour de l'image du vendeur
+      --------------------------------------------------------- */
+      if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+
+          // Dossier cible
+          $uploadDir = "../../../img/photo/";
+          
+          // Nom unique
+          $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+          $filename = "vendeur_" . $vendeur['compte'] . "_" . time() . "." . $ext;
+
+          // Chemin final
+          $filePath = $uploadDir . $filename;
+
+          // Déplace le fichier
+          if (move_uploaded_file($_FILES['image']['tmp_name'], $filePath)) {
+
+              // Nettoyage pour le chemin dans la BDD
+              $dbPath = "html/img/photo/" . $filename;
+              $ImageId = $vendeur['id_image'];
+
+              /* ---- 1) Insérer l'image dans _image ---- */
+              $stmt = $pdo->prepare("
+                  UPDATE cobrec1._image
+                  SET id_image = :lien
+                  WHERE id_image = :img
+              ");
+
+              $stmt->execute([
+                    'img' => $ImageId,
+                    'lien' => $dbPath
+              ]);
+      }
+    }
+
+    /* ---------------------------------------------------------
+       Redirection
+    --------------------------------------------------------- */
+    header("Location: index.php?success=1");
     exit;
 }
 
@@ -187,7 +264,12 @@ function safe($array, $key, $default = "") {
           <img src="<?= str_replace("html/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>" alt="Photo vendeur">
         </div>
 
-        <form id="edit-form" class="edit-form" action="" method="POST" onsubmit="alert('form envoyé');">
+        <form id="edit-form" class="edit-form" action="" method="POST" enctype="multipart/form-data">
+
+          <div class="form-row">
+            <label>Changer l'image</label>
+            <input type="file" name="image" accept="image/*">
+          </div>
 
           <div class="form-row">
             <label>Pseudo</label>
