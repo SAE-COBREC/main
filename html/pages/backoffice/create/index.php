@@ -127,20 +127,7 @@
                         $_POST["prix"] = $_SESSION["creerArticle"]['_GET']['p_prix'];
 
                     }
-                }//else if($_SESSION["creerArticle"]['_GET']['id_produit'] != $_GET['modifier']){
-                    //si l'utilisateur a changé l'url
-                    //print_r('changement');
-                    // $_POST = [];
-                    // $_SESSION["creerArticle"] = [];
-                    // $_FILES["photo"]["name"] = [];
-                    ?>
-                    <script>
-                        //recharge la page afin de remplir les chamspa vec les nouvelles valeurs
-                        //location.reload();
-                    </script>
-
-                    <?php
-                //}
+                }
            
             
             }
@@ -1208,8 +1195,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 ?>
 
 <script>
-    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion");
-    document.location.href = "/pages/backoffice/connexionVendeur/index.php"; 
+    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+    //document.location.href = "/pages/backoffice/connexionVendeur/index.php"; 
 
             
 </script>
