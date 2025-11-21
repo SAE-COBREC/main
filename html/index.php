@@ -55,11 +55,11 @@ if ($idClient === null) {
 
 //gérer l'ajout au panier via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
-    //désactiver l'affichage des erreurs PHP
-    ini_set('display_errors', 0);
-    error_reporting(0);
-    //nettoyer les buffers (par sécurité)
-    while (ob_get_level()) { ob_end_clean(); }
+    // //désactiver l'affichage des erreurs PHP
+    // ini_set('display_errors', 0);
+    // error_reporting(0);
+    // //nettoyer les buffers (par sécurité)
+    // while (ob_get_level()) { ob_end_clean(); }
     header('Content-Type: application/json');
 
     $idProduit = $_POST['idProduit'] ?? null;
