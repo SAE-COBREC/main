@@ -142,6 +142,28 @@ body {
     transform: translateY(0);
   }
 }
+.password-field {
+  position: relative;
+}
+
+.toggle-pwd {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+.toggle-pwd img {
+  width: 20px;
+  height: 20px;
+  margin-top: 30px;
+  margin-right: 10px;
+}
+
 .error {
   color: red;
   font-size: 0.8rem;
@@ -155,4 +177,24 @@ body {
 
 .invalid {
   border: 2px solid red !important;
+}
+
+.popup-success {
+  position: fixed;
+  top: 20%;
+  left: 45%;
+  background-color: #8B5A2B;
+  color: #FFFFFF;
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-size: 18px;
+  box-shadow: 0 4px 20px #030212;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+}
+
+.popup-success.show {
+  opacity: 1;
 }/*# sourceMappingURL=profil.css.map */

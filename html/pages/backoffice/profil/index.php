@@ -378,40 +378,47 @@ function safe($array, $key, $default = "") {
 
       <!-- ===== FORMULAIRE DE MODIFICATION DU MOT DE PASSE ===== -->
 
-      <?php if (isset($_GET['password_success'])): ?>
-        <div class="alert-success">Mot de passe modifié avec succès !</div>
-      <?php endif; ?>
+      <!-- POPUP DE SUCCÈS -->
+    <div id="popup-success" class="popup-success">
+    Mot de passe modifié avec succès !
+    </div>
+
+    <div class="profil-card mt-4">
+
+    <h2 class="profil-card__title">Modifier mon mot de passe</h2>
+
+    <form id="form-password" method="POST" class="edit-form">
+
+        <div class="form-row password-field">
+            <label for="old_password">Ancien mot de passe</label>
+            <input type="password" id="old_password" name="old_password" required>
+            <span class="toggle-pwd" onclick="togglePassword('old_password', this)">
+                <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
+            </span>
+        </div>
+
+        <div class="form-row password-field">
+            <label for="new_password">Nouveau mot de passe</label>
+            <input type="password" id="new_password" name="new_password" required>
+            <span class="toggle-pwd" onclick="togglePassword('new_password', this)">
+                <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
+            </span>
+        </div>
+
+        <div class="form-row password-field">
+            <label for="confirm_password">Confirmer le mot de passe</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+            <span class="toggle-pwd" onclick="togglePassword('confirm_password', this)">
+                <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
+            </span>
+        </div>
 
 
-      <div class="profil-card mt-4">
 
-        <h2 class="profil-card__title">Modifier mon mot de passe</h2>
+        <button class="btn btn--primary" type="submit" name="change_password">Modifier mon mot de passe</button>
 
-        <form id="form-password" method="POST" class="edit-form">
-
-            <div class="form-row">
-                <label for="old_password">Ancien mot de passe</label>
-                <input type="password" id="old_password" name="old_password" required>
-            </div>
-
-            <div class="form-row">
-                <label for="new_password">Nouveau mot de passe</label>
-                <input type="password" id="new_password" name="new_password" required>
-                <span class="error" id="error-new_password"></span>
-            </div>
-
-            <div class="form-row">
-                <label for="confirm_password">Confirmer le mot de passe</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
-                <span class="error" id="error-confirm_password"></span>
-            </div>
-
-            <button class="btn btn--primary" type="submit" name="change_password">Modifier mon mot de passe</button>
-
-        </form>
-      </div>
-
-
+    </form>
+    </div>
     </main>
   </div>
   <script>
@@ -515,6 +522,35 @@ function safe($array, $key, $default = "") {
             error.textContent = "Les mots de passe ne correspondent pas.";
         }
     });
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.has("password_success")) {
+        const popup = document.getElementById("popup-success");
+
+        popup.classList.add("show");
+
+        // Disparaît après 1 seconde
+        setTimeout(() => {
+            popup.classList.remove("show");
+        }, 3000);
+
+        // Nettoyage de l'URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    function togglePassword(id, iconSpan) {
+        const field = document.getElementById(id);
+        const img = iconSpan.querySelector("img");
+
+        if (field.type === "password") {
+            field.type = "text";
+            img.src = "../../../img/svg/oeil-barre.svg"; // icône oeil barré
+        } else {
+            field.type = "password";
+            img.src = "../../../img/svg/oeil.svg"; // icône oeil normal
+        }
+    }
   </script>
 </body>
 </html>
