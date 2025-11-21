@@ -692,9 +692,7 @@ function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $
     }
 }
 
-/**
- * Charge les informations d'un produit et ses images
- */
+//charge les informations d'un produit et ses images
 function chargerProduitBDD($pdo, $idProduit) {
     try {
         $stmtProd = $pdo->prepare("SELECT 
@@ -745,9 +743,7 @@ function chargerProduitBDD($pdo, $idProduit) {
     }
 }
 
-/**
- * Charge les avis et réponses pour un produit
- */
+//charge les avis et réponses pour un produit
 function chargerAvisBDD($pdo, $idProduit) {
     $avis = [];
     $reponses = [];
@@ -788,9 +784,7 @@ function chargerAvisBDD($pdo, $idProduit) {
     return ['avis' => $avis, 'reponses' => $reponses];
 }
 
-/**
- * Gestion des actions AJAX pour les avis
- */
+//gestion des actions AJAX pour les avis
 function gererActionsAvis($pdo, $idClient, $idProduit) {
     header('Content-Type: application/json; charset=utf-8');
     $action = $_POST['action'] ?? 'add_avis';
