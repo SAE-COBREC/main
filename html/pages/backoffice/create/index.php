@@ -317,7 +317,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             <?php
             if(empty($_SESSION["creerArticle"]['_GET']['id_produit']) == false){//si la page est en mode US modification
                 ?>
-                <input type="submit" name="svgModif"title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" />
+                <input type="submit" name="svgModif" title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" />
                 <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
                 <input class="orange" type="submit" name="horsLigne"title="Un article hors ligne n'est plus visible que vous." value="Mettre hors ligne" />
                 <script>
@@ -387,7 +387,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         ?>"
                             minlength="4"
                             maxlength="100"
-                            pattern="[\[\]\(\)\'\x22&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
+                            pattern="[\[\]\(\)'&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+\-=°: .;,!? ]+"
                             required />
                             <?php
                         if($titre != ''){
@@ -399,7 +399,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             ?></small>
                         <?php } ?>
                         <br>
-                        <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +=°[]()'" sont autorisés.</small>
+                        <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +-=°[]()' sont autorisés.</small>
                         <br /> 
                     </article>
 
@@ -410,10 +410,10 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <textarea id="description" name="description" rows="5" cols="60"
                         minlength="4"
                         maxlength="9999"
-                        pattern="[\[\]\(\)\'\x22&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+=°: .;,!? ]+"
+                        pattern="[\[\]\(\)'&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+\-=°: .;,!? ]+"
                         required><?php echo $_POST["description"]; ?></textarea>
                         <br>
-                        <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +=°[]()'" sont autorisés.</small>
+                        <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +-=°[]()' sont autorisés.</small>
                         <br /> 
                     </article>
                 </section>
@@ -660,57 +660,57 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         //
                     }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
                         //
-                    }elseif ($_POST["btn_maj"] == null){//si la zone de réduction n'est que partiellement remplie
+                    }elseif ($_POST["btn_maj"] == null){//si la zone de promotion n'est que partiellement remplie
                         $_SESSION["creerArticle"]["warn"]++;
                         $warnPromo = true;
                         echo 'border: 3px solid red';
                     }
                 ?>">
                     <article>
-                        <p><strong>(Zone facultative)</strong></p>
+                        <!-- <p><strong>(Zone facultative)</strong></p>
                         <?php 
-                            if ($warnPromo){
+                            // if ($warnPromo){
                         ?>
                         <small class="warn"><?php
-                            echo 'Veuillez remplir tous les champs du bloc réduction ou n\'en remplir aucun.';
-                            $_SESSION["creerArticle"]["warn"]++;
+                            // echo 'Veuillez remplir tous les champs du bloc promotion ou n\'en remplir aucun.';
+                            // $_SESSION["creerArticle"]["warn"]++;
                         ?></small>
                         <br>
                         <?php
-                            }
+                            //}
                         ?>
-                        <label for="pourcentage">Pourcentage de réduction</label>
+                        <label for="pourcentage">Pourcentage de promotion</label>
                         <br>
-                        <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00 %" />
+                        <input type="number" id="pourcentage" name="pourcentage" value="<?php //echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00 %" />
 
-                        <br />
+                        <br /> -->
                     </article>
 
                     <article>
-                        <label for="debut">Date de début de réduction</label>
+                        <!-- <label for="debut">Date de début de promotion</label>
                         <br>
-                        <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
-                            value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
+                        <input style="<?php //if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
+                            value="<?php //echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
                             <?php
-                                if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
+                                // if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
                                     ?>
                                     <br>
                                     <small class="warn"><?php
-                                        echo $_POST["debut"] . ' '. $_POST["fin"] . ' ' . 'Le premieur horodatage est postérieur (ou égal) au second';
-                                        $_SESSION["creerArticle"]["warn"]++;
+                                        // echo $_POST["debut"] . ' '. $_POST["fin"] . ' ' . 'Le premieur horodatage est postérieur (ou égal) au second';
+                                        // $_SESSION["creerArticle"]["warn"]++;
                                     ?></small>
                                     <?php
-                                }
+                                //}
                         ?>
-                        <br />
+                        <br /> -->
                     </article>
 
                     <article>
-                        <label for="fin">Date de fin de réduction</label>
+                        <!-- <label for="fin">Date de fin de promotion</label>
                         <br>
-                        <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
-                            value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
-                        <br />
+                        <input style="<?php //if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
+                            value="<?php //echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
+                        <br /> -->
                     </article>
                 </section>
 
@@ -911,7 +911,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 }
                             }
 
-                            //ne pas faire réduction, hors must du Sprint 1
+                            //ne pas faire promotion, hors must du Sprint 1
 
 
                             //Supprime les fichiers de temp_

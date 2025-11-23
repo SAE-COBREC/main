@@ -451,6 +451,23 @@ ALTER TABLE ONLY cobrec1._represente_produit
     ADD CONSTRAINT fk_represente_produit_produit FOREIGN KEY (id_produit) 
             REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
 
+-- TABLE REPRESENTE_PROMOTION
+CREATE TABLE cobrec1._represente_promotion (
+    id_image integer NOT NULL,
+    id_promotion integer NOT NULL
+);
+
+ALTER TABLE ONLY cobrec1._represente_promotion
+    ADD CONSTRAINT pk_represente_promotion PRIMARY KEY (id_image, id_promotion);
+
+ALTER TABLE ONLY cobrec1._represente_promotion
+    ADD CONSTRAINT fk_represente_promotion_image FOREIGN KEY (id_image) 
+            REFERENCES cobrec1._image(id_image) ON DELETE CASCADE;
+
+ALTER TABLE ONLY cobrec1._represente_promotion
+    ADD CONSTRAINT fk_represente_promotion_promotion FOREIGN KEY (id_promotion) 
+            REFERENCES cobrec1._promotion(id_promotion) ON DELETE CASCADE;
+
 -- TABLE REPRESENTE_COMPTE
 CREATE TABLE cobrec1._represente_compte (
     id_image integer NOT NULL,
