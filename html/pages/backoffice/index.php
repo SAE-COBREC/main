@@ -8,7 +8,18 @@ session_start();
 include '../../selectBDD.php';
 
 // Récupération de l'ID du vendeur connecté depuis la session
-$vendeur_id = $_SESSION['vendeur_id'];
+if(empty($_SESSION['vendeur_id']) === false){
+  $vendeur_id = $_SESSION['vendeur_id'];
+}else{
+?>
+
+<script>
+    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+    document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+</script>
+<?php
+}
+
 
 // Initialisation d'un tableau vide pour stocker éventuellement de nouveaux articles
 $_SESSION['creerArticle'] = [];
