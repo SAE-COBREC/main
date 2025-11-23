@@ -315,7 +315,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             <!-- Boutons de soumission principaux -->
             <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
             <?php
-            if($_SESSION["creerArticle"]['_GET'] != null){//si la page est en mode US modification
+            if(empty($_SESSION["creerArticle"]['_GET']['id_produit']) == false){//si la page est en mode US modification
                 ?>
                 <input type="submit" name="svgModif"title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" />
                 <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
@@ -760,6 +760,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             <pre>
                 <?php 
                     if (($_SESSION["creerArticle"]["warn"] === 0) && ($_POST["titre"] !== '')){
+                        $time = time();
                         // print_r("WARNS : " . $_SESSION["creerArticle"]["warn"]);
                             // print_r($_SESSION["creerArticle"]["_FILES"]["photo"]["name"]);
 
@@ -817,7 +818,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             } catch (Exception $e) {
                                 //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
                                 $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet produit dans la base";
-                                $time = time();
                                 $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
 
@@ -950,6 +950,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     
                 }else if (($_POST["horsLigne"] == "Mettre hors ligne") || ($_POST["enLigne"] == "Mettre en ligne") || ($_POST["svgModif"] == "Sauvegarder les modifications")){
                     //Si pas de warning et formulaire soumis via le bouton Mettre en ligne/hors ligne
+                    $time = time();
                     
                     try {//modif de l'objet produit dans la base
                         $sql = '
@@ -970,7 +971,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         $_SESSION["creerArticle"]['_GET']['p_nom'] = $_POST['titre'];
                     } catch (Exception $e) {
                         //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
-                        $time = time();
                         $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'objet produit dans la base";
                         //print_r($_POST);
                         foreach ($_POST as $value) {

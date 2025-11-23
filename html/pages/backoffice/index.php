@@ -145,7 +145,7 @@ try {
                 <td class="products-table__cell">
                   <div class="product">
                     <div class="product__image">
-                      <img src="<?= str_replace("html/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])); ?>" width="50" height="50">
+                      <img src="<?= str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])); ?>" width="50" height="50">
                     </div>
                     <div class="product__info">
                       <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
