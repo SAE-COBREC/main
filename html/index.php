@@ -169,6 +169,7 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
 
     <script src="/js/notifications.js"></script>
     <script>
+        //fonction pour ajouter au panier avec requête AJAX vers la base de données
         function ajouterAuPanier(idProduit) {
             const formData = new FormData();
             formData.append('action', 'ajouter_panier');
@@ -190,15 +191,6 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                     window.notify ? notify('Erreur lors de l\'ajout au panier', 'error') : alert('Erreur lors de l\'ajout au panier');
                 });
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const aside = document.querySelector('aside');
-            if (aside) {
-                aside.addEventListener('click', function () {
-                    this.classList.toggle('open');
-                });
-            }
-        });
     </script>
 </body>
 
