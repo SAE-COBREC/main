@@ -161,8 +161,12 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 <div class="title"><?= htmlspecialchars($produit['p_nom']) ?></div>
                 <div class="rating">
                     <span class="stars" id="summaryStars" aria-hidden="true">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <img src="/img/svg/star-<?= $i <= $noteEntiere ? 'full' : 'empty' ?>.svg" alt="Etoile" width="20">
+                        <?php for ($i = 1; $i <= 5; $i++): 
+                            if ($note >= $i) $s = 'full';
+                            elseif ($note >= $i - 0.5) $s = 'alf';
+                            else $s = 'empty';
+                        ?>
+                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                     </span>
                     <span id="summaryRatingValue" style="color:var(--muted);font-weight:600"><?= number_format($note, 1) ?></span>
