@@ -131,7 +131,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
 </head>
 <body>
-    <?php include __DIR__ . '/partials/header.php'; ?>
+    <?php include __DIR__ . '../../partials/header.php'; ?>
 
     <nav class="page-breadcrumb">
         <a class="btn btn-retour-catalogue back-link" href="/index.php" onclick="if (history.length>1) { history.back(); return false; }" aria-label="Retour au catalogue">
@@ -339,7 +339,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
         </section>
     </main>
 
-    <?php include __DIR__ . '/partials/footer.php'; ?>
+    <?php include __DIR__ . '../../partials/footer.php'; ?>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/js/HL_import.js"></script>
