@@ -6,7 +6,7 @@ session_start();
 include __DIR__ . '/selectBDD.php';
 
 //inclure les fonctions utilitaires
-include __DIR__ . '/pages/fonctions.php'; 
+include __DIR__ . '/pages/fonctions.php';
 
 //récupérer la connexion PDO depuis le fichier de configuration
 $connexionBaseDeDonnees = $pdo;
@@ -89,32 +89,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 //fonction pour filtrer les produits selon les critères choisis
-function filtrerProduits($listeProduits, $filtres) {
+function filtrerProduits($listeProduits, $filtres)
+{
     $produits_filtres = [];
     foreach ($listeProduits as $produitCourant) {
-        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum']) continue;
+        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum'])
+            continue;
         if ($filtres['categorieFiltre'] !== 'all') {
             $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
-            if (!in_array($filtres['categorieFiltre'], $categoriesProduit)) continue;
+            if (!in_array($filtres['categorieFiltre'], $categoriesProduit))
+                continue;
         }
-        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0) continue;
-        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum']) continue;
+        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0)
+            continue;
+        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum'])
+            continue;
         $produits_filtres[] = $produitCourant;
     }
     return $produits_filtres;
 }
 
 //fonction pour trier les produits selon le critère choisi
-function trierProduits($listeProduits, $tri_par) {
+function trierProduits($listeProduits, $tri_par)
+{
     switch ($tri_par) {
         case 'meilleures_ventes':
-            usort($listeProduits, function ($a, $b) { return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0); });
+            usort($listeProduits, function ($a, $b) {
+                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0); });
             break;
         case 'prix_croissant':
-            usort($listeProduits, function ($a, $b) { return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0); });
+            usort($listeProduits, function ($a, $b) {
+                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0); });
             break;
         case 'prix_decroissant':
-            usort($listeProduits, function ($a, $b) { return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0); });
+            usort($listeProduits, function ($a, $b) {
+                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0); });
             break;
         case 'note':
             usort($listeProduits, function ($a, $b) {
@@ -128,7 +137,8 @@ function trierProduits($listeProduits, $tri_par) {
 }
 
 //fonction pour préparer les catégories pour l'affichage
-function preparercategories_affichage($listeCategories) {
+function preparercategories_affichage($listeCategories)
+{
     $categories_affichage = [];
     $total_produits = 0;
     foreach ($listeCategories as $nomCategorie => $compte) {
@@ -190,80 +200,61 @@ $categories_affichage = preparercategories_affichage($listeCategories);
     ?>
 
     <div class="container">
-        <aside>
-            <form method="POST" action="" id="filterForm">
-                <div>
-                    <span>Tri par :</span>
-                    <select name="sort" onchange="document.getElementById('filterForm').submit()">
-                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>
-                            Meilleures ventes
-                        </option>
-                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix
-                            croissant</option>
-                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix
-                            décroissant
-                        </option>
-                        <option value="note" <?= $tri_par === 'note' ? 'selected' : '' ?>>Mieux notés</option>
-                    </select>
-                </div>
-
-                <div>
-                    <h3>Filtres</h3>
-                    <button type="button" onclick="reinitialiserFiltres()">Effacer</button>
-                </div>
-
-                <section>
-                    <h4>Catégories</h4>
-                    <div onclick="definirCategorie('all')">
-                        <span>Tous les produits</span>
-                        <span><?= $tousLesProduits ?></span>
-                    </div>
-                    <?php foreach ($categories_affichage as $categorieCourante): ?>
-                        <?php if ($categorieCourante['category'] !== 'all'): ?>
-                            <div onclick="definirCategorie('<?= htmlspecialchars($categorieCourante['category']) ?>')">
-                                <span><?= htmlspecialchars($categorieCourante['category']) ?></span>
-                                <span><?= $categorieCourante['count'] ?></span>
-                            </div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </section>
-
-                <section>
-                    <h4>Prix</h4>
-                    <div>
-                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>"
-                            value="<?= $prixMaximum ?>" oninput="mettreAJourAffichagePrix(this.value)"
-                            onchange="document.getElementById('filterForm').submit()">
-                    </div>
-                    <div>
-                        <span>0€</span>
-                        <span id="affichagePrixMax" ondblclick="activerEditionPrix()"><?= $prixMaximum ?>€</span>
-                    </div>
-                </section>
-
-                <section>
-                    <h4>Note minimum</h4>
-                    <?php for ($i = 5; $i >= 1; $i--): ?>
-                        <div onclick="definirNote(<?= $i ?>)">
-                            <span><?= str_repeat('<img src="/img/svg/star-full.svg" alt="★" width="16" style="margin-right:3px;">', $i) . str_repeat('<img src="/img/svg/star-empty.svg" alt="☆" width="16">', 5 - $i) ?></span>
-                            <span><?= $i ?> et plus</span>
-                        </div>
-                    <?php endfor; ?>
-                </section>
-
-                <section>
-                    <h4>Disponibilité</h4>
-                    <label>
-                        <input type="checkbox" name="in_stock" <?= $enStockSeulement ? 'checked' : '' ?>
-                            onchange="document.getElementById('filterForm').submit()">
-                        <span>En stock uniquement</span>
-                    </label>
-                </section>
-
-                <input type="hidden" name="category" id="champCategorie"
-                    value="<?= htmlspecialchars($categorieFiltre) ?>">
-                <input type="hidden" name="note" id="champNote" value="<?= $noteMinimum ?>">
-            </form>
+        <aside style="background-image: url(https://media.licdn.com/dms/image/v2/D4E03AQFHzl7e4f9AOA/profile-displayphoto-scale_200_200/B4EZnsAwbtJ0AY-/0/1760601248177?e=1765411200&v=beta&t=BqJE_NgYrU3tcx8zDv-tj7DN4JVLkJER26Xy3L7RDJI);">
+            <section>
+                <h3>lorem ipsum</h3>
+            </section>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+           
         </aside>
 
         <main>
