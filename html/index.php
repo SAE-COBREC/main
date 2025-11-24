@@ -182,9 +182,11 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                                     <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
                                 </div>
                                 <div>
-                                    <?php if ($possedePourcentageRemise): ?>
-                                        <span><?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€</span>
-                                    <?php endif; ?>
+                                    <span>
+                                        <?php if ($possedePourcentageRemise): ?>
+                                            <?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€
+                                        <?php endif; ?>
+                                    </span>
                                     <span><?= number_format($prixApresRemise, 2, ',', ' ') ?>€</span>
                                 </div>
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
