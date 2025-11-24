@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
     <div class="card" id="1">
       <div class="logo">
-        <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
+        <img  src="../../img/svg/logo-text.svg" alt="Logo Alizon" onclick="window.location.href='../../index.php'">
       </div>
 
       <h1>Connexion</h1>
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="mdp">Mot de passe</label>
   <input type="password" id="mdp" name="mdp" placeholder="***********" required>
       </div>
-  <div class="forgot" onclick="window.location.href='../MDPoublie/index.php'">Mot de passe oublié ?</div>
+      <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?</div>
       <!-- affichage des erreurs de saisi -->
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>

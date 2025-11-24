@@ -34,6 +34,7 @@ $pdo->exec("SET search_path TO cobrec1");
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
+  $cmdp = $_POST['Cmdp'] ?? '';
 
   $hasError = false;
   $error_card = null;
@@ -51,47 +52,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    
-    // CORRECTION: Si le compte n'existe PAS
     if (!$row) {
       $hasError = true;
       $error_card = 1;
       $error_message = 'Adresse mail ou pseudo introuvable.';
     } else {
-      // OPTION A: Si vos mots de passe SONT hachés (recommandé)
-      // Décommentez ces lignes et commentez l'OPTION B
-      /*
-      if (password_verify($mdp, $row['mdp'])) {
+      // Vérification que la confirmation correspond au nouveau mot de passe
+      if ($cmdp !== $mdp) {
         $hasError = true;
         $error_card = 1;
-        $error_message = 'Veuillez saisir un nouveau mot de passe différent de l\'ancien.';
+        $error_message = 'Les mots de passe ne correspondent pas.';
+      }
+      if ($hasError) {
+        // stop further processing
       } else {
-        $mdp_hache = password_hash($mdp, PASSWORD_DEFAULT);
-        $sql = 'UPDATE cobrec1._compte SET mdp = :mdp WHERE email = :email';
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-          ':mdp' => $mdp_hache,
-          ':email' => $login
-        ]);
-      */
-      
-      // OPTION B: Si vos mots de passe NE SONT PAS hachés (non sécurisé)
-      // Commentez ces lignes si vous utilisez l'OPTION A
       if ($mdp === $row['mdp']) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Veuillez saisir un nouveau mot de passe différent de l\'ancien.';
       } else {
-        // ATTENTION: Stockage en clair = NON SÉCURISÉ !
-        // Utilisez password_hash() dès que possible
-        $sql = 'UPDATE _compte SET mdp = :mdp WHERE email = :email';
+        $sql = 'UPDATE cobrec1._compte SET mdp = :mdp WHERE id_compte = :id_compte';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
           ':mdp' => $mdp,
-          ':email' => $login
+          ':id_compte' => $row['id_compte']
         ]);
         
-        // CORRECTION: Récupérer l'ID client si nécessaire
+        // CORRECTION: Récupérer l'ID client si nécessaire  
         $stmtClient = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id_compte");
         $stmtClient->execute([':id_compte' => $row['id_compte']]);
         $clientRow = $stmtClient->fetch(PDO::FETCH_ASSOC);
@@ -105,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $url = '../connexionClient/index.php';
         echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
         exit;
+      }
       }
     }
   } catch (Exception $e) {
@@ -120,16 +108,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <style>
   body {
-    background: linear-gradient(to bottom right, #030212, #7171A3);
+    background: linear-gradient(to bottom right, #D4183D, #CD7F32);
   }
   .debutant a {
-    color: #7171A3;
+    color: #CD7F32;
   }
   .footer > p {
-    color: #7171A3;
+    color: #CD7F32;
   }
   .connex-btn > button:hover {
-    background: #7171A3;
+    background: #CD7F32;
     color: #030212;
   }
 </style>
@@ -138,20 +126,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
     <div class="card" id="1">
       <div class="logo">
-        <img src="../../img/logo-text.svg" alt="Logo Alizon">
+        <img  src="../../img/svg/logo-text.svg" alt="Logo Alizon" onclick="window.location.href='../../index.php'">
       </div>
 
       <h1>Récupération mdp</h1>
 
       <div>
-        <label for="email">Email ou pseudo</label>
+        <label for="email">Email de réccuperation</label>
         <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
 
       <div>
         <label for="mdp">Nouveau mot de passe</label>
-        <input type="password" id="mdp" name="mdp" placeholder="***********" required>
+        <input type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
       </div>
+
+      <div>
+        <label for="Cmdp">Confirmer le mot de passe</label>
+        <input type="password" id="Cmdp" name="Cmdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Veuillez saisir les memes mot de passe">
+      </div>
+
+      
 
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
@@ -165,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </button>
       </div>
       
-      <div class="debutant">Débutant sur Alizon ? <a href="../creationClient/index.php"><strong>Démarrer →</strong></a></div>
+      <div class="debutant">Retour a la page de <a href="../connexionClient/index.php"><strong>Connexion →</strong></a></div>
       
       <div class="footer">
         <p>Aide</p><p>Confidentialité</p><p>Conditions</p>
@@ -174,10 +169,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
+
+    function getFieldValidationMessage(el) {
+      try {
+        if (el && el.validity) {
+          //verification du mdp
+          if (el.id === 'mdp') {
+            var val = (el.value || '').trim();
+            if (val.length === 0) return 'Ce champ est requis.';
+            if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
+            if (val.length > 16) return 'Le mot de passe doit contenir au maximum 16 caractères.';
+            if (!/[0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un chiffre.';
+            if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';
+            if (!/[a-z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre minuscule.';
+            if (!/[^A-Za-z0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un caractère spécial.';
+            if (el.validity.patternMismatch) return 'Le mot de passe ne respecte pas le format requis.';
+          }
+        }
+      } catch (e) { /* ignore */ }
+      return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
+    }
+
+
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');
       var form = document.getElementById('multiForm');
       if (!form) return;
+
+      // First ensure HTML5 validity
       if (!form.checkValidity()) {
         var invalid = form.querySelector(':invalid');
         if (invalid) {
@@ -198,14 +217,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               alert(message);
             }
           }
-          invalid.focus();
+          try { invalid.focus(); } catch (e) { /* ignore */ }
         }
         return;
       }
+
+      // Explicit password confirmation check (client-side)
       try {
-        window.__allow_submit = true;
+        var mdpEl = document.getElementById('mdp');
+        var cmdpEl = document.getElementById('Cmdp');
+        if (mdpEl && cmdpEl) {
+          var mdpVal = mdpEl.value || '';
+          var cmdpVal = cmdpEl.value || '';
+          if (mdpVal !== cmdpVal) {
+            var cardEl = document.querySelector('.card');
+            var err = cardEl ? cardEl.querySelector('.error') : null;
+            if (err) {
+              err.textContent = 'Les mots de passe ne correspondent pas.';
+              err.classList.remove('hidden');
+            } else {
+              alert('Les mots de passe ne correspondent pas.');
+            }
+            try { mdpEl.focus(); } catch (e) { /* ignore */ }
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('password confirmation check failed', e);
+      }
+
+      // Submit the form
+      try {
+        try { window.__allow_submit = true; } catch (e) { /* ignore */ }
         try { window.__submission_confirmed = false; } catch (e) {}
-        console.log('[register] calling requestSubmit (or form.submit fallback)');
         if (typeof form.requestSubmit === 'function') {
           form.requestSubmit();
         } else {
@@ -214,14 +258,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setTimeout(function () {
           try {
             if (!window.__submission_confirmed) {
-              console.warn('[register] no submit event detected within timeout — using fallback form.submit()');
-              window.__allow_submit = true;
+              try { window.__allow_submit = true; } catch (e) {}
               form.submit();
             }
           } catch (e) { console.error('[register] fallback submit failed', e); }
         }, 600);
       } catch (e) {
-        window.__allow_submit = false;
+        try { window.__allow_submit = false; } catch (ex) { /* ignore */ }
         form.submit();
       }
     }

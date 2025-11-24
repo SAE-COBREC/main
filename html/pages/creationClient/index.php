@@ -161,7 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   body {
     background: linear-gradient(to bottom right, #7171A3, #030212);
   }
-
+  .debutant a {
+    color: #7171A3;
+  }
   /* style pour entourer en rouge les champs qui ont une erreur */
   .field-error {
     border-color: #dc143c !important;
@@ -189,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
     <div class="card" id="1">
       <div class="logo">
-        <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
+        <img  src="../../img/svg/logo-text.svg" alt="Logo Alizon" onclick="window.location.href='../../index.php'">
       </div>
 
       <h1>Créer un compte</h1>
@@ -210,13 +212,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required>
       </div>
 
+      <div class="debutant">Retour a la page de <a href="../connexionClient/index.php"><strong>Connexion →</strong></a></div>
 
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
         <?php endif; ?>
       </div>
-
       <div class="step">étape 1 / 4</div>
 
       
@@ -226,6 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <img src="../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow"
             aria-hidden="true">
         </button>
+
       </div>
     </div>
 
