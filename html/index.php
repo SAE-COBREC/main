@@ -88,10 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-//chargement des données depuis la base de données
-$donnees = chargerProduitsBDD($connexionBaseDeDonnees);
-$listeProduits = $donnees['produits'];
-
+$listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
 ?>
 
 <!DOCTYPE html>
@@ -107,69 +104,23 @@ $listeProduits = $donnees['produits'];
 </head>
 
 <body>
-    <?php
-    include __DIR__ . '/partials/header.php';
-    ?>
+    <?php include __DIR__ . '/partials/header.php'; ?>
 
     <div class="container">
-        <aside style="background-color: white;">
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>    
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>      
-        </aside>
+        <aside style="background-color: white;"></aside>
 
         <main>
             <div>
                 <?php if (empty($listeProduits)): ?>
                     <p>Aucun produit ne correspond à vos critères de recherche.</p>
                 <?php else: ?>
-                    <?php foreach ($listeProduits as $produitCourant): ?>
-                        <?php
-                        //détermine si le produit est en rupture de stock
+                    <?php foreach ($listeProduits as $produitCourant):
                         $estEnRupture = $produitCourant['p_stock'] <= 0;
-                        //vérifie si le produit a une remise
                         $possedePourcentageRemise = !empty($produitCourant['pourcentage_reduction']) && $produitCourant['pourcentage_reduction'] > 0;
-                        //calcule le prix final (avec remise si applicable)
                         $prixApresRemise = $possedePourcentageRemise
                             ? $produitCourant['p_prix'] * (1 - $produitCourant['pourcentage_reduction'] / 100)
                             : $produitCourant['p_prix'];
-                        //arrondit la note moyenne
-                        $noteArrondie = $produitCourant['note_moyenne'] ? round($produitCourant['note_moyenne']) : 0;
+                        $noteArrondie = round($produitCourant['note_moyenne'] ?? 0);
                         ?>
                         <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
                             onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
@@ -193,11 +144,9 @@ $listeProduits = $donnees['produits'];
                                     <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
                                 </div>
                                 <div>
-                                    <span>
-                                        <?php if ($possedePourcentageRemise): ?>
-                                            <?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€
-                                        <?php endif; ?>
-                                    </span>
+                                    <?php if ($possedePourcentageRemise): ?>
+                                        <span><?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€</span>
+                                    <?php endif; ?>
                                     <span><?= number_format($prixApresRemise, 2, ',', ' ') ?>€</span>
                                 </div>
                                 <button <?= $estEnRupture ? 'disabled' : '' ?>
@@ -220,123 +169,30 @@ $listeProduits = $donnees['produits'];
 
     <script src="/js/notifications.js"></script>
     <script>
-        //fonction pour définir la catégorie et soumettre le formulaire
-        function definirCategorie(categorie) {
-            document.getElementById('champCategorie').value = categorie;
-            document.getElementById('filterForm').submit();
-        }
-
-        //fonction pour définir la note minimum et soumettre le formulaire
-        function definirNote(note) {
-            document.getElementById('champNote').value = note;
-            document.getElementById('filterForm').submit();
-        }
-
-        //fonction pour mettre à jour l'affichage du prix maximum
-        function mettreAJourAffichagePrix(valeur) {
-            document.getElementById('affichagePrixMax').textContent = valeur + '€';
-        }
-
-        //fonction pour ajouter au panier avec requête AJAX vers la base de données
         function ajouterAuPanier(idProduit) {
-            //créer les données du formulaire
             const formData = new FormData();
             formData.append('action', 'ajouter_panier');
             formData.append('idProduit', idProduit);
             formData.append('quantite', 1);
 
-            //envoyer la requête AJAX
             fetch('index.php', {
                 method: 'POST',
                 body: formData
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        if (window.notify) {
-                            notify(data.message, 'success');
-                        } else {
-                            alert('✓ ' + data.message);
-                        }
-                    } else {
-                        if (window.notify) {
-                            notify(data.message, 'error');
-                        } else {
-                            alert('✗ ' + data.message);
-                        }
-                    }
+                    const message = data.success ? data.message : data.message;
+                    const type = data.success ? 'success' : 'error';
+                    window.notify ? notify(message, type) : alert((data.success ? '✓ ' : '✗ ') + message);
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
-                    if (window.notify) {
-                        notify('Erreur lors de l\'ajout au panier', 'error');
-                    } else {
-                        alert('Erreur lors de l\'ajout au panier');
-                    }
+                    window.notify ? notify('Erreur lors de l\'ajout au panier', 'error') : alert('Erreur lors de l\'ajout au panier');
                 });
         }
 
-        //fonction pour réinitialiser tous les filtres
-        function reinitialiserFiltres() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'index.php';
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        //fonction pour activer l'édition manuelle du prix maximum
-        function activerEditionPrix() {
-            const affichagePrix = document.getElementById('affichagePrixMax');
-            const prixActuel = affichagePrix.textContent.replace('€', '');
-            const prixMaxDynamique = <?= $prixMaximumDynamique ?>;
-
-            //remplace l'affichage par un champ de saisie
-            const inputPrix = document.createElement('input');
-            inputPrix.type = 'number';
-            inputPrix.value = prixActuel;
-            inputPrix.min = 0;
-            inputPrix.max = prixMaxDynamique;
-            inputPrix.style.width = '60px';
-
-            affichagePrix.replaceWith(inputPrix);
-            inputPrix.focus();
-            inputPrix.select();
-
-            //gère la sauvegarde quand on quitte le champ
-            inputPrix.addEventListener('blur', sauvegarderPrix);
-            //gère la sauvegarde quand on appuie sur Entrée
-            inputPrix.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    sauvegarderPrix();
-                }
-            });
-
-            //fonction pour sauvegarder la nouvelle valeur du prix
-            function sauvegarderPrix() {
-                const nouveauPrix = parseInt(inputPrix.value) || 0;
-                //s'assure que le prix est dans les limites autorisées
-                const prixValide = Math.min(Math.max(nouveauPrix, 0), prixMaxDynamique);
-
-                document.querySelector('input[name="price"]').value = prixValide;
-
-                //recrée l'élément span d'affichage
-                const nouveauSpan = document.createElement('span');
-                nouveauSpan.id = 'affichagePrixMax';
-                nouveauSpan.textContent = prixValide + '€';
-                nouveauSpan.ondblclick = activerEditionPrix;
-
-                inputPrix.replaceWith(nouveauSpan);
-
-                //soumet le formulaire pour appliquer le nouveau filtre
-                document.getElementById('filterForm').submit();
-            }
-        }
-
-        //initialisation quand la page est chargée
         document.addEventListener('DOMContentLoaded', function () {
             const aside = document.querySelector('aside');
-
             if (aside) {
                 aside.addEventListener('click', function () {
                     this.classList.toggle('open');
