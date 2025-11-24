@@ -145,14 +145,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete_address'])) {
         $idAdresse = (int) $_POST['id_adresse'];
 
-        $resultatSuppressionAdresse = supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $identifiantCompteClient);
+        //vérifier d'abord le nombre d'adresses avant de supprimer
+        $adressesActuelles = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
+        $nombreAdresses = count($adressesActuelles);
 
-        if ($resultatSuppressionAdresse['success']) {
-            $url = 'index.php?success=address_deleted';
-            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-            exit;
+        if ($nombreAdresses <= 1) {
+            $messageErreur = "Vous ne pouvez pas supprimer votre dernière adresse. Vous devez avoir au moins une adresse enregistrée.";
         } else {
-            $messageErreur = $resultatSuppressionAdresse['message'];
+            $resultatSuppressionAdresse = supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $identifiantCompteClient);
+
+            if ($resultatSuppressionAdresse['success']) {
+                $url = 'index.php?success=address_deleted';
+                echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+                exit;
+            } else {
+                $messageErreur = $resultatSuppressionAdresse['message'];
+            }
         }
     }
 
