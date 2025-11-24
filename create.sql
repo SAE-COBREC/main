@@ -638,6 +638,67 @@ ALTER TABLE ONLY cobrec1._definie_pour
     ADD CONSTRAINT fk_definie_pour_compte FOREIGN KEY (id_compte) 
             REFERENCES cobrec1._compte(id_compte) ON DELETE CASCADE;
 
+
+-- ============================================
+-- FONCTIONS ET TRIGGERS
+-- ============================================
+CREATE FUNCTION maj_moyenne_notes_produit_apres_insertion()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(p_note)::numeric,1)
+        FROM cobrec1._avis
+        WHERE id_produit = NEW.id_produit
+    )
+    WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION maj_moyenne_notes_produit_apres_modification()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(p_note)::numeric,1)
+        FROM cobrec1._avis
+        WHERE id_produit = NEW.id_produit
+    )
+    WHERE id_produit = NEW.id_produit;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION maj_moyenne_notes_produit_apres_suppression()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE cobrec1._produit
+    SET p_note = (
+        SELECT ROUND(AVG(p_note)::numeric,1)
+        FROM cobrec1._avis
+        WHERE id_produit = OLD.id_produit
+    )
+    WHERE id_produit = OLD.id_produit;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion
+AFTER INSERT on _avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_insertion();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_modification
+AFTER UPDATE on _avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_modification();
+
+CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
+AFTER DELETE on _avis
+FOR EACH ROW
+EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
+
 -- ============================================
 -- PEUPLEMENT DE LA BASE DE DONNÉES
 -- ============================================
@@ -933,6 +994,7 @@ INSERT INTO _definie_pour (id_seuil, id_compte) VALUES
 (1, 10), (2, 10), (3, 10), (4, 10), (5, 10),
 (5, 1);
 
+
 -- ============================================
 -- MISES À JOUR DES STATISTIQUES
 -- ============================================
@@ -947,64 +1009,6 @@ UPDATE _vendeur SET nb_produits_crees = 8 WHERE id_vendeur = 2;
 UPDATE _vendeur SET nb_produits_crees = 7 WHERE id_vendeur = 3;
 
 -- Mise à jour de la moyenne des notes des produits ajoutés/modifiés/supprimés
-
-CREATE FUNCTION maj_moyenne_notes_produit_apres_insertion()
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE cobrec1._produit
-    SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
-        FROM cobrec1._avis
-        WHERE id_produit = NEW.id_produit
-    )
-    WHERE id_produit = NEW.id_produit;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION maj_moyenne_notes_produit_apres_modification()
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE cobrec1._produit
-    SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
-        FROM cobrec1._avis
-        WHERE id_produit = NEW.id_produit
-    )
-    WHERE id_produit = NEW.id_produit;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION maj_moyenne_notes_produit_apres_suppression()
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE cobrec1._produit
-    SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
-        FROM cobrec1._avis
-        WHERE id_produit = OLD.id_produit
-    )
-    WHERE id_produit = OLD.id_produit;
-    RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion
-AFTER INSERT on _avis
-FOR EACH ROW
-EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_insertion();
-
-CREATE TRIGGER tgr_moyenne_notes_produit_apres_modification
-AFTER UPDATE on _avis
-FOR EACH ROW
-EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_modification();
-
-CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
-AFTER DELETE on _avis
-FOR EACH ROW
-EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
-
 
 UPDATE cobrec1._produit SET p_note = 0;
 UPDATE cobrec1._commentaire SET a_note = 0.0;
