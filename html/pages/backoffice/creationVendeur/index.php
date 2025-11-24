@@ -202,7 +202,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   body {
     background: linear-gradient(to bottom right, #CD7F32, #D4183D);
   }
-
+  .debutant a {
+    color: #CD7F32;
+  }
   .card[id="3"] {
     label {
       margin-left: 20px;
@@ -242,6 +244,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="SIREN">N° SIREN</label>
         <input type="text" id="SIREN" name="SIREN" placeholder="numéro SIREN" pattern="^(?:[0-9]{9}|[0-9]{3} [0-9]{3} [0-9]{3})$" inputmode="numeric" maxlength="11" title="9 chiffres ou format 123 456 789" required>
       </div>
+
+     <div class="debutant">Retour a la page de <a href="../connexionVendeur/index.php"><strong>Connexion →</strong></a></div>
 
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>

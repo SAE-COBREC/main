@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="mdp">Mot de passe</label>
   <input type="password" id="mdp" name="mdp" placeholder="***********" required >
       </div>
-      <div class="forgot" onclick="showNextCard()">Mot de passe oublié ?</div>
+      <div class="forgot" onclick="window.location.href='../../MDPoublieVendeur/index.php'">Mot de passe oublié ?</div>
 
       <!-- affichage des erreurs de saisi -->
       <div class="error">
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Terminer
           </button>
       </div>
-      <div class= "debutant" > Débutant sur Alizon ? <a href= "../register/index.php"><strong >Démarrer →</strong></a></div>
+      <div class= "debutant" > Débutant sur Alizon ? <a href= "../creationVendeur/index.php"><strong >Démarrer →</strong></a></div>
       <div class= "footer">
         <p>Aide</p><p>Confidentialité</p><p>Conditions</p>
       </div>
