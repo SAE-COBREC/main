@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h1>Récupération mdp</h1>
 
       <div>
-        <label for="email">Email de réccuperation</label>
+        <label for="email">Email de récupération</label>
         <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
 
