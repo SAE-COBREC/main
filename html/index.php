@@ -145,23 +145,6 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
             <br>
             <br>
             <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
         </aside>
 
         <main>
