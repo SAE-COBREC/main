@@ -6,6 +6,10 @@ if (!isset($_SESSION['vendeur_id'])) {
     die("Vous n'êtes pas connecté.");
 }
 
+function check_same_string($a, $b) {
+    return $a === $b;
+}
+
 $vendeur_id = $_SESSION['vendeur_id'];
 
 try {
@@ -96,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     /* ---------------------------------------------------------
-      TRAITEMENT DU CHANGEMENT DE MDP 
+    TRAITEMENT DU CHANGEMENT DE MDP 
     --------------------------------------------------------- */
     if (isset($_POST['change_password'])) {
 
@@ -109,32 +113,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['id' => $vendeur['compte']]);
         $oldPasswordDB = $stmt->fetchColumn();
 
-        // Vérif ancien mot de passe
-        if ($old !== $oldPasswordDB) {
-            $error = "L'ancien mot de passe est incorrect.";
-        }
-        // Vérif correspondance nouveau/conf
-        elseif ($new !== $confirm) {
-            $error = "Les nouveaux mots de passe ne correspondent pas.";
-        }
-        // Mise à jour
-        else {
-            $stmt = $pdo->prepare("
-                UPDATE cobrec1._compte
-                SET mdp = :new
-                WHERE id_compte = :id
-            ");
-            $stmt->execute([
-                'new' => $new,
-                'id'  => $vendeur['compte']
-            ]);
-
-            header("Location: index.php?password_success=1");
+        // Vérifier que l'ancien mot de passe est correct
+        if (!check_same_string($old, $oldPasswordDB)) {
+            header("Location: index.php?password_error=" . urlencode("L'ancien mot de passe est incorrect."));
             exit;
         }
+
+        // Vérifier que les nouveaux mots de passe correspondent
+        if ($new !== $confirm) {
+            header("Location: index.php?password_error=" . urlencode("Les nouveaux mots de passe ne correspondent pas."));
+            exit;
+        }
+
+        // Mise à jour du mot de passe en clair
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._compte
+            SET mdp = :new
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'new' => $new,
+            'id'  => $vendeur['compte']
+        ]);
+
+        header("Location: index.php?password_success=1");
+        exit;
+
     }
-
-
 
     /* ---------------------------------------------------------
        2. Mise à jour table _compte
@@ -382,6 +387,11 @@ function safe($array, $key, $default = "") {
     <div id="popup-success" class="popup-success">
     Mot de passe modifié avec succès !
     </div>
+    
+    <!-- POPUP DE SUCCÈS -->
+    <div id="popup-error" class="popup-error">
+        <span id="popup-error-text"></span>
+    </div>
 
     <div class="profil-card mt-4">
 
@@ -551,6 +561,26 @@ function safe($array, $key, $default = "") {
             img.src = "../../../img/svg/oeil.svg"; // icône oeil normal
         }
     }
+
+    // POPUP ERREUR
+        const urlParams2 = new URLSearchParams(window.location.search);
+
+        if (urlParams2.has("password_error")) {
+            const popup = document.getElementById("popup-error");
+            const text = document.getElementById("popup-error-text");
+
+            text.textContent = urlParams2.get("password_error");
+            popup.classList.add("show");
+
+            // Disparaît après 3 sec
+            setTimeout(() => {
+                popup.classList.remove("show");
+            }, 3000);
+
+            // Nettoyage URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
   </script>
 </body>
 </html>
