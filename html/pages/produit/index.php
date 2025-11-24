@@ -338,7 +338,10 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
         </section>
     </main>
 
-    <?php include __DIR__ . '/../../partials/footer.php'; ?>
+    <?php
+    //inclure le pied de page du site
+    include __DIR__ . '/../../partials/footer.html';
+    ?>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/js/HL_import.js"></script>
