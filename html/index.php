@@ -200,7 +200,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
     ?>
 
     <div class="container">
-        <aside style="background-image: url(https://media.licdn.com/dms/image/v2/D4E03AQFHzl7e4f9AOA/profile-displayphoto-scale_200_200/B4EZnsAwbtJ0AY-/0/1760601248177?e=1765411200&v=beta&t=BqJE_NgYrU3tcx8zDv-tj7DN4JVLkJER26Xy3L7RDJI);">
+        <aside style="background-color: red;">
             <section>
                 <h3>lorem ipsum</h3>
             </section>
@@ -230,6 +230,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
             <br>
             <br>
             <br>
+            <br>    
             <br>
             <br>
             <br>
@@ -239,22 +240,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
             <br>
             <br>
             <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-           
+            <br>      
         </aside>
 
         <main>
