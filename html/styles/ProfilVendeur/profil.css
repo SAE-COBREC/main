@@ -197,4 +197,24 @@ body {
 
 .popup-success.show {
   opacity: 1;
+}
+
+.popup-error {
+  position: fixed;
+  top: 20%;
+  left: 45%;
+  background-color: #D4183D;
+  color: #FFFFFF;
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-size: 18px;
+  box-shadow: 0 4px 20px #030212;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+}
+
+.popup-error.show {
+  opacity: 1;
 }/*# sourceMappingURL=profil.css.map */

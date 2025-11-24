@@ -200,3 +200,24 @@ body {
 .popup-success.show {
     opacity: 1;
 }
+
+.popup-error {
+    position: fixed;
+    top: 20%;
+    left: 45%;
+    background-color: $secondary-color-rouge; 
+    color: $primary-color-blanc;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    box-shadow: 0 4px 20px $primary-color-noir;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    z-index: 9999;
+}
+
+.popup-error.show {
+    opacity: 1;
+}
+
