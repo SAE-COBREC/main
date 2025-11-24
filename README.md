@@ -4,7 +4,9 @@
 ├── 📁 Php
 │   ├── 📁 BDD
 │   │   ├── 📄 SqlHistory1.txt
+│   │   ├── 📄 SqlHistory2.txt
 │   │   ├── 📄 WbStatements1.txt
+│   │   ├── 📄 WbStatements2.txt
 │   │   ├── 📄 tabs.properties
 │   │   ├── 📄 toolprop_dbtree.properties
 │   │   ├── 📄 toolprop_filetree.properties
@@ -19,84 +21,109 @@
 │   │   ├── 📄 baloo.regular.ttf
 │   │   └── 📄 quicksand.light-regular.otf
 │   ├── 📁 img
-│   │   ├── 📁 Photo
-│   │   │   └── 🖼️ galette.webp
-│   │   └── 📁 svg
-│   │       ├── 🖼️ 404.svg
-│   │       ├── 🖼️ apple.svg
-│   │       ├── 🖼️ arrow-down.svg
-│   │       ├── 🖼️ box.svg
-│   │       ├── 🖼️ cb.svg
-│   │       ├── 🖼️ check-box-off.svg
-│   │       ├── 🖼️ check-box-on.svg
-│   │       ├── 🖼️ cross.svg
-│   │       ├── 🖼️ edit.svg
-│   │       ├── 🖼️ facebook-blank.svg
-│   │       ├── 🖼️ facebook.svg
-│   │       ├── 🖼️ fleche-gauche.svg
-│   │       ├── 🖼️ folder.svg
-│   │       ├── 🖼️ france.svg
-│   │       ├── 🖼️ google.svg
-│   │       ├── 🖼️ home.svg
-│   │       ├── 🖼️ instagram-blank.svg
-│   │       ├── 🖼️ linkedin-blank.svg
-│   │       ├── 🖼️ logo-text.svg
-│   │       ├── 🖼️ logo.svg
-│   │       ├── 🖼️ logo_bronze.svg
-│   │       ├── 🖼️ loupe.svg
-│   │       ├── 🖼️ menu-burger.svg
-│   │       ├── 🖼️ minus.svg
-│   │       ├── 🖼️ panier-empty.svg
-│   │       ├── 🖼️ panier.svg
-│   │       ├── 🖼️ pinterest-blank.svg
-│   │       ├── 🖼️ plus.svg
-│   │       ├── 🖼️ poubelle.svg
-│   │       ├── 🖼️ profile-v.svg
-│   │       ├── 🖼️ profile.svg
-│   │       ├── 🖼️ promotion.svg
-│   │       ├── 🖼️ recycle.svg
-│   │       ├── 🖼️ reduction.svg
-│   │       ├── 🖼️ star-empty.svg
-│   │       ├── 🖼️ star-full.svg
-│   │       ├── 🖼️ stats.svg
-│   │       ├── 🖼️ tiktok-blank.svg
-│   │       └── 🖼️ youtube-blank.svg
+│   │   ├── 📁 clients
+│   │   │   ├── ⚙️ .keep
+│   │   │   └── 🖼️ Photo_de_profil_id_1.jpg
+│   │   ├── 📁 photo
+│   │   │   ├── ⚙️ .keep
+│   │   │   ├── 🖼️ galette.webp
+│   │   │   └── 🖼️ vendeur_id_2.jpg
+│   │   ├── 📁 svg
+│   │   │   ├── 🖼️ 404.svg
+│   │   │   ├── 🖼️ apple.svg
+│   │   │   ├── 🖼️ arrow-down.svg
+│   │   │   ├── 🖼️ box.svg
+│   │   │   ├── 🖼️ cb.svg
+│   │   │   ├── 🖼️ check-box-off.svg
+│   │   │   ├── 🖼️ check-box-on.svg
+│   │   │   ├── 🖼️ cross.svg
+│   │   │   ├── 🖼️ edit.svg
+│   │   │   ├── 🖼️ facebook-blank.svg
+│   │   │   ├── 🖼️ facebook.svg
+│   │   │   ├── 🖼️ filtre.png
+│   │   │   ├── 🖼️ fleche-gauche.svg
+│   │   │   ├── 🖼️ folder.svg
+│   │   │   ├── 🖼️ folder_black.png
+│   │   │   ├── 🖼️ france.svg
+│   │   │   ├── 🖼️ google.svg
+│   │   │   ├── 🖼️ home.svg
+│   │   │   ├── 🖼️ instagram-blank.svg
+│   │   │   ├── 🖼️ linkedin-blank.svg
+│   │   │   ├── 🖼️ logo-text.svg
+│   │   │   ├── 🖼️ logo.svg
+│   │   │   ├── 🖼️ logo_bronze.svg
+│   │   │   ├── 🖼️ loupe.svg
+│   │   │   ├── 🖼️ menu-burger.svg
+│   │   │   ├── 🖼️ minus.svg
+│   │   │   ├── 🖼️ oeil-barre.svg
+│   │   │   ├── 🖼️ oeil.svg
+│   │   │   ├── 🖼️ panier-empty.svg
+│   │   │   ├── 🖼️ panier.svg
+│   │   │   ├── 🖼️ pinterest-blank.svg
+│   │   │   ├── 🖼️ plus.svg
+│   │   │   ├── 🖼️ poubelle.svg
+│   │   │   ├── 🖼️ profile-v.svg
+│   │   │   ├── 🖼️ profile.svg
+│   │   │   ├── 🖼️ promotion.svg
+│   │   │   ├── 🖼️ recycle.svg
+│   │   │   ├── 🖼️ reduction.svg
+│   │   │   ├── 🖼️ star-empty.svg
+│   │   │   ├── 🖼️ star-full.svg
+│   │   │   ├── 🖼️ star-yellow-empty.svg
+│   │   │   ├── 🖼️ star-yellow-full.svg
+│   │   │   ├── 🖼️ stats.svg
+│   │   │   ├── 🖼️ tiktok-blank.svg
+│   │   │   └── 🖼️ youtube-blank.svg
+│   │   └── 🖼️ favicon.svg
 │   ├── 📁 js
 │   │   ├── 📄 HL_import.js
+│   │   ├── 📄 notifications.js
 │   │   ├── 📄 registerPass.js
 │   │   └── 📄 storage.js
 │   ├── 📁 pages
-│   │   ├── 📁 ProfilClient
+│   │   ├── 📁 MDPoublie
 │   │   │   └── 🐘 index.php
+│   │   ├── 📁 ProfilClient
+│   │   │   └── 🐘 upload_image.php
 │   │   ├── 📁 backoffice
-│   │   │   ├── 📁 connexion
+│   │   │   ├── 📁 connexionVendeur
 │   │   │   │   └── 🐘 index.php
 │   │   │   ├── 📁 create
+│   │   │   │   ├── 📁 temp_
+│   │   │   │   │   └── ⚙️ .keep
+│   │   │   │   ├── 📄 file.csv
+│   │   │   │   ├── 🐘 index.php
+│   │   │   │   └── 📄 rappel.txt
+│   │   │   ├── 📁 creationVendeur
+│   │   │   │   ├── 📄 bdd_errors.csv
 │   │   │   │   └── 🐘 index.php
 │   │   │   ├── 📁 profil
-│   │   │   │   └── 🐘 index.php
-│   │   │   ├── 📁 register
 │   │   │   │   └── 🐘 index.php
 │   │   │   ├── 🐘 index.php
 │   │   │   └── 🐘 test.php
 │   │   ├── 📁 connexionClient
 │   │   │   └── 🐘 index.php
 │   │   ├── 📁 creationClient
-│   │   │   ├── 🌐 index.html
+│   │   │   ├── 📄 file.csv
 │   │   │   └── 🐘 index.php
-│   │   ├── 📁 panier
-│   │   │   ├── 🌐 index.html
+│   │   ├── 📁 finaliserCommande
 │   │   │   ├── 🐘 index.php
+│   │   │   └── 🐘 payerPanier.php
+│   │   ├── 📁 panier
+│   │   │   ├── 🐘 index.php
+│   │   │   ├── 🐘 saveTotalPanier.php
 │   │   │   ├── 🐘 supprimerArticle.php
+│   │   │   ├── 🐘 updateQuantitePanier.php
 │   │   │   └── 🐘 viderPanier.php
 │   │   ├── 📁 produit
-│   │   │   ├── 🐘 index.php
 │   │   │   └── 🐘 not-found.php
-│   │   └── 🌐 404.html
+│   │   └── 🐘 fonctions.php
 │   ├── 📁 partials
 │   │   ├── 🌐 aside.html
 │   │   ├── 🌐 footer.html
-│   │   └── 🌐 header.html
+│   │   ├── 🐘 header.php
+│   │   ├── 🌐 modal.html
+│   │   └── 🌐 toast.html
 │   ├── 📁 styles
 │   │   ├── 📁 AccueilVendeur
 │   │   │   ├── 🎨 accueilVendeur.css
@@ -104,6 +131,9 @@
 │   │   ├── 📁 Aside
 │   │   │   ├── 🎨 Aside.css
 │   │   │   └── 🎨 Aside.scss
+│   │   ├── 📁 Connexion_Creation
+│   │   │   ├── 🎨 styleCoCrea.css
+│   │   │   └── 🎨 styleCoCrea.scss
 │   │   ├── 📁 Footer
 │   │   │   ├── 🎨 stylesFooter.css
 │   │   │   └── 🎨 stylesFooter.scss
@@ -117,30 +147,35 @@
 │   │   │   ├── 🎨 stylesPanier.css
 │   │   │   └── 🎨 stylesPanier.scss
 │   │   ├── 📁 ProfilClient
-│   │   │   └── 🎨 style.css
+│   │   │   ├── 🎨 style.css
+│   │   │   └── 🎨 style.scss
 │   │   ├── 📁 ProfilVendeur
 │   │   │   ├── 🎨 profil.css
 │   │   │   └── 🎨 profil.scss
 │   │   ├── 📁 Register
-│   │   │   ├── 🎨 styleRegister.css
-│   │   │   ├── 🎨 styleRegister.scss
-│   │   │   └── 🎨 styleRegisterVendeur.css
 │   │   ├── 📁 ViewProduit
 │   │   │   ├── 🎨 stylesView-Produit.css
 │   │   │   └── 🎨 stylesView-Produit.scss
 │   │   ├── 📁 creerArticle
 │   │   │   ├── 🎨 creerArticle.css
 │   │   │   └── 🎨 creerArticle.scss
+│   │   ├── 📁 finaliserCommande
+│   │   │   ├── 🎨 styleFinaliserCommande.css
+│   │   │   └── 🎨 styleFinaliserCommande.scss
 │   │   └── 🎨 _variable.scss
-│   ├── 🐘 config1.php
-│   └── 🐘 selectBDD.php
+│   └── 🐘 404.php
 ├── ⚙️ .gitattributes
 ├── ⚙️ .gitignore
+├── 🐳 DOCKERFILE
 ├── 📝 README.md
 ├── 📄 backup_peuplement.sql
+├── 🖼️ bdd.png
 ├── 📝 bug.md
 ├── 📄 commande.txt
 ├── 📄 create.sql
+├── 📦 html.tar.gz
 ├── 📄 lien_GitHub.txt
-└── 📝 serveurs.md
+├── 📄 parcours_review.txt
+├── 📕 serveur.pdf
+└── 📄 serveur.txt
 ```
