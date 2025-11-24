@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // AJOUT ADRESSE - traitement POST pour l'ajout d'une nouvelle adresse
+    //AJOUT ADRESSE - traitement POST pour l'ajout d'une nouvelle adresse
     if (isset($_POST['add_address'])) {
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
@@ -486,7 +486,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         <article>
                             <header>
                                 <div>
-                                    <span>Commande</span>
+                                    <span>N° Commande</span>
                                     <strong>#<?php echo htmlspecialchars($commandeIndividuelle['id_panier']); ?></strong>
                                 </div>
                                 <span
@@ -595,7 +595,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         </div>
     </main>
 
-    <!-- Modal pour éditer une adresse -->
+    <!-- modif une adresse -->
     <div id="modalModificationAdresse"
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
         <div
@@ -632,7 +632,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         </div>
     </div>
 
-    <!-- AJOUT ADRESSE - Modal pour ajouter une adresse -->
+    <!-- ajouter une adresse -->
     <div id="modalAjoutAdresse"
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
         <div
