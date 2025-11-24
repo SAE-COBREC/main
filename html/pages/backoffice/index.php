@@ -105,10 +105,10 @@ try {
 
           <!-- Onglets pour filtrer les produits par statut -->
           <div class="tabs">
-            <div class="tabs__item tabs__item--active">Toutes</div>
-            <div class="tabs__item">Actif</div>
-            <div class="tabs__item">Brouillon</div>
-            <div class="tabs__item">Archivé</div>
+            <div class="tabs__item tabs__item--active">------</div>
+            <div class="tabs__item">-----</div>
+            <div class="tabs__item">---------</div>
+            <div class="tabs__item">-------</div>
           </div>
 
           <script>
@@ -126,9 +126,9 @@ try {
 
           <!-- Filtres supplémentaires -->
           <div class="filters">
-            <div class="filters__item">Filtrer les produits</div>
-            <div class="filters__item">Vendeur du produit ▾</div>
-            <div class="filters__item">Plus de filtres</div>
+            <div class="filters__item">------- --- --------</div>
+            <div class="filters__item">------- -- ------- ▾</div>
+            <div class="filters__item">---- -- -------</div>
           </div>
         </div>
 
