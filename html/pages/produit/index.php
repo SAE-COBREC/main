@@ -8,7 +8,7 @@ $pdo->exec("SET search_path TO cobrec1");
 // --- LOGIQUE PRINCIPALE ---
 
 // 1. Gestion Session / Panier
-$idClient = isset($_SESSION['id']) ? (int)$_SESSION['id'] : null;
+$idClient = isset($_SESSION['idClient']) ? (int)$_SESSION['idClient'] : null;
 
 if ($idClient === null) {
     //si l'utilisateur n'est pas connecté, on utilise un panier temporaire en SESSION
