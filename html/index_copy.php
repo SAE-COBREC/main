@@ -88,9 +88,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
+//fonction pour filtrer les produits selon les critères choisis
+function filtrerProduits($listeProduits, $filtres)
+{
+    $produits_filtres = [];
+    foreach ($listeProduits as $produitCourant) {
+        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum'])
+            continue;
+        if ($filtres['categorieFiltre'] !== 'all') {
+            $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
+            if (!in_array($filtres['categorieFiltre'], $categoriesProduit))
+                continue;
+        }
+        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0)
+            continue;
+        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum'])
+            continue;
+        $produits_filtres[] = $produitCourant;
+    }
+    return $produits_filtres;
+}
+
+//fonction pour trier les produits selon le critère choisi
+function trierProduits($listeProduits, $tri_par)
+{
+    switch ($tri_par) {
+        case 'meilleures_ventes':
+            usort($listeProduits, function ($a, $b) {
+                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
+            });
+            break;
+        case 'prix_croissant':
+            usort($listeProduits, function ($a, $b) {
+                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
+            });
+            break;
+        case 'prix_decroissant':
+            usort($listeProduits, function ($a, $b) {
+                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
+            });
+            break;
+        case 'note':
+            usort($listeProduits, function ($a, $b) {
+                $noteA = $a['note_moyenne'] ?? 0;
+                $noteB = $b['note_moyenne'] ?? 0;
+                return $noteB - $noteA;
+            });
+            break;
+    }
+    return $listeProduits;
+}
+
+//fonction pour préparer les catégories pour l'affichage
+function preparercategories_affichage($listeCategories)
+{
+    $categories_affichage = [];
+    $total_produits = 0;
+    foreach ($listeCategories as $nomCategorie => $compte) {
+        $categories_affichage[] = [
+            'category' => $nomCategorie,
+            'count' => $compte
+        ];
+    }
+    array_unshift($categories_affichage, [
+        'category' => 'all',
+        'count' => $total_produits
+    ]);
+    return $categories_affichage;
+}
+
 //chargement des données depuis la base de données
 $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
+$listeCategories = $donnees['categories'];
+$tousLesProduits = count($listeProduits);
+$prixMaximumDynamique = getPrixMaximum($connexionBaseDeDonnees);
+
+//récupère les valeurs des filtres depuis le formulaire
+$categorieFiltre = $_POST['category'] ?? 'all';
+$noteMinimum = $_POST['note'] ?? 0;
+$prixMaximum = $_POST['price'] ?? $prixMaximumDynamique;
+$enStockSeulement = isset($_POST['in_stock']);
+$tri_par = $_POST['sort'] ?? 'meilleures_ventes';
+
+$filtres = [
+    'categorieFiltre' => $categorieFiltre,
+    'noteMinimum' => $noteMinimum,
+    'prixMaximum' => $prixMaximum,
+    'enStockSeulement' => $enStockSeulement
+];
+
+//application des filtres et du tri
+$produits_filtres = filtrerProduits($listeProduits, $filtres);
+$listeProduits = trierProduits($produits_filtres, $tri_par);
+$categories_affichage = preparercategories_affichage($listeCategories);
 
 ?>
 
@@ -112,45 +203,80 @@ $listeProduits = $donnees['produits'];
     ?>
 
     <div class="container">
-        <aside style="background-color: white;">
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>    
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>      
+        <aside>
+            <form method="POST" action="" id="filterForm">
+                <div>
+                    <span>Tri par :</span>
+                    <select name="sort" onchange="document.getElementById('filterForm').submit()">
+                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>
+                            Meilleures ventes
+                        </option>
+                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix
+                            croissant</option>
+                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix
+                            décroissant
+                        </option>
+                        <option value="note" <?= $tri_par === 'note' ? 'selected' : '' ?>>Mieux notés</option>
+                    </select>
+                </div>
+
+                <div>
+                    <h3>Filtres</h3>
+                    <button type="button" onclick="reinitialiserFiltres()">Effacer</button>
+                </div>
+
+                <section>
+                    <h4>Catégories</h4>
+                    <div onclick="definirCategorie('all')">
+                        <span>Tous les produits</span>
+                        <span><?= $tousLesProduits ?></span>
+                    </div>
+                    <?php foreach ($categories_affichage as $categorieCourante): ?>
+                        <?php if ($categorieCourante['category'] !== 'all'): ?>
+                            <div onclick="definirCategorie('<?= htmlspecialchars($categorieCourante['category']) ?>')">
+                                <span><?= htmlspecialchars($categorieCourante['category']) ?></span>
+                                <span><?= $categorieCourante['count'] ?></span>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </section>
+
+                <section>
+                    <h4>Prix</h4>
+                    <div>
+                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>"
+                            value="<?= $prixMaximum ?>" oninput="mettreAJourAffichagePrix(this.value)"
+                            onchange="document.getElementById('filterForm').submit()">
+                    </div>
+                    <div>
+                        <span>0€</span>
+                        <span id="affichagePrixMax" ondblclick="activerEditionPrix()"><?= $prixMaximum ?>€</span>
+                    </div>
+                </section>
+
+                <section>
+                    <h4>Note minimum</h4>
+                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                        <div onclick="definirNote(<?= $i ?>)">
+                            <span><?= str_repeat('<img src="/img/svg/star-full.svg" alt="★" width="16" style="margin-right:3px;">', $i) . str_repeat('<img src="/img/svg/star-empty.svg" alt="☆" width="16">', 5 - $i) ?></span>
+                            <span><?= $i ?> et plus</span>
+                        </div>
+                    <?php endfor; ?>
+                </section>
+
+                <section>
+                    <h4>Disponibilité</h4>
+                    <label>
+                        <input type="checkbox" name="in_stock" <?= $enStockSeulement ? 'checked' : '' ?>
+                            onchange="document.getElementById('filterForm').submit()">
+                        <span>En stock uniquement</span>
+                    </label>
+                </section>
+
+                <input type="hidden" name="category" id="champCategorie"
+                    value="<?= htmlspecialchars($categorieFiltre) ?>">
+                <input type="hidden" name="note" id="champNote" value="<?= $noteMinimum ?>">
+            </form>
         </aside>
 
         <main>
