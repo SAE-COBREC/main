@@ -1,7 +1,7 @@
 <?php
     session_start();
     include '../../selectBDD.php';
-
+    $boolErreur = false;
     if (isset($_SESSION['idClient'])){
         $id_client = $_SESSION['idClient'];
         $pdo->exec("SET search_path TO cobrec1");
@@ -150,7 +150,7 @@
                     <label>J'accepte les conditions de service et que mon mode de paiement soit utilisé pour cette transaction.</label>
                 </div>
             </div>
-            <?php if ($boolErreur == false): ?>
+            <?php if ($boolErreur == true): ?>
                 <p><span><?php echo $erreur?></span></p>
             <?php endif;?>
             <button>Payer: <?php echo $_SESSION['totalPanier']?>€</button>
