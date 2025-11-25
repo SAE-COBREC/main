@@ -2,7 +2,7 @@
     session_start();
     include '../../selectBDD.php';
     $boolErreur = false;
-    $totalPanier = $_SESSION['totalPanier'];
+    $totalPanier = $_POST['totalPanier'];
     if (isset($_SESSION['idClient'])){
         $id_client = $_SESSION['idClient'];
         $pdo->exec("SET search_path TO cobrec1");
