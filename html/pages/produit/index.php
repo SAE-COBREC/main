@@ -144,6 +144,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
+    <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
 </head>
 <body>
     <?php
