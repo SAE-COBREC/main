@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['pseudo']) && $_POST['pseudo'] !== $old['pseudo']) {
 
         if (valueExists($pdo, "cobrec1._vendeur", "denomination", trim($_POST['pseudo']), $vendeur_id, "id_vendeur")) {
-            header("Location: index.php?error=" . urlencode("Ce pseudo est déjà utilisé."));
+            header("Location: index.php?error_pseudo=" . urlencode("Ce pseudo est déjà utilisé."));
             exit;
         }
 
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['rsociale']) && $_POST['rsociale'] !== $old['rsociale']) {
 
         if (valueExists($pdo, "cobrec1._vendeur", "raison_sociale", trim($_POST['rsociale']), $vendeur_id, "id_vendeur")) {
-            header("Location: index.php?error=" . urlencode("Cette raison sociale existe déjà."));
+            header("Location: index.php?erro_rsociale=" . urlencode("Cette raison sociale existe déjà."));
             exit;
         }
 
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['siren']) && $_POST['siren'] !== $old['siren']) {
 
         if (valueExists($pdo, "cobrec1._vendeur", "siren", trim($_POST['siren']), $vendeur_id, "id_vendeur")) {
-            header("Location: index.php?error=" . urlencode("Ce numéro SIREN est déjà enregistré."));
+            header("Location: index.php?error_siren=" . urlencode("Ce numéro SIREN est déjà enregistré."));
             exit;
         }
 
@@ -420,7 +420,7 @@ function safe($array, $key, $default = "") {
           </div>
 
           <div class="form-row">
-            <label>Complément</label>
+            <label>Complément d'adresse</label>
             <input type="text" id="complement" name="complement" value="<?= safe($vendeur, 'complement') ?>">
             <span class="error" id="error-complement"></span>
           </div>
@@ -629,12 +629,21 @@ function safe($array, $key, $default = "") {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
-    // ALERT SI AUCUN CHANGEMENT
-    if (urlParams.has("error")) {
-        alert("Erreur SIREN, Raison sociale ou Pseudo déjà existant.");
+    // ALERT VALEUR EXISTANTE
+    if (urlParams.has("error_siren")) {
+        alert("Erreur SIREN déjà existant.");
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 
+    if (urlParams.has("error_rsociale")) {
+        alert("Erreur Raison sociale déjà existant.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (urlParams.has("error_pseudo")) {
+        alert("Erreur Pseudo déjà existant.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
   </script>
 </body>
 </html>
