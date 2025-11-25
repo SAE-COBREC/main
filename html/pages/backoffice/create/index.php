@@ -373,7 +373,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 $stmt = $pdo->query($sql);
                                 $titre = $stmt->fetch(PDO::FETCH_ASSOC);
                             } catch (Exception $e) {
-                                print_r($e);
+                                //print_r($e);
                             }
                         }
                         ?>
@@ -387,7 +387,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             required
                         style="<?php 
                             
-                            if (($titre != '') && (empty($_POST["btn_maj"]))) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
+                            if (($titre != '') && (empty($_POST["btn_maj"]))) {'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php $_POST["titre"]; 
                         
                         ?>" />
                             <?php
@@ -1127,14 +1127,14 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     }
                 }
 
-                // if (empty($_SESSION['bdd_errors']) !== true){
-                //     //Sert pour consulter les erreurs de la BDD via un fichier dédié
-                //     $fp = fopen('file.csv', 'w');
-                //     foreach ($_SESSION['bdd_errors'] as $fields) {
-                //         fputcsv($fp, $fields, ',', '"', '');
-                //     }
-                //     fclose($fp);
-                // }
+                if (empty($_SESSION['bdd_errors']) !== true){
+                    //Sert pour consulter les erreurs de la BDD via un fichier dédié
+                    $fp = fopen('file.csv', 'w');
+                    foreach ($_SESSION['bdd_errors'] as $fields) {
+                        fputcsv($fp, $fields, ',', '"', '');
+                    }
+                    fclose($fp);
+                }
                 
 
                 //Sert pour des tests
