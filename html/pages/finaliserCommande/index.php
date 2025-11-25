@@ -82,7 +82,7 @@
         $expiration = $yy . "-" . $mm;
         $dateTodayMA = date("Y-m");
 
-        if ($expiration < $dateTodayMA && $erreur != "") {
+        if ($expiration < $dateTodayMA || $mm > 12 && $erreur != "") {
             $erreur = $erreur . " et date d'expiration incorrecte";
             $boolErreur = true;
         } else if ($expiration < $dateTodayMA) {

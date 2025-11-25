@@ -191,7 +191,6 @@
 
     <!--vérifie qu'il y ait minimun 1 élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
     <?php if (count($articles) > 0):?>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!--pour ajax-->
         <script>
             function verifieStockMax(val, stock){
                 console.log(val, stock);
