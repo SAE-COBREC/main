@@ -437,7 +437,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/js/HL_import.js"></script>
     <script src="/js/notifications.js"></script>
     <script>
