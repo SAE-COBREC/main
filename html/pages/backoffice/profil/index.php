@@ -133,6 +133,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // EMAIL
     if (isset($_POST['email']) && $_POST['email'] !== $old['email']) {
+        
+        if (valueExists($pdo, "cobrec1._compte", "email", trim($_POST['email']), $vendeur['compte'], "id_compte")) {
+            header("Location: index.php?error_email=" . urlencode("Cet email est déjà utilisé."));
+            exit;
+        }
+
+        
         $stmt = $pdo->prepare("
             UPDATE cobrec1._compte
             SET email = :val
@@ -146,6 +153,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // TÉLÉPHONE
     if (isset($_POST['telephone']) && $_POST['telephone'] !== $old['telephone']) {
+        
+        if (valueExists($pdo, "cobrec1._compte", "num_telephone", trim($_POST['telephone']), $vendeur['compte'], "id_compte")) {
+            header("Location: index.php?error_num=" . urlencode("Ce numéro de téléphone est déjà utilisé."));
+            exit;
+        }
+        
         $stmt = $pdo->prepare("
             UPDATE cobrec1._compte
             SET num_telephone = :val
@@ -641,6 +654,16 @@ function safe($array, $key, $default = "") {
 
     if (urlParams.has("error_pseudo")) {
         alert("Erreur Pseudo déjà existant.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (urlParams.has("error_email")) {
+        alert("Erreur Email déjà existant.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (urlParams.has("error_num")) {
+        alert("Erreur Numéro de téléphone déjà existant.");
         window.history.replaceState({}, document.title, window.location.pathname);
     }
   </script>
