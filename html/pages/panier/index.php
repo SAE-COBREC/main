@@ -190,8 +190,10 @@
     </body>
     <?php
     include __DIR__ . '/../../partials/footer.html';
+    include __DIR__ . '/../../partials/toast.html';
+    include __DIR__ . '/../../partials/modal.html';
     ?>
-
+    <script src="/js/notifications.js"></script>
 
     <!--vérifie qu'il y ait minimun 1 élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
     <?php if (count($articles) > 0):?>
@@ -199,7 +201,7 @@
             function verifieStockMax(val, stock){
                 console.log(val, stock);
                 if (val > stock){
-                    alert(`la quantité que vous avez saisie est supérieur au stock (${stock}).`);
+                    notify(`La quantité que vous avez saisie est supérieure au stock (${stock}).`, 'warning');
                     return stock;
                 }
                 return val;
@@ -280,9 +282,17 @@
                 });
                 
                 formSupp.addEventListener('submit', (event) => { //si le client annule la suppression dans le panier
-                    if (!confirm(`Souhaitez-vous vraiment supprimer l'article du panier ?`)) {
-                        event.preventDefault(); //empeche la soumission du formulaire
-                    }
+                    event.preventDefault(); //empeche la soumission du formulaire
+                    showModal({
+                        title: 'Suppression',
+                        message: "Souhaitez-vous vraiment supprimer l'article du panier ?",
+                        okText: 'Supprimer',
+                        cancelText: 'Annuler',
+                        variant: 'default',
+                        onOk: () => {
+                            formSupp.submit();
+                        }
+                    });
                 });
 
                 //gere les cas ou le texte change autrement genre du copier colle
@@ -314,9 +324,17 @@
             const formViderPanier = document.getElementById('formViderPanier');
 
             formViderPanier.addEventListener('submit', (event) => {
-                if (!confirm(`Souhaitez-vous vraiment vider votre panier ?`)) {
-                    event.preventDefault(); //empeche l'envoi du formulaire si annuler est cliqué
-                }
+                event.preventDefault(); //empeche l'envoi du formulaire
+                showModal({
+                    title: 'Vider le panier',
+                    message: "Souhaitez-vous vraiment vider votre panier ?",
+                    okText: 'Vider',
+                    cancelText: 'Annuler',
+                    variant: 'default',
+                    onOk: () => {
+                        formViderPanier.submit();
+                    }
+                });
             });
 
             //initialisation du récap sinon il y a rien au début.
