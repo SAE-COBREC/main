@@ -47,6 +47,14 @@ body a {
     display: flex;
     flex-direction: column;
 
+    p {
+        background-color: $secondary-color-rouge-erreur;
+        color: $secondary-color-rouge;
+        margin-top: 0.5em;
+        padding: 0.7em;
+        border-radius: $border-radius-primary;
+    }
+
     h2 {
         display: flex;
         align-items: center;
@@ -91,7 +99,7 @@ body a {
     //bouton payer
     button {
         width: 100%;
-        margin-top: 1em;
+        margin-top: 0.5em;
         padding: 0.6em;
         background: $primary-color-noir;
         color: $primary-color-blanc;

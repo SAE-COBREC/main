@@ -14,9 +14,9 @@
             $stmt = $pdo->prepare($requeteSuppression);
             $stmt->execute();
         }
-    } else {
+    } else { //si pas connecté
         $id_produit = intval($_POST['id_produit']);
-        unset($_SESSION['panierTemp'][$id_produit]);
+        unset($_SESSION['panierTemp'][$id_produit]); //retirer du panier visiteur
     }
 
     //redirection vers la page du panier
