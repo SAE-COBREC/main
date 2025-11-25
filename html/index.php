@@ -178,7 +178,15 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                             <div>
                                 <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
                                 <div>
-                                    <span><?= str_repeat('<img src="/img/svg/star-yellow-full.svg" alt="★" width="16" style="margin-right:3px;">', $noteArrondie) . str_repeat('<img src="/img/svg/star-yellow-empty.svg" alt="☆" width="16">', 5 - $noteArrondie) ?></span>
+                                    <span>
+                                        <?php for ($i = 1; $i <= 5; $i++): 
+                                            if ($note >= $i) $s = 'full';
+                                            elseif ($note >= $i - 0.5) $s = 'alf';
+                                            else $s = 'empty';
+                                        ?>
+                                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                        <?php endfor; ?>
+                                    </span>
                                     <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
                                 </div>
                                 <div>
