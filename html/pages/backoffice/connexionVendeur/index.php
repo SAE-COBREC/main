@@ -1,5 +1,6 @@
 <?php
 session_start();
+$_SESSION['vendeur_id'] = Null;
 //connexion a la bdd 
 include '../../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");

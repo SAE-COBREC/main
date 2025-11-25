@@ -630,67 +630,140 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
 }
 
 /* Modal Styles */
-#modal-overlay, #editReviewModal {
+.modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(9, 12, 19, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
-  padding: 20px !important; /* Padding important pour mobile */
-  box-sizing: border-box !important;
+  -webkit-backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
+  padding: 20px;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.modal-overlay[style*="display: flex"] {
+  opacity: 1;
 }
 
-#modal-dialog, #editReviewModal .modal-dialog {
-  width: 100% !important;
-  max-width: 400px !important;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(9, 30, 66, 0.18);
-  border: 1px solid #eef1f6;
-  overflow: hidden;
-  font-family: inherit;
-  box-sizing: border-box !important;
-  margin: auto;
+.modal-dialog {
+  width: 100%;
+  max-width: 500px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  padding: 32px;
+  box-sizing: border-box;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
-#modal-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  border-bottom: 1px solid #eef1f6;
+.modal-overlay[style*="display: flex"] .modal-dialog {
+  transform: translateY(0);
 }
-
-#modal-title {
+.modal-dialog h3 {
+  margin: 0 0 20px 0;
+  font-size: 22px;
   font-weight: 700;
   color: #030212;
-  font-size: 16px;
+  text-align: center;
 }
-
-#modal-close {
-  margin-left: auto;
-  background: transparent;
-  border: none;
-  font-size: 18px;
-  line-height: 1;
-  color: #c0c0c0;
-  cursor: pointer;
-}
-
-#modal-body {
-  padding: 16px;
-  color: #030212;
-  line-height: 1.5;
-}
-
-#modal-footer {
+.modal-dialog .star-input {
   display: flex;
-  gap: 10px;
-  padding: 12px 16px;
-  border-top: 1px solid #eef1f6;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.modal-dialog .star-input button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.modal-dialog .star-input button:hover {
+  transform: scale(1.2);
+}
+.modal-dialog .star-input button img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+.modal-dialog textarea {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #EFEFEF;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 120px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #f8f9fa;
+}
+.modal-dialog textarea:focus {
+  outline: none;
+  border-color: #7171A3;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(113, 113, 163, 0.1);
+}
+.modal-dialog textarea::placeholder {
+  color: #a0a0a0;
+}
+.modal-dialog .modal-actions {
+  display: flex;
   justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+.modal-dialog .modal-actions button {
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+.modal-dialog .modal-actions button.btn-secondary {
+  background: #f0f2f5;
+  color: #555;
+}
+.modal-dialog .modal-actions button.btn-secondary:hover {
+  background: #e4e6eb;
+  color: #030212;
+}
+.modal-dialog .modal-actions button.btn-primary {
+  background: #7171A3;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(113, 113, 163, 0.25);
+}
+.modal-dialog .modal-actions button.btn-primary:hover {
+  background: #606090;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(113, 113, 163, 0.3);
+}
+.modal-dialog .modal-actions button.btn-primary:active {
+  transform: translateY(0);
+}
+
+@media screen and (max-width: 480px) {
+  .modal-dialog {
+    padding: 24px;
+    border-radius: 20px 20px 0 0;
+    margin: auto 0 0 0;
+    max-width: 100%;
+    transform: translateY(100%);
+  }
+  .modal-overlay[style*="display: flex"] .modal-dialog {
+    transform: translateY(0);
+  }
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
 }/*# sourceMappingURL=stylesView-Produit.css.map */
