@@ -363,7 +363,7 @@ function safe($array, $key, $default = "") {
     <div class="page-header">
         <h1 class="page-title">Mon Compte</h1>
 
-        <a href="logout.php" class="logout-btn">Déconnexion</a>
+        <a href="../connexionVendeur/index.php" class="logout-btn">Déconnexion</a>
     </div>
 
 
