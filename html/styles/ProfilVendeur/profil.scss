@@ -28,7 +28,7 @@ body {
 }
 
 .header__title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: $primary-color-noir;
 }
@@ -45,7 +45,7 @@ body {
 
   &__title {
     font-family: $font-family-primaire;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
     color: $primary-color-bronze;
     margin-bottom: 24px;
@@ -54,8 +54,8 @@ body {
 }
 
 .profil-photo {
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   margin: 0 auto 25px auto;
 
   img {
@@ -101,7 +101,7 @@ body {
     border-radius: $border-radius-primary;
     border: 1px solid $secondary-color-orange-clair;
     background: $primary-color-blanc;
-    font-size: 16px;
+    font-size: 20px;
     font-family: $font-family-secondaire;
     transition: all 0.2s;
 
@@ -124,7 +124,7 @@ body {
   padding: 10px 20px;
   border-radius: $border-radius-primary;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
 
   &--primary {
@@ -171,7 +171,7 @@ body {
 
 .error {
     color: red;
-    font-size: 0.8rem;
+    font-size: 18px;
     margin-top: 2px;
     display: block;
 }
@@ -190,7 +190,7 @@ body {
     color: $primary-color-blanc;
     padding: 20px 30px;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 20px;
     box-shadow: 0 4px 20px $primary-color-noir;
     opacity: 0;
     pointer-events: none;
@@ -209,7 +209,7 @@ body {
     color: $primary-color-blanc;
     padding: 20px 30px;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 20px;
     box-shadow: 0 4px 20px $primary-color-noir;
     opacity: 0;
     pointer-events: none;
