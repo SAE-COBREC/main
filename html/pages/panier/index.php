@@ -2,7 +2,7 @@
     session_start();
     include '../../selectBDD.php';
 
-    if (isset($_SESSION['panierTemp'])){
+    if (!isset($_SESSION['panierTemp']) && !isset($_SESSION['idClient'])){
         $_SESSION['panierTemp'] = array();
     }
 

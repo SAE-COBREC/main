@@ -75,14 +75,16 @@
             $erreur = "";
         }
 
+
+        /*DATE D'EXPIRATION*/
         $dateExpiration = $_POST['dateExpiration']; //sotck la date de la carte
         list($mm, $yy) = explode("/", $dateExpiration);
         $yy = 2000 + intval($yy);
-
+        echo "_".$mm."_";
         $expiration = $yy . "-" . $mm;
         $dateTodayMA = date("Y-m");
 
-        if ($expiration < $dateTodayMA || $mm > 12 && $erreur != "") {
+        if ($expiration < $dateTodayMA && $mm <= 12 && $erreur != "") {
             $erreur = $erreur . " et date d'expiration incorrecte";
             $boolErreur = true;
         } else if ($expiration < $dateTodayMA) {
