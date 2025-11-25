@@ -1,12 +1,13 @@
 <?php
-session_start();
-include '../../selectBDD.php';
-$boolErreur = false;
-if (isset($_SESSION['idClient'])) {
-    $id_client = $_SESSION['idClient'];
-    $pdo->exec("SET search_path TO cobrec1");
-
-    $requetePanier = "
+    session_start();
+    include '../../selectBDD.php';
+    $boolErreur = false;
+    $totalPanier = $_SESSION['totalPanier'];
+    if (isset($_SESSION['idClient'])){
+        $id_client = $_SESSION['idClient'];
+        $pdo->exec("SET search_path TO cobrec1");
+        
+        $requetePanier = "
             SELECT c_nom
             FROM _client
             WHERE id_client = :id_client";
@@ -94,7 +95,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
         $stmt = $pdo->prepare($requeteFacture);
         $stmt->execute([
             ':id_panier' => $panierEnCours,
-            ':f_total_ttc' => $_SESSION['totalPanier']
+            ':f_total_ttc' => $totalPanier
         ]);
 
         /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
@@ -154,10 +155,10 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
                 </div>
             </div>
             <?php if ($boolErreur == true): ?>
-                <p><span><?php echo $erreur ?></span></p>
-            <?php endif; ?>
-            <button>Payer: <?php echo $_SESSION['totalPanier'] ?>€</button>
-            <form>
+                <p><span><?php echo $erreur?></span></p>
+            <?php endif;?>
+            <button>Payer: <?php echo $totalPanier?>€</button>
+        <form>
     </section>
     <script>
         //récup l'input du numéro de la carte
