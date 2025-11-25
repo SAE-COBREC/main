@@ -165,7 +165,6 @@
                     </div>
                     <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
                         <button class="finaliserCommande">Finaliser commande</button>
-                        <input type="hidden" name="totalPanier" value="<?php echo $totalPanier; ?>">
                     </form>
                     
                     <!--FORMULAIRE POUR VIDER LE PANIER-->
@@ -245,6 +244,11 @@
                 
                 //remplit la liste des produits dans le récap
                 document.getElementById('listeProduits').innerHTML = produitEnHTML;
+
+                //envoyer en session le prix total pour le récuperer à l'utilisation de finaliser commande 
+                $.post('/pages/panier/saveTotalPanier.php', {
+                    total: PrixTotal.toFixed(2)
+                });
             }
 
             //gestion des boutons + et - et  supp pour chaque élément dans le panier
