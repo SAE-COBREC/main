@@ -765,10 +765,9 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
                 cl.c_nom,
                 cl.c_pseudo,
                 i.i_lien as client_image,
-                COALESCE(ROUND(AVG(c.a_note)::numeric, 1), a.a_note, 0) AS avis_note
+                a.a_note AS avis_note
                 " . ($idClient ? ", (SELECT type_vote FROM _vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid) as user_vote" : "") . "
             FROM _avis a
-            LEFT JOIN _commentaire c ON c.id_avis = a.id_avis
             LEFT JOIN _client cl ON a.id_client = cl.id_client
             LEFT JOIN _compte co ON cl.id_compte = co.id_compte
             LEFT JOIN _represente_compte rc ON co.id_compte = rc.id_compte
@@ -794,7 +793,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
             $reponses[(int)$r['id_avis_parent']] = $r;
         }
     } catch (Exception $e) {
-        // Silencieux
+        echo "<!-- Erreur chargerAvisBDD: " . $e->getMessage() . " -->";
     }
     
     return ['avis' => $avis, 'reponses' => $reponses];
@@ -821,9 +820,11 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (!$stmtVerif->fetchColumn()) { echo json_encode(['success' => false, 'message' => 'Achat requis']); exit; }
             
             // Vérif si déjà un avis pour ce client
+            /*
             try {
                 $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS id_client integer');
             } catch (Exception $e) {}
+            */
 
             $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND id_client = :cid");
             $stmtCheck->execute([':pid' => $idProduitPost, ':cid' => $idClient]);
@@ -842,8 +843,10 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
 
             // Insertion
             try {
+                /*
                 $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_note numeric(2,1)');
                 $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_owner_token text');
+                */
                 $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, id_client, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note, a_owner_token) VALUES (:pid, :cid, :txt, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
                 $stmt->execute([':pid' => $idProduitPost, ':cid' => $idClient, ':txt' => $texte, ':note' => $note, ':owner' => $ownerToken]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -967,7 +970,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             exit;
         }
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => 'Erreur serveur']);
+        echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
         exit;
     }
 }

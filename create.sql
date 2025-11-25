@@ -320,7 +320,10 @@ ALTER TABLE ONLY cobrec1._livraison
 CREATE TABLE cobrec1._avis (
     id_avis SERIAL NOT NULL,
     id_produit integer NOT NULL,
+    id_client integer,
     a_texte text,
+    a_note numeric(2,1),
+    a_owner_token text,
     a_pouce_bleu integer DEFAULT 0,
     a_pouce_rouge integer DEFAULT 0,
     a_nb_signalements integer DEFAULT 0,
@@ -336,6 +339,10 @@ ALTER TABLE ONLY cobrec1._avis
 ALTER TABLE ONLY cobrec1._avis
     ADD CONSTRAINT fk_avis_produit FOREIGN KEY (id_produit) 
             REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
+
+ALTER TABLE ONLY cobrec1._avis
+    ADD CONSTRAINT fk_avis_client FOREIGN KEY (id_client) 
+            REFERENCES cobrec1._client(id_client) ON DELETE SET NULL;
 
 -- TABLE VOTE_AVIS
 CREATE TABLE cobrec1._vote_avis (
@@ -658,7 +665,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE cobrec1._produit
     SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
+        SELECT ROUND(AVG(a_note)::numeric,1)
         FROM cobrec1._avis
         WHERE id_produit = NEW.id_produit
     )
@@ -672,7 +679,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE cobrec1._produit
     SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
+        SELECT ROUND(AVG(a_note)::numeric,1)
         FROM cobrec1._avis
         WHERE id_produit = NEW.id_produit
     )
@@ -686,7 +693,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE cobrec1._produit
     SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
+        SELECT ROUND(AVG(a_note)::numeric,1)
         FROM cobrec1._avis
         WHERE id_produit = OLD.id_produit
     )

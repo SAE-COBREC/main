@@ -373,22 +373,25 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 $stmt = $pdo->query($sql);
                                 $titre = $stmt->fetch(PDO::FETCH_ASSOC);
                             } catch (Exception $e) {
-                                
+                                $time = time();
+                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre";
+                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
                         }
                         ?>
 <!-- </pre> -->
                         <label for="titre">Titre</label>
                         <br>
-                        <input style="<?php 
-                            
-                            if (($titre != '') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
-                        
-                        ?>"
+                        <input 
                             minlength="4"
                             maxlength="100"
                             pattern="[\[\]\(\)'&0-9a-zA-ZàâäéèêëîïôöùûüÿçæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ+\-=°: .;,!? ]+"
-                            required />
+                            required
+                        style="<?php 
+                            
+                            if (($titre != '') && (empty($_POST["btn_maj"]))) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
+                        
+                        ?>" />
                             <?php
                         if($titre != ''){
                             ?>
@@ -1126,14 +1129,14 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     }
                 }
 
-                // if (empty($_SESSION['bdd_errors']) !== true){
-                //     //Sert pour consulter les erreurs de la BDD via un fichier dédié
-                //     $fp = fopen('file.csv', 'w');
-                //     foreach ($_SESSION['bdd_errors'] as $fields) {
-                //         fputcsv($fp, $fields, ',', '"', '');
-                //     }
-                //     fclose($fp);
-                // }
+                if (empty($_SESSION['bdd_errors']) !== true){
+                    //Sert pour consulter les erreurs de la BDD via un fichier dédié
+                    $fp = fopen('file.csv', 'w');
+                    foreach ($_SESSION['bdd_errors'] as $fields) {
+                        fputcsv($fp, $fields, ',', '"', '');
+                    }
+                    fclose($fp);
+                }
                 
 
                 //Sert pour des tests
