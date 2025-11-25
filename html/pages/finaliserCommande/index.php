@@ -151,8 +151,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
             <div class="checkBox">
                 <div>
                     <input name="conditions" id="conditions" type="checkbox" required />
-                    <label>J'accepte les conditions de service et que mon mode de paiement soit utilisé pour cette
-                        transaction.</label>
+                    <label>J'accepte les conditions générales de vente</label>
                 </div>
             </div>
             <?php if ($boolErreur == true): ?>
