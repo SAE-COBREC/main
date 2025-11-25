@@ -229,7 +229,7 @@ body.centered {
     margin-left: 0px;
   }
   .card .error:not(.hidden) {
-    margin-bottom: 0px;
+    margin-bottom: 10px;
   }
 }
 .card .next-btn,
