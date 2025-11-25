@@ -52,7 +52,7 @@ if (isset($_SESSION['idClient'])) {
                     style="filter: invert(1) saturate(0.9);">
             </a>
             <a href="/pages/ProfilClient/index.php" class="icon-link">
-                <img src="<?php echo $headerProfileImage; ?>" alt="Profile" class="<?php echo $headerProfileClass; ?>" style="<?php echo $headerProfileStyle; ?>">
+                <img src="<?php echo $headerProfileImage; ?>" alt="Profile" class="<?php echo $headerProfileClass; ?>" style="<?php echo $headerProfileStyle; ?>" width="40" height="40">
                 <?php if (isset($_SESSION['idClient'])): ?>
                     <span class="status-dot"></span>
                 <?php endif; ?>

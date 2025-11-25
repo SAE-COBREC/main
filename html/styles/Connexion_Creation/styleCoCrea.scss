@@ -103,7 +103,7 @@ body {
 
     @media #{$mobile} {
       font-size: 20px;
-      padding-left: 15px;
+      padding-left: 5px;
     }
   }
   input {
@@ -116,8 +116,9 @@ body {
     margin: 10px;
 
     @media #{$mobile} {
-      width: 280px;
+      width: 310px;
       height: 25px;
+      margin-left: 0;
       padding: 8px 4px;
     }
 
@@ -148,7 +149,7 @@ body {
 
     @media #{$mobile} {
       padding: 0;
-      margin-left: 20px;
+      margin-left: 0px;
 
       &:not(.hidden) {
         margin-bottom: 20px;
@@ -367,7 +368,7 @@ body {
     @media #{$mobile} {
       /* supprimer marges et padding spécifiques pour les labels de la carte 3 uniquement sur mobile */
       margin-left: 0 !important;
-      padding-left: 15px !important;
+      padding-left: 5px !important;
     }
   }
 
@@ -385,7 +386,7 @@ body {
 
     input#codeP,
     input#commune {
-      width: 280px;
+      width: 310px;
       margin-left: 0;
     }
 
@@ -468,11 +469,11 @@ body {
 @media #{$mobile} {
   .connex-btn {
     > button {
-      width: 300px;
+      width: 320px;
     }
   }
   .forgot{
-    margin-left: 15px;
+    margin-left: 5px;
   }  
   .footer{
     width: 320px;
@@ -480,6 +481,7 @@ body {
   }
   .debutant{
     margin-left: 0px;
+    font-size: 18px;
     >a{
       &:hover {
         color: $primary-color-noir;
