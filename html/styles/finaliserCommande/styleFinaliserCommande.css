@@ -50,6 +50,13 @@ body a {
   flex-direction: column;
   /* Input par défaut */
 }
+.infoPaiement p {
+  background-color: #FEE9E8;
+  color: #D4183D;
+  margin-top: 0.5em;
+  padding: 0.7em;
+  border-radius: 14px;
+}
 .infoPaiement h2 {
   display: flex;
   align-items: center;
@@ -84,7 +91,7 @@ body a {
 }
 .infoPaiement button {
   width: 100%;
-  margin-top: 1em;
+  margin-top: 0.5em;
   padding: 0.6em;
   background: #030212;
   color: #FFFFFF;

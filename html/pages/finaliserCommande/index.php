@@ -1,14 +1,110 @@
 <?php
     session_start();
+    include '../../selectBDD.php';
+
     if (isset($_SESSION['idClient'])){
         $id_client = $_SESSION['idClient'];
+        $pdo->exec("SET search_path TO cobrec1");
+        
+        $requetePanier = "
+            SELECT c_nom
+            FROM _client
+            WHERE id_client = :id_client";
+
+        $stmt = $pdo->prepare($requetePanier);
+        
+        $stmt->execute([
+            ':id_client' => $id_client
+        ]);
+
+        
+        $nom = $stmt->fetch();
+
     } else {
         $_SESSION['etaitSurFinaliser'] = true;
         header('Location: /pages/connexionClient/index.php');
         exit();
     }
     
-    include __DIR__ . '/../../selectBDD.php';
+
+    //cette condition sert à pour le paiement à vérifier si les informations sont valide ou non
+    if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) { //on vérifie qu'on a bien toutes les infrmations du paiement
+        /*
+        Algorythme pour vérifier si une carte est valide :
+        1.On part du numéro complet à 16 chiffres.
+        2.On double un chiffre sur deux en partant de la droite.
+        3.Si le double fait plus que 9, on enlève 9.
+        4.On additionne tous les chiffres.
+        5.le total doit être un multiple de 10.*/
+        $numCarte = str_replace(' ', '', $_POST['numCarte']);
+        $totalNumCarte = 0; //initialise le total pour l'étape 4
+        $alterne = false; //ppour alternrer un chiffre sur 2 pour étape 2
+        $erreur = "";
+        $boolErreur = false;
+        for ($i = strlen($numCarte) - 1; $i >= 0; $i--) {
+            $chiffreActu = intval($numCarte[$i]);
+
+            if ($alterne) {
+                $chiffreActu *= 2;
+                if ($chiffreActu > 9) {
+                    $chiffreActu -= 9;
+                }
+            }
+            $totalNumCarte += $chiffreActu;
+            $alterne = !$alterne;//on alternre un chiffre sur 2 pour étape 2
+        }
+        if ($totalNumCarte % 10 !== 0) {
+            $erreur = "carte invalide";
+            $boolErreur = true;
+        } else {
+            $dateTodayComplet = date("Y-m-d H:i:s");
+            $erreur = "";                      
+        }
+
+        $dateExpiration = $_POST['dateExpiration']; //sotck la date de la carte
+        list($mm, $yy) = explode("/", $dateExpiration);
+        $yy = 2000 + intval($yy);
+
+        $expiration = $yy . "-" . $mm;
+        $dateTodayMA = date("Y-m");
+
+        if ($expiration < $dateTodayMA && $erreur != "") {
+            $erreur = $erreur . " et date d'expiration incorrecte";
+            $boolErreur = true;
+        } else if ($expiration < $dateTodayMA){
+            $erreur = "Date d'expiration incorrecte";
+            $boolErreur = true;
+        }
+
+        if ($boolErreur == false){ //si pas d'erreur on valide tout
+            $panierEnCours = $_SESSION['panierEnCours']; //récup du panier en cours
+            $requetePanierTimeStamp = "UPDATE _panier_commande 
+                                        SET timestamp_commande = :dateTodayComplet    
+                                        WHERE id_panier = :id_panier"; //la requête pour update le time stamp
+            $stmt = $pdo->prepare($requetePanierTimeStamp);
+            $stmt->execute([
+                ':dateTodayComplet' => $dateTodayComplet,
+                ':id_panier' => $panierEnCours
+            ]); //execute la requête pour update le time stamp
+
+
+            //requête qui servira plus tard pour la facture etle suivi de commande
+            $requeteFacture = "INSERT INTO _facture (id_panier, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
+                                                    (:id_panier, 0, 0, 0, :f_total_ttc)";
+            $stmt = $pdo->prepare($requeteFacture);    
+            $stmt->execute([
+                ':id_panier' => $panierEnCours,
+                ':f_total_ttc' => $_SESSION['totalPanier']
+            ]);   
+
+            echo "paiement validé"; 
+            /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
+
+
+            header('Location: /index.php');
+            exit();
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -25,7 +121,7 @@
     <h1><a href="/pages/panier/index.php" id="retourPanier">◀ Panier</a></h1>
     <section class="infoPaiement">
         <h2><img src="/img/svg/logo.svg"/>Alizon</h2>
-        <form id="payerPanier" method="POST" action="/pages/finaliserCommande/payerPanier.php">
+        <form id="payerPanier" method="POST" action="/pages/finaliserCommande/index.php">
             <label>Numéro de carte</label>
             <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19" placeholder="1111 2222 3333 4444"/>
             <!--maxlenght pour avoir une premiere vérification et minlenght pareil à 19 car il fuat compter les espaces-->
@@ -43,21 +139,20 @@
             <h2>Adresse de facturation</h2>
 
             <label>Nom</label>
-            <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"/>
+            <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont" value="<?php echo $nom['c_nom'] ?>"/>
 
             <label>Pays</label>
             <input name="pays" id="pays" type="text" required maxlength="100" placeholder="ex: France"/>
 
             <div class="checkBox">
                 <div>
-                    <input name="saveDonneePaiement" id="saveDonneePaiement" type="checkbox"/>
-                    <label>J'accepte de sauvegarder mes informations de paiement pour de futurs achats</label>
-                </div>
-                <div>
                     <input name="conditions" id="conditions" type="checkbox" required/>
                     <label>J'accepte les conditions de service et que mon mode de paiement soit utilisé pour cette transaction.</label>
                 </div>
             </div>
+            <?php if ($boolErreur == false): ?>
+                <p><span><?php echo $erreur?></span></p>
+            <?php endif;?>
             <button>Payer: <?php echo $_SESSION['totalPanier']?>€</button>
         <form>
     </section>
