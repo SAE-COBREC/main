@@ -387,7 +387,7 @@ function safe($array, $key, $default = "") {
           </div>
 
           <div class="form-row">
-            <label>Pseudo</label>
+            <label>Dénomination</label>
             <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
             <span class="error" id="error-pseudo"></span>
           </div>
