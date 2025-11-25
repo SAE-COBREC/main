@@ -105,11 +105,17 @@ $hasMultipleImages = count($images) > 1;
 
 // Vérif achat pour formulaire avis
 $clientAachete = false;
+$dejaAvis = false;
 if ($idClient) {
     try {
         $stmt = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
         $stmt->execute([':cid' => $idClient, ':pid' => $idProduit]);
         $clientAachete = (bool)$stmt->fetchColumn();
+
+        // Vérif si déjà avis
+        $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND id_client = :cid");
+        $stmtCheck->execute([':pid' => $idProduit, ':cid' => $idClient]);
+        $dejaAvis = (bool)$stmtCheck->fetchColumn();
     } catch (Exception $e) {}
 }
 $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
@@ -246,7 +252,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                             elseif ($note >= $i - 0.5) $s = 'alf';
                             else $s = 'empty';
                         ?>
-                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                            <img src="/img/svg/star-yellow-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                         </div>
                         <div id="reviewsRatingCount" style="font-size:13px;color:var(--muted);margin-top:4px">Basé sur <?= $nbAvis ?> avis</div>
