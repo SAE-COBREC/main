@@ -179,11 +179,14 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                                 <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
                                 <div>
                                     <span>
-                                        <?php for ($i = 1; $i <= 5; $i++): 
-                                            if ($note >= $i) $s = 'full';
-                                            elseif ($note >= $i - 0.5) $s = 'alf';
-                                            else $s = 'empty';
-                                        ?>
+                                        <?php for ($i = 1; $i <= 5; $i++):
+                                            if ($noteArrondie >= $i)
+                                                $s = 'full';
+                                            elseif ($noteArrondie >= $i - 0.5)
+                                                $s = 'alf';
+                                            else
+                                                $s = 'empty';
+                                            ?>
                                             <img src="/img/svg/star-yellow-<?= $s ?>.svg" alt="Etoile" width="20">
                                         <?php endfor; ?>
                                     </span>
