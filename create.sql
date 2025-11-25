@@ -665,7 +665,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE cobrec1._produit
     SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
+        SELECT ROUND(AVG(a_note)::numeric,1)
         FROM cobrec1._avis
         WHERE id_produit = NEW.id_produit
     )
@@ -679,7 +679,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE cobrec1._produit
     SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
+        SELECT ROUND(AVG(a_note)::numeric,1)
         FROM cobrec1._avis
         WHERE id_produit = NEW.id_produit
     )
@@ -693,7 +693,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE cobrec1._produit
     SET p_note = (
-        SELECT ROUND(AVG(p_note)::numeric,1)
+        SELECT ROUND(AVG(a_note)::numeric,1)
         FROM cobrec1._avis
         WHERE id_produit = OLD.id_produit
     )
