@@ -46,7 +46,6 @@ body.centered {
   padding: 50px 25px 25px 25px;
   border-radius: 14px;
   text-align: center;
-  /* container for input + icon */
 }
 .card.hidden {
   display: none !important;
@@ -191,7 +190,7 @@ body.centered {
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  width: 20px;
+  width: 30px;
   height: 20px;
   background: transparent;
   border: none;
@@ -209,8 +208,8 @@ body.centered {
   border: none;
   box-shadow: none;
   background: transparent;
-  padding-right: 48px; /* keep space for the icon */
-  margin: 0; /* container provides margin */
+  padding-right: 48px;
+  margin: 0;
   width: 100%;
   box-sizing: border-box;
 }
