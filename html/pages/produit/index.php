@@ -596,7 +596,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         fd.append('id_avis', rev.dataset.avisId);
                         
                         fetchJson(window.location.href, { method: 'POST', body: fd })
-                            .then d => {
+                            .then(d => {
                                 if (d.success) location.reload();
                                 else showError('Erreur', d.message || 'Impossible de supprimer');
                             });
