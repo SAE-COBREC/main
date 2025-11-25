@@ -2,13 +2,42 @@
 session_start();
 include '../../../selectBDD.php'; 
 
-if (!isset($_SESSION['vendeur_id'])) {
-    die("Vous n'êtes pas connecté.");
+if(empty($_SESSION['vendeur_id']) === false){
+  $vendeur_id = $_SESSION['vendeur_id'];
+}else{
+?>
+
+<script>
+    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+    document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+</script>
+<?php
 }
 
 function check_same_string($a, $b) {
     return $a === $b;
 }
+
+function valueExists($pdo, $table, $column, $value, $excludeId = null, $excludeColumn = null) {
+    $sql = "SELECT COUNT(*) FROM $table WHERE $column = :value";
+
+    // exclure l'utilisateur courant (évite les faux positifs)
+    if ($excludeId !== null && $excludeColumn !== null) {
+        $sql .= " AND $excludeColumn != :excludeId";
+    }
+
+    $stmt = $pdo->prepare($sql);
+
+    $params = ['value' => $value];
+
+    if ($excludeId !== null && $excludeColumn !== null) {
+        $params['excludeId'] = $excludeId;
+    }
+
+    $stmt->execute($params);
+    return $stmt->fetchColumn() > 0;
+}
+
 
 $vendeur_id = $_SESSION['vendeur_id'];
 
@@ -62,7 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // PSEUDO
     if (isset($_POST['pseudo']) && $_POST['pseudo'] !== $old['pseudo']) {
-      $stmt = $pdo->prepare("
+
+        if (valueExists($pdo, "cobrec1._vendeur", "denomination", trim($_POST['pseudo']), $vendeur_id, "id_vendeur")) {
+            header("Location: index.php?error=" . urlencode("Ce pseudo est déjà utilisé."));
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
             UPDATE cobrec1._vendeur
             SET denomination = :val
             WHERE id_vendeur = :id
@@ -75,6 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // RAISON SOCIALE
     if (isset($_POST['rsociale']) && $_POST['rsociale'] !== $old['rsociale']) {
+
+        if (valueExists($pdo, "cobrec1._vendeur", "raison_sociale", trim($_POST['rsociale']), $vendeur_id, "id_vendeur")) {
+            header("Location: index.php?error=" . urlencode("Cette raison sociale existe déjà."));
+            exit;
+        }
+
         $stmt = $pdo->prepare("
             UPDATE cobrec1._vendeur
             SET raison_sociale = :val
@@ -88,6 +129,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // SIREN
     if (isset($_POST['siren']) && $_POST['siren'] !== $old['siren']) {
+
+        if (valueExists($pdo, "cobrec1._vendeur", "siren", trim($_POST['siren']), $vendeur_id, "id_vendeur")) {
+            header("Location: index.php?error=" . urlencode("Ce numéro SIREN est déjà enregistré."));
+            exit;
+        }
+
         $stmt = $pdo->prepare("
             UPDATE cobrec1._vendeur
             SET siren = :val
@@ -98,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'id'  => $vendeur_id
         ]);
     }
+
 
     /* ---------------------------------------------------------
     TRAITEMENT DU CHANGEMENT DE MDP 
@@ -580,6 +628,12 @@ function safe($array, $key, $default = "") {
             // Nettoyage URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
+
+    // ALERT SI AUCUN CHANGEMENT
+    if (urlParams.has("error")) {
+        alert("Erreur SIREN, Raison sociale ou Pseudo déjà existant.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
   </script>
 </body>
