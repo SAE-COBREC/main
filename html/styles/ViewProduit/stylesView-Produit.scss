@@ -401,12 +401,47 @@ input[type="number"] {
         background: rgba(76, 92, 255, .06);
         border-color: vars.$primary-color-bleu;
     }
+
+    .review-votes {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+        gap: 12px;
+
+        .vote-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .review-date {
+            color: vars.$secondary-color-gris-fonce;
+            font-size: 13px;
+            margin-left: auto;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+
+            .btn-edit-review {
+                color: vars.$primary-color-bleu;
+                border-color: vars.$primary-color-bleu;
+            }
+
+            .btn-delete-review {
+                color: #b00020;
+                border-color: #b00020;
+            }
+        }
+    }
 }
 
 footer {
     grid-column: 1 / -1;
-    background: $primary-color-noir;
-    color: $primary-color-blanc;
+    background: vars.$primary-color-noir;
+    color: vars.$primary-color-blanc;
     padding: 3rem 2rem 2rem;
     margin-top: auto;
 
@@ -422,18 +457,20 @@ footer {
         gap: 2rem;
         margin-bottom: 3rem;
         padding-bottom: 2rem;
-        border-bottom: 1px solid $primary-color-bleu;
+        border-bottom: 1px solid vars.$primary-color-bleu;
 
         >a {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            @include flex-center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
             font-size: 1.5rem;
             text-decoration: none;
-            color: $primary-color-blanc;
-            @include transition(all);
+            color: vars.$primary-color-blanc;
+            transition: all 0.3s ease;
 
             &:hover {
                 background: rgba(255, 255, 255, 0.1);
@@ -443,7 +480,7 @@ footer {
     }
 }
 
-@media (max-width: $breakpoint-tablette) {
+@media (max-width: vars.$breakpoint-tablette) {
     footer>div>div:last-child {
         flex-direction: column;
         gap: 1rem;
@@ -661,6 +698,10 @@ footer {
                     background: #f5f5f5;
                 }
 
+                &.btn-edit-review {
+                    color: vars.$primary-color-bleu;
+                }
+
                 &.btn-delete-review {
                     color: #b00020;
                 }
@@ -766,4 +807,69 @@ footer {
     background: vars.$secondary-color-gris-clair !important;
     cursor: not-allowed !important;
     pointer-events: none !important;
+}
+
+/* Modal Styles */
+#modal-overlay, #editReviewModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 12, 19, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(2px);
+    padding: 20px !important; /* Padding important pour mobile */
+    box-sizing: border-box !important;
+}
+
+#modal-dialog, #editReviewModal .modal-dialog {
+    width: 100% !important;
+    max-width: 400px !important;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(9, 30, 66, .18);
+    border: 1px solid #eef1f6;
+    overflow: hidden;
+    font-family: inherit;
+    box-sizing: border-box !important;
+    margin: auto;
+}
+
+#modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef1f6;
+}
+
+#modal-title {
+    font-weight: 700;
+    color: vars.$primary-color-noir;
+    font-size: 16px;
+}
+
+#modal-close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    color: vars.$secondary-color-gris-fonce;
+    cursor: pointer;
+}
+
+#modal-body {
+    padding: 16px;
+    color: vars.$primary-color-noir;
+    line-height: 1.5;
+}
+
+#modal-footer {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid #eef1f6;
+    justify-content: flex-end;
 }

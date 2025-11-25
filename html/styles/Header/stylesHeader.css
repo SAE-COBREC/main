@@ -197,6 +197,28 @@
     max-width: 480px;
   }
 }
+@media screen and (max-width: 768px) {
+  .site-header {
+    height: 60px;
+  }
+  .site-header .header-inner {
+    height: 60px;
+    padding: 0 15px;
+  }
+  .logo {
+    height: 30px;
+  }
+  .icons-container {
+    gap: 1.5em;
+  }
+  .icons-container img {
+    width: 28px;
+  }
+  .icon-link {
+    width: 32px;
+    height: 32px;
+  }
+}
 @media screen and (max-width: 520px) {
   .search-container {
     display: none;
