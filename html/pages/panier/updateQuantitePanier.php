@@ -20,17 +20,19 @@
                 WHERE id_panier = :id_panier AND id_produit = :id_produit"; //requête pour update la quantite dans le panier
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([
+        $result = $stmt->execute([
             ':quantite' => $quantite,
             ':id_panier' => $id_panier,
             ':id_produit' => $id_produit
         ]);//execute la quantité
 
-        echo json_encode(["success" => true]);
+        echo json_encode(["success" => $result]); //renvoie de l'erreur dans la console si il y en a une
     } else {//sinon
         $id_produit = intval($_POST['id_produit']); //récup l'id du produit 
         $quantite = intval($_POST['quantite']); //récup la nouvelle quantité
         $_SESSION['panierTemp'][$id_produit]['quantite'] = $quantite;//met à jour la quantité dans le panier temporaire
+
+        echo json_encode(["success" => true]);//renvoie le succès de la requête
     }
 
 ?>

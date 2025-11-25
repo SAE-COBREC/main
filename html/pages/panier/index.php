@@ -201,20 +201,38 @@
             function verifieStockMax(val, stock){
                 console.log(val, stock);
                 if (val > stock){
-                    notify(`La quantité que vous avez saisie est supérieure au stock (${stock}).`, 'warning');
+                    notify(`La quantité que vous avez saisie est supérieure au stock (${stock}).`, 'warning'); //fonction d'Elouan
                     return stock;
                 }
                 return val;
             }
 
-            //fonction qui sauvegarde la quantite avec methode AJAX
+            
+            //fonction qui sauvegrade la quantité
             function saveQuantite(id_produit, quantite) {
-                $.post('/pages/panier/updateQuantitePanier.php', {
-                    id_produit: id_produit,
-                    quantite: quantite
-                });
-                console.log("update de la quantité");
+                //on construit la chaine qui va être envoyer dnas l'url
+                const params = 'id_produit=' + encodeURIComponent(id_produit) +
+                               '&quantite=' + encodeURIComponent(quantite);
+
+                //lance une requete HTTP (fetch) vers le fichier ou est effectuer la mise a jour (ici pour nous c'est updateQuantité)
+                fetch('/pages/panier/updateQuantitePanier.php', {
+                    method: 'POST', //avec la méthode post
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }, //on dit ce qu'on envoie et sous quelle forme (comme un formulaire HTML) en gros c'est pour que le php remplissent les variables avec $_POST
+                    body: params //on donne les vrai donnée du formulaire
+                })
+                .then(response => response.json()) //on récupère la réponse
+                .then(data => { //si la requete revoie une erreur ou non
+                    if(data.success) {
+                        console.log("Quantité mise à jour avec succès");
+                    } else {
+                        console.error("Erreur lors de la mise à jour");
+                    }
+                })
+                .catch(error => console.error('Erreur:', error)); //pour les erreurs autres par exemple fichier php non trouvé
             }
+
 
             //fonction pour mettre a jour le recap de la commande
             function updateRecap() {
