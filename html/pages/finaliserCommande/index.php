@@ -97,12 +97,11 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
             ':f_total_ttc' => $_SESSION['totalPanier']
         ]);
 
-        echo "paiement validé";
         /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
 
+        $url = '/index.php';
+        echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
 
-        header('Location: /index.php');
-        exit();
     }
 }
 ?>
