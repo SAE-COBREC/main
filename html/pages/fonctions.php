@@ -1062,8 +1062,7 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
 }
 
 
-//fonction pour récupérer le profil complet avec cache en session (recommandée)
-//évite les requêtes répétées en mettant les données en cache pour 5 minutes
+//fonction pour récupérer le profil complet avec cache en session en mettant les données en cache pour 5 minutes
 function recupererProfilCompletClientAvecCache($connexionBaseDeDonnees, $identifiantClient, $forceRefresh = false) {
     //clé de cache unique pour ce client
     $cacheKey = 'profil_client_' . $identifiantClient;
@@ -1091,7 +1090,6 @@ function recupererProfilCompletClientAvecCache($connexionBaseDeDonnees, $identif
 
 
 //fonction pour invalider le cache du profil client
-//à appeler après toute modification du profil (updateinfo, changepassword, updateaddress, etc.)
 function invaliderCacheProfilClient($identifiantClient) {
     $cacheKey = 'profil_client_' . $identifiantClient;
     unset($_SESSION[$cacheKey]);
