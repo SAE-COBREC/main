@@ -27,7 +27,7 @@ if (isset($_SESSION['idClient'])) {
              if ($headerImgData && !empty($headerImgData['i_lien'])) {
                  $headerProfileImage = htmlspecialchars($headerImgData['i_lien']);
                  $headerProfileClass = "profile-icon-rounded";
-                 $headerProfileStyle = "border-radius: 50%; width: 40px; height: 40px; object-fit: cover;";
+                 $headerProfileStyle = "border-radius: 50%; object-fit: cover;";
              }
          }
     }
