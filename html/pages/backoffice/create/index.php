@@ -657,17 +657,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                 </section>
 
-                <section style="<?php 
-                    if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '') ){
-                        //
-                    }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
-                        //
-                    }elseif ($_POST["btn_maj"] == null){//si la zone de promotion n'est que partiellement remplie
-                        $_SESSION["creerArticle"]["warn"]++;
-                        $warnPromo = true;
-                        echo 'border: 3px solid red';
-                    }
-                ?>">
+                <!-- <section style="<?php 
+                    // if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '') ){
+                    //     //
+                    // }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
+                    //     //
+                    // }elseif ($_POST["btn_maj"] == null){//si la zone de promotion n'est que partiellement remplie
+                    //     $_SESSION["creerArticle"]["warn"]++;
+                    //     $warnPromo = true;
+                    //     echo 'border: 3px solid red';
+                    // }
+                ?>"> -->
                     <article>
                         <!-- <p><strong>(Zone facultative)</strong></p>
                         <?php 
