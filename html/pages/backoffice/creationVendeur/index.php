@@ -174,18 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $hasError = true;
       $error_card = 4; 
       $error_message = 'Une erreur est survenue lors de la création du compte.';
-      $bdd_errors[] = [$e->getMessage()];
     }
-    /*
-    if (!empty($bdd_errors)) {
-      $fp = @fopen(__DIR__ . '/bdd_errors.csv', 'a');
-      if ($fp) {
-        foreach ($bdd_errors as $fields) {
-          fputcsv($fp, $fields);
-        }
-        fclose($fp);
-      }
-    }*/
+
 
     // Redirection vers la page d'accueil uniquement si pas d'erreur
     if (!$hasError) {
