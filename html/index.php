@@ -184,7 +184,7 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                                             elseif ($note >= $i - 0.5) $s = 'alf';
                                             else $s = 'empty';
                                         ?>
-                                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                            <img src="/img/svg/star-yellow-<?= $s ?>.svg" alt="Etoile" width="20">
                                         <?php endfor; ?>
                                     </span>
                                     <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
