@@ -34,7 +34,7 @@ body {
   margin-bottom: 24px;
 }
 .header__title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: #030212;
   margin-bottom: 16px;
@@ -60,7 +60,7 @@ body {
   border: 0;
   outline: 0;
   flex: 1;
-  font-size: 14px;
+  font-size: 18px;
   background: transparent;
 }
 .search-bar__input input::-moz-placeholder {
@@ -75,7 +75,7 @@ body {
   padding: 10px 20px;
   border-radius: 14px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 18px;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -108,7 +108,7 @@ body {
   background: #FFFFFF;
 }
 .content-section__title {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: #030212;
   margin-bottom: 16px;
@@ -135,21 +135,28 @@ body {
 }
 .content-section .products-table__head-cell--produit {
   width: 300px;
+  font-size: 22px;
 }
 .content-section .products-table__head-cell--statut {
   width: 120px;
+  font-size: 22px;
 }
 .content-section .products-table__head-cell--stock {
-  width: 65px;
+  width: 90px;
+  font-size: 22px;
+  text-align: right;
+}
+.content-section .products-table__head-cell--cate {
+  max-width: 275px;
+  font-size: 22px;
 }
 .content-section .products-table__head-cell--cate {
   width: 300px;
-}
-.content-section .products-table__head-cell--cate {
-  width: 300px;
+  font-size: 22px;
 }
 .content-section .products-table__head-cell--des {
   width: 300px;
+  font-size: 22px;
 }
 .content-section .products-table__head-cell--checkbox,
 .content-section .products-table__cell--checkbox {
@@ -169,7 +176,7 @@ body {
 }
 .tabs__item {
   padding-bottom: 8px;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: #030212;
   border-bottom: 3px solid transparent;
@@ -190,7 +197,7 @@ body {
   border: 1px solid #E5D5C5;
   padding: 8px 16px;
   border-radius: 14px;
-  font-size: 13px;
+  font-size: 18px;
   color: #030212;
   cursor: pointer;
 }
@@ -200,9 +207,8 @@ body {
   border-collapse: collapse;
 }
 .products-table__head-cell {
-  text-align: left;
   padding: 20px 24px;
-  font-size: 13px;
+  font-size: 20px;
   font-weight: 600;
   color: #030212;
   background: #FFFFFF;
@@ -216,11 +222,8 @@ body {
 }
 .products-table__cell {
   padding: 16px 24px;
-  font-size: 14px;
+  font-size: 18px;
   color: #030212;
-}
-.products-table__cell--stock {
-  text-align: center;
 }
 .products-table__cell--descrip {
   max-width: 300px;
@@ -257,19 +260,18 @@ body {
 .product__image {
   width: 48px;
   height: 48px;
-  font-size: 15px;
 }
 .product__image img {
   border-radius: 14px;
 }
 .product__name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 18px;
   color: #030212;
   margin-bottom: 2px;
 }
 .product__model {
-  font-size: 13px;
+  font-size: 18px;
   color: #030212;
 }
 
@@ -277,7 +279,7 @@ body {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 14px;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
 }
 .badge--live {
