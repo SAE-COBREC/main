@@ -373,7 +373,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 $stmt = $pdo->query($sql);
                                 $titre = $stmt->fetch(PDO::FETCH_ASSOC);
                             } catch (Exception $e) {
-                                
+                                print_r($e);
                             }
                         }
                         ?>
@@ -387,7 +387,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             required
                         style="<?php 
                             
-                            if (($titre != '') && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
+                            if (($titre != '') && (empty($_POST["btn_maj"]))) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
                         
                         ?>" />
                             <?php
