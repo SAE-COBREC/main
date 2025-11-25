@@ -2,8 +2,22 @@
     session_start();
     include '../../selectBDD.php';
     $boolErreur = false;
-    $totalPanier = $_SESSION['totalPanier'];
-    echo "ok";
+
+    //recalcul du total directement depuis la base de donnees  pour éviter les problème de modification de variable en javascipt
+    $reqTotal = "
+        SELECT SUM(p_prix * quantite * (1 + montant_tva / 100)) 
+        FROM _contient 
+        JOIN _produit ON _contient.id_produit = _produit.id_produit 
+        JOIN _tva ON _produit.id_tva = _tva.id_tva
+        WHERE id_panier = :id_panier
+    ";
+    $stmt = $pdo->prepare($reqTotal);
+    $stmt->execute([':id_panier' => $_SESSION['panierEnCours']]);
+    $totalCalcul = $stmt->fetchColumn();
+
+    //formater le prix pour l'afficher
+    $totalPanier = number_format($totalCalcul, 2, '.', '');
+
     if (isset($_SESSION['idClient'])){
         $id_client = $_SESSION['idClient'];
         $pdo->exec("SET search_path TO cobrec1");
