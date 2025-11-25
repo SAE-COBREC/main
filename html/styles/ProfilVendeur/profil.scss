@@ -27,10 +27,26 @@ body {
   flex-direction: column;
 }
 
-.header__title {
-  font-size: 28px;
-  font-weight: 700;
-  color: $primary-color-noir;
+.page-header {
+  display: flex;
+  justify-content: space-between; /* Titre à gauche, bouton à droite */
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.logout-btn {
+  font-size: 20px;
+  background-color: $primary-color-bronze;
+  color: $primary-color-blanc;
+  padding: 16px 36px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: $secondary-color-bronze-clair;
 }
 
 .profil-card {
