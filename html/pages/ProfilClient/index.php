@@ -474,7 +474,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             </section>
 
             <!-- Section : Mes dernières commandes -->
-            <section>
+            <section style="display : none;">
                 <h2>Mes dernières commandes</h2>
 
                 <?php if (empty($listeCommandesRecentes)): ?>
