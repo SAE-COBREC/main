@@ -180,9 +180,9 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                                 <div>
                                     <span>
                                         <?php for ($i = 1; $i <= 5; $i++):
-                                            if ($noteArrondie >= $i)
+                                            if ($note >= $i)
                                                 $s = 'full';
-                                            elseif ($noteArrondie >= $i - 0.5)
+                                            elseif ($note >= $i - 0.5)
                                                 $s = 'alf';
                                             else
                                                 $s = 'empty';
