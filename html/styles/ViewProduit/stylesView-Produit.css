@@ -709,7 +709,10 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
   outline: none;
   border-color: #7171A3;
   background: #FFFFFF;
-  box-shadow: 0 0 0 4px rgba(113, 113, 163, 0.1);
+  box-shadow: 0 0 0 4px rgba(76, 92, 255, 0.1);
+}
+.modal-dialog textarea::-moz-placeholder {
+  color: #a0a0a0;
 }
 .modal-dialog textarea::placeholder {
   color: #a0a0a0;
@@ -731,7 +734,7 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
 }
 .modal-dialog .modal-actions button.btn-secondary {
   background: #f0f2f5;
-  color: #555;
+  color: #c0c0c0;
 }
 .modal-dialog .modal-actions button.btn-secondary:hover {
   background: #e4e6eb;
@@ -740,12 +743,12 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
 .modal-dialog .modal-actions button.btn-primary {
   background: #7171A3;
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(113, 113, 163, 0.25);
+  box-shadow: 0 4px 12px rgba(76, 92, 255, 0.25);
 }
 .modal-dialog .modal-actions button.btn-primary:hover {
-  background: #606090;
+  background: rgb(98.4871794872, 98.4871794872, 152.0128205128);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(113, 113, 163, 0.3);
+  box-shadow: 0 6px 16px rgba(76, 92, 255, 0.3);
 }
 .modal-dialog .modal-actions button.btn-primary:active {
   transform: translateY(0);

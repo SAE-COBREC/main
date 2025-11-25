@@ -36,13 +36,20 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 //initialiser la variable pour les messages d'erreur
 $messageErreur = null;
 
-//récupérer l'identifiant du compte associé au client
-$identifiantCompteClient = recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClientConnecte);
+//récupérer toutes les données du profil en une seule requête optimisée avec cache
+$profilComplet = recupererProfilCompletClientAvecCache($connexionBaseDeDonnees, $identifiantClientConnecte);
 
-//vérifier que le compte existe bien
-if ($identifiantCompteClient === null) {
-    die("Compte introuvable pour le client : " . htmlspecialchars((string) $identifiantClientConnecte));
+//vérifier que le profil existe
+if ($profilComplet === null) {
+    die("Impossible de charger le profil client.");
 }
+
+//extraire les données pour compatibilité avec le reste du code
+$identifiantCompteClient = $profilComplet['id_compte'];
+$donneesInformationsClient = $profilComplet;
+$listeAdressesClient = $profilComplet['adresses'];
+$listeCommandesRecentes = $profilComplet['commandes_recentes'];
+$donneesImageProfilCompte = $profilComplet['image_profil'];
 
 //traitement des formulaires soumis en POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -80,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationProfil['success']) {
+             ($identifiantClientConnecte); // ← INVALIDER LE CACHE
             $url = 'index.php?success=info_updated';
             echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
@@ -106,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationMotDePasse['success']) {
+            invaliderCacheProfilClient($identifiantClientConnecte); // ← INVALIDER LE CACHE
             $url = 'index.php?success=password_changed';
             echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
@@ -133,6 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($resultatMiseAJourAdresse['success']) {
+            invaliderCacheProfilClient($identifiantClientConnecte); // ← INVALIDER LE CACHE
             $url = 'index.php?success=address_updated';
             echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
@@ -146,8 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $idAdresse = (int) $_POST['id_adresse'];
 
         //vérifier d'abord le nombre d'adresses avant de supprimer
-        $adressesActuelles = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
-        $nombreAdresses = count($adressesActuelles);
+        $nombreAdresses = count($listeAdressesClient);
 
         if ($nombreAdresses <= 1) {
             $messageErreur = "Vous ne pouvez pas supprimer votre dernière adresse. Vous devez avoir au moins une adresse enregistrée.";
@@ -155,6 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $resultatSuppressionAdresse = supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $identifiantCompteClient);
 
             if ($resultatSuppressionAdresse['success']) {
+                invaliderCacheProfilClient($identifiantClientConnecte); // ← INVALIDER LE CACHE
                 $url = 'index.php?success=address_deleted';
                 echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
                 exit;
@@ -181,6 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($resultatAjoutAdresse['success']) {
+            invaliderCacheProfilClient($identifiantClientConnecte); // ← INVALIDER LE CACHE
             $url = 'index.php?success=address_added';
             echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
@@ -190,34 +201,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-//chargement des données pour l'affichage de la page
-$donneesInformationsClient = recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClientConnecte);
-
-//vérifier que le client existe
-if (!$donneesInformationsClient) {
-    die("Client introuvable avec l'ID : " . htmlspecialchars((string) $identifiantClientConnecte));
-}
-
-//récupérer la liste des adresses du client
-$listeAdressesClient = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
-
-//récupérer l'historique des commandes récentes
-$listeCommandesRecentes = recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifiantClientConnecte);
-
-//récupérer l'image de profil du compte
-$donneesImageProfilCompte = recupererImageProfilCompte($connexionBaseDeDonnees, $identifiantCompteClient);
-
-//requête supplémentaire pour vérifier la présence d'une image
-$requeteSQLVerificationImagePresente = "
-    SELECT i.i_lien
-    FROM cobrec1._image i
-    INNER JOIN cobrec1._represente_compte rc ON i.id_image = rc.id_image
-    WHERE rc.id_compte = ?
-";
-
-$requetePrepareeVerificationImage = $connexionBaseDeDonnees->prepare($requeteSQLVerificationImagePresente);
-$requetePrepareeVerificationImage->execute([$identifiantCompteClient]);
-$donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSOC) ?: null;
 ?>
 
 <!DOCTYPE html>
