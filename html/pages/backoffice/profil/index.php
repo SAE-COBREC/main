@@ -360,9 +360,12 @@ function safe($array, $key, $default = "") {
     <?php include __DIR__ . '/../../../partials/aside.html'; ?>
 
     <main class="main">
-      <div class="header">
-        <h1 class="header__title">Profil du vendeur</h1>
-      </div>
+    <div class="page-header">
+        <h1 class="page-title">Mon Compte</h1>
+
+        <a href="../connexionVendeur/index.php" class="logout-btn">Déconnexion</a>
+    </div>
+
 
       <?php if (isset($_GET['success'])): ?>
         <div class="alert-success">Informations mises à jour avec succès !</div>
@@ -384,7 +387,7 @@ function safe($array, $key, $default = "") {
           </div>
 
           <div class="form-row">
-            <label>Pseudo</label>
+            <label>Dénomination</label>
             <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
             <span class="error" id="error-pseudo"></span>
           </div>
