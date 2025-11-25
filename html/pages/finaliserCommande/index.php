@@ -36,7 +36,7 @@
         //formater le prix pour l'afficher
         $totalPanier = number_format($totalCalcul, 2, '.', '');
     } else {
-        $url = '/index.php';
+        $url = '/pages/connexionClient/index.php';
         echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     }
 
