@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
     <div class="card" id="1">
       <div class="logo">
-        <img  src="../../img/svg/logo-text.svg" alt="Logo Alizon" onclick="window.location.href='../../index.php'">
+        <img  src="../../img/svg/logo-text.svg" alt="Logo Alizon" >
       </div>
 
       <h1>Récupération mdp</h1>
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </button>
       </div>
       
-      <div class="debutant">Retour a la page de <a href="../connexionClient/index.php"><strong>Connexion →</strong></a></div>
+      <div class="debutant">Retour a la page de <a href="../backoffice/connexionVendeur/index.php"><strong>Connexion →</strong></a></div>
       
       <div class="footer">
         <p>Aide</p><p>Confidentialité</p><p>Conditions</p>

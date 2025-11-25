@@ -11,6 +11,41 @@ $pdo->exec("SET search_path TO cobrec1");
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
+    function getFieldValidationMessage(el) {
+      try {
+        if (el && el.validity) {
+          //cas ou aucune valeur n'est entrée
+          if (el.validity.valueMissing) return 'Ce champ est requis.';
+
+          // Vérification d'âge
+          if (el.id === 'naissance') {
+            if (el.validity.customError) {
+              return el.validationMessage;
+            }
+          }
+          //verification du mdp
+          if (el.id === 'mdp') {
+            var val = (el.value || '').trim();
+            if (val.length === 0) return 'Ce champ est requis.';
+            if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
+            if (val.length > 16) return 'Le mot de passe doit contenir au maximum 16 caractères.';
+            if (!/[0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un chiffre.';
+            if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';
+            if (!/[a-z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre minuscule.';
+            if (!/[^A-Za-z0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un caractère spécial.';
+            if (el.validity.patternMismatch) return 'Le mot de passe ne respecte pas le format requis.';
+          }
+          //verif des REGEX
+          if (el.validity.patternMismatch) {
+            if (el.type === 'email') return 'Veuillez saisir une adresse e-mail valide.';
+            if (el.id === 'telephone') return 'Le numéro de téléphone n\'a pas le bon format.';
+            if (el.id === 'codeP') return 'Le code postal est incorrecte.';
+            return 'Le format de ce champ est invalide.';
+          }
+        }
+      } catch (e) { /* ignore */ }
+      return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
+    }
     // Ajoute un comportement Entrée : soumet le formulaire quand Enter est pressé dans un champ (sauf textarea)
     document.addEventListener('DOMContentLoaded', function () {
       var form = document.getElementById('multiForm');
@@ -60,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$row) {
       $hasError = true;
       $error_card = 1;
-      $error_message = 'Adresse mail, pseudo ou mot de passe .';
+      $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
     } else {
 
 
@@ -157,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       <div class="connex-btn" role="group" aria-label="Suivant action">
-          <button type="submit" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
             Terminer
           </button>
       </div>
@@ -169,10 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
-    /**
-     * @description Termine le processus d'inscription en validant le formulaire et en le soumettant si toutes les validations sont réussies.
-     * @returns {void}
-     */
+
 
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');

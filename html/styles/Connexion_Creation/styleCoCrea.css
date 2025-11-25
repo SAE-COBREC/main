@@ -103,7 +103,7 @@ body.centered {
 @media screen and (max-width: 508px) {
   .card label {
     font-size: 20px;
-    padding-left: 15px;
+    padding-left: 5px;
   }
 }
 .card input {
@@ -117,8 +117,9 @@ body.centered {
 }
 @media screen and (max-width: 508px) {
   .card input {
-    width: 280px;
+    width: 310px;
     height: 25px;
+    margin-left: 0;
     padding: 8px 4px;
   }
 }
@@ -146,7 +147,7 @@ body.centered {
 @media screen and (max-width: 508px) {
   .card .error {
     padding: 0;
-    margin-left: 20px;
+    margin-left: 0px;
   }
   .card .error:not(.hidden) {
     margin-bottom: 20px;
@@ -342,7 +343,7 @@ body.centered {
   .card[id="3"] label {
     /* supprimer marges et padding spécifiques pour les labels de la carte 3 uniquement sur mobile */
     margin-left: 0 !important;
-    padding-left: 15px !important;
+    padding-left: 5px !important;
   }
 }
 @media screen and (max-width: 508px) {
@@ -357,7 +358,7 @@ body.centered {
   }
   .card[id="3"] input#codeP,
   .card[id="3"] input#commune {
-    width: 280px;
+    width: 310px;
     margin-left: 0;
   }
   .card[id="3"] .error {
@@ -435,10 +436,10 @@ body.centered {
 
 @media screen and (max-width: 508px) {
   .connex-btn > button {
-    width: 300px;
+    width: 320px;
   }
   .forgot {
-    margin-left: 15px;
+    margin-left: 5px;
   }
   .footer {
     width: 320px;
@@ -446,6 +447,7 @@ body.centered {
   }
   .debutant {
     margin-left: 0px;
+    font-size: 18px;
   }
   .debutant > a:hover {
     color: #030212;
