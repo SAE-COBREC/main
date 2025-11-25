@@ -80,7 +80,7 @@ if (!$produit || $produit['p_statut'] != 'En ligne') {
     exit;
 }
 
-$donneesAvis = chargerAvisBDD($pdo, $idProduit);
+$donneesAvis = chargerAvisBDD($pdo, $idProduit, $idClient);
 $avisTextes = $donneesAvis['avis'];
 $reponsesMap = $donneesAvis['reponses'];
 
@@ -130,7 +130,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-    <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
 </head>
 <body>
     <?php
@@ -265,7 +264,9 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 <div class="review new-review-card" id="newReviewCard">
                     <div class="review-head">
                         <div class="review-head-left">
-                            <div class="avatar">V</div>
+                            <div class="avatar">
+                                <?php $avatarUrl = $ta['client_image'] ?? 'V'; ?>
+                            </div>
                             <div class="review-head-texts">
                                 <div class="review-author">Vous</div>
                                 <div class="review-subtitle">Laisser un avis</div>
@@ -310,12 +311,27 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                     <?php foreach ($avisTextes as $ta): 
                         $aNote = (float)($ta['avis_note'] ?? 0);
                         $aNoteEntiere = (int)floor($aNote);
+                        
+                        // Determine display name
+                        $displayName = 'Utilisateur';
+                        if (!empty($ta['c_pseudo'])) {
+                            $displayName = $ta['c_pseudo'];
+                        } elseif (!empty($ta['c_prenom']) || !empty($ta['c_nom'])) {
+                            $displayName = trim(($ta['c_prenom'] ?? '') . ' ' . ($ta['c_nom'] ?? ''));
+                        }
+                        
+                        // Determine avatar
+                        $avatarUrl = $ta['client_image'] ?? null;
                     ?>
                         <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" style="margin-bottom:12px;">
                             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                                <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)">U</div>
+                                <?php if ($avatarUrl): ?>
+                                    <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                                <?php else: ?>
+                                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper(substr($displayName, 0, 1)) ?></div>
+                                <?php endif; ?>
                                 <div>
-                                    <div style="font-weight:700">Utilisateur</div>
+                                    <div style="font-weight:700"><?= htmlspecialchars($displayName) ?></div>
                                     <div style="color:var(--muted);font-size:13px">Avis</div>
                                     <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
                                         <span class="stars" aria-hidden="true">
@@ -329,10 +345,10 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                             </div>
                             <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
                             <div class="review-votes" style="display:flex;align-items:center;gap:10px;margin-top:8px">
-                                <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus">
+                                <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
                                     <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
                                 </button>
-                                <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins">
+                                <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
                                     <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
                                 </button>
                                 <span style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
@@ -453,8 +469,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 const rev = btn.closest('.review');
                 const aid = rev.dataset.avisId;
                 const type = btn.dataset.type;
-                const key = `vote:${productId}:${aid}`;
-                const prev = localStorage.getItem(key) || '';
                 
                 btn.disabled = true;
                 const fd = new FormData();
@@ -462,17 +476,21 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 fd.append('id_produit', productId);
                 fd.append('id_avis', aid);
                 fd.append('value', type);
-                fd.append('prev', prev);
                 
                 fetchJson(window.location.href, { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success && d.counts) {
                             rev.querySelector('.like-count').textContent = d.counts.a_pouce_bleu;
                             rev.querySelector('.dislike-count').textContent = d.counts.a_pouce_rouge;
-                            localStorage.setItem(key, prev === type ? '' : type);
+                            
                             // Update UI state
                             rev.querySelectorAll('.btn-vote').forEach(b => b.setAttribute('aria-pressed', 'false'));
-                            if (prev !== type) btn.setAttribute('aria-pressed', 'true');
+                            if (d.user_vote === type) {
+                                btn.setAttribute('aria-pressed', 'true');
+                            }
+                        } else if (!d.success && d.message) {
+                            if(window.showError) showError('Erreur', d.message);
+                            else alert(d.message);
                         }
                     })
                     .finally(() => btn.disabled = false);
@@ -605,12 +623,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
             });
         }
 
-        // Init votes UI
-        document.querySelectorAll('.review').forEach(r => {
-            const aid = r.dataset.avisId;
-            const val = localStorage.getItem(`vote:${productId}:${aid}`);
-            if (val) r.querySelector(`.btn-vote[data-type="${val}"]`)?.setAttribute('aria-pressed', 'true');
-        });
+
     </script>
 </body>
 </html>

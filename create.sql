@@ -337,6 +337,17 @@ ALTER TABLE ONLY cobrec1._avis
     ADD CONSTRAINT fk_avis_produit FOREIGN KEY (id_produit) 
             REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
 
+-- TABLE VOTE_AVIS
+CREATE TABLE cobrec1._vote_avis (
+    id_client integer NOT NULL,
+    id_avis integer NOT NULL,
+    vote_type varchar(10) NOT NULL, -- 'like' ou 'dislike'
+    CONSTRAINT pk_vote_avis PRIMARY KEY (id_client, id_avis),
+    CONSTRAINT fk_vote_avis_client FOREIGN KEY (id_client) REFERENCES cobrec1._client(id_client) ON DELETE CASCADE,
+    CONSTRAINT fk_vote_avis_avis FOREIGN KEY (id_avis) REFERENCES cobrec1._avis(id_avis) ON DELETE CASCADE,
+    CONSTRAINT chk_vote_type CHECK (vote_type IN ('like', 'dislike'))
+);
+
 -- TABLE COMMENTAIRE
 CREATE TABLE cobrec1._commentaire (
     id_commentaire SERIAL NOT NULL,
