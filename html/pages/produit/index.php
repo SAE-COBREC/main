@@ -10,6 +10,20 @@ $pdo->exec("SET search_path TO cobrec1");
 // 1. Gestion Session / Panier
 $idClient = isset($_SESSION['idClient']) ? (int)$_SESSION['idClient'] : null;
 
+// Récupération infos client courant pour l'affichage (avatar, pseudo)
+$currentUser = null;
+$currentUserImage = null;
+if ($idClient) {
+    $currentUser = recupererInformationsCompletesClient($pdo, $idClient);
+    $idCompte = recupererIdentifiantCompteClient($pdo, $idClient);
+    if ($idCompte) {
+        $imgData = recupererImageProfilCompte($pdo, $idCompte);
+        if ($imgData && !empty($imgData['i_lien'])) {
+            $currentUserImage = $imgData['i_lien'];
+        }
+    }
+}
+
 if ($idClient === null) {
     //si l'utilisateur n'est pas connecté, on utilise un panier temporaire en SESSION
     if (!isset($_SESSION['panierTemp'])) {
@@ -80,7 +94,7 @@ if (!$produit || $produit['p_statut'] != 'En ligne') {
     exit;
 }
 
-$donneesAvis = chargerAvisBDD($pdo, $idProduit);
+$donneesAvis = chargerAvisBDD($pdo, $idProduit, $idClient);
 $avisTextes = $donneesAvis['avis'];
 $reponsesMap = $donneesAvis['reponses'];
 
@@ -130,7 +144,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-    <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
 </head>
 <body>
     <?php
@@ -252,7 +265,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                             elseif ($note >= $i - 0.5) $s = 'alf';
                             else $s = 'empty';
                         ?>
-                            <img src="/img/svg/star-yellow-<?= $s ?>.svg" alt="Etoile" width="20">
+                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                         </div>
                         <div id="reviewsRatingCount" style="font-size:13px;color:var(--muted);margin-top:4px">Basé sur <?= $nbAvis ?> avis</div>
@@ -261,11 +274,24 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
             </div>
 
             <!-- Formulaire avis -->
-            <?php if ($idClient && $clientAachete): ?>
+            <?php if ($idClient && $clientAachete && !$dejaAvis): ?>
                 <div class="review new-review-card" id="newReviewCard">
                     <div class="review-head">
                         <div class="review-head-left">
-                            <div class="avatar">V</div>
+                            <div class="avatar">
+                                <?php if ($currentUserImage): ?>
+                                    <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                                <?php else: ?>
+                                    <?php 
+                                        $initial = 'U';
+                                        if ($currentUser) {
+                                            if (!empty($currentUser['c_pseudo'])) $initial = substr($currentUser['c_pseudo'], 0, 1);
+                                            elseif (!empty($currentUser['c_prenom'])) $initial = substr($currentUser['c_prenom'], 0, 1);
+                                        }
+                                    ?>
+                                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper($initial) ?></div>
+                                <?php endif; ?>
+                            </div>
                             <div class="review-head-texts">
                                 <div class="review-author">Vous</div>
                                 <div class="review-subtitle">Laisser un avis</div>
@@ -288,6 +314,12 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         </div>
                     </form>
                 </div>
+            <?php elseif ($idClient && $dejaAvis): ?>
+                <div class="review new-review-card" style="background:#f3f4f7;opacity:.85">
+                    <div style="padding:12px 16px;font-size:14px;color:#555">
+                        Vous avez déjà publié un avis sur ce produit.
+                    </div>
+                </div>
             <?php else: ?>
                 <div class="review new-review-card" style="background:#f3f4f7;opacity:.85">
                     <div style="padding:12px 16px;font-size:14px;color:#555">
@@ -304,12 +336,27 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                     <?php foreach ($avisTextes as $ta): 
                         $aNote = (float)($ta['avis_note'] ?? 0);
                         $aNoteEntiere = (int)floor($aNote);
+                        
+                        // Determine display name
+                        $displayName = 'Utilisateur';
+                        if (!empty($ta['c_pseudo'])) {
+                            $displayName = $ta['c_pseudo'];
+                        } elseif (!empty($ta['c_prenom']) || !empty($ta['c_nom'])) {
+                            $displayName = trim(($ta['c_prenom'] ?? '') . ' ' . ($ta['c_nom'] ?? ''));
+                        }
+                        
+                        // Determine avatar
+                        $avatarUrl = $ta['client_image'] ?? null;
                     ?>
                         <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" style="margin-bottom:12px;">
                             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                                <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)">U</div>
+                                <?php if ($avatarUrl): ?>
+                                    <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                                <?php else: ?>
+                                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper(substr($displayName, 0, 1)) ?></div>
+                                <?php endif; ?>
                                 <div>
-                                    <div style="font-weight:700">Utilisateur</div>
+                                    <div style="font-weight:700"><?= htmlspecialchars($displayName) ?></div>
                                     <div style="color:var(--muted);font-size:13px">Avis</div>
                                     <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
                                         <span class="stars" aria-hidden="true">
@@ -322,17 +369,31 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                                 </div>
                             </div>
                             <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
-                            <div class="review-votes" style="display:flex;align-items:center;gap:10px;margin-top:8px">
-                                <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus">
-                                    <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
-                                </button>
-                                <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins">
-                                    <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
-                                </button>
-                                <span style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
-                                <?php if ($ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer): ?>
-                                    <button class="ghost btn-edit-review" style="margin-left:8px;font-size:12px;padding:4px 8px;">Modifier</button>
-                                    <button class="ghost btn-delete-review" style="margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;">Supprimer</button>
+                            <div class="review-votes">
+                                <div class="vote-buttons">
+                                    <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
+                                        <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
+                                    </button>
+                                    <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
+                                        <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
+                                    </button>
+                                </div>
+                                <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
+                                <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
+                                    <div class="review-actions">
+                                        <button class="ghost btn-edit-review desktop-only">Modifier</button>
+                                        <button class="ghost btn-delete-review desktop-only">Supprimer</button>
+                                        
+                                        <div class="mobile-menu-container mobile-only">
+                                            <button class="ghost btn-menu-trigger" aria-label="Options">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                            </button>
+                                            <div class="mobile-menu-dropdown">
+                                                <button class="btn-edit-review">Modifier</button>
+                                                <button class="btn-delete-review">Supprimer</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                             <?php if(isset($reponsesMap[(int)$ta['id_avis']])): $rep = $reponsesMap[(int)$ta['id_avis']]; ?>
@@ -356,6 +417,18 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     //inclure le pied de page du site
     include __DIR__ . '/../../partials/footer.html';
     ?>
+
+    <!-- Modal Edition Avis -->
+    <div id="editReviewModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+        <div class="modal-dialog" style="background:#fff;padding:20px;border-radius:8px;width:90%;max-width:500px;box-shadow:0 4px 12px rgba(0,0,0,0.15);box-sizing:border-box;">
+            <h3 style="margin-top:0;margin-bottom:15px;">Modifier votre avis</h3>
+            <textarea id="editReviewText" rows="5" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;resize:vertical;font-family:inherit;box-sizing:border-box;"></textarea>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+                <button class="button" id="cancelEditReview">Annuler</button>
+                <button class="button primary" id="confirmEditReview">Enregistrer</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/js/HL_import.js"></script>
@@ -435,8 +508,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 const rev = btn.closest('.review');
                 const aid = rev.dataset.avisId;
                 const type = btn.dataset.type;
-                const key = `vote:${productId}:${aid}`;
-                const prev = localStorage.getItem(key) || '';
                 
                 btn.disabled = true;
                 const fd = new FormData();
@@ -444,17 +515,21 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 fd.append('id_produit', productId);
                 fd.append('id_avis', aid);
                 fd.append('value', type);
-                fd.append('prev', prev);
                 
                 fetchJson(window.location.href, { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success && d.counts) {
                             rev.querySelector('.like-count').textContent = d.counts.a_pouce_bleu;
                             rev.querySelector('.dislike-count').textContent = d.counts.a_pouce_rouge;
-                            localStorage.setItem(key, prev === type ? '' : type);
+                            
                             // Update UI state
                             rev.querySelectorAll('.btn-vote').forEach(b => b.setAttribute('aria-pressed', 'false'));
-                            if (prev !== type) btn.setAttribute('aria-pressed', 'true');
+                            if (d.user_vote === type) {
+                                btn.setAttribute('aria-pressed', 'true');
+                            }
+                        } else if (!d.success && d.message) {
+                            if(window.showError) showError('Erreur', d.message);
+                            else alert(d.message);
                         }
                     })
                     .finally(() => btn.disabled = false);
@@ -468,8 +543,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
             const starInput = document.getElementById('inlineStarInput');
             const noteInput = document.getElementById('inlineNote');
             if (starInput) {
-                // Reset listeners via cloneNode ou juste en réassignant si on utilisait onclick (mais ici c'est addEventListener)
-                // On va utiliser un flag sur le container
                 if (!starInput.dataset.bound) {
                     starInput.dataset.bound = "true";
                     starInput.querySelectorAll('button').forEach(b => {
@@ -495,8 +568,8 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 const txt = document.getElementById('inlineComment').value;
                 const note = document.getElementById('inlineNote').value;
                 
-                if (!txt.trim()) return alert('Commentaire vide');
-                if (note == 0) return alert('Note requise');
+                if (!txt.trim()) return notify('Commentaire vide', 'warning');
+                if (note == 0) return notify('Note requise', 'warning');
                 
                 submitBtn.disabled = true;
                 const fd = new FormData();
@@ -510,7 +583,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         if (d.success) {
                             location.reload(); 
                         } else {
-                            alert(d.message);
+                            showError('Erreur', d.message);
                             submitBtn.disabled = false;
                         }
                     })
@@ -523,49 +596,99 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
             listAvis.dataset.boundDelete = "true";
             listAvis.addEventListener('click', (e) => {
                 if (!e.target.closest('.btn-delete-review')) return;
-                if (!confirm('Supprimer ?')) return;
-                const rev = e.target.closest('.review');
+                
+                showModal({
+                    title: 'Suppression',
+                    message: 'Voulez-vous vraiment supprimer cet avis ?',
+                    okText: 'Supprimer',
+                    cancelText: 'Annuler',
+                    onOk: () => {
+                        const rev = e.target.closest('.review');
+                        const fd = new FormData();
+                        fd.append('action', 'delete_avis');
+                        fd.append('id_produit', productId);
+                        fd.append('id_avis', rev.dataset.avisId);
+                        
+                        fetchJson(window.location.href, { method: 'POST', body: fd })
+                            .then(d => {
+                                if (d.success) location.reload();
+                                else showError('Erreur', d.message || 'Impossible de supprimer');
+                            });
+                    }
+                });
+            });
+        }
+
+        // Edition
+        const editModal = document.getElementById('editReviewModal');
+        const editText = document.getElementById('editReviewText');
+        const editCancel = document.getElementById('cancelEditReview');
+        const editConfirm = document.getElementById('confirmEditReview');
+        let currentEditId = null;
+
+        if (editModal) {
+            editCancel.onclick = () => editModal.style.display = 'none';
+            editModal.onclick = (e) => { if(e.target === editModal) editModal.style.display = 'none'; };
+            
+            editConfirm.onclick = () => {
+                const newTxt = editText.value.trim();
+                if (!newTxt) return notify('Le commentaire ne peut pas être vide', 'warning');
+                
                 const fd = new FormData();
-                fd.append('action', 'delete_avis');
+                fd.append('action', 'edit_avis');
                 fd.append('id_produit', productId);
-                fd.append('id_avis', rev.dataset.avisId);
+                fd.append('id_avis', currentEditId);
+                fd.append('commentaire', newTxt);
                 
                 fetchJson(window.location.href, { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success) location.reload();
+                        else showError('Erreur', d.message || 'Erreur lors de la modification');
                     });
-            });
+                editModal.style.display = 'none';
+            };
         }
 
-        // Edition (simplifiée : prompt)
         if (listAvis && !listAvis.dataset.boundEdit) {
             listAvis.dataset.boundEdit = "true";
             listAvis.addEventListener('click', (e) => {
+                // Menu trigger
+                const menuBtn = e.target.closest('.btn-menu-trigger');
+                if (menuBtn) {
+                    const container = menuBtn.closest('.mobile-menu-container');
+                    const dropdown = container.querySelector('.mobile-menu-dropdown');
+                    
+                    // Close others
+                    document.querySelectorAll('.mobile-menu-dropdown').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('show');
+                    });
+                    
+                    dropdown.classList.toggle('show');
+                    e.stopPropagation();
+                    return;
+                }
+
+                // Close menu when clicking outside
+                if (!e.target.closest('.mobile-menu-dropdown')) {
+                     document.querySelectorAll('.mobile-menu-dropdown').forEach(d => d.classList.remove('show'));
+                }
+
                 if (!e.target.closest('.btn-edit-review')) return;
                 const rev = e.target.closest('.review');
                 const content = rev.querySelector('.review-content');
-                const newTxt = prompt('Modifier votre avis :', content.textContent.trim());
-                if (newTxt !== null && newTxt !== content.textContent.trim()) {
-                    const fd = new FormData();
-                    fd.append('action', 'edit_avis');
-                    fd.append('id_produit', productId);
-                    fd.append('id_avis', rev.dataset.avisId);
-                    fd.append('commentaire', newTxt);
-                    
-                    fetchJson(window.location.href, { method: 'POST', body: fd })
-                        .then(d => {
-                            if (d.success) location.reload();
-                        });
-                }
+                
+                currentEditId = rev.dataset.avisId;
+                editText.value = content.textContent.trim();
+                editModal.style.display = 'flex';
+            });
+            
+            // Global click to close menus
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.mobile-menu-dropdown').forEach(d => d.classList.remove('show'));
             });
         }
 
-        // Init votes UI
-        document.querySelectorAll('.review').forEach(r => {
-            const aid = r.dataset.avisId;
-            const val = localStorage.getItem(`vote:${productId}:${aid}`);
-            if (val) r.querySelector(`.btn-vote[data-type="${val}"]`)?.setAttribute('aria-pressed', 'true');
-        });
+
     </script>
 </body>
 </html>

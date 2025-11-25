@@ -2,6 +2,7 @@
     session_start();
     include '../../selectBDD.php';
     $boolErreur = false;
+    $totalPanier = $_SESSION['totalPanier'];
     if (isset($_SESSION['idClient'])){
         $id_client = $_SESSION['idClient'];
         $pdo->exec("SET search_path TO cobrec1");
@@ -11,149 +12,152 @@
             FROM _client
             WHERE id_client = :id_client";
 
-        $stmt = $pdo->prepare($requetePanier);
-        
-        $stmt->execute([
-            ':id_client' => $id_client
-        ]);
+    $stmt = $pdo->prepare($requetePanier);
 
-        
-        $nom = $stmt->fetch();
+    $stmt->execute([
+        ':id_client' => $id_client
+    ]);
 
-    } else {
-        $_SESSION['etaitSurFinaliser'] = true;
-        header('Location: /pages/connexionClient/index.php');
-        exit();
-    }
-    
 
-    //cette condition sert à pour le paiement à vérifier si les informations sont valide ou non
-    if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) { //on vérifie qu'on a bien toutes les infrmations du paiement
-        /*
-        Algorythme pour vérifier si une carte est valide :
-        1.On part du numéro complet à 16 chiffres.
-        2.On double un chiffre sur deux en partant de la droite.
-        3.Si le double fait plus que 9, on enlève 9.
-        4.On additionne tous les chiffres.
-        5.le total doit être un multiple de 10.*/
-        $numCarte = str_replace(' ', '', $_POST['numCarte']);
-        $totalNumCarte = 0; //initialise le total pour l'étape 4
-        $alterne = false; //ppour alternrer un chiffre sur 2 pour étape 2
-        $erreur = "";
-        $boolErreur = false;
-        for ($i = strlen($numCarte) - 1; $i >= 0; $i--) {
-            $chiffreActu = intval($numCarte[$i]);
+    $nom = $stmt->fetch();
 
-            if ($alterne) {
-                $chiffreActu *= 2;
-                if ($chiffreActu > 9) {
-                    $chiffreActu -= 9;
-                }
+} else {
+    $_SESSION['etaitSurFinaliser'] = true;
+    header('Location: /pages/connexionClient/index.php');
+    exit();
+}
+
+
+//cette condition sert à pour le paiement à vérifier si les informations sont valide ou non
+if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) { //on vérifie qu'on a bien toutes les infrmations du paiement
+    /*
+    Algorythme pour vérifier si une carte est valide :
+    1.On part du numéro complet à 16 chiffres.
+    2.On double un chiffre sur deux en partant de la droite.
+    3.Si le double fait plus que 9, on enlève 9.
+    4.On additionne tous les chiffres.
+    5.le total doit être un multiple de 10.*/
+    $numCarte = str_replace(' ', '', $_POST['numCarte']);
+    $totalNumCarte = 0; //initialise le total pour l'étape 4
+    $alterne = false; //ppour alternrer un chiffre sur 2 pour étape 2
+    $erreur = "";
+    $boolErreur = false;
+    for ($i = strlen($numCarte) - 1; $i >= 0; $i--) {
+        $chiffreActu = intval($numCarte[$i]);
+
+        if ($alterne) {
+            $chiffreActu *= 2;
+            if ($chiffreActu > 9) {
+                $chiffreActu -= 9;
             }
-            $totalNumCarte += $chiffreActu;
-            $alterne = !$alterne;//on alternre un chiffre sur 2 pour étape 2
         }
-        if ($totalNumCarte % 10 !== 0) {
-            $erreur = "carte invalide";
-            $boolErreur = true;
-        } else {
-            $dateTodayComplet = date("Y-m-d H:i:s");
-            $erreur = "";                      
-        }
+        $totalNumCarte += $chiffreActu;
+        $alterne = !$alterne;//on alternre un chiffre sur 2 pour étape 2
+    }
+    if ($totalNumCarte % 10 !== 0) {
+        $erreur = "carte invalide";
+        $boolErreur = true;
+    } else {
+        $dateTodayComplet = date("Y-m-d H:i:s");
+        $erreur = "";
+    }
 
-        $dateExpiration = $_POST['dateExpiration']; //sotck la date de la carte
-        list($mm, $yy) = explode("/", $dateExpiration);
-        $yy = 2000 + intval($yy);
+    $dateExpiration = $_POST['dateExpiration']; //sotck la date de la carte
+    list($mm, $yy) = explode("/", $dateExpiration);
+    $yy = 2000 + intval($yy);
 
-        $expiration = $yy . "-" . $mm;
-        $dateTodayMA = date("Y-m");
+    $expiration = $yy . "-" . $mm;
+    $dateTodayMA = date("Y-m");
 
-        if ($expiration < $dateTodayMA && $erreur != "") {
-            $erreur = $erreur . " et date d'expiration incorrecte";
-            $boolErreur = true;
-        } else if ($expiration < $dateTodayMA){
-            $erreur = "Date d'expiration incorrecte";
-            $boolErreur = true;
-        }
+    if ($expiration < $dateTodayMA && $erreur != "") {
+        $erreur = $erreur . " et date d'expiration incorrecte";
+        $boolErreur = true;
+    } else if ($expiration < $dateTodayMA) {
+        $erreur = "Date d'expiration incorrecte";
+        $boolErreur = true;
+    }
 
-        if ($boolErreur == false){ //si pas d'erreur on valide tout
-            $panierEnCours = $_SESSION['panierEnCours']; //récup du panier en cours
-            $requetePanierTimeStamp = "UPDATE _panier_commande 
+    if ($boolErreur == false) { //si pas d'erreur on valide tout
+        $panierEnCours = $_SESSION['panierEnCours']; //récup du panier en cours
+        $requetePanierTimeStamp = "UPDATE _panier_commande 
                                         SET timestamp_commande = :dateTodayComplet    
                                         WHERE id_panier = :id_panier"; //la requête pour update le time stamp
-            $stmt = $pdo->prepare($requetePanierTimeStamp);
-            $stmt->execute([
-                ':dateTodayComplet' => $dateTodayComplet,
-                ':id_panier' => $panierEnCours
-            ]); //execute la requête pour update le time stamp
+        $stmt = $pdo->prepare($requetePanierTimeStamp);
+        $stmt->execute([
+            ':dateTodayComplet' => $dateTodayComplet,
+            ':id_panier' => $panierEnCours
+        ]); //execute la requête pour update le time stamp
 
 
-            //requête qui servira plus tard pour la facture etle suivi de commande
-            $requeteFacture = "INSERT INTO _facture (id_panier, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
+        //requête qui servira plus tard pour la facture etle suivi de commande
+        $requeteFacture = "INSERT INTO _facture (id_panier, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
                                                     (:id_panier, 0, 0, 0, :f_total_ttc)";
-            $stmt = $pdo->prepare($requeteFacture);    
-            $stmt->execute([
-                ':id_panier' => $panierEnCours,
-                ':f_total_ttc' => $_SESSION['totalPanier']
-            ]);   
+        $stmt = $pdo->prepare($requeteFacture);
+        $stmt->execute([
+            ':id_panier' => $panierEnCours,
+            ':f_total_ttc' => $totalPanier
+        ]);
 
-            echo "paiement validé"; 
-            /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
+        /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
 
+        $url = '/index.php';
+        echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
 
-            header('Location: /index.php');
-            exit();
-        }
     }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paiement - Alizon</title>
-  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link rel="stylesheet" href="/styles/finaliserCommande/styleFinaliserCommande.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement - Alizon</title>
+    <link rel="icon" type="image/png" href="../../../img/favicon.svg">
+    <link rel="stylesheet" href="/styles/finaliserCommande/styleFinaliserCommande.css">
 </head>
 
 <body>
     <h1><a href="/pages/panier/index.php" id="retourPanier">◀ Panier</a></h1>
     <section class="infoPaiement">
-        <h2><img src="/img/svg/logo.svg"/>Alizon</h2>
+        <h2><img src="/img/svg/logo.svg" />Alizon</h2>
         <form id="payerPanier" method="POST" action="/pages/finaliserCommande/index.php">
             <label>Numéro de carte</label>
-            <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19" placeholder="1111 2222 3333 4444"/>
+            <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19"
+                placeholder="1111 2222 3333 4444" />
             <!--maxlenght pour avoir une premiere vérification et minlenght pareil à 19 car il fuat compter les espaces-->
 
             <div class="dateCode">
                 <div>
                     <label>Date d'expriation</label>
-                    <input name="dateExpiration" id="dateExpiration" type="text" required maxlength="5" minlength="5" placeholder="MM/AA"/>
+                    <input name="dateExpiration" id="dateExpiration" type="text" required maxlength="5" minlength="5"
+                        placeholder="MM/AA" />
                 </div>
                 <div>
                     <label>Code de sécurité</label>
-                    <input name="cvc" id="cvc" type="text" required maxlength="3" minlength="3" placeholder="CVC"/>
+                    <input name="cvc" id="cvc" type="text" required maxlength="3" minlength="3" placeholder="CVC" />
                 </div>
             </div>
             <h2>Adresse de facturation</h2>
 
             <label>Nom</label>
-            <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont" value="<?php echo $nom['c_nom'] ?>"/>
+            <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"
+                value="<?php echo $nom['c_nom'] ?>" />
 
             <label>Pays</label>
-            <input name="pays" id="pays" type="text" required maxlength="100" placeholder="ex: France"/>
+            <input name="pays" id="pays" type="text" required maxlength="100" placeholder="ex: France" />
 
             <div class="checkBox">
                 <div>
-                    <input name="conditions" id="conditions" type="checkbox" required/>
-                    <label>J'accepte les conditions de service et que mon mode de paiement soit utilisé pour cette transaction.</label>
+                    <input name="conditions" id="conditions" type="checkbox" required />
+                    <label>J'accepte les conditions de service et que mon mode de paiement soit utilisé pour cette
+                        transaction.</label>
                 </div>
             </div>
             <?php if ($boolErreur == true): ?>
                 <p><span><?php echo $erreur?></span></p>
             <?php endif;?>
-            <button>Payer: <?php echo $_SESSION['totalPanier']?>€</button>
+            <button>Payer: <?php echo $totalPanier?>€</button>
         <form>
     </section>
     <script>
@@ -175,11 +179,11 @@
 
             //met la valeur changé (après tous les regex)
             this.value = valeur;
-        });        
+        });
 
         //récup l'input de la date d'expiration
         const dateInput = document.getElementById("dateExpiration");
-        
+
         //pour chaque entré dans l'input
         dateInput.addEventListener("input", function () {
             let valeur = this.value; //stock la valeur de l'input
@@ -210,4 +214,5 @@
         });
     </script>
 </body>
+
 </html>
