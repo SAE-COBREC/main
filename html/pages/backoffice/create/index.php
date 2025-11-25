@@ -416,6 +416,32 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <small>Seuls les caractères alphanumériques d'usage en français, les signes de ponctuation et les caractères suivants +-=°[]()' sont autorisés.</small>
                         <br /> 
                     </article>
+                    <article>
+                        <!-- Liste déroulante -->
+                        <label for="categorie">Catégorie</label>
+                        <br>
+                        <select id="categorie" name="categorie" required>
+                        <option value=''></option>
+                            <?php
+                                try {//Permets d'obtenir toutes les catégories de produits listées dans la BDD
+                                    $sql = 'SELECT id_categorie, nom_categorie FROM cobrec1._categorie_produit';
+                                    $stmt = $pdo->query($sql);
+                                    $categorie = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    //print_r($categorie);
+                                } catch (Exception $e) {
+                                    //print_r($e);
+                                }
+
+                                foreach ($categorie as $value) {
+                            ?>
+                            <option 
+                            value="<?php echo $value['id_categorie'] ?>" <?php if ($_POST["categorie"] == $value['id_categorie']){echo 'selected';} ?>>
+                            <?php echo $value['nom_categorie'] ?>
+                            </option>
+                            <?php } ?>
+                        </select>
+                        <br />
+                    </article>
                 </section>
                 <section>
                     <article>
@@ -575,32 +601,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                     <article>
                         <!-- Liste déroulante -->
-                        <label for="categorie">Catégorie</label>
-                        <br>
-                        <select id="categorie" name="categorie" required>
-                        <option value=''></option>
-                            <?php
-                                try {//Permets d'obtenir toutes les catégories de produits listées dans la BDD
-                                    $sql = 'SELECT id_categorie, nom_categorie FROM cobrec1._categorie_produit';
-                                    $stmt = $pdo->query($sql);
-                                    $categorie = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                    //print_r($categorie);
-                                } catch (Exception $e) {
-                                    //print_r($e);
-                                }
-
-                                foreach ($categorie as $value) {
-                            ?>
-                            <option 
-                            value="<?php echo $value['id_categorie'] ?>" <?php if ($_POST["categorie"] == $value['id_categorie']){echo 'selected';} ?>>
-                            <?php echo $value['nom_categorie'] ?>
-                            </option>
-                            <?php } ?>
-                        </select>
-                        <br />
-                    </article>
-                    <article>
-                        <!-- Liste déroulante -->
                         <label for="origine">Origine</label>
                         <br>
                         <select id="origine" name="origine" required>
@@ -624,6 +624,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         </select>
                         <br />
                     </article>
+
+                    
 
                     <!-- <article>
                         

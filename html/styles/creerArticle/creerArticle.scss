@@ -26,6 +26,9 @@ body{
                 color: #030212;
                 margin-bottom: 2em;
             }
+            input[type=submit] {
+                cursor: pointer;
+            }
             > .orange{
                 background: $primary-color-bronze;
                 color: #fff;
@@ -73,8 +76,9 @@ body{
                     transform: scale(5,5);
                 }
 
-                > input, textarea{
+                > input, textarea, select, option{
                     border:1px solid $card;
+                    background-color: white;
                     border-radius: 8px;
                     font: {
                         family:inherit;
@@ -113,8 +117,8 @@ body{
             //width: 360px;
             //max-height: 15em;
             grid-column: 2;
-            input, textarea{
-                width: 325px;
+            input, textarea, select, option{
+                width: 20em;
                 padding:0.6em;
             }
         }
