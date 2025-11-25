@@ -145,29 +145,29 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
     <section class="infoPaiement">
         <h2><img src="/img/svg/logo.svg" />Alizon</h2>
         <form id="payerPanier" method="POST" action="/pages/finaliserCommande/index.php">
-            <label>Numéro de carte</label>
+            <label>Numéro de carte *</label>
             <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19"
                 placeholder="1111 2222 3333 4444" />
             <!--maxlenght pour avoir une premiere vérification et minlenght pareil à 19 car il fuat compter les espaces-->
 
             <div class="dateCode">
                 <div>
-                    <label>Date d'expriation</label>
+                    <label>Date d'expriation *</label>
                     <input name="dateExpiration" id="dateExpiration" type="text" required maxlength="5" minlength="5"
                         placeholder="MM/AA" />
                 </div>
                 <div>
-                    <label>Code de sécurité</label>
+                    <label>Code de sécurité *</label>
                     <input name="cvc" id="cvc" type="text" required maxlength="3" minlength="3" placeholder="CVC" />
                 </div>
             </div>
             <h2>Adresse de facturation</h2>
 
-            <label>Nom</label>
+            <label>Nom *</label>
             <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"
                 value="<?php echo $nom['c_nom'] ?>" />
 
-            <label>Pays</label>
+            <label>Pays *</label>
             <input name="pays" id="pays" type="text" required maxlength="100" placeholder="ex: France" />
 
             <div class="checkBox">
