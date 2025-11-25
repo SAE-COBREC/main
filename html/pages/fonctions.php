@@ -821,6 +821,12 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (!$stmtVerif->fetchColumn()) { echo json_encode(['success' => false, 'message' => 'Achat requis']); exit; }
             
             // Vérif si déjà un avis pour ce client
+            /*
+            try {
+                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS id_client integer');
+            } catch (Exception $e) {}
+            */
+
             $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND id_client = :cid");
             $stmtCheck->execute([':pid' => $idProduitPost, ':cid' => $idClient]);
             if ($stmtCheck->fetchColumn()) {
@@ -837,9 +843,21 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (!isset($_COOKIE['alizon_owner'])) setcookie('alizon_owner', $ownerToken, time() + 3600*24*365, '/');
 
             // Insertion
-            $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, id_client, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note, a_owner_token) VALUES (:pid, :cid, :txt, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
-            $stmt->execute([':pid' => $idProduitPost, ':cid' => $idClient, ':txt' => $texte, ':note' => $note, ':owner' => $ownerToken]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            try {
+                /*
+                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_note numeric(2,1)');
+                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_owner_token text');
+                */
+                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, id_client, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note, a_owner_token) VALUES (:pid, :cid, :txt, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
+                $stmt->execute([':pid' => $idProduitPost, ':cid' => $idClient, ':txt' => $texte, ':note' => $note, ':owner' => $ownerToken]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                // Fallback si colonnes manquantes (ne devrait pas arriver si BDD à jour)
+                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES (:pid, :txt, 0, 0, NOW()) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt");
+                $stmt->execute([':pid' => $idProduitPost, ':txt' => $texte]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $row['a_note'] = 0.0;
+            }
 
             // Stats
             $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
@@ -953,7 +971,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             exit;
         }
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => 'Erreur serveur']);
+        echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
         exit;
     }
 }
