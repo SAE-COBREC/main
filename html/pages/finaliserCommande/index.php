@@ -143,7 +143,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
 <body>
     <h1><a href="/pages/panier/index.php" id="retourPanier">◀ Panier</a></h1>
     <section class="infoPaiement">
-        <h2><img src="/img/svg/logo.svg" />Alizon</h2>
+        <h2><a href="/index.php"><img src="/img/svg/logo.svg" /> Alizon</a></h2>
         <form id="payerPanier" method="POST" action="/pages/finaliserCommande/index.php">
             <label>Numéro de carte *</label>
             <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19"
