@@ -36,10 +36,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 //initialiser la variable pour les messages d'erreur
 $messageErreur = null;
 
-//----------------------------------------------------------------
-// CHARGEMENT OPTIMISÉ DU PROFIL CLIENT (1 seule requête au lieu de 6)
-//----------------------------------------------------------------
-
 //récupérer toutes les données du profil en une seule requête optimisée avec cache
 $profilComplet = recupererProfilCompletClientAvecCache($connexionBaseDeDonnees, $identifiantClientConnecte);
 
@@ -54,10 +50,6 @@ $donneesInformationsClient = $profilComplet;
 $listeAdressesClient = $profilComplet['adresses'];
 $listeCommandesRecentes = $profilComplet['commandes_recentes'];
 $donneesImageProfilCompte = $profilComplet['image_profil'];
-
-//----------------------------------------------------------------
-// FIN DU CHARGEMENT OPTIMISÉ
-//----------------------------------------------------------------
 
 //traitement des formulaires soumis en POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -95,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationProfil['success']) {
-            invaliderCacheProfilClient($identifiantClientConnecte); // ← INVALIDER LE CACHE
+             ($identifiantClientConnecte); // ← INVALIDER LE CACHE
             $url = 'index.php?success=info_updated';
             echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
             exit;
