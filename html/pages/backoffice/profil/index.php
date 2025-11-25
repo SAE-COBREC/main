@@ -86,68 +86,6 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* ---------------------------------------------------------
-       1. Mise à jour table _vendeur
-    --------------------------------------------------------- */
-
-    // PSEUDO
-    if (isset($_POST['pseudo']) && $_POST['pseudo'] !== $old['pseudo']) {
-
-        if (valueExists($pdo, "cobrec1._vendeur", "denomination", trim($_POST['pseudo']), $vendeur_id, "id_vendeur")) {
-            header("Location: index.php?error_pseudo=" . urlencode("Ce pseudo est déjà utilisé."));
-            exit;
-        }
-
-        $stmt = $pdo->prepare("
-            UPDATE cobrec1._vendeur
-            SET denomination = :val
-            WHERE id_vendeur = :id
-        ");
-        $stmt->execute([
-            'val' => trim($_POST['pseudo']),
-            'id'  => $vendeur_id
-        ]);
-    }
-
-    // RAISON SOCIALE
-    if (isset($_POST['rsociale']) && $_POST['rsociale'] !== $old['rsociale']) {
-
-        if (valueExists($pdo, "cobrec1._vendeur", "raison_sociale", trim($_POST['rsociale']), $vendeur_id, "id_vendeur")) {
-            header("Location: index.php?erro_rsociale=" . urlencode("Cette raison sociale existe déjà."));
-            exit;
-        }
-
-        $stmt = $pdo->prepare("
-            UPDATE cobrec1._vendeur
-            SET raison_sociale = :val
-            WHERE id_vendeur = :id
-        ");
-        $stmt->execute([
-            'val' => trim($_POST['rsociale']),
-            'id'  => $vendeur_id
-        ]);
-    }
-
-    // SIREN
-    if (isset($_POST['siren']) && $_POST['siren'] !== $old['siren']) {
-
-        if (valueExists($pdo, "cobrec1._vendeur", "siren", trim($_POST['siren']), $vendeur_id, "id_vendeur")) {
-            header("Location: index.php?error_siren=" . urlencode("Ce numéro SIREN est déjà enregistré."));
-            exit;
-        }
-
-        $stmt = $pdo->prepare("
-            UPDATE cobrec1._vendeur
-            SET siren = :val
-            WHERE id_vendeur = :id
-        ");
-        $stmt->execute([
-            'val' => trim($_POST['siren']),
-            'id'  => $vendeur_id
-        ]);
-    }
-
-
-    /* ---------------------------------------------------------
     TRAITEMENT DU CHANGEMENT DE MDP 
     --------------------------------------------------------- */
     if (isset($_POST['change_password'])) {
@@ -320,6 +258,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'img'  => $vendeur['id_image']
             ]);
         }
+    }
+
+    /* ---------------------------------------------------------
+       1. Mise à jour table _vendeur
+    --------------------------------------------------------- */
+
+    // PSEUDO
+    if (isset($_POST['pseudo']) && $_POST['pseudo'] !== $old['pseudo']) {
+
+        if (valueExists($pdo, "cobrec1._vendeur", "denomination", trim($_POST['pseudo']), $vendeur_id, "id_vendeur")) {
+            header("Location: index.php?error_pseudo=" . urlencode("Ce pseudo est déjà utilisé."));
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._vendeur
+            SET denomination = :val
+            WHERE id_vendeur = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['pseudo']),
+            'id'  => $vendeur_id
+        ]);
+    }
+
+    // RAISON SOCIALE
+    if (isset($_POST['rsociale']) && $_POST['rsociale'] !== $old['rsociale']) {
+
+        if (valueExists($pdo, "cobrec1._vendeur", "raison_sociale", trim($_POST['rsociale']), $vendeur_id, "id_vendeur")) {
+            header("Location: index.php?error_rsociale=" . urlencode("Cette raison sociale existe déjà."));
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._vendeur
+            SET raison_sociale = :val
+            WHERE id_vendeur = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['rsociale']),
+            'id'  => $vendeur_id
+        ]);
+    }
+
+    // SIREN
+    if (isset($_POST['siren']) && $_POST['siren'] !== $old['siren']) {
+
+        if (valueExists($pdo, "cobrec1._vendeur", "siren", trim($_POST['siren']), $vendeur_id, "id_vendeur")) {
+            header("Location: index.php?error_siren=" . urlencode("Ce numéro SIREN est déjà enregistré."));
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._vendeur
+            SET siren = :val
+            WHERE id_vendeur = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['siren']),
+            'id'  => $vendeur_id
+        ]);
     }
 
     /* ---------------------------------------------------------
