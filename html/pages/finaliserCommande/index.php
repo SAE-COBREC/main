@@ -3,21 +3,6 @@
     include '../../selectBDD.php';
     $boolErreur = false;
 
-    //recalcul du total directement depuis la base de donnees  pour éviter les problème de modification de variable en javascipt
-    $reqTotal = "
-        SELECT SUM(p_prix * quantite * (1 + montant_tva / 100)) 
-        FROM _contient 
-        JOIN _produit ON _contient.id_produit = _produit.id_produit 
-        JOIN _tva ON _produit.id_tva = _tva.id_tva
-        WHERE id_panier = :id_panier
-    ";
-    $stmt = $pdo->prepare($reqTotal);
-    $stmt->execute([':id_panier' => $_SESSION['panierEnCours']]);
-    $totalCalcul = $stmt->fetchColumn();
-
-    //formater le prix pour l'afficher
-    $totalPanier = number_format($totalCalcul, 2, '.', '');
-
     if (isset($_SESSION['idClient'])){
         $id_client = $_SESSION['idClient'];
         $pdo->exec("SET search_path TO cobrec1");
@@ -27,99 +12,112 @@
             FROM _client
             WHERE id_client = :id_client";
 
-    $stmt = $pdo->prepare($requetePanier);
+        $stmt = $pdo->prepare($requetePanier);
 
-    $stmt->execute([
-        ':id_client' => $id_client
-    ]);
-
-
-    $nom = $stmt->fetch();
-
-} else {
-    $_SESSION['etaitSurFinaliser'] = true;
-    header('Location: /pages/connexionClient/index.php');
-    exit();
-}
-
-
-//cette condition sert à pour le paiement à vérifier si les informations sont valide ou non
-if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) { //on vérifie qu'on a bien toutes les infrmations du paiement
-    /*
-    Algorythme pour vérifier si une carte est valide :
-    1.On part du numéro complet à 16 chiffres.
-    2.On double un chiffre sur deux en partant de la droite.
-    3.Si le double fait plus que 9, on enlève 9.
-    4.On additionne tous les chiffres.
-    5.le total doit être un multiple de 10.*/
-    $numCarte = str_replace(' ', '', $_POST['numCarte']);
-    $totalNumCarte = 0; //initialise le total pour l'étape 4
-    $alterne = false; //ppour alternrer un chiffre sur 2 pour étape 2
-    $erreur = "";
-    $boolErreur = false;
-    for ($i = strlen($numCarte) - 1; $i >= 0; $i--) {
-        $chiffreActu = intval($numCarte[$i]);
-
-        if ($alterne) {
-            $chiffreActu *= 2;
-            if ($chiffreActu > 9) {
-                $chiffreActu -= 9;
-            }
-        }
-        $totalNumCarte += $chiffreActu;
-        $alterne = !$alterne;//on alternre un chiffre sur 2 pour étape 2
-    }
-    if ($totalNumCarte % 10 !== 0) {
-        $erreur = "carte invalide";
-        $boolErreur = true;
-    } else {
-        $dateTodayComplet = date("Y-m-d H:i:s");
-        $erreur = "";
-    }
-
-    $dateExpiration = $_POST['dateExpiration']; //sotck la date de la carte
-    list($mm, $yy) = explode("/", $dateExpiration);
-    $yy = 2000 + intval($yy);
-
-    $expiration = $yy . "-" . $mm;
-    $dateTodayMA = date("Y-m");
-
-    if ($expiration < $dateTodayMA && $erreur != "") {
-        $erreur = $erreur . " et date d'expiration incorrecte";
-        $boolErreur = true;
-    } else if ($expiration < $dateTodayMA) {
-        $erreur = "Date d'expiration incorrecte";
-        $boolErreur = true;
-    }
-
-    if ($boolErreur == false) { //si pas d'erreur on valide tout
-        $panierEnCours = $_SESSION['panierEnCours']; //récup du panier en cours
-        $requetePanierTimeStamp = "UPDATE _panier_commande 
-                                        SET timestamp_commande = :dateTodayComplet    
-                                        WHERE id_panier = :id_panier"; //la requête pour update le time stamp
-        $stmt = $pdo->prepare($requetePanierTimeStamp);
         $stmt->execute([
-            ':dateTodayComplet' => $dateTodayComplet,
-            ':id_panier' => $panierEnCours
-        ]); //execute la requête pour update le time stamp
-
-
-        //requête qui servira plus tard pour la facture etle suivi de commande
-        $requeteFacture = "INSERT INTO _facture (id_panier, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
-                                                    (:id_panier, 0, 0, 0, :f_total_ttc)";
-        $stmt = $pdo->prepare($requeteFacture);
-        $stmt->execute([
-            ':id_panier' => $panierEnCours,
-            ':f_total_ttc' => $totalPanier
+            ':id_client' => $id_client
         ]);
 
-        /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
 
+        $nom = $stmt->fetch();
+
+        //recalcul du total directement depuis la base de donnees  pour éviter les problème de modification de variable en javascipt
+        $reqTotal = "
+            SELECT SUM(p_prix * quantite * (1 + montant_tva / 100)) 
+            FROM _contient 
+            JOIN _produit ON _contient.id_produit = _produit.id_produit 
+            JOIN _tva ON _produit.id_tva = _tva.id_tva
+            WHERE id_panier = :id_panier
+        ";
+        $stmt = $pdo->prepare($reqTotal);
+        $stmt->execute([':id_panier' => $_SESSION['panierEnCours']]);
+        $totalCalcul = $stmt->fetchColumn();
+
+        //formater le prix pour l'afficher
+        $totalPanier = number_format($totalCalcul, 2, '.', '');
+    } else {
         $url = '/index.php';
         echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-
     }
-}
+
+
+    //cette condition sert à pour le paiement à vérifier si les informations sont valide ou non
+    if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) { //on vérifie qu'on a bien toutes les infrmations du paiement
+        /*
+        Algorythme pour vérifier si une carte est valide :
+        1.On part du numéro complet à 16 chiffres.
+        2.On double un chiffre sur deux en partant de la droite.
+        3.Si le double fait plus que 9, on enlève 9.
+        4.On additionne tous les chiffres.
+        5.le total doit être un multiple de 10.*/
+        $numCarte = str_replace(' ', '', $_POST['numCarte']);
+        $totalNumCarte = 0; //initialise le total pour l'étape 4
+        $alterne = false; //ppour alternrer un chiffre sur 2 pour étape 2
+        $erreur = "";
+        $boolErreur = false;
+        for ($i = strlen($numCarte) - 1; $i >= 0; $i--) {
+            $chiffreActu = intval($numCarte[$i]);
+
+            if ($alterne) {
+                $chiffreActu *= 2;
+                if ($chiffreActu > 9) {
+                    $chiffreActu -= 9;
+                }
+            }
+            $totalNumCarte += $chiffreActu;
+            $alterne = !$alterne;//on alternre un chiffre sur 2 pour étape 2
+        }
+        if ($totalNumCarte % 10 !== 0) {
+            $erreur = "carte invalide";
+            $boolErreur = true;
+        } else {
+            $dateTodayComplet = date("Y-m-d H:i:s");
+            $erreur = "";
+        }
+
+        $dateExpiration = $_POST['dateExpiration']; //sotck la date de la carte
+        list($mm, $yy) = explode("/", $dateExpiration);
+        $yy = 2000 + intval($yy);
+
+        $expiration = $yy . "-" . $mm;
+        $dateTodayMA = date("Y-m");
+
+        if ($expiration < $dateTodayMA && $erreur != "") {
+            $erreur = $erreur . " et date d'expiration incorrecte";
+            $boolErreur = true;
+        } else if ($expiration < $dateTodayMA) {
+            $erreur = "Date d'expiration incorrecte";
+            $boolErreur = true;
+        }
+
+        if ($boolErreur == false) { //si pas d'erreur on valide tout
+            $panierEnCours = $_SESSION['panierEnCours']; //récup du panier en cours
+            $requetePanierTimeStamp = "UPDATE _panier_commande 
+                                            SET timestamp_commande = :dateTodayComplet    
+                                            WHERE id_panier = :id_panier"; //la requête pour update le time stamp
+            $stmt = $pdo->prepare($requetePanierTimeStamp);
+            $stmt->execute([
+                ':dateTodayComplet' => $dateTodayComplet,
+                ':id_panier' => $panierEnCours
+            ]); //execute la requête pour update le time stamp
+
+
+            //requête qui servira plus tard pour la facture etle suivi de commande
+            $requeteFacture = "INSERT INTO _facture (id_panier, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
+                                                        (:id_panier, 0, 0, 0, :f_total_ttc)";
+            $stmt = $pdo->prepare($requeteFacture);
+            $stmt->execute([
+                ':id_panier' => $panierEnCours,
+                ':f_total_ttc' => $totalPanier
+            ]);
+
+            /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
+
+            $url = '/index.php';
+            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="fr">
