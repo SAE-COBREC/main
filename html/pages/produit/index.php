@@ -349,7 +349,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         // Determine avatar
                         $avatarUrl = $ta['client_image'] ?? null;
                     ?>
-                        <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" style="margin-bottom:12px;">
+                        <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>" style="margin-bottom:12px;">
                             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
                                 <?php if ($avatarUrl): ?>
                                     <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
@@ -420,13 +420,19 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     ?>
 
     <!-- Modal Edition Avis -->
-    <div id="editReviewModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-        <div class="modal-dialog" style="background:#fff;padding:20px;border-radius:8px;width:90%;max-width:500px;box-shadow:0 4px 12px rgba(0,0,0,0.15);box-sizing:border-box;">
-            <h3 style="margin-top:0;margin-bottom:15px;">Modifier votre avis</h3>
-            <textarea id="editReviewText" rows="5" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;resize:vertical;font-family:inherit;box-sizing:border-box;"></textarea>
-            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
-                <button class="button" id="cancelEditReview">Annuler</button>
-                <button class="button primary" id="confirmEditReview">Enregistrer</button>
+    <div id="editReviewModal" class="modal-overlay">
+        <div class="modal-dialog">
+            <h3>Modifier votre avis</h3>
+            <div class="star-input" id="editStarInput" title="Sélectionnez une note">
+                <?php for($i=1; $i<=5; $i++): ?>
+                    <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                <?php endfor; ?>
+            </div>
+            <input type="hidden" id="editNote" name="note" value="0">
+            <textarea id="editReviewText" rows="5" placeholder="Votre avis..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelEditReview">Annuler</button>
+                <button class="btn-primary" id="confirmEditReview">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -626,20 +632,47 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
         const editCancel = document.getElementById('cancelEditReview');
         const editConfirm = document.getElementById('confirmEditReview');
         let currentEditId = null;
+        let updateEditStars = () => {};
 
         if (editModal) {
             editCancel.onclick = () => editModal.style.display = 'none';
             editModal.onclick = (e) => { if(e.target === editModal) editModal.style.display = 'none'; };
             
+            const editStarInput = document.getElementById('editStarInput');
+            const editNoteInput = document.getElementById('editNote');
+
+            updateEditStars = (v) => {
+                if(!editStarInput) return;
+                editStarInput.querySelectorAll('button img').forEach((img, i) => {
+                    img.src = (i < v) ? '/img/svg/star-full.svg' : '/img/svg/star-empty.svg';
+                });
+            };
+
+            if (editStarInput && !editStarInput.dataset.bound) {
+                editStarInput.dataset.bound = "true";
+                editStarInput.querySelectorAll('button').forEach(b => {
+                    b.addEventListener('mouseenter', () => updateEditStars(b.dataset.value));
+                    b.addEventListener('click', () => {
+                        editNoteInput.value = b.dataset.value;
+                        updateEditStars(b.dataset.value);
+                    });
+                });
+                editStarInput.addEventListener('mouseleave', () => updateEditStars(editNoteInput.value));
+            }
+            
             editConfirm.onclick = () => {
                 const newTxt = editText.value.trim();
+                const newNote = editNoteInput.value;
+
                 if (!newTxt) return notify('Le commentaire ne peut pas être vide', 'warning');
+                if (newNote == 0) return notify('Note requise', 'warning');
                 
                 const fd = new FormData();
                 fd.append('action', 'edit_avis');
                 fd.append('id_produit', productId);
                 fd.append('id_avis', currentEditId);
                 fd.append('commentaire', newTxt);
+                fd.append('note', newNote);
                 
                 fetchJson(window.location.href, { method: 'POST', body: fd })
                     .then(d => {
@@ -680,6 +713,12 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 
                 currentEditId = rev.dataset.avisId;
                 editText.value = content.textContent.trim();
+                
+                const currentNote = rev.dataset.note || 0;
+                const editNoteInput = document.getElementById('editNote');
+                if(editNoteInput) editNoteInput.value = currentNote;
+                updateEditStars(currentNote);
+
                 editModal.style.display = 'flex';
             });
             
