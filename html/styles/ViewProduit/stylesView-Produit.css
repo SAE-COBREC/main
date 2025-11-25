@@ -545,6 +545,29 @@ footer > div > div:last-child span:hover {
     padding-left: 12px;
     padding-right: 12px;
   }
+  .reviews .review-votes {
+    flex-wrap: wrap;
+  }
+  
+  .reviews .review-votes > span {
+    margin-left: 0 !important;
+    width: 100%;
+    order: 3;
+    margin-top: 8px;
+  }
+  
+  .reviews .review-votes .btn-vote {
+    order: 1;
+  }
+
+  .reviews .review-votes .btn-edit-review,
+  .reviews .review-votes .btn-delete-review {
+    order: 2;
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+  }
 }
 @media screen and (max-width: 768px) {
   .product-row .summary .title {

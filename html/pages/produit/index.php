@@ -369,17 +369,31 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                                 </div>
                             </div>
                             <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
-                            <div class="review-votes" style="display:flex;align-items:center;gap:10px;margin-top:8px">
-                                <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
-                                    <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
-                                </button>
-                                <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
-                                    <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
-                                </button>
-                                <span style="font-size:12px;color:#888;margin-left:auto;"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
+                            <div class="review-votes">
+                                <div class="vote-buttons">
+                                    <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
+                                        <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
+                                    </button>
+                                    <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
+                                        <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
+                                    </button>
+                                </div>
+                                <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
                                 <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
-                                    <button class="ghost btn-edit-review" style="margin-left:8px;font-size:12px;padding:4px 8px;">Modifier</button>
-                                    <button class="ghost btn-delete-review" style="margin-left:4px;font-size:12px;padding:4px 8px;color:#b00020;border-color:#f3d3d8;">Supprimer</button>
+                                    <div class="review-actions">
+                                        <button class="ghost btn-edit-review desktop-only">Modifier</button>
+                                        <button class="ghost btn-delete-review desktop-only">Supprimer</button>
+                                        
+                                        <div class="mobile-menu-container mobile-only">
+                                            <button class="ghost btn-menu-trigger" aria-label="Options">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                            </button>
+                                            <div class="mobile-menu-dropdown">
+                                                <button class="btn-edit-review">Modifier</button>
+                                                <button class="btn-delete-review">Supprimer</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                             <?php if(isset($reponsesMap[(int)$ta['id_avis']])): $rep = $reponsesMap[(int)$ta['id_avis']]; ?>
@@ -638,6 +652,27 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
         if (listAvis && !listAvis.dataset.boundEdit) {
             listAvis.dataset.boundEdit = "true";
             listAvis.addEventListener('click', (e) => {
+                // Menu trigger
+                const menuBtn = e.target.closest('.btn-menu-trigger');
+                if (menuBtn) {
+                    const container = menuBtn.closest('.mobile-menu-container');
+                    const dropdown = container.querySelector('.mobile-menu-dropdown');
+                    
+                    // Close others
+                    document.querySelectorAll('.mobile-menu-dropdown').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('show');
+                    });
+                    
+                    dropdown.classList.toggle('show');
+                    e.stopPropagation();
+                    return;
+                }
+
+                // Close menu when clicking outside
+                if (!e.target.closest('.mobile-menu-dropdown')) {
+                     document.querySelectorAll('.mobile-menu-dropdown').forEach(d => d.classList.remove('show'));
+                }
+
                 if (!e.target.closest('.btn-edit-review')) return;
                 const rev = e.target.closest('.review');
                 const content = rev.querySelector('.review-content');
@@ -645,6 +680,11 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 currentEditId = rev.dataset.avisId;
                 editText.value = content.textContent.trim();
                 editModal.style.display = 'flex';
+            });
+            
+            // Global click to close menus
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.mobile-menu-dropdown').forEach(d => d.classList.remove('show'));
             });
         }
 
