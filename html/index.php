@@ -178,14 +178,8 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                             <div>
                                 <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
                                 <div>
-                                    <span title="Note moyenne: <?= number_format($produitCourant['note_moyenne'] ?? 0, 1) ?> / 5"
-                                          aria-label="Note moyenne <?= number_format($produitCourant['note_moyenne'] ?? 0, 1) ?> sur 5">
-                                        <?= str_repeat('<img src="/img/svg/star-yellow-full.svg" alt="★" width="16" style="margin-right:3px;">', $noteArrondie)
-                                           . str_repeat('<img src="/img/svg/star-yellow-empty.svg" alt="☆" width="16">', 5 - $noteArrondie) ?>
-                                        
-                                    </span>
-                                    <span style="margin-left:6px;"><?= number_format($produitCourant['note_moyenne'] ?? 0, 1) ?>/5</span>
-                                    <span style="margin-left:8px;">(<?= (int)($produitCourant['nombre_avis'] ?? 0) ?>)</span>
+                                    <span><?= str_repeat('<img src="/img/svg/star-yellow-full.svg" alt="★" width="16" style="margin-right:3px;">', $noteArrondie) . str_repeat('<img src="/img/svg/star-yellow-empty.svg" alt="☆" width="16">', 5 - $noteArrondie) ?></span>
+                                    <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
                                 </div>
                                 <div>
                                     <span>
