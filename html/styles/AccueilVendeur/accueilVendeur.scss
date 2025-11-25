@@ -34,7 +34,7 @@ body {
   margin-bottom: 24px;
 
   &__title {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     color: $primary-color-noir;
     margin-bottom: 16px;
@@ -62,7 +62,7 @@ body {
       border: 0;
       outline: 0;
       flex: 1;
-      font-size: 14px;
+      font-size: 18px;
       background: transparent;
 
       &::placeholder {
@@ -78,7 +78,7 @@ body {
   padding: 10px 20px;
   border-radius: $border-radius-primary;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 18px;
   cursor: pointer;
   white-space: nowrap;
 
@@ -118,7 +118,7 @@ body {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: $primary-color-noir;
     margin-bottom: 16px;
@@ -150,26 +150,33 @@ body {
   .products-table__head-cell{
     &--produit{
       width: 300px;
+      font-size: 22px;
     }
 
     &--statut{
-      width: 120px  ;
+      width: 120px;
+      font-size: 22px;
     }
 
     &--stock{
-      width: 65px;
+      width: 90px;
+      font-size: 22px;
+      text-align: right;
+    }
+
+    &--cate{
+      max-width: 275px;
+      font-size: 22px;
     }
 
     &--cate{
       width: 300px;
-    }
-
-    &--cate{
-      width: 300px;
+      font-size: 22px;
     }
 
     &--des{
       width: 300px;
+      font-size: 22px;
     }
   }
 
@@ -194,7 +201,7 @@ body {
 
   &__item {
     padding-bottom: 8px;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
     color: $primary-color-noir;
     border-bottom: 3px solid transparent;
@@ -218,7 +225,7 @@ body {
     border: 1px solid $secondary-color-orange-clair;
     padding: 8px 16px;
     border-radius: $border-radius-primary;
-    font-size: 13px;
+    font-size: 18px;
     color: $primary-color-noir;
     cursor: pointer;
   }
@@ -229,10 +236,9 @@ body {
   width: 200px;
   border-collapse: collapse;
 
-  &__head-cell {
-    text-align: left;
+  &__head-cell {  
     padding: 20px 24px;
-    font-size: 13px;
+    font-size: 20px;
     font-weight: 600;
     color: $primary-color-noir;
     background: $primary-color-blanc;
@@ -249,12 +255,8 @@ body {
 
   &__cell {
     padding: 16px 24px;
-    font-size: 14px;
+    font-size: 18px;
     color: $primary-color-noir;
-
-    &--stock {
-      text-align: center;
-    }
 
     &--descrip{
       max-width: 300px  ;
@@ -295,7 +297,6 @@ body {
   &__image {
     width: 48px;
     height: 48px;
-    font-size: 15px;
     img{
       border-radius: $border-radius-primary;
     }
@@ -303,13 +304,13 @@ body {
 
   &__name {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 18px;
     color: $primary-color-noir;
     margin-bottom: 2px;
   }
 
   &__model {
-    font-size: 13px;
+    font-size: 18px;
     color: $primary-color-noir;
   }
 }
@@ -319,7 +320,7 @@ body {
   display: inline-block;
   padding: 6px 12px;
   border-radius: $border-radius-primary;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
 
   &--live {

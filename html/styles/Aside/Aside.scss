@@ -22,13 +22,13 @@
   gap: 8px;
   margin-bottom: 16px;
   color: $primary-color-blanc;
-  font-size: 20px;
+  font-size: 28px;
   font-weight: bold;
   font-family: $font-family-secondaire;
 
   &__icon {
-    width: 32px;
-    height: 32px;
+    width: 50px;
+    height: 50px;
     background: $primary-color-blanc;
     border-radius: $border-radius-primary;
     display: flex;
@@ -54,12 +54,12 @@
     border-radius: $border-radius-primary;
     color: rgba($primary-color-blanc, 0.7);
     text-decoration: none;
-    font-size: 16px;
+    font-size: 22px;
     transition: all 0.2s;
     font-weight: bold;
       img{
-        width: 20px;
-        height: 20px;
+        width: 28px;
+        height: 28px;
       }
 
     &:hover {
@@ -72,10 +72,6 @@
       color: $primary-color-blanc;
     }
   }
-
-  &__icon {
-    font-size: 20px;
-  }
 }
 
 // Preview button
@@ -86,7 +82,7 @@
   color: $primary-color-blanc;
   padding: 10px 12px;
   border-radius: $border-radius-primary;
-  font-size: 16px;
+  font-size: 22px;
   font-weight: bold;
   cursor: pointer;
   font-family: $font-family-secondaire;
