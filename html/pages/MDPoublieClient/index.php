@@ -136,24 +136,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
 
-      <div class="input-with-icon">
+      <div>
         <label for="mdp">Nouveau mot de passe</label>
-        <div>
-        <input class="with-icon" type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
-        <button type="button" class="toggle-password" data-target="mdp" >
-          <img src="../../img/svg/oeil.svg" alt="Afficher/Masquer" width="24" height="24">
-        </button>
-        </div>
+        <input type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
       </div>
 
-      <div class="input-with-icon">
+      <div>
         <label for="Cmdp">Confirmer le mot de passe</label>
-        <div>
-        <input class="with-icon" type="password" id="Cmdp" name="Cmdp" placeholder="***********" required pattern="^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Veuillez saisir les mêmes mots de passe">
-        <button type="button" class="toggle-password" data-target="mdp" >
-          <img src="../../img/svg/oeil.svg" alt="Afficher/Masquer" width="24" height="24">
-        </button>
-          </div>
+        <input type="password" id="Cmdp" name="Cmdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Veuillez saisir les memes mot de passe">
       </div>
 
       
@@ -179,44 +169,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
-    // Chemins des images pour l'oeil
-    const PATH_OEIL_OUVERT = '../../img/svg/oeil.svg';
-    const PATH_OEIL_FERME  = '../../img/svg/oeil-barre.svg';
 
-    function initPasswordToggles() {
-      const buttons = document.querySelectorAll('.toggle-password');
-      
-      buttons.forEach(btn => {
-        btn.addEventListener('click', function (ev) {
-          ev.preventDefault(); // Empêche le submit du formulaire
-          
-          const targetId = btn.getAttribute('data-target');
-          const input = document.getElementById(targetId);
-          const imgIcon = btn.querySelector('img');
-
-          if (!input || !imgIcon) return;
-
-          const isPassword = input.type === 'password';
-
-          // Bascule input
-          input.type = isPassword ? 'text' : 'password';
-
-          // inversion d'images
-          imgIcon.src = isPassword ? PATH_OEIL_FERME : PATH_OEIL_OUVERT;
-        });
-      });
-    }
-
-
-//validation des champs
     function getFieldValidationMessage(el) {
       try {
         if (el && el.validity) {
-          // Vérifications spécifiques pour le mot de passe
-          if (el.id === 'mdp' || el.id === 'Cmdp') {
+          //verification du mdp
+          if (el.id === 'mdp') {
             var val = (el.value || '').trim();
             if (val.length === 0) return 'Ce champ est requis.';
-            if (val.length < 8) return 'Le mot de passe doit contenir au moins 8 caractères.';
+            if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
             if (val.length > 16) return 'Le mot de passe doit contenir au maximum 16 caractères.';
             if (!/[0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un chiffre.';
             if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';
@@ -230,79 +191,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 
-//validation du formulaire
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');
       var form = document.getElementById('multiForm');
       if (!form) return;
 
+      // First ensure HTML5 validity
       if (!form.checkValidity()) {
         var invalid = form.querySelector(':invalid');
         if (invalid) {
           var card = invalid.closest('.card');
+          var cards = Array.from(document.querySelectorAll('.card'));
+          var idx = card ? cards.indexOf(card) : 0;
+          if (typeof showCardByIndex === 'function') showCardByIndex(idx);
           var errDiv = card ? card.querySelector('.error') : null;
           var message = getFieldValidationMessage(invalid);
-          
           try { invalid.setCustomValidity(message); } catch (e) {}
-          
           if (errDiv) {
             errDiv.textContent = message;
             errDiv.classList.remove('hidden');
           } else {
-            alert(message);
+            if (window.showError) {
+              showError('Champ invalide', message);
+            } else {
+              alert(message);
+            }
           }
           try { invalid.focus(); } catch (e) { /* ignore */ }
         }
         return;
       }
 
-      //Vérification correspondance MDP (Script côté client)
+      // Explicit password confirmation check (client-side)
       try {
         var mdpEl = document.getElementById('mdp');
         var cmdpEl = document.getElementById('Cmdp');
         if (mdpEl && cmdpEl) {
-          if (mdpEl.value !== cmdpEl.value) {
+          var mdpVal = mdpEl.value || '';
+          var cmdpVal = cmdpEl.value || '';
+          if (mdpVal !== cmdpVal) {
             var cardEl = document.querySelector('.card');
             var err = cardEl ? cardEl.querySelector('.error') : null;
-            var msg = 'Les mots de passe ne correspondent pas.';
-            
             if (err) {
-              err.textContent = msg;
+              err.textContent = 'Les mots de passe ne correspondent pas.';
               err.classList.remove('hidden');
             } else {
-              alert(msg);
+              alert('Les mots de passe ne correspondent pas.');
             }
-            try { mdpEl.focus(); } catch (e) { }
+            try { mdpEl.focus(); } catch (e) { /* ignore */ }
             return;
           }
         }
       } catch (e) {
-        console.warn('Erreur vérif correspondance', e);
+        console.warn('password confirmation check failed', e);
       }
 
-      // C. Soumission finale
-      form.submit();
+      // Submit the form
+      try {
+        try { window.__allow_submit = true; } catch (e) { /* ignore */ }
+        try { window.__submission_confirmed = false; } catch (e) {}
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.submit();
+        }
+        setTimeout(function () {
+          try {
+            if (!window.__submission_confirmed) {
+              try { window.__allow_submit = true; } catch (e) {}
+              form.submit();
+            }
+          } catch (e) { console.error('[register] fallback submit failed', e); }
+        }, 600);
+      } catch (e) {
+        try { window.__allow_submit = false; } catch (ex) { /* ignore */ }
+        form.submit();
+      }
     }
-    document.addEventListener('DOMContentLoaded', function () {
-      // Lancer la gestion des yeux
-      initPasswordToggles();
-
-      // Gestion de la touche Entrée
-      var form = document.getElementById('multiForm');
-      if (!form) return;
-      var elems = form.querySelectorAll('input, textarea, select');
-      
-      elems.forEach(function (el) {
-        el.addEventListener('keydown', function (ev) {
-          if (ev.key !== 'Enter') return;
-          if (ev.shiftKey || ev.ctrlKey || ev.altKey || ev.metaKey) return;
-          var tag = (el.tagName || '').toLowerCase();
-          if (tag === 'textarea') return;
-          ev.preventDefault();
-          finishRegistration();
-        });
-      });
-    });
   </script>
   <script type="module" src="../../js/registerPass.js"></script>
 </body>

@@ -139,16 +139,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
 
-      <div class="input-with-icon">
+      <div>
         <label for="mdp">Mot de passe</label>
-        <div>
-        <input class="with-icon" type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
-        <button type="button" class="toggle-password" data-target="mdp" >
-          <img src="../../../img/svg/oeil.svg" alt="Afficher/Masquer" width="24" height="24">
-        </button>
-        </div>
+  <input type="password" id="mdp" name="mdp" placeholder="***********" required >
       </div>
-      
       <div class="forgot" onclick="window.location.href='../../MDPoublieVendeur/index.php'">Mot de passe oublié ?</div>
 
       <!-- affichage des erreurs de saisi -->
@@ -160,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       <div class="connex-btn" role="group" aria-label="Suivant action">
-          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+          <button type="submit" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
             Terminer
           </button>
       </div>
@@ -173,44 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
-
-    // 1. DÉFINIR LES CONSTANTES (Elles manquaient dans votre dernier code)
-    const PATH_OEIL_OUVERT = '../../../img/svg/oeil.svg';
-    const PATH_OEIL_FERME  = '../../../img/svg/oeil-barre.svg';
-
-    function initPasswordToggles() {
-      const buttons = document.querySelectorAll('.toggle-password');
-      
-      buttons.forEach(btn => {
-        btn.addEventListener('click', function (ev) {
-          ev.preventDefault(); 
-          
-          const targetId = btn.getAttribute('data-target');
-          const input = document.getElementById(targetId);
-          const imgIcon = btn.querySelector('img');
-
-          // Vérification de sécurité
-          if (!input || !imgIcon) {
-              console.error("Input ou Image introuvable pour le toggle mdp");
-              return;
-          }
-
-          const isPassword = input.type === 'password';
-
-          // Bascule input
-          input.type = isPassword ? 'text' : 'password';
-
-          // Bascule image
-          imgIcon.src = isPassword ? PATH_OEIL_FERME : PATH_OEIL_OUVERT;
-        });
-      });
-    }
-
-    // 2. INITIALISER AU CHARGEMENT
-    document.addEventListener('DOMContentLoaded', function() {
-        initPasswordToggles();
-    });
-
     window.finishRegistration = function () {
       console.log('[register] finishRegistration called');
       var form = document.getElementById('multiForm');

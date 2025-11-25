@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     > button {
       &:hover {
         background: #7171A3;
-        color: black;
+        color: $primary-color-noir;
       }
     }
   }
@@ -143,15 +143,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
       </div>
 
-      <div class="input-with-icon">
+      <div>
         <label for="mdp">Mot de passe</label>
-        <div>
-        <input class="with-icon" type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
-        <button type="button" class="toggle-password" data-target="mdp" >
-          <img src="../../img/svg/oeil.svg" alt="Afficher/Masquer" width="24" height="24">
-        </button>
-        </div>
+  <input type="password" id="mdp" name="mdp" placeholder="***********" required>
       </div>
+      <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?</div>
       <!-- affichage des erreurs de saisi -->
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
@@ -159,10 +155,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
       </div>
 
-      <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?</div>
 
       <div class="connex-btn" role="group" aria-label="Suivant action">
-          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+          <button type="submit" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
             Terminer
           </button>
       </div>
@@ -173,72 +168,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </form>
 
-    <script>
-    // 1. DÉFINIR LES CONSTANTES (Elles manquaient dans votre dernier code)
-    const PATH_OEIL_OUVERT = '../../img/svg/oeil.svg';
-    const PATH_OEIL_FERME  = '../../img/svg/oeil-barre.svg';
+  <script>
+    /**
+     * @description Termine le processus d'inscription en validant le formulaire et en le soumettant si toutes les validations sont réussies.
+     * @returns {void}
+     */
 
-    function initPasswordToggles() {
-      const buttons = document.querySelectorAll('.toggle-password');
-      
-      buttons.forEach(btn => {
-        btn.addEventListener('click', function (ev) {
-          ev.preventDefault(); 
-          
-          const targetId = btn.getAttribute('data-target');
-          const input = document.getElementById(targetId);
-          const imgIcon = btn.querySelector('img');
-
-          // Vérification de sécurité
-          if (!input || !imgIcon) {
-              console.error("Input ou Image introuvable pour le toggle mdp");
-              return;
-          }
-
-          const isPassword = input.type === 'password';
-
-          // Bascule input
-          input.type = isPassword ? 'text' : 'password';
-
-          // Bascule image
-          imgIcon.src = isPassword ? PATH_OEIL_FERME : PATH_OEIL_OUVERT;
-        });
-      });
-    }
-
-    // 2. INITIALISER AU CHARGEMENT
-    document.addEventListener('DOMContentLoaded', function() {
-        initPasswordToggles();
-    });
-
-    // ... (Le reste de votre code finishRegistration reste inchangé ci-dessous) ...
     window.finishRegistration = function () {
-      // ... Votre code existant pour finishRegistration ...
       console.log('[register] finishRegistration called');
       var form = document.getElementById('multiForm');
-      if (!form) return; 
+      if (!form) return; // Ne fini le formulaire que si il existe
       if (!form.checkValidity()) {
+        // Ne termine l'inscription que si le formulaire est valide (Tout les champs sont correctement remplis)
         var invalid = form.querySelector(':invalid');
         if (invalid) {
+          // Trouve la carte parente de l'élément invalide
           var card = invalid.closest('.card');
+          var cards = Array.from(document.querySelectorAll('.card'));
+          var idx = card ? cards.indexOf(card) : 0;
+          if (typeof showCardByIndex === 'function') showCardByIndex(idx);
           var errDiv = card ? card.querySelector('.error') : null;
-          // Note: getFieldValidationMessage doit être défini quelque part ou retiré si inutile
-          var message = invalid.validationMessage; 
-          
+          var message = getFieldValidationMessage(invalid);
+          try { invalid.setCustomValidity(message); } catch (e) {}
           if (errDiv) {
+            // Affiche le message d'erreur dans la carte parente
             errDiv.textContent = message;
             errDiv.classList.remove('hidden');
           } else {
-            alert(message);
+            // Fallback: popup d'erreur standard
+            if (window.showError) {
+              showError('Champ invalide', message);
+            } else {
+              alert(message);
+            }
           }
-          invalid.focus(); 
+          invalid.focus(); // Met le focus sur le champ invalide
         }
         return;
       }
-      form.submit();
+      try { // Soumet le formulaire
+        window.__allow_submit = true;
+        try { window.__submission_confirmed = false; } catch (e) {} // Réinitialise le suivi de soumission
+        console.log('[register] calling requestSubmit (or form.submit fallback)');
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit(); // Préférer requestSubmit pour déclencher les événements de soumission
+        } else {
+          form.submit(); // Fallback si requestSubmit n'est pas disponible
+        }
+        setTimeout(function () { // Fallback en cas d'absence d'événement de soumission
+          try {
+            if (!window.__submission_confirmed) { // Vérifie si la soumission a été confirmée
+              console.warn('[register] no submit event detected within timeout — using fallback form.submit()');
+              window.__allow_submit = true;
+              form.submit();
+            }
+          } catch (e) { console.error('[register] fallback submit failed', e); }
+        }, 600);
+      } catch (e) {
+        window.__allow_submit = false;
+        form.submit();
+      }
     }
   </script>
-
   <script type="module" src="../../js/registerPass.js"></script>
 </body>
 

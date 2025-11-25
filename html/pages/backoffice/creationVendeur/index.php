@@ -202,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   body {
     background: linear-gradient(to bottom right, #CD7F32, #D4183D);
   }
-  .debutantC a {
+  .debutant a {
     color: #CD7F32;
   }
   .card[id="3"] {
@@ -245,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="SIREN" name="SIREN" placeholder="numéro SIREN" pattern="^(?:[0-9]{9}|[0-9]{3} [0-9]{3} [0-9]{3})$" inputmode="numeric" maxlength="11" title="9 chiffres ou format 123 456 789" required>
       </div>
 
-     <div class="debutantC">Retour a la page de <a href="../connexionVendeur/index.php"><strong>Connexion →</strong></a></div>
+     <div class="debutant">Retour a la page de <a href="../connexionVendeur/index.php"><strong>Connexion →</strong></a></div>
 
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
@@ -323,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex" id="div_codeP">
           <label for="codeP">Code Postal</label>
-          <input type="text" id="codeP" name="codeP" inputmode="text" pattern="^(?:0[1-9]|[1-8][0-9]|9[0-8]|2[Aa]|2[Bb])[0-9]{3}$" maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 caractères (ex: 22300 ou 2A200)">
+          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-8])|(2A)|(2B)) *([0-9]{3})?$ " maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
         </div>
 
         <div class="culumn-flex">
@@ -361,24 +361,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h1>Créer un compte</h1>
       <p class="subtitle">Mot de passe</p>
 
-      <div class="input-with-icon">
+      <div>
         <label for="mdp">Mot de passe</label>
-        <div>
-        <input class="with-icon" type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
-        <button type="button" class="toggle-password" data-target="mdp" >
-          <img src="../../../img/svg/oeil.svg" alt="Afficher/Masquer" width="24" height="24">
-        </button>
-        </div>
+        <input type="password" id="mdp" name="mdp" placeholder="***********" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
       </div>
 
-      <div class="input-with-icon">
-        <label for="mdp">Confirmation de mot de passe</label>
-        <div>
-        <input class="with-icon" type="password" id="Cmdp" name="Cmdp" placeholder="***********" required title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
-        <button type="button" class="toggle-password" data-target="mdp" >
-          <img src="../../../img/svg/oeil.svg" alt="Afficher/Masquer" width="24" height="24">
-        </button>
-        </div>
+      <div>
+        <label for="Cmdp">Confirmer le mot de passe</label>
+        <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" required>
       </div>
 
       <div class="error">
@@ -407,45 +397,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <script>
-
-
-    // 1. DÉFINIR LES CONSTANTES (Elles manquaient dans votre dernier code)
-    const PATH_OEIL_OUVERT = '../../../img/svg/oeil.svg';
-    const PATH_OEIL_FERME  = '../../../img/svg/oeil-barre.svg';
-
-    function initPasswordToggles() {
-      const buttons = document.querySelectorAll('.toggle-password');
-      
-      buttons.forEach(btn => {
-        btn.addEventListener('click', function (ev) {
-          ev.preventDefault(); 
-          
-          const targetId = btn.getAttribute('data-target');
-          const input = document.getElementById(targetId);
-          const imgIcon = btn.querySelector('img');
-
-          // Vérification de sécurité
-          if (!input || !imgIcon) {
-              console.error("Input ou Image introuvable pour le toggle mdp");
-              return;
-          }
-
-          const isPassword = input.type === 'password';
-
-          // Bascule input
-          input.type = isPassword ? 'text' : 'password';
-
-          // Bascule image
-          imgIcon.src = isPassword ? PATH_OEIL_FERME : PATH_OEIL_OUVERT;
-        });
-      });
-    }
-
-    // 2. INITIALISER AU CHARGEMENT
-    document.addEventListener('DOMContentLoaded', function() {
-        initPasswordToggles();
-    });
-
     function currentCard() { return document.querySelector('.card:not(.hidden)'); }
     
     //fonction pour afficher les card
@@ -463,7 +414,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           // Vérification du mot de passe
           if (el.id === 'mdp') {
             var val = (el.value || '').trim();
-            if (val.length < 8) return 'Le mot de passe doit contenir au moins 8 caractères.';
+            if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
             if (val.length > 16) return 'Le mot de passe doit contenir au maximum 16 caractères.';
             if (!/[0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un chiffre.';
             if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';
