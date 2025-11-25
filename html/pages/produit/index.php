@@ -211,10 +211,10 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                     </button>
                 </div>
 
-                <div class="summary-actions">
+                <!--<div class="summary-actions">
                     <button class="ghost">Ajouter aux favoris</button>
                     <button class="ghost">Partager</button>
-                </div>
+                </div>-->
 
                 <div class="meta" style="margin-top:12px">
                     Stock : <strong><?= $estEnRupture ? 'Rupture' : $produit['p_stock'] . ' disponible(s)' ?></strong>
