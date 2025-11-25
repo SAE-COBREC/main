@@ -4,7 +4,6 @@
 
     if (isset($_SESSION['idClient'])){
         $id_client = $_SESSION['idClient'];
-
         $pdo->exec("SET search_path TO cobrec1");
         
         $requetePanier = "
@@ -18,7 +17,8 @@
             JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
             JOIN _tva ON _produit.id_tva = _tva.id_tva 
             WHERE id_client = :id_client
-            AND _panier_commande.id_panier = :id_panier;
+            AND _panier_commande.id_panier = :id_panier
+            AND p_statut = 'En ligne';
         ";
 
         $stmt = $pdo->prepare($requetePanier);
