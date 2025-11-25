@@ -10,6 +10,20 @@ $pdo->exec("SET search_path TO cobrec1");
 // 1. Gestion Session / Panier
 $idClient = isset($_SESSION['idClient']) ? (int)$_SESSION['idClient'] : null;
 
+// Récupération infos client courant pour l'affichage (avatar, pseudo)
+$currentUser = null;
+$currentUserImage = null;
+if ($idClient) {
+    $currentUser = recupererInformationsCompletesClient($pdo, $idClient);
+    $idCompte = recupererIdentifiantCompteClient($pdo, $idClient);
+    if ($idCompte) {
+        $imgData = recupererImageProfilCompte($pdo, $idCompte);
+        if ($imgData && !empty($imgData['i_lien'])) {
+            $currentUserImage = $imgData['i_lien'];
+        }
+    }
+}
+
 if ($idClient === null) {
     //si l'utilisateur n'est pas connecté, on utilise un panier temporaire en SESSION
     if (!isset($_SESSION['panierTemp'])) {
@@ -265,7 +279,18 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                     <div class="review-head">
                         <div class="review-head-left">
                             <div class="avatar">
-                                <?php $avatarUrl = $ta['client_image'] ?? 'V'; ?>
+                                <?php if ($currentUserImage): ?>
+                                    <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                                <?php else: ?>
+                                    <?php 
+                                        $initial = 'U';
+                                        if ($currentUser) {
+                                            if (!empty($currentUser['c_pseudo'])) $initial = substr($currentUser['c_pseudo'], 0, 1);
+                                            elseif (!empty($currentUser['c_prenom'])) $initial = substr($currentUser['c_prenom'], 0, 1);
+                                        }
+                                    ?>
+                                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper($initial) ?></div>
+                                <?php endif; ?>
                             </div>
                             <div class="review-head-texts">
                                 <div class="review-author">Vous</div>
@@ -571,7 +596,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         fd.append('id_avis', rev.dataset.avisId);
                         
                         fetchJson(window.location.href, { method: 'POST', body: fd })
-                            .then(d => {
+                            .then d => {
                                 if (d.success) location.reload();
                                 else showError('Erreur', d.message || 'Impossible de supprimer');
                             });
