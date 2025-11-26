@@ -184,7 +184,10 @@ try {
                 <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['categories']); ?></td>
                 <!-- Description -->
                 <td class="products-table__cell products-table__cell--descrip">
-                <?php echo htmlspecialchars(substr($article['p_description'], 0, 100)); ?>
+                <?php 
+                  $desc = $article['p_description'];
+                  echo htmlspecialchars(strlen($desc) > 10 ? substr($desc, 0, 100) . "..." : $desc);
+                ?>
                 </td>
               </tr>
             <?php endforeach; ?>
