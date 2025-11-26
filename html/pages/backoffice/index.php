@@ -183,7 +183,9 @@ try {
                 <!-- Catégories -->
                 <td class="products-table__cell products-table__cell--catego"><?php echo htmlspecialchars($article['categories']); ?></td>
                 <!-- Description -->
-                <td class="products-table__cell products-table__cell--descrip"><?php echo htmlspecialchars($article['p_description']); ?></td>
+                <td class="products-table__cell products-table__cell--descrip">
+                <?php echo htmlspecialchars(substr($article['p_description'], 0, 10)); ?>
+                </td>
               </tr>
             <?php endforeach; ?>
           <?php endif; ?>
