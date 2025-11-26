@@ -766,7 +766,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
                 cl.c_pseudo,
                 i.i_lien as client_image,
                 a.a_note AS avis_note
-                " . ($idClient ? ", (SELECT vote_type FROM _vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote" : "") . "
+                " . ($idClient ? ", (SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM _vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote" : "") . "
             FROM _avis a
             LEFT JOIN _client cl ON a.id_client = cl.id_client
             LEFT JOIN _compte co ON cl.id_compte = co.id_compte
@@ -881,14 +881,17 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (!$idClient) { echo json_encode(['success' => false, 'message' => 'Connexion requise']); exit; }
             if ($idAvis <= 0 || !in_array($val, ['plus', 'minus'])) { echo json_encode(['success' => false]); exit; }
             
+            // Map frontend value to DB value
+            $dbVal = ($val === 'plus') ? 'like' : 'dislike';
+
             // Check existing vote
             $stmtCheck = $pdo->prepare("SELECT vote_type FROM _vote_avis WHERE id_client = :cid AND id_avis = :aid");
             $stmtCheck->execute([':cid' => $idClient, ':aid' => $idAvis]);
-            $existingVote = $stmtCheck->fetchColumn();
+            $existingVoteDb = $stmtCheck->fetchColumn();
             
             $pdo->beginTransaction();
             try {
-                if ($existingVote === $val) {
+                if ($existingVoteDb === $dbVal) {
                     // Remove vote
                     $pdo->prepare("DELETE FROM _vote_avis WHERE id_client = :cid AND id_avis = :aid")->execute([':cid' => $idClient, ':aid' => $idAvis]);
                     if ($val === 'plus') {
@@ -897,17 +900,17 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
                         $pdo->prepare("UPDATE _avis SET a_pouce_rouge = GREATEST(a_pouce_rouge - 1, 0) WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
                     }
                 } else {
-                    if ($existingVote) {
+                    if ($existingVoteDb) {
                         // Change vote
-                        $pdo->prepare("UPDATE _vote_avis SET vote_type = :val WHERE id_client = :cid AND id_avis = :aid")->execute([':val' => $val, ':cid' => $idClient, ':aid' => $idAvis]);
-                        if ($existingVote === 'plus' && $val === 'minus') {
+                        $pdo->prepare("UPDATE _vote_avis SET vote_type = :val WHERE id_client = :cid AND id_avis = :aid")->execute([':val' => $dbVal, ':cid' => $idClient, ':aid' => $idAvis]);
+                        if ($existingVoteDb === 'like' && $dbVal === 'dislike') {
                             $pdo->prepare("UPDATE _avis SET a_pouce_bleu = GREATEST(a_pouce_bleu - 1, 0), a_pouce_rouge = a_pouce_rouge + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
-                        } elseif ($existingVote === 'minus' && $val === 'plus') {
+                        } elseif ($existingVoteDb === 'dislike' && $dbVal === 'like') {
                             $pdo->prepare("UPDATE _avis SET a_pouce_rouge = GREATEST(a_pouce_rouge - 1, 0), a_pouce_bleu = a_pouce_bleu + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
                         }
                     } else {
                         // New vote
-                        $pdo->prepare("INSERT INTO _vote_avis (id_client, id_avis, vote_type) VALUES (:cid, :aid, :val)")->execute([':cid' => $idClient, ':aid' => $idAvis, ':val' => $val]);
+                        $pdo->prepare("INSERT INTO _vote_avis (id_client, id_avis, vote_type) VALUES (:cid, :aid, :val)")->execute([':cid' => $idClient, ':aid' => $idAvis, ':val' => $dbVal]);
                         if ($val === 'plus') {
                             $pdo->prepare("UPDATE _avis SET a_pouce_bleu = a_pouce_bleu + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
                         } else {
@@ -920,11 +923,11 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
                 
                 $stmt = $pdo->prepare("SELECT a_pouce_bleu, a_pouce_rouge FROM _avis WHERE id_avis = :id");
                 $stmt->execute([':id' => $idAvis]);
-                echo json_encode(['success' => true, 'counts' => $stmt->fetch(PDO::FETCH_ASSOC), 'user_vote' => ($existingVote === $val ? null : $val)]);
+                echo json_encode(['success' => true, 'counts' => $stmt->fetch(PDO::FETCH_ASSOC), 'user_vote' => ($existingVoteDb === $dbVal ? null : $val)]);
                 exit;
             } catch (Exception $e) {
                 $pdo->rollBack();
-                echo json_encode(['success' => false, 'message' => 'Erreur serveur']);
+                echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
                 exit;
             }
 
