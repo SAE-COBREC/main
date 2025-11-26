@@ -766,7 +766,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
                 cl.c_pseudo,
                 i.i_lien as client_image,
                 a.a_note AS avis_note
-                " . ($idClient ? ", (SELECT type_vote FROM _vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid) as user_vote" : "") . "
+                " . ($idClient ? ", (SELECT type_vote FROM _vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote" : "") . "
             FROM _avis a
             LEFT JOIN _client cl ON a.id_client = cl.id_client
             LEFT JOIN _compte co ON cl.id_compte = co.id_compte
