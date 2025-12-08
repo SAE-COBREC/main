@@ -61,12 +61,15 @@ body main section article label {
   font-weight: bold;
 }
 body main section article img {
+  position: relative;
   transition: all 0.5s ease 0.25s;
   transform: scale(1, 1);
+  z-index: 0;
 }
 body main section article img:hover {
   transition: all 0.5s ease 0.25s;
-  transform: scale(5, 5);
+  transform: scale(2, 2);
+  z-index: 1;
 }
 body main section article > input, body main section article textarea, body main section article select, body main section article option {
   border: 1px solid #ecd9c6;
@@ -95,6 +98,28 @@ body main #photo {
 }
 body main section:nth-child(2) {
   grid-row: 2;
+}
+body main section:nth-child(2) article > label:first-of-type {
+  cursor: pointer;
+  border: 1px solid #ecd9c6;
+  background-color: white;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  width: 40em;
+  padding: 0.6em;
+}
+body main section:nth-child(2) article > input:first-of-type {
+  opacity: 0;
+  height: 0;
+}
+body main section:nth-child(2) article small {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+body main section:nth-child(2) article small input {
+  width: 2em;
 }
 body main section:nth-child(3), body main section:nth-child(4) {
   grid-column: 2;

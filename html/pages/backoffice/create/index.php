@@ -533,9 +533,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 }else{
                                     echo 'temp_/' . $value;
                                 }
-                                ?>" height="25">
-                                <?php 
-                                echo $value; ?>
+                                ?>" height="125">
                                 <input type="submit" name="btn_moins<?php echo $key ?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
                             <?php } ?>
@@ -1187,3 +1185,28 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     }
 
 ?>
+<script>
+    const input = document.getElementById("photo[]");
+    const formulaire = document.querySelector("form");
+    // var btn_moins = document.querySelectorAll('input[name^="btn_moins"]');
+    var btn_moins0 = document.querySelector('input[name="btn_moins0"]');
+    var btn_moins1 = document.querySelector('input[name="btn_moins1"]');
+    var btn_moins2 = document.querySelector('input[name="btn_moins2"]');
+    // console.log(btn_moins);
+    var i =0;
+
+
+    function updateImageDisplay() {
+        formulaire.submit();
+    }
+
+    
+    input.addEventListener("change", updateImageDisplay);
+    btn_moins0.addEventListener("click", updateImageDisplay);
+    btn_moins1.addEventListener("click", updateImageDisplay);
+    btn_moins2.addEventListener("click", updateImageDisplay);
+    // for (const btn of btn_moins){
+    //     btn.addEventListener("moins" . i, updateImageDisplay);
+    //     i++;
+    // }
+    </script>

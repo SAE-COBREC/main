@@ -68,12 +68,15 @@ body{
                 }
                 
                 img{
+                    position: relative;
                     transition: all 0.5s ease 0.25s;
                     transform: scale(1,1);
+                    z-index: 0;
                 }
                 img:hover{
                     transition: all 0.5s ease 0.25s;
-                    transform: scale(5,5);
+                    transform: scale(2,2);
+                    z-index: 1;
                 }
 
                 > input, textarea, select, option{
@@ -111,6 +114,32 @@ body{
         section:nth-child(2){
             grid-row:2;
             //max-height:12em;
+            article{
+                > label:first-of-type{
+                    cursor: pointer;
+                    border:1px solid $card;
+                    background-color: white;
+                    border-radius: 8px;
+                    font: {
+                        family:inherit;
+                        size: 15px;
+                    }
+                    width:40em;
+                    padding:0.6em;
+                }
+                > input:first-of-type{
+                    opacity: 0;
+                    height: 0;
+                }
+                small{
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    input{
+                        width: 2em;
+                    }
+                }
+            }
         }
     
         section:nth-child(3), section:nth-child(4){
