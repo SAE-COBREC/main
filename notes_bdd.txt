@@ -1,0 +1,6 @@
+Notes bdd
+
+- supprimer p_taille
+- date_mise_sur_marche  faire trigger pour passage 'Ebauche' -> 'en ligne'
+- p_modif  faire trigger pour chaque UPDATE produit
+- destinataire de l'achat (dans facture sûrement)
