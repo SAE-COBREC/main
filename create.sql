@@ -746,17 +746,17 @@ EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
 -- ============================================
 
 -- 1. COMPTES
-INSERT INTO _compte (email, num_telephone, mdp, etat_A2F, nb_fois_signale, nb_signalements_avis, nb_cpts_signales, nb_avis_signales) VALUES
-('admin@cobrec.fr', '0601020304', 'Admin123!', TRUE, 0, 0, 0, 0),
-('vendeur1@example.com', '0612345678', 'Vendeur1!', FALSE, 0, 0, 0, 0),
-('vendeur2@shop.fr', '0623456789', 'Shop2024!', FALSE, 1, 0, 0, 0),
-('client1@gmail.com', '0634567890', 'Client1!', FALSE, 0, 1, 0, 0),
-('client2@yahoo.fr', '0645678901', 'Client2!', TRUE, 0, 0, 1, 0),
-('client3@outlook.com', '0656789012', 'Client3!', FALSE, 0, 0, 0, 0),
-('client4@free.fr', '0667890123', 'Test1234!', FALSE, 0, 0, 0, 0),
-('client5@orange.fr', '0678901234', 'Pass5678!', FALSE, 0, 0, 0, 0),
-('client6@wanadoo.fr', '0689012345', 'Secure99!', TRUE, 0, 0, 0, 0),
-('vendeur3@boutique.fr', '0690123456', 'Boutique1!', FALSE, 0, 0, 0, 0);
+INSERT INTO _compte (nom, prenom, email, num_telephone, mdp, etat_A2F, nb_fois_signale, nb_signalements_avis, nb_cpts_signales, nb_avis_signales) VALUES
+('Maeleau', 'Le Hyver', 'admin@cobrec.fr', '0601020304', 'Admin123!', TRUE, 0, 0, 0, 0),
+('Lopicier', 'Mallo', 'vendeur1@example.com', '0612345678', 'Vendeur1!', FALSE, 0, 0, 0, 0),
+('Elouard', 'Jean-Jacques', 'vendeur2@shop.fr', '0623456789', 'Shop2024!', FALSE, 1, 0, 0, 0),
+('Jean', 'Dupont','client1@gmail.com', '0634567890', 'Client1!', FALSE, 0, 1, 0, 0),
+('Marie', 'Martin','client2@yahoo.fr', '0645678901', 'Client2!', TRUE, 0, 0, 1, 0),
+('Pierre', 'Durand','client3@outlook.com', '0656789012', 'Client3!', FALSE, 0, 0, 0, 0),
+('Sophie', 'Bernard','client4@free.fr', '0667890123', 'Test1234!', FALSE, 0, 0, 0, 0),
+('Lucas', 'Petit','client5@orange.fr', '0678901234', 'Pass5678!', FALSE, 0, 0, 0, 0),
+('Emma', 'Lefebvre','client6@wanadoo.fr', '0689012345', 'Secure99!', TRUE, 0, 0, 0, 0),
+('Martinière', 'Yvili', 'vendeur3@boutique.fr', '0690123456', 'Boutique1!', FALSE, 0, 0, 0, 0);
 
 -- 2. ADMINISTRATEURS
 INSERT INTO _administrateur (id_compte) VALUES (1);
@@ -768,13 +768,13 @@ INSERT INTO _vendeur (id_compte, SIREN, raison_sociale, denomination, nb_produit
 (10, '456789123', 'SportPro EURL', 'SportPro', 2);
 
 -- 4. CLIENTS
-INSERT INTO _client (id_compte, c_prenom, c_nom, c_pseudo, c_nb_produits_achetes, c_depense_totale, c_cloture, c_datenaissance) VALUES
-(4, 'Jean', 'Dupont', 'jdupont', 2, 907.18, FALSE, '1985-03-15'),
-(5, 'Marie', 'Martin', 'mmartin', 3, 124.75, FALSE, '1990-07-22'),
-(6, 'Pierre', 'Durand', 'pdurand', 1, 1091.98, FALSE, '1988-11-10'),
-(7, 'Sophie', 'Bernard', 'sbernard', 2, 298.76, FALSE, '1995-05-30'),
-(8, 'Lucas', 'Petit', 'lpetit', 0, 0.0, FALSE, '2000-01-18'),
-(9, 'Emma', 'Lefebvre', 'elefebvre', 1, 179.98, FALSE, '1992-09-25');
+INSERT INTO _client (id_compte, c_pseudo, c_nb_produits_achetes, c_depense_totale, c_cloture, c_datenaissance) VALUES
+(4, 'jdupont', 2, 907.18, FALSE, '1985-03-15'),
+(5, 'mmartin', 3, 124.75, FALSE, '1990-07-22'),
+(6, 'pdurand', 1, 1091.98, FALSE, '1988-11-10'),
+(7, 'sbernard', 2, 298.76, FALSE, '1995-05-30'),
+(8, 'lpetit', 0, 0.0, FALSE, '2000-01-18'),
+(9, 'elefebvre', 1, 179.98, FALSE, '1992-09-25');
 
 
 -- 5. ADRESSES
