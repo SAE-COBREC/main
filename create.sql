@@ -5,6 +5,27 @@ DROP SCHEMA IF EXISTS cobrec1 CASCADE;
 CREATE SCHEMA cobrec1;
 SET SCHEMA 'cobrec1';
 
+
+-- GLOSSAIRE
+--
+-- SERIAL : nombre naturel qui s'auto-incrémente
+-- DOUBLE PRECISION : nombre décimal, a n'utiliser que pour des montants n'ayant pas de plafonds
+-- NUMERIC(X,Y) : nombre décimal, X indique le nombre de chiffres total de la valeur et Y son nombre de chiffres après la virgule. Surtout utilisé pour les pourcentages
+-- UNIQUE : sert à iniquer que la valeur que prend la variable est unique dnas toutes les instances de la table. 2 instances ne peuvent avoir la même valeur sur cette variable
+-- CHECK : utilisé pour faire des vérifications sur les variables
+-- LIKE : utilisé pour le REGEX (cf. regextester.com, onglet Top Regular Expressions)
+-- IN (VAL1, VAL2, ...) : utilisé quand les valeurs que peut prendre une variable sont limités et définies à l'avance. Indique une liste de valeurs possibles.
+-- ALTER TABLE ONLY : permet de modifier une table déjà créée, pour y rajouter des contraintes de clé étrangère, de valeurs uniques et des vérifications. Préférer cette utilisation à des inscriptions en dur dans la table, ne serait-ce que pour les clés étrangères (fk) et les unique (unique)
+
+-- MULTIPLICITÉS
+--
+-- Cas de deux id dans une même table (hors héritage) : Inique une multpiplicté 1..* (cf. UML), ne pas représenter le lien via une table
+-- Autre cas : représneter les liens via des tables
+
+-- HÉRITAGE
+--
+-- L'héritage est représenté en faisant référence à l'id de la table parent dans le.s table.s enfant.s
+
 -- ============================================
 -- CRÉATION DES TABLES
 -- ============================================
@@ -19,8 +40,14 @@ CREATE TABLE cobrec1._compte (
     nb_cpts_signales integer DEFAULT 0,
     nb_avis_signales integer DEFAULT 0,
     timestamp_inscription timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    timestamp_blocage timestamp,
+    motif_blocage varchar(255),
     mdp varchar(255) NOT NULL,
     etat_A2F boolean DEFAULT FALSE,
+    prenom varchar(100) NOT NULL,
+    nom varchar(100) NOT NULL,
+    civilite varchar(255) DEFAULT 'Inconnu' NOT NULL,
+    CONSTRAINT verif_compte_civilite CHECK (civilite IN ('M.', 'Mme', 'Inconnu', 'Ne souhaite pas s''exprimer', 'Autre')),
     CONSTRAINT verif_compte_email CHECK (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
     CONSTRAINT verif_compte_num_telephone CHECK (num_telephone ~ '^(0|\+33|0033)[1-9][0-9]{8}$'),
     CONSTRAINT verif_compte_mdp CHECK (mdp ~ '^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$')
@@ -67,8 +94,6 @@ ALTER TABLE ONLY cobrec1._vendeur
 CREATE TABLE cobrec1._client (
     id_client SERIAL NOT NULL,
     id_compte integer NOT NULL,
-    c_prenom varchar(100),
-    c_nom varchar(100),
     c_pseudo varchar(100),
     c_nb_produits_achetes integer DEFAULT 0,
     c_depense_totale numeric(11,2) DEFAULT 0.0,
@@ -90,10 +115,13 @@ ALTER TABLE ONLY cobrec1._client
 CREATE TABLE cobrec1._adresse (
     id_adresse serial NOT NULL,
     id_compte integer NOT NULL,
+    a_numero integer DEFAULT 0 NOT NULL,
     a_adresse varchar(255) NOT NULL,
     a_ville varchar(100) NOT NULL,
     a_code_postal varchar(10) NOT NULL,
-    a_complement varchar(255)
+    a_pays varchar(255) DEFAULT 'France' NOT NULL,
+    a_complement varchar(255),
+    CONSTRAINT verif_adresse_numero CHECK (a_numero > 0)
 );
 
 ALTER TABLE ONLY cobrec1._adresse
@@ -180,11 +208,12 @@ CREATE TABLE cobrec1._produit (
     p_note numeric(2,1) DEFAULT NULL,
     p_stock integer DEFAULT 0,
     p_nb_signalements integer DEFAULT 0,
-    p_taille varchar(10) DEFAULT NULL,
     date_arrivee_stock_recent timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    date_mise_sur_marche timestamp,
     p_nb_ventes integer DEFAULT 0,
     p_statut varchar(20) DEFAULT 'Ébauche',
     p_origine varchar(20) DEFAULT 'Inconnu',
+    p_modif timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT verif_produit_frais_de_port CHECK (p_frais_de_port >= 0.00),
     CONSTRAINT verif_produit_volume CHECK (p_volume >= 0.00),
     CONSTRAINT verif_produit_poids CHECK (p_poids >= 0.00),
@@ -210,14 +239,6 @@ ALTER TABLE ONLY cobrec1._produit
 
 ALTER TABLE ONLY cobrec1._produit
     ADD CONSTRAINT unique_produit_nom UNIQUE (p_nom);
-
--- Contrainte pour les tailles
-ALTER TABLE cobrec1._produit 
-ADD CONSTRAINT verif_produit_taille CHECK (
-    p_taille IS NULL OR 
-    p_taille IN ('XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL') OR
-    (p_taille ~ '^[3-4][0-9]$')
-);
 
 -- TABLE IMAGE
 CREATE TABLE cobrec1._image (
@@ -285,6 +306,7 @@ CREATE TABLE cobrec1._paiement (
     timestamp_paiement timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     numero_carte varchar(16),
     mois_annee_expiration varchar(5),
+    titulaire_carte varchar(100),
     cryptogramme_carte varchar(3)
 );
 
@@ -329,6 +351,7 @@ CREATE TABLE cobrec1._avis (
     a_nb_signalements integer DEFAULT 0,
     a_timestamp_creation timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     a_timestamp_modification timestamp,
+    a_titre varchar(255),
     CONSTRAINT verif_pouce_bleu CHECK (a_pouce_bleu >= 0),
     CONSTRAINT verif_pouce_rouge CHECK (a_pouce_rouge >= 0)
 );
@@ -415,6 +438,7 @@ CREATE TABLE cobrec1._signalement (
     timestamp_signalement timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     type_signalement varchar(50) NOT NULL,
     motif_signalement text NOT NULL,
+    commentaire_libre text,
     CONSTRAINT verif_signalement_type_signalement CHECK (type_signalement IN ('signale_avis', 'signale_compte', 'signale_produit'))
 );
 
