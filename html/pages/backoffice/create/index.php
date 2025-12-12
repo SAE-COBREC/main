@@ -16,40 +16,64 @@
                     //si premier passage
                     try {//Récupération des infos du produit
                         $sql = '
-                        SELECT * FROM cobrec1._produit 
-                        WHERE id_produit = ' . $_GET['modifier'] . ';'
+                        SELECT id_produit, id_TVA, id_vendeur, p_nom, p_description, p_poids, p_volume, p_prix, p_stock, p_statut, p_origine FROM cobrec1._produit 
+                        WHERE id_produit = :modifier;'
                         ;
-                        $stmt = $pdo->query($sql);
+                        $stmt = $pdo->prepare($sql);
+                        $params = [
+                            'modifier' => $_GET['modifier']
+                        ];
+                        $stmt->execute($params);
                         $_SESSION["creerArticle"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $_SESSION["creerArticle"]['_GET'] = $_SESSION["creerArticle"]['_GET'][0];
                         
                         $sql = '
                         SELECT id_categorie FROM cobrec1._fait_partie_de 
-                        WHERE id_produit = ' . $_GET['modifier'] . ';'
+                        WHERE id_produit = :modifier;'
                         ;
-                        $stmt = $pdo->query($sql);
+                        $stmt = $pdo->prepare($sql);
+                        $params = [
+                            'modifier' => $_GET['modifier']
+                        ];
+                        $stmt->execute($params);
                         $_SESSION["creerArticle"]['_GET']['id_categorie'] = $stmt->fetch(PDO::FETCH_ASSOC);
                         $_SESSION["creerArticle"]['_GET']['id_categorie'] = $_SESSION["creerArticle"]['_GET']['id_categorie']['id_categorie'];
                         
                         $sql = '
                         SELECT id_image FROM cobrec1._represente_produit
-                        WHERE id_produit = ' . $_GET['modifier'] . ';'
+                        WHERE id_produit = :modifier;'
                         ;
-                        $stmt = $pdo->query($sql);
+                        $stmt = $pdo->prepare($sql);
+                        $params = [
+                            'modifier' => $_GET['modifier']
+                        ];
+                        $stmt->execute($params);
                         $_SESSION["creerArticle"]['_GET']['imgs'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         
                         foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
                             $sql = '
-                            SELECT * FROM cobrec1._image 
-                            WHERE id_image = ' . $value['id_image'] . ';'
+                            SELECT id_image, i_lien, i_title, i_alt FROM cobrec1._image 
+                            WHERE id_image = :idImage;'
                             ;
-                            $stmt = $pdo->query($sql);
+                            $stmt = $pdo->prepare($sql);
+                            $params = [
+                                'idImage' => $value['id_image']
+                            ];
+                            $stmt->execute($params);
                             $_SESSION["creerArticle"]['_GET']['imgs'][$key] = $stmt->fetch(PDO::FETCH_ASSOC);
                         }
                         
                     
                     } catch (Exception $e) {
+                        $time = time();
                         $_SESSION["creerArticle"]['_GET'] = null;
+                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre";
+                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$e;
+                        $fp = fopen('file.csv', 'w');
+                        foreach ($_SESSION['bdd_errors'] as $fields) {
+                            fputcsv($fp, $fields, ',', '"', '');
+                        }
+                        fclose($fp);
                     ?>
 
                     <script>
@@ -369,8 +393,12 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $titre = '';
                         }else{
                             try {//cherche dans la BDD pour voir si le nom n'est pas déjà pris
-                                $sql = 'SELECT p_nom FROM cobrec1._produit where p_nom = ' . "'" . $titre_pour_bdd ."'";
-                                $stmt = $pdo->query($sql);
+                                $sql = 'SELECT p_nom FROM cobrec1._produit where p_nom = :titre';
+                                $stmt = $pdo->prepare($sql);
+                                $params = [
+                                    'titre' =>  $titre_pour_bdd
+                                ];
+                                $stmt->execute($params);
                                 $titre = $stmt->fetch(PDO::FETCH_ASSOC);
                             } catch (Exception $e) {
                                 $time = time();
@@ -583,7 +611,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <select id="tva" name="tva" >
                             <?php
                                 try {//Permets d'obtenir toutes les TVA listées dans la BDD
-                                    $sql = 'SELECT * FROM cobrec1._tva';
+                                    $sql = 'SELECT id_TVA, montant_TVA, libelle_TVA FROM cobrec1._tva';
                                     $stmt = $pdo->query($sql);
                                     $tva = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 } catch (Exception $e) {
@@ -636,7 +664,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <option value=''></option>
                             <?php
                                 // try {
-                                //     $sql = 'SELECT * FROM cobrec1._couleur';
+                                //     $sql = 'SELECT code_hexa, nom, type_couleur FROM cobrec1._couleur';
                                 //     $stmt = $pdo->query($sql);
                                 //     $tva = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 // } catch (Exception $e) {
@@ -774,7 +802,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             //fonction là pour éviter des problèmes à l'insertions dans la BDD
                             $_POST['titre'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['titre']);
                             $_POST['description'] = RemplacerCaracteresProblematiquesDansChampsTextes($_POST['description']);
-                            $taille  = 'M';  //à ne pas incorporer
 
                             //sert à ne pas avoir de warnings php sur le serv
                             if (empty($_POST["sauvegarder"])){
@@ -801,23 +828,22 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                             try {//création de l'objet produit dans la base
                                 $sql = '
-                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,p_taille,date_arrivee_stock_recent)
-                                VALUES (
-                                ' . "'" . $_POST['tva'] ."'" .', 
-                                ' . $_SESSION['vendeur_id'] .', 
-                                ' . "'" . $_POST['origine'] ."'" .', 
-                                ' . "'" . $_POST['titre'] ."'" .', 
-                                ' . "'" . $_POST["description"] ."'" .', 
-                                ' . "'" . $_POST["poids"] ."'" .', 
-                                ' . "'" . $_POST["volume"] ."'" .',
-                                ' . $_POST['prix'] .',
-                                ' . $_POST['stock'] .',
-                                ' . "'" . $taille ."'" .', 
-                                CURRENT_TIMESTAMP
-                                );
+                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,date_arrivee_stock_recent)
+                                VALUES (:tva, :vendeur_id, :origine, :titre, :description, :poids, :volume, :prix, :stock, CURRENT_TIMESTAMP);
                                 ';
                                 $stmt = $pdo->prepare($sql);
-                                $stmt->execute();
+                                $params = [
+                                    'tva' => $_POST['tva'], 
+                                    'vendeur_id' => $_SESSION['vendeur_id'],
+                                    'origine' => $_POST['origine'],
+                                    'titre' => $_POST['titre'],
+                                    'description' => $_POST['description'],
+                                    'poids' => $_POST['poids'],
+                                    'volume' => $_POST['volume'],
+                                    'prix' => $_POST['prix'],
+                                    'stock' => $_POST['stock']
+                                ];
+                                $stmt->execute($params);
                             } catch (Exception $e) {
                                 //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
                                 $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet produit dans la base";
@@ -828,36 +854,44 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 $sql = '
                                 INSERT INTO cobrec1._fait_partie_de(id_produit,id_categorie)
                                 VALUES (
-                                (SELECT id_produit FROM cobrec1._produit WHERE p_nom = ' . "'" . $_POST['titre'] . "'". '), 
-                                ' . "'" . $_POST['tva'] ."'" .'
-                                );
+                                (SELECT id_produit FROM cobrec1._produit WHERE p_nom = :titre), :tva);
                                 ';
                                 $stmt = $pdo->prepare($sql);
-                                $stmt->execute();
+                                $params = [
+                                    'tva' => $_POST['tva'], 
+                                    'titre' => $_POST['titre']
+                                ];
+                                $stmt->execute($params);
                             } catch (Exception $e) {
                                 $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre catégorie et produit";
                                 $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
 
-                            // try {//création de l'affiliation entre couleur et produit
-                            //     $sql = '
-                            //     INSERT INTO cobrec1._est_dote_de(id_produit,code_hexa)
-                            //     VALUES (
-                            //     (SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'),' 
-                            //     . "'" . $_POST['couleur'] . "'". '
-                            //     );
-                            //     ';
-                            //     $stmt = $pdo->prepare($sql);
-                            //     $stmt->execute();
-                            // } catch (Exception $e) {
-                            //     print_r($e);
-                            // }
+                            try {//création de l'affiliation entre couleur et produit
+                                $sql = '
+                                INSERT INTO cobrec1._est_dote_de(id_produit,code_hexa)
+                                VALUES (
+                                (SELECT id_produit FROM cobrec1._produit WHERE p_nom = :titre), :couleur);
+                                ';
+                                $stmt = $pdo->prepare($sql);
+                                $params = [
+                                    'couleur' => $_POST['couleur'], 
+                                    'titre' => $_POST['titre']
+                                ];
+                                $stmt->execute($params);
+                            } catch (Exception $e) {
+                                print_r($e);
+                            }
                             try{//SELEC de id_produit
                                 $sql = '
-                                    SELECT id_produit FROM cobrec1._produit WHERE p_nom = '. "'" . $_POST['titre'] . "'".'
+                                    SELECT id_produit FROM cobrec1._produit WHERE p_nom = :titre
                                     ;
                                     ';
-                                    $stmt = $pdo->query($sql);
+                                    $stmt = $pdo->prepare($sql);
+                                    $params = [
+                                        'titre' => $_POST['titre']
+                                    ];
+                                    $stmt->execute($params);
                                     $id_produit = $stmt->fetch(PDO::FETCH_ASSOC);
                                     $id_produit = $id_produit['id_produit'];
                             }catch(Exception $e){
@@ -875,15 +909,19 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     $sql = '
                                     INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
                                     VALUES (
-                                    ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value . "'" .', '
-                                    . "'" . $id_produit . '_' . $value . "'". ','
-                                    . "'" . 'photo du produit ' . $_POST["titre"] . "'". '
+                                    :i_lien, :i_title, :i_alt
                                     );
                                     ';
                                     $stmt = $pdo->prepare($sql);
-                                    $stmt->execute();
+                                    $params = [
+                                        'i_lien' => EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value,
+                                        'i_title' => $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value,
+                                        'i_alt' => 'photo du produit ' . $_POST['titre']
+                                    ];
+                                    $stmt->execute($params);
                                 } catch (Exception $e) {
-                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images";
+                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="   $ id produit est égal à  " .  $id_produit . '   ';
+                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images1";
                                     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                                 }
 
@@ -892,13 +930,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     $sql = '
                                     INSERT INTO cobrec1._represente_produit(id_produit,id_image)
                                     VALUES (
-                                    ' . $id_produit .', 
-                                    (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value ."'" .')
+                                    :idProduit,
+                                    '. $pdo->lastInsertId() . '
                                     );
                                     ';
                                     $stmt = $pdo->prepare($sql);
-                                    $stmt->execute();
+                                    $params = [
+                                        'idProduit' => $id_produit
+                                    ];
+                                    $stmt->execute($params);
                                 } catch (Exception $e) {
+                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="   $ id produit est égal à  " .  $id_produit . '   ';
                                     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
                                     $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                                     //print_r($_POST["titre"]);
@@ -940,11 +982,15 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         try {//mise en ligne du produit
                             $sql = '
                             UPDATE cobrec1._produit 
-                            SET p_statut = ' . "'" . 'En ligne' . "' ". '
-                            WHERE p_nom = '. "'" . $_POST['titre'] . "'"
+                            SET p_statut = ' . "'" . 'En ligne' . "' " . ',
+                            p_modif = CURRENT_DATE 
+                            WHERE p_nom = :titre'
                             ;
                             $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
+                            $params = [
+                                'titre' => $_POST['titre']
+                            ];
+                            $stmt->execute($params);
                         } catch (Exception $e) {
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
@@ -958,18 +1004,30 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     try {//modif de l'objet produit dans la base
                         $sql = '
                         UPDATE cobrec1._produit
-                        SET id_tva =' . $_POST['tva'] . ', 
-                        p_origine ='. "'" . $_POST['origine'] . "'" . ', 
-                        p_nom ='. "'" . $_POST['titre'] . "'" . ', 
-                        p_description ='. "'" . $_POST['description'] . "'" . ', 
-                        p_poids =' . $_POST['poids'] . ', 
-                        p_volume =' . $_POST['volume'] . ', 
-                        p_prix =' . $_POST['prix'] . ', 
-                        p_stock =' . $_POST['stock'] . ' 
-                        WHERE id_produit =' . $_SESSION["creerArticle"]['_GET']['id_produit'] .';
+                        SET id_tva = :tva, 
+                        p_origine = :origine, 
+                        p_nom = :titre, 
+                        p_description = :description, 
+                        p_poids = :poids, 
+                        p_volume = :volume, 
+                        p_prix = :prix, 
+                        p_stock = :stock,
+                        p_modif = CURRENT_DATE  
+                        WHERE id_produit = :getId;
                         ';
                         $stmt = $pdo->prepare($sql);
-                        $stmt->execute();
+                        $params = [
+                            'tva' => $_POST['tva'],
+                            'origine' => $_POST['origine'],
+                            'titre' => $_POST['titre'],
+                            'description' => $_POST['description'],
+                            'poids' => $_POST['poids'],
+                            'volume' => $_POST['volume'],
+                            'prix' => $_POST['prix'],
+                            'stock' => $_POST['stock'],
+                            'getId' => $_SESSION["creerArticle"]['_GET']['id_produit']
+                        ];
+                        $stmt->execute($params);
 
                         $_SESSION["creerArticle"]['_GET']['p_nom'] = $_POST['titre'];
                     } catch (Exception $e) {
@@ -987,11 +1045,15 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         try {//modif de l'affiliation entre catégorie et produit
                             $sql = '
                             UPDATE cobrec1._fait_partie_de 
-                            SET id_categorie = ' . $_POST['categorie'] . ' 
-                            WHERE id_produit =' . $_SESSION["creerArticle"]['_GET']['id_produit'] .';
+                            SET id_categorie = :categorie 
+                            WHERE id_produit = :getId;
                             ';
                             $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
+                            $params = [
+                                'categorie' => $_POST['categorie'],
+                                'getId' => $_SESSION["creerArticle"]['_GET']['id_produit']
+                            ];
+                            $stmt->execute($params);
                         } catch (Exception $e) {
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre catégorie et produit";
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
@@ -1001,10 +1063,13 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                     try{//suppression du lien images-produit
                         $sql = '
                         DELETE FROM cobrec1._represente_produit
-                        WHERE id_produit = ' . $_SESSION["creerArticle"]['_GET']['id_produit'] . '
+                        WHERE id_produit = :getId
                         ';
                         $stmt = $pdo->prepare($sql);
-                        $stmt->execute();
+                        $params = [
+                            'getId' => $_SESSION["creerArticle"]['_GET']['id_produit']
+                        ];
+                        $stmt->execute($params);
                     } catch (Exception $e) {
                         $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression du lien images-produit";
                         $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
@@ -1017,11 +1082,14 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         }
                         try {//suppression des images
                             $sql = '
-                            DELETE FROM cobrec1._image
-                            WHERE i_lien = ' . "'" .$value['i_lien'] . "'" . ';
+                            DELETE FROM cobrec1._image 
+                            WHERE i_lien = :i_lien;
                             ';
                             $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
+                            $params = [
+                                'i_lien' => $value['i_lien']
+                            ];
+                            $stmt->execute($params);
                         } catch (Exception $e) {
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression des images";
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
@@ -1040,18 +1108,21 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $sql = '
                             INSERT INTO cobrec1._image(i_lien, i_title, i_alt)
                             VALUES (
-                            ' . "'" . EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value . "'" .', '
-                            . "'" . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value . "'". ','
-                            . "'" . 'photo du produit ' . $_POST["titre"] . "'". '
+                            :i_lien, :i_title, :i_alt
                             );
                             ';
                             $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
+                            $params = [
+                                'i_lien' => EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value,
+                                'i_title' => $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value,
+                                'i_alt' => 'photo du produit ' . $_POST['titre']
+                            ];
+                            $stmt->execute($params);
                             $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_lien'] = EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value;
                             $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_title'] = $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value;
                             $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_alt'] = 'photo du produit ' . $_POST["titre"];
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images";
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images2";
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
 
@@ -1060,13 +1131,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $sql = '
                             INSERT INTO cobrec1._represente_produit(id_produit,id_image)
                             VALUES (
-                            ' . $_SESSION["creerArticle"]['_GET']['id_produit'] .', 
-                            (SELECT id_image FROM cobrec1._image WHERE i_lien = ' . "'" . EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value ."'" .')
+                            :getId, 
+                            '. $pdo->lastInsertId() . '
                             );
                             ';
                             $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
+                            $params = [
+                                'getId' => $_SESSION["creerArticle"]['_GET']['id_produit'],
+                            ];
+                            $stmt->execute($params);
                         } catch (Exception $e) {
+                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = 'value =    ' . $value . '      ';
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             //print_r($_POST["titre"]);
@@ -1091,11 +1166,15 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         try {//mise hors ligne du produit
                             $sql = '
                             UPDATE cobrec1._produit 
-                            SET p_statut = ' . "'" . 'Hors ligne' . "' ". '
-                            WHERE p_nom = '. "'" . $_POST['titre'] . "'"
+                            SET p_statut = ' . "'" . 'Hors ligne' . "' ". ',
+                            p_modif = CURRENT_DATE 
+                            WHERE p_nom = :titre'
                             ;
                             $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
+                            $params = [
+                                'titre' => $_POST['titre']
+                            ];
+                            $stmt->execute($params);
                             $_SESSION["creerArticle"]['_GET']['p_statut'] = 'Hors ligne';
                         } catch (Exception $e) {
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise hors ligne du produit";
@@ -1114,11 +1193,15 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         try {//mise en ligne du produit
                             $sql = '
                             UPDATE cobrec1._produit 
-                            SET p_statut = ' . "'" . 'En ligne' . "' ". '
-                            WHERE p_nom = '. "'" . $_POST['titre'] . "'"
+                            SET p_statut = ' . "'" . 'En ligne' . "' ". ',
+                            p_modif = CURRENT_DATE 
+                            WHERE p_nom = :titre'
                             ;
                             $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
+                            $params = [
+                                'titre' => $_POST['titre']
+                            ];
+                            $stmt->execute($params);
                             $_SESSION["creerArticle"]['_GET']['p_statut'] = 'En ligne';
                         } catch (Exception $e) {
                             $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
@@ -1202,9 +1285,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
     
     input.addEventListener("change", updateImageDisplay);
-    btn_moins0.addEventListener("click", updateImageDisplay);
-    btn_moins1.addEventListener("click", updateImageDisplay);
-    btn_moins2.addEventListener("click", updateImageDisplay);
+    // btn_moins0.addEventListener("click", updateImageDisplay);
+    // btn_moins1.addEventListener("click", updateImageDisplay);
+    // btn_moins2.addEventListener("click", updateImageDisplay);
     // for (const btn of btn_moins){
     //     btn.addEventListener("moins" . i, updateImageDisplay);
     //     i++;

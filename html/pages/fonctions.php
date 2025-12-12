@@ -1030,7 +1030,7 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
                     ) ORDER BY p.timestamp_commande DESC
                 )
                 FROM (
-                    SELECT * FROM cobrec1._panier_commande
+                    SELECT id_panier, id_client, timestamp_commande FROM cobrec1._panier_commande
                     WHERE id_client = cl.id_client 
                     AND timestamp_commande IS NOT NULL
                     ORDER BY timestamp_commande DESC
