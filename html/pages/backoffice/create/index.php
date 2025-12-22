@@ -303,7 +303,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     $_POST["volume"] =null;
     $_POST["origine"] =null;
     $_POST["categorie"] =null;
-    $_POST["btn_maj"] =null;
+    // $_POST["btn_maj"] =null;
     $_POST["stock"] =null;
     $_POST["prix"] =null;
 
@@ -336,42 +336,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                 echo '?modifier=' . $_SESSION["creerArticle"]["_GET"]['id_produit'];
             }
         ?>" method="post" enctype="multipart/form-data">
-            <!-- Boutons de soumission principaux -->
-            <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
-            <?php
-            if(empty($_SESSION["creerArticle"]['_GET']['id_produit']) == false){//si la page est en mode US modification
-                ?>
-                <input type="submit" name="svgModif" title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" />
-                <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
-                <input class="orange" type="submit" name="horsLigne"title="Un article hors ligne n'est plus visible que vous." value="Mettre hors ligne" />
-                <script>
-                    const btnPrincipauxModif = document.querySelectorAll("input");
-                </script>
-                <?php
-                if (($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne') || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
-                    //si article hors ligne
-                ?>
-                
-                <script>
-                    btnPrincipauxModif[2].disabled = false;
-                    btnPrincipauxModif[3].disabled = true;
-                    //grisage du bouton hors ligne et dégrisage du bouton en ligne
-                </script>
-            <?php
-                }else{//sinon
-                    ?>
-                    <script>
-                    btnPrincipauxModif[3].disabled = false;
-                    btnPrincipauxModif[2].disabled = true;
-                    //grisage du bouton en ligne et dégrisage du bouton hors ligne
-                    </script>
-                <?php
-                }
-            }else{
-                ?>
-            <input type="submit" name="sauvegarder" title="Un article sauvegardé est inscrit dans la base de données mais n'est visible que par vous." value="Sauvegarder l'ébauche" />
-            <input class="orange" type="submit" name="publier"title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier le produit dans le catalogue client" />
-            <?php } ?>
+            
             <div>
                 <section>
                     <h3><?php 
@@ -417,7 +382,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             required
                         style="<?php 
                             
-                            if (($titre != '') && (empty($_POST["btn_maj"]))) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
+                            if (($titre != '') /*&& (empty($_POST["btn_maj"]))*/) {echo 'border: 3px solid red';} ?>" type="text" id="titre" name="titre" value="<?php echo $_POST["titre"]; 
                         
                         ?>" />
                             <?php
@@ -481,10 +446,10 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         <label for="photo[]">Sélectionner un fichier</label>
                         <br>
                          <input style="<?php 
-                        if (empty($_POST["btn_maj"])){
+                        /*if (empty($_POST["btn_maj"])){
                             $_POST["btn_maj"] = '';
-                        }
-                        if ((($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] === [])) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
+                        }*/
+                        if ((($_SESSION["creerArticle"]["_FILES"]["photo"]["name"] === [])) /*&& ($_POST["btn_maj"] == null)*/) {echo 'border: 3px solid red';} ?>" type="file" multiple id="photo[]" name="photo[]" accept="image/*" value="<?php
                         if (empty($_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0])){
                             //si vide alors
                             $_SESSION["creerArticle"]["_FILES"]["photo"]["tmp_name"][0] = '';
@@ -565,8 +530,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 <input type="submit" name="btn_moins<?php echo $key ?>" title="Permets de supprimer l'image qui est en face." value="-" />
                             </small>
                             <?php } ?>
-                        <br>
-                        <input type="submit" name="btn_maj" title="Cliquez ici pour voir les images que vous avez déposées !" value="Voir les images ayant été déposées" />
+                        <!-- <br>
+                        <input type="submit" name="btn_maj" title="Cliquez ici pour voir les images que vous avez déposées !" value="Voir les images ayant été déposées" /> -->
                         <br />
                     </article>
                 </section>
@@ -747,10 +712,48 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
 
             </div>
+            <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
+            <?php
+            if(empty($_SESSION["creerArticle"]['_GET']['id_produit']) == false){//si la page est en mode US modification
+                ?>
+                <input type="submit" name="svgModif" title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" accesskey="s"/>
+                <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
+                <input class="orange" type="submit" name="horsLigne"title="Un article hors ligne n'est plus visible que vous." value="Mettre hors ligne" />
+                <script>
+                    const btnEnLigne = document.querySelector("input[name='enLigne']");
+                    const btnHorsLigne = document.querySelector("input[name='horsLigne']");
+                </script>
+                <?php
+                if (($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne') || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
+                    //si article hors ligne
+                ?>
+                
+                <script>
+                    btnHorsLigne.disabled = true;
+                    btnEnLigne.disabled = false;
+                    //grisage du bouton hors ligne et dégrisage du bouton en ligne
+                </script>
+            <?php
+                }else{//sinon
+                    ?>
+                    <script>
+                    btnHorsLigne.disabled = false;
+                    btnEnLigne.disabled = true;
+                    //grisage du bouton en ligne et dégrisage du bouton hors ligne
+                    </script>
+                <?php
+                }
+            }else{
+                ?>
+            <input type="submit" name="sauvegarder" title="Un article sauvegardé est inscrit dans la base de données mais n'est visible que par vous." value="Sauvegarder l'ébauche" accesskey="s"/>
+            <input class="orange" type="submit" name="publier"title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier le produit dans le catalogue client" />
+            <?php } ?>
             </form>
             <script>
-            const btnPrincipaux = document.querySelectorAll("input");
-            btnPrincipaux[0].addEventListener('click', () => {//si clic sur Annuler
+            const btnAnnuler = document.querySelector("input[value='Annuler']");
+            // const btnEnLigne = document.querySelector("input[name='enLigne']");
+            // const btnHorsLigne = document.querySelector("input[name='horsLigne']");
+            btnAnnuler.addEventListener('click', () => {//si clic sur Annuler
                 if (confirm("Êtes-vous certain de vouloir annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
                     document.location.href="/pages/backoffice/index.php"; 
                 }
@@ -768,16 +771,16 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
             function enLigne(){//si clic sur en ligne et pas de warnings
                 if (confirm("Votre article a bien été mis en ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
-                    btnPrincipauxModif[3].disabled = false;
-                    btnPrincipauxModif[2].disabled = true;
+                    btnHorsLigne.disabled = false;
+                    btnEnLigne.disabled = true;
                 }else{document.location.href="/pages/backoffice/index.php"; 
                 }
             }
 
             function horsLigne(){//si clic sur hors ligne et pas de warnings
                 if (confirm("Votre article a bien été mis hors ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
-                    btnPrincipauxModif[2].disabled = false;
-                    btnPrincipauxModif[3].disabled = true;
+                    btnHorsLigne.disabled = true;
+                    btnEnLigne.disabled = false;
                 }else{document.location.href="/pages/backoffice/index.php"; 
                 }
             }
