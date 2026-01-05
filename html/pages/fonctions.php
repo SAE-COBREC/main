@@ -410,7 +410,7 @@ function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifi
 {
     try {
         $requeteSQL = "
-            SELECT cl.c_nom, cl.c_prenom, cl.c_pseudo, co.email, co.num_telephone , co.civilite
+            SELECT cl.c_nom, cl.c_prenom, cl.c_pseudo, co.email, co.num_telephone
             FROM cobrec1._client cl
             INNER JOIN cobrec1._compte co ON cl.id_compte = co.id_compte
             WHERE cl.id_client = ?
