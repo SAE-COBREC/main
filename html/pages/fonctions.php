@@ -705,6 +705,7 @@ function chargerProduitBDD($pdo, $idProduit) {
                 COALESCE(p.p_nb_ventes, 0) AS p_nb_ventes,
                 COALESCE(p.p_note, 0) AS p_note,
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
+                COALESCE(t.montant_tva, 0) as tva,
                 (SELECT STRING_AGG(cp.nom_categorie, ', ')
                    FROM _fait_partie_de fpd
                    JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
@@ -712,6 +713,7 @@ function chargerProduitBDD($pdo, $idProduit) {
             FROM _produit p
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            LEFT JOIN _tva t ON p.id_tva = t.id_tva
             WHERE p.id_produit = :pid
             LIMIT 1");
         $stmtProd->execute([':pid' => $idProduit]);
@@ -1100,4 +1102,13 @@ function invaliderCacheProfilClient($identifiantClient) {
     $cacheKey = 'profil_client_' . $identifiantClient;
     unset($_SESSION[$cacheKey]);
     unset($_SESSION[$cacheKey . '_timestamp']);
+}
+
+function calcPrixTVA($identifiantProduit, $TVA, $prixHT) {
+    $resultat = $prixHT;
+    if ($TVA > 0) {
+        $resultat += ($prixHT * ($TVA / 100));
+    }
+
+    return $resultat;
 }
