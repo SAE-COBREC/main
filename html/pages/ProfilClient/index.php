@@ -376,6 +376,15 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                             <div>
                                 <label>
+                                    <span>Civilité</span>
+                                    <input type="text" name="civilite"
+                                        value="<?php echo htmlspecialchars($donneesInformationsClient['civilite'] ?? ''); ?>"
+                                        required>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label>
                                     <span>Téléphone</span>
                                     <input type="tel" name="telephone" inputmode="numeric"
                                         pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10"
@@ -430,8 +439,15 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     </main>
 
                     <footer>
-                        <button type="button"
-                            onclick="ouvrirModalModificationAdresse(<?php echo $adresseIndividuelle['id_adresse']; ?>, '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_code_postal'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_complement'], ENT_QUOTES); ?>')">
+                        <button type="button" onclick="ouvrirModalModificationAdresse(
+    <?php echo $adresseIndividuelle['id_adresse']; ?>, 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_num'] ?? '', ENT_QUOTES); ?>', 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_pays'] ?? 'France', ENT_QUOTES); ?>', 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_code_postal'], ENT_QUOTES); ?>', 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_complement'], ENT_QUOTES); ?>'
+)">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -704,10 +720,10 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     });
 
     //fonction pour ouvrir le modal de modification d'adresse
-    function ouvrirModalModificationAdresse(id, adresse, ville, codePostal, complement) {
-        document.getElementById('modification_num').value = '';
+    function ouvrirModalModificationAdresse(id, num, adresse, pays, ville, codePostal, complement) {
+        document.getElementById('modification_num').value = num;
         document.getElementById('modification_id_adresse').value = id;
-        document.getElementById('modification_pays').value = '';
+        document.getElementById('modification_pays').value = pays;
         document.getElementById('modification_adresse').value = adresse;
         document.getElementById('modification_ville').value = ville;
         document.getElementById('modification_code_postal').value = codePostal;
