@@ -172,7 +172,7 @@ button {
   height: 49px;
   border: none;
   margin-top: 10px;
-  font-size: 1.6em;
+  font-size: 1.5em;
 }
 
 #panierVide {
@@ -201,6 +201,7 @@ button {
   text-align: center;
   padding: 1em;
   margin: 1em auto;
+  font-size: 1.5em;
 }
 @media screen and (max-width: 428px) {
   #retourAchat {
