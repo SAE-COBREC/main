@@ -1,8 +1,6 @@
 # Structure du Repo
 
 ```
-
-```
 ├── 📁 fonts
 │   ├── 📄 baloo.regular.ttf
 │   └── 📄 quicksand.light-regular.otf
