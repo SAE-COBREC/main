@@ -257,7 +257,7 @@ article > div:last-child > div:nth-child(3) span:first-child {
   font-size: 0.9rem;
 }
 article > div:last-child > div:nth-child(3) span:last-child {
-  font-size: 1.25rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #030212;
 }

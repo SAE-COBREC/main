@@ -151,9 +151,9 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
         <main>
             <div>
                 <?php if (empty($listeProduits)): ?>
-                    <p>Aucun produit ne correspond à vos critères de recherche.</p>
+                <p>Aucun produit ne correspond à vos critères de recherche.</p>
                 <?php else: ?>
-                    <?php foreach ($listeProduits as $produitCourant):
+                <?php foreach ($listeProduits as $produitCourant):
                         $estEnRupture = $produitCourant['p_stock'] <= 0;
                         $possedePourcentageRemise = !empty($produitCourant['pourcentage_reduction']) && $produitCourant['pourcentage_reduction'] > 0;
                         $prixApresRemise = $possedePourcentageRemise
@@ -161,26 +161,26 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                             : $produitCourant['p_prix'];
                         $noteArrondie = round($produitCourant['note_moyenne'] ?? 0);
                         ?>
-                        <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
-                            onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
-                            <div>
-                                <div>
-                                    <img src="<?= str_replace("html/img/photo", "/img/photo", htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg')) ?>"
-                                        alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>"
-                                        class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
-                                </div>
-                                <?php if ($possedePourcentageRemise): ?>
-                                    <span class="badge-reduction">-<?= round($produitCourant['pourcentage_reduction']) ?>%</span>
-                                <?php endif; ?>
-                                <?php if ($estEnRupture): ?>
-                                    <div class="rupture-stock">Rupture de stock</div>
-                                <?php endif; ?>
-                            </div>
-                            <div>
-                                <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
-                                <div>
-                                    <span>
-                                        <?php for ($i = 1; $i <= 5; $i++):
+                <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
+                    onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
+                    <div>
+                        <div>
+                            <img src="<?= str_replace("html/img/photo", "/img/photo", htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg')) ?>"
+                                alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>"
+                                class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
+                        </div>
+                        <?php if ($possedePourcentageRemise): ?>
+                        <span class="badge-reduction">-<?= round($produitCourant['pourcentage_reduction']) ?>%</span>
+                        <?php endif; ?>
+                        <?php if ($estEnRupture): ?>
+                        <div class="rupture-stock">Rupture de stock</div>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
+                        <div>
+                            <span>
+                                <?php for ($i = 1; $i <= 5; $i++):
                                             if ($noteArrondie >= $i)
                                                 $s = 'full';
                                             elseif ($noteArrondie >= $i - 0.5)
@@ -188,26 +188,26 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                                             else
                                                 $s = 'empty';
                                             ?>
-                                            <img src="/img/svg/star-yellow-<?= $s ?>.svg" alt="Etoile" width="20">
-                                        <?php endfor; ?>
-                                    </span>
-                                    <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
-                                </div>
-                                <div>
-                                    <span>
-                                        <?php if ($possedePourcentageRemise): ?>
-                                            <?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€
-                                        <?php endif; ?>
-                                    </span>
-                                    <span><?= number_format($prixApresRemise, 2, ',', ' ') ?>€</span>
-                                </div>
-                                <button <?= $estEnRupture ? 'disabled' : '' ?>
-                                    onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
-                                    <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
-                                </button>
-                            </div>
-                        </article>
-                    <?php endforeach; ?>
+                                <img src="/img/svg/star-yellow-<?= $s ?>.svg" alt="Etoile" width="20">
+                                <?php endfor; ?>
+                            </span>
+                            <span>(<?= $produitCourant['nombre_avis'] ?>)</span>
+                        </div>
+                        <div>
+                            <span>
+                                <?php if ($possedePourcentageRemise): ?>
+                                <?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€
+                                <?php endif; ?>
+                            </span>
+                            <span><?= number_format($prixApresRemise, 2, ',', ' ') ?>€</span>
+                        </div>
+                        <button <?= $estEnRupture ? 'disabled' : '' ?>
+                            onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
+                            <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
+                        </button>
+                    </div>
+                </article>
+                <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </main>
@@ -221,28 +221,29 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
 
     <script src="/js/notifications.js"></script>
     <script>
-        //fonction pour ajouter au panier avec requête AJAX vers la base de données
-        function ajouterAuPanier(idProduit) {
-            const formData = new FormData();
-            formData.append('action', 'ajouter_panier');
-            formData.append('idProduit', idProduit);
-            formData.append('quantite', 1);
+    //fonction pour ajouter au panier avec requête AJAX vers la base de données
+    function ajouterAuPanier(idProduit) {
+        const formData = new FormData();
+        formData.append('action', 'ajouter_panier');
+        formData.append('idProduit', idProduit);
+        formData.append('quantite', 1);
 
-            fetch('index.php', {
+        fetch('index.php', {
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.json())
-                .then(data => {
-                    const message = data.success ? data.message : data.message;
-                    const type = data.success ? 'success' : 'error';
-                    window.notify ? notify(message, type) : alert((data.success ? '✓ ' : '✗ ') + message);
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    window.notify ? notify('Erreur lors de l\'ajout au panier', 'error') : alert('Erreur lors de l\'ajout au panier');
-                });
-        }
+            .then(response => response.json())
+            .then(data => {
+                const message = data.success ? data.message : data.message;
+                const type = data.success ? 'success' : 'error';
+                window.notify ? notify(message, type) : alert((data.success ? '✓ ' : '✗ ') + message);
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                window.notify ? notify('Erreur lors de l\'ajout au panier', 'error') : alert(
+                    'Erreur lors de l\'ajout au panier');
+            });
+    }
     </script>
 </body>
 

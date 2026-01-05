@@ -250,16 +250,16 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             <h1>Mon Profil</h1>
 
             <?php if (isset($messageErreur)): ?>
-                <!-- Afficher le message d'erreur si présent -->
-                <div class="error-message">
-                    <?php echo htmlspecialchars($messageErreur); ?>
-                </div>
+            <!-- Afficher le message d'erreur si présent -->
+            <div class="error-message">
+                <?php echo htmlspecialchars($messageErreur); ?>
+            </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['success'])): ?>
-                <!-- Afficher le message de succès si présent -->
-                <div class="success-message">
-                    <?php
+            <!-- Afficher le message de succès si présent -->
+            <div class="success-message">
+                <?php
                     //afficher le message correspondant au type de succès
                     if ($_GET['success'] === 'info_updated')
                         echo "Informations mises à jour avec succès.";
@@ -273,7 +273,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     if ($_GET['success'] === 'address_added')
                         echo "Adresse ajoutée avec succès.";
                     ?>
-                </div>
+            </div>
             <?php endif; ?>
 
             <!-- Section : Informations personnelles -->
@@ -298,20 +298,20 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         <!-- Conteneur de l'image de profil -->
                         <div class="profile-image-container">
                             <?php if ($donneesImageProfilCompte !== null && $donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
-                                <!-- Afficher l'image de profil si elle existe -->
-                                <img src="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien']); ?>"
-                                    alt="<?php echo htmlspecialchars($donneesImageProfilCompte['i_alt'] ?? 'Photo de profil'); ?>"
-                                    title="<?php echo htmlspecialchars($donneesImageProfilCompte['i_title'] ?? ''); ?>"
-                                    class="profile-image" id="current-profile-image">
+                            <!-- Afficher l'image de profil si elle existe -->
+                            <img src="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien']); ?>"
+                                alt="<?php echo htmlspecialchars($donneesImageProfilCompte['i_alt'] ?? 'Photo de profil'); ?>"
+                                title="<?php echo htmlspecialchars($donneesImageProfilCompte['i_title'] ?? ''); ?>"
+                                class="profile-image" id="current-profile-image">
                             <?php else: ?>
-                                <!-- Afficher un placeholder si aucune image -->
-                                <div class="profile-image-placeholder">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="12" cy="7" r="4"></circle>
-                                    </svg>
-                                </div>
-                                <p class="no-profile-image">Aucune photo de profil</p>
+                            <!-- Afficher un placeholder si aucune image -->
+                            <div class="profile-image-placeholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <p class="no-profile-image">Aucune photo de profil</p>
                             <?php endif; ?>
                         </div>
 
@@ -410,120 +410,107 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 </div>
 
                 <?php if (empty($listeAdressesClient)): ?>
-                    <!-- Afficher un message si aucune adresse -->
-                    <p>Aucune adresse enregistrée</p>
+                <!-- Afficher un message si aucune adresse -->
+                <p>Aucune adresse enregistrée</p>
                 <?php else: ?>
-                    <!-- Boucler sur chaque adresse du client -->
-                    <?php foreach ($listeAdressesClient as $adresseIndividuelle): ?>
-                        <article>
-                            <header>
-                                <div>
-                                    <span>Adresse</span>
-                                    <strong>#<?php echo $adresseIndividuelle['id_adresse']; ?></strong>
-                                </div>
-                                <span data-type="adresse">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                        <circle cx="12" cy="10" r="3"></circle>
-                                    </svg>
-                                </span>
-                            </header>
+                <!-- Boucler sur chaque adresse du client -->
+                <?php foreach ($listeAdressesClient as $adresseIndividuelle): ?>
+                <article>
+                    <main>
+                        <div>
+                            <p>
+                                <strong><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
+                                <?php echo htmlspecialchars($adresseIndividuelle['a_code_postal']); ?>
+                                <?php echo htmlspecialchars($adresseIndividuelle['a_ville']); ?>
+                                <?php if (!empty($adresseIndividuelle['a_complement'])): ?>
+                                <br><em><?php echo htmlspecialchars($adresseIndividuelle['a_complement']); ?></em>
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                    </main>
 
-                            <main>
-                                <div>
-                                    <p>
-                                        <strong><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
-                                        <?php echo htmlspecialchars($adresseIndividuelle['a_code_postal']); ?>
-                                        <?php echo htmlspecialchars($adresseIndividuelle['a_ville']); ?>
-                                        <?php if (!empty($adresseIndividuelle['a_complement'])): ?>
-                                            <br><em><?php echo htmlspecialchars($adresseIndividuelle['a_complement']); ?></em>
-                                        <?php endif; ?>
-                                    </p>
-                                </div>
-                            </main>
+                    <footer>
+                        <button type="button"
+                            onclick="ouvrirModalModificationAdresse(<?php echo $adresseIndividuelle['id_adresse']; ?>, '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_code_postal'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_complement'], ENT_QUOTES); ?>')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Modifier
+                        </button>
 
-                            <footer>
-                                <button type="button"
-                                    onclick="ouvrirModalModificationAdresse(<?php echo $adresseIndividuelle['id_adresse']; ?>, '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_code_postal'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($adresseIndividuelle['a_complement'], ENT_QUOTES); ?>')">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                    Modifier
-                                </button>
-
-                                <form method="post" style="display:inline;"
-                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">
-                                    <input type="hidden" name="id_adresse"
-                                        value="<?php echo $adresseIndividuelle['id_adresse']; ?>">
-                                    <button type="submit" name="delete_address">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path
-                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                            </path>
-                                        </svg>
-                                        Supprimer
-                                    </button>
-                                </form>
-                            </footer>
-                        </article>
-                    <?php endforeach; ?>
+                        <form method="post" style="display:inline;"
+                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">
+                            <input type="hidden" name="id_adresse"
+                                value="<?php echo $adresseIndividuelle['id_adresse']; ?>">
+                            <button type="submit" name="delete_address">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg>
+                                Supprimer
+                            </button>
+                        </form>
+                    </footer>
+                </article>
+                <?php endforeach; ?>
                 <?php endif; ?>
             </section>
 
             <!-- Section : Mes dernières commandes -->
-            <section style="display : none;">
+            <section>
                 <h2>Mes dernières commandes</h2>
 
                 <?php if (empty($listeCommandesRecentes)): ?>
-                    <!-- Afficher un message si aucune commande -->
-                    <p>Aucune commande effectuée</p>
+                <!-- Afficher un message si aucune commande -->
+                <p>Aucune commande effectuée</p>
                 <?php else: ?>
-                    <!-- Boucler sur chaque commande du client -->
-                    <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
-                        <article>
-                            <header>
-                                <div>
-                                    <span>N° Commande</span>
-                                    <strong>#<?php echo htmlspecialchars($commandeIndividuelle['id_panier']); ?></strong>
-                                </div>
-                                <span
-                                    data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
-                                    <?php echo htmlspecialchars($commandeIndividuelle['statut']); ?>
-                                </span>
-                            </header>
+                <!-- Boucler sur chaque commande du client -->
+                <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
+                <article>
+                    <header>
+                        <div>
+                            <span>N° Commande</span>
+                            <strong>#<?php echo htmlspecialchars($commandeIndividuelle['id_panier']); ?></strong>
+                        </div>
+                        <span
+                            data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
+                            <?php echo htmlspecialchars($commandeIndividuelle['statut']); ?>
+                        </span>
+                    </header>
 
-                            <main>
-                                <div>
-                                    <div>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                                        </svg>
-                                        <span><?php echo date('d/m/Y', strtotime($commandeIndividuelle['timestamp_commande'])); ?></span>
-                                    </div>
-                                    <div>
-                                        <em><?php echo number_format($commandeIndividuelle['montant_total'], 2, ',', ' '); ?>
-                                            €</em>
-                                    </div>
-                                </div>
-                            </main>
+                    <main>
+                        <div>
+                            <div>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span><?php echo date('d/m/Y', strtotime($commandeIndividuelle['timestamp_commande'])); ?></span>
+                            </div>
+                            <div>
+                                <em><?php echo number_format($commandeIndividuelle['montant_total'], 2, ',', ' '); ?>
+                                    €</em>
+                            </div>
+                        </div>
+                    </main>
 
-                            <footer>
-                                <button type="button"
-                                    onclick="location.href='suivi-commande.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>'">
-                                    Voir les détails
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        <polyline points="12 5 19 12 12 19"></polyline>
-                                    </svg>
-                                </button>
-                            </footer>
-                        </article>
-                    <?php endforeach; ?>
+                    <footer>
+                        <button type="button"
+                            onclick="location.href='suivi-commande.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>'">
+                            Voir les détails
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </footer>
+                </article>
+                <?php endforeach; ?>
                 <?php endif; ?>
             </section>
 
@@ -607,6 +594,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 </label>
 
                 <label>
+                    <span>Complément (optionnel)</span>
+                    <input type="text" name="complement" id="modification_complement">
+                </label>
+
+                <label>
                     <span>Ville</span>
                     <input type="text" name="ville" id="modification_ville" required>
                 </label>
@@ -618,10 +610,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         placeholder="ex: 22300" required>
                 </label>
 
-                <label>
-                    <span>Complément (optionnel)</span>
-                    <input type="text" name="complement" id="modification_complement">
-                </label>
+
 
                 <button type="submit" name="update_address">Mettre à jour</button>
                 <button type="button" onclick="fermerModalModificationAdresse()">Annuler</button>
@@ -640,6 +629,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 </label>
 
                 <label>
+                    <span>Complément (optionnel)</span>
+                    <input type="text" name="complement" id="ajout_complement">
+                </label>
+
+                <label>
                     <span>Ville</span>
                     <input type="text" name="ville" id="ajout_ville" required>
                 </label>
@@ -651,10 +645,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         placeholder="ex: 22300" required>
                 </label>
 
-                <label>
-                    <span>Complément (optionnel)</span>
-                    <input type="text" name="complement" id="ajout_complement">
-                </label>
+
 
                 <button type="submit" name="add_address">Ajouter</button>
                 <button type="button" onclick="fermerModalAjoutAdresse()">Annuler</button>
@@ -668,235 +659,240 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     ?>
 
     <script>
-        //gestion des onglets
-        const boutonsOnglets = document.querySelectorAll('.tab-btn');
-        const contenuOnglets = document.querySelectorAll('.tab-content');
+    //gestion des onglets
+    const boutonsOnglets = document.querySelectorAll('.tab-btn');
+    const contenuOnglets = document.querySelectorAll('.tab-content');
 
-        //ajouter un événement sur chaque bouton d'onglet
-        boutonsOnglets.forEach(boutonOnglet => {
-            boutonOnglet.addEventListener('click', () => {
-                //récupérer le nom de l'onglet depuis l'attribut data-tab
-                const nomOnglet = boutonOnglet.getAttribute('data-tab');
+    //ajouter un événement sur chaque bouton d'onglet
+    boutonsOnglets.forEach(boutonOnglet => {
+        boutonOnglet.addEventListener('click', () => {
+            //récupérer le nom de l'onglet depuis l'attribut data-tab
+            const nomOnglet = boutonOnglet.getAttribute('data-tab');
 
-                //désactiver tous les onglets
-                boutonsOnglets.forEach(bouton => bouton.classList.remove('active'));
-                contenuOnglets.forEach(contenu => contenu.classList.remove('active'));
+            //désactiver tous les onglets
+            boutonsOnglets.forEach(bouton => bouton.classList.remove('active'));
+            contenuOnglets.forEach(contenu => contenu.classList.remove('active'));
 
-                //activer l'onglet sélectionné
-                boutonOnglet.classList.add('active');
-                document.getElementById(nomOnglet + '-tab').classList.add('active');
-            });
+            //activer l'onglet sélectionné
+            boutonOnglet.classList.add('active');
+            document.getElementById(nomOnglet + '-tab').classList.add('active');
         });
+    });
 
-        //fonction pour ouvrir le modal de modification d'adresse
-        function ouvrirModalModificationAdresse(id, adresse, ville, codePostal, complement) {
-            document.getElementById('modification_id_adresse').value = id;
-            document.getElementById('modification_adresse').value = adresse;
-            document.getElementById('modification_ville').value = ville;
-            document.getElementById('modification_code_postal').value = codePostal;
-            document.getElementById('modification_complement').value = complement;
-            document.getElementById('modalModificationAdresse').style.display = 'block';
-        }
+    //fonction pour ouvrir le modal de modification d'adresse
+    function ouvrirModalModificationAdresse(id, adresse, ville, codePostal, complement) {
+        document.getElementById('modification_id_adresse').value = id;
+        document.getElementById('modification_adresse').value = adresse;
+        document.getElementById('modification_ville').value = ville;
+        document.getElementById('modification_code_postal').value = codePostal;
+        document.getElementById('modification_complement').value = complement;
+        document.getElementById('modalModificationAdresse').style.display = 'block';
+    }
 
-        //fonction pour fermer le modal de modification d'adresse
-        function fermerModalModificationAdresse() {
-            document.getElementById('modalModificationAdresse').style.display = 'none';
-        }
+    //fonction pour fermer le modal de modification d'adresse
+    function fermerModalModificationAdresse() {
+        document.getElementById('modalModificationAdresse').style.display = 'none';
+    }
 
-        // AJOUT ADRESSE - fonction pour ouvrir le modal d'ajout d'adresse
-        function ouvrirModalAjoutAdresse() {
-            //réinitialiser les champs du formulaire
-            document.getElementById('ajout_adresse').value = '';
-            document.getElementById('ajout_ville').value = '';
-            document.getElementById('ajout_code_postal').value = '';
-            document.getElementById('ajout_complement').value = '';
-            document.getElementById('modalAjoutAdresse').style.display = 'block';
-        }
+    // AJOUT ADRESSE - fonction pour ouvrir le modal d'ajout d'adresse
+    function ouvrirModalAjoutAdresse() {
+        //réinitialiser les champs du formulaire
+        document.getElementById('ajout_adresse').value = '';
+        document.getElementById('ajout_ville').value = '';
+        document.getElementById('ajout_code_postal').value = '';
+        document.getElementById('ajout_complement').value = '';
+        document.getElementById('modalAjoutAdresse').style.display = 'block';
+    }
 
-        // AJOUT ADRESSE - fonction pour fermer le modal d'ajout d'adresse
-        function fermerModalAjoutAdresse() {
-            document.getElementById('modalAjoutAdresse').style.display = 'none';
-        }
+    // AJOUT ADRESSE - fonction pour fermer le modal d'ajout d'adresse
+    function fermerModalAjoutAdresse() {
+        document.getElementById('modalAjoutAdresse').style.display = 'none';
+    }
 
-        //fonction pour prévisualiser l'image depuis une URL
-        function previsualiserImageDepuisURL() {
-            //récupérer les éléments du DOM
-            const champSaisieURL = document.getElementById('url_image_input');
-            const champCacheLienImage = document.getElementById('lien_image');
-            const elementImageActuelle = document.getElementById('current-profile-image');
-            const urlImageSaisie = champSaisieURL.value.trim();
-
-            //vérifier si une URL a été saisie
-            if (!urlImageSaisie) {
-                alert('Veuillez saisir une URL d\'image');
-                return;
-            }
-
-            //vérifier si l'URL est valide
-            try {
-                new URL(urlImageSaisie);
-            } catch (erreur) {
-                alert('URL invalide. Veuillez saisir une URL complète (ex: https://exemple.com/image.jpg)');
-                return;
-            }
-
-            //tester si l'image se charge correctement
-            const imageTest = new Image();
-
-            //si l'image se charge avec succès
-            imageTest.onload = function () {
-                //mettre à jour l'affichage de l'image
-                if (elementImageActuelle) {
-                    elementImageActuelle.src = urlImageSaisie;
-                } else {
-                    //créer l'image si elle n'existe pas
-                    const conteneurImage = document.querySelector('.profile-image-container');
-                    conteneurImage.innerHTML = `<img src="${urlImageSaisie}" alt="Photo de profil" class="profile-image" id="current-profile-image">`;
-                }
-
-                //mettre à jour le champ caché
-                champCacheLienImage.value = urlImageSaisie;
-
-                alert('Image chargée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.');
-            };
-
-            //si l'image ne se charge pas
-            imageTest.onerror = function () {
-                alert('Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.');
-            };
-
-            imageTest.src = urlImageSaisie;
-        }
-
-        //déclaration des variables pour le drag and drop
-        const zoneDepotFichier = document.getElementById('drop-zone');
-        const champSelectionFichier = document.getElementById('file-input');
-        const zoneApercuImage = document.getElementById('preview-zone');
-        const zoneStatutUpload = document.getElementById('upload-status');
+    //fonction pour prévisualiser l'image depuis une URL
+    function previsualiserImageDepuisURL() {
+        //récupérer les éléments du DOM
+        const champSaisieURL = document.getElementById('url_image_input');
         const champCacheLienImage = document.getElementById('lien_image');
-        const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
+        const elementImageActuelle = document.getElementById('current-profile-image');
+        const urlImageSaisie = champSaisieURL.value.trim();
 
-        //clic sur la zone pour ouvrir le sélecteur de fichier
-        zoneDepotFichier.addEventListener('click', () => champSelectionFichier.click());
-
-        //empêcher le comportement par défaut du navigateur pour le drag and drop
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(nomEvenement => {
-            zoneDepotFichier.addEventListener(nomEvenement, empecherComportementParDefaut, false);
-            document.body.addEventListener(nomEvenement, empecherComportementParDefaut, false);
-        });
-
-        //fonction pour empêcher le comportement par défaut
-        function empecherComportementParDefaut(evenement) {
-            evenement.preventDefault();
-            evenement.stopPropagation();
+        //vérifier si une URL a été saisie
+        if (!urlImageSaisie) {
+            alert('Veuillez saisir une URL d\'image');
+            return;
         }
 
-        //effet visuel lors du drag
-        ['dragenter', 'dragover'].forEach(nomEvenement => {
-            zoneDepotFichier.addEventListener(nomEvenement, () => {
-                zoneDepotFichier.classList.add('drag-over');
-            });
-        });
-
-        ['dragleave', 'drop'].forEach(nomEvenement => {
-            zoneDepotFichier.addEventListener(nomEvenement, () => {
-                zoneDepotFichier.classList.remove('drag-over');
-            });
-        });
-
-        //gestion du drop de fichier
-        zoneDepotFichier.addEventListener('drop', gererDepotFichier);
-        champSelectionFichier.addEventListener('change', gererSelectionFichier);
-
-        //fonction pour gérer le dépôt de fichier
-        function gererDepotFichier(evenement) {
-            //récupérer les fichiers déposés
-            const fichiersDePoses = evenement.dataTransfer.files;
-            if (fichiersDePoses.length > 0) {
-                envoyerFichierVersServeur(fichiersDePoses[0]);
-            }
+        //vérifier si l'URL est valide
+        try {
+            new URL(urlImageSaisie);
+        } catch (erreur) {
+            alert('URL invalide. Veuillez saisir une URL complète (ex: https://exemple.com/image.jpg)');
+            return;
         }
 
-        //fonction pour gérer la sélection de fichier
-        function gererSelectionFichier(evenement) {
-            //récupérer les fichiers sélectionnés
-            const fichiersSelectionnes = evenement.target.files;
-            if (fichiersSelectionnes.length > 0) {
-                envoyerFichierVersServeur(fichiersSelectionnes[0]);
+        //tester si l'image se charge correctement
+        const imageTest = new Image();
+
+        //si l'image se charge avec succès
+        imageTest.onload = function() {
+            //mettre à jour l'affichage de l'image
+            if (elementImageActuelle) {
+                elementImageActuelle.src = urlImageSaisie;
+            } else {
+                //créer l'image si elle n'existe pas
+                const conteneurImage = document.querySelector('.profile-image-container');
+                conteneurImage.innerHTML =
+                    `<img src="${urlImageSaisie}" alt="Photo de profil" class="profile-image" id="current-profile-image">`;
             }
+
+            //mettre à jour le champ caché
+            champCacheLienImage.value = urlImageSaisie;
+
+            alert('Image chargée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.');
+        };
+
+        //si l'image ne se charge pas
+        imageTest.onerror = function() {
+            alert(
+                'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.'
+            );
+        };
+
+        imageTest.src = urlImageSaisie;
+    }
+
+    //déclaration des variables pour le drag and drop
+    const zoneDepotFichier = document.getElementById('drop-zone');
+    const champSelectionFichier = document.getElementById('file-input');
+    const zoneApercuImage = document.getElementById('preview-zone');
+    const zoneStatutUpload = document.getElementById('upload-status');
+    const champCacheLienImage = document.getElementById('lien_image');
+    const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
+
+    //clic sur la zone pour ouvrir le sélecteur de fichier
+    zoneDepotFichier.addEventListener('click', () => champSelectionFichier.click());
+
+    //empêcher le comportement par défaut du navigateur pour le drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(nomEvenement => {
+        zoneDepotFichier.addEventListener(nomEvenement, empecherComportementParDefaut, false);
+        document.body.addEventListener(nomEvenement, empecherComportementParDefaut, false);
+    });
+
+    //fonction pour empêcher le comportement par défaut
+    function empecherComportementParDefaut(evenement) {
+        evenement.preventDefault();
+        evenement.stopPropagation();
+    }
+
+    //effet visuel lors du drag
+    ['dragenter', 'dragover'].forEach(nomEvenement => {
+        zoneDepotFichier.addEventListener(nomEvenement, () => {
+            zoneDepotFichier.classList.add('drag-over');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(nomEvenement => {
+        zoneDepotFichier.addEventListener(nomEvenement, () => {
+            zoneDepotFichier.classList.remove('drag-over');
+        });
+    });
+
+    //gestion du drop de fichier
+    zoneDepotFichier.addEventListener('drop', gererDepotFichier);
+    champSelectionFichier.addEventListener('change', gererSelectionFichier);
+
+    //fonction pour gérer le dépôt de fichier
+    function gererDepotFichier(evenement) {
+        //récupérer les fichiers déposés
+        const fichiersDePoses = evenement.dataTransfer.files;
+        if (fichiersDePoses.length > 0) {
+            envoyerFichierVersServeur(fichiersDePoses[0]);
+        }
+    }
+
+    //fonction pour gérer la sélection de fichier
+    function gererSelectionFichier(evenement) {
+        //récupérer les fichiers sélectionnés
+        const fichiersSelectionnes = evenement.target.files;
+        if (fichiersSelectionnes.length > 0) {
+            envoyerFichierVersServeur(fichiersSelectionnes[0]);
+        }
+    }
+
+    //fonction pour envoyer un fichier vers le serveur
+    function envoyerFichierVersServeur(fichierImage) {
+        //vérifier que c'est bien une image
+        if (!fichierImage.type.startsWith('image/')) {
+            afficherMessageStatut('Veuillez sélectionner une image valide (JPEG, PNG, GIF, WebP)', 'error');
+            return;
         }
 
-        //fonction pour envoyer un fichier vers le serveur
-        function envoyerFichierVersServeur(fichierImage) {
-            //vérifier que c'est bien une image
-            if (!fichierImage.type.startsWith('image/')) {
-                afficherMessageStatut('Veuillez sélectionner une image valide (JPEG, PNG, GIF, WebP)', 'error');
-                return;
+        //vérifier la taille (max 5MB)
+        const tailleLimiteMegaOctets = 5 * 1024 * 1024;
+        if (fichierImage.size > tailleLimiteMegaOctets) {
+            afficherMessageStatut('L\'image est trop volumineuse (max 5 MB)', 'error');
+            return;
+        }
+
+        //créer un objet FormData pour envoyer le fichier
+        const donneesFormulaireUpload = new FormData();
+        donneesFormulaireUpload.append('image', fichierImage);
+        donneesFormulaireUpload.append('id_client', identifiantClientConnecte);
+
+        //afficher un aperçu de l'image
+        const lecteurFichier = new FileReader();
+        lecteurFichier.onload = (evenement) => {
+            //afficher l'aperçu dans la zone dédiée
+            zoneApercuImage.innerHTML = `<img src="${evenement.target.result}" alt="Aperçu">`;
+
+            //mettre à jour l'image de profil actuelle si elle existe
+            const elementImageActuelle = document.getElementById('current-profile-image');
+            if (elementImageActuelle) {
+                elementImageActuelle.src = evenement.target.result;
             }
+        };
+        lecteurFichier.readAsDataURL(fichierImage);
 
-            //vérifier la taille (max 5MB)
-            const tailleLimiteMegaOctets = 5 * 1024 * 1024;
-            if (fichierImage.size > tailleLimiteMegaOctets) {
-                afficherMessageStatut('L\'image est trop volumineuse (max 5 MB)', 'error');
-                return;
-            }
+        //afficher le message d'upload en cours
+        afficherMessageStatut('Upload en cours...', 'success');
 
-            //créer un objet FormData pour envoyer le fichier
-            const donneesFormulaireUpload = new FormData();
-            donneesFormulaireUpload.append('image', fichierImage);
-            donneesFormulaireUpload.append('id_client', identifiantClientConnecte);
-
-            //afficher un aperçu de l'image
-            const lecteurFichier = new FileReader();
-            lecteurFichier.onload = (evenement) => {
-                //afficher l'aperçu dans la zone dédiée
-                zoneApercuImage.innerHTML = `<img src="${evenement.target.result}" alt="Aperçu">`;
-
-                //mettre à jour l'image de profil actuelle si elle existe
-                const elementImageActuelle = document.getElementById('current-profile-image');
-                if (elementImageActuelle) {
-                    elementImageActuelle.src = evenement.target.result;
-                }
-            };
-            lecteurFichier.readAsDataURL(fichierImage);
-
-            //afficher le message d'upload en cours
-            afficherMessageStatut('Upload en cours...', 'success');
-
-            //envoyer le fichier au serveur via fetch
-            fetch('upload_image.php', {
+        //envoyer le fichier au serveur via fetch
+        fetch('upload_image.php', {
                 method: 'POST',
                 body: donneesFormulaireUpload
             })
-                .then(reponse => reponse.json())
-                .then(donneesReponse => {
-                    if (donneesReponse.success) {
-                        //mettre à jour le champ caché avec le chemin local sous /img/clients/[i_alt].[image_format]
-                        champCacheLienImage.value = donneesReponse.path;
-                        afficherMessageStatut('Image uploadée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.', 'success');
-                    } else {
-                        afficherMessageStatut('Erreur: ' + donneesReponse.message, 'error');
-                    }
-                })
-                .catch(erreur => {
-                    console.error('Erreur:', erreur);
-                    afficherMessageStatut('Erreur lors de l\'upload', 'error');
-                });
-        }
+            .then(reponse => reponse.json())
+            .then(donneesReponse => {
+                if (donneesReponse.success) {
+                    //mettre à jour le champ caché avec le chemin local sous /img/clients/[i_alt].[image_format]
+                    champCacheLienImage.value = donneesReponse.path;
+                    afficherMessageStatut(
+                        'Image uploadée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.',
+                        'success');
+                } else {
+                    afficherMessageStatut('Erreur: ' + donneesReponse.message, 'error');
+                }
+            })
+            .catch(erreur => {
+                console.error('Erreur:', erreur);
+                afficherMessageStatut('Erreur lors de l\'upload', 'error');
+            });
+    }
 
-        //fonction pour afficher un message de statut
-        function afficherMessageStatut(messageTexte, typeMessage) {
-            //afficher le message dans la zone de statut
-            zoneStatutUpload.textContent = messageTexte;
-            zoneStatutUpload.className = 'upload-status ' + typeMessage;
+    //fonction pour afficher un message de statut
+    function afficherMessageStatut(messageTexte, typeMessage) {
+        //afficher le message dans la zone de statut
+        zoneStatutUpload.textContent = messageTexte;
+        zoneStatutUpload.className = 'upload-status ' + typeMessage;
 
-            //masquer le message après 5 secondes si succès
-            if (typeMessage === 'success') {
-                setTimeout(() => {
-                    zoneStatutUpload.style.display = 'none';
-                }, 5000);
-            }
+        //masquer le message après 5 secondes si succès
+        if (typeMessage === 'success') {
+            setTimeout(() => {
+                zoneStatutUpload.style.display = 'none';
+            }, 5000);
         }
+    }
     </script>
 
 </body>
