@@ -155,10 +155,11 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                 <?php else: ?>
                 <?php foreach ($listeProduits as $produitCourant):
                         $estEnRupture = $produitCourant['p_stock'] <= 0;
-                        $possedePourcentageRemise = !empty($produitCourant['pourcentage_reduction']) && $produitCourant['pourcentage_reduction'] > 0;
-                        $prixApresRemise = $possedePourcentageRemise
-                            ? $produitCourant['p_prix'] * (1 - $produitCourant['pourcentage_reduction'] / 100)
-                            : $produitCourant['p_prix'];
+                        $discount = (float)$produitCourant['pourcentage_reduction'];
+                        $possedePourcentageRemise = $discount > 0;
+                        $prixDiscount = ($discount > 0) ? $produitCourant['p_prix'] * (1 - $discount/100) : $produitCourant['p_prix'];
+                        $prixFinal = calcPrixTVA($produitCourant['id_produit'], $produitCourant['tva'], $prixDiscount);
+                        $prixOriginalTTC = calcPrixTVA($produitCourant['id_produit'], $produitCourant['tva'], $produitCourant['p_prix']);
                         $noteArrondie = round($produitCourant['note_moyenne'] ?? 0);
                         ?>
                 <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
@@ -196,10 +197,10 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                         <div>
                             <span>
                                 <?php if ($possedePourcentageRemise): ?>
-                                <?= number_format($produitCourant['p_prix'], 2, ',', ' ') ?>€
+                                <span style="text-decoration: line-through; color: #999; margin-right: 5px;"><?= number_format($prixOriginalTTC, 2, ',', ' ') ?>€</span>
                                 <?php endif; ?>
                             </span>
-                            <span><?= number_format($prixApresRemise, 2, ',', ' ') ?>€</span>
+                            <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
                         <button <?= $estEnRupture ? 'disabled' : '' ?>
                             onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">

@@ -21,6 +21,7 @@ function chargerProduitsBDD($pdo)
             p.p_statut,
             COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
             COALESCE(avis.nombre_avis, 0) as nombre_avis,
+            COALESCE(t.montant_tva, 0) as tva,
             (SELECT STRING_AGG(cp.nom_categorie, ', ') 
                 FROM _fait_partie_de fpd 
                 JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
@@ -33,6 +34,7 @@ function chargerProduitsBDD($pdo)
         FROM _produit p
         LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
         LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
+        LEFT JOIN _tva t ON p.id_tva = t.id_tva
         LEFT JOIN (
             SELECT id_produit, COUNT(*) as nombre_avis 
             FROM _avis 
@@ -706,6 +708,8 @@ function chargerProduitBDD($pdo, $idProduit) {
                 COALESCE(p.p_note, 0) AS p_note,
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
                 COALESCE(t.montant_tva, 0) as tva,
+                v.raison_sociale AS vendeur_nom,
+                c.email AS vendeur_email,
                 (SELECT STRING_AGG(cp.nom_categorie, ', ')
                    FROM _fait_partie_de fpd
                    JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
@@ -714,6 +718,8 @@ function chargerProduitBDD($pdo, $idProduit) {
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
             LEFT JOIN _tva t ON p.id_tva = t.id_tva
+            LEFT JOIN _vendeur v ON p.id_vendeur = v.id_vendeur
+            LEFT JOIN _compte c ON v.id_compte = c.id_compte
             WHERE p.id_produit = :pid
             LIMIT 1");
         $stmtProd->execute([':pid' => $idProduit]);
