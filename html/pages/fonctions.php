@@ -1089,4 +1089,17 @@ function calcPrixTVA($identifiantProduit, $TVA, $prixHT) {
     }
 
     return $resultat;
+}//fonction pour transférer le panier temporaire vers la BDD lors de la connexion
+function transfererPanierTempVersBDD($pdo, $idPanier)
+{
+    if (!isset($_SESSION['panierTemp']) || empty($_SESSION['panierTemp'])) {
+        return;
+    }
+
+    foreach ($_SESSION['panierTemp'] as $article) {
+        ajouterArticleBDD($pdo, $article['id_produit'], $idPanier, $article['quantite']);
+    }
+
+    //vider le panier temporaire après transfert
+    unset($_SESSION['panierTemp']);
 }
