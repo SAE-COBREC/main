@@ -272,6 +272,12 @@ input[type="number"] {
     }
 }
 
+.smaller {
+    font-size: 13px;
+    line-height: 1.4;
+    font-style: italic;
+}
+
 .reviews {
     .review {
         background: vars.$primary-color-blanc;

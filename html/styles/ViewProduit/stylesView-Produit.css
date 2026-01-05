@@ -248,6 +248,12 @@ input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner
   color: #030212;
 }
 
+.smaller {
+  font-size: 13px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
 .reviews .review {
   background: #FFFFFF;
   padding: 16px;
