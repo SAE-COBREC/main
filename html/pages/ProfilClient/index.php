@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pseudonymeClientSaisi = htmlspecialchars($_POST['pseudo'] ?? '');
         $adresseEmailSaisie = htmlspecialchars($_POST['email'] ?? '');
         $numeroTelephoneSaisi = htmlspecialchars($_POST['telephone'] ?? '');
+        $civilteSaisie = htmlspecialchars($_POST['civilite'] ?? '');
         $numeroTelephoneSaisi = str_replace(' ', '', $numeroTelephoneSaisi);
 
         //récupération des données de l'image si fournies
@@ -73,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pseudonymeClientSaisi,
             $adresseEmailSaisie,
             $numeroTelephoneSaisi,
+            $civilteSaisie,
             $cheminLienImageSaisi,
             $titreImageGenere,
             $texteAlternatifImageGenere
