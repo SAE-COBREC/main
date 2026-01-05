@@ -101,7 +101,8 @@ $reponsesMap = $donneesAvis['reponses'];
 // Calculs affichage
 $estEnRupture = ($produit['p_stock'] <= 0);
 $discount = (float)$produit['pourcentage_reduction'];
-$prixFinal = ($discount > 0) ? $produit['p_prix'] * (1 - $discount/100) : $produit['p_prix'];
+$prixDiscount = ($discount > 0) ? $produit['p_prix'] * (1 - $discount/100) : $produit['p_prix'];
+$prixFinal = calcPrixTVA($produit['id_produit'], $produit['tva'], $prixDiscount);
 
 // Note moyenne (recalculée pour être sûr)
 try {
@@ -195,7 +196,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 <div class="price">
                     <?= number_format($prixFinal, 2, ',', ' ') ?> €
                     <?php if ($discount > 0): ?>
-                        <span class="old"><?= number_format($produit['p_prix'], 2, ',', ' ') ?> €</span>
+                        <span class="old"><?= number_format(calcPrixTVA($produit['id_produit'], $produit['tva'], $produit['p_prix']), 2, ',', ' ') ?> €</span>
                         <span style="background:#D4183D;color:#fff;padding:6px 10px;border-radius:24px;font-size:13px; margin-left: 1em;">-<?= round($discount) ?>%</span>
                     <?php endif; ?>
                 </div>
