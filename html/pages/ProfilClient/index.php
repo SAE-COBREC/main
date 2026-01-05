@@ -119,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //mise à jour d'une adresse
     if (isset($_POST['update_address'])) {
         $idAdresse = (int) $_POST['id_adresse'];
+        $numSaisi = (int) ($_POST['num'] ?? 0);
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
@@ -168,6 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //AJOUT ADRESSE - traitement POST pour l'ajout d'une nouvelle adresse
     if (isset($_POST['add_address'])) {
+        $numSaisi = (int) ($_POST['num'] ?? 0);
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
