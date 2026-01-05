@@ -21,8 +21,8 @@
             JOIN _image ON _represente_produit.id_image = _image.id_image
             JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
             JOIN _tva ON _produit.id_tva = _tva.id_tva 
-            WHERE id_client = 1
-                AND _panier_commande.id_panier = 4
+            WHERE id_client = :id_client
+                AND _panier_commande.id_panier = :id_panier
                 AND p_statut = 'En ligne';
         ";
 
