@@ -12,17 +12,18 @@
         
         $requetePanier = "
             SELECT DISTINCT ON (_produit.id_produit)
-            _produit.id_produit,
-            p_nom, p_description, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt
+                _produit.id_produit,
+                p_nom, p_description, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt, denomination 
             FROM _contient
             JOIN _produit ON _produit.id_produit = _contient.id_produit
+            JOIN _vendeur ON _produit.id_vendeur = _vendeur.id_vendeur
             JOIN _represente_produit ON _produit.id_produit = _represente_produit.id_produit
             JOIN _image ON _represente_produit.id_image = _image.id_image
             JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
             JOIN _tva ON _produit.id_tva = _tva.id_tva 
-            WHERE id_client = :id_client
-            AND _panier_commande.id_panier = :id_panier
-            AND p_statut = 'En ligne';
+            WHERE id_client = 1
+                AND _panier_commande.id_panier = 4
+                AND p_statut = 'En ligne';
         ";
 
         $stmt = $pdo->prepare($requetePanier);
@@ -79,7 +80,7 @@
                             </div>
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                                <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
+                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'])?></p>
                                 <div class="basArticleP">
                                     <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
                                     <div class="quantite">
@@ -135,7 +136,7 @@
                             </div>
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                                <p class="articleDescP"><?php echo htmlspecialchars($article['p_description'])?></p>
+                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'] ?? "vendeur inconnu")?></p>
                                 <div class="basArticleP">
                                     <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
                                     <div class="quantite">

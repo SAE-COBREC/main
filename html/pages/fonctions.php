@@ -181,6 +181,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
             p.p_prix, 
             p.p_frais_de_port, 
             p.p_stock,
+            denomination,
             COALESCE(t.montant_tva, 0) as tva,
             COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
             (SELECT i.i_lien
@@ -202,6 +203,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         LEFT JOIN _tva t ON p.id_tva = t.id_tva
         LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
         LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+        LEFT JOIN _vendeur ON _vendeur.id_vendeur = p.id_vendeur
         WHERE p.id_produit = :idProduit
         ";
 
@@ -270,7 +272,8 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'p_prix' => $prixUnitaire,
                 'p_stock' => $stock,
                 'p_frais_de_port' => $fraisDePort,
-                'montant_tva' => $tva
+                'montant_tva' => $tva,
+                'denomination' => $produitCourant['denomination']
             ];
 
             if ($aAjouter < $quantite) {
@@ -281,37 +284,6 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
 
     } catch (Exception $e) {
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
-    }
-}
-
-//fonction pour transférer le panier temporaire vers la BDD lors de la connexion
-function transfererPanierTempVersBDD($pdo, $idPanier)
-{
-    if (!isset($_SESSION['panierTemp']) || empty($_SESSION['panierTemp'])) {
-        return;
-    }
-
-    foreach ($_SESSION['panierTemp'] as $article) {
-        ajouterArticleBDD($pdo, $article['id_produit'], $idPanier, $article['quantite']);
-    }
-
-    //vider le panier temporaire après transfert
-    unset($_SESSION['panierTemp']);
-}
-
-//fonction pour récupérer le prix maximum parmi tous les produits
-function getPrixMaximum($pdo)
-{
-    try {
-        $requeteSQL = "SELECT MAX(p_prix) AS prix_maximum 
-            FROM _produit";
-
-        $requetePrepare = $pdo->query($requeteSQL);
-        $result = $requetePrepare->fetch(PDO::FETCH_ASSOC);
-
-        return $result['prix_maximum'] ? ceil($result['prix_maximum'] / 100) * 100 : 3000;
-    } catch (Exception $e) {
-        return 3000;
     }
 }
 
@@ -410,7 +382,7 @@ function recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifi
 {
     try {
         $requeteSQL = "
-            SELECT co.nom, co.prenom, cl.c_pseudo, co.email, co.num_telephone, co.civilite
+            SELECT cl.c_nom, cl.c_prenom, cl.c_pseudo, co.email, co.num_telephone
             FROM cobrec1._client cl
             INNER JOIN cobrec1._compte co ON cl.id_compte = co.id_compte
             WHERE cl.id_client = ?
@@ -525,8 +497,8 @@ function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifi
     try {
         $requeteSQL = "
             SELECT p.id_panier, p.timestamp_commande,
-                   COALESCE(f.f_total_ttc, 0) as montant_total,
-                   COALESCE(l.etat_livraison, 'En attente') as statut
+                COALESCE(f.f_total_ttc, 0) as montant_total,
+                COALESCE(l.etat_livraison, 'En attente') as statut
             FROM cobrec1._panier_commande p
             LEFT JOIN cobrec1._facture f ON p.id_panier = f.id_panier
             LEFT JOIN cobrec1._livraison l ON f.id_facture = l.id_facture
@@ -708,12 +680,12 @@ function chargerProduitBDD($pdo, $idProduit) {
                 COALESCE(p.p_note, 0) AS p_note,
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
                 COALESCE(t.montant_tva, 0) as tva,
-                v.denomination AS vendeur_nom,
+                v.raison_sociale AS vendeur_nom,
                 c.email AS vendeur_email,
                 (SELECT STRING_AGG(cp.nom_categorie, ', ')
-                   FROM _fait_partie_de fpd
-                   JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-                  WHERE fpd.id_produit = p.id_produit) AS categories
+                FROM _fait_partie_de fpd
+                JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+                WHERE fpd.id_produit = p.id_produit) AS categories
             FROM _produit p
             LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
             LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
@@ -729,10 +701,10 @@ function chargerProduitBDD($pdo, $idProduit) {
 
         // Images
         $stmtImgs = $pdo->prepare("SELECT i.i_lien
-                                     FROM _represente_produit rp
-                                     JOIN _image i ON rp.id_image = i.id_image
+                                    FROM _represente_produit rp
+                                    JOIN _image i ON rp.id_image = i.id_image
                                     WHERE rp.id_produit = :pid
-                                 ORDER BY rp.id_image ASC");
+                                ORDER BY rp.id_image ASC");
         $stmtImgs->execute([':pid' => $idProduit]);
         $images = $stmtImgs->fetchAll(PDO::FETCH_COLUMN) ?: [];
         
