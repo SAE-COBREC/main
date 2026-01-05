@@ -100,6 +100,7 @@ body {
   flex-direction: column;
   flex: 1;
   overflow: hidden;
+  /* Styles pour la case cochée */
 }
 .content-section__header {
   flex-shrink: 0;
@@ -161,6 +162,21 @@ body {
 .content-section .products-table__head-cell--checkbox,
 .content-section .products-table__cell--checkbox {
   width: 50px;
+}
+.content-section .checkbox {
+  width: 18px;
+  height: 18px;
+  max-width: 40px;
+  border: 2px solid #E5D5C5;
+  border-radius: 20px;
+  display: inline-block;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-left: 25px;
+}
+.content-section .checkbox--active {
+  background-color: #E6A96E;
+  border-color: #E6A96E;
 }
 .content-section .products-table thead {
   position: sticky;
@@ -227,23 +243,6 @@ body {
 }
 .products-table__cell--descrip {
   max-width: 300px;
-}
-
-/* Styles pour la case cochée */
-.checkbox {
-  width: 18px;
-  height: 18px;
-  max-width: 40px;
-  border: 2px solid #E5D5C5;
-  border-radius: 4px;
-  display: inline-block;
-  cursor: pointer;
-  transition: 0.2s;
-  margin-left: 25px;
-}
-.checkbox--active {
-  background-color: #E6A96E;
-  border-color: #E6A96E;
 }
 
 /* Met en évidence la ligne sélectionnée */
