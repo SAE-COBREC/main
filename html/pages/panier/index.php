@@ -80,7 +80,7 @@
                             </div>
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'])?></p>
+                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?></p>
                                 <div class="basArticleP">
                                     <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
                                     <div class="quantite">
@@ -136,7 +136,7 @@
                             </div>
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'] ?? "vendeur inconnu")?></p>
+                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?></p>
                                 <div class="basArticleP">
                                     <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
                                     <div class="quantite">
