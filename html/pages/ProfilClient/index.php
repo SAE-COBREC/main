@@ -342,7 +342,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                 <label>
                                     <span>Nom</span>
                                     <input type="text" name="nom" id="nom"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_nom'] ?? ''); ?>"
+                                        value="<?php echo htmlspecialchars($donneesInformationsClient['nom'] ?? ''); ?>"
                                         required>
                                 </label>
                             </div>
@@ -351,7 +351,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                 <label>
                                     <span>Prénom</span>
                                     <input type="text" name="prenom" id="prenom"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_prenom'] ?? ''); ?>"
+                                        value="<?php echo htmlspecialchars($donneesInformationsClient['prenom'] ?? ''); ?>"
                                         required>
                                 </label>
                             </div>
