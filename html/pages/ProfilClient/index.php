@@ -381,11 +381,24 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div>
                                 <label>
                                     <span>Civilité</span>
-                                    <input type="text" name="civilite"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['civilite'] ?? ''); ?>"
-                                        required>
+                                    <select name="civilite" required>
+                                        <option value="">-- Sélectionnez --</option>
+                                        <option value="M."
+                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'M.' ? 'selected' : ''; ?>>
+                                            M.</option>
+                                        <option value="Mme"
+                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Mme' ? 'selected' : ''; ?>>
+                                            Mme</option>
+                                        <option value="Ne souhaite pas s'exprimer"
+                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Ne souhaite pas s\'exprimer' ? 'selected' : ''; ?>>
+                                            Ne souhaite pas s'exprimer</option>
+                                        <option value="Autre"
+                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Autre' ? 'selected' : ''; ?>>
+                                            Autre</option>
+                                    </select>
                                 </label>
                             </div>
+
 
                             <div>
                                 <label>
