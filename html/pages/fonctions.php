@@ -708,7 +708,7 @@ function chargerProduitBDD($pdo, $idProduit) {
                 COALESCE(p.p_note, 0) AS p_note,
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
                 COALESCE(t.montant_tva, 0) as tva,
-                v.raison_sociale AS vendeur_nom,
+                v.denomination AS vendeur_nom,
                 c.email AS vendeur_email,
                 (SELECT STRING_AGG(cp.nom_categorie, ', ')
                    FROM _fait_partie_de fpd

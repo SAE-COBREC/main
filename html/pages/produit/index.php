@@ -228,7 +228,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         <li>Catégorie : <?= htmlspecialchars(explode(', ', $produit['categories'])[0] ?? 'Général') ?></li>
                         <li>Référence : #<?= $produit['id_produit'] ?></li>
                         <li>Statut : <?= htmlspecialchars($produit['p_statut']) ?></li>
-                        <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?> (<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>)</li>
+                        <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?> <div class="smaller">(<a href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)</div></li>
                         <li>Origine : <?= htmlspecialchars($produit['p_origine'] ?? 'Non spécifiée') ?></li>
                     </ul>
                 </div>
