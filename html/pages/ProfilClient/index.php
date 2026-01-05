@@ -589,6 +589,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <input type="hidden" name="id_adresse" id="modification_id_adresse">
 
                 <label>
+                    <span>Numéro</span>
+                    <input type="text" name="num" id="modification_num" inputmode="numeric" pattern="[0-9]+"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                </label>
+
+
+                <label>
                     <span>Adresse</span>
                     <input type="text" name="adresse" id="modification_adresse" required>
                 </label>
@@ -596,6 +603,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <label>
                     <span>Complément (optionnel)</span>
                     <input type="text" name="complement" id="modification_complement">
+                </label>
+
+                <label>
+                    <span>Pays</span>
+                    <input type="text" name="pays" id="modification_pays" required>
                 </label>
 
                 <label>
@@ -623,6 +635,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         <div>
             <h2>Ajouter une adresse</h2>
             <form method="post" id="formulaireAjoutAdresse">
+
+                <label>
+                    <span>Numéro</span>
+                    <input type="text" name="num" id="ajout_num" inputmode="numeric" pattern="[0-9]+"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                </label>
+
                 <label>
                     <span>Adresse</span>
                     <input type="text" name="adresse" id="ajout_adresse" required>
@@ -631,6 +650,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <label>
                     <span>Complément (optionnel)</span>
                     <input type="text" name="complement" id="ajout_complement">
+                </label>
+
+                <label>
+                    <span>Pays</span>
+                    <input type="text" name="pays" id="ajout_pays" required>
                 </label>
 
                 <label>
@@ -681,7 +705,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     //fonction pour ouvrir le modal de modification d'adresse
     function ouvrirModalModificationAdresse(id, adresse, ville, codePostal, complement) {
+        document.getElementById('modification_num').value = '';
         document.getElementById('modification_id_adresse').value = id;
+        document.getElementById('modification_pays').value = '';
         document.getElementById('modification_adresse').value = adresse;
         document.getElementById('modification_ville').value = ville;
         document.getElementById('modification_code_postal').value = codePostal;
@@ -697,7 +723,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     // AJOUT ADRESSE - fonction pour ouvrir le modal d'ajout d'adresse
     function ouvrirModalAjoutAdresse() {
         //réinitialiser les champs du formulaire
+        document.getElementById('ajout_num').value = '';
         document.getElementById('ajout_adresse').value = '';
+        document.getElementById('ajout_pays').value = '';
         document.getElementById('ajout_ville').value = '';
         document.getElementById('ajout_code_postal').value = '';
         document.getElementById('ajout_complement').value = '';
