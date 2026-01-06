@@ -444,7 +444,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <main>
                         <div>
                             <p>
-                                <strong><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
+                                <strong><?php echo htmlspecialchars($adresseIndividuelle['a_numero']) ; ?><?php echo ' ' ;?><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
                                 <?php echo htmlspecialchars($adresseIndividuelle['a_code_postal']); ?>
                                 <?php echo htmlspecialchars($adresseIndividuelle['a_ville']); ?>
                                 <?php if (!empty($adresseIndividuelle['a_complement'])): ?>
