@@ -21,7 +21,7 @@ if (isset($_SESSION['idClient'])) {
 
     $nom = $stmt->fetch();
 
-    $requeteAdresse = "SELECT a_adresse, a_ville, a_code_postal, a_pays
+    $requeteAdresse = "SELECT a_adresse, a_ville, a_code_postal, a_pays, id_adresse, a_numero
             FROM _client
             JOIN _compte ON _client.id_compte = _compte.id_compte
             JOIN _adresse ON _compte.id_compte = _adresse.id_compte
@@ -55,7 +55,7 @@ if (isset($_SESSION['idClient'])) {
 
 
 //cette condition sert à pour le paiement à vérifier si les informations sont valide ou non
-if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['pays'], $_POST['nom'])) { //on vérifie qu'on a bien toutes les infrmations du paiement
+if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['adresse'], $_POST['nom'])) { //on vérifie qu'on a bien toutes les infrmations du paiement
     /*
     Algorythme pour vérifier si une carte est valide :
     1.On part du numéro complet à 16 chiffres.
@@ -100,16 +100,30 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
 
     // Vérification du mois
     if ($mm < 1 || $mm > 12) {
-        $erreur = $erreur .  " Mois d'expiration incorrect";
+        $erreur = $erreur .  " Date d'expiration invalide";
         $boolErreur = true;
     } else {
         $yy = 2000 + $yy;
         $expiration = $yy . "-" . str_pad($mm, 2, "0", STR_PAD_LEFT);
         $dateTodayMA = date("Y-m");
         if ($expiration < $dateTodayMA) {
-            $erreur = $erreur . " Date d'expiration incorrecte";
+            $erreur = $erreur . " Date d'expiration invalide";
             $boolErreur = true;
         }
+    }
+
+    if ($_POST['adresse'] == "invalide"){
+        $erreur = $erreur . " Adresse invalide";
+        $boolErreur = true;
+    } else if ($_POST['adresse'] == "nouvelle"){
+        if (empty($_POST['numero']) || empty($_POST['rue']) || empty($_POST['ville']) || empty($_POST['codePostal'])){
+            $erreur = $erreur . " Information d'adresse manquante";
+            $boolErreur = true;
+        } /*else {
+            $erreur = $erreur . " Information d'adresse manquante";
+            $boolErreur = true;
+            echo "ok";
+        }*/
     }
 
 
@@ -178,11 +192,30 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
             <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"
                 value="<?php echo $nom['nom'] ?>" />
             <h2>Adresse de facturation</h2>
-            <select>
-            <?php foreach($adresses as $adresse) : ?>
-                <option value="<?php echo $adresse ?>"><?php echo $adresse["a_adresse"] . " (" . $adresse["a_code_postal"] . ") " . $adresse["a_ville"];?></option>
-            <?php endforeach; ?>
+            <select name="adresse" id="adresse">
+                <option value="invalide">Choisir l'adresse de livraison</option>
+                <?php foreach($adresses as $adresse) : ?>
+                    <option value="<?php echo $id_adresse ?>"><?php echo $adresse["a_numero"] . " " . $adresse["a_adresse"] . " (" . $adresse["a_code_postal"] . ") " . $adresse["a_ville"];?></option>
+                <?php endforeach; ?>
+                <option value="nouvelle">Nouvelle adresse</option>
             </select>
+            <div id="nouvelleAdresse" style="display: none;">
+                <label>Numéro *</label>
+                <input type="text" name="numero" placeholder="Ex : 4">
+
+                <label>Rue *</label>
+                <input type="text" name="rue" placeholder="Ex : Edouard Branly">
+
+                <label>Complément (optionnel)</label>
+                <input type="text" name="complement">
+                
+                <label>Ville *</label>
+                <input type="text" name="ville" placeholder="Ex : Lannion">
+                
+                <label>Code postal *</label>
+                <input type="text" name="codePostal" placeholder="Ex : 22970">
+            </div>
+
             <div class="checkBox">
                 <div>
                     <input name="conditions" id="conditions" type="checkbox" required />
@@ -193,7 +226,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
                 <p><span><?php echo $erreur ?></span></p>
             <?php endif; ?>
             <button>Payer: <?php echo $totalPanier ?>€</button>
-            <form>
+            </form>
     </section>
     <script>
         //récup l'input du numéro de la carte
@@ -247,6 +280,18 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
 
             this.value = valeur;
         });
+
+        //a chaque changement de valeur du select
+        document.getElementById('adresse').addEventListener('change', function() {
+            let champsAdresse = document.getElementById('nouvelleAdresse');
+            
+            if (this.value === 'nouvelle') { //regarde si la valeur est nouvelle
+                champsAdresse.style.display = 'block'; //si oui faire apparaitre les block
+            } else { //sinon les rendre invisible
+                champsAdresse.style.display = 'none';
+            }
+        });
+
     </script>
 </body>
 
