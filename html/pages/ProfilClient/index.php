@@ -504,8 +504,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <article>
                     <header>
                         <div>
-                            <span>N° Commande</span>
-                            <strong>#<?php echo htmlspecialchars($commandeIndividuelle['id_panier']); ?></strong>
+                            <span>Commande</span>
                         </div>
                         <span
                             data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
