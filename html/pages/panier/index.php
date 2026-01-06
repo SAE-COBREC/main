@@ -80,9 +80,10 @@
                             </div>
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?></p>
+                                <p><strong>Vendu par : </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
+                                    <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.')?> €</p>
                                 <div class="basArticleP">
-                                    <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
+                                    <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?> €</p>
                                     <div class="quantite">
 
                                         <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
@@ -136,9 +137,10 @@
                             </div>
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                                <p>Vendu par: <?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?></p>
+                                <p><strong>Vendu par : </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
+                                    <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.')?> €</p>
                                 <div class="basArticleP">
-                                    <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?>€</p>
+                                    <P class="articlePrix">TTC : <?php echo number_format($article['p_prix'] + $article['p_prix'] * ($article['montant_tva'] / 100), 2, '.')?> €</p>
                                     <div class="quantite">
 
                                         <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
@@ -256,12 +258,12 @@
                         PrixTotal += (prix * quantite) + (prix * (tva / 100) * quantite); 
                         console.log(PrixTotal);
                         nbArticles += quantite; //pour le nombre de produit total
-                        produitEnHTML += `<p>${titre} <span>x${quantite}</span>, tva: <span>${tva}</span>%</p>`; //pour ajouter dans le récap
+                        produitEnHTML += `<p>${titre} <span>x${quantite}</span>, tva : <span>${tva}</span> %</p>`; //pour ajouter dans le récap
                     }
                 });
                 
                 //remplit le prix total et arrondit à 2 après la virgule
-                document.getElementById('prixTotal').textContent = PrixTotal.toFixed(2) + '€';
+                document.getElementById('prixTotal').textContent = PrixTotal.toFixed(2) + ' €';
 
                 //remplit le nombre d'articles total, et gère le petit s si il y a plusieurs articles
                 document.getElementById('totalArticles').textContent = `Récapitulatif (${nbArticles} produit${nbArticles > 1 ? 's' : ''}) :`; 

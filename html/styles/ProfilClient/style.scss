@@ -956,7 +956,7 @@ main section:nth-of-type(2) article > footer > form {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #FFFFFF;
+  background: $primary-color-blanc;
   padding: 3em;
   border-radius: 12px;
   max-width: 500px;
@@ -966,10 +966,10 @@ main section:nth-of-type(2) article > footer > form {
 
 #modalModificationAdresse h2,
 #modalAjoutAdresse h2 {
-  color: #7171A3;
+  color: $primary-color-bleu;
   margin-bottom: 2rem;
   font-size: 1.5em;
-  border-bottom: 2px solid #EFEFEF;
+  border-bottom: 2px solid $secondary-color-gris-clair;
   padding-bottom: 1rem;
   text-align: center;
 }
@@ -998,7 +998,7 @@ main section:nth-of-type(2) article > footer > form {
 #formulaireModificationAdresse input[type="text"],
 #formulaireAjoutAdresse input[type="text"] {
   padding: 12px 16px;
-  border: 2px solid #EFEFEF;
+  border: 2px solid $secondary-color-gris-clair;
   border-radius: 8px;
   font-size: 1em;
   font-family: "Quicksand", sans-serif;
@@ -1008,7 +1008,7 @@ main section:nth-of-type(2) article > footer > form {
 #formulaireModificationAdresse input[type="text"]:focus,
 #formulaireAjoutAdresse input[type="text"]:focus {
   outline: none;
-  border-color: #7171A3;
+  border-color: $primary-color-bleu;
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 
@@ -1025,8 +1025,8 @@ main section:nth-of-type(2) article > footer > form {
 
 #formulaireModificationAdresse button[type="submit"],
 #formulaireAjoutAdresse button[type="submit"] {
-  background: #7171A3;
-  color: #FFFFFF;
+  background: $primary-color-bleu;
+  color: $primary-color-blanc;
   border: none;
   margin-top: 0.5rem;
 }
@@ -1040,15 +1040,15 @@ main section:nth-of-type(2) article > footer > form {
 
 #formulaireModificationAdresse button[type="button"],
 #formulaireAjoutAdresse button[type="button"] {
-  background: #FFFFFF;
-  color: #7171A3;
-  border: 2px solid #7171A3;
+  background: $primary-color-blanc;
+  color: $primary-color-bleu;
+  border: 2px solid $primary-color-bleu;
 }
 
 #formulaireModificationAdresse button[type="button"]:hover,
 #formulaireAjoutAdresse button[type="button"]:hover {
-  background: #7171A3;
-  color: #FFFFFF;
+  background: $primary-color-bleu;
+  color: $primary-color-blanc;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
 }
@@ -1091,4 +1091,26 @@ main section:nth-of-type(2) article > footer > form {
     font-size: 0.95em;
     padding: 10px 16px;
   }
+}
+
+main section:nth-of-type(1) article select {
+    padding: 12px 16px;
+    border: 2px solid $secondary-color-gris-clair;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Quicksand', sans-serif;
+    transition: all 0.3s ease;
+    background-color: $primary-color-blanc;
+    cursor: pointer;
+    width: 100%;
+}
+
+main section:nth-of-type(1) article select:focus {
+    outline: none;
+    border-color: $primary-color-bleu;
+    box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
+}
+
+main section:nth-of-type(1) article select:hover {
+    border-color: $primary-color-bleu;
 }

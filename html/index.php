@@ -197,13 +197,14 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
                         <div>
                             <span>
                                 <?php if ($possedePourcentageRemise): ?>
-                                <span style="text-decoration: line-through; color: #999; margin-right: 5px;"><?= number_format($prixOriginalTTC, 2, ',', ' ') ?>€</span>
+                                <span style="text-decoration: line-through; color: #999; margin-right: 5px; font-size:
+                                    1.2em;"><?= number_format($prixOriginalTTC, 2, ',', ' ') ?>€</span>
                                 <?php endif; ?>
                             </span>
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
                         <button <?= $estEnRupture ? 'disabled' : '' ?>
-                            onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
+                            onclick=" event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
                             <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
                         </button>
                     </div>

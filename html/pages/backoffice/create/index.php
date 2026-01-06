@@ -67,13 +67,13 @@
                     } catch (Exception $e) {
                         $time = time();
                         $_SESSION["creerArticle"]['_GET'] = null;
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre";
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$e;
-                        $fp = fopen('file.csv', 'w');
-                        foreach ($_SESSION['bdd_errors'] as $fields) {
-                            fputcsv($fp, $fields, ',', '"', '');
-                        }
-                        fclose($fp);
+                        // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre";
+                        // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$e;
+                        // $fp = fopen('file.csv', 'w');
+                        // foreach ($_SESSION["creerArticle"]['bdd_errors'] as $fields) {
+                        //     fputcsv($fp, $fields, ',', '"', '');
+                        // }
+                        // fclose($fp);
                     ?>
 
                     <script>
@@ -367,8 +367,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 $titre = $stmt->fetch(PDO::FETCH_ASSOC);
                             } catch (Exception $e) {
                                 $time = time();
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre";
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre";
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
                         }
                         ?>
@@ -848,9 +848,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 ];
                                 $stmt->execute($params);
                             } catch (Exception $e) {
-                                //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet produit dans la base";
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                //$_SESSION["creerArticle"]['bdd_errors'] sert pour consulter les erreurs de la BDD
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet produit dans la base";
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
 
                             try {//création de l'affiliation entre catégorie et produit
@@ -866,8 +866,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 ];
                                 $stmt->execute($params);
                             } catch (Exception $e) {
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre catégorie et produit";
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre catégorie et produit";
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
 
                             try {//création de l'affiliation entre couleur et produit
@@ -883,7 +883,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 ];
                                 $stmt->execute($params);
                             } catch (Exception $e) {
-                                print_r($e);
+                                //print_r($e);
                             }
                             try{//SELEC de id_produit
                                 $sql = '
@@ -898,8 +898,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     $id_produit = $stmt->fetch(PDO::FETCH_ASSOC);
                                     $id_produit = $id_produit['id_produit'];
                             }catch(Exception $e){
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="SELEC de id_produit";
-                                $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="SELEC de id_produit";
+                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
                             
                             
@@ -923,9 +923,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     ];
                                     $stmt->execute($params);
                                 } catch (Exception $e) {
-                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="   $ id produit est égal à  " .  $id_produit . '   ';
-                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images1";
-                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                    // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="   $ id produit est égal à  " .  $id_produit . '   ';
+                                    // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images1";
+                                    // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                                 }
 
 
@@ -943,9 +943,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     ];
                                     $stmt->execute($params);
                                 } catch (Exception $e) {
-                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="   $ id produit est égal à  " .  $id_produit . '   ';
-                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
-                                    $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                    // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="   $ id produit est égal à  " .  $id_produit . '   ';
+                                    // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
+                                    // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                                     //print_r($_POST["titre"]);
                                 }
                                 
@@ -995,8 +995,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             ];
                             $stmt->execute($params);
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
                     }
                     
@@ -1034,14 +1034,14 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                         $_SESSION["creerArticle"]['_GET']['p_nom'] = $_POST['titre'];
                     } catch (Exception $e) {
-                        //$_SESSION['bdd_errors'] sert pour consulter les erreurs de la BDD
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'objet produit dans la base";
+                        //$_SESSION["creerArticle"]['bdd_errors'] sert pour consulter les erreurs de la BDD
+                        // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'objet produit dans la base";
                         //print_r($_POST);
-                        foreach ($_POST as $value) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $key . ' : ' ;
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $value ;
-                        }
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        // foreach ($_POST as $value) {
+                        //     $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $key . ' : ' ;
+                        //     $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $value ;
+                        // }
+                        // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                     }
 
                     if ($_SESSION["creerArticle"]['_GET']['id_categorie'] != $_POST['categorie']){
@@ -1058,8 +1058,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             ];
                             $stmt->execute($params);
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre catégorie et produit";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre catégorie et produit";
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
                     }
 
@@ -1074,8 +1074,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         ];
                         $stmt->execute($params);
                     } catch (Exception $e) {
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression du lien images-produit";
-                        $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                        // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression du lien images-produit";
+                        // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                     }
 
 
@@ -1094,8 +1094,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             ];
                             $stmt->execute($params);
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression des images";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="suppression des images";
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
                         unset($_SESSION["creerArticle"]['_GET']['imgs'][$key]);
                     }
@@ -1125,8 +1125,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_title'] = $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value;
                             $_SESSION["creerArticle"]['_GET']['imgs'][$key]['i_alt'] = 'photo du produit ' . $_POST["titre"];
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images2";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création des images2";
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
 
 
@@ -1144,9 +1144,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             ];
                             $stmt->execute($params);
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = 'value =    ' . $value . '      ';
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = 'value =    ' . $value . '      ';
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre images et produit";
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             //print_r($_POST["titre"]);
                         }
 
@@ -1180,8 +1180,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $stmt->execute($params);
                             $_SESSION["creerArticle"]['_GET']['p_statut'] = 'Hors ligne';
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise hors ligne du produit";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise hors ligne du produit";
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
                 
                     }else if ($_POST["enLigne"] == "Mettre en ligne"){
@@ -1207,20 +1207,20 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $stmt->execute($params);
                             $_SESSION["creerArticle"]['_GET']['p_statut'] = 'En ligne';
                         } catch (Exception $e) {
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
-                            $_SESSION['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="mise en ligne du produit";
+                            // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
                     }
                 }
 
-                if (empty($_SESSION['bdd_errors']) !== true){
+                //if (empty($_SESSION["creerArticle"]['bdd_errors']) !== true){
                     //Sert pour consulter les erreurs de la BDD via un fichier dédié
-                    $fp = fopen('file.csv', 'w');
-                    foreach ($_SESSION['bdd_errors'] as $fields) {
-                        fputcsv($fp, $fields, ',', '"', '');
-                    }
-                    fclose($fp);
-                }
+                    // $fp = fopen('file.csv', 'w');
+                    // foreach ($_SESSION["creerArticle"]['bdd_errors'] as $fields) {
+                    //     fputcsv($fp, $fields, ',', '"', '');
+                    // }
+                    // fclose($fp);
+                //}
                 
 
                 //Sert pour des tests

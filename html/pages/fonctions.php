@@ -411,26 +411,26 @@ function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantC
 }
 
 //fonction pour récupérer toutes les adresses du client
-function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompte)
-{
+function recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompte) {
     try {
         $requeteSQL = "
-            SELECT id_adresse, a_adresse, a_ville, a_code_postal, a_complement
+            SELECT id_adresse, a_numero, a_adresse, a_ville, a_code_postal, a_complement
             FROM cobrec1._adresse
             WHERE id_compte = ?
             ORDER BY id_adresse DESC
         ";
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute([$identifiantCompte]);
+
         return $requetePreparee->fetchAll(PDO::FETCH_ASSOC) ?: [];
     } catch (Exception $erreurException) {
         return [];
     }
 }
 
+
 //fonction pour mettre à jour une adresse existante
-function mettreAJourAdresse($connexionBaseDeDonnees, $idAdresse, $idCompte, $adresse, $ville, $codePostal, $complement = '')
-{
+function mettreAJourAdresse($connexionBaseDeDonnees, $idAdresse, $idCompte, $numero, $adresse, $ville, $codePostal, $complement = '') {
     try {
         //vérifier que l'adresse appartient bien au compte
         $requeteVerification = "SELECT id_adresse FROM cobrec1._adresse WHERE id_adresse = ? AND id_compte = ?";
@@ -444,15 +444,11 @@ function mettreAJourAdresse($connexionBaseDeDonnees, $idAdresse, $idCompte, $adr
         //mise à jour de l'adresse
         $requeteMiseAJour = "
             UPDATE cobrec1._adresse 
-            SET a_adresse = ?, 
-                a_ville = ?, 
-                a_code_postal = ?, 
-                a_complement = ? 
+            SET a_numero = ?, a_adresse = ?, a_ville = ?, a_code_postal = ?, a_complement = ?
             WHERE id_adresse = ? AND id_compte = ?
         ";
-
         $requetePrepareeMiseAJour = $connexionBaseDeDonnees->prepare($requeteMiseAJour);
-        $requetePrepareeMiseAJour->execute([$adresse, $ville, $codePostal, $complement, $idAdresse, $idCompte]);
+        $requetePrepareeMiseAJour->execute([$numero, $adresse, $ville, $codePostal, $complement, $idAdresse, $idCompte]);
 
         return ['success' => true, 'message' => "Adresse mise à jour avec succès."];
     } catch (Exception $erreurException) {
@@ -474,22 +470,22 @@ function supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $idCompte)
     }
 }
 
-// AJOUT ADRESSE - fonction pour ajouter une nouvelle adresse
-function ajouterNouvelleAdresse($connexionBaseDeDonnees, $idCompte, $adresse, $ville, $codePostal, $complement = '')
-{
+//fonction pour ajouter une nouvelle adresse
+function ajouterNouvelleAdresse($connexionBaseDeDonnees, $idCompte, $numero, $adresse, $ville, $codePostal, $complement = '') {
     try {
         $requeteSQL = "
-            INSERT INTO cobrec1._adresse (id_compte, a_adresse, a_ville, a_code_postal, a_complement)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO cobrec1._adresse (id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_complement)
+            VALUES (?, ?, ?, ?, ?, ?)
         ";
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
-        $requetePreparee->execute([$idCompte, $adresse, $ville, $codePostal, $complement]);
+        $requetePreparee->execute([$idCompte, $numero, $adresse, $ville, $codePostal, $complement]);
 
         return ['success' => true, 'message' => "Adresse ajoutée avec succès."];
     } catch (Exception $erreurException) {
         return ['success' => false, 'message' => "Erreur lors de l'ajout de l'adresse."];
     }
 }
+
 
 //fonction pour récupérer l'historique des dernières commandes
 function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifiantClient)
@@ -533,8 +529,7 @@ function recupererImageProfilCompte($connexionBaseDeDonnees, $identifiantCompte)
 }
 
 //fonction pour mettre à jour le profil complet (client, compte et image)
-function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantClient, $identifiantCompte, $nomFamille, $prenomClient, $pseudonymeClient, $adresseEmail, $numeroTelephone, $cheminLienImage = null, $titreImage = null, $texteAlternatifImage = null)
-{
+function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantClient, $identifiantCompte, $nomFamille, $prenomClient, $pseudonymeClient, $adresseEmail, $numeroTelephone, $civilite, $cheminLienImage = null, $titreImage = null, $texteAlternatifImage = null) {
     try {
         //validation du pseudo unique
         if (!verifierUnicitePseudo($connexionBaseDeDonnees, $pseudonymeClient, $identifiantClient)) {
@@ -561,23 +556,23 @@ function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantCli
             return ['success' => false, 'message' => "Ce numéro de téléphone est déjà utilisé par un autre compte."];
         }
 
-        //mise à jour des informations du client dans la table _client
+        //mise à jour du pseudo dans la table _client
         $requeteMiseAJourClient = "
-            UPDATE cobrec1._client
-            SET c_nom = ?, c_prenom = ?, c_pseudo = ?
+            UPDATE cobrec1._client 
+            SET c_pseudo = ?
             WHERE id_client = ?
         ";
         $requetePrepareeClient = $connexionBaseDeDonnees->prepare($requeteMiseAJourClient);
-        $requetePrepareeClient->execute([$nomFamille, $prenomClient, $pseudonymeClient, $identifiantClient]);
+        $requetePrepareeClient->execute([$pseudonymeClient, $identifiantClient]);
 
-        //mise à jour des informations du compte dans la table _compte
+        //mise à jour des informations du compte dans la table _compte (nom, prenom, email, telephone, civilite)
         $requeteMiseAJourCompte = "
-            UPDATE cobrec1._compte
-            SET email = ?, num_telephone = ?
+            UPDATE cobrec1._compte 
+            SET nom = ?, prenom = ?, email = ?, num_telephone = ?, civilite = ?
             WHERE id_compte = ?
         ";
         $requetePrepareeCompte = $connexionBaseDeDonnees->prepare($requeteMiseAJourCompte);
-        $requetePrepareeCompte->execute([$adresseEmail, $numeroTelephone, $identifiantCompte]);
+        $requetePrepareeCompte->execute([$nomFamille, $prenomClient, $adresseEmail, $numeroTelephone, $civilite, $identifiantCompte]);
 
         //si une image est fournie, la mettre à jour ou l'insérer
         if ($cheminLienImage !== null && $cheminLienImage !== '') {
@@ -588,7 +583,7 @@ function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantCli
 
             if ($donneesImageExistante) {
                 $requeteModificationImage = "
-                    UPDATE cobrec1._image
+                    UPDATE cobrec1._image 
                     SET i_lien = ?, i_title = ?, i_alt = ?
                     WHERE id_image = ?
                 ";
@@ -602,8 +597,7 @@ function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantCli
             } else {
                 $requeteInsertionNouvelleImage = "
                     INSERT INTO cobrec1._image (i_lien, i_title, i_alt)
-                    VALUES (?, ?, ?)
-                    RETURNING id_image
+                    VALUES (?, ?, ?) RETURNING id_image
                 ";
                 $requetePrepareeInsertion = $connexionBaseDeDonnees->prepare($requeteInsertionNouvelleImage);
                 $requetePrepareeInsertion->execute([$cheminLienImage, $titreImage, $texteAlternatifImage]);
@@ -617,7 +611,7 @@ function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantCli
 
         return ['success' => true, 'message' => "Profil mis à jour avec succès."];
     } catch (Exception $erreurException) {
-        return ['success' => false, 'message' => "Erreur lors de la mise à jour"];
+        return ['success' => false, 'message' => "Erreur lors de la mise à jour: " . $erreurException->getMessage()];
     }
 }
 
@@ -964,13 +958,11 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
         //requête SQL unique avec sous-requêtes JSON pour agréger toutes les données
         $requeteSQL = "
             SELECT 
-                -- informations du client
                 cl.id_client,
                 cl.c_nom,
                 cl.c_prenom,
                 cl.c_pseudo,
                 
-                -- informations du compte
                 co.id_compte,
                 co.email,
                 co.num_telephone,
@@ -987,7 +979,6 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
                 WHERE rc.id_compte = co.id_compte
                 LIMIT 1) as image_profil,
                 
-                -- toutes les adresses (agrégées en JSON)
                 (SELECT json_agg(
                     json_build_object(
                         'id_adresse', a.id_adresse,
@@ -1000,7 +991,6 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
                 FROM cobrec1._adresse a
                 WHERE a.id_compte = co.id_compte) as adresses,
                 
-                -- historique des 5 dernières commandes (agrégé en JSON)
                 (SELECT json_agg(
                     json_build_object(
                         'id_panier', p.id_panier,
@@ -1089,4 +1079,17 @@ function calcPrixTVA($identifiantProduit, $TVA, $prixHT) {
     }
 
     return $resultat;
+}//fonction pour transférer le panier temporaire vers la BDD lors de la connexion
+function transfererPanierTempVersBDD($pdo, $idPanier)
+{
+    if (!isset($_SESSION['panierTemp']) || empty($_SESSION['panierTemp'])) {
+        return;
+    }
+
+    foreach ($_SESSION['panierTemp'] as $article) {
+        ajouterArticleBDD($pdo, $article['id_produit'], $idPanier, $article['quantite']);
+    }
+
+    //vider le panier temporaire après transfert
+    unset($_SESSION['panierTemp']);
 }

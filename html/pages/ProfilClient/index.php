@@ -35,6 +35,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 
 //initialiser la variable pour les messages d'erreur
 $messageErreur = null;
+$messageSucces = null;  // Variable pour les messages de succès
 
 //récupérer l'identifiant du compte associé au client
 $identifiantCompteClient = recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClientConnecte);
@@ -82,9 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationProfil['success']) {
-            $url = 'index.php?success=info_updated';
-            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-            exit;
+            $messageSucces = "Vos informations ont été mises à jour avec succès";
+            // Recharger les données
+            $donneesInformationsClient = recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClientConnecte);
         } else {
             $messageErreur = $resultatModificationProfil['message'];
         }
@@ -108,9 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationMotDePasse['success']) {
-            $url = 'index.php?success=password_changed';
-            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-            exit;
+            $messageSucces = "Votre mot de passe a été modifié avec succès";
         } else {
             $messageErreur = $resultatModificationMotDePasse['message'];
         }
@@ -119,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //mise à jour d'une adresse
     if (isset($_POST['update_address'])) {
         $idAdresse = (int) $_POST['id_adresse'];
+        $numSaisi = (int) ($_POST['num'] ?? 1);
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
@@ -128,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $connexionBaseDeDonnees,
             $idAdresse,
             $identifiantCompteClient,
+            $numSaisi,
             $adresseSaisie,
             $villeSaisie,
             $codePostalSaisi,
@@ -135,12 +136,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($resultatMiseAJourAdresse['success']) {
-            $url = 'index.php?success=address_updated';
-            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-            exit;
-        } else {
-            $messageErreur = $resultatMiseAJourAdresse['message'];
-        }
+    $messageSucces = "Votre adresse a été modifiée avec succès";
+    // Recharger les adresses
+    $listeAdressesClient = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
+} else {
+    $messageErreur = $resultatMiseAJourAdresse['message'];
+}
+
     }
 
     //suppression d'une adresse
@@ -168,6 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //AJOUT ADRESSE - traitement POST pour l'ajout d'une nouvelle adresse
     if (isset($_POST['add_address'])) {
+        $numSaisi = (int) ($_POST['num'] ?? 1);
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
@@ -176,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultatAjoutAdresse = ajouterNouvelleAdresse(
             $connexionBaseDeDonnees,
             $identifiantCompteClient,
+            $numSaisi,
             $adresseSaisie,
             $villeSaisie,
             $codePostalSaisi,
@@ -183,9 +187,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($resultatAjoutAdresse['success']) {
-            $url = 'index.php?success=address_added';
-            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-            exit;
+            $messageSucces = "Votre nouvelle adresse a été ajoutée avec succès";
+            // Recharger les adresses
+            $listeAdressesClient = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
         } else {
             $messageErreur = $resultatAjoutAdresse['message'];
         }
@@ -250,33 +254,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             </button>
 
             <h1>Mon Profil</h1>
-
-            <?php if (isset($messageErreur)): ?>
-            <!-- Afficher le message d'erreur si présent -->
-            <div class="error-message">
-                <?php echo htmlspecialchars($messageErreur); ?>
-            </div>
-            <?php endif; ?>
-
-            <?php if (isset($_GET['success'])): ?>
-            <!-- Afficher le message de succès si présent -->
-            <div class="success-message">
-                <?php
-                    //afficher le message correspondant au type de succès
-                    if ($_GET['success'] === 'info_updated')
-                        echo "Informations mises à jour avec succès.";
-                    if ($_GET['success'] === 'password_changed')
-                        echo "Mot de passe changé avec succès.";
-                    if ($_GET['success'] === 'address_updated')
-                        echo "Adresse mise à jour avec succès.";
-                    if ($_GET['success'] === 'address_deleted')
-                        echo "Adresse supprimée avec succès.";
-                    // AJOUT ADRESSE - message de succès
-                    if ($_GET['success'] === 'address_added')
-                        echo "Adresse ajoutée avec succès.";
-                    ?>
-            </div>
-            <?php endif; ?>
 
             <!-- Section : Informations personnelles -->
             <section>
@@ -379,11 +356,21 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div>
                                 <label>
                                     <span>Civilité</span>
-                                    <input type="text" name="civilite"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['civilite'] ?? ''); ?>"
-                                        required>
+                                    <select name="civilite" required>
+                                        <option value="">-- Sélectionnez --</option>
+                                        <option value="M."
+                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'M.' ? 'selected' : ''; ?>>
+                                            M.</option>
+                                        <option value="Mme"
+                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Mme' ? 'selected' : ''; ?>>
+                                            Mme</option>
+                                        <option value="Inconnu"
+                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Inconnu' ? 'selected' : ''; ?>>
+                                            Inconnu</option>
+                                    </select>
                                 </label>
                             </div>
+
 
                             <div>
                                 <label>
@@ -430,7 +417,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <main>
                         <div>
                             <p>
-                                <strong><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
+                                <strong><?php echo htmlspecialchars($adresseIndividuelle['a_numero']) ; ?><?php echo ' ' ;?><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
                                 <?php echo htmlspecialchars($adresseIndividuelle['a_code_postal']); ?>
                                 <?php echo htmlspecialchars($adresseIndividuelle['a_ville']); ?>
                                 <?php if (!empty($adresseIndividuelle['a_complement'])): ?>
@@ -443,7 +430,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <footer>
                         <button type="button" onclick="ouvrirModalModificationAdresse(
     <?php echo $adresseIndividuelle['id_adresse']; ?>, 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_num'] ?? '', ENT_QUOTES); ?>', 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_numero'] ?? '', ENT_QUOTES); ?>', 
     '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', 
     '<?php echo htmlspecialchars($adresseIndividuelle['a_pays'] ?? 'France', ENT_QUOTES); ?>', 
     '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', 
@@ -490,8 +477,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <article>
                     <header>
                         <div>
-                            <span>N° Commande</span>
-                            <strong>#<?php echo htmlspecialchars($commandeIndividuelle['id_panier']); ?></strong>
+                            <span>Commande</span>
                         </div>
                         <span
                             data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
@@ -698,6 +684,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     <?php
     //inclure le pied de page du site
     include __DIR__ . '/../../partials/footer.html';
+    include __DIR__ . '/../../partials/toast.html';
     ?>
 
     <script>
@@ -738,7 +725,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         document.getElementById('modalModificationAdresse').style.display = 'none';
     }
 
-    // AJOUT ADRESSE - fonction pour ouvrir le modal d'ajout d'adresse
+    //fonction pour ouvrir le modal d'ajout d'adresse
     function ouvrirModalAjoutAdresse() {
         //réinitialiser les champs du formulaire
         document.getElementById('ajout_num').value = '';
@@ -750,7 +737,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         document.getElementById('modalAjoutAdresse').style.display = 'block';
     }
 
-    // AJOUT ADRESSE - fonction pour fermer le modal d'ajout d'adresse
+    //fonction pour fermer le modal d'ajout d'adresse
     function fermerModalAjoutAdresse() {
         document.getElementById('modalAjoutAdresse').style.display = 'none';
     }
@@ -941,6 +928,21 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     }
     </script>
 
+
+    <!-- Système de notifications -->
+    <script src="/js/notifications.js"></script>
+    <script>
+    // Afficher les notifications après le chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php if (isset($messageSucces) && $messageSucces !== null): ?>
+        notify(<?= json_encode($messageSucces) ?>, 'success');
+        <?php endif; ?>
+
+        <?php if (isset($messageErreur) && $messageErreur !== null): ?>
+        notify(<?= json_encode($messageErreur) ?>, 'error');
+        <?php endif; ?>
+    });
+    </script>
 </body>
 
 </html>

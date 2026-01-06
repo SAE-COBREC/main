@@ -375,11 +375,11 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                             <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
                             <div class="review-votes">
                                 <div class="vote-buttons">
-                                    <button class="ghost btn-vote" data-type="plus" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
-                                        <img src="/img/svg/plus.svg" alt="Plus" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
+                                    <button class="ghost btn-vote" data-type="J'aime" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
+                                        <img src="/img/svg/PouceHaut.svg" alt="J'aime" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
                                     </button>
-                                    <button class="ghost btn-vote" data-type="minus" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
-                                        <img src="/img/svg/minus.svg" alt="Moins" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
+                                    <button class="ghost btn-vote" data-type="Je n'aime pas" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
+                                        <img src="/img/svg/PouceBas.svg" alt="Je n'aime pas" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
                                     </button>
                                 </div>
                                 <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
