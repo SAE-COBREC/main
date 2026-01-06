@@ -4,7 +4,7 @@ include("config1.php");
 
 try {
     $dsn = "$driver:host=$serveur;port=$port;dbname=$dbname";
-    $pdo = new PDO($dsn, $user, $pass, [
+    $pdo = new PDO($dsn, $user, $password, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
