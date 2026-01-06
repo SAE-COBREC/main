@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    //AJOUT ADRESSE - traitement POST pour l'ajout d'une nouvelle adresse
+    //traitement POST pour l'ajout d'une nouvelle adresse
     if (isset($_POST['add_address'])) {
         $numSaisi = (int) ($_POST['num'] ?? 1);
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
@@ -188,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($resultatAjoutAdresse['success']) {
             $messageSucces = "Votre nouvelle adresse a été ajoutée avec succès";
-            // Recharger les adresses
+            //recharger les adresses
             $listeAdressesClient = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
         } else {
             $messageErreur = $resultatAjoutAdresse['message'];
@@ -274,16 +274,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     </header>
 
                     <main>
-                        <!-- Conteneur de l'image de profil -->
                         <div class="profile-image-container">
                             <?php if ($donneesImageProfilCompte !== null && $donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
-                            <!-- Afficher l'image de profil si elle existe -->
                             <img src="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien']); ?>"
                                 alt="<?php echo htmlspecialchars($donneesImageProfilCompte['i_alt'] ?? 'Photo de profil'); ?>"
                                 title="<?php echo htmlspecialchars($donneesImageProfilCompte['i_title'] ?? ''); ?>"
                                 class="profile-image" id="current-profile-image">
                             <?php else: ?>
-                            <!-- Afficher un placeholder si aucune image -->
                             <div class="profile-image-placeholder">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -296,7 +293,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                         <!-- Formulaire de mise à jour du profil -->
                         <form method="POST" id="profile-form">
-                            <!-- Zone de drag and drop pour l'image -->
                             <div id="drop-zone">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="48" height="48"
                                     style="margin-bottom: 10px;">
@@ -312,11 +308,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div id="preview-zone"></div>
                             <div id="upload-status" class="upload-status"></div>
 
-                            <!-- Champ caché pour stocker le chemin de l'image -->
                             <input type="hidden" name="lien_image" id="lien_image"
                                 value="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien'] ?? ''); ?>">
 
-                            <!-- Champs du formulaire -->
                             <div>
                                 <label>
                                     <span>Nom</span>
@@ -401,17 +395,14 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             <section>
                 <div>
                     <h2>Mes adresses</h2>
-                    <!-- AJOUT ADRESSE - bouton modifié pour ouvrir le modal -->
                     <button type="button" onclick="ouvrirModalAjoutAdresse()">
                         + Ajouter une adresse
                     </button>
                 </div>
 
                 <?php if (empty($listeAdressesClient)): ?>
-                <!-- Afficher un message si aucune adresse -->
                 <p>Aucune adresse enregistrée</p>
                 <?php else: ?>
-                <!-- Boucler sur chaque adresse du client -->
                 <?php foreach ($listeAdressesClient as $adresseIndividuelle): ?>
                 <article>
                     <main>
@@ -469,10 +460,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <h2>Mes dernières commandes</h2>
 
                 <?php if (empty($listeCommandesRecentes)): ?>
-                <!-- Afficher un message si aucune commande -->
                 <p>Aucune commande effectuée</p>
                 <?php else: ?>
-                <!-- Boucler sur chaque commande du client -->
                 <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
                 <article>
                     <header>
@@ -688,26 +677,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     ?>
 
     <script>
-    //gestion des onglets
-    const boutonsOnglets = document.querySelectorAll('.tab-btn');
-    const contenuOnglets = document.querySelectorAll('.tab-content');
-
-    //ajouter un événement sur chaque bouton d'onglet
-    boutonsOnglets.forEach(boutonOnglet => {
-        boutonOnglet.addEventListener('click', () => {
-            //récupérer le nom de l'onglet depuis l'attribut data-tab
-            const nomOnglet = boutonOnglet.getAttribute('data-tab');
-
-            //désactiver tous les onglets
-            boutonsOnglets.forEach(bouton => bouton.classList.remove('active'));
-            contenuOnglets.forEach(contenu => contenu.classList.remove('active'));
-
-            //activer l'onglet sélectionné
-            boutonOnglet.classList.add('active');
-            document.getElementById(nomOnglet + '-tab').classList.add('active');
-        });
-    });
-
     //fonction pour ouvrir le modal de modification d'adresse
     function ouvrirModalModificationAdresse(id, num, adresse, pays, ville, codePostal, complement) {
         document.getElementById('modification_num').value = num;
@@ -846,7 +815,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     //fonction pour gérer la sélection de fichier
     function gererSelectionFichier(evenement) {
-        //récupérer les fichiers sélectionnés
         const fichiersSelectionnes = evenement.target.files;
         if (fichiersSelectionnes.length > 0) {
             envoyerFichierVersServeur(fichiersSelectionnes[0]);
@@ -855,13 +823,12 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     //fonction pour envoyer un fichier vers le serveur
     function envoyerFichierVersServeur(fichierImage) {
-        //vérifier que c'est bien une image
         if (!fichierImage.type.startsWith('image/')) {
             afficherMessageStatut('Veuillez sélectionner une image valide (JPEG, PNG, GIF, WebP)', 'error');
             return;
         }
 
-        //vérifier la taille (max 5MB)
+        //vérifier la taille
         const tailleLimiteMegaOctets = 5 * 1024 * 1024;
         if (fichierImage.size > tailleLimiteMegaOctets) {
             afficherMessageStatut('L\'image est trop volumineuse (max 5 MB)', 'error');
@@ -926,13 +893,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             }, 5000);
         }
     }
-    </script>
 
-
-    <!-- Système de notifications -->
-    <script src="/js/notifications.js"></script>
-    <script>
-    // Afficher les notifications après le chargement de la page
+    //afficher les notifications après le chargement de la page
     document.addEventListener('DOMContentLoaded', function() {
         <?php if (isset($messageSucces) && $messageSucces !== null): ?>
         notify(<?= json_encode($messageSucces) ?>, 'success');
@@ -943,6 +905,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         <?php endif; ?>
     });
     </script>
+    <script src="/js/notifications.js"></script>
 </body>
 
 </html>
