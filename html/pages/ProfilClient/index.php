@@ -136,12 +136,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($resultatMiseAJourAdresse['success']) {
-            $url = 'index.php?success=address_updated';
-            echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-            exit;
-        } else {
-            $messageErreur = $resultatMiseAJourAdresse['message'];
-        }
+    $messageSucces = "Votre adresse a été modifiée avec succès";
+    // Recharger les adresses
+    $listeAdressesClient = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
+} else {
+    $messageErreur = $resultatMiseAJourAdresse['message'];
+}
+
     }
 
     //suppression d'une adresse
