@@ -310,14 +310,8 @@ article {
       gap: 0.5rem;
       margin-bottom: 1rem;
 
-      span:first-child {
-        color: $secondary-color-gris-fonce;
-        text-decoration: line-through;
-        font-size: 0.9rem;
-      }
-
       span:last-child {
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: bold;
         color: $primary-color-noir;
       }
@@ -334,6 +328,7 @@ article {
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 1.2em;
     @include transition(background);
 
     &:hover:not(:disabled) {
