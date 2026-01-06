@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //mise à jour d'une adresse
     if (isset($_POST['update_address'])) {
         $idAdresse = (int) $_POST['id_adresse'];
-        $numSaisi = (int) ($_POST['num'] ?? 0);
+        $numSaisi = (int) ($_POST['num'] ?? 1);
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
@@ -129,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $connexionBaseDeDonnees,
             $idAdresse,
             $identifiantCompteClient,
+            $numSaisi,
             $adresseSaisie,
             $villeSaisie,
             $codePostalSaisi,
@@ -169,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //AJOUT ADRESSE - traitement POST pour l'ajout d'une nouvelle adresse
     if (isset($_POST['add_address'])) {
-        $numSaisi = (int) ($_POST['num'] ?? 0);
+        $numSaisi = (int) ($_POST['num'] ?? 1);
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
@@ -178,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultatAjoutAdresse = ajouterNouvelleAdresse(
             $connexionBaseDeDonnees,
             $identifiantCompteClient,
+            $numSaisi,
             $adresseSaisie,
             $villeSaisie,
             $codePostalSaisi,
@@ -455,7 +457,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <footer>
                         <button type="button" onclick="ouvrirModalModificationAdresse(
     <?php echo $adresseIndividuelle['id_adresse']; ?>, 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_num'] ?? '', ENT_QUOTES); ?>', 
+    '<?php echo htmlspecialchars($adresseIndividuelle['a_numero'] ?? '', ENT_QUOTES); ?>', 
     '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', 
     '<?php echo htmlspecialchars($adresseIndividuelle['a_pays'] ?? 'France', ENT_QUOTES); ?>', 
     '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', 
@@ -750,7 +752,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         document.getElementById('modalModificationAdresse').style.display = 'none';
     }
 
-    // AJOUT ADRESSE - fonction pour ouvrir le modal d'ajout d'adresse
+    //fonction pour ouvrir le modal d'ajout d'adresse
     function ouvrirModalAjoutAdresse() {
         //réinitialiser les champs du formulaire
         document.getElementById('ajout_num').value = '';
@@ -762,7 +764,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         document.getElementById('modalAjoutAdresse').style.display = 'block';
     }
 
-    // AJOUT ADRESSE - fonction pour fermer le modal d'ajout d'adresse
+    //fonction pour fermer le modal d'ajout d'adresse
     function fermerModalAjoutAdresse() {
         document.getElementById('modalAjoutAdresse').style.display = 'none';
     }

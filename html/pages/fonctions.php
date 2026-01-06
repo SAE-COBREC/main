@@ -958,13 +958,11 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
         //requête SQL unique avec sous-requêtes JSON pour agréger toutes les données
         $requeteSQL = "
             SELECT 
-                -- informations du client
                 cl.id_client,
                 cl.c_nom,
                 cl.c_prenom,
                 cl.c_pseudo,
                 
-                -- informations du compte
                 co.id_compte,
                 co.email,
                 co.num_telephone,
@@ -981,7 +979,6 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
                 WHERE rc.id_compte = co.id_compte
                 LIMIT 1) as image_profil,
                 
-                -- toutes les adresses (agrégées en JSON)
                 (SELECT json_agg(
                     json_build_object(
                         'id_adresse', a.id_adresse,
@@ -994,7 +991,6 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
                 FROM cobrec1._adresse a
                 WHERE a.id_compte = co.id_compte) as adresses,
                 
-                -- historique des 5 dernières commandes (agrégé en JSON)
                 (SELECT json_agg(
                     json_build_object(
                         'id_panier', p.id_panier,
