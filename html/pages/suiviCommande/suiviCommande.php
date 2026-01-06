@@ -14,5 +14,5 @@
     <body>
         <h1>Votre suivi de commande ici et maintenant tout de suite là à l'instant T vu que vous le demandé en ayant cliqué sur le bouton</h1>
     </body>
-    <?php include __DIR__ . '/../../partials/footer.php';?>
+    <?php include __DIR__ . '/../../partials/footer.html';?>
 </html>
