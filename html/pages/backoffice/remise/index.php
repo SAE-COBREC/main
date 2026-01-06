@@ -26,13 +26,25 @@
                         $_SESSION["remise"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $_SESSION["remise"]['_GET'] = $_SESSION["remise"]['_GET'][0];
 
+
                         $sql = '
-                        SELECT id_vendeur FROM cobrec1._produit
-                        WHERE id_produit = (SELECT id_produit FROM cobrec1._en_reduction WHERE id_reduction = :modifier);'
+                        SELECT id_produit FROM cobrec1._en_reduction WHERE id_reduction = :modifier;'
                         ;
                         $stmt = $pdo->prepare($sql);
                         $params = [
                             'modifier' => $_GET['modifier']
+                        ];
+                        $stmt->execute($params);
+                        $_SESSION["remise"]['_GET']['produit'] = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['produit']['id_produit'];
+
+                        $sql = '
+                        SELECT id_vendeur FROM cobrec1._produit
+                        WHERE id_produit = :produit;'
+                        ;
+                        $stmt = $pdo->prepare($sql);
+                        $params = [
+                            'produit' => $_SESSION["remise"]['_GET']['produit']
                         ];
                         $stmt->execute($params);
                         $_SESSION["remise"]['_GET']['id_vendeur'] = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -94,9 +106,10 @@
                         //peuplement de _post et de remise
                         //print_r("peuplement\n");
                         $_POST = [];
-                        $_POST["pourcentage"] =null; //$_SESSION["remise"]['_GET']['reduction_pourcentage'];
-                        $_POST["debut"] =null; //$_SESSION["remise"]['_GET']['reduction_debut'];
-                        $_POST["fin"] =null; //$_SESSION["remise"]['_GET']['fin'];
+                        $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
+                        $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
+                        $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
+                        $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
                         $_SESSION["remise"]['etat'] = 'svg';
 
                     }
@@ -248,33 +261,9 @@ if ($_POST !== []) {
             <?php
             if(empty($_SESSION["remise"]['_GET']['id_reduction']) == false){//si la page est en mode US modification
                 ?>
-                <input type="submit" name="svgModif" title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" accesskey="s"/>
-                <input class="orange" type="submit" name="enLigne"title="Un article en ligne est visible par les clients." value="Mettre en ligne" />
-                <input class="orange" type="submit" name="horsLigne"title="Un article hors ligne n'est plus visible que vous." value="Mettre hors ligne" />
-                <script>
-                    const btnEnLigne = document.querySelector("input[name='enLigne']");
-                    const btnHorsLigne = document.querySelector("input[name='horsLigne']");
-                </script>
+                <input type="submit" class="orange" name="svgModif" title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" accesskey="s"/>
+                <input type="submit" name="suppr" title="Supprimer la remise." value="Supprimer la remise" accesskey="d"/>
                 <?php
-                if ($_SESSION["remise"]['etat'] == 'pasSvg'){
-                    //si article hors ligne
-                ?>
-                
-                <script>
-                    btnHorsLigne.disabled = true;
-                    btnEnLigne.disabled = false;
-                    //grisage du bouton hors ligne et dégrisage du bouton en ligne
-                </script>
-            <?php
-                }else{//sinon
-                    ?>
-                    <script>
-                    btnHorsLigne.disabled = false;
-                    btnEnLigne.disabled = true;
-                    //grisage du bouton en ligne et dégrisage du bouton hors ligne
-                    </script>
-                <?php
-                }
             }else{
                 ?>
             <input class="orange" type="submit" name="publier"title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier la remise dans le catalogue client" />
@@ -282,8 +271,6 @@ if ($_POST !== []) {
             </form>
             <script>
             const btnAnnuler = document.querySelector("input[value='Annuler']");
-            // const btnEnLigne = document.querySelector("input[name='enLigne']");
-            // const btnHorsLigne = document.querySelector("input[name='horsLigne']");
             btnAnnuler.addEventListener('click', () => {//si clic sur Annuler
                 if (confirm("Êtes-vous certain de vouloir annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
                     document.location.href="/pages/backoffice/index.php"; 
@@ -298,22 +285,6 @@ if ($_POST !== []) {
             function publier(){//si clic sur publier et pas de warnings
                 alert("Votre article a bien été publié.");
                 document.location.href = "/pages/backoffice/index.php"; 
-            }
-
-            function enLigne(){//si clic sur en ligne et pas de warnings
-                if (confirm("Votre article a bien été mis en ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
-                    btnHorsLigne.disabled = false;
-                    btnEnLigne.disabled = true;
-                }else{document.location.href="/pages/backoffice/index.php"; 
-                }
-            }
-
-            function horsLigne(){//si clic sur hors ligne et pas de warnings
-                if (confirm("Votre article a bien été mis hors ligne. Souhaitez-vous continuer à modifier l'article ?.")) {
-                    btnHorsLigne.disabled = true;
-                    btnEnLigne.disabled = false;
-                }else{document.location.href="/pages/backoffice/index.php"; 
-                }
             }
 
             function svgModif(){//si clic sur svgModif et pas de warnings
@@ -333,12 +304,6 @@ if ($_POST !== []) {
                             //sert à ne pas avoir de warnings php sur le serv
                             if (empty($_POST["publier"])){
                                 $_POST["publier"] = '';
-                            }
-                            if (empty($_POST["horsLigne"])){
-                                $_POST["horsLigne"] = '';
-                            }
-                            if (empty($_POST["enLigne"])){
-                                $_POST["enLigne"] = '';
                             }
                             if (empty($_POST["svgModif"])){
                                 $_POST["svgModif"] = '';
@@ -394,7 +359,7 @@ if ($_POST !== []) {
     <?php
                     }
                     
-                }else if (($_POST["horsLigne"] == "Mettre hors ligne") || ($_POST["enLigne"] == "Mettre en ligne")){
+                }else if ($_POST["svgModif"] == "Sauvegarder les modifications"){
                     //Si pas de warning et formulaire soumis via le bouton Mettre en ligne/hors ligne
                     $time = time();
                     
@@ -442,28 +407,6 @@ if ($_POST !== []) {
                             $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre reduction et produit";
                             $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                         }
-                    }
-
-
-
-                    if ($_POST["horsLigne"] == "Mettre hors ligne"){
-                        ?>
-                    <script>
-                        horsLigne();
-                    </script>
-                    <?php 
-                    
-
-                
-                    }else if ($_POST["enLigne"] == "Mettre en ligne"){
-
-                        
-                    ?>
-                    <script>
-                        enLigne();
-                    </script>
-
-    <?php
                     }
                 }
 

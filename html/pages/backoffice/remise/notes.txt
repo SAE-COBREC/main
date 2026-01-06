@@ -1,0 +1,1 @@
+Créer une f() en BDD qui regarde si pour un même produit les dates se recoupent pas
