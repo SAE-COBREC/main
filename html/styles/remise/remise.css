@@ -1,0 +1,115 @@
+* {
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  overflow: auto;
+  background-color: #FFF2E9;
+  height: 1024px;
+  width: 1440px;
+  font-family: "Quicksand", sans-serif;
+}
+body main {
+  padding: 1px 36px;
+}
+body main form > input {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+  background: #FFFFFF;
+  border: 1px solid #ecd9c6;
+  color: #030212;
+  margin-bottom: 2em;
+}
+body main form input[type=submit] {
+  cursor: pointer;
+}
+body main form > .orange {
+  background: #CD7F32;
+  color: #fff;
+  box-shadow: 0 4px 0.1em rgba(205, 127, 50, 0.12);
+}
+body main form > *:disabled {
+  background: #c0c0c0;
+}
+body main div {
+  display: grid;
+  gap: 2em;
+}
+body main section {
+  grid-column: 1;
+  grid-row: 1;
+  background: white;
+  border-radius: 0.1em;
+  padding: 14px;
+  border: 1px solid #ecd9c6;
+  border-radius: 14px;
+}
+body main section h3 {
+  font-weight: bold;
+}
+body main section article {
+  padding: 0.3em;
+  margin-bottom: 0.3em;
+}
+body main section article label {
+  font-weight: bold;
+}
+body main section article img {
+  position: relative;
+  transition: all 0.5s ease 0.25s;
+  transform: scale(1, 1);
+  z-index: 0;
+}
+body main section article img:hover {
+  transition: all 0.5s ease 0.25s;
+  transform: scale(2, 2);
+  z-index: 1;
+}
+body main section article > input, body main section article textarea, body main section article select, body main section article option {
+  border: 1px solid #ecd9c6;
+  background-color: white;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  width: 40em;
+  padding: 0.6em;
+}
+body main section:nth-of-type(4) {
+  background: #FFF7F1;
+}
+body main section:nth-of-type(4) input {
+  background: #FFF7F1;
+}
+body main .warn {
+  color: red;
+}
+body main #photo {
+  border: 2px dashed #ecd9c6;
+  border-radius: 0.1em;
+  padding: 28px;
+  text-align: center;
+  color: #8b7a6a;
+}
+body main section:nth-child(2) {
+  grid-row: 2;
+}
+body main section:nth-child(3), body main section:nth-child(4) {
+  grid-column: 2;
+}
+body main section:nth-child(3) input, body main section:nth-child(3) textarea, body main section:nth-child(3) select, body main section:nth-child(3) option, body main section:nth-child(4) input, body main section:nth-child(4) textarea, body main section:nth-child(4) select, body main section:nth-child(4) option {
+  width: 20em;
+  padding: 0.6em;
+}
+body main section:nth-child(3) {
+  grid-row: 1;
+}
+body main section:nth-child(4) {
+  grid-row: 2;
+}/*# sourceMappingURL=remise.css.map */

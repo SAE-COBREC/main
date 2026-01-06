@@ -1,0 +1,12 @@
+"reduc ne vous appartient pas","Array != 1"
+"reduc ne vous appartient pas"," != 1"
+"reduc ne vous appartient pas","10 != 1"
+"reduc ne vous appartient pas"," != 1"
+"verif titre","PDOException: SQLSTATE[21000]: Cardinality violation: 7 ERREUR:  plus d'une ligne renvoyée par une sous-requête utilisée comme une expression in /media/sf_dossier_partage/main/html/pages/backoffice/remise/index.php:37
+Stack trace:
+#0 /media/sf_dossier_partage/main/html/pages/backoffice/remise/index.php(37): PDOStatement->execute()
+#1 {main}"
+"verif titre","PDOException: SQLSTATE[21000]: Cardinality violation: 7 ERREUR:  plus d'une ligne renvoyée par une sous-requête utilisée comme une expression in /media/sf_dossier_partage/main/html/pages/backoffice/remise/index.php:37
+Stack trace:
+#0 /media/sf_dossier_partage/main/html/pages/backoffice/remise/index.php(37): PDOStatement->execute()
+#1 {main}"

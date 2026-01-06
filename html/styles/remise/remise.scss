@@ -1,0 +1,137 @@
+@use "../variable" as *;
+
+$card: #ecd9c6;
+
+body{
+    display: flex;
+    flex-direction: row;
+    margin:0;
+    overflow: auto;
+    background-color: $secondary-color-marron-clair;
+    height: 1024px;
+    width: 1440px;
+    font-family: $font-family-secondaire;
+
+    main{
+        padding:1px 36px;
+        form{
+            > input{
+                position: relative;
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-weight: 700;
+                border: 0;
+                cursor: pointer;
+                background: $primary-color-blanc;
+                border: 1px solid #ecd9c6;
+                color: #030212;
+                margin-bottom: 2em;
+            }
+            input[type=submit] {
+                cursor: pointer;
+            }
+            > .orange{
+                background: $primary-color-bronze;
+                color: #fff;
+                box-shadow: 0 4px 0.1em rgba(205,127,50,0.12);
+            }
+            > *:disabled{
+                background: $secondary-color-gris-fonce;
+            }
+        }
+
+        div {
+            display:grid;
+            // grid-template-columns:2fr 1fr;
+            gap:2em;
+            // height:calc(100% - 70px);
+        }
+
+        section{
+            grid-column:1;
+            grid-row:1;
+            //width: 630px;
+            background:white;
+            border-radius:0.1em;
+            padding:14px;
+            border:1px solid $card;
+            border-radius: $border-radius-primary;
+
+            h3{
+                font-weight: bold;
+            }
+            article{
+                padding: 0.3em;
+                margin-bottom: 0.3em;
+
+                label{
+                    font-weight: bold;
+                }
+                
+                img{
+                    position: relative;
+                    transition: all 0.5s ease 0.25s;
+                    transform: scale(1,1);
+                    z-index: 0;
+                }
+                img:hover{
+                    transition: all 0.5s ease 0.25s;
+                    transform: scale(2,2);
+                    z-index: 1;
+                }
+
+                > input, textarea, select, option{
+                    border:1px solid $card;
+                    background-color: white;
+                    border-radius: 8px;
+                    font: {
+                        family:inherit;
+                        size: 15px;
+                    }
+                    width:40em;
+                    padding:0.6em;
+                }
+            }
+        }
+        section:nth-of-type(4){
+            background:$secondary-color-rose-claire;
+
+            input{
+                background:$secondary-color-rose-claire;
+            }
+        }
+        .warn{
+            color:red;
+        }
+
+        #photo {
+            border:2px dashed #ecd9c6;
+            border-radius:0.1em;
+            padding:28px;
+            text-align:center;
+            color:#8b7a6a;
+        }
+
+        section:nth-child(2){
+            grid-row:2;
+        }
+    
+        section:nth-child(3), section:nth-child(4){
+            //width: 360px;
+            //max-height: 15em;
+            grid-column: 2;
+            input, textarea, select, option{
+                width: 20em;
+                padding:0.6em;
+            }
+        }
+
+        section:nth-child(3){
+            grid-row:1;
+        }
+
+        section:nth-child(4){
+            grid-row:2;
+        }
+    }
+}
