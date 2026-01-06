@@ -35,7 +35,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 
 //initialiser la variable pour les messages d'erreur
 $messageErreur = null;
-$messageSucces = null;  // Variable pour les messages de succès
+$messageSucces = null;
 
 //récupérer l'identifiant du compte associé au client
 $identifiantCompteClient = recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClientConnecte);
@@ -84,7 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationProfil['success']) {
             $messageSucces = "Vos informations ont été mises à jour avec succès";
-            // Recharger les données
             $donneesInformationsClient = recupererInformationsCompletesClient($connexionBaseDeDonnees, $identifiantClientConnecte);
         } else {
             $messageErreur = $resultatModificationProfil['message'];
@@ -137,7 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($resultatMiseAJourAdresse['success']) {
     $messageSucces = "Votre adresse a été modifiée avec succès";
-    // Recharger les adresses
     $listeAdressesClient = recupererToutesAdressesClient($connexionBaseDeDonnees, $identifiantCompteClient);
 } else {
     $messageErreur = $resultatMiseAJourAdresse['message'];
@@ -711,153 +709,108 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         document.getElementById('modalAjoutAdresse').style.display = 'none';
     }
 
-    //fonction pour prévisualiser l'image depuis une URL
+    const champCacheLienImage = document.getElementById('lien_image');
+    const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
+
     function previsualiserImageDepuisURL() {
-        //récupérer les éléments du DOM
         const champSaisieURL = document.getElementById('url_image_input');
-        const champCacheLienImage = document.getElementById('lien_image');
-        const elementImageActuelle = document.getElementById('current-profile-image');
         const urlImageSaisie = champSaisieURL.value.trim();
 
-        //vérifier si une URL a été saisie
         if (!urlImageSaisie) {
             alert('Veuillez saisir une URL d\'image');
             return;
         }
 
-        //vérifier si l'URL est valide
         try {
             new URL(urlImageSaisie);
-        } catch (erreur) {
+        } catch {
             alert('URL invalide. Veuillez saisir une URL complète (ex: https://exemple.com/image.jpg)');
             return;
         }
 
-        //tester si l'image se charge correctement
         const imageTest = new Image();
-
-        //si l'image se charge avec succès
         imageTest.onload = function() {
-            //mettre à jour l'affichage de l'image
+            const elementImageActuelle = document.getElementById('current-profile-image');
             if (elementImageActuelle) {
                 elementImageActuelle.src = urlImageSaisie;
             } else {
-                //créer l'image si elle n'existe pas
-                const conteneurImage = document.querySelector('.profile-image-container');
-                conteneurImage.innerHTML =
+                document.querySelector('.profile-image-container').innerHTML =
                     `<img src="${urlImageSaisie}" alt="Photo de profil" class="profile-image" id="current-profile-image">`;
             }
-
-            //mettre à jour le champ caché
             champCacheLienImage.value = urlImageSaisie;
-
             alert('Image chargée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.');
         };
-
-        //si l'image ne se charge pas
         imageTest.onerror = function() {
             alert(
                 'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.'
             );
         };
-
         imageTest.src = urlImageSaisie;
     }
 
-    //déclaration des variables pour le drag and drop
     const zoneDepotFichier = document.getElementById('drop-zone');
     const champSelectionFichier = document.getElementById('file-input');
     const zoneApercuImage = document.getElementById('preview-zone');
     const zoneStatutUpload = document.getElementById('upload-status');
-    const champCacheLienImage = document.getElementById('lien_image');
-    const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
 
-    //clic sur la zone pour ouvrir le sélecteur de fichier
     zoneDepotFichier.addEventListener('click', () => champSelectionFichier.click());
 
-    //empêcher le comportement par défaut du navigateur pour le drag and drop
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(nomEvenement => {
-        zoneDepotFichier.addEventListener(nomEvenement, empecherComportementParDefaut, false);
-        document.body.addEventListener(nomEvenement, empecherComportementParDefaut, false);
-    });
-
-    //fonction pour empêcher le comportement par défaut
     function empecherComportementParDefaut(evenement) {
         evenement.preventDefault();
         evenement.stopPropagation();
     }
 
-    //effet visuel lors du drag
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(nomEvenement => {
+        zoneDepotFichier.addEventListener(nomEvenement, empecherComportementParDefaut);
+        document.body.addEventListener(nomEvenement, empecherComportementParDefaut);
+    });
+
     ['dragenter', 'dragover'].forEach(nomEvenement => {
-        zoneDepotFichier.addEventListener(nomEvenement, () => {
-            zoneDepotFichier.classList.add('drag-over');
-        });
+        zoneDepotFichier.addEventListener(nomEvenement, () => zoneDepotFichier.classList.add('drag-over'));
     });
 
     ['dragleave', 'drop'].forEach(nomEvenement => {
-        zoneDepotFichier.addEventListener(nomEvenement, () => {
-            zoneDepotFichier.classList.remove('drag-over');
-        });
+        zoneDepotFichier.addEventListener(nomEvenement, () => zoneDepotFichier.classList.remove('drag-over'));
     });
 
-    //gestion du drop de fichier
     zoneDepotFichier.addEventListener('drop', gererDepotFichier);
     champSelectionFichier.addEventListener('change', gererSelectionFichier);
 
-    //fonction pour gérer le dépôt de fichier
     function gererDepotFichier(evenement) {
-        //récupérer les fichiers déposés
         const fichiersDePoses = evenement.dataTransfer.files;
-        if (fichiersDePoses.length > 0) {
-            envoyerFichierVersServeur(fichiersDePoses[0]);
-        }
+        if (fichiersDePoses.length > 0) envoyerFichierVersServeur(fichiersDePoses[0]);
     }
 
-    //fonction pour gérer la sélection de fichier
     function gererSelectionFichier(evenement) {
         const fichiersSelectionnes = evenement.target.files;
-        if (fichiersSelectionnes.length > 0) {
-            envoyerFichierVersServeur(fichiersSelectionnes[0]);
-        }
+        if (fichiersSelectionnes.length > 0) envoyerFichierVersServeur(fichiersSelectionnes[0]);
     }
 
-    //fonction pour envoyer un fichier vers le serveur
     function envoyerFichierVersServeur(fichierImage) {
         if (!fichierImage.type.startsWith('image/')) {
             afficherMessageStatut('Veuillez sélectionner une image valide (JPEG, PNG, GIF, WebP)', 'error');
             return;
         }
 
-        //vérifier la taille
-        const tailleLimiteMegaOctets = 5 * 1024 * 1024;
-        if (fichierImage.size > tailleLimiteMegaOctets) {
+        if (fichierImage.size > 5 * 1024 * 1024) {
             afficherMessageStatut('L\'image est trop volumineuse (max 5 MB)', 'error');
             return;
         }
 
-        //créer un objet FormData pour envoyer le fichier
         const donneesFormulaireUpload = new FormData();
         donneesFormulaireUpload.append('image', fichierImage);
         donneesFormulaireUpload.append('id_client', identifiantClientConnecte);
 
-        //afficher un aperçu de l'image
         const lecteurFichier = new FileReader();
         lecteurFichier.onload = (evenement) => {
-            //afficher l'aperçu dans la zone dédiée
             zoneApercuImage.innerHTML = `<img src="${evenement.target.result}" alt="Aperçu">`;
-
-            //mettre à jour l'image de profil actuelle si elle existe
             const elementImageActuelle = document.getElementById('current-profile-image');
-            if (elementImageActuelle) {
-                elementImageActuelle.src = evenement.target.result;
-            }
+            if (elementImageActuelle) elementImageActuelle.src = evenement.target.result;
         };
         lecteurFichier.readAsDataURL(fichierImage);
 
-        //afficher le message d'upload en cours
         afficherMessageStatut('Upload en cours...', 'success');
 
-        //envoyer le fichier au serveur via fetch
         fetch('upload_image.php', {
                 method: 'POST',
                 body: donneesFormulaireUpload
@@ -865,7 +818,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             .then(reponse => reponse.json())
             .then(donneesReponse => {
                 if (donneesReponse.success) {
-                    //mettre à jour le champ caché avec le chemin local sous /img/clients/[i_alt].[image_format]
                     champCacheLienImage.value = donneesReponse.path;
                     afficherMessageStatut(
                         'Image uploadée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.',
@@ -880,21 +832,14 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             });
     }
 
-    //fonction pour afficher un message de statut
     function afficherMessageStatut(messageTexte, typeMessage) {
-        //afficher le message dans la zone de statut
         zoneStatutUpload.textContent = messageTexte;
         zoneStatutUpload.className = 'upload-status ' + typeMessage;
-
-        //masquer le message après 5 secondes si succès
         if (typeMessage === 'success') {
-            setTimeout(() => {
-                zoneStatutUpload.style.display = 'none';
-            }, 5000);
+            setTimeout(() => zoneStatutUpload.style.display = 'none', 5000);
         }
     }
 
-    //afficher les notifications après le chargement de la page
     document.addEventListener('DOMContentLoaded', function() {
         <?php if (isset($messageSucces) && $messageSucces !== null): ?>
         notify(<?= json_encode($messageSucces) ?>, 'success');
@@ -904,6 +849,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         notify(<?= json_encode($messageErreur) ?>, 'error');
         <?php endif; ?>
     });
+    </script>
     </script>
     <script src="/js/notifications.js"></script>
 </body>
