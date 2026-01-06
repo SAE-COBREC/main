@@ -21,6 +21,7 @@ if(empty($_SESSION['vendeur_id']) === false){
 
 // Initialisation d'un tableau vide pour stocker éventuellement de nouveaux articles
 $_SESSION['creerArticle'] = [];
+$_SESSION['remise'] = [];
 $fichiers = glob('create/temp_/*');
 foreach ($fichiers as $value) {
   unlink($value);

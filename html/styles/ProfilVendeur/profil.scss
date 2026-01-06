@@ -112,7 +112,7 @@ body {
     color: $primary-color-noir;
   }
 
-  input {
+  input, select{
     padding: 12px 16px;
     border-radius: $border-radius-primary;
     border: 1px solid $secondary-color-orange-clair;
@@ -236,4 +236,3 @@ body {
 .popup-error.show {
     opacity: 1;
 }
-

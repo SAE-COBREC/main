@@ -51,6 +51,9 @@ try {
             c.mdp,
             c.email AS email,
             c.num_telephone AS telephone,
+            c.prenom as prenom,
+            c.nom as nom,
+            c.civilite as sexe,
             a.a_adresse AS adresse,
             a.a_code_postal AS codep,
             a.a_ville AS ville,
@@ -130,6 +133,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /* ---------------------------------------------------------
        2. Mise à jour table _compte
     --------------------------------------------------------- */
+    // NOM
+    if (isset($_POST['nom']) && $_POST['nom'] !== $old['nom']) { 
+
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._compte
+            SET nom = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['nom']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+    // PRENOM
+    if (isset($_POST['prenom']) && $_POST['prenom'] !== $old['prenom']) {
+
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._compte
+            SET prenom = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['prenom']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+    // CIVILITE
+    if (isset($_POST['sexe']) && $_POST['sexe'] !== $old['sexe']) {
+
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._compte
+            SET civilite = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['sexe']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
 
     // EMAIL
     if (isset($_POST['email']) && $_POST['email'] !== $old['email']) {
@@ -388,20 +432,31 @@ function safe($array, $key, $default = "") {
 
           <div class="form-row">
             <label>Nom</label>
-            <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
-            <span class="error" id="error-pseudo"></span>
+            <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'nom') ?>" required>
+            <span class="error" id="error-nom"></span>
           </div>
 
           <div class="form-row">
             <label>Prénom</label>
-            <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
-            <span class="error" id="error-pseudo"></span>
+            <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'prenom') ?>" required>
+            <span class="error" id="error-prenom"></span>
           </div>
 
           <div class="form-row">
             <label>Civilité</label>
-            <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
-            <span class="error" id="error-pseudo"></span>
+            <select name="civilite" required>
+                <option value="">-- Sélectionnez --</option>
+                <option value="M."
+                    <?php echo ( safe($vendeur, 'sexe') ?? '') === 'M.' ? 'selected' : ''; ?>>
+                    M.</option>
+                <option value="Mme"
+                    <?php echo (safe($vendeur, 'sexe') ?? '') === 'Mme' ? 'selected' : ''; ?>>
+                    Mme</option>
+                <option value="Inconnu"
+                    <?php echo (safe($vendeur, 'sexe') ?? '') === 'Inconnu' ? 'selected' : ''; ?>>
+                    Inconnu</option>
+            </select>
+            <span class="error" id="error-civilte"></span>
           </div>
 
           <div class="form-row">
@@ -515,6 +570,8 @@ function safe($array, $key, $default = "") {
   <script>
     // REGEX
     const regex = {
+        nom: /^[a-zA-Z0-9 _-]{2,30}$/,
+        prenom: /^[a-zA-Z0-9 _-]{2,30}$/,
         pseudo: /^[a-zA-Z0-9 _-]{2,30}$/,
         rsociale: /^[a-zA-Z0-9À-ÿ' -]{2,50}$/,
         siren: /^[0-9]{9}$/,
