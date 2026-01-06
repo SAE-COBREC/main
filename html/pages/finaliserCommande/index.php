@@ -8,8 +8,9 @@ if (isset($_SESSION['idClient'])) {
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
-            SELECT c_nom
+            SELECT nom
             FROM _client
+            JOIN _compte ON _client.id_compte = _compte.id_compte
             WHERE id_client = :id_client";
 
     $stmt = $pdo->prepare($requetePanier);
@@ -18,8 +19,20 @@ if (isset($_SESSION['idClient'])) {
         ':id_client' => $id_client
     ]);
 
-
     $nom = $stmt->fetch();
+
+    $requeteAdresse = "SELECT a_adresse, a_ville, a_code_postal, a_pays
+            FROM _client
+            JOIN _compte ON _client.id_compte = _compte.id_compte
+            JOIN _adresse ON _compte.id_compte = _adresse.id_compte
+            WHERE id_client = :id_client";
+    $stmt = $pdo->prepare($requeteAdresse);
+
+    $stmt->execute([
+        ':id_client' => $id_client
+    ]);
+    $adresses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
     //recalcul du total directement depuis la base de donnees  pour éviter les problème de modification de variable en javascipt
     $reqTotal = "
@@ -161,15 +174,15 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['p
                     <input name="cvc" id="cvc" type="text" required maxlength="3" minlength="3" placeholder="CVC" />
                 </div>
             </div>
-            <h2>Adresse de facturation</h2>
-
-            <label>Nom *</label>
+            <label>Nom du titulaire *</label>
             <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"
-                value="<?php echo $nom['c_nom'] ?>" />
-
-            <label>Pays *</label>
-            <input name="pays" id="pays" type="text" required maxlength="100" placeholder="ex: France" />
-
+                value="<?php echo $nom['nom'] ?>" />
+            <h2>Adresse de facturation</h2>
+            <select>
+            <?php foreach($adresses as $adresse) : ?>
+                <option value="<?php echo $adresse ?>"><?php echo $adresse["a_adresse"] . " (" . $adresse["a_code_postal"] . ") " . $adresse["a_ville"];?></option>
+            <?php endforeach; ?>
+            </select>
             <div class="checkBox">
                 <div>
                     <input name="conditions" id="conditions" type="checkbox" required />
