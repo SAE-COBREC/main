@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $rue = htmlspecialchars($_POST['rue'] ?? '', ENT_QUOTES, 'UTF-8');
   $codeP = htmlspecialchars($_POST['codeP'] ?? '', ENT_QUOTES, 'UTF-8');
   $commune = htmlspecialchars($_POST['commune'] ?? '', ENT_QUOTES, 'UTF-8');
+  $civilite = htmlspecialchars($_POST['civilite'] ?? '', ENT_QUOTES, 'UTF-8');
   $mdp = $_POST['mdp'] ?? '';
   $Cmdp = $_POST['Cmdp'] ?? '';
 
@@ -88,13 +89,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!$hasError && isset($_POST['action']) === false) {
     try {
       //insertion dans la bdd des données de compte
-      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription)
-              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP)';
+      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite,nom,prenom)
+              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom)';
       $stmt = $pdo->prepare($sql);
       $stmt->execute([
         'email' => $email,
         'telephone' => $telephone,
-        'mdp' => $mdp
+        'mdp' => $mdp,
+        'civilite' => $civilite,
+        'nom' => $nom,
+        'prenom' => $prenom
       ]);
 
       // Récupérer l'id du compte créé
@@ -106,14 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['idCompte'] = $id_compte;
 
         //insérer les informations client
-        $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_prenom, c_nom, c_datenaissance)
-                VALUES (:id_compte, :pseudo, :prenom, :nom, :datenaissance)';
+        $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_datenaissance)
+                VALUES (:id_compte, :pseudo, :datenaissance)';
         $stmtClient = $pdo->prepare($sqlClient);
         $stmtClient->execute([
           'id_compte' => $id_compte,
           'pseudo'    => $pseudo,
-          'prenom'    => $prenom,
-          'nom'       => $nom,
           'datenaissance' => $naissance
         ]);
 
@@ -306,7 +308,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <input type="text" id="commune" name="commune" placeholder="ex:lannion" required>
         </div>
       </div>
-
+      <div>
+          <label>Civilité</label>
+          <div class="radio-group">
+            <label><input type="radio" name="civilite" value="Homme" required> Homme</label>
+            <label><input type="radio" name="civilite" value="Femme" required> Femme</label>
+            <label><input type="radio" name="civilite" value="Autre" required> Autre</label>
+          </div>
+        </select>
+      </div>
       <div class="error">
       </div>
 
@@ -344,15 +354,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       <div>
-        <label for="mdp">Mot de passe</label>
-        <input type="password" id="mdp" name="mdp" placeholder="***********" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
+        <label for="mdp">Mot de passe </label>
+        <input type="password" id="mdp" name="mdp" placeholder="8-16 caractère,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
       </div>
 
       <div>
         <label for="Cmdp">Confirmer le mot de passe</label>
-        <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" value="" required>
+        <input type="password" id="Cmdp" name="Cmdp" placeholder="8-16 caractère,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" required>
       </div>
 
+      <div>
+        <label><input type="checkbox" id="cgv" name="cgv" required> J'accepte les conditions générales de vente</label>
+      </div>
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 4): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>

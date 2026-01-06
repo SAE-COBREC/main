@@ -109,6 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $rue = htmlspecialchars($_POST['rue'] ?? '', ENT_QUOTES, 'UTF-8');
   $codeP = htmlspecialchars($_POST['codeP'] ?? '', ENT_QUOTES, 'UTF-8');
   $commune = htmlspecialchars($_POST['commune'] ?? '', ENT_QUOTES, 'UTF-8');
+  $nom = htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8');
+  $prenom = htmlspecialchars($_POST['prenom'] ?? '', ENT_QUOTES, 'UTF-8');
   $mdp = $_POST['mdp'] ?? '';
   $Cmdp = $_POST['Cmdp'] ?? '';
 
@@ -121,13 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
 
       // Insertion dans la bdd des données de compte
-      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription)
-              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP)';
+      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription,prenom,nom)
+              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :prenom, :nom)';
       $stmt = $pdo->prepare($sql);
       $stmt->execute([
         'email' => $email,
         'telephone' => $telephone,
-        'mdp' => $mdp
+        'mdp' => $mdp,
+        'nom' => $nom,
+        'prenom' => $prenom
       ]);
 
       // Récupérer l'id du compte créé
@@ -172,8 +176,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
     } catch (Exception $e) {
       $hasError = true;
-      $error_card = 4; 
+      $error_card = 4;
       $error_message = 'Une erreur est survenue lors de la création du compte.';
+
+      // Écriture de l'erreur dans le CSV bdd_errors.csv
+      $csvFile = __DIR__ . '/bdd_errors.csv';
+      $date = date('Y-m-d H:i:s');
+      $user = isset($_SESSION['idCompte']) ? $_SESSION['idCompte'] : 'inconnu';
+      $errorData = [
+        $date,
+        $user,
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine()
+      ];
+      $header = ['date', 'id_compte', 'message', 'fichier', 'ligne'];
+      $writeHeader = !file_exists($csvFile) || filesize($csvFile) === 0;
+      $fp = fopen($csvFile, 'a');
+      if ($fp) {
+        if ($writeHeader) {
+          fputcsv($fp, $header);
+        }
+        fputcsv($fp, $errorData);
+        fclose($fp);
+      }
     }
 
 
@@ -272,6 +298,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
       </div>
 
+      <div>
+        <label for="Rsociale">Nom</label>
+        <input type="text" id="nom" name="nom" placeholder="Votre Nom" maxlength="254" required>
+      </div>
+
+      <div>
+        <label for="Rsociale">Prenom</label>
+        <input type="text" id="prenom" name="prenom" placeholder="Votre Prenom" maxlength="254" required>
+      </div>
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 2): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>

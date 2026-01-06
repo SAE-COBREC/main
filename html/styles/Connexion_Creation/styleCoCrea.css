@@ -452,4 +452,58 @@ body.centered {
   .debutant > a:hover {
     color: #030212;
   }
+}
+.radio-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+.radio-group label {
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+.radio-group label input[type=radio] {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  accent-color: #7171A3;
+}
+@media screen and (max-width: 508px) {
+  .radio-group {
+    gap: 20px;
+  }
+  .radio-group label {
+    font-size: 14px;
+  }
+  .radio-group label input[type=radio] {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.card label:has(input#cgv) {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding-left: 0;
+}
+.card label:has(input#cgv) input[type=checkbox] {
+  width: 14px;
+  height: 14px;
+  accent-color: #7171A3;
+}
+
+@media screen and (max-width: 508px) {
+  .card label:has(input#cgv) input[type=checkbox] {
+    width: 12px;
+    height: 12px;
+  }
 }/*# sourceMappingURL=styleCoCrea.css.map */

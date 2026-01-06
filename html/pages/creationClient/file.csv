@@ -1,2 +1,0 @@
-"SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column ""c_datenaissance"" of relation ""_client"" violates not-null constraint
-DETAIL:  Failing row contains (9, 13, dsvsdv, dvsdsv, dsvdsvdsv, 0, 0, f, null)."

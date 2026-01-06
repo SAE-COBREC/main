@@ -489,3 +489,66 @@ body {
     }
   }
 }
+
+// Civilité - boutons radio sur une seule ligne
+.radio-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+
+  label {
+    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 0;
+    margin-bottom: 0;
+
+    input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
+      accent-color: $primary-color-bleu;
+    }
+  }
+
+  @media #{$mobile} {
+    gap: 20px;
+
+    label {
+      font-size: 14px;
+
+      input[type="radio"] {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+// CGV checkbox - texte à gauche, checkbox à droite
+.card label:has(input#cgv) {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding-left: 0;
+
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: $primary-color-bleu;
+  }
+}
+
+@media #{$mobile} {
+  .card label:has(input#cgv) {
+    input[type="checkbox"] {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}
