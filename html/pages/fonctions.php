@@ -693,7 +693,7 @@ function chargerProduitBDD($pdo, $idProduit) {
 
         if (!$produit) return null;
 
-        // Images
+        //pour les images
         $stmtImgs = $pdo->prepare("SELECT i.i_lien
                                     FROM _represente_produit rp
                                     JOIN _image i ON rp.id_image = i.id_image
@@ -702,7 +702,7 @@ function chargerProduitBDD($pdo, $idProduit) {
         $stmtImgs->execute([':pid' => $idProduit]);
         $images = $stmtImgs->fetchAll(PDO::FETCH_COLUMN) ?: [];
         
-        // Nettoyage URLs images
+        //nettoyage URLs images
         $images = array_values(array_unique(array_map(function ($u) {
             if (!is_string($u) || $u === '') return '/img/Photo/default.png';
             $u = trim($u);
@@ -723,7 +723,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
     $reponses = [];
     
     try {
-        // Avis
+        //avis
         $sql = "
             SELECT 
                 a.id_avis,
@@ -759,7 +759,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
         $stmtAvis->execute($params);
         $avis = $stmtAvis->fetchAll(PDO::FETCH_ASSOC);
 
-        // Réponses
+        //réponses
         $stmtRep = $pdo->prepare("SELECT r.id_avis_parent, a.id_avis, a.a_texte, TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt FROM _reponse r JOIN _avis a ON r.id_avis = a.id_avis WHERE a.id_produit = :pid");
         $stmtRep->execute([':pid' => $idProduit]);
         $rowsRep = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
@@ -788,18 +788,11 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
         if ($action === 'add_avis') {
             if (!$idClient) { echo json_encode(['success' => false, 'message' => 'Connexion requise']); exit; }
             
-            // Vérif achat
+            //vérif achat
             $stmtVerif = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
             $stmtVerif->execute([':cid' => $idClient, ':pid' => $idProduitPost]);
             if (!$stmtVerif->fetchColumn()) { echo json_encode(['success' => false, 'message' => 'Achat requis']); exit; }
             
-            // Vérif si déjà un avis pour ce client
-            /*
-            try {
-                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS id_client integer');
-            } catch (Exception $e) {}
-            */
-
             $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND id_client = :cid");
             $stmtCheck->execute([':pid' => $idProduitPost, ':cid' => $idClient]);
             if ($stmtCheck->fetchColumn()) {
@@ -815,24 +808,20 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             $ownerToken = $_COOKIE['alizon_owner'] ?? bin2hex(random_bytes(16));
             if (!isset($_COOKIE['alizon_owner'])) setcookie('alizon_owner', $ownerToken, time() + 3600*24*365, '/');
 
-            // Insertion
+            //insertion
             try {
-                /*
-                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_note numeric(2,1)');
-                $pdo->exec('ALTER TABLE _avis ADD COLUMN IF NOT EXISTS a_owner_token text');
-                */
                 $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, id_client, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note, a_owner_token) VALUES (:pid, :cid, :txt, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
                 $stmt->execute([':pid' => $idProduitPost, ':cid' => $idClient, ':txt' => $texte, ':note' => $note, ':owner' => $ownerToken]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
             } catch (Exception $e) {
-                // Fallback si colonnes manquantes (ne devrait pas arriver si BDD à jour)
+                //fallback si colonnes manquantes (ne devrait pas arriver si BDD à jour)
                 $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES (:pid, :txt, 0, 0, NOW()) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt");
                 $stmt->execute([':pid' => $idProduitPost, ':txt' => $texte]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $row['a_note'] = 0.0;
             }
 
-            // Stats
+            //Stats
             $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
             $stmtAvg->execute([':pid' => $idProduitPost]);
             $newAvg = (float)$stmtAvg->fetchColumn();
@@ -855,10 +844,10 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (!$idClient) { echo json_encode(['success' => false, 'message' => 'Connexion requise']); exit; }
             if ($idAvis <= 0 || !in_array($val, ['plus', 'minus'])) { echo json_encode(['success' => false]); exit; }
             
-            // Map frontend value to DB value
+            //map frontend value to DB value
             $dbVal = ($val === 'plus') ? 'like' : 'dislike';
 
-            // Check existing vote
+            //check existing vote
             $stmtCheck = $pdo->prepare("SELECT vote_type FROM _vote_avis WHERE id_client = :cid AND id_avis = :aid");
             $stmtCheck->execute([':cid' => $idClient, ':aid' => $idAvis]);
             $existingVoteDb = $stmtCheck->fetchColumn();
@@ -866,7 +855,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             $pdo->beginTransaction();
             try {
                 if ($existingVoteDb === $dbVal) {
-                    // Remove vote
+                    //remove vote
                     $pdo->prepare("DELETE FROM _vote_avis WHERE id_client = :cid AND id_avis = :aid")->execute([':cid' => $idClient, ':aid' => $idAvis]);
                     if ($val === 'plus') {
                         $pdo->prepare("UPDATE _avis SET a_pouce_bleu = GREATEST(a_pouce_bleu - 1, 0) WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
@@ -875,7 +864,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
                     }
                 } else {
                     if ($existingVoteDb) {
-                        // Change vote
+                        //change vote
                         $pdo->prepare("UPDATE _vote_avis SET vote_type = :val WHERE id_client = :cid AND id_avis = :aid")->execute([':val' => $dbVal, ':cid' => $idClient, ':aid' => $idAvis]);
                         if ($existingVoteDb === 'like' && $dbVal === 'dislike') {
                             $pdo->prepare("UPDATE _avis SET a_pouce_bleu = GREATEST(a_pouce_bleu - 1, 0), a_pouce_rouge = a_pouce_rouge + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
@@ -883,7 +872,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
                             $pdo->prepare("UPDATE _avis SET a_pouce_rouge = GREATEST(a_pouce_rouge - 1, 0), a_pouce_bleu = a_pouce_bleu + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
                         }
                     } else {
-                        // New vote
+                        //new vote
                         $pdo->prepare("INSERT INTO _vote_avis (id_client, id_avis, vote_type) VALUES (:cid, :aid, :val)")->execute([':cid' => $idClient, ':aid' => $idAvis, ':val' => $dbVal]);
                         if ($val === 'plus') {
                             $pdo->prepare("UPDATE _avis SET a_pouce_bleu = a_pouce_bleu + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
