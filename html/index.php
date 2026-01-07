@@ -87,7 +87,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-$listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
+$donnees = chargerProduitsBDD($connexionBaseDeDonnees);
+$listeProduits = $donnees['produits'];
+$listeCategories = $donnees['categories'];
+$tousLesProduits = count($listeProduits);
+$categories_affichage = preparercategories_affichage($listeCategories);
+
 ?>
 
 <!DOCTYPE html>
@@ -107,44 +112,79 @@ $listeProduits = chargerProduitsBDD($connexionBaseDeDonnees)['produits'];
     <?php include __DIR__ . '/partials/header.php'; ?>
 
     <div class="container">
-        <aside style="background-color: white;">
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
+        <aside>
+            <form method="POST" action="" id="filterForm">
+                <div>
+                    <span>Tri par :</span>
+                    <select name="sort" onchange="document.getElementById('filterForm').submit()">
+                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>
+                            Meilleures ventes
+                        </option>
+                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix
+                            croissant</option>
+                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix
+                            décroissant
+                        </option>
+                        <option value="note" <?= $tri_par === 'note' ? 'selected' : '' ?>>Mieux notés</option>
+                    </select>
+                </div>
+
+                <div>
+                    <h3>Filtres</h3>
+                    <button type="button" onclick="reinitialiserFiltres()">Effacer</button>
+                </div>
+
+                <section>
+                    <h4>Catégories</h4>
+                    <select onchange="definirCategorie(this.value)">
+                        <option value="all">Tous les produits (<?= $tousLesProduits ?>)</option>
+                        <?php foreach ($categories_affichage as $categorieCourante): ?>
+                        <?php if ($categorieCourante['category'] !== 'all'): ?>
+                        <option value="<?= htmlspecialchars($categorieCourante['category']) ?>">
+                            <?= htmlspecialchars($categorieCourante['category']) ?> (<?= $categorieCourante['count'] ?>)
+                        </option>
+                        <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </section>
+
+
+                <section>
+                    <h4>Prix</h4>
+                    <div>
+                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>"
+                            value="<?= $prixMaximum ?>" oninput="mettreAJourAffichagePrix(this.value)"
+                            onchange="document.getElementById('filterForm').submit()">
+                    </div>
+                    <div>
+                        <span>0€</span>
+                        <span id="affichagePrixMax" ondblclick="activerEditionPrix()"><?= $prixMaximum ?>€</span>
+                    </div>
+                </section>
+
+                <section>
+                    <h4>Note minimum</h4>
+                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                    <div onclick="definirNote(<?= $i ?>)">
+                        <span><?= str_repeat('<img src="/img/svg/star-full.svg" alt="★" width="16" style="margin-right:3px;">', $i) . str_repeat('<img src="/img/svg/star-empty.svg" alt="☆" width="16">', 5 - $i) ?></span>
+                        <span><?= $i ?> et plus</span>
+                    </div>
+                    <?php endfor; ?>
+                </section>
+
+                <section>
+                    <h4>Disponibilité</h4>
+                    <label>
+                        <input type="checkbox" name="in_stock" <?= $enStockSeulement ? 'checked' : '' ?>
+                            onchange="document.getElementById('filterForm').submit()">
+                        <span>En stock uniquement</span>
+                    </label>
+                </section>
+
+                <input type="hidden" name="category" id="champCategorie"
+                    value="<?= htmlspecialchars($categorieFiltre) ?>">
+                <input type="hidden" name="note" id="champNote" value="<?= $noteMinimum ?>">
+            </form>
         </aside>
 
         <main>
