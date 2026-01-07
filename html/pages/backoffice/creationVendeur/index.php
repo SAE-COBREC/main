@@ -111,8 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $commune = htmlspecialchars($_POST['commune'] ?? '', ENT_QUOTES, 'UTF-8');
   $nom = htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8');
   $prenom = htmlspecialchars($_POST['prenom'] ?? '', ENT_QUOTES, 'UTF-8');
+  $civilite = htmlspecialchars($_POST['civilite'] ?? '', ENT_QUOTES, 'UTF-8');
   $mdp = $_POST['mdp'] ?? '';
   $Cmdp = $_POST['Cmdp'] ?? '';
+  $mdp = password_hash($mdp, PASSWORD_DEFAULT);
 
   // Initialisation du message d'erreur
   $hasError = false;
@@ -123,15 +125,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
 
       // Insertion dans la bdd des données de compte
-      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription,prenom,nom)
-              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :prenom, :nom)';
+      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, prenom, nom, civilite)
+              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :prenom, :nom, :civilite)';
       $stmt = $pdo->prepare($sql);
       $stmt->execute([
         'email' => $email,
         'telephone' => $telephone,
         'mdp' => $mdp,
         'nom' => $nom,
-        'prenom' => $prenom
+        'prenom' => $prenom,
+        'civilite' => $civilite
       ]);
 
       // Récupérer l'id du compte créé
@@ -269,7 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
       </div>
 
-      <div class="step">étape 1 / 4</div>
+      <div class="step">étape 1 / 5</div>
 
       <div class="next-btn" role="group" aria-label="Suivant action">
         <span class="next-text">Suivant</span>
@@ -279,41 +282,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
 
-    <!-- Card 2 -->
+    <!-- Card 2 - Identité -->
     <div class="card hidden" id="2">
       <div class="logo">
         <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
 
       <h1>Créer un compte</h1>
-      <p class="subtitle">Coordonnées</p>
+      <p class="subtitle">Identité</p>
 
       <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide.">
-      </div>
-
-      <div>
-        <label for="telephone">Numéro de téléphone</label>
-        <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
-      </div>
-
-      <div>
-        <label for="Rsociale">Nom</label>
+        <label for="nom">Nom</label>
         <input type="text" id="nom" name="nom" placeholder="Votre Nom" maxlength="254" required>
       </div>
 
       <div>
-        <label for="Rsociale">Prenom</label>
-        <input type="text" id="prenom" name="prenom" placeholder="Votre Prenom" maxlength="254" required>
+        <label for="prenom">Prénom</label>
+        <input type="text" id="prenom" name="prenom" placeholder="Votre Prénom" maxlength="254" required>
       </div>
+
+      <div>
+          <label>Civilité</label>
+          <div class="radio-group">
+            <label><input type="radio" name="civilite" value="M." required> Homme</label>
+            <label><input type="radio" name="civilite" value="Mme" required> Femme</label>
+            <label><input type="radio" name="civilite" value="Autre" required> Autre</label>
+          </div>
+      </div>
+
       <div class="error">
         <?php if (isset($hasError) && $hasError && $error_card == 2): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
         <?php endif; ?>
       </div>
 
-      <div class="step">étape 2 / 4</div>
+      <div class="step">étape 2 / 5</div>
 
       <div class="inline-flex">
         <div class="next-btn" role="group" aria-label="Précédent action">
@@ -331,8 +334,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
 
-    <!-- Card 3 -->
+    <!-- Card 3 - Coordonnées -->
     <div class="card hidden" id="3">
+      <div class="logo">
+        <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
+      </div>
+
+      <h1>Créer un compte</h1>
+      <p class="subtitle">Coordonnées</p>
+
+      <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide.">
+      </div>
+
+      <div>
+        <label for="telephone">Numéro de téléphone</label>
+        <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+      </div>
+
+      <div class="error">
+        <?php if (isset($hasError) && $hasError && $error_card == 3): ?>
+          <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
+        <?php endif; ?>
+      </div>
+
+      <div class="step">étape 3 / 5</div>
+
+      <div class="inline-flex">
+        <div class="next-btn" role="group" aria-label="Précédent action">
+          <span class="next-text">Précédent</span>
+          <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
+            <img src="../../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)" class="btn-arrow-left" aria-hidden="true">
+          </button>
+        </div>
+        <div class="next-btn" role="group" aria-label="Suivant action">
+          <span class="next-text">Suivant</span>
+          <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+            <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow" aria-hidden="true">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 - Adresse -->
+    <div class="card hidden" id="4">
       <div class="logo">
         <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
@@ -359,7 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="error"></div>
 
-      <div class="step">étape 3 / 4</div>
+      <div class="step">étape 4 / 5</div>
 
       <div class="inline-flex">
         <div class="next-btn" role="group" aria-label="Précédent action">
@@ -377,8 +423,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
 
-    <!-- Card 4 -->
-    <div class="card hidden" id="4">
+    <!-- Card 5 - Mot de passe -->
+    <div class="card hidden" id="5">
       <div class="logo">
         <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
@@ -397,12 +443,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
 
       <div class="error">
-        <?php if (isset($hasError) && $hasError && $error_card == 4): ?>
+        <?php if (isset($hasError) && $hasError && $error_card == 5): ?>
           <strong>Erreur</strong> : <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
         <?php endif; ?>
       </div>
 
-      <div class="step">étape 4 / 4</div>
+      <div class="step">étape 5 / 5</div>
 
       <div class="inline-flex">
         <div class="next-btn" role="group" aria-label="Précédent action">

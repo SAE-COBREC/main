@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
 
       //verification que le mdp corespondant a ce mail existe
-      if (!($row['mdp'] === $mdp)) {
+      if (!password_verify($mdp, $row['mdp'])) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Adresse mail ou mot de passe incorrecte.';

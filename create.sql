@@ -49,8 +49,7 @@ CREATE TABLE cobrec1._compte (
     civilite varchar(255) DEFAULT 'Inconnu' NOT NULL,
     CONSTRAINT verif_compte_civilite CHECK (civilite IN ('M.', 'Mme', 'Inconnu', 'Ne souhaite pas s''exprimer', 'Autre')),
     CONSTRAINT verif_compte_email CHECK (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
-    CONSTRAINT verif_compte_num_telephone CHECK (num_telephone ~ '^(0|\+33|0033)[1-9][0-9]{8}$'),
-    CONSTRAINT verif_compte_mdp CHECK (mdp ~ '^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$')
+    CONSTRAINT verif_compte_num_telephone CHECK (num_telephone ~ '^(0|\+33|0033)[1-9][0-9]{8}$')
 );
 
 ALTER TABLE ONLY cobrec1._compte

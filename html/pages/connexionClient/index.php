@@ -24,7 +24,7 @@ $pdo->exec("SET search_path TO cobrec1");
             }
           }
           //verification du mdp
-          if (el.id === 'mdp') {
+          if (el.id ===   $mdp = 'mdp') {
             var val = (el.value || '').trim();
             if (val.length === 0) return 'Ce champ est requis.';
             if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       //verification que le mdp corespondant a ce mail existe
-      if (!($row['mdp'] === $mdp)) {
+      if (!password_verify($mdp, $row['mdp'])) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';

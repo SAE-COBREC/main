@@ -528,27 +528,63 @@ body {
   }
 }
 
-// CGV checkbox - texte à gauche, checkbox à droite
+// CGV checkbox - checkbox avant le texte
 .card label:has(input#cgv) {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 10px;
   padding-left: 0;
 
   input[type="checkbox"] {
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     accent-color: $primary-color-bleu;
+  }
+
+  a {
+    color: $primary-color-bleu;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
 @media #{$mobile} {
   .card label:has(input#cgv) {
     input[type="checkbox"] {
-      width: 12px;
-      height: 12px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Modal CGV
+#cgvModal {
+  .modal-content {
+    max-height: 80vh;
+    width: 700px;
+    overflow-y: auto;
+  }
+
+  .cgv-content {
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.6;
+
+    h3 {
+      font-size: 16px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      color: $primary-color-bleu;
+    }
+
+    p {
+      margin-bottom: 12px;
     }
   }
 }
