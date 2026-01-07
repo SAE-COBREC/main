@@ -273,6 +273,7 @@ ALTER TABLE ONLY cobrec1._seuil_alerte
 CREATE TABLE cobrec1._panier_commande (
     id_panier SERIAL NOT NULL,
     id_client integer NOT NULL,
+    id_adresse integer NOT NULL,
     timestamp_commande timestamp
 );
 
@@ -282,6 +283,10 @@ ALTER TABLE ONLY cobrec1._panier_commande
 ALTER TABLE ONLY cobrec1._panier_commande
     ADD CONSTRAINT fk_panier_commande_client FOREIGN KEY (id_client) 
             REFERENCES cobrec1._client(id_client) ON DELETE CASCADE;
+
+ALTER TABLE ONLY cobrec1._adresse
+    ADD CONSTRAINT fk_panier_commande_adresse FOREIGN KEY (id_adresse) 
+            REFERENCES cobrec1._adresse(id_adresse) ON DELETE CASCADE;
 
 -- TABLE FACTURE
 CREATE TABLE cobrec1._facture (
@@ -1145,16 +1150,19 @@ INSERT INTO _seuil_alerte (nb_seuil, message_seuil) VALUES
 (20, 'Stock normal - Surveillance recommandée'),
 (1, 'Rupture de stock - Produit indisponible');
 
+INSERT INTO _adresse (id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays) VALUES
+(4, 13, 'rue du Pillard', 'Rennes', 35590, 'France');
+
 -- 18. PANIERS/COMMANDES
-INSERT INTO _panier_commande (id_client, timestamp_commande) VALUES
-(1, '2025-11-01 10:30:00'),
-(2, '2025-11-02 14:45:00'),
-(3, '2025-11-03 09:15:00'),
-(1, NULL),
-(4, '2025-11-04 16:20:00'),
-(6, '2025-11-05 11:00:00'),
-(2, NULL),
-(5, '2025-11-06 13:30:00');
+INSERT INTO _panier_commande (id_client, id_adresse, timestamp_commande) VALUES
+(1, 1, '2025-11-01 10:30:00'),
+(2, 1, '2025-11-02 14:45:00'),
+(3, 1, '2025-11-03 09:15:00'),
+(1, 1, NULL),
+(4, 1, '2025-11-04 16:20:00'),
+(6, 1, '2025-11-05 11:00:00'),
+(2, 1, NULL),
+(5, 1, '2025-11-06 13:30:00');
 
 -- 19. CONTIENT (produits dans paniers)
 INSERT INTO _contient (id_panier, id_produit, quantite, prix_unitaire, remise_unitaire, frais_de_port, TVA) VALUES

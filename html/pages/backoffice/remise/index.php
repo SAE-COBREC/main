@@ -59,26 +59,24 @@
                         $_SESSION["remise"]['_GET'] = null;
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre" . " " . $_SESSION["remise"]['_GET']['produit'];
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$e;
-                        $fp = fopen('file.csv', 'w');
-                        foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
-                            fputcsv($fp, $fields, ',', '"', '');
-                        }
-                        fclose($fp);
                     ?>
 
                     <script>
-                        alert("La valeur de la reduc renseigné dans l'URL n'est pas valide. Vous allez être redirigé vers votre catalogue.");
+                        alert("La valeur de la remise renseigné dans l'URL n'est pas valide. Vous allez être redirigé vers votre catalogue.");
                         document.location.href = "/pages/backoffice/index.php"; 
                     </script>
 
                     <?php
                     }
-                    if($_SESSION["remise"]['_GET']['id_reduction'] == null){
+
+
+                    
+                    if($_SESSION["remise"]['_GET']['produit'] == null){
                         $_SESSION["remise"]['_GET'] = null;
                         ?>
 
                     <script>
-                        alert("La valeur de la reduc renseigné dans l'URL ne correspond à aucun produit. Vous allez être redirigé vers votre catalogue.");
+                        alert("La valeur de la remise renseigné dans l'URL ne correspond à aucune remise et à aucun produit. Vous allez être redirigé vers votre catalogue.");
                         document.location.href = "/pages/backoffice/index.php"; 
                     </script>
 
@@ -166,7 +164,7 @@ if ($_POST !== []) {
             $_SESSION["remise"]['_GET']['reduction_pourcentage'] = '';
             $_SESSION["remise"]['_GET']['id_reduction'] = '';
         }
-        if(empty($_SESSION["remise"]['_GET']) == false){
+        if(empty($_GET['modifier'])){
             echo 'Remise non sauvegardée';
         }else{
             echo 'Modifier la remise sauvegardée';
@@ -210,6 +208,20 @@ if ($_POST !== []) {
                                         print_r($e);
                                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                                     }
+
+                                    try {//Permets d'obtenir toutes les catégories de produits listées dans la BDD
+                                        $sql = 'SELECT id_produit FROM cobrec1._reduction WHERE id_produit = :produit';
+                                        $stmt = $pdo->prepare($sql);
+                                        $params = [
+                                            'produit' => $_SESSION["remise"]['_GET']['produit']
+                                        ];
+                                        $stmt->execute($params);
+                                        $warn2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                        print_r($warn2);
+                                    } catch (Exception $e) {
+                                        print_r($e);
+                                        $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                    }
                                 }
 
                                 foreach ($produit as $value) {
@@ -225,7 +237,7 @@ if ($_POST !== []) {
                     <article>
                         <label for="pourcentage">Pourcentage de promotion</label>
                         <br>
-                        <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00" />
+                        <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00" required/>
 
                         <br />
                     </article>
@@ -233,14 +245,23 @@ if ($_POST !== []) {
                     <article>
                         <label for="debut">Date de début de promotion</label>
                         <br>
-                        <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
-                            value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
+                        <input style="<?php if((time() + 15 * 60 >= strtotime($_POST["debut"])) || ((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
+                            value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" required/>
                             <?php
                                 if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
                                     ?>
                                     <br>
                                     <small class="warn"><?php
-                                        echo $_POST["debut"] . ' '. $_POST["fin"] . ' ' . 'Le premieur horodatage est postérieur (ou égal) au second';
+                                        echo 'Le premieur horodatage est postérieur (ou égal) au second';
+                                        $_SESSION["remise"]["warn"]++;
+                                    ?></small>
+                                    <?php
+                                }
+                                if(time() + 15 * 60 >= strtotime($_POST["debut"])){
+                                    ?>
+                                    <br>
+                                    <small class="warn"><?php
+                                        echo 'Le premieur horodatage est bloqué dans le passé';
                                         $_SESSION["remise"]["warn"]++;
                                     ?></small>
                                     <?php
@@ -253,7 +274,7 @@ if ($_POST !== []) {
                         <label for="fin">Date de fin de promotion</label>
                         <br>
                         <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
-                            value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" />
+                            value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" required/>
                         <br />
                     </article>
                 </section>
@@ -298,7 +319,7 @@ if ($_POST !== []) {
         </script>
             <pre>
                 <?php 
-                    if (($_SESSION["remise"]["warn"] === 0) && ($_POST["titre"] !== '')){
+                    if (($_SESSION["remise"]["warn"] === 0) && ($_POST["produit"] !== '')){
                         $time = time();
                         // print_r("WARNS : " . $_SESSION["remise"]["warn"]);
 
@@ -427,7 +448,7 @@ if ($_POST !== []) {
                 
 
             }
-            if (($_SESSION["remise"]["warn"] === 0) && ($_POST["titre"] !== '') && ($_POST["publier"] == "Publier la remise dans le catalogue client")){
+            if (($_SESSION["remise"]["warn"] === 0) && ($_POST["produit"] !== '') && ($_POST["publier"] == "Publier la remise dans le catalogue client")){
                 //nettoyage
                 $_POST = [];
                 $_SESSION["remise"] = [];
