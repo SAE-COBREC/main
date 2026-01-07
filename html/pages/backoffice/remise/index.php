@@ -10,13 +10,13 @@
             if (empty($_GET['modifier']) === false){
                 //si US modifier reduc
                 //print_r("detect modif\n");
-                if ((empty($_SESSION["remise"]['_GET'])) || ($_SESSION["remise"]['_GET']['id_reduction'] != $_GET['modifier'])){
+                if ((empty($_SESSION["remise"]['_GET'])) || ($_SESSION["remise"]['_GET']['produit'] != $_GET['modifier'])){
                     //print_r('1');
                     //si premier passage
                     try {//Récupération des infos de la reduc
                         $sql = '
-                        SELECT id_reduction, reduction_pourcentage, reduction_debut, reduction_fin FROM cobrec1._reduction
-                        WHERE id_reduction = :modifier;'
+                        SELECT id_reduction, id_produit, reduction_pourcentage, reduction_debut, reduction_fin FROM cobrec1._reduction
+                        WHERE id_produit = :modifier;'
                         ;
                         $stmt = $pdo->prepare($sql);
                         $params = [
@@ -25,18 +25,21 @@
                         $stmt->execute($params);
                         $_SESSION["remise"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $_SESSION["remise"]['_GET'] = $_SESSION["remise"]['_GET'][0];
+                        print_r($_SESSION["remise"]['_GET']);
+                        $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['id_produit'];
+                        unset($_SESSION["remise"]['_GET']['id_produit']);
 
 
-                        $sql = '
-                        SELECT id_produit FROM cobrec1._en_reduction WHERE id_reduction = :modifier;'
-                        ;
-                        $stmt = $pdo->prepare($sql);
-                        $params = [
-                            'modifier' => $_GET['modifier']
-                        ];
-                        $stmt->execute($params);
-                        $_SESSION["remise"]['_GET']['produit'] = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['produit']['id_produit'];
+                        // $sql = '
+                        // SELECT id_produit FROM cobrec1._en_reduction WHERE id_reduction = :modifier;'
+                        // ;
+                        // $stmt = $pdo->prepare($sql);
+                        // $params = [
+                        //     'modifier' => $_GET['modifier']
+                        // ];
+                        // $stmt->execute($params);
+                        // $_SESSION["remise"]['_GET']['produit'] = $stmt->fetch(PDO::FETCH_ASSOC);
+                        // $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['produit']['id_produit'];
 
                         $sql = '
                         SELECT id_vendeur FROM cobrec1._produit
@@ -54,7 +57,7 @@
                     } catch (Exception $e) {
                         $time = time();
                         $_SESSION["remise"]['_GET'] = null;
-                        $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre";
+                        $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre" . " " . $_SESSION["remise"]['_GET']['produit'];
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$e;
                         $fp = fopen('file.csv', 'w');
                         foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
