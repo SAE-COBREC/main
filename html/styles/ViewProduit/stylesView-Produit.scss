@@ -365,9 +365,10 @@ input[type="number"] {
         gap: 10px;
     }
 
+    .review-title-input,
     .review-textarea {
-        resize: vertical;
-        min-height: 90px;
+        width: 100%;
+        box-sizing: border-box;
         padding: 10px 12px;
         border-radius: 10px;
         border: 1px solid vars.$secondary-color-gris-clair;
@@ -376,12 +377,18 @@ input[type="number"] {
         font-family: inherit;
         font-size: 14px;
         line-height: 1.4;
+        transition: border-color 0.2s, box-shadow 0.2s;
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 92, 255, .12);
+            border-color: vars.$primary-color-bleu;
+        }
     }
 
-    .review-textarea:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(76, 92, 255, .12);
-        border-color: vars.$primary-color-bleu;
+    .review-textarea {
+        resize: vertical;
+        min-height: 90px;
     }
 
     .review-actions {
@@ -808,32 +815,6 @@ input[type="number"] {
                 height: 32px;
                 display: block;
             }
-        }
-    }
-
-    textarea {
-        width: 100%;
-        padding: 16px;
-        border: 2px solid vars.$secondary-color-gris-clair;
-        border-radius: 12px;
-        font-family: inherit;
-        font-size: 15px;
-        line-height: 1.5;
-        resize: vertical;
-        min-height: 120px;
-        box-sizing: border-box;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        background: #f8f9fa;
-
-        &:focus {
-            outline: none;
-            border-color: vars.$primary-color-bleu;
-            background: vars.$primary-color-blanc;
-            box-shadow: 0 0 0 4px rgba(76, 92, 255, 0.1);
-        }
-
-        &::placeholder {
-            color: #a0a0a0;
         }
     }
 
