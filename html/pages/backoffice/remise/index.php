@@ -69,10 +69,27 @@
                     <?php
                     }
 
-
+                    try {//Récupération des infos de la reduc
+                        $sql = '
+                        SELECT id_produit, id_vendeur FROM cobrec1._produit
+                        WHERE id_produit = :modifier;'
+                        ;
+                        $stmt = $pdo->prepare($sql);
+                        $params = [
+                            'modifier' => $_GET['modifier']
+                        ];
+                        $stmt->execute($params);
+                        $_SESSION["remise"]['_GET']['produit'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        $_SESSION["remise"]['_GET']['id_vendeur']  = $_SESSION["remise"]['_GET']['produit'][0]['id_vendeur'];
+                        $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['produit'][0]['id_produit'];
+                        print_r($_SESSION["remise"]['_GET']);
+                        
+                    
+                    } catch (Exception $e) {}
                     
                     if($_SESSION["remise"]['_GET']['produit'] == null){
                         $_SESSION["remise"]['_GET'] = null;
+
                         ?>
 
                     <script>
