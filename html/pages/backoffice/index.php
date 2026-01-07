@@ -38,14 +38,16 @@ try {
         p.p_prix,
         p.p_statut,
         i.i_lien AS image_url,
+        r.reduction_pourcentage AS pourcentage,
         STRING_AGG(c.nom_categorie, ', ') AS categories
     FROM cobrec1._produit p
+    LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
     LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
     LEFT JOIN cobrec1._categorie_produit c ON fpd.id_categorie = c.id_categorie
     LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
     LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
     WHERE p.id_vendeur = :id_vendeur
-    GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, i.i_lien
+    GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, pourcentage, i.i_lien
     ORDER BY p.id_produit ASC";
 
     $stmt = $pdo->prepare($query);
@@ -162,12 +164,14 @@ try {
       <div class="page-actions">
         <a href="create/index.php" class="btn btn--primary">Ajouter un produit</a>
         <a href="#" id="btn-modifier" class="btn btn--secondary btn--disabled">Modifier le produit</a>
+        <a href="#" id="btn-remise" class="btn btn--secondary btn--disabled">Remiser le produit</a>
       </div>
 
       <script>
         document.addEventListener('DOMContentLoaded', () => {
           const rows = document.querySelectorAll('.products-table__row');
           const btnModifier = document.getElementById('btn-modifier');
+          const btnRemise = document.getElementById('btn-remise');
 
           rows.forEach(row => {
             row.addEventListener('click', () => {
@@ -189,6 +193,10 @@ try {
                 // Activer le bouton Modifier
                 btnModifier.classList.remove('btn--disabled');
                 btnModifier.href = "create/index.php?modifier=" + productID;
+
+                // Activer le bouton Remise
+                btnRemise.classList.remove('btn--disabled');
+                btnRemise.href = "remise/index.php?modifier=" + productID;
               } else {
                 // Désactiver le bouton Modifier
                 btnModifier.classList.add('btn--disabled');
