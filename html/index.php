@@ -66,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
 
-    //envelopper l'appel dans un try-catch
     try {
         if ($idClient === null) {
             //utilisateur non connecté : utiliser le panier temporaire en SESSION
