@@ -631,7 +631,7 @@ function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $
         }
 
         //vérifier que le mot de passe actuel correspond
-        if ($motDePasseActuel != $motDePasseStockeHashe) {
+        if (password_verify($motDePasseActuel, $motDePasseStockeHashe) === false) {
             return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
         }
 
@@ -646,7 +646,7 @@ function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $
         }
 
         //mettre à jour le nouveau mot de passe
-        $nouveauMotDePasseHashe = $nouveauMotDePasse;
+        $nouveauMotDePasseHashe = password_hash($nouveauMotDePasse, PASSWORD_DEFAULT);
         $requeteMiseAJourMotDePasse = "UPDATE cobrec1._compte SET mdp = ? WHERE id_compte = ?";
         $requetePrepareeMiseAJour = $connexionBaseDeDonnees->prepare($requeteMiseAJourMotDePasse);
         $requetePrepareeMiseAJour->execute([$nouveauMotDePasseHashe, $identifiantCompte]);
