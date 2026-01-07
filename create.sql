@@ -153,32 +153,6 @@ ALTER TABLE ONLY cobrec1._categorie_produit
 ALTER TABLE ONLY cobrec1._categorie_produit
     ADD CONSTRAINT unique_categorie_produit_nom UNIQUE (nom_categorie);
 
--- TABLE REDUCTION
-CREATE TABLE cobrec1._reduction (
-    id_reduction SERIAL NOT NULL,
-    reduction_pourcentage numeric(5,2) DEFAULT 0.00 NOT NULL,
-    reduction_debut timestamp NOT NULL,
-    reduction_fin timestamp NOT NULL,
-    CONSTRAINT verif_reduction_pourcentage CHECK (reduction_pourcentage >= 0.00 AND reduction_pourcentage <= 100.00),
-    CONSTRAINT verif_reduction_debut CHECK (reduction_debut >  CURRENT_TIMESTAMP),
-    CONSTRAINT verif_reduction_fin CHECK (reduction_fin > reduction_debut)
-);
-
-ALTER TABLE ONLY cobrec1._reduction
-    ADD CONSTRAINT pk_reduction PRIMARY KEY (id_reduction);
-
--- TABLE PROMOTION
-CREATE TABLE cobrec1._promotion (
-    id_promotion SERIAL NOT NULL,
-    promotion_debut timestamp NOT NULL,
-    promotion_fin timestamp NOT NULL,
-    CONSTRAINT verif_promotion_debut CHECK (promotion_debut >  CURRENT_TIMESTAMP),
-    CONSTRAINT verif_promotion_fin CHECK (promotion_fin > promotion_debut)
-);
-
-ALTER TABLE ONLY cobrec1._promotion
-    ADD CONSTRAINT pk_promotion PRIMARY KEY (id_promotion);
-
 -- TABLE TVA
 CREATE TABLE cobrec1._TVA (
     id_TVA SERIAL NOT NULL,
@@ -238,6 +212,38 @@ ALTER TABLE ONLY cobrec1._produit
 
 ALTER TABLE ONLY cobrec1._produit
     ADD CONSTRAINT unique_produit_nom UNIQUE (p_nom);
+
+-- TABLE REDUCTION
+CREATE TABLE cobrec1._reduction (
+    id_reduction SERIAL NOT NULL,
+    id_produit INT NOT NULL,
+    reduction_pourcentage numeric(5,2) DEFAULT 0.00 NOT NULL,
+    reduction_debut timestamp NOT NULL,
+    reduction_fin timestamp NOT NULL,
+    CONSTRAINT verif_reduction_pourcentage CHECK (reduction_pourcentage >= 0.00 AND reduction_pourcentage <= 100.00),
+    CONSTRAINT verif_reduction_debut CHECK (reduction_debut >  CURRENT_TIMESTAMP),
+    CONSTRAINT verif_reduction_fin CHECK (reduction_fin > reduction_debut)
+);
+
+ALTER TABLE ONLY cobrec1._reduction
+    ADD CONSTRAINT unique_reduction_id_produit UNIQUE (id_produit);
+
+ALTER TABLE ONLY cobrec1._reduction
+    ADD CONSTRAINT fk_reduction_produit FOREIGN KEY (id_produit) 
+            REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
+
+-- TABLE PROMOTION
+CREATE TABLE cobrec1._promotion (
+    id_promotion SERIAL NOT NULL,
+    promotion_debut timestamp NOT NULL,
+    promotion_fin timestamp NOT NULL,
+    CONSTRAINT verif_promotion_debut CHECK (promotion_debut >  CURRENT_TIMESTAMP),
+    CONSTRAINT verif_promotion_fin CHECK (promotion_fin > promotion_debut)
+);
+
+ALTER TABLE ONLY cobrec1._promotion
+    ADD CONSTRAINT pk_promotion PRIMARY KEY (id_promotion);
+
 
 -- TABLE IMAGE
 CREATE TABLE cobrec1._image (
@@ -563,21 +569,21 @@ ALTER TABLE ONLY cobrec1._est_dote_de
             REFERENCES cobrec1._couleur(code_hexa) ON DELETE CASCADE;
 
 -- TABLE EN_REDUCTION
-CREATE TABLE cobrec1._en_reduction (
-    id_produit integer NOT NULL,
-    id_reduction integer NOT NULL
-);
+-- CREATE TABLE cobrec1._en_reduction (
+--     id_produit integer NOT NULL,
+--     id_reduction integer NOT NULL
+-- );
 
-ALTER TABLE ONLY cobrec1._en_reduction
-    ADD CONSTRAINT pk_en_reduction PRIMARY KEY (id_produit, id_reduction);
+-- ALTER TABLE ONLY cobrec1._en_reduction
+--     ADD CONSTRAINT pk_en_reduction PRIMARY KEY (id_produit, id_reduction);
 
-ALTER TABLE ONLY cobrec1._en_reduction
-    ADD CONSTRAINT fk_en_reduction_produit FOREIGN KEY (id_produit) 
-            REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
+-- ALTER TABLE ONLY cobrec1._en_reduction
+--     ADD CONSTRAINT fk_en_reduction_produit FOREIGN KEY (id_produit) 
+--             REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
 
-ALTER TABLE ONLY cobrec1._en_reduction
-    ADD CONSTRAINT fk_en_reduction_reduction FOREIGN KEY (id_reduction) 
-            REFERENCES cobrec1._reduction(id_reduction) ON DELETE CASCADE;
+-- ALTER TABLE ONLY cobrec1._en_reduction
+--     ADD CONSTRAINT fk_en_reduction_reduction FOREIGN KEY (id_reduction) 
+--             REFERENCES cobrec1._reduction(id_reduction) ON DELETE CASCADE;
 
 -- TABLE EN_PROMOTION
 CREATE TABLE cobrec1._en_promotion (
@@ -844,18 +850,6 @@ INSERT INTO _TVA (montant_TVA, libelle_TVA) VALUES
 (5.5, 'TVA réduite'),
 (2.1, 'TVA super réduite');
 
--- 9. RÉDUCTIONS (futures)
-INSERT INTO _reduction (reduction_pourcentage, reduction_debut, reduction_fin) VALUES
-(10.00, '2026-02-09 00:00:00', '2026-02-19 23:59:59'),
-(15.00, '2026-02-15 00:00:00', '2026-02-25 23:59:59'),
-(20.00, '2026-02-01 00:00:00', '2026-02-15 23:59:59'),
-(25.00, '2026-02-20 00:00:00', '2026-02-26 23:59:59'),
-(30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59'),
-(60.00, '2026-04-01 00:00:00', '2026-04-15 23:59:59'),
-(55.00, '2026-05-01 00:00:00', '2026-05-07 23:59:59'),
-(70.00, '2026-06-10 00:00:00', '2026-06-20 23:59:59'),
-(65.00, '2026-07-01 00:00:00', '2026-07-31 23:59:59');
-
 -- 10. PROMOTIONS (futures)
 INSERT INTO _promotion (promotion_debut, promotion_fin) VALUES
 ('2027-12-20 00:00:00', '2027-12-25 23:59:59'),
@@ -974,7 +968,17 @@ INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock,
 (3, 3, 'Galettes Artisanal', 'Produit breton authentique. Fabriqué avec passion à Roscoff. Artisanal. Qualité supérieure garantie.', 123.48, 95, 'Hors ligne', 'Bretagne', 0.4, 0.26, 6.39, 4.5, 32),
 (1, 1, 'Bol Breton Bio', 'Produit breton authentique. Fabriqué avec passion à Concarneau. Bio. Qualité supérieure garantie.', 194.19, 164, 'Hors ligne', 'Bretagne', 1.88, 0.32, 5.24, 4.9, 73);
 
-
+-- 9. RÉDUCTIONS (futures)
+INSERT INTO _reduction (id_produit, reduction_pourcentage, reduction_debut, reduction_fin) VALUES
+(1, 10.00, '2026-02-09 00:00:00', '2026-02-19 23:59:59'),
+(2, 15.00, '2026-02-15 00:00:00', '2026-02-25 23:59:59'),
+(3, 20.00, '2026-02-01 00:00:00', '2026-02-15 23:59:59'),
+(4, 25.00, '2026-02-20 00:00:00', '2026-02-26 23:59:59'),
+(5, 30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59'),
+(6, 60.00, '2026-04-01 00:00:00', '2026-04-15 23:59:59'),
+(7, 55.00, '2026-05-01 00:00:00', '2026-05-07 23:59:59'),
+(8, 70.00, '2026-06-10 00:00:00', '2026-06-20 23:59:59'),
+(9, 65.00, '2026-07-01 00:00:00', '2026-07-31 23:59:59');
 
 -- 12. IMAGES
 INSERT INTO _image (i_lien, i_title, i_alt) VALUES
@@ -1205,10 +1209,10 @@ INSERT INTO _livraison (id_facture, date_livraison, etat_livraison) VALUES
 -- Supprimer
 
 -- 29. RÉDUCTIONS APPLIQUÉES
-INSERT INTO _en_reduction (id_produit, id_reduction) VALUES
-(3, 2), (4, 2), (11, 1), (14, 1),
-(16, 1), (17, 2), (18, 3), (19, 4), (20, 5),
-(21, 1), (22, 2), (23, 3), (24, 4), (25, 5);
+-- INSERT INTO _en_reduction (id_produit, id_reduction) VALUES
+-- (3, 2), (4, 2), (11, 1), (14, 1),
+-- (16, 1), (17, 2), (18, 3), (19, 4), (20, 5),
+-- (21, 1), (22, 2), (23, 3), (24, 4), (25, 5);
 
 -- 30. PROMOTIONS APPLIQUÉES
 INSERT INTO _en_promotion (id_produit, id_promotion) VALUES
