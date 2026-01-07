@@ -9,7 +9,7 @@ if (isset($_SESSION['idClient'])) {
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
-            SELECT nom, prenom, id_compte
+            SELECT nom, prenom, _compte.id_compte
             FROM _client
             JOIN _compte ON _client.id_compte = _compte.id_compte
             WHERE id_client = :id_client";
@@ -142,13 +142,17 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
         /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI⚠️⚠️⚠️⚠️⚠️⚠️*/
         if ($_POST['adresse'] == "nouvelle"){ 
             insererFacture($pdo, $panierEnCours, $_POST['nom_destinataire'], $_POST['prenom_destinataire'],
-            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2));
+            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, $totalPanier);
             ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
         } else {
             insererFacture($pdo, $panierEnCours, $nomPrenom["nom"], $nomPrenom["prenom"],
             $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2));
         }
 
+        //on créer un session pour le panier qui vient d'être commandé car le panierEnCours on doit le supprimé pour éviter
+        //les problèmes ave la page panier qui ne reset pas le panier  en cours et donc on aura encore le panier en cours dans notre 
+        //panier alors qu'on vient de payer. Il servira pour la page de suivi de commande vu qu'on est redirigé sur celle-ci après le paiement
+        $_SESSION["id_commande"] = $_SESSION["panierEnCours"];
 
         //une fois que tout le panier a été traité on créer un nouveau pour eviter les erreurs
         $sqlCreatePanier = "
