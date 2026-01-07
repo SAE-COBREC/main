@@ -1126,27 +1126,13 @@ function trierProduits($listeProduits, $tri_par)
 {
     switch ($tri_par) {
         case 'meilleures_ventes':
-            usort($listeProduits, function ($a, $b) {
-                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
-            });
-            break;
+            
         case 'prix_croissant':
-            usort($listeProduits, function ($a, $b) {
-                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
-            });
-            break;
+            
         case 'prix_decroissant':
-            usort($listeProduits, function ($a, $b) {
-                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
-            });
-            break;
+            
         case 'note':
-            usort($listeProduits, function ($a, $b) {
-                $noteA = $a['note_moyenne'] ?? 0;
-                $noteB = $b['note_moyenne'] ?? 0;
-                return $noteB - $noteA;
-            });
-            break;
+            
     }
     return $listeProduits;
 }
@@ -1156,18 +1142,7 @@ function filtrerProduits($listeProduits, $filtres)
 {
     $produits_filtres = [];
     foreach ($listeProduits as $produitCourant) {
-        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum'])
-            continue;
-        if ($filtres['categorieFiltre'] !== 'all') {
-            $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
-            if (!in_array($filtres['categorieFiltre'], $categoriesProduit))
-                continue;
-        }
-        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0)
-            continue;
-        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum'])
-            continue;
-        $produits_filtres[] = $produitCourant;
+        
     }
     return $produits_filtres;
 }
