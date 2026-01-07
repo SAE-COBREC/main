@@ -1078,9 +1078,10 @@ function transfererPanierTempVersBDD($pdo, $idPanier)
 }
 
 //fonction pour inserer une facture
-function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ht_remise, $f_total_ttc){
-        $requeteFacture = "INSERT INTO _facture (id_panier, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
+function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ht_remise, $f_total_ttc, $id_adresse){
+        $requeteFacture = "INSERT INTO _facture (id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
                                                         (:id_panier, 
+                                                         :id_adresse,
                                                          :nom_destinataire,
                                                          :prenom_destinataire,
                                                          :f_total_ht,
@@ -1090,6 +1091,7 @@ function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_tot
         $stmt = $pdo->prepare($requeteFacture);
         $stmt->execute([
             ':id_panier' => $panierEnCours,
+            ':id_adresse' => $id_adresse,
             ':nom_destinataire' => $nom,
             ':prenom_destinataire' => $prenom,
             'f_total_ht' => $f_total_ht,
