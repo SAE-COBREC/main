@@ -148,7 +148,10 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                     </select>
                 </section>
 
-
+                <section>
+                    <h4>Vendeur</h4>
+                    <input type="text" placeholder="Rechercher vendeur...">
+                </section>
                 <section class="no-hover">
                     <h4>Prix</h4>
                     <div>
