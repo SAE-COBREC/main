@@ -207,10 +207,10 @@ body {
 }
 
 .checkbox {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #E5D5C5;
-  border-radius: 50%;
+  border-radius: 100%;
   margin: 0 auto;
 }
 .checkbox--active {
@@ -235,11 +235,11 @@ body {
   margin-bottom: 2px;
 }
 .product__model {
-  font-size: 18px;
+  font-size: 16px;
   color: #030212;
 }
 .product__model__ancien {
-  font-size: 18px;
+  font-size: 16px;
   text-decoration: line-through !important;
   color: #c0c0c0;
   margin-right: 10px;
