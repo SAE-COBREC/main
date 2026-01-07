@@ -93,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //changement du mot de passe
     if (isset($_POST['change_password'])) {
         //récupérer les mots de passe saisis
-        $motDePasseActuelSaisi = $_POST['current_password'] ?? '';
-        $nouveauMotDePasseSaisi = $_POST['new_password'] ?? '';
+        $motDePasseActuelSaisi = $_POST['actuel_password'] ?? '';
+        $nouveauMotDePasseSaisi = $_POST['nouveau_password'] ?? '';
         $confirmationMotDePasseSaisie = $_POST['confirm_password'] ?? '';
 
         //appeler la fonction de modification du mot de passe
@@ -527,13 +527,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div>
                                 <label>
                                     <span>Mot de passe actuel</span>
-                                    <input type="password" name="current_password" required>
+                                    <input type="password" name="actuel_password" required>
                                 </label>
                             </div>
                             <div>
                                 <label>
                                     <span>Nouveau mot de passe</span>
-                                    <input type="password" name="new_password"
+                                    <input type="password" name="nouveau_password"
                                         pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$"
                                         title="Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère parmi : . ! @ # $ % ^ & *"
                                         required>
