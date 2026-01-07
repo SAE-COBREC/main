@@ -78,6 +78,16 @@ aside section h4 {
   margin-bottom: 1rem;
   font-weight: 600;
 }
+aside section select {
+  padding: 0.2em;
+  border: 1px solid #7171A3;
+  color: #7171A3;
+  border-radius: 20px;
+  background: #FFFFFF;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
 aside section:not(.no-hover) > div {
   display: flex;
   justify-content: space-between;
@@ -296,7 +306,11 @@ article button:disabled {
     display: none;
   }
   aside form > div:first-child select {
-    font-size: 1.3em;
+    font-size: 1.2em;
+    padding: 5px 10px;
+  }
+  aside form > section select {
+    font-size: 1em;
     padding: 5px 10px;
   }
 }
