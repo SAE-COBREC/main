@@ -110,6 +110,13 @@
                         $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
                         $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
                         $_SESSION["creerArticle"]["_FILES"]['photo']['name'] = [];
+                        $fp = fopen('file.csv', 'w');
+                        foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
+                            fputcsv($fp, $fields, ',', '"', '');
+                        }
+                        fclose($fp);
+
+
                         foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
                             $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] = $value['i_title'];
                             $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace('/img/photo', '../../../img/photo',$value['i_lien']);
@@ -117,6 +124,8 @@
                             // $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace("'","''",$_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key]);
                             $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
                             $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key]);
+                            
+                            print_r("\n" . $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] . "\n" . 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] . "\n");
                             if (file_exists($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key])){
                                 copy($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key], 
                                 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
@@ -917,8 +926,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     ';
                                     $stmt = $pdo->prepare($sql);
                                     $params = [
-                                        'i_lien' => EMPLACEMENT_DES_IMGS . $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value,
-                                        'i_title' => $_SESSION["creerArticle"]['_GET']['id_produit'] . '_' . $value,
+                                        'i_lien' => EMPLACEMENT_DES_IMGS . $id_produit . '_' . $value,
+                                        'i_title' => $id_produit . '_' . $value,
                                         'i_alt' => 'photo du produit ' . $_POST['titre']
                                     ];
                                     $stmt->execute($params);
@@ -1081,7 +1090,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                     foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
                         if (file_exists('../../../img/Photo/' . $value['i_title'])){
-                            unlink('../../../img/Photo/' . $value['i_title']);
+                            //unlink('../../../img/Photo/' . $value['i_title']);
                         }
                         try {//suppression des images
                             $sql = '
