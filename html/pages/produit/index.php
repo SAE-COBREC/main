@@ -146,6 +146,34 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
+    <style>
+        .vote-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .vote-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+            margin: 0;
+        }
+        .vote-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        @media (max-width: 768px) {
+            .vote-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+            .vote-label {
+                font-size: 13px;
+            }
+        }
+    </style>
 </head>
 <body>
     <?php
@@ -290,7 +318,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                                         $initial = 'U';
                                         if ($currentUser) {
                                             if (!empty($currentUser['c_pseudo'])) $initial = substr($currentUser['c_pseudo'], 0, 1);
-                                            elseif (!empty($currentUser['c_prenom'])) $initial = substr($currentUser['c_prenom'], 0, 1);
+                                            elseif (!empty($currentUser['prenom'])) $initial = substr($currentUser['prenom'], 0, 1);
                                         }
                                     ?>
                                     <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper($initial) ?></div>
@@ -345,8 +373,8 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         $displayName = 'Utilisateur';
                         if (!empty($ta['c_pseudo'])) {
                             $displayName = $ta['c_pseudo'];
-                        } elseif (!empty($ta['c_prenom']) || !empty($ta['c_nom'])) {
-                            $displayName = trim(($ta['c_prenom'] ?? '') . ' ' . ($ta['c_nom'] ?? ''));
+                        } elseif (!empty($ta['prenom']) || !empty($ta['nom'])) {
+                            $displayName = trim(($ta['prenom'] ?? '') . ' ' . ($ta['nom'] ?? ''));
                         }
                         
                         // Determine avatar
@@ -374,13 +402,16 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                             </div>
                             <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
                             <div class="review-votes">
-                                <div class="vote-buttons">
-                                    <button class="ghost btn-vote" data-type="J'aime" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
-                                        <img src="/img/svg/PouceHaut.svg" alt="J'aime" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
-                                    </button>
-                                    <button class="ghost btn-vote" data-type="Je n'aime pas" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
-                                        <img src="/img/svg/PouceBas.svg" alt="Je n'aime pas" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
-                                    </button>
+                                <div class="vote-section">
+                                    <span class="vote-label">Évaluer ce commentaire :</span>
+                                    <div class="vote-buttons">
+                                        <button type="button" class="ghost btn-vote" data-type="J'aime" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
+                                            <img src="/img/svg/PouceHaut.svg" alt="J'aime" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
+                                        </button>
+                                        <button type="button" class="ghost btn-vote" data-type="Je n'aime pas" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
+                                            <img src="/img/svg/PouceBas.svg" alt="Je n'aime pas" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
+                                        </button>
+                                    </div>
                                 </div>
                                 <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
                                 <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
@@ -506,6 +537,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
 
         // Gestion Avis (Vote, Ajout, Edit, Delete)
         const productId = <?= (int)$idProduit ?>;
+        const idClient = <?= $idClient ?: 'null' ?>;
         
         // Vote
         const listAvis = document.getElementById('listeAvisProduit');
@@ -514,16 +546,25 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
             listAvis.addEventListener('click', (e) => {
                 const btn = e.target.closest('.btn-vote');
                 if (!btn) return;
+                if (!idClient) {
+                    alert('Vous devez être connecté pour voter sur les commentaires.');
+                    return;
+                }
                 const rev = btn.closest('.review');
+                if (!rev || !rev.dataset.avisId) {
+                    console.error('Review element not found or missing data-avis-id');
+                    return;
+                }
                 const aid = rev.dataset.avisId;
                 const type = btn.dataset.type;
+                const value = (type === "J'aime") ? 'plus' : 'minus';
                 
                 btn.disabled = true;
                 const fd = new FormData();
                 fd.append('action', 'vote');
                 fd.append('id_produit', productId);
                 fd.append('id_avis', aid);
-                fd.append('value', type);
+                fd.append('value', value);
                 
                 fetchJson(window.location.href, { method: 'POST', body: fd })
                     .then(d => {
@@ -533,7 +574,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                             
                             // Update UI state
                             rev.querySelectorAll('.btn-vote').forEach(b => b.setAttribute('aria-pressed', 'false'));
-                            if (d.user_vote === type) {
+                            if (d.user_vote === value) {
                                 btn.setAttribute('aria-pressed', 'true');
                             }
                         } else if (!d.success && d.message) {
