@@ -23,23 +23,26 @@ function chargerProduitsBDD($pdo)
             COALESCE(avis.nombre_avis, 0) as nombre_avis,
             COALESCE(t.montant_tva, 0) as tva,
             (SELECT STRING_AGG(cp.nom_categorie, ', ') 
-                FROM _fait_partie_de fpd 
-                JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+                FROM cobrec1._fait_partie_de fpd 
+                JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
                 WHERE fpd.id_produit = p.id_produit) as categories,
             (SELECT i.i_lien 
-                FROM _represente_produit rp 
-                JOIN _image i ON rp.id_image = i.id_image
+                FROM cobrec1._represente_produit rp 
+                JOIN cobrec1._image i ON rp.id_image = i.id_image
                 WHERE rp.id_produit = p.id_produit 
                 LIMIT 1) as image_url
-        FROM _produit p
-        LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-        LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction 
-        LEFT JOIN _tva t ON p.id_tva = t.id_tva
+        FROM cobrec1._produit p
+        LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit 
+            AND r.reduction_debut <= CURRENT_TIMESTAMP 
+            AND r.reduction_fin >= CURRENT_TIMESTAMP
+        LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
         LEFT JOIN (
             SELECT id_produit, COUNT(*) as nombre_avis 
-            FROM _avis 
+            FROM cobrec1._avis 
             GROUP BY id_produit
-        ) avis ON p.id_produit = avis.id_produit WHERE p.p_statut = 'En ligne'
+        ) avis ON p.id_produit = avis.id_produit 
+        WHERE p.p_statut = 'En ligne'
+        ORDER BY p.id_produit
     ";
 
         $requetePrepare = $pdo->query($requeteSQL);
@@ -84,8 +87,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
             FROM _produit p
             LEFT JOIN _tva t ON p.id_tva = t.id_tva
-            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
             WHERE p.id_produit = :idProduit
         ";
 
@@ -181,29 +183,30 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
             p.p_prix, 
             p.p_frais_de_port, 
             p.p_stock,
-            denomination,
+            v.denomination,
             COALESCE(t.montant_tva, 0) as tva,
             COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
             (SELECT i.i_lien
-                FROM _represente_produit rp 
-                JOIN _image i ON rp.id_image = i.id_image
+                FROM cobrec1._represente_produit rp 
+                JOIN cobrec1._image i ON rp.id_image = i.id_image
                 WHERE rp.id_produit = p.id_produit 
                 LIMIT 1) as image_url,
             (SELECT i.i_alt
-                FROM _represente_produit rp 
-                JOIN _image i ON rp.id_image = i.id_image
+                FROM cobrec1._represente_produit rp 
+                JOIN cobrec1._image i ON rp.id_image = i.id_image
                 WHERE rp.id_produit = p.id_produit 
                 LIMIT 1) as image_alt,
             (SELECT i.i_title
-                FROM _represente_produit rp 
-                JOIN _image i ON rp.id_image = i.id_image
+                FROM cobrec1._represente_produit rp 
+                JOIN cobrec1._image i ON rp.id_image = i.id_image
                 WHERE rp.id_produit = p.id_produit 
                 LIMIT 1) as image_title
-        FROM _produit p
-        LEFT JOIN _tva t ON p.id_tva = t.id_tva
-        LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-        LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
-        LEFT JOIN _vendeur ON _vendeur.id_vendeur = p.id_vendeur
+        FROM cobrec1._produit p
+        LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
+        LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
+            AND r.reduction_debut <= CURRENT_TIMESTAMP 
+            AND r.reduction_fin >= CURRENT_TIMESTAMP
+        LEFT JOIN cobrec1._vendeur v ON v.id_vendeur = p.id_vendeur
         WHERE p.id_produit = :idProduit
         ";
 
@@ -681,8 +684,7 @@ function chargerProduitBDD($pdo, $idProduit) {
                 JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
                 WHERE fpd.id_produit = p.id_produit) AS categories
             FROM _produit p
-            LEFT JOIN _en_reduction er ON p.id_produit = er.id_produit
-            LEFT JOIN _reduction r ON er.id_reduction = r.id_reduction
+            LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit=
             LEFT JOIN _tva t ON p.id_tva = t.id_tva
             LEFT JOIN _vendeur v ON p.id_vendeur = v.id_vendeur
             LEFT JOIN _compte c ON v.id_compte = c.id_compte
