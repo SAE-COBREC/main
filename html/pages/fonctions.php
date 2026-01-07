@@ -15,26 +15,19 @@ function chargerProduitsBDD($pdo)
             p.p_description,
             p.p_prix,
             p.p_stock,
-            p.p_note as note_moyenne,
-            p.p_nb_ventes,
-            p.p_statut,
-            COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
-            COALESCE(t.montant_tva, 0) as tva,
-            i.i_lien as image_url,
-            COUNT(av.id_avis) as nombre_avis,
+            (SELECT COUNT(*) FROM cobrec1._avis av2 WHERE av2.id_produit = p.id_produit AND av2.a_note IS NOT NULL) as nombre_avis,
+            (SELECT ROUND(COALESCE(AVG(av3.a_note), 0)::numeric, 1) FROM cobrec1._avis av3 WHERE av3.id_produit = p.id_produit AND av3.a_note IS NOT NULL) as note_moyenne,
+            (SELECT COALESCE(i2.i_lien, '/img/photo/smartphone_xpro.jpg') FROM cobrec1._represente_produit rp2 LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image WHERE rp2.id_produit = p.id_produit LIMIT 1) as image_url,
             STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories
         FROM cobrec1._produit p
         LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit 
         LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
-        LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
-        LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
-        LEFT JOIN cobrec1._avis av ON p.id_produit = av.id_produit
         LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
         LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
         WHERE p.p_statut = 'En ligne'
         GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
                  p.p_note, p.p_nb_ventes, p.p_statut, r.reduction_pourcentage, 
-                 t.montant_tva, i.i_lien
+                 t.montant_tva
         ORDER BY p.id_produit
     ";
 
@@ -183,7 +176,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 v.denomination,
                 t.montant_tva as tva,
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
-                i.i_lien as image_url,
+                COALESCE(i.i_lien, '/img/photo/smartphone_xpro.jpg') as image_url,
                 i.i_alt as image_alt,
                 i.i_title as image_title
             FROM cobrec1._produit p
@@ -733,8 +726,8 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
                 a.a_note,
                 a.a_owner_token,
                 a.id_client,
-                cl.c_prenom,
-                cl.c_nom,
+                co.prenom as c_prenom,
+                co.nom as c_nom,
                 cl.c_pseudo,
                 i.i_lien as client_image,
                 a.a_note AS avis_note
@@ -745,7 +738,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
             LEFT JOIN _represente_compte rc ON co.id_compte = rc.id_compte
             LEFT JOIN _image i ON rc.id_image = i.id_image
             WHERE a.id_produit = :pid
-            GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge, a.a_note, a.a_owner_token, a.id_client, cl.c_prenom, cl.c_nom, cl.c_pseudo, i.i_lien
+            GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge, a.a_note, a.a_owner_token, a.id_client, co.prenom, co.nom, cl.c_pseudo, i.i_lien
             ORDER BY a.a_timestamp_creation DESC
         ";
         
@@ -946,8 +939,8 @@ function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifi
         $requeteSQL = "
             SELECT 
                 cl.id_client,
-                cl.c_nom,
-                cl.c_prenom,
+                co.nom as c_nom,
+                co.prenom as c_prenom,
                 cl.c_pseudo,
                 
                 co.id_compte,
