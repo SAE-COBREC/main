@@ -273,7 +273,6 @@ ALTER TABLE ONLY cobrec1._seuil_alerte
 CREATE TABLE cobrec1._panier_commande (
     id_panier SERIAL NOT NULL,
     id_client integer NOT NULL,
-    id_adresse integer NOT NULL,
     timestamp_commande timestamp
 );
 
@@ -284,14 +283,11 @@ ALTER TABLE ONLY cobrec1._panier_commande
     ADD CONSTRAINT fk_panier_commande_client FOREIGN KEY (id_client) 
             REFERENCES cobrec1._client(id_client) ON DELETE CASCADE;
 
-ALTER TABLE ONLY cobrec1._adresse
-    ADD CONSTRAINT fk_panier_commande_adresse FOREIGN KEY (id_adresse) 
-            REFERENCES cobrec1._adresse(id_adresse) ON DELETE CASCADE;
-
 -- TABLE FACTURE
 CREATE TABLE cobrec1._facture (
     id_facture SERIAL NOT NULL,
     id_panier integer NOT NULL,
+    id_adresse integer NOT NULL,
     nom_destinataire varchar(100),
     prenom_destinataire varchar(100),
     f_total_ht numeric(11,2) DEFAULT 0.0,
@@ -309,6 +305,10 @@ ALTER TABLE ONLY cobrec1._facture
 ALTER TABLE ONLY cobrec1._facture
     ADD CONSTRAINT fk_facture_panier FOREIGN KEY (id_panier) 
             REFERENCES cobrec1._panier_commande(id_panier) ON DELETE CASCADE;
+
+ALTER TABLE ONLY cobrec1._adresse
+    ADD CONSTRAINT fk_facture_adresse FOREIGN KEY (id_adresse) 
+            REFERENCES cobrec1._adresse(id_adresse) ON DELETE CASCADE;
 
 -- TABLE PAIEMENT
 CREATE TABLE cobrec1._paiement (
@@ -1154,15 +1154,15 @@ INSERT INTO _adresse (id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_
 (4, 13, 'rue du Pillard', 'Rennes', 35590, 'France');
 
 -- 18. PANIERS/COMMANDES
-INSERT INTO _panier_commande (id_client, id_adresse, timestamp_commande) VALUES
-(1, 1, '2025-11-01 10:30:00'),
-(2, 1, '2025-11-02 14:45:00'),
-(3, 1, '2025-11-03 09:15:00'),
-(1, 1, NULL),
-(4, 1, '2025-11-04 16:20:00'),
-(6, 1, '2025-11-05 11:00:00'),
-(2, 1, NULL),
-(5, 1, '2025-11-06 13:30:00');
+INSERT INTO _panier_commande (id_client, timestamp_commande) VALUES
+(1, '2025-11-01 10:30:00'),
+(2, '2025-11-02 14:45:00'),
+(3, '2025-11-03 09:15:00'),
+(1, NULL),
+(4, '2025-11-04 16:20:00'),
+(6, '2025-11-05 11:00:00'),
+(2, NULL),
+(5, '2025-11-06 13:30:00');
 
 -- 19. CONTIENT (produits dans paniers)
 INSERT INTO _contient (id_panier, id_produit, quantite, prix_unitaire, remise_unitaire, frais_de_port, TVA) VALUES
@@ -1181,13 +1181,13 @@ INSERT INTO _contient (id_panier, id_produit, quantite, prix_unitaire, remise_un
 (8, 14, 1, 34.99, 0.0, 5.99, 20.0);
 
 -- 20. FACTURES
-INSERT INTO _facture (id_panier, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
-(1, 755.98, 0.0, 755.98, 907.18),
-(2, 103.96, 0.0, 103.96, 124.75),
-(3, 909.98, 0.0, 909.98, 1091.98),
-(5, 248.97, 0.0, 248.97, 298.76),
-(6, 185.97, 0.0, 185.97, 223.16),
-(8, 95.96, 0.0, 95.96, 115.15);
+INSERT INTO _facture (id_panier, id_adresse, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
+(1, 1, 755.98, 0.0, 755.98, 907.18),
+(2, 1, 103.96, 0.0, 103.96, 124.75),
+(3, 1, 909.98, 0.0, 909.98, 1091.98),
+(5, 1, 248.97, 0.0, 248.97, 298.76),
+(6, 1, 185.97, 0.0, 185.97, 223.16),
+(8, 1, 95.96, 0.0, 95.96, 115.15);
 
 -- 21. PAIEMENTS
 INSERT INTO _paiement (id_facture, mode_paiement, numero_carte, mois_annee_expiration, cryptogramme_carte, timestamp_paiement) VALUES
