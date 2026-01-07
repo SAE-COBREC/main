@@ -218,14 +218,6 @@ body {
   border-color: #E6A96E;
 }
 
-.model {
-  display: flex;
-}
-.model .product__model {
-  font-size: 18px;
-  color: #030212;
-}
-
 .product {
   display: flex;
   align-items: center;
@@ -245,6 +237,12 @@ body {
 .product__model {
   font-size: 18px;
   color: #030212;
+}
+.product__model__ancien {
+  font-size: 18px;
+  text-decoration: line-through !important;
+  color: #c0c0c0;
+  margin-right: 10px;
 }
 
 .badge {

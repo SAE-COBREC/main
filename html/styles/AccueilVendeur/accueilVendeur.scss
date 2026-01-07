@@ -248,7 +248,13 @@ body {
   }
   &__model {
     font-size: 18px; 
-    color: $primary-color-noir; 
+    color: $primary-color-noir;
+  }
+  &__model__ancien{
+    font-size: 18px;
+      text-decoration: line-through !important;
+      color: $secondary-color-gris-fonce;
+      margin-right: 10px;
   }
 }
 

@@ -14,6 +14,9 @@ if(empty($_SESSION['vendeur_id']) === false){
 <?php
 }
 
+$_SESSION['creerArticle'] = [];
+$_SESSION['remise'] = [];
+
 function check_same_string($a, $b) {
     return $a === $b;
 }

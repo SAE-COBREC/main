@@ -124,13 +124,15 @@ try {
                   <td class="products-table__cell col-produit">
                     <div class="product">
                       <div class="product__image">
-                        <img src="<?= str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])); ?>" width="50" height="50">
+                        <img src="<?= str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])); ?>" width="70" height="70">
                       </div>
                       <div class="product__info">
                         <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
                         <?php if(!empty($article['pourcentage'])): ?>
-                          <p class="product__model"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
+                        <div class="product__prix">
+                          <p class="product__model__ancien"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
                           <p class="product__model"><?php echo number_format($article['p_prix']* (1 - $article['pourcentage']/100), 2, ',', ' '); ?> €</p>
+                        </div>
                         <?php else: ?>
                           <p class="product__model"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
                         <?php endif; ?>
@@ -169,7 +171,7 @@ try {
       <div class="page-actions">
         <a href="create/index.php" class="btn btn--primary">Ajouter un produit</a>
         <a href="#" id="btn-modifier" class="btn btn--secondary btn--disabled">Modifier le produit</a>
-        <a href="#" id="btn-remise" class="btn btn--secondary btn--disabled">Remiser le produit</a>
+        <a href="#" id="btn-remise" class="btn btn--secondary btn--disabled">Appliquer remise</a>
       </div>
 
       <script>
