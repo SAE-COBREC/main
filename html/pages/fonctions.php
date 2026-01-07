@@ -1084,3 +1084,25 @@ function transfererPanierTempVersBDD($pdo, $idPanier)
     //vider le panier temporaire après transfert
     unset($_SESSION['panierTemp']);
 }
+
+
+function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ht_remise, $f_total_ttc){
+        $requeteFacture = "INSERT INTO _facture (id_panier, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
+                                                        (:id_panier, 
+                                                         :nom_destinataire,
+                                                         :prenom_destinataire,
+                                                         :f_total_ht,
+                                                         :f_total_remise,
+                                                         :f_total_ht_remise,
+                                                         :f_total_ttc)";
+        $stmt = $pdo->prepare($requeteFacture);
+        $stmt->execute([
+            ':id_panier' => $panierEnCours,
+            ':nom_destinataire' => $nom,
+            ':prenom_destinataire' => $prenom,
+            'f_total_ht' => $f_total_ht,
+            'f_total_remise' => $f_total_remise,
+            'f_total_ht_remise' => $f_total_ht_remise,
+            ':f_total_ttc' => $totalPanier
+        ]);
+}
