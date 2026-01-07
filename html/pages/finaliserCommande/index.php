@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../../selectBDD.php';
+include '../fonctions.php';
 $boolErreur = false;
 
 if (isset($_SESSION['idClient'])) {
@@ -8,7 +9,7 @@ if (isset($_SESSION['idClient'])) {
     $pdo->exec("SET search_path TO cobrec1");
 
     $requetePanier = "
-            SELECT nom
+            SELECT nom, prenom, id_compte
             FROM _client
             JOIN _compte ON _client.id_compte = _compte.id_compte
             WHERE id_client = :id_client";
@@ -19,7 +20,7 @@ if (isset($_SESSION['idClient'])) {
         ':id_client' => $id_client
     ]);
 
-    $nom = $stmt->fetch();
+    $nomPrenom = $stmt->fetch();
 
     $requeteAdresse = "SELECT a_adresse, a_ville, a_code_postal, a_pays, id_adresse, a_numero
             FROM _client
@@ -112,18 +113,16 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
         }
     }
 
-    if ($_POST['adresse'] == "invalide"){
-        $erreur = $erreur . " Adresse invalide";
-        $boolErreur = true;
-    } else if ($_POST['adresse'] == "nouvelle"){
-        if (empty($_POST['numero']) || empty($_POST['rue']) || empty($_POST['ville']) || empty($_POST['codePostal'])){
+    if ($_POST['adresse'] == "invalide"){ //invalide c'est quand l'utilisateur n'a pas changé d'adresse donc l'option par défaut dans le select
+        $erreur = $erreur . " Adresse invalide"; 
+        $boolErreur = true; //c'est donc une erreur on passe le booleen a vrai pour ne pas validé le paiement
+    } else if ($_POST['adresse'] == "nouvelle"){ //si l'utilisateur choisi une nouvelle adresse
+        if (empty($_POST['numero']) || empty($_POST['rue']) || empty($_POST['ville']) || empty($_POST['codePostal'] ||
+         empty($_POST['nom_destinataire']) || empty($_POST['prenom_destinataire']))){ 
+            //si les champs obligatoire sont vide
             $erreur = $erreur . " Information d'adresse manquante";
-            $boolErreur = true;
-        } /*else {
-            $erreur = $erreur . " Information d'adresse manquante";
-            $boolErreur = true;
-            echo "ok";
-        }*/
+            $boolErreur = true; //c'est donc une erreur on passe le booleen a vrai pour ne pas validé le paiement
+        } 
     }
 
 
@@ -139,17 +138,31 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
         ]); //execute la requête pour update le time stamp
 
 
-        //requête qui servira plus tard pour la facture etle suivi de commande
-        $requeteFacture = "INSERT INTO _facture (id_panier, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
-                                                        (:id_panier, 0, 0, 0, :f_total_ttc)";
-        $stmt = $pdo->prepare($requeteFacture);
-        $stmt->execute([
-            ':id_panier' => $panierEnCours,
-            ':f_total_ttc' => $totalPanier
-        ]);
+        //⚠️On insère dans la facture MAIS A TERMINER⚠️
+        /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI⚠️⚠️⚠️⚠️⚠️⚠️*/
+        if ($_POST['adresse'] == "nouvelle"){ 
+            insererFacture($pdo, $panierEnCours, $_POST['nom_destinataire'], $_POST['prenom_destinataire'],
+            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2));
+            ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
+        } else {
+            insererFacture($pdo, $panierEnCours, $nomPrenom["nom"], $nomPrenom["prenom"],
+            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2));
+        }
 
-        /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI*/
 
+        //une fois que tout le panier a été traité on créer un nouveau pour eviter les erreurs
+        $sqlCreatePanier = "
+            INSERT INTO _panier_commande (id_client, timestamp_commande)
+            VALUES (:id_client, NULL)
+            RETURNING id_panier
+        ";
+        $stmtCreate = $pdo->prepare($sqlCreatePanier);
+        $stmtCreate->execute([":id_client" => $id_client]);
+        $idPanier = (int) $stmtCreate->fetchColumn();
+
+        $_SESSION["panierEnCours"] = $idPanier; // on stock l'id du panier créer dans le panier en cours
+
+      
         $url = '../suiviCommande/suiviCommande.php';
         echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
 
@@ -190,7 +203,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             </div>
             <label>Nom du titulaire *</label>
             <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"
-                value="<?php echo $nom['nom'] ?>" />
+                value="<?php echo $nomPrenom['nom'] ?>" />
             <h2>Adresse de facturation</h2>
             <select name="adresse" id="adresse">
                 <option value="invalide">Choisir l'adresse de livraison</option>
@@ -214,6 +227,12 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
                 
                 <label>Code postal *</label>
                 <input type="text" name="codePostal" placeholder="Ex : 22970">
+
+                <label>Nom du destinataire*</label>
+                <input type="text" name="nom_destinataire" placeholder="Ex : Dupont">
+
+                <label>Prenom du destinataire*</label>
+                <input type="text" name="prenom_destinataire" placeholder="Ex : Jean">
             </div>
 
             <div class="checkBox">
