@@ -148,12 +148,13 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                     </select>
                 </section>
 
-                <section>
-                    <h4>Vendeur</h4>
-                    <input type="text" placeholder="Rechercher vendeur...">
-                </section>
+                <div class="search-container" style="justify-content: normal;">
+                    <img src="/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
+                    <input type="text" placeholder="Rechercher vendeur..." class="search-input">
+                </div>
+
                 <section class="no-hover">
-                    <h4>Prix</h4>
+                    <h4 style="padding-top: 1em;">Prix</h4>
                     <div>
                         <input type="range" name="price" min="0" max="<?= $prixMaximum ?>" value="<?= $prixMaximum ?>">
                     </div>
