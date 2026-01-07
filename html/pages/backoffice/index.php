@@ -115,7 +115,7 @@ try {
               </tr>
             </thead>
             <tbody>
-            <?php if (!empty($articles)): ?>
+            <?php if(!empty($articles)): ?>
               <?php foreach ($articles as $article): ?>
                 <tr class="products-table__row" data-id="<?php echo $article['id_produit']; ?>">
                   <td class="products-table__cell col-check">
@@ -128,7 +128,12 @@ try {
                       </div>
                       <div class="product__info">
                         <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
-                        <p class="product__model"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
+                        <?php if(!empty($article['pourcentage'])): ?>
+                          <p class="product__model"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
+                          <p class="product__model"><?php echo number_format($article['p_prix']* (1 - $article['pourcentage']/100), 2, ',', ' '); ?> €</p>
+                        <?php else: ?>
+                          <p class="product__model"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
+                        <?php endif; ?>
                       </div>
                     </div>
                   </td>
@@ -201,6 +206,10 @@ try {
                 // Désactiver le bouton Modifier
                 btnModifier.classList.add('btn--disabled');
                 btnModifier.href = "#";
+
+                // Désactiver le bouton Remise
+                btnRemise.classList.add('btn--disabled');
+                btnRemise.href = "#" + productID;
               }
             });
           });
