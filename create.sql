@@ -689,6 +689,15 @@ ALTER TABLE ONLY cobrec1._definie_pour
 
 
 -- ============================================
+-- TABLE DU COTE TRANSPORTEUR
+-- ============================================
+
+CREATE TABLE cobrec1.bordereau (
+    id_bordereau integer NOT NULL,
+    id_commande integer NOT NULL
+);
+
+-- ============================================
 -- FONCTIONS ET TRIGGERS
 -- ============================================
 CREATE FUNCTION maj_moyenne_notes_produit_apres_insertion()
