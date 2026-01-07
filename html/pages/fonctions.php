@@ -714,43 +714,41 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
     $reponses = [];
     
     try {
-        //avis
+        // Sélection simple et explicite
         $sql = "
             SELECT 
                 a.id_avis,
                 a.a_texte,
+                a.a_titre,
                 a.a_timestamp_creation,
-                TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt,
+                a.a_note,
                 a.a_pouce_bleu,
                 a.a_pouce_rouge,
-                a.a_note,
-                a.a_owner_token,
                 a.id_client,
-                co.prenom as c_prenom,
-                co.nom as c_nom,
+                a.a_owner_token,
+                TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt,
+                co.prenom,
+                co.nom,
                 cl.c_pseudo,
                 i.i_lien as client_image,
-                a.a_note AS avis_note
-                " . ($idClient ? ", (SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM _vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote" : "") . "
+                " . ($idClient ? "(SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM _vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote" : "NULL as user_vote") . "
             FROM _avis a
             LEFT JOIN _client cl ON a.id_client = cl.id_client
             LEFT JOIN _compte co ON cl.id_compte = co.id_compte
             LEFT JOIN _represente_compte rc ON co.id_compte = rc.id_compte
             LEFT JOIN _image i ON rc.id_image = i.id_image
             WHERE a.id_produit = :pid
-            GROUP BY a.id_avis, a.a_texte, a.a_timestamp_creation, a.a_pouce_bleu, a.a_pouce_rouge, a.a_note, a.a_owner_token, a.id_client, co.prenom, co.nom, cl.c_pseudo, i.i_lien
             ORDER BY a.a_timestamp_creation DESC
         ";
         
         $stmtAvis = $pdo->prepare($sql);
         $params = [':pid' => $idProduit];
-        if ($idClient) {
-            $params[':cid'] = $idClient;
-        }
+        if ($idClient) $params[':cid'] = $idClient;
+        
         $stmtAvis->execute($params);
         $avis = $stmtAvis->fetchAll(PDO::FETCH_ASSOC);
 
-        //réponses
+        // Réponses
         $stmtRep = $pdo->prepare("SELECT r.id_avis_parent, a.id_avis, a.a_texte, TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt FROM _reponse r JOIN _avis a ON r.id_avis = a.id_avis WHERE a.id_produit = :pid");
         $stmtRep->execute([':pid' => $idProduit]);
         $rowsRep = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
@@ -758,7 +756,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
             $reponses[(int)$r['id_avis_parent']] = $r;
         }
     } catch (Exception $e) {
-        echo "<!-- Erreur chargerAvisBDD: " . $e->getMessage() . " -->";
+        error_log("Erreur chargerAvisBDD: " . $e->getMessage());
     }
     
     return ['avis' => $avis, 'reponses' => $reponses];
@@ -767,167 +765,172 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
 //gestion des actions AJAX pour les avis
 function gererActionsAvis($pdo, $idClient, $idProduit) {
     header('Content-Type: application/json; charset=utf-8');
-    $action = $_POST['action'] ?? 'add_avis';
-    $idProduitPost = isset($_POST['id_produit']) ? (int)$_POST['id_produit'] : 0;
     
-    if ($idProduitPost <= 0 || $idProduitPost !== $idProduit) {
-        echo json_encode(['success' => false, 'message' => 'Produit invalide']);
+    $action = $_POST['action'] ?? '';
+    
+    if (empty($action)) {
+        echo json_encode(['success' => false, 'message' => 'Action manquante']);
         exit;
     }
 
     try {
         if ($action === 'add_avis') {
-            if (!$idClient) { echo json_encode(['success' => false, 'message' => 'Connexion requise']); exit; }
+            if (!$idClient) throw new Exception('Connexion requise.');
             
-            //vérif achat
-            $stmtVerif = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
-            $stmtVerif->execute([':cid' => $idClient, ':pid' => $idProduitPost]);
-            if (!$stmtVerif->fetchColumn()) { echo json_encode(['success' => false, 'message' => 'Achat requis']); exit; }
-            
-            $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND id_client = :cid");
-            $stmtCheck->execute([':pid' => $idProduitPost, ':cid' => $idClient]);
-            if ($stmtCheck->fetchColumn()) {
-                echo json_encode(['success' => false, 'message' => 'Vous avez déjà publié un avis sur ce produit.']);
-                exit;
-            }
+            $idProduitPost = (int)($_POST['id_produit'] ?? 0);
+            if ($idProduitPost !== $idProduit) throw new Exception('Produit incohérent.');
 
+            // Achat ?
+            $sqlAchat = "SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = ? AND c.id_produit = ? AND pc.timestamp_commande IS NOT NULL LIMIT 1";
+            $stmtAchat = $pdo->prepare($sqlAchat);
+            $stmtAchat->execute([$idClient, $idProduit]);
+            if (!$stmtAchat->fetchColumn()) throw new Exception('Vous devez avoir acheté ce produit.');
+
+            // Déjà avis ?
+            $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = ? AND id_client = ?");
+            $stmtCheck->execute([$idProduit, $idClient]);
+            if ($stmtCheck->fetchColumn()) throw new Exception('Vous avez déjà donné votre avis.');
+
+            $titre = trim($_POST['titre'] ?? '');
             $texte = trim($_POST['commentaire'] ?? '');
-            $note = (float)($_POST['note'] ?? 0.0);
-            if (!in_array($note, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0], true)) $note = 0.0;
-            if ($note <= 0) { echo json_encode(['success' => false, 'message' => 'Note invalide']); exit; }
+            $note = (float)($_POST['note'] ?? 0);
+
+            if (empty($titre)) throw new Exception('Le titre est obligatoire.');
+            if (empty($texte)) throw new Exception('Le commentaire est obligatoire.');
+            if ($note < 0.5 || $note > 5) throw new Exception('La note est invalide.');
 
             $ownerToken = $_COOKIE['alizon_owner'] ?? bin2hex(random_bytes(16));
             if (!isset($_COOKIE['alizon_owner'])) setcookie('alizon_owner', $ownerToken, time() + 3600*24*365, '/');
 
-            //insertion
-            try {
-                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, id_client, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation, a_note, a_owner_token) VALUES (:pid, :cid, :txt, 0, 0, NOW(), :note, :owner) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt, a_note");
-                $stmt->execute([':pid' => $idProduitPost, ':cid' => $idClient, ':txt' => $texte, ':note' => $note, ':owner' => $ownerToken]);
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            } catch (Exception $e) {
-                //fallback si colonnes manquantes (ne devrait pas arriver si BDD à jour)
-                $stmt = $pdo->prepare("INSERT INTO _avis (id_produit, a_texte, a_pouce_bleu, a_pouce_rouge, a_timestamp_creation) VALUES (:pid, :txt, 0, 0, NOW()) RETURNING id_avis, a_timestamp_creation, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS created_at_fmt");
-                $stmt->execute([':pid' => $idProduitPost, ':txt' => $texte]);
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $row['a_note'] = 0.0;
-            }
-
-            //Stats
-            $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
-            $stmtAvg->execute([':pid' => $idProduitPost]);
-            $newAvg = (float)$stmtAvg->fetchColumn();
+            // Insertion
+            $sqlInsert = "
+                INSERT INTO _avis (id_produit, id_client, a_titre, a_texte, a_note, a_timestamp_creation, a_pouce_bleu, a_pouce_rouge, a_owner_token) 
+                VALUES (:pid, :cid, :titre, :txt, :note, NOW(), 0, 0, :owner) 
+                RETURNING id_avis, a_titre, a_texte, a_note, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') as created_at_fmt
+            ";
             
-            $stmtCnt = $pdo->prepare('SELECT COUNT(*) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
-            $stmtCnt->execute([':pid' => $idProduitPost]);
-            $newCnt = (int)$stmtCnt->fetchColumn();
+            $stmt = $pdo->prepare($sqlInsert);
+            $stmt->execute([
+                ':pid' => $idProduit,
+                ':cid' => $idClient,
+                ':titre' => $titre,
+                ':txt' => $texte,
+                ':note' => $note,
+                ':owner' => $ownerToken
+            ]);
+            
+            $newReview = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Stats
+            $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) as avg, COUNT(*) as cnt FROM _avis WHERE id_produit = ? AND a_note IS NOT NULL');
+            $stmtAvg->execute([$idProduit]);
+            $stats = $stmtAvg->fetch(PDO::FETCH_ASSOC);
 
             echo json_encode([
-                'success' => true, 'message' => 'Avis enregistré',
-                'id_avis' => $row['id_avis'], 'created_at_fmt' => $row['created_at_fmt'],
-                'note' => (float)$row['a_note'], 'avg' => $newAvg, 'countAvis' => $newCnt
+                'success' => true,
+                'message' => 'Avis publié avec succès',
+                'avis' => $newReview, 
+                'avg' => $stats['avg'],
+                'countAvis' => $stats['cnt']
             ]);
             exit;
 
-        } elseif ($action === 'vote') {
-            $idAvis = (int)($_POST['id_avis'] ?? 0);
-            $val = $_POST['value'] ?? '';
-            
-            if (!$idClient) { echo json_encode(['success' => false, 'message' => 'Connexion requise']); exit; }
-            if ($idAvis <= 0 || !in_array($val, ['plus', 'minus'])) { echo json_encode(['success' => false]); exit; }
-            
-            //map frontend value to DB value
-            $dbVal = ($val === 'plus') ? 'like' : 'dislike';
-
-            //check existing vote
-            $stmtCheck = $pdo->prepare("SELECT vote_type FROM _vote_avis WHERE id_client = :cid AND id_avis = :aid");
-            $stmtCheck->execute([':cid' => $idClient, ':aid' => $idAvis]);
-            $existingVoteDb = $stmtCheck->fetchColumn();
-            
-            $pdo->beginTransaction();
-            try {
-                if ($existingVoteDb === $dbVal) {
-                    //remove vote
-                    $pdo->prepare("DELETE FROM _vote_avis WHERE id_client = :cid AND id_avis = :aid")->execute([':cid' => $idClient, ':aid' => $idAvis]);
-                    if ($val === 'plus') {
-                        $pdo->prepare("UPDATE _avis SET a_pouce_bleu = GREATEST(a_pouce_bleu - 1, 0) WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
-                    } else {
-                        $pdo->prepare("UPDATE _avis SET a_pouce_rouge = GREATEST(a_pouce_rouge - 1, 0) WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
-                    }
-                } else {
-                    if ($existingVoteDb) {
-                        //change vote
-                        $pdo->prepare("UPDATE _vote_avis SET vote_type = :val WHERE id_client = :cid AND id_avis = :aid")->execute([':val' => $dbVal, ':cid' => $idClient, ':aid' => $idAvis]);
-                        if ($existingVoteDb === 'like' && $dbVal === 'dislike') {
-                            $pdo->prepare("UPDATE _avis SET a_pouce_bleu = GREATEST(a_pouce_bleu - 1, 0), a_pouce_rouge = a_pouce_rouge + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
-                        } elseif ($existingVoteDb === 'dislike' && $dbVal === 'like') {
-                            $pdo->prepare("UPDATE _avis SET a_pouce_rouge = GREATEST(a_pouce_rouge - 1, 0), a_pouce_bleu = a_pouce_bleu + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
-                        }
-                    } else {
-                        //new vote
-                        $pdo->prepare("INSERT INTO _vote_avis (id_client, id_avis, vote_type) VALUES (:cid, :aid, :val)")->execute([':cid' => $idClient, ':aid' => $idAvis, ':val' => $dbVal]);
-                        if ($val === 'plus') {
-                            $pdo->prepare("UPDATE _avis SET a_pouce_bleu = a_pouce_bleu + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
-                        } else {
-                            $pdo->prepare("UPDATE _avis SET a_pouce_rouge = a_pouce_rouge + 1 WHERE id_avis = :aid")->execute([':aid' => $idAvis]);
-                        }
-                    }
-                }
-                
-                $pdo->commit();
-                
-                $stmt = $pdo->prepare("SELECT a_pouce_bleu, a_pouce_rouge FROM _avis WHERE id_avis = :id");
-                $stmt->execute([':id' => $idAvis]);
-                echo json_encode(['success' => true, 'counts' => $stmt->fetch(PDO::FETCH_ASSOC), 'user_vote' => ($existingVoteDb === $dbVal ? null : $val)]);
-                exit;
-            } catch (Exception $e) {
-                $pdo->rollBack();
-                echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
-                exit;
-            }
-
         } elseif ($action === 'edit_avis') {
+            if (!$idClient) throw new Exception('Connexion requise.');
+            
             $idAvis = (int)($_POST['id_avis'] ?? 0);
-            $txt = trim($_POST['commentaire'] ?? '');
+            $titre = trim($_POST['titre'] ?? '');
+            $texte = trim($_POST['commentaire'] ?? '');
             $note = isset($_POST['note']) ? (float)$_POST['note'] : null;
-            $owner = $_COOKIE['alizon_owner'] ?? '';
             
-            if (!$idClient) { echo json_encode(['success' => false, 'message' => 'Connexion requise']); exit; }
+            if (empty($titre)) throw new Exception('Titre requis.');
+            if (empty($texte)) throw new Exception('Commentaire requis.');
 
-            $set = ['a_texte = :txt', 'a_timestamp_modification = NOW()'];
-            $params = [':txt' => $txt, ':id' => $idAvis, ':pid' => $idProduitPost, ':owner' => $owner, ':cid' => $idClient];
-            if ($note !== null) { $set[] = 'a_note = :note'; $params[':note'] = $note; }
+            $owner = $_COOKIE['alizon_owner'] ?? '';
+            $checkSql = "SELECT 1 FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (a_owner_token = ? AND id_client IS NULL))";
+            $stmtC = $pdo->prepare($checkSql);
+            $stmtC->execute([$idAvis, $idProduit, $idClient, $owner]);
+            if (!$stmtC->fetchColumn()) throw new Exception('Action non autorisée.');
+
+            $updateSql = "UPDATE _avis SET a_titre = :titre, a_texte = :txt, a_timestamp_modification = NOW()";
+            $params = [':titre' => $titre, ':txt' => $texte, ':id' => $idAvis];
             
-            $stmt = $pdo->prepare('UPDATE _avis SET ' . implode(', ', $set) . ' WHERE id_avis = :id AND id_produit = :pid AND ((id_client IS NOT NULL AND id_client = :cid) OR (id_client IS NULL AND a_owner_token = :owner)) RETURNING TO_CHAR(a_timestamp_modification,\'YYYY-MM-DD HH24:MI\') AS fmt, a_note');
-            $stmt->execute($params);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($note !== null) {
+                $updateSql .= ", a_note = :note";
+                $params[':note'] = $note;
+            }
             
-            if ($row) echo json_encode(['success' => true, 'updated_at_fmt' => $row['fmt'], 'note' => $row['a_note']]);
-            else echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+            $updateSql .= " WHERE id_avis = :id RETURNING a_titre, a_texte, a_note, TO_CHAR(a_timestamp_modification,'YYYY-MM-DD HH24:MI') AS fmt";
+            
+            $stmtUp = $pdo->prepare($updateSql);
+            $stmtUp->execute($params);
+            $updated = $stmtUp->fetch(PDO::FETCH_ASSOC);
+
+            echo json_encode(['success' => true, 'updated_at_fmt' => $updated['fmt'], 'avis' => $updated]);
             exit;
 
         } elseif ($action === 'delete_avis') {
-            $idAvis = (int)($_POST['id_avis'] ?? 0);
-            $owner = $_COOKIE['alizon_owner'] ?? '';
+             if (!$idClient) throw new Exception('Connexion requise.');
+             $idAvis = (int)($_POST['id_avis'] ?? 0);
+             $owner = $_COOKIE['alizon_owner'] ?? '';
 
-            if (!$idClient) { echo json_encode(['success' => false, 'message' => 'Connexion requise']); exit; }
+             $sqlDel = "DELETE FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (a_owner_token = ? AND id_client IS NULL))";
+             $stmtDel = $pdo->prepare($sqlDel);
+             $stmtDel->execute([$idAvis, $idProduit, $idClient, $owner]);
+             
+             if ($stmtDel->rowCount() > 0) {
+                 echo json_encode(['success' => true]);
+             } else {
+                 throw new Exception('Impossible de supprimer cet avis.');
+             }
+             exit;
 
-            $stmt = $pdo->prepare('DELETE FROM _avis WHERE id_avis = :id AND id_produit = :pid AND ((id_client IS NOT NULL AND id_client = :cid) OR (id_client IS NULL AND a_owner_token = :owner)) RETURNING id_avis');
-            $stmt->execute([':id' => $idAvis, ':pid' => $idProduitPost, ':owner' => $owner, ':cid' => $idClient]);
-            if ($stmt->fetch()) echo json_encode(['success' => true]);
-            else echo json_encode(['success' => false, 'message' => 'Non autorisé']);
-            exit;
+        } elseif ($action === 'vote') {
+             if (!$idClient) throw new Exception('Connexion requise.');
+             $idAvis = (int)($_POST['id_avis'] ?? 0);
+             $val = $_POST['value'] ?? '';
+             $dbTyp = ($val === 'plus') ? 'like' : (($val === 'minus') ? 'dislike' : null);
+             
+             if (!$dbTyp) throw new Exception('Vote invalide.');
 
-        } elseif ($action === 'get_rating') {
-            $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
-            $stmtAvg->execute([':pid' => $idProduitPost]);
-            $avg = (float)$stmtAvg->fetchColumn();
-            $stmtCnt = $pdo->prepare('SELECT COUNT(*) FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
-            $stmtCnt->execute([':pid' => $idProduitPost]);
-            echo json_encode(['success' => true, 'avg' => $avg, 'countAvis' => (int)$stmtCnt->fetchColumn()]);
-            exit;
+             $stmtExist = $pdo->prepare("SELECT vote_type FROM _vote_avis WHERE id_client = ? AND id_avis = ?");
+             $stmtExist->execute([$idClient, $idAvis]);
+             $existing = $stmtExist->fetchColumn();
+
+             $pdo->beginTransaction();
+             try {
+                 if ($existing === $dbTyp) {
+                     $pdo->prepare("DELETE FROM _vote_avis WHERE id_client = ? AND id_avis = ?")->execute([$idClient, $idAvis]);
+                     $finalStatus = null;
+                 } else {
+                     if ($existing) {
+                         $pdo->prepare("DELETE FROM _vote_avis WHERE id_client = ? AND id_avis = ?")->execute([$idClient, $idAvis]);
+                     }
+                     $pdo->prepare("INSERT INTO _vote_avis (id_client, id_avis, vote_type) VALUES (?, ?, ?)")->execute([$idClient, $idAvis, $dbTyp]);
+                     $finalStatus = $val;
+                 }
+                 
+                 $stmtCounts = $pdo->prepare("SELECT (SELECT COUNT(*) FROM _vote_avis WHERE id_avis = ? AND vote_type = 'like') as likes, (SELECT COUNT(*) FROM _vote_avis WHERE id_avis = ? AND vote_type = 'dislike') as dislikes");
+                 $stmtCounts->execute([$idAvis, $idAvis]);
+                 $counts = $stmtCounts->fetch(PDO::FETCH_ASSOC);
+
+                 $pdo->prepare("UPDATE _avis SET a_pouce_bleu = ?, a_pouce_rouge = ? WHERE id_avis = ?")->execute([$counts['likes'], $counts['dislikes'], $idAvis]);
+                 
+                 $pdo->commit();
+                 echo json_encode([
+                     'success' => true, 
+                     'user_vote' => $finalStatus,
+                     'counts' => ['a_pouce_bleu' => $counts['likes'], 'a_pouce_rouge' => $counts['dislikes']]
+                 ]);
+             } catch (Exception $e) {
+                 $pdo->rollBack();
+                 throw $e;
+             }
+             exit;
         }
+
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         exit;
     }
 }
@@ -1120,13 +1123,27 @@ function trierProduits($listeProduits, $tri_par)
 {
     switch ($tri_par) {
         case 'meilleures_ventes':
-            
+            usort($listeProduits, function ($a, $b) {
+                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
+            });
+            break;
         case 'prix_croissant':
-            
+            usort($listeProduits, function ($a, $b) {
+                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
+            });
+            break;
         case 'prix_decroissant':
-            
+            usort($listeProduits, function ($a, $b) {
+                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
+            });
+            break;
         case 'note':
-            
+            usort($listeProduits, function ($a, $b) {
+                $noteA = $a['note_moyenne'] ?? 0;
+                $noteB = $b['note_moyenne'] ?? 0;
+                return $noteB - $noteA;
+            });
+            break;
     }
     return $listeProduits;
 }
@@ -1136,7 +1153,18 @@ function filtrerProduits($listeProduits, $filtres)
 {
     $produits_filtres = [];
     foreach ($listeProduits as $produitCourant) {
-        
+        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum'])
+            continue;
+        if ($filtres['categorieFiltre'] !== 'all') {
+            $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
+            if (!in_array($filtres['categorieFiltre'], $categoriesProduit))
+                continue;
+        }
+        if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0)
+            continue;
+        if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum'])
+            continue;
+        $produits_filtres[] = $produitCourant;
     }
     return $produits_filtres;
 }
