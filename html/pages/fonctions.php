@@ -25,8 +25,6 @@ function chargerProduitsBDD($pdo)
             STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories
         FROM cobrec1._produit p
         LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit 
-            AND r.reduction_debut <= CURRENT_TIMESTAMP 
-            AND r.reduction_fin >= CURRENT_TIMESTAMP
         LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
         LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
         LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
@@ -1103,4 +1101,22 @@ function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_tot
             'f_total_ht_remise' => $f_total_ht_remise,
             ':f_total_ttc' => $f_total_ttc
         ]);
+}
+
+//fonction pour préparer les catégories pour l'affichage
+function preparercategories_affichage($listeCategories)
+{
+    $categories_affichage = [];
+    $total_produits = 0;
+    foreach ($listeCategories as $nomCategorie => $compte) {
+        $categories_affichage[] = [
+            'category' => $nomCategorie,
+            'count' => $compte
+        ];
+    }
+    array_unshift($categories_affichage, [
+        'category' => 'all',
+        'count' => $total_produits
+    ]);
+    return $categories_affichage;
 }
