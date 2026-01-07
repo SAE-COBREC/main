@@ -78,7 +78,7 @@ aside section h4 {
   margin-bottom: 1rem;
   font-weight: 600;
 }
-aside section > div {
+aside section:not(.no-hover) > div {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -87,12 +87,23 @@ aside section > div {
   color: #c0c0c0;
   transition: all 0.2s ease;
 }
-aside section > div:hover {
+aside section:not(.no-hover) > div:hover {
   background-color: #EFEFEF;
   border-radius: 8px;
   padding: 5px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-aside section > div span:last-child {
+aside section:not(.no-hover) > div span {
+  color: #7171A3;
+  font-size: 0.9rem;
+}
+aside section.no-hover > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+aside section.no-hover > div span {
   color: #7171A3;
   font-size: 0.9rem;
 }
