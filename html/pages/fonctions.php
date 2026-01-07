@@ -7,10 +7,9 @@ function chargerProduitsBDD($pdo)
     $listeCategories = [];
 
     try {
-        //requête SQL pur récupérer tous les produits avec leurs informations
+        //requête SQL pour récupérer tous les produits avec leurs informations
         $requeteSQL = "
-        SELECT 
-            DISTINCT ON (p.id_produit)
+        SELECT DISTINCT ON (p.id_produit)
             p.id_produit,
             p.p_nom,
             p.p_description,
@@ -20,28 +19,24 @@ function chargerProduitsBDD($pdo)
             p.p_nb_ventes,
             p.p_statut,
             COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
-            COALESCE(avis.nombre_avis, 0) as nombre_avis,
             COALESCE(t.montant_tva, 0) as tva,
-            (SELECT STRING_AGG(cp.nom_categorie, ', ') 
-                FROM cobrec1._fait_partie_de fpd 
-                JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-                WHERE fpd.id_produit = p.id_produit) as categories,
-            (SELECT i.i_lien 
-                FROM cobrec1._represente_produit rp 
-                JOIN cobrec1._image i ON rp.id_image = i.id_image
-                WHERE rp.id_produit = p.id_produit 
-                LIMIT 1) as image_url
+            i.i_lien as image_url,
+            COUNT(av.id_avis) as nombre_avis,
+            STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories
         FROM cobrec1._produit p
         LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit 
             AND r.reduction_debut <= CURRENT_TIMESTAMP 
             AND r.reduction_fin >= CURRENT_TIMESTAMP
         LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
-        LEFT JOIN (
-            SELECT id_produit, COUNT(*) as nombre_avis 
-            FROM cobrec1._avis 
-            GROUP BY id_produit
-        ) avis ON p.id_produit = avis.id_produit 
+        LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
+        LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
+        LEFT JOIN cobrec1._avis av ON p.id_produit = av.id_produit
+        LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+        LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
         WHERE p.p_statut = 'En ligne'
+        GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
+                 p.p_note, p.p_nb_ventes, p.p_statut, r.reduction_pourcentage, 
+                 t.montant_tva, i.i_lien
         ORDER BY p.id_produit
     ";
 
@@ -52,9 +47,9 @@ function chargerProduitsBDD($pdo)
         $sqlCategories = "
         SELECT cp.nom_categorie as category, 
                 COUNT(DISTINCT p.id_produit) as count
-        FROM _produit p
-        JOIN _fait_partie_de fpd ON p.id_produit = fpd.id_produit
-        JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+        FROM cobrec1._produit p
+        JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+        JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
         WHERE p.p_statut = 'En ligne'
         GROUP BY cp.nom_categorie
     ";
@@ -73,21 +68,24 @@ function chargerProduitsBDD($pdo)
     return ['produits' => $listeProduits, 'categories' => $listeCategories];
 }
 
+
 //fonction pour ajouter un article au panier dans la BDD
 function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 {
     try {
         //récupérer les informations du produit (prix, TVA, frais de port, remise)
         $sqlProduit = "
-            SELECT 
+            SELECT DISTINCT ON (p.id_produit)
                 p.p_prix, 
                 p.p_frais_de_port, 
                 p.p_stock,
-                COALESCE(t.montant_tva, 0) as tva,
+                t.montant_tva as tva,
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
-            FROM _produit p
-            LEFT JOIN _tva t ON p.id_tva = t.id_tva
+            FROM cobrec1._produit p
+            JOIN cobrec1._tva t ON p.id_tva = t.id_tva
             LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
+                AND r.reduction_debut <= CURRENT_TIMESTAMP 
+                AND r.reduction_fin >= CURRENT_TIMESTAMP
             WHERE p.id_produit = :idProduit
         ";
 
@@ -113,7 +111,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
         $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
 
         //vérifier si l'article existe déjà dans le panier
-        $sqlCheck = "SELECT quantite FROM _contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
+        $sqlCheck = "SELECT quantite FROM cobrec1._contient WHERE id_produit = :idProduit AND id_panier = :idPanier";
         $stmtCheck = $pdo->prepare($sqlCheck);
         $stmtCheck->execute([
             ':idProduit' => $idProduit,
@@ -133,7 +131,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 
         if ($existe) {
             //si l'article existe déjà, augmenter la quantité
-            $sqlUpdate = "UPDATE _contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
+            $sqlUpdate = "UPDATE cobrec1._contient SET quantite = quantite + :quantite WHERE id_produit = :idProduit AND id_panier = :idPanier";
             $stmtUpdate = $pdo->prepare($sqlUpdate);
             $stmtUpdate->execute([
                 ':quantite' => $aAjouter,
@@ -147,7 +145,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
         } else {
             //sinon, insérer un nouvel article avec toutes les informations
             $sqlInsert = "
-                INSERT INTO _contient 
+                INSERT INTO cobrec1._contient 
                 (id_produit, id_panier, quantite, prix_unitaire, remise_unitaire, frais_de_port, tva) 
                 VALUES (:idProduit, :idPanier, :quantite, :prixUnitaire, :remiseUnitaire, :fraisDePort, :tva)
             ";
@@ -171,43 +169,34 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
     }
 }
 
+
 //fonction pour ajouter un article au panier temporaire (SESSION) pour utilisateurs non connectés
 function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
 {
     try {
         //récupérer les informations du produit (prix, TVA, frais de port, remise, nom, description, image)
         $sqlProduit = "
-            SELECT 
-            p.p_nom,
-            p.p_description,
-            p.p_prix, 
-            p.p_frais_de_port, 
-            p.p_stock,
-            v.denomination,
-            COALESCE(t.montant_tva, 0) as tva,
-            COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
-            (SELECT i.i_lien
-                FROM cobrec1._represente_produit rp 
-                JOIN cobrec1._image i ON rp.id_image = i.id_image
-                WHERE rp.id_produit = p.id_produit 
-                LIMIT 1) as image_url,
-            (SELECT i.i_alt
-                FROM cobrec1._represente_produit rp 
-                JOIN cobrec1._image i ON rp.id_image = i.id_image
-                WHERE rp.id_produit = p.id_produit 
-                LIMIT 1) as image_alt,
-            (SELECT i.i_title
-                FROM cobrec1._represente_produit rp 
-                JOIN cobrec1._image i ON rp.id_image = i.id_image
-                WHERE rp.id_produit = p.id_produit 
-                LIMIT 1) as image_title
-        FROM cobrec1._produit p
-        LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
-        LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
-            AND r.reduction_debut <= CURRENT_TIMESTAMP 
-            AND r.reduction_fin >= CURRENT_TIMESTAMP
-        LEFT JOIN cobrec1._vendeur v ON v.id_vendeur = p.id_vendeur
-        WHERE p.id_produit = :idProduit
+            SELECT DISTINCT ON (p.id_produit)
+                p.p_nom,
+                p.p_description,
+                p.p_prix, 
+                p.p_frais_de_port, 
+                p.p_stock,
+                v.denomination,
+                t.montant_tva as tva,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
+                i.i_lien as image_url,
+                i.i_alt as image_alt,
+                i.i_title as image_title
+            FROM cobrec1._produit p
+            JOIN cobrec1._tva t ON p.id_tva = t.id_tva
+            JOIN cobrec1._vendeur v ON v.id_vendeur = p.id_vendeur
+            LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
+                AND r.reduction_debut <= CURRENT_TIMESTAMP 
+                AND r.reduction_fin >= CURRENT_TIMESTAMP
+            LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
+            LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
+            WHERE p.id_produit = :idProduit
         ";
 
         $stmtProduit = $pdo->prepare($sqlProduit);
@@ -666,7 +655,8 @@ function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $
 //charge les informations d'un produit et ses images
 function chargerProduitBDD($pdo, $idProduit) {
     try {
-        $stmtProd = $pdo->prepare("SELECT 
+        $stmtProd = $pdo->prepare("
+            SELECT DISTINCT ON (p.id_produit)
                 p.id_produit,
                 p.p_nom,
                 p.p_prix,
@@ -676,31 +666,38 @@ function chargerProduitBDD($pdo, $idProduit) {
                 COALESCE(p.p_nb_ventes, 0) AS p_nb_ventes,
                 COALESCE(p.p_note, 0) AS p_note,
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
-                COALESCE(t.montant_tva, 0) as tva,
+                t.montant_tva as tva,
                 v.raison_sociale AS vendeur_nom,
                 c.email AS vendeur_email,
-                (SELECT STRING_AGG(cp.nom_categorie, ', ')
-                FROM _fait_partie_de fpd
-                JOIN _categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-                WHERE fpd.id_produit = p.id_produit) AS categories
-            FROM _produit p
-            LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit=
-            LEFT JOIN _tva t ON p.id_tva = t.id_tva
-            LEFT JOIN _vendeur v ON p.id_vendeur = v.id_vendeur
-            LEFT JOIN _compte c ON v.id_compte = c.id_compte
+                STRING_AGG(DISTINCT cp.nom_categorie, ', ') AS categories
+            FROM cobrec1._produit p
+            JOIN cobrec1._tva t ON p.id_tva = t.id_tva
+            JOIN cobrec1._vendeur v ON p.id_vendeur = v.id_vendeur
+            JOIN cobrec1._compte c ON v.id_compte = c.id_compte
+            LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
+                AND r.reduction_debut <= CURRENT_TIMESTAMP 
+                AND r.reduction_fin >= CURRENT_TIMESTAMP
+            LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+            LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
             WHERE p.id_produit = :pid
-            LIMIT 1");
+            GROUP BY p.id_produit, p.p_nom, p.p_prix, p.p_stock, p.p_statut, 
+                     p.p_description, p.p_nb_ventes, p.p_note, r.reduction_pourcentage,
+                     t.montant_tva, v.raison_sociale, c.email
+            LIMIT 1
+        ");
         $stmtProd->execute([':pid' => $idProduit]);
         $produit = $stmtProd->fetch(PDO::FETCH_ASSOC);
 
         if (!$produit) return null;
 
         //pour les images
-        $stmtImgs = $pdo->prepare("SELECT i.i_lien
-                                    FROM _represente_produit rp
-                                    JOIN _image i ON rp.id_image = i.id_image
-                                    WHERE rp.id_produit = :pid
-                                ORDER BY rp.id_image ASC");
+        $stmtImgs = $pdo->prepare("
+            SELECT DISTINCT i.i_lien
+            FROM cobrec1._represente_produit rp
+            JOIN cobrec1._image i ON rp.id_image = i.id_image
+            WHERE rp.id_produit = :pid
+            ORDER BY i.i_lien ASC
+        ");
         $stmtImgs->execute([':pid' => $idProduit]);
         $images = $stmtImgs->fetchAll(PDO::FETCH_COLUMN) ?: [];
         
@@ -718,6 +715,7 @@ function chargerProduitBDD($pdo, $idProduit) {
         return null;
     }
 }
+
 
 //charge les avis et réponses pour un produit
 function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
@@ -1103,6 +1101,6 @@ function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_tot
             'f_total_ht' => $f_total_ht,
             'f_total_remise' => $f_total_remise,
             'f_total_ht_remise' => $f_total_ht_remise,
-            ':f_total_ttc' => $totalPanier
+            ':f_total_ttc' => $f_total_ttc
         ]);
 }
