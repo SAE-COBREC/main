@@ -172,7 +172,7 @@ if ($_POST !== []) {
         </h2>
         <form action="index.php<?php 
             if($_SESSION["remise"]["_GET"] != null){
-                echo '?modifier=' . $_SESSION["remise"]["_GET"]['id_reduction'];
+                echo '?modifier=' . $_SESSION["remise"]["_GET"]['produit'];
             }
         ?>" method="post" enctype="multipart/form-data">
             
@@ -317,14 +317,15 @@ if ($_POST !== []) {
 
                             try {//création de l'objet reduction
                                 $sql = '
-                                INSERT INTO cobrec1._reduction( reduction_pourcentage, reduction_debut, reduction_fin)
-                                VALUES (:pourcentage, :debut, :fin);
+                                INSERT INTO cobrec1._reduction(id_produit, reduction_pourcentage, reduction_debut, reduction_fin)
+                                VALUES (:produit, :pourcentage, :debut, :fin);
                                 ';
                                 $stmt = $pdo->prepare($sql);
                                 $params = [
                                     'pourcentage' => $_POST['pourcentage'],
                                     'debut' => $_POST['debut'],
-                                    'fin' => $_POST['fin']
+                                    'fin' => $_POST['fin'],
+                                    'produit' => $_POST['produit']
                                 ];
                                 $stmt->execute($params);
                             } catch (Exception $e) {
@@ -333,22 +334,22 @@ if ($_POST !== []) {
                                 $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                             }
 
-                            try {//création de l'affiliation entre reduction et produit
-                                $sql = '
-                                INSERT INTO cobrec1._en_reduction(id_produit,id_reduction)
-                                VALUES (
-                                :produit, :id_reduc);
-                                ';
-                                $stmt = $pdo->prepare($sql);
-                                $params = [
-                                    'id_reduc' => $pdo->lastInsertId(), 
-                                    'produit' => $_POST['produit']
-                                ];
-                                $stmt->execute($params);
-                            } catch (Exception $e) {
-                                $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre reduction et produit";
-                                $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                            }
+                            // try {//création de l'affiliation entre reduction et produit
+                            //     $sql = '
+                            //     INSERT INTO cobrec1._en_reduction(id_produit,id_reduction)
+                            //     VALUES (
+                            //     :produit, :id_reduc);
+                            //     ';
+                            //     $stmt = $pdo->prepare($sql);
+                            //     $params = [
+                            //         'id_reduc' => $pdo->lastInsertId(), 
+                            //         'produit' => $_POST['produit']
+                            //     ];
+                            //     $stmt->execute($params);
+                            // } catch (Exception $e) {
+                            //     $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre reduction et produit";
+                            //     $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            // }
                             
                             if ($_POST["publier"] == "Publier la remise dans le catalogue client"){
                         
@@ -367,6 +368,7 @@ if ($_POST !== []) {
                         $sql = '
                         UPDATE cobrec1._reduction 
                         SET reduction_pourcentage = :pourcentage, 
+                        id_produit = :produit,
                         reduction_debut = :debut, 
                         reduction_fin = :fin   
                         WHERE id_reduction = :getId;
@@ -376,7 +378,8 @@ if ($_POST !== []) {
                             'pourcentage' => $_POST['pourcentage'],
                             'debut' => $_POST['debut'],
                             'fin' => $_POST['fin'],
-                            'getId' => $_SESSION["remise"]['_GET']['id_reduction']
+                            'getId' => $_SESSION["remise"]['_GET']['id_reduction'],
+                            'produit' => $_POST['produit']
                         ];
                         $stmt->execute($params);
                     } catch (Exception $e) {
@@ -390,24 +393,24 @@ if ($_POST !== []) {
                         // $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                     }
 
-                    if ($_SESSION["remise"]['_GET']['id_produit'] != $_POST['produit']){
-                        try {//modif de l'affiliation entre catégorie et produit
-                            $sql = '
-                            UPDATE cobrec1._en_reduction
-                            SET id_produit = :produit
-                            WHERE id_reduction = :getId;
-                            ';
-                            $stmt = $pdo->prepare($sql);
-                            $params = [
-                                'produit' => $_POST['produit'],
-                                'getId' => $_SESSION["remise"]['_GET']['id_reduction']
-                            ];
-                            $stmt->execute($params);
-                        } catch (Exception $e) {
-                            $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre reduction et produit";
-                            $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                        }
-                    }
+                    // if ($_SESSION["remise"]['_GET']['id_produit'] != $_POST['produit']){
+                    //     try {//modif de l'affiliation entre catégorie et produit
+                    //         $sql = '
+                    //         UPDATE cobrec1._en_reduction
+                    //         SET id_produit = :produit
+                    //         WHERE id_reduction = :getId;
+                    //         ';
+                    //         $stmt = $pdo->prepare($sql);
+                    //         $params = [
+                    //             'produit' => $_POST['produit'],
+                    //             'getId' => $_SESSION["remise"]['_GET']['id_reduction']
+                    //         ];
+                    //         $stmt->execute($params);
+                    //     } catch (Exception $e) {
+                    //         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre reduction et produit";
+                    //         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                    //     }
+                    // }
                 }
 
                 if (empty($_SESSION["remise"]['bdd_errors']) !== true){
