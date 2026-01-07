@@ -1074,7 +1074,7 @@ function transfererPanierTempVersBDD($pdo, $idPanier)
     unset($_SESSION['panierTemp']);
 }
 
-
+//fonction pour inserer une facture
 function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ht_remise, $f_total_ttc){
         $requeteFacture = "INSERT INTO _facture (id_panier, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
                                                         (:id_panier, 
@@ -1095,6 +1095,7 @@ function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_tot
             ':f_total_ttc' => $f_total_ttc
         ]);
 }
+
 
 //fonction pour préparer les catégories pour l'affichage
 function preparercategories_affichage($listeCategories)
