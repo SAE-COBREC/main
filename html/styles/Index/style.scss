@@ -119,6 +119,17 @@ section {
     font-weight: 600;
   }
 
+  select {
+      padding: 0.2em;
+      border: 1px solid #7171A3;
+      color: #7171A3;
+      border-radius: 20px;
+      background: #FFFFFF;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+  }
+
   // Items de catégorie
   &:not(.no-hover) > div {
     @include flex-between;
@@ -370,7 +381,12 @@ article {
     } 
     
     form > div:first-child select {
-      font-size: 1.3em;
+      font-size: 1.2em;
+      padding: 5px 10px;
+    }
+
+    form > section select {
+      font-size: 1.0em;
       padding: 5px 10px;
     }
   }
