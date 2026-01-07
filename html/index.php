@@ -92,7 +92,7 @@ $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
 $tousLesProduits = count($listeProduits);
 $categories_affichage = preparercategories_affichage($listeCategories);
-
+$prixMaximum = max(array_column($listeProduits, 'p_prix'));
 ?>
 
 <!DOCTYPE html>
@@ -116,7 +116,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
             <form method="POST" action="" id="filterForm">
                 <div>
                     <span>Tri par :</span>
-                    <select name="sort" onchange="document.getElementById('filterForm').submit()">
+                    <select>
                         <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>
                             Meilleures ventes
                         </option>
@@ -131,12 +131,12 @@ $categories_affichage = preparercategories_affichage($listeCategories);
 
                 <div>
                     <h3>Filtres</h3>
-                    <button type="button" onclick="reinitialiserFiltres()">Effacer</button>
+                    <button type="button">Effacer</button>
                 </div>
 
                 <section>
                     <h4>Catégories</h4>
-                    <select onchange="definirCategorie(this.value)">
+                    <select>
                         <option value="all">Tous les produits (<?= $tousLesProduits ?>)</option>
                         <?php foreach ($categories_affichage as $categorieCourante): ?>
                         <?php if ($categorieCourante['category'] !== 'all'): ?>
@@ -152,13 +152,11 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 <section>
                     <h4>Prix</h4>
                     <div>
-                        <input type="range" name="price" min="0" max="<?= $prixMaximumDynamique ?>"
-                            value="<?= $prixMaximum ?>" oninput="mettreAJourAffichagePrix(this.value)"
-                            onchange="document.getElementById('filterForm').submit()">
+                        <input type="range" name="price" min="0" max="<?= $prixMaximum ?>" value="<?= $prixMaximum ?>">
                     </div>
                     <div>
                         <span>0€</span>
-                        <span id="affichagePrixMax" ondblclick="activerEditionPrix()"><?= $prixMaximum ?>€</span>
+                        <span><?= $prixMaximum ?>€</span>
                     </div>
                 </section>
 
@@ -175,15 +173,10 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 <section>
                     <h4>Disponibilité</h4>
                     <label>
-                        <input type="checkbox" name="in_stock" <?= $enStockSeulement ? 'checked' : '' ?>
-                            onchange="document.getElementById('filterForm').submit()">
+                        <input type="checkbox" <?= $enStockSeulement ? 'checked' : '' ?>>
                         <span>En stock uniquement</span>
                     </label>
                 </section>
-
-                <input type="hidden" name="category" id="champCategorie"
-                    value="<?= htmlspecialchars($categorieFiltre) ?>">
-                <input type="hidden" name="note" id="champNote" value="<?= $noteMinimum ?>">
             </form>
         </aside>
 
