@@ -149,7 +149,7 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                 </section>
 
 
-                <section>
+                <section class="no-hover">
                     <h4>Prix</h4>
                     <div>
                         <input type="range" name="price" min="0" max="<?= $prixMaximum ?>" value="<?= $prixMaximum ?>">
