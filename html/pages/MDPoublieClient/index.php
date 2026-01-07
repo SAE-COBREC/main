@@ -35,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
   $cmdp = $_POST['Cmdp'] ?? '';
-
   $hasError = false;
   $error_card = null;
   $error_message = '';
@@ -66,15 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if ($hasError) {
         // stop further processing
       } else {
-      if ($mdp === $row['mdp']) {
+      // Vérifier que le nouveau mdp est différent de l'ancien
+      if (password_verify($mdp, $row['mdp'])) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Veuillez saisir un nouveau mot de passe différent de l\'ancien.';
       } else {
+        // Hasher le nouveau mot de passe avant de l'enregistrer
+        $mdpHash = password_hash($mdp, PASSWORD_DEFAULT);
         $sql = 'UPDATE cobrec1._compte SET mdp = :mdp WHERE id_compte = :id_compte';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-          ':mdp' => $mdp,
+          ':mdp' => $mdpHash,
           ':id_compte' => $row['id_compte']
         ]);
         
@@ -138,12 +140,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="mdp">Nouveau mot de passe</label>
-        <input type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
+        <input type="password" id="mdp" name="mdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-8]).{8,16}$" title="Le mot de passe doit contenir entre 9 et 16 caractères, au moins une majuscule, une minuscule, un chiffre et un caractère spécial.">
       </div>
 
       <div>
         <label for="Cmdp">Confirmer le mot de passe</label>
-        <input type="password" id="Cmdp" name="Cmdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{9,16}$" title="Veuillez saisir les memes mot de passe">
+        <input type="password" id="Cmdp" name="Cmdp" placeholder="***********" required pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-8]).{8,16}$" title="Veuillez saisir les memes mot de passe">
       </div>
 
       
@@ -177,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           if (el.id === 'mdp') {
             var val = (el.value || '').trim();
             if (val.length === 0) return 'Ce champ est requis.';
-            if (val.length < 9) return 'Le mot de passe doit contenir au moins 9 caractères.';
+            if (val.length < 8) return 'Le mot de passe doit contenir au moins 8 caractères.';
             if (val.length > 16) return 'Le mot de passe doit contenir au maximum 16 caractères.';
             if (!/[0-9]/.test(val)) return 'Le mot de passe doit contenir au moins un chiffre.';
             if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';

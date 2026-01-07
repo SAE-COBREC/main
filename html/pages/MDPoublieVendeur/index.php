@@ -66,19 +66,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if ($hasError) {
         // stop further processing
       } else {
-      if ($mdp === $row['mdp']) {
+      // Vérifier que le nouveau mdp est différent de l'ancien
+      if (password_verify($mdp, $row['mdp'])) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Veuillez saisir un mot de passe différent de l\'ancien.';
       } else {
+        // Hasher le nouveau mot de passe avant de l'enregistrer
+        $mdpHash = password_hash($mdp, PASSWORD_DEFAULT);
         $sql = 'UPDATE cobrec1._compte SET mdp = :mdp WHERE id_compte = :id_compte';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-          ':mdp' => $mdp,
+          ':mdp' => $mdpHash,
           ':id_compte' => $row['id_compte']
         ]);
-        
-        // CORRECTION: Récupérer l'ID client si nécessaire  
+
         $stmtClient = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id_compte");
         $stmtClient->execute([':id_compte' => $row['id_compte']]);
         $clientRow = $stmtClient->fetch(PDO::FETCH_ASSOC);
@@ -89,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['idCompte'] = (int)$row['id_compte'];
         
         // Redirection
-        $url = '../connexionClient/index.php';
+        $url = '../connexionVendeur/index.php';
         echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
         exit;
       }
@@ -217,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               alert(message);
             }
           }
-          try { invalid.focus(); } catch (e) { /* ignore */ }
+          try { invalid.focus(); } catch (e) {}
         }
         return;
       }
