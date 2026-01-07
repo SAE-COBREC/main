@@ -110,53 +110,66 @@ aside {
   }
 
   // Sections de filtres
-  section {
-    margin-bottom: 2rem;
+section {
+  margin-bottom: 2rem;
 
-    h4 {
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-      font-weight: 600;
+  h4 {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  // Items de catégorie
+  &:not(.no-hover) > div {
+    @include flex-between;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    color: $secondary-color-gris-fonce;
+    @include transition(all);
+
+    &:hover {
+      background-color: $secondary-color-gris-clair;
+      border-radius: 8px;
+      padding: 5px 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    // Items de catégorie
-    > div {
-      @include flex-between;
-      padding: 0.5rem 0;
-      cursor: pointer;
-      color: $secondary-color-gris-fonce;
-      @include transition(all);
-
-      &:hover {
-        background-color: $secondary-color-gris-clair;
-        border-radius: 8px;
-        padding: 5px 10px;
-      }
-
-      span:last-child {
-        color: $primary-color-bleu;
-        font-size: 0.9rem;
-      }
-    }
-
-    // Checkboxes
-    label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      padding: 0.5rem 0;
-      @include transition(color);
-
-      &:hover {
-        color: $primary-color-bleu;
-      }
-
-      input[type="checkbox"] {
-        cursor: pointer;
-      }
+    span {
+      color: $primary-color-bleu;
+      font-size: 0.9rem;
     }
   }
+
+  // Styles pour les divs de la section Prix (sans hover)
+  &.no-hover > div {
+    @include flex-between;
+    padding: 0.5rem 0;
+    
+    span {
+      color: $primary-color-bleu;
+      font-size: 0.9rem;
+    }
+  }
+
+  // Checkboxes
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    @include transition(color);
+
+    &:hover {
+      color: $primary-color-bleu;
+    }
+
+    input[type="checkbox"] {
+      cursor: pointer;
+    }
+  }
+}
+
 
   // Range slider
   input[type="range"] {
