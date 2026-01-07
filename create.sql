@@ -787,16 +787,16 @@ EXECUTE PROCEDURE mise_sur_marche_produit();
 
 -- 1. COMPTES
 INSERT INTO _compte (nom, prenom, email, num_telephone, mdp, etat_A2F, nb_fois_signale, nb_signalements_avis, nb_cpts_signales, nb_avis_signales) VALUES
-('Maeleau', 'Le Hyver', 'admin@cobrec.fr', '0601020304', 'Admin123!', TRUE, 0, 0, 0, 0),
-('Lopicier', 'Mallo', 'vendeur1@example.com', '0612345678', 'Vendeur1!', FALSE, 0, 0, 0, 0),
-('Elouard', 'Jean-Jacques', 'vendeur2@shop.fr', '0623456789', 'Shop2024!', FALSE, 1, 0, 0, 0),
-('Jean', 'Dupont','client1@gmail.com', '0634567890', 'Client1!', FALSE, 0, 1, 0, 0),
-('Marie', 'Martin','client2@yahoo.fr', '0645678901', 'Client2!', TRUE, 0, 0, 1, 0),
-('Pierre', 'Durand','client3@outlook.com', '0656789012', 'Client3!', FALSE, 0, 0, 0, 0),
-('Sophie', 'Bernard','client4@free.fr', '0667890123', 'Test1234!', FALSE, 0, 0, 0, 0),
-('Lucas', 'Petit','client5@orange.fr', '0678901234', 'Pass5678!', FALSE, 0, 0, 0, 0),
-('Emma', 'Lefebvre','client6@wanadoo.fr', '0689012345', 'Secure99!', TRUE, 0, 0, 0, 0),
-('Martinière', 'Yvili', 'vendeur3@boutique.fr', '0690123456', 'Boutique1!', FALSE, 0, 0, 0, 0);
+('Maeleau', 'Le Hyver', 'admin@cobrec.fr', '0601020304', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', TRUE, 0, 0, 0, 0),
+('Lopicier', 'Mallo', 'vendeur1@example.com', '0612345678', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', FALSE, 0, 0, 0, 0),
+('Elouard', 'Jean-Jacques', 'vendeur2@shop.fr', '0623456789', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', FALSE, 1, 0, 0, 0),
+('Jean', 'Dupont','client1@gmail.com', '0634567890', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', FALSE, 0, 1, 0, 0),
+('Marie', 'Martin','client2@yahoo.fr', '0645678901', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', TRUE, 0, 0, 1, 0),
+('Pierre', 'Durand','client3@outlook.com', '0656789012', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', FALSE, 0, 0, 0, 0),
+('Sophie', 'Bernard','client4@free.fr', '0667890123', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', FALSE, 0, 0, 0, 0),
+('Lucas', 'Petit','client5@orange.fr', '0678901234', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', FALSE, 0, 0, 0, 0),
+('Emma', 'Lefebvre','client6@wanadoo.fr', '0689012345', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', TRUE, 0, 0, 0, 0),
+('Martinière', 'Yvili', 'vendeur3@boutique.fr', '0690123456', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS', FALSE, 0, 0, 0, 0);
 
 -- 2. ADMINISTRATEURS
 INSERT INTO _administrateur (id_compte) VALUES (1);
