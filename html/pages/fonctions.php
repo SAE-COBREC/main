@@ -15,6 +15,7 @@ function chargerProduitsBDD($pdo)
             p.p_description,
             p.p_prix,
             p.p_stock,
+            r.reduction_pourcentage,
             (SELECT COUNT(*) FROM cobrec1._avis av2 WHERE av2.id_produit = p.id_produit AND av2.a_note IS NOT NULL) as nombre_avis,
             (SELECT ROUND(COALESCE(AVG(av3.a_note), 0)::numeric, 1) FROM cobrec1._avis av3 WHERE av3.id_produit = p.id_produit AND av3.a_note IS NOT NULL) as note_moyenne,
             (SELECT COALESCE(i2.i_lien, '/img/photo/smartphone_xpro.jpg') FROM cobrec1._represente_produit rp2 LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image WHERE rp2.id_produit = p.id_produit LIMIT 1) as image_url,
