@@ -544,7 +544,8 @@ article {
 
 /* Style pour les articles en promotion */
 .produit-promotion {
-    border: 3px solid $secondary-color-bordure !important; 
+    border: 3px solid $secondary-color-bordure !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); 
 }
 
 /* Style pour le bouton des articles en promotion */
