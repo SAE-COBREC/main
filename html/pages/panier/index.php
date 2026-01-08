@@ -13,7 +13,7 @@
         $requetePanier = "
             SELECT DISTINCT ON (_produit.id_produit)
                 _produit.id_produit,
-                p_nom, p_description, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt, denomination 
+                p_nom, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt, denomination, reduction_pourcentage
             FROM _contient
             JOIN _produit ON _produit.id_produit = _contient.id_produit
             JOIN _vendeur ON _produit.id_vendeur = _vendeur.id_vendeur
@@ -21,6 +21,7 @@
             JOIN _image ON _represente_produit.id_image = _image.id_image
             JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
             JOIN _tva ON _produit.id_tva = _tva.id_tva 
+            LEFT JOIN _reduction ON _reduction.id_produit = _produit.id_produit
             WHERE id_client = :id_client
                 AND _panier_commande.id_panier = :id_panier
                 AND p_statut = 'En ligne';
@@ -69,8 +70,9 @@
                 <div>
                     
                     <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
+                    
                     <?php foreach ($articles as $article): ?> 
-                        <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
+                        <article class="unArticleP" data-prix="<?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.')?>"
                                                     data-stock="<?php echo intval($article['p_stock'])?>"
                                                     data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                             <div class="imageArticleP">
@@ -81,9 +83,9 @@
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
                                 <p><strong>Vendu par : </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
-                                    <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.')?> €</p>
+                                    <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.', ' ')?> €</p>
                                 <div class="basArticleP">
-                                    <p class="articlePrix"><?php echo  number_format($article['p_prix'], 2, '.')?> €</p>
+                                    <p class="articlePrix">TTC : <?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.', ' ')?> €</p>
                                     <div class="quantite">
 
                                         <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
@@ -105,11 +107,11 @@
                 <!-- BLOCK DU RECAP DE LA COMMANDE -->
                 <aside class="recapCommande">
                     <div class="recapTete">
-                        <h3 id="totalArticles"></h3> <!--es tremplit avec le js-->
-                        <div id="listeProduits"></div> <!--es tremplit avec le js-->
+                        <h3 id="totalArticles"></h3> <!--est tremplit avec le js-->
+                        <div id="listeProduits"></div> <!--est tremplit avec le js-->
                     </div>
                     <div class="recapTotal">
-                        <h3>Prix TTC :</h3> <!--es tremplit avec le js-->
+                        <h3>Prix TTC :</h3> <!--est tremplit avec le js-->
                         <h3 class="prixTotal" id="prixTotal"></h3>
                     </div>
                     <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
@@ -127,9 +129,9 @@
 
                 <div>
                     <?php foreach ($panierTemp as $idProduit => $article): ?>
-                        <article class="unArticleP" data-prix="<?php echo number_format($article['p_prix'], 2, '.')?>"
-                                                        data-stock="<?php echo intval($article['p_stock'])?>"
-                                                        data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
+                        <article class="unArticleP" data-prix="<?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.')?>"
+                                                    data-stock="<?php echo intval($article['p_stock'])?>"
+                                                    data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                             <div class="imageArticleP">
                                 <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
                                     alt="<?php echo htmlspecialchars($article['i_alt']) ?>" 
@@ -138,9 +140,9 @@
                             <div class="articleDetailP">
                                 <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
                                 <p><strong>Vendu par : </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
-                                    <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.')?> €</p>
+                                    <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.', ' ')?> €</p>
                                 <div class="basArticleP">
-                                    <P class="articlePrix">TTC : <?php echo number_format($article['p_prix'] + $article['p_prix'] * ($article['montant_tva'] / 100), 2, '.')?> €</p>
+                                    <p class="articlePrix">TTC : <?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.', ' ')?> €</p>
                                     <div class="quantite">
 
                                         <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
@@ -255,7 +257,7 @@
 
 
                     if (quantite > 0) {
-                        PrixTotal += (prix * quantite) + (prix * (tva / 100) * quantite); 
+                        PrixTotal += prix * quantite //calcul le prix avec la quantité dans le panier pour le récap
                         console.log(PrixTotal);
                         nbArticles += quantite; //pour le nombre de produit total
                         produitEnHTML += `<p>${titre} <span>x${quantite}</span>, tva : <span>${tva}</span> %</p>`; //pour ajouter dans le récap

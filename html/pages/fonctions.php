@@ -1100,10 +1100,10 @@ function transfererPanierTempVersBDD($pdo, $idPanier)
 }
 
 //fonction pour inserer une facture
-function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ht_remise, $f_total_ttc, $id_adresse) {
+function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ttc, $id_adresse) {
     $requeteFacture = "
         INSERT INTO _facture 
-        (id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc)
+        (id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ttc)
         
         VALUES
         (
@@ -1113,7 +1113,6 @@ function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_tot
             :prenom_destinataire,
             :f_total_ht,
             :f_total_remise,
-            :f_total_ht_remise,
             :f_total_ttc
         )
     ";
@@ -1126,7 +1125,6 @@ function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_tot
         ':prenom_destinataire' => $prenom,
         ':f_total_ht' => $f_total_ht,
         ':f_total_remise' => $f_total_remise,
-        ':f_total_ht_remise' => $f_total_ht_remise,
         ':f_total_ttc' => $f_total_ttc
     ]);
 }
@@ -1202,26 +1200,10 @@ function filtrerProduits($listeProduits, $filtres)
     return $produits_filtres;
 }
 
-function recupInfoPourFacture($pdo, $id_panier){
-    //calcul le prix d'un produit apres les remises et la tva ne calcul pas avec la quantite
-    $reqFacture = "
-                SELECT p_prix, quantite, montant_tva, reduction_pourcentage 
-                FROM _contient 
-                JOIN _produit ON _contient.id_produit = _produit.id_produit 
-                JOIN _tva ON _produit.id_tva = _tva.id_tva
-                JOIN _reduction ON _produit.id_produit = _reduction.id_produit
-                WHERE id_panier = :id_panier;
-    ";
-    $stmt = $pdo->prepare($reqFacture);
-    $stmt->execute([':id_panier' => $id_panier]);
-    $donnees = $stmt->fetch();
-    return $donnees;
-}
-
 function recupInfoPourFactureArticle($pdo, $id_produit){
     //calcul le prix d'un produit apres les remises et la tva ne calcul pas avec la quantite
     $reqFacture = "
-                SELECT p_prix, quantite, montant_tva, reduction_pourcentage 
+                SELECT p_prix, montant_tva, reduction_pourcentage 
                 FROM _produit 
                 JOIN _tva ON _produit.id_tva = _tva.id_tva
                 JOIN _reduction ON _produit.id_produit = _reduction.id_produit

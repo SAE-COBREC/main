@@ -34,21 +34,34 @@ if (isset($_SESSION['idClient'])) {
     ]);
     $adresses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    //on init les prix qui seront rentré dans la facture de la BDD
+    $prixTotalFinal = 0;
+    $f_total_ht = 0; //le prix total HT
+    $f_total_remise = 0; //le prix des remises
 
-    //recalcul du total directement depuis la base de donnees  pour éviter les problème de modification de variable en javascipt
-    $reqTotal = "
-            SELECT SUM(p_prix * quantite * (1 + montant_tva / 100)) 
+    //on récup tous les id des produit dans le panier
+    $reqArticlePanier = "
+            SELECT _contient.id_produit, quantite
             FROM _contient 
-            JOIN _produit ON _contient.id_produit = _produit.id_produit 
-            JOIN _tva ON _produit.id_tva = _tva.id_tva
+            JOIN _produit ON _contient.id_produit = _produit.id_produit
             WHERE id_panier = :id_panier
+            AND p_statut = 'En ligne';
         ";
-    $stmt = $pdo->prepare($reqTotal);
+    $stmt = $pdo->prepare($reqArticlePanier);
     $stmt->execute([':id_panier' => $_SESSION['panierEnCours']]);
-    $totalCalcul = $stmt->fetchColumn();
+    $articlesDansPanier = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    //formater le prix pour l'afficher
-    $totalPanier = number_format($totalCalcul, 2, '.', '');
+    //pour chaque article dans le panier  
+    foreach($articlesDansPanier as $article){
+        $donnees = recupInfoPourFactureArticle($pdo, $article["id_produit"]);
+        $f_total_ht = $f_total_ht + $donnees["p_prix"];
+        $reduc = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
+        $f_total_remise = $f_total_remise + $reduc;
+        $prixTotalFinal = $prixTotalFinal + ((($donnees["p_prix"] - $reduc) * (1 + $donnees["montant_tva"] / 100)) * $article["quantite"]);
+        echo $prixTotalFinal . "_";
+    }
+    $prixTotalFinal = round($prixTotalFinal, 2);
+
 } else {
     $url = '/pages/connexionClient/index.php';
     echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
@@ -140,42 +153,14 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
 
         //⚠️On insère dans la facture MAIS A TERMINER⚠️
         /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI⚠️⚠️⚠️⚠️⚠️⚠️*/
-        
-        //on init les prix qui seront rentré dans la facture de la BDD
-        $prixTotalFinal = 0;
-        $f_total_ht = 0; //le prix total HT
-        $f_total_remise = 0; //le prix des remises
-        $f_total_ht_remise = 0; //le prix total HT avec les remises
-
-        //on récup tous les id des produit dans le panier
-        $reqArticlePanier = "
-                SELECT id_produit, quantite
-                FROM _contient 
-                WHERE id_panier = :id_panier
-            ";
-        $stmt = $pdo->prepare($reqArticlePanier);
-        $stmt->execute([':id_panier' => $_SESSION['panierEnCours']]);
-        $articlesDansPanier = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        //pour chaque article dans le panier
-        foreach($articlesDansPanier as $article){
-            $donnees = recupInfoPourFactureArticle($pdo, $article["id_produit"]); //on récupère les information de la promotion de la TVA ...
-            $f_total_ht += $donnees["p_prix"];
-            $f_total_remise += $donnees["p_prix"] - ($donnees["p_prix"] * (1 - $donnees["reduction_pourcentage"] / 100));
-            $f_total_ht_remise = $f_total_ht - $f_total_remise;
-            $prixApresReduction = $donnees["p_prix"] * (1 - $donnees["reduction_pourcentage"] / 100);
-            $prixFinal = ($prixApresReduction * (1 + $donnees["montant_tva"] / 100)) * $article["quantite"];
-            $prixTotalFinal += $prixFinal;
-        }
 
         if ($_POST['adresse'] == "nouvelle"){ 
             $resultatAdresse = ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
             insererFacture($pdo, $panierEnCours, $_POST['nom_destinataire'], $_POST['prenom_destinataire'], 
-            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, $totalPanier, $resultatAdresse['id_adresse']);
-            
+            $f_total_ht ?? 0, $f_total_remise ?? 0, $prixTotalFinal, $resultatAdresse['id_adresse']);
         } else {
             insererFacture($pdo, $panierEnCours, $nomPrenom["nom"], $nomPrenom["prenom"],
-            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2), $_POST['adresse']);
+            $f_total_ht ?? 0, $f_total_remise ?? 0, $prixTotalFinal, $_POST['adresse']);
         }
 
         //on créer un session pour le panier qui vient d'être commandé car le panierEnCours on doit le supprimé pour éviter
@@ -277,7 +262,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             <?php if ($boolErreur == true): ?>
                 <p><span><?php echo $erreur ?></span></p>
             <?php endif; ?>
-            <button>Payer: <?php echo $totalPanier ?>€</button>
+            <button>Payer: <?php echo $prixTotalFinal ?>€</button>
             </form>
     </section>
     <script>
