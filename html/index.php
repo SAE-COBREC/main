@@ -106,6 +106,11 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
     <link rel="stylesheet" href="/styles/Index/style.css">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
+    <style>
+        .star-rating-filter { display: flex; gap: 5px; margin-top: 10px; }
+        .star-btn { background: none; border: none; cursor: pointer; padding: 0; transition: transform 0.1s; }
+        .star-btn:hover { transform: scale(1.1); }
+    </style>
 </head>
 
 <body>
@@ -166,12 +171,14 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
 
                 <section>
                     <h4>Note minimum</h4>
-                    <?php for ($i = 5; $i >= 1; $i--): ?>
-                    <div onclick="definirNote(<?= $i ?>)">
-                        <span><?= str_repeat('<img src="/img/svg/star-full.svg" alt="★" width="16" style="margin-right:3px;">', $i) . str_repeat('<img src="/img/svg/star-empty.svg" alt="☆" width="16">', 5 - $i) ?></span>
-                        <span><?= $i ?> et plus</span>
+                    <div class="star-rating-filter" id="starFilterWidget">
+                        <?php for($i=1; $i<=5; $i++): ?>
+                        <button type="button" class="star-btn" data-value="<?= $i ?>" aria-label="Note <?= $i ?>">
+                            <img src="/img/svg/star-empty.svg" alt="" width="24" height="24">
+                        </button>
+                        <?php endfor; ?>
                     </div>
-                    <?php endfor; ?>
+                    <input type="hidden" name="note_min" id="inputNoteMin" value="0">
                 </section>
 
                 <section>
@@ -259,6 +266,45 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
 
     <script src="/js/notifications.js"></script>
     <script>
+    // Gestion du sélecteur d'étoiles (Filtres)
+    document.addEventListener('DOMContentLoaded', () => {
+        const widget = document.getElementById('starFilterWidget');
+        const input = document.getElementById('inputNoteMin');
+        let selectedValue = 0;
+
+        if (widget) {
+            const btns = widget.querySelectorAll('.star-btn');
+            
+            const updateStars = (val) => {
+                btns.forEach(b => {
+                    const v = parseInt(b.dataset.value);
+                    const img = b.querySelector('img');
+                    // Change l'image selon la valeur (full ou empty)
+                    img.src = v <= val ? '/img/svg/star-full.svg' : '/img/svg/star-empty.svg';
+                });
+            };
+
+            btns.forEach(btn => {
+                // Survol : affiche les étoiles jusqu'au curseur
+                btn.addEventListener('mouseenter', () => updateStars(btn.dataset.value));
+                
+                // Clic : sélectionne la note
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    selectedValue = parseInt(btn.dataset.value);
+                    if (input) input.value = selectedValue;
+                    updateStars(selectedValue);
+                    
+                    // "Return" de la valeur sélectionnée
+                    console.log(selectedValue);
+                });
+            });
+
+            // Sortie de souris : revient à la valeur sélectionnée
+            widget.addEventListener('mouseleave', () => updateStars(selectedValue));
+        }
+    });
+
     //fonction pour ajouter au panier avec requête AJAX vers la base de données
     function ajouterAuPanier(idProduit) {
         const formData = new FormData();
