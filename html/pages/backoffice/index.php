@@ -39,15 +39,20 @@ try {
         p.p_statut,
         i.i_lien AS image_url,
         r.reduction_pourcentage AS pourcentage,
+        r.reduction_debut AS debut_reduc,
+        r.reduction_fin AS fin_reduc,
+        promo.promotion_debut AS debut_promo,
+        promo.promotion_fin AS fin_promo,
         STRING_AGG(c.nom_categorie, ', ') AS categories
     FROM cobrec1._produit p
     LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
+    LEFT JOIN cobrec1._promotion promo ON p.id_produit = promo.id_produit
     LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
     LEFT JOIN cobrec1._categorie_produit c ON fpd.id_categorie = c.id_categorie
     LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
     LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
     WHERE p.id_vendeur = :id_vendeur
-    GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, pourcentage, i.i_lien
+    GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, pourcentage, debut_reduc, fin_reduc, debut_promo, fin_promo, i.i_lien
     ORDER BY p.id_produit ASC";
 
     $stmt = $pdo->prepare($query);
@@ -128,7 +133,7 @@ try {
                       </div>
                       <div class="product__info">
                         <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
-                        <?php if(!empty($article['pourcentage'])): ?>
+                        <?php if(!empty($article['pourcentage']) && ((strtotime($article["debut_reduc"]) <= time()) && (time() <= strtotime($article["fin_reduc"])))): ?>
                         <div class="product__prix">
                           <p class="product__model__ancien"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
                           <p class="product__model"><?php echo number_format($article['p_prix']* (1 - $article['pourcentage']/100), 2, ',', ' '); ?> €</p>
@@ -168,10 +173,11 @@ try {
         </div>
       </div>
 
-      <div class="page-actions">
-        <a href="create/index.php" class="btn btn--primary">Ajouter un produit</a>
-        <a href="#" id="btn-modifier" class="btn btn--secondary btn--disabled">Modifier le produit</a>
+      <div class="page-actions">  
+        <a href="#" id="btn-promotion" class="btn btn--secondary btn--disabled">Appliquer promotion</a>
         <a href="#" id="btn-remise" class="btn btn--secondary btn--disabled">Appliquer remise</a>
+        <a href="#" id="btn-modifier" class="btn btn--secondary btn--disabled">Modifier le produit</a>
+        <a href="create/index.php" class="btn btn--primary">Ajouter un produit</a>
       </div>
 
       <script>
@@ -179,6 +185,7 @@ try {
           const rows = document.querySelectorAll('.products-table__row');
           const btnModifier = document.getElementById('btn-modifier');
           const btnRemise = document.getElementById('btn-remise');
+          const btnPromotion = document.getElementById('btn-promotion');
 
           rows.forEach(row => {
             row.addEventListener('click', () => {
@@ -204,6 +211,10 @@ try {
                 // Activer le bouton Remise
                 btnRemise.classList.remove('btn--disabled');
                 btnRemise.href = "remise/index.php?modifier=" + productID;
+
+                // Activer le bouton Promotion
+                btnPromotion.classList.remove('btn--disabled');
+                btnPromotion.href = "promotion/index.php?modifier=" + productID;
               } else {
                 // Désactiver le bouton Modifier
                 btnModifier.classList.add('btn--disabled');
@@ -212,6 +223,10 @@ try {
                 // Désactiver le bouton Remise
                 btnRemise.classList.add('btn--disabled');
                 btnRemise.href = "#" + productID;
+
+                // Désactiver le bouton Promotion
+                btnPromotion.classList.add('btn--disabled');
+                btnPromotion.href = "#" + productID;
               }
             });
           });
