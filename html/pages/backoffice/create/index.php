@@ -840,8 +840,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
                             try {//création de l'objet produit dans la base
                                 $sql = '
-                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,date_arrivee_stock_recent)
-                                VALUES (:tva, :vendeur_id, :origine, :titre, :description, :poids, :volume, :prix, :stock, CURRENT_TIMESTAMP);
+                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,date_arrivee_stock_recent,p_modif)
+                                VALUES (:tva, :vendeur_id, :origine, :titre, :description, :poids, :volume, :prix, :stock, CURRENT_TIMESTAMP,CURRENT_DATE);
                                 ';
                                 $stmt = $pdo->prepare($sql);
                                 $params = [

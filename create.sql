@@ -221,7 +221,7 @@ CREATE TABLE cobrec1._reduction (
     reduction_debut timestamp NOT NULL,
     reduction_fin timestamp NOT NULL,
     CONSTRAINT verif_reduction_pourcentage CHECK (reduction_pourcentage >= 0.00 AND reduction_pourcentage <= 100.00),
-    CONSTRAINT verif_reduction_debut CHECK (reduction_debut >  CURRENT_TIMESTAMP),
+    /*CONSTRAINT verif_reduction_debut CHECK (reduction_debut >  CURRENT_TIMESTAMP),*/
     CONSTRAINT verif_reduction_fin CHECK (reduction_fin > reduction_debut)
 );
 
@@ -241,7 +241,7 @@ CREATE TABLE cobrec1._promotion (
     id_produit INT NOT NULL,
     promotion_debut timestamp NOT NULL,
     promotion_fin timestamp NOT NULL,
-    CONSTRAINT verif_promotion_debut CHECK (promotion_debut >  CURRENT_TIMESTAMP),
+    /*CONSTRAINT verif_promotion_debut CHECK (promotion_debut >  CURRENT_TIMESTAMP),*/
     CONSTRAINT verif_promotion_fin CHECK (promotion_fin > promotion_debut)
 );
 
@@ -517,21 +517,21 @@ ALTER TABLE ONLY cobrec1._represente_produit
             REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
 
 -- TABLE REPRESENTE_PROMOTION
-CREATE TABLE cobrec1._represente_promotion (
-    id_image integer NOT NULL,
-    id_promotion integer NOT NULL
-);
+-- CREATE TABLE cobrec1._represente_promotion (
+--     id_image integer NOT NULL,
+--     id_promotion integer NOT NULL
+-- );
 
-ALTER TABLE ONLY cobrec1._represente_promotion
-    ADD CONSTRAINT pk_represente_promotion PRIMARY KEY (id_image, id_promotion);
+-- ALTER TABLE ONLY cobrec1._represente_promotion
+--     ADD CONSTRAINT pk_represente_promotion PRIMARY KEY (id_image, id_promotion);
 
-ALTER TABLE ONLY cobrec1._represente_promotion
-    ADD CONSTRAINT fk_represente_promotion_image FOREIGN KEY (id_image) 
-            REFERENCES cobrec1._image(id_image) ON DELETE CASCADE;
+-- ALTER TABLE ONLY cobrec1._represente_promotion
+--     ADD CONSTRAINT fk_represente_promotion_image FOREIGN KEY (id_image) 
+--             REFERENCES cobrec1._image(id_image) ON DELETE CASCADE;
 
-ALTER TABLE ONLY cobrec1._represente_promotion
-    ADD CONSTRAINT fk_represente_promotion_promotion FOREIGN KEY (id_promotion) 
-            REFERENCES cobrec1._promotion(id_promotion) ON DELETE CASCADE;
+-- ALTER TABLE ONLY cobrec1._represente_promotion
+--     ADD CONSTRAINT fk_represente_promotion_promotion FOREIGN KEY (id_promotion) 
+--             REFERENCES cobrec1._promotion(id_promotion) ON DELETE CASCADE;
 
 -- TABLE REPRESENTE_COMPTE
 CREATE TABLE cobrec1._represente_compte (
@@ -985,25 +985,25 @@ INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock,
 
 -- 10. PROMOTIONS (futures)
 INSERT INTO _promotion (id_produit, promotion_debut, promotion_fin) VALUES
-(1, '2027-12-20 00:00:00', '2027-12-25 23:59:59'),
-(2, '2026-02-01 00:00:00', '2026-02-07 23:59:59'),
-(3, '2026-02-16 00:00:00', '2026-02-25 23:59:59'),
-(4, '2026-04-01 00:00:00', '2026-04-15 23:59:59'),
-(5, '2026-05-01 00:00:00', '2026-05-07 23:59:59'),
-(6, '2026-06-10 00:00:00', '2026-06-20 23:59:59'),
-(7, '2026-07-01 00:00:00', '2026-07-31 23:59:59');
+(1, '2027-12-20 00:00:00', '2027-12-25 23:59:00'),
+(2, '2026-02-01 00:00:00', '2026-02-07 23:59:00'),
+(3, '2026-02-16 00:00:00', '2026-02-25 23:59:00'),
+(4, '2026-04-01 00:00:00', '2026-04-15 23:59:00'),
+(5, '2026-05-01 00:00:00', '2026-05-07 23:59:00'),
+(6, '2026-06-10 00:00:00', '2026-06-20 23:59:00'),
+(7, '2026-07-01 00:00:00', '2026-07-31 23:59:00');
 
 -- 9. RÉDUCTIONS (futures)
 INSERT INTO _reduction (id_produit, reduction_pourcentage, reduction_debut, reduction_fin) VALUES
-(1, 10.00, '2026-02-09 00:00:00', '2026-02-19 23:59:59'),
-(2, 15.00, '2026-02-15 00:00:00', '2026-02-25 23:59:59'),
-(3, 20.00, '2026-02-01 00:00:00', '2026-02-15 23:59:59'),
-(4, 25.00, '2026-02-20 00:00:00', '2026-02-26 23:59:59'),
-(5, 30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59'),
-(6, 60.00, '2026-04-01 00:00:00', '2026-04-15 23:59:59'),
-(7, 55.00, '2026-05-01 00:00:00', '2026-05-07 23:59:59'),
-(8, 70.00, '2026-06-10 00:00:00', '2026-06-20 23:59:59'),
-(9, 65.00, '2026-07-01 00:00:00', '2026-07-31 23:59:59');
+(1, 10.00, '2026-02-09 00:00:00', '2026-02-19 23:59:00'),
+(2, 15.00, '2026-02-15 00:00:00', '2026-02-25 23:59:00'),
+(3, 20.00, '2026-02-01 00:00:00', '2026-02-15 23:59:00'),
+(4, 25.00, '2026-02-20 00:00:00', '2026-02-26 23:59:00'),
+(5, 30.00, '2026-06-01 00:00:00', '2026-06-30 23:59:00'),
+(6, 60.00, '2026-04-01 00:00:00', '2026-04-15 23:59:00'),
+(7, 55.00, '2026-05-01 00:00:00', '2026-05-07 23:59:00'),
+(8, 70.00, '2026-06-10 00:00:00', '2026-06-20 23:59:00'),
+(9, 65.00, '2026-07-01 00:00:00', '2026-07-31 23:59:00');
 
 -- 12. IMAGES
 INSERT INTO _image (i_lien, i_title, i_alt) VALUES

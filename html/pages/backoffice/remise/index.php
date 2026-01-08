@@ -2,6 +2,7 @@
     session_start();
     $sth = null ;
     $dbh = null ;
+    $_SESSION["remise"]["warn"]= 0; //réinitialisation des warnings
     include '../../../selectBDD.php';
     $pdo->exec("SET search_path to cobrec1");
 
@@ -13,6 +14,7 @@
                 if ((empty($_SESSION["remise"]['_GET'])) || ($_SESSION["remise"]['_GET']['produit'] != $_GET['modifier'])){
                     //print_r('1');
                     //si premier passage
+                     $_SESSION["remise"]["warn"]++;
                     try {//Récupération des infos de la reduc
                         $sql = '
                         SELECT id_reduction, id_produit, reduction_pourcentage, reduction_debut, reduction_fin FROM cobrec1._reduction
@@ -25,7 +27,7 @@
                         $stmt->execute($params);
                         $_SESSION["remise"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $_SESSION["remise"]['_GET'] = $_SESSION["remise"]['_GET'][0];
-                        print_r($_SESSION["remise"]['_GET']);
+                        //print_r($_SESSION["remise"]['_GET']);
                         $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['id_produit'];
                         unset($_SESSION["remise"]['_GET']['id_produit']);
 
@@ -82,7 +84,7 @@
                         $_SESSION["remise"]['_GET']['produit'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $_SESSION["remise"]['_GET']['id_vendeur']  = $_SESSION["remise"]['_GET']['produit'][0]['id_vendeur'];
                         $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['produit'][0]['id_produit'];
-                        print_r($_SESSION["remise"]['_GET']);
+                        //print_r($_SESSION["remise"]['_GET']);
                         
                     
                     } catch (Exception $e) {}
@@ -99,12 +101,12 @@
 
                     <?php
                     }else if ($_SESSION["remise"]['_GET']['id_vendeur'] != $_SESSION['vendeur_id']){
-                        print_r($_SESSION["remise"]['_GET']['id_vendeur']);
-                        print_r($_SESSION['vendeur_id']);
+                        // print_r($_SESSION["remise"]['_GET']['id_vendeur']);
+                        // print_r($_SESSION['vendeur_id']);
 
                         $time = time();
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="reduc ne vous appartient pas";
-                        $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$_SESSION["remise"]['_GET']['id_vendeur'] . ' != ' . print_r($_SESSION['vendeur_id']);
+                        $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$_SESSION["remise"]['_GET']['id_vendeur'] . ' != ' . $_SESSION['vendeur_id'];
 
                         $fp = fopen('file.csv', 'w');
                         foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
@@ -152,11 +154,11 @@
 <pre>
 <?php
 
-print_r($_GET);
+// print_r($_GET);
 // print_r($_SESSION["remise"]['_GET']);
-print_r($_POST);
-print_r($_SESSION["remise"]);
-$_SESSION["remise"]["warn"]= 0; //réinitialisation des warnings
+// print_r($_POST);
+// print_r($_SESSION["remise"]);
+
 if ($_POST !== []) {
 
 } else {//Initialisation des tablaux pour éviter problèmes de comparaison avec des valeurs nulls
@@ -262,7 +264,7 @@ if ($_POST !== []) {
                     <article>
                         <label for="debut">Date de début de promotion</label>
                         <br>
-                        <input style="<?php if((time() + 15 * 60 >= strtotime($_POST["debut"])) || ((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
+                        <input style="<?php if(/*(time() + 15 * 60 >= strtotime($_POST["debut"])) ||*/ ((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
                             value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" required/>
                             <?php
                                 if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
@@ -274,15 +276,15 @@ if ($_POST !== []) {
                                     ?></small>
                                     <?php
                                 }
-                                if(time() + 15 * 60 >= strtotime($_POST["debut"])){
+                                //if(time() + 15 * 60 >= strtotime($_POST["debut"])){
                                     ?>
-                                    <br>
-                                    <small class="warn"><?php
-                                        echo 'Le premieur horodatage est bloqué dans le passé';
-                                        $_SESSION["remise"]["warn"]++;
-                                    ?></small>
+                                    <!-- <br>
+                                    <small class="warn"> --><?php
+                                        // echo 'Le premieur horodatage est bloqué dans le passé';
+                                        // $_SESSION["remise"]["warn"]++;
+                                    ?><!-- </small> -->
                                     <?php
-                                }
+                                //}
                         ?>
                         <br />
                     </article>
@@ -319,17 +321,23 @@ if ($_POST !== []) {
             });
 
             function sauvegarder(){//si clic sur sauvegarder et pas de warnings
-                alert("Votre article a bien été sauvegardé.");
+                alert("Votre remise a bien été sauvegardé.");
                 document.location.href = "/pages/backoffice/index.php"; 
             }
 
             function publier(){//si clic sur publier et pas de warnings
-                alert("Votre article a bien été publié.");
+                alert("Votre remise a bien été appliquée.");
                 document.location.href = "/pages/backoffice/index.php"; 
             }
 
+            function avertirEcrasement(){//si clic sur publier, pas de warnings et écrasement produit
+                if (confirm("Votre remise a écrasée la remise précédente appliquée sur ce produit. Souhaitez-vous contineur à modifier la remise ?")) {
+                }else{document.location.href="/pages/backoffice/index.php"; 
+                }
+            }
+
             function svgModif(){//si clic sur svgModif et pas de warnings
-                if (confirm("Vos modifications ont bien été sauvegardées. Souhaitez-vous continuer à modifier l'article ?.")) {
+                if (confirm("Vos modifications ont bien été sauvegardées. Souhaitez-vous continuer à modifier la remise ?.")) {
                 }else{document.location.href="/pages/backoffice/index.php"; 
                 }
             }
@@ -349,7 +357,6 @@ if ($_POST !== []) {
                             if (empty($_POST["svgModif"])){
                                 $_POST["svgModif"] = '';
                             }
-                            if ($_POST["publier"] == "Publier la remise dans le catalogue client"){
 
                             
                         
@@ -357,6 +364,23 @@ if ($_POST !== []) {
 
 
                             try {//création de l'objet reduction
+                                $sql = '
+                                DELETE FROM cobrec1._reduction WHERE id_produit = :produit;
+                                ';
+                                $stmt = $pdo->prepare($sql);
+                                $params = [
+                                    'produit' => $_POST['produit']
+                                ];
+                                $stmt->execute($params);
+                                $existait = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                if (!empty($existait)){?>
+                                    <script>
+                                        avertirEcrasement();
+                                    </script>
+                                <?php
+                                }
+
+
                                 $sql = '
                                 INSERT INTO cobrec1._reduction(id_produit, reduction_pourcentage, reduction_debut, reduction_fin)
                                 VALUES (:produit, :pourcentage, :debut, :fin);
@@ -399,7 +423,6 @@ if ($_POST !== []) {
                         publier();
                     </script>
     <?php
-                    }
                     
                 }else if ($_POST["svgModif"] == "Sauvegarder les modifications"){
                     //Si pas de warning et formulaire soumis via le bouton Mettre en ligne/hors ligne
