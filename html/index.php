@@ -107,9 +107,23 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <style>
-        .star-rating-filter { display: flex; gap: 5px; margin-top: 10px; }
-        .star-btn { background: none; border: none; cursor: pointer; padding: 0; transition: transform 0.1s; }
-        .star-btn:hover { transform: scale(1.1); }
+    .star-rating-filter {
+        display: flex;
+        gap: 5px;
+        margin-top: 10px;
+    }
+
+    .star-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.1s;
+    }
+
+    .star-btn:hover {
+        transform: scale(1.1);
+    }
     </style>
 </head>
 
@@ -204,8 +218,10 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                         $prixFinal = calcPrixTVA($produitCourant['id_produit'], $produitCourant['tva'], $prixDiscount);
                         $prixOriginalTTC = calcPrixTVA($produitCourant['id_produit'], $produitCourant['tva'], $produitCourant['p_prix']);
                         $noteArrondie = round($produitCourant['note_moyenne'] ?? 0);
+                        $estEnPromotion = !empty($produitCourant['estenpromo']); 
                         ?>
-                <article class="<?= $estEnRupture ? 'produit-rupture' : '' ?>"
+                <article
+                    class="<?= $estEnRupture ? 'produit-rupture' : '' ?> <?= $estEnPromotion ? 'produit-promotion' : '' ?>"
                     onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
                     <div>
                         <div>
@@ -274,7 +290,7 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
 
         if (widget) {
             const btns = widget.querySelectorAll('.star-btn');
-            
+
             const updateStars = (val) => {
                 btns.forEach(b => {
                     const v = parseInt(b.dataset.value);
@@ -287,14 +303,14 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
             btns.forEach(btn => {
                 // Survol : affiche les étoiles jusqu'au curseur
                 btn.addEventListener('mouseenter', () => updateStars(btn.dataset.value));
-                
+
                 // Clic : sélectionne la note
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     selectedValue = parseInt(btn.dataset.value);
                     if (input) input.value = selectedValue;
                     updateStars(selectedValue);
-                    
+
                     // "Return" de la valeur sélectionnée
                     console.log(selectedValue);
                 });
