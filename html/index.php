@@ -136,15 +136,10 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                 <div>
                     <span>Tri par :</span>
                     <select>
-                        <option value="meilleures_ventes" <?= $tri_par === 'meilleures_ventes' ? 'selected' : '' ?>>
-                            Meilleures ventes
-                        </option>
-                        <option value="prix_croissant" <?= $tri_par === 'prix_croissant' ? 'selected' : '' ?>>Prix
-                            croissant</option>
-                        <option value="prix_decroissant" <?= $tri_par === 'prix_decroissant' ? 'selected' : '' ?>>Prix
-                            décroissant
-                        </option>
-                        <option value="note" <?= $tri_par === 'note' ? 'selected' : '' ?>>Mieux notés</option>
+                        <option value="meilleures_ventes">Meilleures ventes</option>
+                        <option value="prix_croissant">Prix croissant</option>
+                        <option value="prix_decroissant">Prix décroissant</option>
+                        <option value="note">Mieux notés</option>
                     </select>
                 </div>
 
@@ -198,7 +193,7 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                 <section>
                     <h4>Disponibilité</h4>
                     <label>
-                        <input type="checkbox" <?= $enStockSeulement ? 'checked' : '' ?>>
+                        <input type="checkbox">
                         <span>En stock uniquement</span>
                     </label>
                 </section>
