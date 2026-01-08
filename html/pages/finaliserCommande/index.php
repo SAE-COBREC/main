@@ -140,16 +140,33 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
 
         //⚠️On insère dans la facture MAIS A TERMINER⚠️
         /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI⚠️⚠️⚠️⚠️⚠️⚠️*/
+        
+        //on init les prix qui seront rentré dans la facture de la BDD
+        $prixTotalFinal = 0;
+        $f_total_ht = 0; //le prix total HT
+        $f_total_remise = 0; //le prix des remises
+        $f_total_ht_remise = 0; //le prix total HT avec les remises
+
+        //on récup tous les id des produit dans le panier
         $reqArticlePanier = "
-                SELECT id_produit
+                SELECT id_produit, quantite
                 FROM _contient 
                 WHERE id_panier = :id_panier
             ";
         $stmt = $pdo->prepare($reqArticlePanier);
         $stmt->execute([':id_panier' => $_SESSION['panierEnCours']]);
-        $articlesDansPanier = $stmt->fetchColumn();
-        foreach($articlesDansPanier as article)
-        calculPrixArticleFinal($pdo, $id_produit);
+        $articlesDansPanier = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        //pour chaque article dans le panier
+        foreach($articlesDansPanier as $article){
+            $donnees = recupInfoPourFactureArticle($pdo, $article["id_produit"]); //on récupère les information de la promotion de la TVA ...
+            $f_total_ht += $donnees["p_prix"];
+            $f_total_remise += $donnees["p_prix"] - ($donnees["p_prix"] * (1 - $donnees["reduction_pourcentage"] / 100));
+            $f_total_ht_remise = $f_total_ht - $f_total_remise;
+            $prixApresReduction = $donnees["p_prix"] * (1 - $donnees["reduction_pourcentage"] / 100);
+            $prixFinal = ($prixApresReduction * (1 + $donnees["montant_tva"] / 100)) * $article["quantite"];
+            $prixTotalFinal += $prixFinal;
+        }
 
         if ($_POST['adresse'] == "nouvelle"){ 
             $resultatAdresse = ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
@@ -158,7 +175,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             
         } else {
             insererFacture($pdo, $panierEnCours, $nomPrenom["nom"], $nomPrenom["prenom"],
-            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2), $id_adresse);
+            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2), $_POST['adresse']);
         }
 
         //on créer un session pour le panier qui vient d'être commandé car le panierEnCours on doit le supprimé pour éviter
@@ -224,7 +241,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             <select name="adresse" id="adresse">
                 <option value="invalide">Choisir l'adresse de livraison</option>
                 <?php foreach($adresses as $adresse) : ?>
-                    <option value="<?php echo $id_adresse ?>"><?php echo $adresse["a_numero"] . " " . $adresse["a_adresse"] . " (" . $adresse["a_code_postal"] . ") " . $adresse["a_ville"];?></option>
+                    <option value="<?php echo $adresse["id_adresse"] ?>"><?php echo $adresse["a_numero"] . " " . $adresse["a_adresse"] . " (" . $adresse["a_code_postal"] . ") " . $adresse["a_ville"];?></option>
                 <?php endforeach; ?>
                 <option value="nouvelle">Nouvelle adresse</option>
             </select>

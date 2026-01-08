@@ -1217,3 +1217,18 @@ function recupInfoPourFacture($pdo, $id_panier){
     $donnees = $stmt->fetch();
     return $donnees;
 }
+
+function recupInfoPourFactureArticle($pdo, $id_produit){
+    //calcul le prix d'un produit apres les remises et la tva ne calcul pas avec la quantite
+    $reqFacture = "
+                SELECT p_prix, quantite, montant_tva, reduction_pourcentage 
+                FROM _produit 
+                JOIN _tva ON _produit.id_tva = _tva.id_tva
+                JOIN _reduction ON _produit.id_produit = _reduction.id_produit
+                WHERE _produit.id_produit = :id_produit;
+    ";
+    $stmt = $pdo->prepare($reqFacture);
+    $stmt->execute([':id_produit' => $id_produit]);
+    $donnees = $stmt->fetch();
+    return $donnees;
+}
