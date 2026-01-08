@@ -1,0 +1,7 @@
+date,id_compte,message,fichier,ligne
+"2026-01-08 10:36:55",18,"SQLSTATE[22P02]: Invalid text representation: 7 ERROR:  invalid input syntax for type integer: ""i""
+CONTEXT:  unnamed portal parameter $2 = '...'",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/backoffice/creationVendeur/index.php,176
+"2026-01-08 10:37:40",18,"SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint ""_compte_email_key""
+DETAIL:  Key (email)=(i@i.com) already exists.",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/backoffice/creationVendeur/index.php,133
+"2026-01-08 10:43:16",20,"SQLSTATE[22P02]: Invalid text representation: 7 ERROR:  invalid input syntax for type integer: ""i""
+CONTEXT:  unnamed portal parameter $2 = '...'",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/backoffice/creationVendeur/index.php,176

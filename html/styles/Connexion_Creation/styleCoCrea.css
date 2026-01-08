@@ -132,7 +132,14 @@ body.centered {
   width: 140px;
   margin-left: 55px;
 }
+.card input#num {
+  width: 140px;
+  margin-left: 55px;
+}
 .card input#commune {
+  width: 325px;
+}
+.card input#rue {
   width: 325px;
 }
 .card .error {
@@ -357,7 +364,9 @@ body.centered {
     box-sizing: border-box;
   }
   .card[id="3"] input#codeP,
-  .card[id="3"] input#commune {
+  .card[id="3"] input#commune,
+  .card[id="3"] input#num,
+  .card[id="3"] input#rue {
     width: 310px;
     margin-left: 0;
   }

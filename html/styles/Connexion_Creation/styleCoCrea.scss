@@ -131,11 +131,20 @@ body {
     &#codeP {
       width: 140px;
       margin-left: 55px;
+    }
+    &#num {
+      width: 140px;
+      margin-left: 55px;
     } 
 
     &#commune {
       width: 325px;
     }
+
+    &#rue {
+      width: 325px;
+    }
+
   }
 
   .error {
@@ -385,7 +394,9 @@ body {
     }
 
     input#codeP,
-    input#commune {
+    input#commune,
+    input#num,
+    input#rue {
       width: 310px;
       margin-left: 0;
     }

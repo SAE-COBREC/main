@@ -1,5 +1,10 @@
 date,id_compte,message,fichier,ligne
-"2026-01-06 15:09:51",inconnu,"SQLSTATE[23514]: Check violation: 7 ERROR:  new row for relation ""_compte"" violates check constraint ""verif_compte_civilite""
-DETAIL:  Failing row contains (31, sv@sdvdsv.com, 0546546546, 0, 0, 0, 0, 2026-01-06 16:09:51.921391, null, null, Client1!, f, sdvsdvdsv, mamam, M).",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,95
-"2026-01-06 15:43:13",inconnu,"SQLSTATE[23514]: Check violation: 7 ERROR:  new row for relation ""_compte"" violates check constraint ""verif_compte_mdp""
-DETAIL:  Failing row contains (36, dsvdsv@sdvsdv.com, 0654654689, 0, 0, 0, 0, 2026-01-06 16:43:13.957039, null, null, $2y$10$y3b6aAO0bchgRjSLnn4gi.8vVeHViAD9SLVbxUbTOb8MjyxbDpA4q, f, dvsvdsdsv, dvsdsvdsv, Mme).",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,96
+"2026-01-08 10:18:57",14,"SQLSTATE[42601]: Syntax error: 7 ERROR:  syntax error at or near ""$3""
+LINE 2:                 VALUES ($1, $2 $3, $4, $5, $6)
+                                       ^",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,136
+"2026-01-08 10:22:16",15,"SQLSTATE[42601]: Syntax error: 7 ERROR:  syntax error at or near ""$3""
+LINE 2:                 VALUES ($1, $2 $3, $4, $5, $6)
+                                       ^",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,136
+"2026-01-08 10:23:59",16,"SQLSTATE[42703]: Undefined column: 7 ERROR:  column ""a_numéro"" of relation ""_adresse"" does not exist
+LINE 1: INSERT INTO cobrec1._adresse(id_compte, a_numéro, a_adresse,...
+                                                ^",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,136

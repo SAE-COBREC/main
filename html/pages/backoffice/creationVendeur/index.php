@@ -107,6 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
   $telephone = htmlspecialchars($_POST['telephone'] ?? '', ENT_QUOTES, 'UTF-8');
   $rue = htmlspecialchars($_POST['rue'] ?? '', ENT_QUOTES, 'UTF-8');
+  $num = htmlspecialchars($_POST['num'] ?? '', ENT_QUOTES, 'UTF-8');
+  $pays = htmlspecialchars($_POST['pays'] ?? '', ENT_QUOTES, 'UTF-8');
   $codeP = htmlspecialchars($_POST['codeP'] ?? '', ENT_QUOTES, 'UTF-8');
   $commune = htmlspecialchars($_POST['commune'] ?? '', ENT_QUOTES, 'UTF-8');
   $nom = htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -168,14 +170,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       $_SESSION['vendeur_id'] = $vendeurId;
       
-      $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_adresse, a_ville, a_code_postal)
-                VALUES (:id_compte, :adresse, :ville, :code_postal)';
+      $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays)
+                VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays)';
         $stmtAdrss = $pdo->prepare($sqlAdrss);
         $stmtAdrss->execute([
           'id_compte' => $id_compte,
           'adresse' => $rue,
           'ville'    => $commune,
-          'code_postal'    => $codeP
+          'code_postal'    => $codeP,
+          'numero'    => $num,
+          'pays'    => $pays
         ]);
     } catch (Exception $e) {
       $hasError = true;
@@ -305,8 +309,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label>Civilité</label>
           <div class="radio-group">
             <label><input type="radio" name="civilite" value="M." required> Homme</label>
-            <label><input type="radio" name="civilite" value="Mme" required> Femme</label>
-            <label><input type="radio" name="civilite" value="Autre" required> Autre</label>
+            <label><input type="radio" name="civilite" value="Mme"> Femme</label>
+            <label><input type="radio" name="civilite" value="Autre"> Autre</label>
           </div>
       </div>
 
@@ -334,12 +338,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
 
-    <!-- Card 3 - Coordonnées -->
+    <!-- Card3 -->
+
     <div class="card hidden" id="3">
       <div class="logo">
-        <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
+        <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
-
       <h1>Créer un compte</h1>
       <p class="subtitle">Coordonnées</p>
 
@@ -384,25 +388,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
 
       <h1>Créer un compte</h1>
-      <p class="subtitle">Adresse</p>
+      <p class="subtitle">Coordonnées</p>
 
-      <div>
-        <label for="rue">Rue</label>
-        <input type="text" id="rue" name="rue" placeholder="ex: 19 rue Hant koz" required>
+      <div class="inline-flex address-row">
+        <div class="culumn-flex">
+          <label for="num">Numéro</label>
+          <input type="text" id="num" name="num" maxlength="10" placeholder="ex: 1bis">
+        </div>
+
+        <div class="culumn-flex">
+          <label for="rue">Rue</label>
+          <input type="text" id="rue" name="rue" placeholder="ex: rue Hant koz" required>
+        </div>
       </div>
 
       <div class="inline-flex address-row">
-        <div class="culumn-flex" id="div_codeP">
+        <div class="culumn-flex">
           <label for="codeP">Code Postal</label>
-          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5" placeholder="ex: 22300" required title="Le code postal doit contenir 5 chiffres">
+          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$" maxlength="5" placeholder="ex: 22300">
         </div>
 
         <div class="culumn-flex">
           <label for="commune">Commune</label>
-          <input type="text" id="commune" name="commune" placeholder="ex:lannion" required>
+          <input type="text" id="commune" name="commune" placeholder="ex: Lannion" required>
         </div>
       </div>
-
+      
+      <div>
+        <label for="pays">Pays</label>
+        <input type="text" id="pays" name="pays" 
+           placeholder="ex: France" required >
+      </div>
       <div class="error"></div>
 
       <div class="step">étape 4 / 5</div>
@@ -722,11 +738,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           showCardByIndex(idx);
           const errDiv = card ? card.querySelector('.error') : null;
           const message = getFieldValidationMessage(invalid);
+          const fieldName = invalid.name || invalid.id || 'inconnu';
           if (errDiv) { 
-            errDiv.innerHTML = '<strong>Erreur</strong> : ' + message;
+            errDiv.innerHTML = '<strong>Erreur</strong> (' + fieldName + ') : ' + message;
             errDiv.classList.remove('hidden'); 
           }
           invalid.focus();
+          console.log('Champ invalide:', fieldName, invalid);
         }
         return;
       }
