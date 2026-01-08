@@ -1201,18 +1201,18 @@ function filtrerProduits($listeProduits, $filtres)
     return $produits_filtres;
 }
 
-function calculFacture($pdo, $id_produit){
+function recupInfoPourFacture($pdo, $id_panier){
     //calcul le prix d'un produit apres les remises et la tva ne calcul pas avec la quantite
     $reqFacture = "
-        SELECT p_prix, montant_tva, reduction_pourcentage 
-        FROM _produit 
-        JOIN _tva ON _produit.id_tva = _tva.id_tva
-        JOIN _reduction ON _produit.id_produit = _reduction.id_produit
-        WHERE _produit.id_produit =:id_produit;
-        ";
+                SELECT p_prix, quantite, montant_tva, reduction_pourcentage 
+                FROM _contient 
+                JOIN _produit ON _contient.id_produit = _produit.id_produit 
+                JOIN _tva ON _produit.id_tva = _tva.id_tva
+                JOIN _reduction ON _produit.id_produit = _reduction.id_produit
+                WHERE id_panier = :id_panier;
+    ";
     $stmt = $pdo->prepare($reqFacture);
-    $stmt->execute([':id_produit' => id_produit]);
-    $donnees = $stmt->fetchColumn();
-    $prixFinal = $donnees["p_prix"] *
-    return
+    $stmt->execute([':id_panier' => $id_panier]);
+    $donnees = $stmt->fetch();
+    return $donnees;
 }

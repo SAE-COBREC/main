@@ -140,8 +140,17 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
 
         //⚠️On insère dans la facture MAIS A TERMINER⚠️
         /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI⚠️⚠️⚠️⚠️⚠️⚠️*/
+        $reqArticlePanier = "
+                SELECT id_produit
+                FROM _contient 
+                WHERE id_panier = :id_panier
+            ";
+        $stmt = $pdo->prepare($reqArticlePanier);
+        $stmt->execute([':id_panier' => $_SESSION['panierEnCours']]);
+        $articlesDansPanier = $stmt->fetchColumn();
+        foreach($articlesDansPanier as article)
+        calculPrixArticleFinal($pdo, $id_produit);
 
-        
         if ($_POST['adresse'] == "nouvelle"){ 
             $resultatAdresse = ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
             insererFacture($pdo, $panierEnCours, $_POST['nom_destinataire'], $_POST['prenom_destinataire'], 
