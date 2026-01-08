@@ -16,19 +16,21 @@ function chargerProduitsBDD($pdo)
             p.p_prix,
             p.p_stock,
             r.reduction_pourcentage,
+            pr.id_produit as estEnpromo,
             (SELECT COUNT(*) FROM cobrec1._avis av2 WHERE av2.id_produit = p.id_produit AND av2.a_note IS NOT NULL) as nombre_avis,
             (SELECT ROUND(COALESCE(AVG(av3.a_note), 0)::numeric, 1) FROM cobrec1._avis av3 WHERE av3.id_produit = p.id_produit AND av3.a_note IS NOT NULL) as note_moyenne,
             (SELECT COALESCE(i2.i_lien, '/img/photo/smartphone_xpro.jpg') FROM cobrec1._represente_produit rp2 LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image WHERE rp2.id_produit = p.id_produit LIMIT 1) as image_url,
             STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories
         FROM cobrec1._produit p
         LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit 
+        LEFT JOIN cobrec1._promotion pr ON p.id_produit = pr.id_produit 
         LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
         LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
         LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
         WHERE p.p_statut = 'En ligne'
         GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
-                 p.p_note, p.p_nb_ventes, p.p_statut, r.reduction_pourcentage, 
-                 t.montant_tva
+                p.p_note, p.p_nb_ventes, p.p_statut, r.reduction_pourcentage, 
+                pr.id_produit, t.montant_tva
         ORDER BY p.id_produit
     ";
 
