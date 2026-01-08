@@ -226,6 +226,9 @@ CREATE TABLE cobrec1._reduction (
 );
 
 ALTER TABLE ONLY cobrec1._reduction
+    ADD CONSTRAINT pk_reduction PRIMARY KEY (id_reduction);
+
+ALTER TABLE ONLY cobrec1._reduction
     ADD CONSTRAINT unique_reduction_id_produit UNIQUE (id_produit);
 
 ALTER TABLE ONLY cobrec1._reduction
@@ -235,6 +238,7 @@ ALTER TABLE ONLY cobrec1._reduction
 -- TABLE PROMOTION
 CREATE TABLE cobrec1._promotion (
     id_promotion SERIAL NOT NULL,
+    id_produit INT NOT NULL,
     promotion_debut timestamp NOT NULL,
     promotion_fin timestamp NOT NULL,
     CONSTRAINT verif_promotion_debut CHECK (promotion_debut >  CURRENT_TIMESTAMP),
@@ -243,6 +247,13 @@ CREATE TABLE cobrec1._promotion (
 
 ALTER TABLE ONLY cobrec1._promotion
     ADD CONSTRAINT pk_promotion PRIMARY KEY (id_promotion);
+
+ALTER TABLE ONLY cobrec1._promotion
+    ADD CONSTRAINT unique_promotion_id_produit UNIQUE (id_produit);
+
+ALTER TABLE ONLY cobrec1._promotion
+    ADD CONSTRAINT fk_promotion_produit FOREIGN KEY (id_produit) 
+            REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
 
 
 -- TABLE IMAGE
@@ -591,21 +602,21 @@ ALTER TABLE ONLY cobrec1._est_dote_de
 --             REFERENCES cobrec1._reduction(id_reduction) ON DELETE CASCADE;
 
 -- TABLE EN_PROMOTION
-CREATE TABLE cobrec1._en_promotion (
-    id_produit integer NOT NULL,
-    id_promotion integer NOT NULL
-);
+-- CREATE TABLE cobrec1._en_promotion (
+--     id_produit integer NOT NULL,
+--     id_promotion integer NOT NULL
+-- );
 
-ALTER TABLE ONLY cobrec1._en_promotion
-    ADD CONSTRAINT pk_en_promotion PRIMARY KEY (id_produit, id_promotion);
+-- ALTER TABLE ONLY cobrec1._en_promotion
+--     ADD CONSTRAINT pk_en_promotion PRIMARY KEY (id_produit, id_promotion);
 
-ALTER TABLE ONLY cobrec1._en_promotion
-    ADD CONSTRAINT fk_en_promotion_produit FOREIGN KEY (id_produit) 
-            REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
+-- ALTER TABLE ONLY cobrec1._en_promotion
+--     ADD CONSTRAINT fk_en_promotion_produit FOREIGN KEY (id_produit) 
+--             REFERENCES cobrec1._produit(id_produit) ON DELETE CASCADE;
 
-ALTER TABLE ONLY cobrec1._en_promotion
-    ADD CONSTRAINT fk_en_promotion_promotion FOREIGN KEY (id_promotion) 
-            REFERENCES cobrec1._promotion(id_promotion) ON DELETE CASCADE;
+-- ALTER TABLE ONLY cobrec1._en_promotion
+--     ADD CONSTRAINT fk_en_promotion_promotion FOREIGN KEY (id_promotion) 
+--             REFERENCES cobrec1._promotion(id_promotion) ON DELETE CASCADE;
 
 -- TABLE SIGNALE_PRODUIT
 CREATE TABLE cobrec1._signale_produit (
@@ -864,16 +875,6 @@ INSERT INTO _TVA (montant_TVA, libelle_TVA) VALUES
 (5.5, 'TVA réduite'),
 (2.1, 'TVA super réduite');
 
--- 10. PROMOTIONS (futures)
-INSERT INTO _promotion (promotion_debut, promotion_fin) VALUES
-('2027-12-20 00:00:00', '2027-12-25 23:59:59'),
-('2026-02-01 00:00:00', '2026-02-07 23:59:59'),
-('2026-02-16 00:00:00', '2026-02-25 23:59:59'),
-('2026-04-01 00:00:00', '2026-04-15 23:59:59'),
-('2026-05-01 00:00:00', '2026-05-07 23:59:59'),
-('2026-06-10 00:00:00', '2026-06-20 23:59:59'),
-('2026-07-01 00:00:00', '2026-07-31 23:59:59');
-
 -- 11. PRODUITS
 INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock, p_statut, p_origine, p_poids, p_volume, p_frais_de_port, p_note, p_nb_ventes) VALUES
 (1, 1, 'Smartphone XPro', 'Smartphone dernière génération avec écran OLED 6.7 pouces, 256Go stockage, 5G', 599.99, 35, 'En ligne', 'Bretagne', 0.180, 0.01, 5.99, 4.3, 15),
@@ -981,6 +982,16 @@ INSERT INTO _produit (id_TVA, id_vendeur, p_nom, p_description, p_prix, p_stock,
 (3, 3, 'Coussin Triskell Fait main', 'Produit breton authentique. Fabriqué avec passion à Quimper. Fait main. Qualité supérieure garantie.', 27.62, 29, 'En ligne', 'Bretagne', 2.26, 0.19, 6.17, 4.1, 148),
 (3, 3, 'Galettes Artisanal', 'Produit breton authentique. Fabriqué avec passion à Roscoff. Artisanal. Qualité supérieure garantie.', 123.48, 95, 'Hors ligne', 'Bretagne', 0.4, 0.26, 6.39, 4.5, 32),
 (1, 1, 'Bol Breton Bio', 'Produit breton authentique. Fabriqué avec passion à Concarneau. Bio. Qualité supérieure garantie.', 194.19, 164, 'Hors ligne', 'Bretagne', 1.88, 0.32, 5.24, 4.9, 73);
+
+-- 10. PROMOTIONS (futures)
+INSERT INTO _promotion (id_produit, promotion_debut, promotion_fin) VALUES
+(1, '2027-12-20 00:00:00', '2027-12-25 23:59:59'),
+(2, '2026-02-01 00:00:00', '2026-02-07 23:59:59'),
+(3, '2026-02-16 00:00:00', '2026-02-25 23:59:59'),
+(4, '2026-04-01 00:00:00', '2026-04-15 23:59:59'),
+(5, '2026-05-01 00:00:00', '2026-05-07 23:59:59'),
+(6, '2026-06-10 00:00:00', '2026-06-20 23:59:59'),
+(7, '2026-07-01 00:00:00', '2026-07-31 23:59:59');
 
 -- 9. RÉDUCTIONS (futures)
 INSERT INTO _reduction (id_produit, reduction_pourcentage, reduction_debut, reduction_fin) VALUES
@@ -1232,10 +1243,10 @@ INSERT INTO _livraison (id_facture, date_livraison, etat_livraison) VALUES
 -- (21, 1), (22, 2), (23, 3), (24, 4), (25, 5);
 
 -- 30. PROMOTIONS APPLIQUÉES
-INSERT INTO _en_promotion (id_produit, id_promotion) VALUES
-(1, 1), (6, 1), (8, 1), (13, 3),
-(16, 1), (17, 2), (18, 3), (19, 4), (20, 5),
-(21, 1), (22, 2), (23, 3), (24, 4), (25, 5);
+-- INSERT INTO _en_promotion (id_produit, id_promotion) VALUES
+-- (1, 1), (6, 1), (8, 1), (13, 3),
+-- (16, 1), (17, 2), (18, 3), (19, 4), (20, 5),
+-- (21, 1), (22, 2), (23, 3), (24, 4), (25, 5);
 
 -- 31. SEUILS DÉFINIS POUR COMPTES (vendeurs)
 INSERT INTO _definie_pour (id_seuil, id_compte) VALUES

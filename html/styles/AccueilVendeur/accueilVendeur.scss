@@ -155,20 +155,22 @@ body {
     width: 350px; 
   }
   .col-statut { 
-    width: 150px; 
+    width: 150px;
+    text-align: center;
   }
   .col-stock { 
     width: 100px; 
-    text-align: right; 
+    text-align: center; 
   }
   .col-cate { 
-    width: 250px; 
+    width: 250px;
+    text-align: center  ;
   }
   .col-desc { 
-    width: auto; 
+    width: auto;
+    text-align: left; 
     overflow: hidden; 
-    text-overflow: 
-    ellipsis; 
+    text-overflow:ellipsis; 
     white-space: nowrap; 
   }
 }
@@ -261,7 +263,7 @@ body {
 // Badge original
 .badge {
   display: inline-block;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: $border-radius-primary;
   font-size: 16px;
   font-weight: 600;
