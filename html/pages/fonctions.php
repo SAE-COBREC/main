@@ -16,6 +16,7 @@ function chargerProduitsBDD($pdo)
             p.p_prix,
             p.p_stock,
             r.reduction_pourcentage,
+            t.montant_tva as tva,
             pr.id_produit as estEnpromo,
             (SELECT COUNT(*) FROM cobrec1._avis av2 WHERE av2.id_produit = p.id_produit AND av2.a_note IS NOT NULL) as nombre_avis,
             (SELECT ROUND(COALESCE(AVG(av3.a_note), 0)::numeric, 1) FROM cobrec1._avis av3 WHERE av3.id_produit = p.id_produit AND av3.a_note IS NOT NULL) as note_moyenne,
