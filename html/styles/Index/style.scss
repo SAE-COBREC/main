@@ -138,13 +138,6 @@ section {
     color: $secondary-color-gris-fonce;
     @include transition(all);
 
-    &:hover {
-      background-color: $secondary-color-gris-clair;
-      border-radius: 8px;
-      padding: 5px 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
     span {
       color: $primary-color-bleu;
       font-size: 0.9rem;
@@ -547,3 +540,8 @@ article {
 
 
 }
+
+.produit-promotion {
+        border: 3px solid #000 !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
