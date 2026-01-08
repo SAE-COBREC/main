@@ -140,10 +140,13 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
 
         //⚠️On insère dans la facture MAIS A TERMINER⚠️
         /*RESTE À FAIRE JE DOIS PRENDRE LE PRIX TOTAL HORS TAXE, LE PRIX TOTAL TTC LES REMIS ECT POUR INSERER DANS LA BDD CORRECTEMENT ET LA REMISE AUSSI⚠️⚠️⚠️⚠️⚠️⚠️*/
+
+        
         if ($_POST['adresse'] == "nouvelle"){ 
-            insererFacture($pdo, $panierEnCours, $_POST['nom_destinataire'], $_POST['prenom_destinataire'],
-            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, $totalPanier, $id_adresse);
-            ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
+            $resultatAdresse = ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
+            insererFacture($pdo, $panierEnCours, $_POST['nom_destinataire'], $_POST['prenom_destinataire'], 
+            $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, $totalPanier, $resultatAdresse['id_adresse']);
+            
         } else {
             insererFacture($pdo, $panierEnCours, $nomPrenom["nom"], $nomPrenom["prenom"],
             $f_total_ht ?? 0, $f_total_remise ?? 0, $f_total_ht_remise ?? 0, round($totalCalcul, 2), $id_adresse);
