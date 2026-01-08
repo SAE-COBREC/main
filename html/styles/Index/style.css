@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -430,7 +431,26 @@ article button:disabled {
     font-size: 0.9rem;
   }
 }
+/* Style pour les articles en promotion */
 .produit-promotion {
-  border: 3px solid #000 !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 3px solid #7171a3 !important;
+}
+
+/* Style pour le bouton des articles en promotion */
+.produit-promotion button:not(:disabled) {
+  background: #FFFFFF !important; /* Fond blanc */
+  color: #D4183D !important; /* Texte rouge */
+  border: 2px solid #D4183D !important; /* Bordure rouge */
+}
+
+/* Hover sur le bouton en promotion */
+.produit-promotion button:hover:not(:disabled) {
+  background: #D4183D !important; /* Fond rouge au survol */
+  color: #FFFFFF !important; /* Texte blanc au survol */
+}
+
+/* Si l'article est à la fois en rupture ET en promotion */
+.produit-rupture.produit-promotion {
+  border: 3px solid #D4183D !important;
+  opacity: 0.7;
 }/*# sourceMappingURL=style.css.map */
