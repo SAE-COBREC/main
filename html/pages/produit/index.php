@@ -506,6 +506,13 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Check for pending notification
+            const pendingMsg = localStorage.getItem('pendingNotification');
+            if (pendingMsg) {
+                if (window.notify) notify(pendingMsg, 'success');
+                localStorage.removeItem('pendingNotification');
+            }
+
             // Vignettes
             const mainImg = document.getElementById('productMainImage');
             document.querySelectorAll('.thumb').forEach(t => {
@@ -640,7 +647,9 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 fetchJson(window.location.href, { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success) {
+                            localStorage.setItem('pendingNotification', 'Avis publié');
                             location.reload(); 
+
                         } else {
                             showError('Erreur', d.message);
                             submitBtn.disabled = false;
@@ -670,7 +679,10 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         
                         fetchJson(window.location.href, { method: 'POST', body: fd })
                             .then(d => {
-                                if (d.success) location.reload();
+                                if (d.success) {
+                                    localStorage.setItem('pendingNotification', 'Avis supprimé');
+                                    location.reload();
+                                }
                                 else showError('Erreur', d.message || 'Impossible de supprimer');
                             });
                     }
@@ -684,7 +696,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
         const editText = document.getElementById('editReviewText');
         const editCancel = document.getElementById('cancelEditReview');
         const editConfirm = document.getElementById('confirmEditReview');
-        let currentEditId = null;
+        let currentEditId = null, originalTitle, originalText, originalNote;
         let updateEditStars = () => {};
 
         if (editModal) {
@@ -720,7 +732,8 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 if (!newTitre) return notify('Titre requis', 'warning');
                 if (!newTxt) return notify('Le commentaire ne peut pas être vide', 'warning');
                 if (newNote == 0) return notify('Note requise', 'warning');
-                
+
+
                 const fd = new FormData();
                 fd.append('action', 'edit_avis');
                 fd.append('id_produit', productId);
@@ -731,7 +744,10 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 
                 fetchJson(window.location.href, { method: 'POST', body: fd })
                     .then(d => {
-                        if (d.success) location.reload();
+                        if (d.success) {
+                            localStorage.setItem('pendingNotification', 'Avis modifié');
+                            location.reload();
+                        }
                         else showError('Erreur', d.message || 'Erreur lors de la modification');
                     });
                 editModal.style.display = 'none';
@@ -776,6 +792,10 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 const editNoteInput = document.getElementById('editNote');
                 if(editNoteInput) editNoteInput.value = currentNote;
                 updateEditStars(currentNote);
+
+                originalTitle = editTitle.value;
+                originalText = editText.value;
+                originalNote = currentNote;
 
                 editModal.style.display = 'flex';
             });
