@@ -97,12 +97,6 @@ aside section:not(.no-hover) > div {
   color: #c0c0c0;
   transition: all 0.2s ease;
 }
-aside section:not(.no-hover) > div:hover {
-  background-color: #EFEFEF;
-  border-radius: 8px;
-  padding: 5px 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
 aside section:not(.no-hover) > div span {
   color: #7171A3;
   font-size: 0.9rem;
@@ -435,4 +429,8 @@ article button:disabled {
     padding: 0.6rem;
     font-size: 0.9rem;
   }
+}
+.produit-promotion {
+  border: 3px solid #000 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }/*# sourceMappingURL=style.css.map */
