@@ -433,7 +433,7 @@ article button:disabled {
 }
 /* Style pour les articles en promotion */
 .produit-promotion {
-  border: 3px solid #7171a3 !important;
+  border: 3px solid rgba(212, 24, 61, 0.6196078431) !important;
 }
 
 /* Style pour le bouton des articles en promotion */
