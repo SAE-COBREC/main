@@ -150,16 +150,19 @@ body {
 }
 .products-table .col-statut {
   width: 150px;
+  text-align: center;
 }
 .products-table .col-stock {
   width: 100px;
-  text-align: right;
+  text-align: center;
 }
 .products-table .col-cate {
   width: 250px;
+  text-align: center;
 }
 .products-table .col-desc {
   width: auto;
+  text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -247,7 +250,7 @@ body {
 
 .badge {
   display: inline-block;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 14px;
   font-size: 16px;
   font-weight: 600;

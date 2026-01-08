@@ -462,13 +462,14 @@ function ajouterNouvelleAdresse($connexionBaseDeDonnees, $idCompte, $numero, $ad
         $requeteSQL = "
             INSERT INTO cobrec1._adresse (id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_complement)
             VALUES (?, ?, ?, ?, ?, ?)
+            RETURNING id_adresse
         ";
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
         $requetePreparee->execute([$idCompte, $numero, $adresse, $ville, $codePostal, $complement]);
-
-        return ['success' => true, 'message' => "Adresse ajoutée avec succès."];
+        $idAdresse = (int) $requetePreparee->fetchColumn();
+        return ['success' => true, 'message' => "Adresse ajoutée avec succès.", 'id_adresse' => $idAdresse];
     } catch (Exception $erreurException) {
-        return ['success' => false, 'message' => "Erreur lors de l'ajout de l'adresse."];
+        return ['success' => false, 'message' => "Erreur lors de l'ajout de l'adresse.", 'id_adresse' => $idAdresse];
     }
 }
 
@@ -766,6 +767,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
 }
 
 //gestion des actions AJAX pour les avis
+
 function gererActionsAvis($pdo, $idClient, $idProduit) {
     header('Content-Type: application/json; charset=utf-8');
     
@@ -842,6 +844,11 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (!$idClient) throw new Exception('Connexion requise.');
             
             $idAvis = (int)($_POST['id_avis'] ?? 0);
+
+            $stmtExist = $pdo->prepare("SELECT 1 FROM _avis WHERE id_avis = ?");
+            $stmtExist->execute([$idAvis]);
+            if (!$stmtExist->fetchColumn()) throw new Exception("Cet avis n’existe plus");
+
             $titre = trim($_POST['titre'] ?? '');
             $texte = trim($_POST['commentaire'] ?? '');
             $note = isset($_POST['note']) ? (float)$_POST['note'] : null;
@@ -875,6 +882,11 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
         } elseif ($action === 'delete_avis') {
              if (!$idClient) throw new Exception('Connexion requise.');
              $idAvis = (int)($_POST['id_avis'] ?? 0);
+
+             $stmtExist = $pdo->prepare("SELECT 1 FROM _avis WHERE id_avis = ?");
+             $stmtExist->execute([$idAvis]);
+             if (!$stmtExist->fetchColumn()) throw new Exception("Cet avis n’existe plus");
+
              $owner = $_COOKIE['alizon_owner'] ?? '';
 
              $sqlDel = "DELETE FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (a_owner_token = ? AND id_client IS NULL))";
@@ -891,6 +903,11 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
         } elseif ($action === 'vote') {
              if (!$idClient) throw new Exception('Connexion requise.');
              $idAvis = (int)($_POST['id_avis'] ?? 0);
+
+             $stmtExist = $pdo->prepare("SELECT 1 FROM _avis WHERE id_avis = ?");
+             $stmtExist->execute([$idAvis]);
+             if (!$stmtExist->fetchColumn()) throw new Exception("Cette avis n’existe plus");
+
              $val = $_POST['value'] ?? '';
              $dbTyp = ($val === 'plus') ? 'like' : (($val === 'minus') ? 'dislike' : null);
              
@@ -937,6 +954,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
         exit;
     }
 }
+
 
 //fonction pour récupérer toutes les données du profil client en une seule requête optimisée
 function recupererProfilCompletClientOptimise($connexionBaseDeDonnees, $identifiantClient) {
@@ -1081,28 +1099,37 @@ function transfererPanierTempVersBDD($pdo, $idPanier)
 }
 
 //fonction pour inserer une facture
-function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ht_remise, $f_total_ttc, $id_adresse){
-        $requeteFacture = "INSERT INTO _facture (id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc) VALUES
-                                                        (:id_panier, 
-                                                         :id_adresse,
-                                                         :nom_destinataire,
-                                                         :prenom_destinataire,
-                                                         :f_total_ht,
-                                                         :f_total_remise,
-                                                         :f_total_ht_remise,
-                                                         :f_total_ttc)";
-        $stmt = $pdo->prepare($requeteFacture);
-        $stmt->execute([
-            ':id_panier' => $panierEnCours,
-            ':id_adresse' => $id_adresse,
-            ':nom_destinataire' => $nom,
-            ':prenom_destinataire' => $prenom,
-            'f_total_ht' => $f_total_ht,
-            'f_total_remise' => $f_total_remise,
-            'f_total_ht_remise' => $f_total_ht_remise,
-            ':f_total_ttc' => $f_total_ttc
-        ]);
+function insererFacture($pdo, $panierEnCours, $nom, $prenom, $f_total_ht, $f_total_remise, $f_total_ht_remise, $f_total_ttc, $id_adresse) {
+    $requeteFacture = "
+        INSERT INTO _facture 
+        (id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ht_remise, f_total_ttc)
+        
+        VALUES
+        (
+            :id_panier,
+            :id_adresse,
+            :nom_destinataire,
+            :prenom_destinataire,
+            :f_total_ht,
+            :f_total_remise,
+            :f_total_ht_remise,
+            :f_total_ttc
+        )
+    ";
+
+    $stmt = $pdo->prepare($requeteFacture);
+    $stmt->execute([
+        ':id_panier' => $panierEnCours,
+        ':id_adresse' => $id_adresse,
+        ':nom_destinataire' => $nom,
+        ':prenom_destinataire' => $prenom,
+        ':f_total_ht' => $f_total_ht,
+        ':f_total_remise' => $f_total_remise,
+        ':f_total_ht_remise' => $f_total_ht_remise,
+        ':f_total_ttc' => $f_total_ttc
+    ]);
 }
+
 
 
 //fonction pour préparer les catégories pour l'affichage
@@ -1172,4 +1199,20 @@ function filtrerProduits($listeProduits, $filtres)
         $produits_filtres[] = $produitCourant;
     }
     return $produits_filtres;
+}
+
+function calculFacture($pdo, $id_produit){
+    //calcul le prix d'un produit apres les remises et la tva ne calcul pas avec la quantite
+    $reqFacture = "
+        SELECT p_prix, montant_tva, reduction_pourcentage 
+        FROM _produit 
+        JOIN _tva ON _produit.id_tva = _tva.id_tva
+        JOIN _reduction ON _produit.id_produit = _reduction.id_produit
+        WHERE _produit.id_produit =:id_produit;
+        ";
+    $stmt = $pdo->prepare($reqFacture);
+    $stmt->execute([':id_produit' => id_produit]);
+    $donnees = $stmt->fetchColumn();
+    $prixFinal = $donnees["p_prix"] *
+    return
 }
