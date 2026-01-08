@@ -191,7 +191,7 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                 <?php else: ?>
                 <?php foreach ($listeProduits as $produitCourant):
                         $estEnRupture = $produitCourant['p_stock'] <= 0;
-                        $discount = (float)$produitCourant['pourcentage_reduction'];
+                        $discount = (float)$produitCourant['reduction_pourcentage'];
                         $possedePourcentageRemise = $discount > 0;
                         $prixDiscount = ($discount > 0) ? $produitCourant['p_prix'] * (1 - $discount/100) : $produitCourant['p_prix'];
                         $prixFinal = calcPrixTVA($produitCourant['id_produit'], $produitCourant['tva'], $prixDiscount);
@@ -207,7 +207,7 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
                                 class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
                         </div>
                         <?php if ($possedePourcentageRemise): ?>
-                        <span class="badge-reduction">-<?= round($produitCourant['pourcentage_reduction']) ?>%</span>
+                        <span class="badge-reduction">-<?= round($produitCourant['reduction_pourcentage']) ?>%</span>
                         <?php endif; ?>
                         <?php if ($estEnRupture): ?>
                         <div class="rupture-stock">Rupture de stock</div>
