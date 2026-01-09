@@ -26,12 +26,11 @@
                         ];
                         $stmt->execute($params);
                         $_SESSION["remise"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        if (empty($_SESSION["remise"]['_GET'])){
-                            $_SESSION["remise"]['_GET'] = [];
+                        if (empty($_SESSION["remise"]['_GET'][0])){
                             $_SESSION["remise"]['_GET'][0] = [];
                             $_SESSION["remise"]['_GET'][0]['produit'] = '';
-                            $_SESSION["remise"]['_GET']['produit'] = '';
-                            $_SESSION["remise"]['_GET']['id_produit'] = '';
+                            // $_SESSION["remise"]['_GET']['produit'] = '';
+                            // $_SESSION["remise"]['_GET']['id_produit'] = '';
                             $_SESSION["remise"]['_GET']['id_vendeur'] = [];
                             $_SESSION["remise"]['_GET']['id_vendeur']['id_vendeur'] = '';
                         }
