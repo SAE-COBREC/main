@@ -147,7 +147,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="../../../../styles/remise/remise.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="../../../../styles/creerArticle/creerArticle.css" media="screen">
     <title>Ébauche de produit</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
 </head>
@@ -156,7 +156,7 @@
 
 // print_r($_GET);
 // print_r($_SESSION["remise"]['_GET']);
-// print_r($_POST);
+print_r($_POST);
 // print_r($_SESSION["remise"]);
 
 if ($_POST !== []) {
@@ -176,7 +176,7 @@ if ($_POST !== []) {
     <main>
         <h2><?php 
         if (empty($_SESSION["remise"]['_GET']['id_reduction'])){
-            //si id_reduction n'est pas connu alors on paramètre les autres var du _GET afind 'éviter des warnings php
+            //si id_reduction n'est pas connu alors on paramètre les autres var du _GET afin d'éviter des warnings php
             //TODO plus tard
             $_SESSION["remise"]['_GET']['reduction_fin'] = '';
             $_SESSION["remise"]['_GET']['reduction_debut'] = '';
@@ -197,16 +197,7 @@ if ($_POST !== []) {
         ?>" method="post" enctype="multipart/form-data">
             
             <div>
-                <section style="<?php 
-                    if (($_POST["pourcentage"] === '') && ($_POST["debut"] === '') && ($_POST["fin"] === '') ){
-                        //
-                    }elseif (($_POST["pourcentage"] !== '') && ($_POST["debut"] !== '') && ($_POST["fin"] !== '') ) {
-                        //
-                    }elseif ($_POST["btn_maj"] == null){//si la zone de promotion n'est que partiellement remplie
-                        $_SESSION["remise"]["warn"]++;
-                        echo 'border: 3px solid red';
-                    }
-                ?>">
+                <section>
                 <article>
                         <!-- Liste déroulante -->
                         <label for="produit">Produit</label>
@@ -216,7 +207,7 @@ if ($_POST !== []) {
                             <?php
                                 if (empty($produit)){
                                     try {//Permets d'obtenir toutes les catégories de produits listées dans la BDD
-                                        $sql = 'SELECT id_produit, p_nom FROM cobrec1._produit WHERE id_vendeur = :vendeur ORDER BY p_nom';
+                                        $sql = 'SELECT id_produit, p_nom, p_stock, p_statut FROM cobrec1._produit WHERE id_vendeur = :vendeur ORDER BY p_nom';
                                         $stmt = $pdo->prepare($sql);
                                         $params = [
                                             'vendeur' => $_SESSION['vendeur_id']
@@ -228,33 +219,33 @@ if ($_POST !== []) {
                                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
                                     }
 
-                                    try {//Permets d'obtenir toutes les catégories de produits listées dans la BDD
-                                        $sql = 'SELECT id_produit FROM cobrec1._reduction WHERE id_produit = :produit';
-                                        $stmt = $pdo->prepare($sql);
-                                        $params = [
-                                            'produit' => $_SESSION["remise"]['_GET']['produit']
-                                        ];
-                                        $stmt->execute($params);
-                                        $warn2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                        print_r($warn2);
-                                    } catch (Exception $e) {
-                                        print_r($e);
-                                        $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                                    }
+                                    // try {//
+                                    //     $sql = 'SELECT id_produit FROM cobrec1._reduction WHERE id_produit = :produit';
+                                    //     $stmt = $pdo->prepare($sql);
+                                    //     $params = [
+                                    //         'produit' => $_SESSION["remise"]['_GET']['produit']
+                                    //     ];
+                                    //     $stmt->execute($params);
+                                    //     $warn2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    //     print_r($warn2);
+                                    // } catch (Exception $e) {
+                                    //     print_r($e);
+                                    //     $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                    // }
                                 }
 
                                 foreach ($produit as $value) {
                             ?>
                             <option 
-                            value="<?php echo $value['id_produit'] ?>" <?php if ($_POST["produit"] == $value['id_produit']){echo 'selected';} ?>>
-                            <?php echo $value['p_nom'] ?>
+                            value="<?php echo $value['id_produit']?>" <?php if ($_POST["produit"] == $value['id_produit']){echo 'selected';} ?>>
+                            <?php echo $value['p_nom']  . ' (' . $value['p_statut'] . ' ; stock : ' . $value['p_stock'] . ')' ?>
                             </option>
                             <?php } ?>
                         </select>
                         <br />
                     </article>
                     <article>
-                        <label for="pourcentage">Pourcentage de promotion</label>
+                        <label for="pourcentage">Pourcentage de remise</label>
                         <br>
                         <input type="number" id="pourcentage" name="pourcentage" value="<?php echo $_POST["pourcentage"];?>" step="0.01" min="1" max="99" placeholder="20,00" required/>
 
@@ -262,7 +253,7 @@ if ($_POST !== []) {
                     </article>
 
                     <article>
-                        <label for="debut">Date de début de promotion</label>
+                        <label for="debut">Date de début de remise</label>
                         <br>
                         <input style="<?php if(/*(time() + 15 * 60 >= strtotime($_POST["debut"])) ||*/ ((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
                             value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" required/>
@@ -290,7 +281,7 @@ if ($_POST !== []) {
                     </article>
 
                     <article>
-                        <label for="fin">Date de fin de promotion</label>
+                        <label for="fin">Date de fin de remise</label>
                         <br>
                         <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
                             value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" required/>
@@ -345,6 +336,7 @@ if ($_POST !== []) {
             <pre>
                 <?php 
                     if (($_SESSION["remise"]["warn"] === 0) && ($_POST["produit"] !== '')){
+                        $_SESSION["remise"]["warn"]++;
                         $time = time();
                         // print_r("WARNS : " . $_SESSION["remise"]["warn"]);
 
@@ -361,26 +353,9 @@ if ($_POST !== []) {
                             
                         
                             
-
-
+                        
+                        if ($_POST["publier"] == "Publier la remise dans le catalogue client"){
                             try {//création de l'objet reduction
-                                $sql = '
-                                DELETE FROM cobrec1._reduction WHERE id_produit = :produit;
-                                ';
-                                $stmt = $pdo->prepare($sql);
-                                $params = [
-                                    'produit' => $_POST['produit']
-                                ];
-                                $stmt->execute($params);
-                                $existait = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                if (!empty($existait)){?>
-                                    <script>
-                                        avertirEcrasement();
-                                    </script>
-                                <?php
-                                }
-
-
                                 $sql = '
                                 INSERT INTO cobrec1._reduction(id_produit, reduction_pourcentage, reduction_debut, reduction_fin)
                                 VALUES (:produit, :pourcentage, :debut, :fin);
@@ -393,6 +368,7 @@ if ($_POST !== []) {
                                     'produit' => $_POST['produit']
                                 ];
                                 $stmt->execute($params);
+                                print_r('INSERT ' . $_POST['produit']);
                             } catch (Exception $e) {
                                 //$_SESSION["remise"]['bdd_errors'] sert pour consulter les erreurs de la BDD
                                 $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet reduction dans la base";
@@ -423,10 +399,11 @@ if ($_POST !== []) {
                         publier();
                     </script>
     <?php
+                            }
                     
                 }else if ($_POST["svgModif"] == "Sauvegarder les modifications"){
+                    $_SESSION["remise"]["warn"]++;
                     //Si pas de warning et formulaire soumis via le bouton Mettre en ligne/hors ligne
-                    $time = time();
                     
                     try {//modif de l'objet reduction dans la base
                         $sql = '
@@ -445,6 +422,7 @@ if ($_POST !== []) {
                             'getId' => $_SESSION["remise"]['_GET']['id_reduction'],
                             'produit' => $_POST['produit']
                         ];
+                        print_r('UPDATE' . $_POST['produit']);
                         $stmt->execute($params);
                     } catch (Exception $e) {
                         //$_SESSION["remise"]['bdd_errors'] sert pour consulter les erreurs de la BDD
