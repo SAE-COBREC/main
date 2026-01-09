@@ -26,10 +26,11 @@
                         ];
                         $stmt->execute($params);
                         $_SESSION["remise"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        $_SESSION["remise"]['_GET'] = $_SESSION["remise"]['_GET'][0];
-                        //print_r($_SESSION["remise"]['_GET']);
-                        $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['id_produit'];
-                        unset($_SESSION["remise"]['_GET']['id_produit']);
+                        if (!empty($_SESSION["remise"]['_GET'])){
+                            $_SESSION["remise"]['_GET'] = $_SESSION["remise"]['_GET'][0];
+                            $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['id_produit'];
+                            unset($_SESSION["remise"]['_GET']['id_produit']);
+                        }
 
 
                         // $sql = '
@@ -126,10 +127,12 @@
                         //peuplement de _post et de remise
                         //print_r("peuplement\n");
                         $_POST = [];
-                        $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
-                        $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
-                        $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
-                        $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
+                        if (!empty($_SESSION["remise"]['_GET'])){
+                             $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
+                            $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
+                            $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
+                            $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
+                        }
                         $_SESSION["remise"]['etat'] = 'svg';
 
                     }
