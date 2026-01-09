@@ -31,7 +31,7 @@
                             $_SESSION["remise"]['_GET'][0]['produit'] = 0;
                             $_SESSION["remise"]['_GET']['produit'] = 0;
                             $_SESSION["remise"]['_GET']['id_produit'] = 0;
-                            $_SESSION["remise"]['_GET']['id_vendeur'] = 0;
+                            $_SESSION["remise"]['_GET']['id_vendeur'] = [];
                             $_SESSION["remise"]['_GET']['id_vendeur']['id_vendeur'] = 0;
                         }
                         $_SESSION["remise"]['_GET'] = $_SESSION["remise"]['_GET'][0];
