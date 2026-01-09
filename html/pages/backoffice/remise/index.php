@@ -143,6 +143,7 @@
                             $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
                             $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
                         }else{
+                            $_POST["produit"] = 0;
                             $_POST["pourcentage"] = '';
                             $_POST["debut"] = '';
                             $_POST["fin"] = '';
