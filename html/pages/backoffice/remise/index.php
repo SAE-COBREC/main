@@ -156,7 +156,7 @@
 
 // print_r($_GET);
 // print_r($_SESSION["remise"]['_GET']);
-print_r($_POST);
+// print_r($_POST);
 // print_r($_SESSION["remise"]);
 
 if ($_POST !== []) {
@@ -183,7 +183,8 @@ if ($_POST !== []) {
             $_SESSION["remise"]['_GET']['reduction_pourcentage'] = '';
             $_SESSION["remise"]['_GET']['id_reduction'] = '';
         }
-        if(empty($_GET['modifier'])){
+        if(empty($_GET['modifier']) || empty($_SESSION["remise"]['_GET']['id_reduction'])){
+            //si on a un ?modifier= dans l'URL ou que la remise n'existe pas
             echo 'Remise non sauvegardée';
         }else{
             echo 'Modifier la remise sauvegardée';
@@ -238,7 +239,7 @@ if ($_POST !== []) {
                             ?>
                             <option 
                             value="<?php echo $value['id_produit']?>" <?php if ($_POST["produit"] == $value['id_produit']){echo 'selected';} ?>>
-                            <?php echo $value['p_nom']  . ' (' . $value['p_statut'] . ' ; stock : ' . $value['p_stock'] . ')' ?>
+                            <?php echo $value['p_nom']  . ' (' . $value['p_statut'] . ' ; ' . $value['p_stock'] . ' en stock)' ?>
                             </option>
                             <?php } ?>
                         </select>
@@ -293,14 +294,35 @@ if ($_POST !== []) {
             </div>
             <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
             <?php
-            if(empty($_SESSION["remise"]['_GET']['id_reduction']) == false){//si la page est en mode US modification
+            if(empty($_SESSION["remise"]['_GET']['produit']) == false){//si la page est en mode US modification
                 ?>
                 <input type="submit" class="orange" name="svgModif" title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" accesskey="s"/>
-                <input type="submit" name="suppr" title="Supprimer la remise." value="Supprimer la remise" accesskey="d"/>
+                <input type="button" name="suppr" title="Supprimer la remise." value="Supprimer la remise" accesskey="d"/>
+                <script>
+                        const btnSupprimer = document.querySelector("input[value='Supprimer la remise']");
+                        btnSupprimer.addEventListener('click', () => {//si clic sur Supprimer
+                            if (confirm("Êtes-vous certain de vouloir supprimer cette remise ?")) {
+                                document.location.href="/pages/backoffice/supprRemise/index.php"; 
+                            }
+                        });
+                    </script>
                 <?php
+                if (empty($_SESSION["remise"]['_GET']['id_reduction'])){
+                    ?>
+                    <script>
+                        btnSupprimer.disabled = true; //grisage du bouton
+                    </script>
+                    <?php
+                }else{
+                    ?>
+                    <script>
+                        btnSupprimer.disabled = false; //dégrisage du bouton
+                    </script>
+                    <?php
+                }
             }else{
                 ?>
-            <input class="orange" type="submit" name="publier"title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier la remise dans le catalogue client" />
+            <input class="orange" type="submit" name="publier" title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier la remise dans le catalogue client" />
             <?php } ?>
             </form>
             <script>
@@ -354,7 +376,8 @@ if ($_POST !== []) {
                         
                             
                         
-                        if ($_POST["publier"] == "Publier la remise dans le catalogue client"){
+                        if ($_POST["publier"] == "Publier la remise dans le catalogue client"  || (empty($_SESSION["remise"]['_GET']['id_reduction']) && ($_POST["svgModif"] == "Sauvegarder les modifications"))){
+                            //si la remise n'existe pas (même si l'URL nous fait croire que l'on en modifie une, ce qui en fait n'est pas le cas)
                             try {//création de l'objet reduction
                                 $sql = '
                                 INSERT INTO cobrec1._reduction(id_produit, reduction_pourcentage, reduction_debut, reduction_fin)
@@ -368,7 +391,15 @@ if ($_POST !== []) {
                                     'produit' => $_POST['produit']
                                 ];
                                 $stmt->execute($params);
-                                print_r('INSERT ' . $_POST['produit']);
+                                $_SESSION["remise"]['_GET']['id_reduction'] = $pdo->lastInsertId();
+                                ?>
+                                <script>
+                                    btnSupprimer.disabled = false; //dégrisage du bouton
+                                    const titre = document.querySelector("h2");
+                                    titre.textContent = 'Modifier la remise sauvegardée';
+                                </script>
+                                <?php
+                                //print_r('INSERT ' . $_POST['produit']);
                             } catch (Exception $e) {
                                 //$_SESSION["remise"]['bdd_errors'] sert pour consulter les erreurs de la BDD
                                 $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'objet reduction dans la base";
@@ -422,7 +453,7 @@ if ($_POST !== []) {
                             'getId' => $_SESSION["remise"]['_GET']['id_reduction'],
                             'produit' => $_POST['produit']
                         ];
-                        print_r('UPDATE' . $_POST['produit']);
+                        //print_r('UPDATE' . $_POST['produit']);
                         $stmt->execute($params);
                     } catch (Exception $e) {
                         //$_SESSION["remise"]['bdd_errors'] sert pour consulter les erreurs de la BDD
