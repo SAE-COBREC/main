@@ -71,11 +71,12 @@
                         $_SESSION["remise"]['_GET'] = null;
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="verif titre" . " " . $_SESSION["remise"]['_GET']['produit'];
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$e;
+                        print_r($e);
                     ?>
 
                     <script>
                         alert("La valeur de la remise renseigné dans l'URL n'est pas valide. Vous allez être redirigé vers votre catalogue.");
-                        document.location.href = "/pages/backoffice/index.php"; 
+                        //document.location.href = "/pages/backoffice/index.php"; 
                     </script>
 
                     <?php
@@ -136,11 +137,14 @@
                         //peuplement de _post et de remise
                         //print_r("peuplement\n");
                         $_POST = [];
-                        if (empty($_SESSION["remise"]['_GET']['produit'])){
+                        // if (empty($_SESSION["remise"]['_GET']['produit'])){
                             $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
                             $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
                             $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
                             $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
+                        // }
+                        if (empty($_POST["produit"])){
+                            $_POST["produit"] = '';
                         }
                         $_SESSION["remise"]['etat'] = 'svg';
 
