@@ -26,35 +26,34 @@
                         ];
                         $stmt->execute($params);
                         $_SESSION["remise"]['_GET'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        if (!empty($_SESSION["remise"]['_GET'])){
+                        if (!empty($_SESSION["remise"]['_GET'][0])){
                             $_SESSION["remise"]['_GET'] = $_SESSION["remise"]['_GET'][0];
                             $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['id_produit'];
                             unset($_SESSION["remise"]['_GET']['id_produit']);
+
+                            // $sql = '
+                            // SELECT id_produit FROM cobrec1._en_reduction WHERE id_reduction = :modifier;'
+                            // ;
+                            // $stmt = $pdo->prepare($sql);
+                            // $params = [
+                            //     'modifier' => $_GET['modifier']
+                            // ];
+                            // $stmt->execute($params);
+                            // $_SESSION["remise"]['_GET']['produit'] = $stmt->fetch(PDO::FETCH_ASSOC);
+                            // $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['produit']['id_produit'];
+
+                            $sql = '
+                            SELECT id_vendeur FROM cobrec1._produit
+                            WHERE id_produit = :produit;'
+                            ;
+                            $stmt = $pdo->prepare($sql);
+                            $params = [
+                                'produit' => $_SESSION["remise"]['_GET']['produit']
+                            ];
+                            $stmt->execute($params);
+                            $_SESSION["remise"]['_GET']['id_vendeur'] = $stmt->fetch(PDO::FETCH_ASSOC);
+                            $_SESSION["remise"]['_GET']['id_vendeur'] = $_SESSION["remise"]['_GET']['id_vendeur']['id_vendeur'];
                         }
-
-
-                        // $sql = '
-                        // SELECT id_produit FROM cobrec1._en_reduction WHERE id_reduction = :modifier;'
-                        // ;
-                        // $stmt = $pdo->prepare($sql);
-                        // $params = [
-                        //     'modifier' => $_GET['modifier']
-                        // ];
-                        // $stmt->execute($params);
-                        // $_SESSION["remise"]['_GET']['produit'] = $stmt->fetch(PDO::FETCH_ASSOC);
-                        // $_SESSION["remise"]['_GET']['produit'] = $_SESSION["remise"]['_GET']['produit']['id_produit'];
-
-                        $sql = '
-                        SELECT id_vendeur FROM cobrec1._produit
-                        WHERE id_produit = :produit;'
-                        ;
-                        $stmt = $pdo->prepare($sql);
-                        $params = [
-                            'produit' => $_SESSION["remise"]['_GET']['produit']
-                        ];
-                        $stmt->execute($params);
-                        $_SESSION["remise"]['_GET']['id_vendeur'] = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $_SESSION["remise"]['_GET']['id_vendeur'] = $_SESSION["remise"]['_GET']['id_vendeur']['id_vendeur'];
                         
                     
                     } catch (Exception $e) {
@@ -127,8 +126,8 @@
                         //peuplement de _post et de remise
                         //print_r("peuplement\n");
                         $_POST = [];
-                        if (!empty($_SESSION["remise"]['_GET'])){
-                             $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
+                        if (!empty($_SESSION["remise"]['_GET']['produit'])){
+                            $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
                             $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
                             $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
                             $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
