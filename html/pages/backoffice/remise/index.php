@@ -192,7 +192,7 @@ if ($_POST !== []) {
         ?>
         </h2>
         <form action="index.php<?php 
-            if($_SESSION["remise"]["_GET"] != null){
+            if(!empty($_SESSION["remise"]["_GET"]['produit'])){
                 echo '?modifier=' . $_SESSION["remise"]["_GET"]['produit'];
             }
         ?>" method="post" enctype="multipart/form-data">
@@ -357,6 +357,9 @@ if ($_POST !== []) {
         </script>
             <pre>
                 <?php 
+                    if (empty($_POST["produit"])){
+                        $_POST["produit"] = '';
+                    }
                     if (($_SESSION["remise"]["warn"] === 0) && ($_POST["produit"] !== '')){
                         $_SESSION["remise"]["warn"]++;
                         $time = time();
