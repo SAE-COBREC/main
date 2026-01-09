@@ -139,9 +139,11 @@
                         $_POST = [];
                         // if (empty($_SESSION["remise"]['_GET']['produit'])){
                             $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
-                            $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
-                            $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
-                            $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
+                            if (!empty($_SESSION["remise"]['_GET']['reduction_pourcentage'])){
+                                $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
+                                $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
+                                $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
+                            }
                         // }
                         if (empty($_POST["produit"])){
                             $_POST["produit"] = '';
