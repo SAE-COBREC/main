@@ -108,11 +108,11 @@
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="reduc ne vous appartient pas";
                         $_SESSION["remise"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] =$_SESSION["remise"]['_GET']['id_vendeur'] . ' != ' . $_SESSION['vendeur_id'];
 
-                        $fp = fopen('file.csv', 'w');
-                        foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
-                            fputcsv($fp, $fields, ',', '"', '');
-                        }
-                        fclose($fp);
+                        // $fp = fopen('file.csv', 'w');
+                        // foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
+                        //     fputcsv($fp, $fields, ',', '"', '');
+                        // }
+                        // fclose($fp);
                         $_SESSION["remise"]['_GET'] = null;
                         ?>
 
@@ -488,11 +488,11 @@ if ($_POST !== []) {
 
                 if (empty($_SESSION["remise"]['bdd_errors']) !== true){
                     //Sert pour consulter les erreurs de la BDD via un fichier dédié
-                    $fp = fopen('file.csv', 'w');
-                    foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
-                        fputcsv($fp, $fields, ',', '"', '');
-                    }
-                    fclose($fp);
+                    // $fp = fopen('file.csv', 'w');
+                    // foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
+                    //     fputcsv($fp, $fields, ',', '"', '');
+                    // }
+                    // fclose($fp);
                 }
                 
 
