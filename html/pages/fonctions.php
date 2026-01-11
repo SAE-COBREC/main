@@ -24,7 +24,9 @@ function chargerProduitsBDD($pdo)
             STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories
         FROM cobrec1._produit p
         LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit 
+            AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin
         LEFT JOIN cobrec1._promotion pr ON p.id_produit = pr.id_produit 
+            AND CURRENT_TIMESTAMP BETWEEN pr.promotion_debut AND pr.promotion_fin
         LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
         LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
         LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
@@ -32,7 +34,7 @@ function chargerProduitsBDD($pdo)
         GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
                 p.p_note, p.p_nb_ventes, p.p_statut, r.reduction_pourcentage, 
                 pr.id_produit, t.montant_tva
-        ORDER BY p.id_produit
+        ORDER BY p.id_produit;
     ";
 
         $requetePrepare = $pdo->query($requeteSQL);
