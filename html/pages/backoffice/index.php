@@ -30,9 +30,19 @@ foreach ($fichiers as $value) {
 }
 
 try {
+    $tri = $_GET['tri'] ?? 'id_asc';
+    $order_sql = "id_produit ASC";
+
+    if($tri === 'prix_asc'){
+      $order_sql = "p_prix ASC";
+    }elseif($tri === 'prix_desc'){
+      $order_sql = "p_prix DESC";
+    }
+    
     // Requête SQL pour récupérer les produits du vendeur
     $query = "
-    SELECT DISTINCT on (id_produit)
+    SELECT * FROM (
+      SELECT DISTINCT on (id_produit)
         p.id_produit,
         p.p_nom AS nom_article,
         p.p_description,
@@ -55,7 +65,8 @@ try {
     LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
     WHERE p.id_vendeur = :id_vendeur
     GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, pourcentage, debut_reduc, fin_reduc, debut_promo, fin_promo, i.i_lien
-    ORDER BY p.id_produit ASC";
+    ) AS subquery
+     ORDER BY $order_sql";
 
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_vendeur' => $vendeur_id]);
@@ -125,11 +136,22 @@ try {
                 </div>
             <?php endforeach; ?>
         </div>
-
-          <div class="filters">
-            <div class="filters__item">------- --- --------</div>
-            <div class="filters__item">------- -- ------- ▾</div>
-            <div class="filters__item">---- -- -------</div>
+          <div class="tri">
+            <div class="tri__item"><span class="tri__label">Trier par prix :</span>
+              <a href="<?= genererUrlTri('prix_asc') ?>" 
+                class="tri__item <?= ($tri === 'prix_asc') ? 'tri__item--active' : '' ?>">
+                ↑ Croissant
+              </a>
+              <a href="<?= genererUrlTri('prix_desc') ?>" 
+                class="tri__item <?= ($tri === 'prix_desc') ? 'tri__item--active' : '' ?>">
+                ↓ Décroissant
+              </a>
+              <?php if($tri !== 'id_asc'): ?>
+                  <a href="<?= genererUrlTri('id_asc') ?>" class="tri__item" style="color: #666; font-size: 0.8em;">Réinitialiser</a>
+              <?php endif; ?>
+            </div>
+            <div class="tri__item">------- -- -------</div>
+            <div class="tri__item">---- -- -------</div>
           </div>
         </div>
 
