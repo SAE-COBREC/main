@@ -1,10 +1,35 @@
-date,id_compte,message,fichier,ligne
-"2026-01-08 10:18:57",14,"SQLSTATE[42601]: Syntax error: 7 ERROR:  syntax error at or near ""$3""
-LINE 2:                 VALUES ($1, $2 $3, $4, $5, $6)
-                                       ^",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,136
-"2026-01-08 10:22:16",15,"SQLSTATE[42601]: Syntax error: 7 ERROR:  syntax error at or near ""$3""
-LINE 2:                 VALUES ($1, $2 $3, $4, $5, $6)
-                                       ^",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,136
-"2026-01-08 10:23:59",16,"SQLSTATE[42703]: Undefined column: 7 ERROR:  column ""a_numéro"" of relation ""_adresse"" does not exist
-LINE 1: INSERT INTO cobrec1._adresse(id_compte, a_numéro, a_adresse,...
-                                                ^",/home/tessier/Documents/Cours/SAE/GitHub/main/html/pages/creationClient/index.php,136
+memset(buffer3, 0, BUFFER_SIZE);
+        n = read(client_fd, buffer3, BUFFER_SIZE - 1);
+
+        if (n <= 0) {
+            close(client_fd);
+            continue;
+        }
+
+        char *ligne_status = strtok(buffer3, "\r\n");
+
+        if (!ligne_status) {
+            close(client_fd);
+            continue;
+        }
+
+        if (strncmp(ligne_status, "STATUS ", 7) == 0) {
+            int new_status = atoi(ligne_status + 6);
+            if (new_status == (status+1)){
+                status = new_status;
+                printf("Nouveau status : %d \n", new_status);
+            }
+            else{
+                printf("statut inchangeable :  \n ");
+            }
+        char response[BUFFER_SIZE];
+        snprintf(response, sizeof(response),"OK STATUS= %d \n",status);
+        write(client_fd, response, strlen(response));
+
+        close(client_fd);
+
+        }else {
+            const char *rep = "ERREUR\n";
+            write(client_fd, rep, strlen(rep));
+        }
+    }

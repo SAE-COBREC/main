@@ -6,86 +6,236 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
 
 #define PORT 9000
 #define BUFFER_SIZE 256
+#define FICHIER_COMMANDES "commandes.txt"
+
+int chercher_commande(int id_commande, int *max_bordereau) {
+    FILE *f = fopen(FICHIER_COMMANDES, "r");
+    *max_bordereau = 0;
+    if (f == NULL) {
+        return -1;
+    }
+
+    int cmd, bordereau, resultat = -1, st;
+    char login[64], mdp[64];
+
+    while (fscanf(f, "%d;%d;%63s;%63s;%d", &cmd, &bordereau, login, mdp, &st) == 5) {
+        if (bordereau > *max_bordereau) {
+            *max_bordereau = bordereau;
+        }
+        if (cmd == id_commande) {
+            resultat = bordereau;
+        }
+    }
+    fclose(f);
+    return resultat;
+}
+
+void enregistrer_commande(int id_commande, int bordereau, const char *login, const char *mdp, int status) {
+    FILE *f = fopen(FICHIER_COMMANDES, "a");
+    if (f != NULL) {
+        fprintf(f, "%d;%d;%s;%s;%d\n", id_commande, bordereau, login, mdp, status);
+        fclose(f);
+    } else {
+        perror("erreur ouverture");
+    }
+}
+
+int chercher_status_par_bordereau(int bordereau_recherche, int *status) {
+    FILE *f = fopen(FICHIER_COMMANDES, "r");
+    if (f == NULL) return -1;
+
+    int cmd, bordereau, st;
+    char login[64], mdp[64];
+
+    while (fscanf(f, "%d;%d;%63s;%63s;%d", &cmd, &bordereau, login, mdp, &st) == 5) {
+        if (bordereau == bordereau_recherche) {
+            *status = st;
+            fclose(f);
+            printf("Ligne lue: cmd=%d, bordereau=%d, login=%s, mdp=%s, st=%d\n",
+       cmd, bordereau, login, mdp, st);
+
+            return 0;
+        }
+    }
+
+    fclose(f);
+    return -1;
+}
+
+
 
 int main() {
     int server_fd, client_fd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
     char buffer[BUFFER_SIZE];
-    int id_commande;
+    char buffer2[BUFFER_SIZE];
+    char buffer3[BUFFER_SIZE];
 
-    // Création du socket
+
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        perror("socket");
+        return 1;
+    }
 
-    // Option pour réutiliser l'adresse
     int opt = 1;
     setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    // Configuration adresse
+    memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
 
-    // Bind
     if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        perror("Erreur bind");
+        perror("bind");
         close(server_fd);
         return 1;
     }
 
-    // Listen
     if (listen(server_fd, 5) < 0) {
-        perror("Erreur listen");
+        perror("listen");
         close(server_fd);
         return 1;
     }
 
-    printf("Transporteur en écoute sur le port %d...\n", PORT);
-
-    // Sémaphores
-    key_t cle1 = ftok(".", 1);
-    key_t cle2 = ftok(".", 2);
-    int workers = semget(cle1, 1, IPC_CREAT | 0640);
-    semctl(workers, 0, SETVAL, 0);
-    int taches = semget(cle2, 1, IPC_CREAT | 0640);
-    semctl(taches, 0, SETVAL, 0);
+    printf("Serveur en écoute sur le port %d\n", PORT);
 
     while (1) {
-        // Accepter connexion
         client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
         if (client_fd < 0) {
-            perror("Erreur accept");
+            perror("accept");
             continue;
         }
 
-        // Lire le numéro de commande
+        //LOGIN
         memset(buffer, 0, BUFFER_SIZE);
-        int bytes_read = read(client_fd, buffer, BUFFER_SIZE - 1);
-        if (bytes_read > 0) {
-            id_commande = atoi(buffer);
-            printf("Commande reçue: %d\n", id_commande);
-
-            // Envoyer confirmation
-            char response[64];
-            sprintf(response, "OK:%d", id_commande);
-            write(client_fd, response, strlen(response));
-
-            // Traitement avec sémaphores
-            struct sembuf sop;
-            sop.sem_num = 0;
-            sop.sem_flg = 0;
-
-            // Signaler une tâche disponible
-            sop.sem_op = 1;
-            semop(taches, &sop, 1);
+        ssize_t n = read(client_fd, buffer, BUFFER_SIZE - 1);
+        if (n <= 0) {
+            close(client_fd);
+            continue;
         }
 
-        close(client_fd);
+        char *ligne_login = strtok(buffer, "\r\n");
+        if (!ligne_login) {
+            const char *rep = "EREUR\n";
+            write(client_fd, rep, strlen(rep));
+            close(client_fd);
+            continue;
+        }
+
+        if (strncmp(ligne_login, "LOGIN ", 6) != 0) {
+            const char *rep = "EREUR\n";
+            write(client_fd, rep, strlen(rep));
+            close(client_fd);
+            continue;
+        }
+
+        //recupere le login
+        char current_login[64] = "inconnu";
+        char current_mdp[64] = " ";
+        char user[64], pass[64];
+        user[0] = '\0';
+        pass[0] = '\0';
+
+        if (sscanf(ligne_login, "LOGIN %63s %63s", user, pass) >= 1) {
+            strncpy(current_login, user, sizeof(current_login) - 1);
+            strncpy(current_mdp, pass, sizeof(current_mdp) - 1);
+            current_login[sizeof(current_login) - 1] = '\0';
+        }
+
+        const char *rep_ok_login = "OK LOGGED_IN\n";
+        write(client_fd, rep_ok_login, strlen(rep_ok_login));
+        printf("LOGIN reçu: %s (user=%s)\n", ligne_login, current_login);
+
+        // CREATE_LABEL
+        memset(buffer2, 0, BUFFER_SIZE);
+        n = read(client_fd, buffer2, BUFFER_SIZE - 1);
+        if (n <= 0) {
+            close(client_fd);
+            continue;
+        }
+
+        char *ligne_cmd = strtok(buffer2, "\r\n");
+        if (!ligne_cmd) {
+            close(client_fd);
+            continue;
+        }
+
+        if (strncmp(ligne_cmd, "CREATE_LABEL ", 12) == 0) {
+            int id_commande = atoi(ligne_cmd + 12);
+            int max_bordereau = 0;
+            int status = 0;
+            int bordereau = chercher_commande(id_commande, &max_bordereau);
+            int already = 0;
+
+            if (bordereau < 0) {
+
+                bordereau = max_bordereau + 1;
+                enregistrer_commande(id_commande, bordereau, current_login, current_mdp, status);
+                already = 0;
+                printf("Nouveau: commande %d -> bordereau %d (login=%s)\n",
+                       id_commande, bordereau, current_login);
+            } else {
+
+                already = 1;
+                printf("Existant: commande %d -> bordereau %d\n",
+                       id_commande, bordereau);
+            }
+
+            char response[BUFFER_SIZE];
+            snprintf(response, sizeof(response),
+                     "OK LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
+                     bordereau, already);
+            write(client_fd, response, strlen(response));
+        } else {
+            const char *rep = "ERREUR\n";
+            write(client_fd, rep, strlen(rep));
+        }
+        // STATUS
+
+    memset(buffer3, 0, BUFFER_SIZE);
+    n = read(client_fd, buffer3, BUFFER_SIZE - 1);
+
+        if (n <= 0) {
+            close(client_fd);
+            continue;
+        }
+
+        char *ligne_status = strtok(buffer3, "\r\n");
+        
+        fflush(stdout);
+
+
+        if (!ligne_status) {
+            close(client_fd);
+            continue;
+        }
+
+        if (strncmp(ligne_status, "STATUS ", 7) == 0) {
+            int label = atoi(ligne_status + 7);
+            int step = 0;
+            int ret = chercher_status_par_bordereau(label, &step);
+
+            if (ret != 0) {
+                const char *rep = "ERROR UNKNOWN_PARCEL\n";
+                write(client_fd, rep, strlen(rep));
+            } else {
+                const char *libelle = "Chez Alizon"; 
+                char response[BUFFER_SIZE];
+                snprintf(response, sizeof(response),
+                        "OK STEP=%d LABEL_STEP=\"%s\"\n", step, libelle);
+                write(client_fd, response, strlen(response));
+            }
+        } else {
+            const char *rep = "ERROR UNKNOWN_COMMAND\n";
+            write(client_fd, rep, strlen(rep));
+        }
+
+
     }
 
     close(server_fd);
