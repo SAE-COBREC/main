@@ -140,11 +140,11 @@ try {
             <div class="tri__item"><span class="tri__label">Trier par prix :</span>
               <a href="<?= genererUrlTri('prix_asc') ?>" 
                 class="tri__item <?= ($tri === 'prix_asc') ? 'tri__item--active' : '' ?>">
-                ↑ Croissant
+                Croissant
               </a>
               <a href="<?= genererUrlTri('prix_desc') ?>" 
                 class="tri__item <?= ($tri === 'prix_desc') ? 'tri__item--active' : '' ?>">
-                ↓ Décroissant
+                Décroissant
               </a>
               <?php if($tri !== 'id_asc'): ?>
                   <a href="<?= genererUrlTri('id_asc') ?>" class="tri__item" style="color: #666; font-size: 0.8em;">Réinitialiser</a>
