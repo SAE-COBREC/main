@@ -892,43 +892,6 @@ BEFORE UPDATE on _reduction
 FOR EACH ROW
 EXECUTE PROCEDURE produit_deja_en_reduction_update();
 
-
-
-
-CREATE FUNCTION produit_deja_en_promotion_insert()
-RETURNS TRIGGER AS $$
-BEGIN
-    PERFORM * FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
-    IF FOUND THEN
-        DELETE FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER tgr_produit_deja_en_promotion_insert
-BEFORE INSERT on _promotion
-FOR EACH ROW
-EXECUTE PROCEDURE produit_deja_en_promotion_insert();
-
-CREATE FUNCTION produit_deja_en_promotion_update()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF (NEW.id_produit != OLD.id_produit) THEN
-        PERFORM * FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
-        IF FOUND THEN
-            DELETE FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
-        END IF;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER tgr_produit_deja_en_promotion_update
-BEFORE UPDATE on _promotion
-FOR EACH ROW
-EXECUTE PROCEDURE produit_deja_en_promotion_update();
-
 -- ============================================
 -- PEUPLEMENT DE LA BASE DE DONNÉES
 -- ============================================
@@ -3007,9 +2970,9 @@ VALUES (
 INSERT INTO
     _image (i_lien, i_title, i_alt)
 VALUES (
-        '/img/photo/enceinte_bluetooth_waterproof.jpg',
-        'Enceinte Bluetooth.jpg',
-        'Image de l enceinte'
+        '/img/photo/smartphone_xpro.jpg',
+        'Smartphone XPro.jpg',
+        'Image du smartphone'
     ),
     (
         '/img/photo/ordinateur_portable_ultra.jpg',
@@ -3017,69 +2980,9 @@ VALUES (
         'Image de l ordinateur'
     ),
     (
-        '/img/photo/_cran_gaming_4k_27_.jpg',
-        'Écran 4K.jpeg',
-        'Image de l écran'
-    ),
-    (
-        '/img/photo/console_nextgen.jpg',
-        'Console NextGen.jpg',
-        'Image de la console'
-    ),
-    (
-        '/img/photo/montre_connect_e.jpg',
-        'Montre connectée.jpg',
-        'Image de la montre'
-    ),
-    (
-        '/img/photo/raquette_de_tennis_pro.jpg',
-        'Raquette tennis.jpg',
-        'Image de la raquette'
-    ),
-    (
-        '/img/photo/tablette_10_pouces.jpg',
-        'Tablette.jpg',
-        'Image de la tablette'
-    ),
-    (
-        '/img/photo/tente_4_places.jpg',
-        'Tente 4 places.jpg',
-        'Image de la tente'
-    ),
-    (
-        '/img/photo/veste_en_cuir.jpg',
-        'Veste cuir.jpg',
-        'Image de la veste'
-    ),
-    (
-        '/img/photo/baskets_limited_edition.jpg',
-        'Baskets limited.jpeg',
-        'Image des baskets'
-    ),
-    (
-        '/img/photo/chaussures_running.jpg',
-        'Chaussures running.jpeg',
-        'Image des chaussures'
-    ),
-    (
-        '/img/photo/ballon_de_football.jpg',
-        'Ballon football.jpg',
-        'Image du ballon'
-    ),
-    (
-        '/img/photo/casque_audio_bluetooth.jpg',
-        'Casque audio.jpg',
-        'Image du casque'
-    ),
-    (
-        '/img/photo/clavier_m_canique_rgb.jpg',
-        'Clavier.jpg',
-        'Image du clavier'
-    ),
-    (
-        '/img/photo/drone_professionnel_4k.jpg',
-        'Drone 4K.jpg',
-        'Image du drone'
+        '/img/photo/t_shirt_coton_bio.jpg',
+        'T-shirt.png',
+        'Image du t-shirt'
     ),
     (
         '/img/photo/jean_slim.jpg',
@@ -3087,424 +2990,9 @@ VALUES (
         'Image du jean'
     ),
     (
-        '/img/photo/livre_cuisine_fran_aise.jpg',
-        'Livre cuisine.jpeg',
-        'Image du livre'
-    ),
-    (
-        '/img/photo/manteau_d_hiver_imperm_able.jpg',
-        'Manteau hiver.jpeg',
-        'Image du manteau'
-    ),
-    (
-        '/img/photo/sac___dos_urbain.jpg',
-        'Sac à dos.jpeg',
-        'Image du sac'
-    ),
-    (
-        '/img/photo/smartphone_xpro.jpg',
-        'Smartphone XPro.jpg',
-        'Image du smartphone'
-    ),
-    (
-        '/img/photo/sweat___capuche_premium.jpg',
-        'Sweat à capuche.jpeg',
-        'Image du sweat'
-    ),
-    (
-        '/img/photo/t_shirt_coton_bio.jpg',
-        'T-shirt.png',
-        'Image du t-shirt'
-    ),
-    (
-        '/img/photo/tapis_de_yoga.jpg',
-        'Tapis yoga.jpeg',
-        'Image du tapis'
-    ),
-    (
-        '/img/photo/v_lo_de_route_carbone.jpg',
-        'Vélo route.jpeg',
-        'Image du vélo'
-    ),
-    (
-        '/img/photo/logo_fashionhub.jpg',
-        'Logo FashionHub.jpg',
-        'Logo entreprise FashionHub'
-    ),
-    (
-        '/img/photo/logo_techstore.jpg',
-        'Logo TechStore.jpg',
-        'Logo entreprise TechStore'
-    ),
-    (
-        '/img/photo/affiche_vintage_de_dinard.jpg',
-        'Affiche Vintage de Dinard',
-        'Photo de Affiche Vintage de Dinard'
-    ),
-    (
-        '/img/photo/affiche_vintage_de_vannes.jpg',
-        'Affiche Vintage de Vannes',
-        'Photo de Affiche Vintage de Vannes'
-    ),
-    (
-        '/img/photo/bol_breton_bio.jpg',
-        'Bol Breton Bio',
-        'Photo de Bol Breton Bio'
-    ),
-    (
-        '/img/photo/bol_breton_fait_main.jpg',
-        'Bol Breton Fait main',
-        'Photo de Bol Breton Fait main'
-    ),
-    (
-        '/img/photo/bol_breton_premium.jpg',
-        'Bol Breton Premium',
-        'Photo de Bol Breton Premium'
-    ),
-    (
-        '/img/photo/bol_breton_traditionnel.jpg',
-        'Bol Breton Traditionnel',
-        'Photo de Bol Breton Traditionnel'
-    ),
-    (
-        '/img/photo/bol_breton_de_saint_malo.jpg',
-        'Bol Breton de Saint-Malo',
-        'Photo de Bol Breton de Saint-Malo'
-    ),
-    (
-        '/img/photo/bol_e___cidre_artisanal.jpg',
-        'Bolée à Cidre Artisanal',
-        'Photo de Bolée à Cidre Artisanal'
-    ),
-    (
-        '/img/photo/bol_e___cidre_local.jpg',
-        'Bolée à Cidre Local',
-        'Photo de Bolée à Cidre Local'
-    ),
-    (
-        '/img/photo/bol_e___cidre_de_saint_malo.jpg',
-        'Bolée à Cidre de Saint-Malo',
-        'Photo de Bolée à Cidre de Saint-Malo'
-    ),
-    (
-        '/img/photo/bonnet_miki_authentique.jpg',
-        'Bonnet Miki Authentique',
-        'Photo de Bonnet Miki Authentique'
-    ),
-    (
-        '/img/photo/bonnet_miki_premium.jpg',
-        'Bonnet Miki Premium',
-        'Photo de Bonnet Miki Premium'
-    ),
-    (
-        '/img/photo/bonnet_miki_traditionnel.jpg',
-        'Bonnet Miki Traditionnel',
-        'Photo de Bonnet Miki Traditionnel'
-    ),
-    (
-        '/img/photo/bonnet_miki_de_carnac.jpg',
-        'Bonnet Miki de Carnac',
-        'Photo de Bonnet Miki de Carnac'
-    ),
-    (
-        '/img/photo/bonnet_miki_de_concarneau.jpg',
-        'Bonnet Miki de Concarneau',
-        'Photo de Bonnet Miki de Concarneau'
-    ),
-    (
-        '/img/photo/bracelet_ancre_artisanal.jpg',
-        'Bracelet Ancre Artisanal',
-        'Photo de Bracelet Ancre Artisanal'
-    ),
-    (
-        '/img/photo/bracelet_ancre_durable.jpg',
-        'Bracelet Ancre Durable',
-        'Photo de Bracelet Ancre Durable'
-    ),
-    (
-        '/img/photo/bracelet_ancre_fait_main.jpg',
-        'Bracelet Ancre Fait main',
-        'Photo de Bracelet Ancre Fait main'
-    ),
-    (
-        '/img/photo/bracelet_ancre_de_brest.jpg',
-        'Bracelet Ancre de Brest',
-        'Photo de Bracelet Ancre de Brest'
-    ),
-    (
-        '/img/photo/bracelet_ancre_de_carnac.jpg',
-        'Bracelet Ancre de Carnac',
-        'Photo de Bracelet Ancre de Carnac'
-    ),
-    (
-        '/img/photo/bracelet_ancre_de_concarneau.jpg',
-        'Bracelet Ancre de Concarneau',
-        'Photo de Bracelet Ancre de Concarneau'
-    ),
-    (
-        '/img/photo/caramels_artisanal.jpg',
-        'Caramels Artisanal',
-        'Photo de Caramels Artisanal'
-    ),
-    (
-        '/img/photo/caramels_durable.jpg',
-        'Caramels Durable',
-        'Photo de Caramels Durable'
-    ),
-    (
-        '/img/photo/caramels_de_carnac.jpg',
-        'Caramels de Carnac',
-        'Photo de Caramels de Carnac'
-    ),
-    (
-        '/img/photo/caramels_de_dinard.jpg',
-        'Caramels de Dinard',
-        'Photo de Caramels de Dinard'
-    ),
-    (
-        '/img/photo/caramels_de_roscoff.jpg',
-        'Caramels de Roscoff',
-        'Photo de Caramels de Roscoff'
-    ),
-    (
-        '/img/photo/cir__jaune_de_vannes.jpg',
-        'Ciré Jaune de Vannes',
-        'Photo de Ciré Jaune de Vannes'
-    ),
-    (
-        '/img/photo/cir__navy_artisanal.jpg',
-        'Ciré Navy Artisanal',
-        'Photo de Ciré Navy Artisanal'
-    ),
-    (
-        '/img/photo/cir__navy_de_brest.jpg',
-        'Ciré Navy de Brest',
-        'Photo de Ciré Navy de Brest'
-    ),
-    (
-        '/img/photo/cir__navy_de_concarneau.jpg',
-        'Ciré Navy de Concarneau',
-        'Photo de Ciré Navy de Concarneau'
-    ),
-    (
-        '/img/photo/cir__navy_de_quimper.jpg',
-        'Ciré Navy de Quimper',
-        'Photo de Ciré Navy de Quimper'
-    ),
-    (
-        '/img/photo/coussin_triskell_artisanal.jpg',
-        'Coussin Triskell Artisanal',
-        'Photo de Coussin Triskell Artisanal'
-    ),
-    (
-        '/img/photo/coussin_triskell_bio.jpg',
-        'Coussin Triskell Bio',
-        'Photo de Coussin Triskell Bio'
-    ),
-    (
-        '/img/photo/coussin_triskell_fait_main.jpg',
-        'Coussin Triskell Fait main',
-        'Photo de Coussin Triskell Fait main'
-    ),
-    (
-        '/img/photo/coussin_triskell_premium.jpg',
-        'Coussin Triskell Premium',
-        'Photo de Coussin Triskell Premium'
-    ),
-    (
-        '/img/photo/coussin_triskell_de_roscoff.jpg',
-        'Coussin Triskell de Roscoff',
-        'Photo de Coussin Triskell de Roscoff'
-    ),
-    (
-        '/img/photo/galettes_artisanal.jpg',
-        'Galettes Artisanal',
-        'Photo de Galettes Artisanal'
-    ),
-    (
-        '/img/photo/galettes_local.jpg',
-        'Galettes Local',
-        'Photo de Galettes Local'
-    ),
-    (
-        '/img/photo/galettes_de_quimper.jpg',
-        'Galettes de Quimper',
-        'Photo de Galettes de Quimper'
-    ),
-    (
-        '/img/photo/kabig_bio.jpg',
-        'Kabig Bio',
-        'Photo de Kabig Bio'
-    ),
-    (
-        '/img/photo/lampe_temp_te_authentique.jpg',
-        'Lampe Tempête Authentique',
-        'Photo de Lampe Tempête Authentique'
-    ),
-    (
-        '/img/photo/lampe_temp_te_local.jpg',
-        'Lampe Tempête Local',
-        'Photo de Lampe Tempête Local'
-    ),
-    (
-        '/img/photo/lampe_temp_te_traditionnel.jpg',
-        'Lampe Tempête Traditionnel',
-        'Photo de Lampe Tempête Traditionnel'
-    ),
-    (
-        '/img/photo/lampe_temp_te_de_quimper.jpg',
-        'Lampe Tempête de Quimper',
-        'Photo de Lampe Tempête de Quimper'
-    ),
-    (
-        '/img/photo/lampe_temp_te_de_saint_malo.jpg',
-        'Lampe Tempête de Saint-Malo',
-        'Photo de Lampe Tempête de Saint-Malo'
-    ),
-    (
-        '/img/photo/lampe_temp_te_de_vannes.jpg',
-        'Lampe Tempête de Vannes',
-        'Photo de Lampe Tempête de Vannes'
-    ),
-    (
-        '/img/photo/marini_re_authentique.jpg',
-        'Marinière Authentique',
-        'Photo de Marinière Authentique'
-    ),
-    (
-        '/img/photo/marini_re_local.jpg',
-        'Marinière Local',
-        'Photo de Marinière Local'
-    ),
-    (
-        '/img/photo/marini_re_premium.jpg',
-        'Marinière Premium',
-        'Photo de Marinière Premium'
-    ),
-    (
-        '/img/photo/marini_re_de_pont_aven.jpg',
-        'Marinière de Pont-Aven',
-        'Photo de Marinière de Pont-Aven'
-    ),
-    (
-        '/img/photo/pendentif_hermine_bio.jpg',
-        'Pendentif Hermine Bio',
-        'Photo de Pendentif Hermine Bio'
-    ),
-    (
-        '/img/photo/pendentif_hermine_fait_main.jpg',
-        'Pendentif Hermine Fait main',
-        'Photo de Pendentif Hermine Fait main'
-    ),
-    (
-        '/img/photo/pendentif_hermine_local.jpg',
-        'Pendentif Hermine Local',
-        'Photo de Pendentif Hermine Local'
-    ),
-    (
-        '/img/photo/pendentif_hermine_traditionnel.jpg',
-        'Pendentif Hermine Traditionnel',
-        'Photo de Pendentif Hermine Traditionnel'
-    ),
-    (
-        '/img/photo/pendentif_hermine_de_roscoff.jpg',
-        'Pendentif Hermine de Roscoff',
-        'Photo de Pendentif Hermine de Roscoff'
-    ),
-    (
-        '/img/photo/pendentif_hermine_de_saint_malo.jpg',
-        'Pendentif Hermine de Saint-Malo',
-        'Photo de Pendentif Hermine de Saint-Malo'
-    ),
-    (
-        '/img/photo/phare_miniature_fait_main.jpg',
-        'Phare Miniature Fait main',
-        'Photo de Phare Miniature Fait main'
-    ),
-    (
-        '/img/photo/phare_miniature_de_quimper.jpg',
-        'Phare Miniature de Quimper',
-        'Photo de Phare Miniature de Quimper'
-    ),
-    (
-        '/img/photo/pull_marin_authentique.jpg',
-        'Pull Marin Authentique',
-        'Photo de Pull Marin Authentique'
-    ),
-    (
-        '/img/photo/pull_marin_bio.jpg',
-        'Pull Marin Bio',
-        'Photo de Pull Marin Bio'
-    ),
-    (
-        '/img/photo/pull_marin_de_brest.jpg',
-        'Pull Marin de Brest',
-        'Photo de Pull Marin de Brest'
-    ),
-    (
-        '/img/photo/pull_marin_de_carnac.jpg',
-        'Pull Marin de Carnac',
-        'Photo de Pull Marin de Carnac'
-    ),
-    (
-        '/img/photo/pull_marin_de_quimper.jpg',
-        'Pull Marin de Quimper',
-        'Photo de Pull Marin de Quimper'
-    ),
-    (
-        '/img/photo/pull_marin_de_saint_malo.jpg',
-        'Pull Marin de Saint-Malo',
-        'Photo de Pull Marin de Saint-Malo'
-    ),
-    (
-        '/img/photo/sac_voile_bio.jpg',
-        'Sac Voile Bio',
-        'Photo de Sac Voile Bio'
-    ),
-    (
-        '/img/photo/sac_voile_durable.jpg',
-        'Sac Voile Durable',
-        'Photo de Sac Voile Durable'
-    ),
-    (
-        '/img/photo/sac_voile_premium.jpg',
-        'Sac Voile Premium',
-        'Photo de Sac Voile Premium'
-    ),
-    (
-        '/img/photo/sac_voile_de_concarneau.jpg',
-        'Sac Voile de Concarneau',
-        'Photo de Sac Voile de Concarneau'
-    ),
-    (
-        '/img/photo/sac_voile_de_pont_aven.jpg',
-        'Sac Voile de Pont-Aven',
-        'Photo de Sac Voile de Pont-Aven'
-    ),
-    (
-        '/img/photo/vareuse_artisanal.jpg',
-        'Vareuse Artisanal',
-        'Photo de Vareuse Artisanal'
-    ),
-    (
-        '/img/photo/vareuse_durable.jpg',
-        'Vareuse Durable',
-        'Photo de Vareuse Durable'
-    ),
-    (
-        '/img/photo/vareuse_de_dinard.jpg',
-        'Vareuse de Dinard',
-        'Photo de Vareuse de Dinard'
-    ),
-    (
-        '/img/photo/vareuse_de_pont_aven.jpg',
-        'Vareuse de Pont-Aven',
-        'Photo de Vareuse de Pont-Aven'
-    ),
-    (
-        '/img/photo/vareuse_de_saint_malo.jpg',
-        'Vareuse de Saint-Malo',
-        'Photo de Vareuse de Saint-Malo'
+        '/img/photo/casque_audio_bluetooth.jpg',
+        'Casque audio.jpg',
+        'Image du casque'
     ),
     (
         '/img/photo/avatar_jean.jpg',
@@ -3517,14 +3005,124 @@ VALUES (
         'Photo de profil Marie'
     ),
     (
-        '/img/photo/_charpe_ray_e_authentique.jpg',
-        'Écharpe Rayée Authentique',
-        'Photo de Écharpe Rayée Authentique'
+        '/img/photo/logo_techstore.jpg',
+        'Logo TechStore.jpg',
+        'Logo entreprise TechStore'
     ),
     (
-        '/img/photo/_charpe_ray_e_bio.jpg',
-        'Écharpe Rayée Bio',
-        'Photo de Écharpe Rayée Bio'
+        '/img/photo/logo_fashionhub.jpg',
+        'Logo FashionHub.jpg',
+        'Logo entreprise FashionHub'
+    ),
+    (
+        '/img/photo/montre_connect_e.jpg',
+        'Montre connectée.jpg',
+        'Image de la montre'
+    ),
+    (
+        '/img/photo/sac___dos_urbain.jpg',
+        'Sac à dos.jpeg',
+        'Image du sac'
+    ),
+    (
+        '/img/photo/chaussures_running.jpg',
+        'Chaussures running.jpeg',
+        'Image des chaussures'
+    ),
+    (
+        '/img/photo/tablette_10_pouces.jpg',
+        'Tablette.jpg',
+        'Image de la tablette'
+    ),
+    (
+        '/img/photo/ballon_de_football.jpg',
+        'Ballon football.jpg',
+        'Image du ballon'
+    ),
+    (
+        '/img/photo/veste_en_cuir.jpg',
+        'Veste cuir.jpg',
+        'Image de la veste'
+    ),
+    (
+        '/img/photo/livre_cuisine_fran_aise.jpg',
+        'Livre cuisine.jpeg',
+        'Image du livre'
+    ),
+    (
+        '/img/photo/tapis_de_yoga.jpg',
+        'Tapis yoga.jpeg',
+        'Image du tapis'
+    ),
+    (
+        '/img/photo/clavier_m_canique_rgb.jpg',
+        'Clavier.jpg',
+        'Image du clavier'
+    ),
+    (
+        '/img/photo/console_nextgen.jpg',
+        'Console NextGen.jpg',
+        'Image de la console'
+    ),
+    (
+        '/img/photo/sweat___capuche_premium.jpg',
+        'Sweat à capuche.jpeg',
+        'Image du sweat'
+    ),
+    (
+        '/img/photo/raquette_de_tennis_pro.jpg',
+        'Raquette tennis.jpg',
+        'Image de la raquette'
+    ),
+    (
+        '/img/photo/_cran_gaming_4k_27_.jpg',
+        'Écran 4K.jpeg',
+        'Image de l écran'
+    ),
+    (
+        '/img/photo/baskets_limited_edition.jpg',
+        'Baskets limited.jpeg',
+        'Image des baskets'
+    ),
+    (
+        '/img/photo/v_lo_de_route_carbone.jpg',
+        'Vélo route.jpeg',
+        'Image du vélo'
+    ),
+    (
+        '/img/photo/drone_professionnel_4k.jpg',
+        'Drone 4K.jpg',
+        'Image du drone'
+    ),
+    (
+        '/img/photo/manteau_d_hiver_imperm_able.jpg',
+        'Manteau hiver.jpeg',
+        'Image du manteau'
+    ),
+    (
+        '/img/photo/tente_4_places.jpg',
+        'Tente 4 places.jpg',
+        'Image de la tente'
+    ),
+    (
+        '/img/photo/enceinte_bluetooth_waterproof.jpg',
+        'Enceinte Bluetooth.jpg',
+        'Image de l enceinte'
+    ),
+    (
+        '/img/photo/pull_marin_de_saint_malo.jpg',
+        'Pull Marin de Saint-Malo',
+        'Photo de Pull Marin de Saint-Malo'
+    ),
+    (
+        '/img/photo/bonnet_miki_de_carnac.jpg',
+        'Bonnet Miki de Carnac',
+        'Photo de Bonnet Miki de Carnac'
+    ),
+    (
+        '/img/photo/galettes_local.jpg',
+        'Galettes Local',
+        'Photo de Galettes Local'
     ),
     (
         '/img/photo/_charpe_ray_e_fait_main.jpg',
@@ -3537,9 +3135,34 @@ VALUES (
         'Photo de Écharpe Rayée de Brest'
     ),
     (
-        '/img/photo/_charpe_ray_e_de_dinard.jpg',
-        'Écharpe Rayée de Dinard',
-        'Photo de Écharpe Rayée de Dinard'
+        '/img/photo/cir__navy_de_concarneau.jpg',
+        'Ciré Navy de Concarneau',
+        'Photo de Ciré Navy de Concarneau'
+    ),
+    (
+        '/img/photo/bracelet_ancre_fait_main.jpg',
+        'Bracelet Ancre Fait main',
+        'Photo de Bracelet Ancre Fait main'
+    ),
+    (
+        '/img/photo/marini_re_local.jpg',
+        'Marinière Local',
+        'Photo de Marinière Local'
+    ),
+    (
+        '/img/photo/bracelet_ancre_de_concarneau.jpg',
+        'Bracelet Ancre de Concarneau',
+        'Photo de Bracelet Ancre de Concarneau'
+    ),
+    (
+        '/img/photo/pendentif_hermine_fait_main.jpg',
+        'Pendentif Hermine Fait main',
+        'Photo de Pendentif Hermine Fait main'
+    ),
+    (
+        '/img/photo/sac_voile_de_concarneau.jpg',
+        'Sac Voile de Concarneau',
+        'Photo de Sac Voile de Concarneau'
     ),
     (
         '/img/photo/_charpe_ray_e_de_saint_malo.jpg',
@@ -3547,9 +3170,344 @@ VALUES (
         'Photo de Écharpe Rayée de Saint-Malo'
     ),
     (
-        '/img/photo/5_S01618f64dc714163846501cb2c2e0f0fN.webp',
-        '5_S01618f64dc714163846501cb2c2e0f0fN.webp',
-        'photo du produit Robe d été'
+        '/img/photo/coussin_triskell_de_roscoff.jpg',
+        'Coussin Triskell de Roscoff',
+        'Photo de Coussin Triskell de Roscoff'
+    ),
+    (
+        '/img/photo/_charpe_ray_e_authentique.jpg',
+        'Écharpe Rayée Authentique',
+        'Photo de Écharpe Rayée Authentique'
+    ),
+    (
+        '/img/photo/_charpe_ray_e_bio.jpg',
+        'Écharpe Rayée Bio',
+        'Photo de Écharpe Rayée Bio'
+    ),
+    (
+        '/img/photo/bonnet_miki_authentique.jpg',
+        'Bonnet Miki Authentique',
+        'Photo de Bonnet Miki Authentique'
+    ),
+    (
+        '/img/photo/cir__navy_de_quimper.jpg',
+        'Ciré Navy de Quimper',
+        'Photo de Ciré Navy de Quimper'
+    ),
+    (
+        '/img/photo/bol_breton_traditionnel.jpg',
+        'Bol Breton Traditionnel',
+        'Photo de Bol Breton Traditionnel'
+    ),
+    (
+        '/img/photo/bol_breton_premium.jpg',
+        'Bol Breton Premium',
+        'Photo de Bol Breton Premium'
+    ),
+    (
+        '/img/photo/pull_marin_de_brest.jpg',
+        'Pull Marin de Brest',
+        'Photo de Pull Marin de Brest'
+    ),
+    (
+        '/img/photo/affiche_vintage_de_dinard.jpg',
+        'Affiche Vintage de Dinard',
+        'Photo de Affiche Vintage de Dinard'
+    ),
+    (
+        '/img/photo/vareuse_artisanal.jpg',
+        'Vareuse Artisanal',
+        'Photo de Vareuse Artisanal'
+    ),
+    (
+        '/img/photo/pull_marin_bio.jpg',
+        'Pull Marin Bio',
+        'Photo de Pull Marin Bio'
+    ),
+    (
+        '/img/photo/kabig_bio.jpg',
+        'Kabig Bio',
+        'Photo de Kabig Bio'
+    ),
+    (
+        '/img/photo/phare_miniature_fait_main.jpg',
+        'Phare Miniature Fait main',
+        'Photo de Phare Miniature Fait main'
+    ),
+    (
+        '/img/photo/bol_breton_fait_main.jpg',
+        'Bol Breton Fait main',
+        'Photo de Bol Breton Fait main'
+    ),
+    (
+        '/img/photo/bracelet_ancre_de_carnac.jpg',
+        'Bracelet Ancre de Carnac',
+        'Photo de Bracelet Ancre de Carnac'
+    ),
+    (
+        '/img/photo/caramels_de_dinard.jpg',
+        'Caramels de Dinard',
+        'Photo de Caramels de Dinard'
+    ),
+    (
+        '/img/photo/affiche_vintage_de_vannes.jpg',
+        'Affiche Vintage de Vannes',
+        'Photo de Affiche Vintage de Vannes'
+    ),
+    (
+        '/img/photo/_charpe_ray_e_de_dinard.jpg',
+        'Écharpe Rayée de Dinard',
+        'Photo de Écharpe Rayée de Dinard'
+    ),
+    (
+        '/img/photo/vareuse_de_saint_malo.jpg',
+        'Vareuse de Saint-Malo',
+        'Photo de Vareuse de Saint-Malo'
+    ),
+    (
+        '/img/photo/bracelet_ancre_durable.jpg',
+        'Bracelet Ancre Durable',
+        'Photo de Bracelet Ancre Durable'
+    ),
+    (
+        '/img/photo/lampe_temp_te_de_quimper.jpg',
+        'Lampe Tempête de Quimper',
+        'Photo de Lampe Tempête de Quimper'
+    ),
+    (
+        '/img/photo/sac_voile_de_pont_aven.jpg',
+        'Sac Voile de Pont-Aven',
+        'Photo de Sac Voile de Pont-Aven'
+    ),
+    (
+        '/img/photo/caramels_de_roscoff.jpg',
+        'Caramels de Roscoff',
+        'Photo de Caramels de Roscoff'
+    ),
+    (
+        '/img/photo/pendentif_hermine_de_saint_malo.jpg',
+        'Pendentif Hermine de Saint-Malo',
+        'Photo de Pendentif Hermine de Saint-Malo'
+    ),
+    (
+        '/img/photo/cir__navy_artisanal.jpg',
+        'Ciré Navy Artisanal',
+        'Photo de Ciré Navy Artisanal'
+    ),
+    (
+        '/img/photo/vareuse_de_pont_aven.jpg',
+        'Vareuse de Pont-Aven',
+        'Photo de Vareuse de Pont-Aven'
+    ),
+    (
+        '/img/photo/pendentif_hermine_bio.jpg',
+        'Pendentif Hermine Bio',
+        'Photo de Pendentif Hermine Bio'
+    ),
+    (
+        '/img/photo/galettes_de_quimper.jpg',
+        'Galettes de Quimper',
+        'Photo de Galettes de Quimper'
+    ),
+    (
+        '/img/photo/sac_voile_durable.jpg',
+        'Sac Voile Durable',
+        'Photo de Sac Voile Durable'
+    ),
+    (
+        '/img/photo/marini_re_de_pont_aven.jpg',
+        'Marinière de Pont-Aven',
+        'Photo de Marinière de Pont-Aven'
+    ),
+    (
+        '/img/photo/sac_voile_bio.jpg',
+        'Sac Voile Bio',
+        'Photo de Sac Voile Bio'
+    ),
+    (
+        '/img/photo/sac_voile_premium.jpg',
+        'Sac Voile Premium',
+        'Photo de Sac Voile Premium'
+    ),
+    (
+        '/img/photo/pendentif_hermine_local.jpg',
+        'Pendentif Hermine Local',
+        'Photo de Pendentif Hermine Local'
+    ),
+    (
+        '/img/photo/vareuse_durable.jpg',
+        'Vareuse Durable',
+        'Photo de Vareuse Durable'
+    ),
+    (
+        '/img/photo/pendentif_hermine_traditionnel.jpg',
+        'Pendentif Hermine Traditionnel',
+        'Photo de Pendentif Hermine Traditionnel'
+    ),
+    (
+        '/img/photo/pendentif_hermine_de_roscoff.jpg',
+        'Pendentif Hermine de Roscoff',
+        'Photo de Pendentif Hermine de Roscoff'
+    ),
+    (
+        '/img/photo/cir__navy_de_brest.jpg',
+        'Ciré Navy de Brest',
+        'Photo de Ciré Navy de Brest'
+    ),
+    (
+        '/img/photo/pull_marin_authentique.jpg',
+        'Pull Marin Authentique',
+        'Photo de Pull Marin Authentique'
+    ),
+    (
+        '/img/photo/bol_e___cidre_local.jpg',
+        'Bolée à Cidre Local',
+        'Photo de Bolée à Cidre Local'
+    ),
+    (
+        '/img/photo/bol_breton_de_saint_malo.jpg',
+        'Bol Breton de Saint-Malo',
+        'Photo de Bol Breton de Saint-Malo'
+    ),
+    (
+        '/img/photo/phare_miniature_de_quimper.jpg',
+        'Phare Miniature de Quimper',
+        'Photo de Phare Miniature de Quimper'
+    ),
+    (
+        '/img/photo/caramels_artisanal.jpg',
+        'Caramels Artisanal',
+        'Photo de Caramels Artisanal'
+    ),
+    (
+        '/img/photo/vareuse_de_dinard.jpg',
+        'Vareuse de Dinard',
+        'Photo de Vareuse de Dinard'
+    ),
+    (
+        '/img/photo/lampe_temp_te_traditionnel.jpg',
+        'Lampe Tempête Traditionnel',
+        'Photo de Lampe Tempête Traditionnel'
+    ),
+    (
+        '/img/photo/bracelet_ancre_de_brest.jpg',
+        'Bracelet Ancre de Brest',
+        'Photo de Bracelet Ancre de Brest'
+    ),
+    (
+        '/img/photo/coussin_triskell_premium.jpg',
+        'Coussin Triskell Premium',
+        'Photo de Coussin Triskell Premium'
+    ),
+    (
+        '/img/photo/coussin_triskell_bio.jpg',
+        'Coussin Triskell Bio',
+        'Photo de Coussin Triskell Bio'
+    ),
+    (
+        '/img/photo/lampe_temp_te_de_saint_malo.jpg',
+        'Lampe Tempête de Saint-Malo',
+        'Photo de Lampe Tempête de Saint-Malo'
+    ),
+    (
+        '/img/photo/coussin_triskell_artisanal.jpg',
+        'Coussin Triskell Artisanal',
+        'Photo de Coussin Triskell Artisanal'
+    ),
+    (
+        '/img/photo/bol_e___cidre_de_saint_malo.jpg',
+        'Bolée à Cidre de Saint-Malo',
+        'Photo de Bolée à Cidre de Saint-Malo'
+    ),
+    (
+        '/img/photo/caramels_durable.jpg',
+        'Caramels Durable',
+        'Photo de Caramels Durable'
+    ),
+    (
+        '/img/photo/lampe_temp_te_local.jpg',
+        'Lampe Tempête Local',
+        'Photo de Lampe Tempête Local'
+    ),
+    (
+        '/img/photo/bol_e___cidre_artisanal.jpg',
+        'Bolée à Cidre Artisanal',
+        'Photo de Bolée à Cidre Artisanal'
+    ),
+    (
+        '/img/photo/bonnet_miki_traditionnel.jpg',
+        'Bonnet Miki Traditionnel',
+        'Photo de Bonnet Miki Traditionnel'
+    ),
+    (
+        '/img/photo/bonnet_miki_premium.jpg',
+        'Bonnet Miki Premium',
+        'Photo de Bonnet Miki Premium'
+    ),
+    (
+        '/img/photo/caramels_de_carnac.jpg',
+        'Caramels de Carnac',
+        'Photo de Caramels de Carnac'
+    ),
+    (
+        '/img/photo/marini_re_premium.jpg',
+        'Marinière Premium',
+        'Photo de Marinière Premium'
+    ),
+    (
+        '/img/photo/pull_marin_de_quimper.jpg',
+        'Pull Marin de Quimper',
+        'Photo de Pull Marin de Quimper'
+    ),
+    (
+        '/img/photo/cir__jaune_de_vannes.jpg',
+        'Ciré Jaune de Vannes',
+        'Photo de Ciré Jaune de Vannes'
+    ),
+    (
+        '/img/photo/lampe_temp_te_authentique.jpg',
+        'Lampe Tempête Authentique',
+        'Photo de Lampe Tempête Authentique'
+    ),
+    (
+        '/img/photo/bonnet_miki_de_concarneau.jpg',
+        'Bonnet Miki de Concarneau',
+        'Photo de Bonnet Miki de Concarneau'
+    ),
+    (
+        '/img/photo/marini_re_authentique.jpg',
+        'Marinière Authentique',
+        'Photo de Marinière Authentique'
+    ),
+    (
+        '/img/photo/bracelet_ancre_artisanal.jpg',
+        'Bracelet Ancre Artisanal',
+        'Photo de Bracelet Ancre Artisanal'
+    ),
+    (
+        '/img/photo/lampe_temp_te_de_vannes.jpg',
+        'Lampe Tempête de Vannes',
+        'Photo de Lampe Tempête de Vannes'
+    ),
+    (
+        '/img/photo/pull_marin_de_carnac.jpg',
+        'Pull Marin de Carnac',
+        'Photo de Pull Marin de Carnac'
+    ),
+    (
+        '/img/photo/coussin_triskell_fait_main.jpg',
+        'Coussin Triskell Fait main',
+        'Photo de Coussin Triskell Fait main'
+    ),
+    (
+        '/img/photo/galettes_artisanal.jpg',
+        'Galettes Artisanal',
+        'Photo de Galettes Artisanal'
+    ),
+    (
+        '/img/photo/bol_breton_bio.jpg',
+        'Bol Breton Bio',
+        'Photo de Bol Breton Bio'
     );
 
 -- 13. RELATIONS IMAGES-PRODUITS
@@ -3658,8 +3616,7 @@ VALUES (1, 1),
     (105, 102),
     (106, 103),
     (107, 104),
-    (108, 105),
-    (110, 5);
+    (108, 105);
 
 -- 14. RELATIONS IMAGES-COMPTES
 INSERT INTO
