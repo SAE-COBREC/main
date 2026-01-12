@@ -1327,4 +1327,10 @@ function recupInfoPourFactureArticle($pdo, $id_produit){
     $stmt->execute([':id_produit' => $id_produit]);
     $donnees = $stmt->fetch();
     return $donnees;
-}     
+}
+
+function genererUrlTri($type_tri) {
+    $params = $_GET;
+    $params['tri'] = $type_tri;
+    return "?" . http_build_query($params);
+}
