@@ -260,11 +260,6 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                     </select>
                 </section>
 
-                <!-- <div class="search-container" style="justify-content: normal;">
-                    <img src="/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
-                    <input type="text" placeholder="Rechercher vendeur..." class="search-input">
-                </div> -->
-
                 <div class="search-container" style="justify-content: normal;">
                     <img src="/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
                     <input type="text" id="searchVendeur" name="vendeur" placeholder="Rechercher vendeur..."
@@ -469,6 +464,7 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 if (priceEl) {
                     priceEl.value = maxVal;
                 }
+                document.getElementById('searchVendeur').value = '';
                 document.getElementById('inputNoteMin').value = '0';
                 document.getElementById('triSelect').value = 'meilleures_ventes';
                 document.getElementById('stockOnlyCheckbox').checked = false;
