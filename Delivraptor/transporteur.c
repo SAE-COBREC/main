@@ -49,12 +49,12 @@ int chercher_status_par_bordereau(int bordereau_recherche, int *status) {
 
     int cmd, bordereau, st;
     char login[64], mdp[64];
-    while (fscanf(f, "%d;%d;%63s;%63s;%d", &cmd, &bordereau, login, mdp, &st) == 5) {
+    while (fscanf(f, "%d;%d;%d", &cmd, &bordereau, &st) == 5) {
         if (bordereau == bordereau_recherche) {
             *status = st;
             fclose(f);
-            printf("Ligne lue: cmd=%d, bordereau=%d, login=%s, mdp=%s, st=%d\n",
-            cmd, bordereau, login, mdp, st);
+            printf("Ligne lue: cmd=%d, bordereau=%d, st=%d\n",
+            cmd, bordereau, st);
 
             return 0;
         }
@@ -176,7 +176,6 @@ int main() {
 
         if (strncmp(ligne_status, "STATUS ", 7) == 0) {
             int label = atoi(ligne_status + 7);
-            printf("label:%d",label);
             int step = 0;
             int ret = chercher_status_par_bordereau(label, &step);
 
