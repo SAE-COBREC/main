@@ -218,12 +218,13 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 <section class="no-hover">
                     <h4 style="padding-top: 1em;">Prix</h4>
                     <div>
-                        <input type="range" name="price" id="priceRange" min="0" max="<?= $prixMaximum ?>"
+                        <input type="range" id="priceRange" min="0" max="<?= $prixMaximum ?>"
                             value="<?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>">
                     </div>
                     <div>
                         <span>0€</span>
-                        <span id="priceValue"><?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>€</span>
+                        <input type="number" name="price" id="priceValue" step="0.01" min="0" max="<?= $prixMaximum ?>"
+                            value="<?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>" style="width:100px;">
                     </div>
                 </section>
 
@@ -345,19 +346,41 @@ $categories_affichage = preparercategories_affichage($listeCategories);
         }
     });
 
-    // Gestion du slider de prix
+    // Gestion du slider de prix et du champ numérique (le champ `name="price"`)
     document.addEventListener('DOMContentLoaded', () => {
         const priceRange = document.getElementById('priceRange');
-        const priceValue = document.getElementById('priceValue');
+        const priceInput = document.getElementById('priceValue'); // now an <input name="price">
 
-        if (priceRange && priceValue) {
-            // Mise à jour de l'affichage en temps réel
+        if (priceRange && priceInput) {
+            const setAll = (v) => {
+                const num = Math.round((parseFloat(v) || 0) * 100) / 100;
+                priceRange.value = num;
+                priceInput.value = num;
+            };
+
+            // initial sync
+            setAll(priceInput.value);
+
+            // slider -> input
             priceRange.addEventListener('input', function() {
-                priceValue.textContent = this.value + '€';
+                setAll(this.value);
             });
 
-            // Soumettre le formulaire quand l'utilisateur relâche le slider
+            // submit on change (end of interaction)
             priceRange.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+
+            // input -> slider, submit on change
+            priceInput.addEventListener('input', function() {
+                // keep inside bounds
+                const max = parseFloat(this.max) || parseFloat(priceRange.max) || 0;
+                let v = parseFloat(this.value) || 0;
+                if (v < 0) v = 0;
+                if (v > max) v = max;
+                setAll(v);
+            });
+            priceInput.addEventListener('change', function() {
                 document.getElementById('filterForm').submit();
             });
         }
@@ -381,9 +404,12 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 e.preventDefault();
                 // Réinitialiser tous les filtres
                 document.getElementById('categorieSelect').value = 'all';
-                document.getElementById('priceRange').value = document.getElementById('priceRange').max;
-                document.getElementById('priceValue').textContent = document.getElementById(
-                    'priceRange').max + '€';
+                const maxVal = document.getElementById('priceRange').max;
+                document.getElementById('priceRange').value = maxVal;
+                const priceEl = document.getElementById('priceValue');
+                if (priceEl) {
+                    priceEl.value = maxVal;
+                }
                 document.getElementById('inputNoteMin').value = '0';
                 document.getElementById('triSelect').value = 'meilleures_ventes';
                 document.getElementById('stockOnlyCheckbox').checked = false;
