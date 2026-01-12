@@ -125,9 +125,82 @@ if (!$produit || $produit['p_statut'] != 'En ligne') {
     exit;
 }
 
-$donneesAvis = chargerAvisBDD($pdo, $idProduit, $idClient);
-$avisTextes = $donneesAvis['avis'];
-$reponsesMap = $donneesAvis['reponses'];
+$tri = isset($_GET['tri']) ? trim($_GET['tri']) : 'date_desc';
+$allowedTri = ['date_desc','date_asc','note_desc','note_asc','popular'];
+if (!in_array($tri, $allowedTri)) $tri = 'date_desc';
+
+// Token "propriétaire" (si jamais avis anonymes / session navigateur)
+$ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
+
+// Chargement des avis (requête SQL directe pour un tri fiable)
+switch ($tri) {
+    case 'date_asc':
+        $orderClauseAvis = 'a.a_timestamp_creation ASC, a.id_avis ASC';
+        break;
+    case 'note_asc':
+        $orderClauseAvis = 'a.a_note ASC NULLS LAST, a.a_timestamp_creation DESC, a.id_avis DESC';
+        break;
+    case 'note_desc':
+        $orderClauseAvis = 'a.a_note DESC NULLS LAST, a.a_timestamp_creation DESC, a.id_avis DESC';
+        break;
+    case 'popular':
+        $orderClauseAvis = '(a.a_pouce_bleu - a.a_pouce_rouge) DESC, a.a_timestamp_creation DESC, a.id_avis DESC';
+        break;
+    default:
+        $orderClauseAvis = 'a.a_timestamp_creation DESC, a.id_avis DESC';
+}
+
+// Épingler l'avis de l'utilisateur en haut, quel que soit le filtre
+$pinOrderPrefix = '';
+if ($idClient) {
+    $pinOrderPrefix = 'CASE WHEN a.id_client = :cid THEN 0 ELSE 1 END, ';
+} elseif (!empty($ownerTokenServer)) {
+    $pinOrderPrefix = 'CASE WHEN a.a_owner_token IS NOT NULL AND a.a_owner_token = :owner_token THEN 0 ELSE 1 END, ';
+}
+
+$sqlAvis = "
+    SELECT
+        a.id_avis,
+        a.a_texte,
+        a.a_titre,
+        a.a_timestamp_creation,
+        a.a_note,
+        a.a_pouce_bleu,
+        a.a_pouce_rouge,
+        a.id_client,
+        a.a_owner_token,
+        TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt,
+        co.prenom,
+        co.nom,
+        cl.c_pseudo,
+        i.i_lien as client_image,
+        " . ($idClient ? "(SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM cobrec1._vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote" : "NULL as user_vote") . "
+    FROM cobrec1._avis a
+    LEFT JOIN cobrec1._client cl ON a.id_client = cl.id_client
+    LEFT JOIN cobrec1._compte co ON cl.id_compte = co.id_compte
+    LEFT JOIN cobrec1._represente_compte rc ON co.id_compte = rc.id_compte
+    LEFT JOIN cobrec1._image i ON rc.id_image = i.id_image
+    WHERE a.id_produit = :pid
+    ORDER BY $pinOrderPrefix$orderClauseAvis
+";
+
+$stmtAvis = $pdo->prepare($sqlAvis);
+$paramsAvis = [':pid' => $idProduit];
+if ($idClient) {
+    $paramsAvis[':cid'] = $idClient;
+} elseif (!empty($ownerTokenServer)) {
+    $paramsAvis[':owner_token'] = $ownerTokenServer;
+}
+$stmtAvis->execute($paramsAvis);
+$avisTextes = $stmtAvis->fetchAll(PDO::FETCH_ASSOC);
+
+$stmtRep = $pdo->prepare("SELECT r.id_avis_parent, a.id_avis, a.a_texte, TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt FROM cobrec1._reponse r JOIN cobrec1._avis a ON r.id_avis = a.id_avis WHERE a.id_produit = :pid");
+$stmtRep->execute([':pid' => $idProduit]);
+$rowsRep = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
+$reponsesMap = [];
+foreach ($rowsRep as $r) {
+    $reponsesMap[(int)$r['id_avis_parent']] = $r;
+}
 
 // Calculs affichage
 $estEnRupture = ($produit['p_stock'] <= 0);
@@ -164,7 +237,127 @@ if ($idClient) {
         $dejaAvis = (bool)$stmtCheck->fetchColumn();
     } catch (Exception $e) {}
 }
-$ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
+
+
+// Rendu HTML de la liste d'avis (réutilisé pour le mode fragment AJAX)
+function renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer) {
+    if (empty($avisTextes)) {
+        echo '<p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>';
+        return;
+    }
+
+    foreach ($avisTextes as $ta) {
+        $aNote = (float)($ta['a_note'] ?? 0);
+        $aTitre = $ta['a_titre'] ?? '';
+        $aNoteEntiere = (int)floor($aNote);
+
+        // Determine display name
+        $displayName = 'Utilisateur';
+        if (!empty($ta['c_pseudo'])) {
+            $displayName = $ta['c_pseudo'];
+        } elseif (!empty($ta['prenom']) || !empty($ta['nom'])) {
+            $displayName = trim(($ta['prenom'] ?? '') . ' ' . ($ta['nom'] ?? ''));
+        }
+
+        // Determine avatar
+        $avatarUrl = $ta['client_image'] ?? null;
+        ?>
+        <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>" data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;position:relative;padding-right:44px;">
+            <button class="ghost btn-report-trigger" aria-label="Options avis" style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+            </button>
+            <div class="report-dropdown" style="display:none;position:absolute;right:8px;top:44px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;z-index:60;min-width:160px;box-shadow:0 6px 18px rgba(0,0,0,.06)">
+                <button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l'avis</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <?php if ($avatarUrl): ?>
+                    <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                <?php else: ?>
+                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper(substr($displayName, 0, 1)) ?></div>
+                <?php endif; ?>
+                <div>
+                    <div style="font-weight:700"><?= htmlspecialchars($displayName) ?></div>
+                    <div style="color:var(--muted);font-size:13px">Avis</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                        <span class="stars" aria-hidden="true">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <img src="/img/svg/star-<?= $i <= $aNoteEntiere ? 'full' : 'empty' ?>.svg" alt="Etoile" width="16">
+                            <?php endfor; ?>
+                        </span>
+                        <span style="color:var(--muted);font-weight:600;"><?= number_format($aNote, 1) ?></span>
+                    </div>
+                </div>
+            </div>
+            <?php if (!empty($aTitre)): ?>
+                <strong style="display:block;margin-bottom:8px;color:var(--text);font-size:16px;"><?= htmlspecialchars($aTitre) ?></strong>
+            <?php endif; ?>
+            <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
+            <div class="review-votes">
+                <div class="vote-section">
+                    <span class="vote-label">Évaluer ce commentaire :</span>
+                    <div class="vote-buttons">
+                        <button type="button" class="ghost btn-vote" data-type="J'aime" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
+                            <img src="/img/svg/PouceHaut.svg" alt="J'aime" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
+                        </button>
+                        <button type="button" class="ghost btn-vote" data-type="Je n'aime pas" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
+                            <img src="/img/svg/PouceBas.svg" alt="Je n'aime pas" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
+                        </button>
+                    </div>
+                </div>
+                <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
+                <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
+                    <div class="review-actions">
+                        <button class="ghost btn-edit-review desktop-only">Modifier</button>
+                        <button class="ghost btn-delete-review desktop-only">Supprimer</button>
+
+                        <div class="mobile-menu-container mobile-only">
+                            <button class="ghost btn-menu-trigger" aria-label="Options">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </button>
+                            <div class="mobile-menu-dropdown">
+                                <button class="btn-edit-review">Modifier</button>
+                                <button class="btn-delete-review">Supprimer</button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <?php if(isset($reponsesMap[(int)$ta['id_avis']])): $rep = $reponsesMap[(int)$ta['id_avis']]; ?>
+                <div class="review" style="margin:12px 0 4px 48px;padding:10px 12px;background:#fff6e6;border:1px solid #ffe0a3;border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                        <div style="width:32px;height:32px;border-radius:50%;background:#ffc860;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#7a4d00">V</div>
+                        <div style="font-weight:600;color:#7a4d00">Réponse du vendeur</div>
+                        <span style="margin-left:auto;font-size:11px;color:#b07200;"><?= htmlspecialchars($rep['a_timestamp_fmt'] ?? '') ?></span>
+                    </div>
+                    <div style="font-size:13px;color:#7a4d00;line-height:1.4"><?= htmlspecialchars($rep['a_texte']) ?></div>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+}
+
+// Mode fragment: renvoyer uniquement la liste HTML des avis (sans recharger la page)
+if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
+    header('Content-Type: application/json; charset=utf-8');
+    ob_start();
+    renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer);
+    $html = ob_get_clean();
+    $optionsForLabel = [
+        'date_desc' => 'Les plus récentes',
+        'date_asc' => 'Les plus anciennes',
+        'note_desc' => 'Note décroissante',
+        'note_asc' => 'Note croissante',
+        'popular' => 'Pertinence (pouces)'
+    ];
+    echo json_encode([
+        'success' => true,
+        'tri' => $tri,
+        'label' => $optionsForLabel[$tri] ?? $tri,
+        'html' => $html
+    ]);
+    exit;
+}
 
 ?>
 <!doctype html>
@@ -204,6 +397,58 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 font-size: 13px;
             }
         }
+
+        /* Dropdown filtre avis (style “YouTube”) */
+        .filters-wrap { position: relative; display: inline-flex; align-items: center; gap: 10px; }
+        .filters-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 999px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .filters-btn .label { color: #666; font-weight: 600; }
+        .filters-btn .value { color: #111; font-weight: 700; }
+        .filters-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 240px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 10px 24px rgba(0,0,0,.10);
+            padding: 8px;
+            display: none;
+            z-index: 200;
+        }
+        .filters-menu.is-open { display: block; }
+        .filters-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .filters-item:hover { background: #f4f5f7; }
+        .filters-item.is-active { background: #111; color: #fff; }
+        .filters-item small { opacity: .8; font-weight: 500; }
+
+        .product-ref {
+            font-size: 12px;
+            color: #8a8f98;
+            font-weight: 700;
+            letter-spacing: .02em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
@@ -238,6 +483,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
 
             <!-- Colonne droite - résumé produit -->
             <aside class="summary">
+                <div class="product-ref">Ref : #<?= (int)$produit['id_produit'] ?></div>
                 <div class="title"><?= htmlspecialchars($produit['p_nom']) ?></div>
                 <div class="rating">
                     <span class="stars" id="summaryStars" aria-hidden="true">
@@ -285,7 +531,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                     <h3>Caractéristiques</h3>
                     <ul>
                         <li>Catégorie : <?= htmlspecialchars(explode(', ', $produit['categories'])[0] ?? 'Général') ?></li>
-                        <li>Référence : #<?= $produit['id_produit'] ?></li>
                         <li>Statut : <?= htmlspecialchars($produit['p_statut']) ?></li>
                         <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?> <div class="smaller">(<a href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)</div></li>
                         <li>Origine : <?= htmlspecialchars($produit['p_origine'] ?? 'Non spécifiée') ?></li>
@@ -306,9 +551,6 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 <span style="background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:24px;font-size:13px">
                     <?= htmlspecialchars(explode(', ', $produit['categories'])[0] ?? 'Général') ?>
                 </span>
-                <?php if ($produit['p_nb_ventes'] > 100): ?>
-                    <span style="background:#d4edda;color:#155724;padding:6px 10px;border-radius:24px;font-size:13px">Populaire</span>
-                <?php endif; ?>
             </div>
             <p style="color:var(--muted);line-height:1.6">
                 <?= htmlspecialchars($produit['p_description'] ?? 'Description non disponible.') ?>
@@ -392,100 +634,38 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 </div>
             <?php endif; ?>
 
-            <!-- Liste des avis -->
-            <div id="listeAvisProduit">
-                <?php if (empty($avisTextes)): ?>
-                    <p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>
-                <?php else: ?>
-                    <?php foreach ($avisTextes as $ta): 
-                        $aNote = (float)($ta['a_note'] ?? 0);
-                        $aTitre = $ta['a_titre'] ?? '';
-                        $aNoteEntiere = (int)floor($aNote);
-                        
-                        // Determine display name
-                        $displayName = 'Utilisateur';
-                        if (!empty($ta['c_pseudo'])) {
-                            $displayName = $ta['c_pseudo'];
-                        } elseif (!empty($ta['prenom']) || !empty($ta['nom'])) {
-                            $displayName = trim(($ta['prenom'] ?? '') . ' ' . ($ta['nom'] ?? ''));
-                        }
-                        
-                        // Determine avatar
-                        $avatarUrl = $ta['client_image'] ?? null;
+            <!-- Filtrer les avis (dropdown style YouTube) -->
+            <?php
+                $baseHref = '/pages/produit/index.php?id=' . urlencode($idProduit);
+                $options = [
+                    'date_desc' => 'Les plus récentes',
+                    'date_asc' => 'Les plus anciennes',
+                    'note_desc' => 'Note décroissante',
+                    'note_asc' => 'Note croissante',
+                    'popular' => 'Pertinence (pouces)'
+                ];
+                $activeLabel = $options[$tri] ?? 'Filtre';
+            ?>
+            <div class="filters-wrap" style="margin:10px 0 16px;">
+                <button type="button" class="filters-btn" id="reviewsFilterBtn" aria-haspopup="true" aria-expanded="false">
+                    <span class="label">Filtrer</span>
+                    <span class="value">• <?= htmlspecialchars($activeLabel) ?></span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="filters-menu" id="reviewsFilterMenu" role="menu" aria-label="Filtres des avis">
+                    <?php foreach ($options as $k => $label):
+                        $isActive = ($tri === $k);
+                        $href = $baseHref . '&tri=' . urlencode($k);
                     ?>
-                        <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>" data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;position:relative;padding-right:44px;">
-                            <button class="ghost btn-report-trigger" aria-label="Options avis" style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
-                            </button>
-                            <div class="report-dropdown" style="display:none;position:absolute;right:8px;top:44px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;z-index:60;min-width:160px;box-shadow:0 6px 18px rgba(0,0,0,.06)">
-                                <button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l'avis</button>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                                <?php if ($avatarUrl): ?>
-                                    <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
-                                <?php else: ?>
-                                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper(substr($displayName, 0, 1)) ?></div>
-                                <?php endif; ?>
-                                <div>
-                                    <div style="font-weight:700"><?= htmlspecialchars($displayName) ?></div>
-                                    <div style="color:var(--muted);font-size:13px">Avis</div>
-                                    <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-                                        <span class="stars" aria-hidden="true">
-                                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                <img src="/img/svg/star-<?= $i <= $aNoteEntiere ? 'full' : 'empty' ?>.svg" alt="Etoile" width="16">
-                                            <?php endfor; ?>
-                                        </span>
-                                        <span style="color:var(--muted);font-weight:600;"><?= number_format($aNote, 1) ?></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php if (!empty($aTitre)): ?>
-                                <strong style="display:block;margin-bottom:8px;color:var(--text);font-size:16px;"><?= htmlspecialchars($aTitre) ?></strong>
-                            <?php endif; ?>
-                            <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
-                            <div class="review-votes">
-                                <div class="vote-section">
-                                    <span class="vote-label">Évaluer ce commentaire :</span>
-                                    <div class="vote-buttons">
-                                        <button type="button" class="ghost btn-vote" data-type="J'aime" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
-                                            <img src="/img/svg/PouceHaut.svg" alt="J'aime" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
-                                        </button>
-                                        <button type="button" class="ghost btn-vote" data-type="Je n'aime pas" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
-                                            <img src="/img/svg/PouceBas.svg" alt="Je n'aime pas" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
-                                <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
-                                    <div class="review-actions">
-                                        <button class="ghost btn-edit-review desktop-only">Modifier</button>
-                                        <button class="ghost btn-delete-review desktop-only">Supprimer</button>
-                                        
-                                        <div class="mobile-menu-container mobile-only">
-                                            <button class="ghost btn-menu-trigger" aria-label="Options">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                            </button>
-                                            <div class="mobile-menu-dropdown">
-                                                <button class="btn-edit-review">Modifier</button>
-                                                <button class="btn-delete-review">Supprimer</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <?php if(isset($reponsesMap[(int)$ta['id_avis']])): $rep = $reponsesMap[(int)$ta['id_avis']]; ?>
-                                <div class="review" style="margin:12px 0 4px 48px;padding:10px 12px;background:#fff6e6;border:1px solid #ffe0a3;border-radius:8px">
-                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                                        <div style="width:32px;height:32px;border-radius:50%;background:#ffc860;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#7a4d00">V</div>
-                                        <div style="font-weight:600;color:#7a4d00">Réponse du vendeur</div>
-                                        <span style="margin-left:auto;font-size:11px;color:#b07200;"><?= htmlspecialchars($rep['a_timestamp_fmt'] ?? '') ?></span>
-                                    </div>
-                                    <div style="font-size:13px;color:#7a4d00;line-height:1.4"><?= htmlspecialchars($rep['a_texte']) ?></div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                        <a class="filters-item <?= $isActive ? 'is-active' : '' ?>" role="menuitem" href="<?= htmlspecialchars($href) ?>">
+                            <span><?= htmlspecialchars($label) ?></span>
+                            <?php if ($isActive): ?><small>Actif</small><?php endif; ?>
+                        </a>
                     <?php endforeach; ?>
-                <?php endif; ?>
+                </div>
+            </div>
+            <div id="listeAvisProduit">
+                <?php renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer); ?>
             </div>
         </section>
     </main>
@@ -974,5 +1154,102 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
 
 
     </script>
+    <script>
+        // Dropdown “Filtrer” (UI uniquement, liens classiques)
+        (function(){
+            const btn = document.getElementById('reviewsFilterBtn');
+            const menu = document.getElementById('reviewsFilterMenu');
+            if (!btn || !menu) return;
+
+            const valueEl = btn.querySelector('.value');
+            const listEl = document.getElementById('listeAvisProduit');
+
+            function closeMenu(){
+                menu.classList.remove('is-open');
+                btn.setAttribute('aria-expanded','false');
+            }
+
+            async function applyFilter(href) {
+                if (!listEl) {
+                    window.location.href = href;
+                    return;
+                }
+
+                const url = new URL(href, window.location.href);
+                url.searchParams.set('partial', 'reviews');
+
+                btn.disabled = true;
+                btn.style.opacity = '0.75';
+
+                try {
+                    const resp = await fetch(url.toString(), { credentials: 'same-origin' });
+                    const data = await resp.json();
+                    if (!data || !data.success) throw new Error('Réponse invalide');
+
+                    listEl.innerHTML = data.html || '';
+
+                    if (valueEl) valueEl.textContent = '• ' + (data.label || data.tri || 'Filtre');
+
+                    // Mettre à jour l'état actif dans le menu
+                    menu.querySelectorAll('.filters-item').forEach(a => {
+                        const aUrl = new URL(a.getAttribute('href'), window.location.href);
+                        const isActive = aUrl.searchParams.get('tri') === (data.tri || '');
+                        a.classList.toggle('is-active', isActive);
+                        const small = a.querySelector('small');
+                        if (small) small.remove();
+                        if (isActive) {
+                            const s = document.createElement('small');
+                            s.textContent = 'Actif';
+                            a.appendChild(s);
+                        }
+                    });
+
+                    // Mettre à jour l'URL sans recharger la page (garde le scroll)
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('tri', data.tri);
+                    newUrl.searchParams.delete('partial');
+                    history.replaceState({}, '', newUrl.toString());
+
+                    document.dispatchEvent(new CustomEvent('reviews:updated'));
+                } catch (e) {
+                    // Fallback si fetch/JSON KO
+                    window.location.href = href;
+                } finally {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            }
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isOpen = menu.classList.contains('is-open');
+                if (isOpen) closeMenu();
+                else {
+                    menu.classList.add('is-open');
+                    btn.setAttribute('aria-expanded','true');
+                }
+            });
+
+            // Intercepter le clic sur un filtre (sans reload)
+            menu.addEventListener('click', (e) => {
+                const a = e.target.closest && e.target.closest('a.filters-item');
+                if (!a) return;
+                e.preventDefault();
+                closeMenu();
+                applyFilter(a.href);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('#reviewsFilterBtn')) return;
+                if (e.target.closest('#reviewsFilterMenu')) return;
+                closeMenu();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeMenu();
+            });
+        })();
+    </script>
+    <!-- Tri des avis: liens classiques (fiable, sans AJAX) -->
 </body>
 </html>
