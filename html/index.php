@@ -90,6 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
+
+//récup l'option de tri sélectionnée (par défaut: meilleures ventes)
+$triSelection = $_POST['tri'] ?? 'meilleures_ventes';
+
+//appliquer le tri sélectionné via la fonction
+$listeProduits = trierProduits($listeProduits, $triSelection);
+
 $tousLesProduits = count($listeProduits);
 $categories_affichage = preparercategories_affichage($listeCategories);
 $prixMaximum = max(array_column($listeProduits, 'p_prix'));
@@ -135,11 +142,14 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
             <form method="POST" action="" id="filterForm">
                 <div>
                     <span>Tri par :</span>
-                    <select>
-                        <option value="meilleures_ventes">Meilleures ventes</option>
-                        <option value="prix_croissant">Prix croissant</option>
-                        <option value="prix_decroissant">Prix décroissant</option>
-                        <option value="note">Mieux notés</option>
+                    <select name="tri" id="triSelect">
+                        <option value="meilleures_ventes"
+                            <?= $triSelection === 'meilleures_ventes' ? 'selected' : '' ?>>Meilleures ventes</option>
+                        <option value="prix_croissant" <?= $triSelection === 'prix_croissant' ? 'selected' : '' ?>>Prix
+                            croissant</option>
+                        <option value="prix_decroissant" <?= $triSelection === 'prix_decroissant' ? 'selected' : '' ?>>
+                            Prix décroissant</option>
+                        <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>Mieux notés</option>
                     </select>
                 </div>
 
@@ -277,6 +287,16 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
 
     <script src="/js/notifications.js"></script>
     <script>
+    // Gestion du changement de tri
+    document.addEventListener('DOMContentLoaded', () => {
+        const triSelect = document.getElementById('triSelect');
+        if (triSelect) {
+            triSelect.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+        }
+    });
+
     // Gestion du sélecteur d'étoiles (Filtres)
     document.addEventListener('DOMContentLoaded', () => {
         const widget = document.getElementById('starFilterWidget');
