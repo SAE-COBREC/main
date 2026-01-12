@@ -288,15 +288,33 @@ body {
   border-bottom: 3px solid #CD7F32;
 }
 
-.filters {
+.tri {
   display: flex;
+  align-items: center;
   gap: 12px;
 }
-.filters__item {
-  background: #F9F6F3;
-  border: 1px solid #E5D5C5;
+.tri__label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #030212;
+}
+.tri__item {
+  text-decoration: none;
+  color: #030212;
   padding: 8px 16px;
-  border-radius: 14px;
   font-size: 18px;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+.tri__item a {
+  border-radius: 14px;
+  background: #F9F6F3;
+  border: 1px solid #E5D5C5;
+}
+.tri__item a:hover {
+  background: #FFF7F1;
+  border-color: #CD7F32;
+}
+.tri__item--active {
+  display: none;
 }/*# sourceMappingURL=accueilVendeur.css.map */
