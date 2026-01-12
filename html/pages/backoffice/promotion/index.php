@@ -153,9 +153,11 @@
            
             
             }else{
-                $_POST["produit"] = 0;
-                $_POST["debut"] = '';
-                $_POST["fin"] = '';
+                if (empty($_POST["produit"])){
+                    $_POST["produit"] = 0;
+                    $_POST["debut"] = '';
+                    $_POST["fin"] = '';
+                }
             }
 ?>
 

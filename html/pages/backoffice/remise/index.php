@@ -154,11 +154,13 @@
                 }
            
             
-            }else{
-                $_POST["produit"] = 0;
-                $_POST["debut"] = '';
-                $_POST["fin"] = '';
-                $_POST["pourcentage"] = 0;
+            }else{else{
+                if (empty($_POST["produit"])){
+                    $_POST["produit"] = 0;
+                    $_POST["debut"] = '';
+                    $_POST["fin"] = '';
+                    $_POST["pourcentage"] = 0;
+                }
             }
 ?>
 
