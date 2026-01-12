@@ -91,13 +91,29 @@ $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
 
+$totalProduitsSansFiltre = count($donnees['produits']);
+
+// Calculer le prix maximum global (TTC) à partir de tous les produits (avant filtrage)
+$prixMaximum = 0;
+if (!empty($donnees['produits'])) {
+    // prix HT maximum
+    $prixMaximumHT = max(array_column($donnees['produits'], 'p_prix'));
+    // trouver un produit qui a ce prix HT pour récupérer sa TVA
+    foreach ($donnees['produits'] as $produitTmp) {
+        if ((float)$produitTmp['p_prix'] === (float)$prixMaximumHT) {
+            $prixMaximum = round(calcPrixTVA($produitTmp['id_produit'], $produitTmp['tva'], $prixMaximumHT));
+            break;
+        }
+    }
+}
+
 //récup la catégorie sélectionnée (par défaut: toutes les catégories)
 $categorieSelection = $_POST['categorie'] ?? 'all';
 
 //récup l'option de tri sélectionnée (par défaut: meilleures ventes)
 $triSelection = $_POST['tri'] ?? 'meilleures_ventes';
 
-//récup le prix maximum depuis le formulaire
+//récup le prix maximum sélectionné depuis le formulaire (valeur du slider)
 $prixMaximumFiltre = isset($_POST['price']) ? (float)$_POST['price'] : $prixMaximum;
 
 //récup la note minimum sélectionnée (par défaut: 0)
@@ -110,7 +126,7 @@ $enStockSeulement = isset($_POST['stock_only']) ? true : false;
 $filtres = [
     'categorieFiltre' => $categorieSelection,
     'noteMinimum' => $noteMinimumFiltre,
-    'prixMaximum' => PHP_INT_MAX,
+    'prixMaximum' => $prixMaximumFiltre,
     'enStockSeulement' => $enStockSeulement
 ];
 
@@ -120,17 +136,6 @@ $listeProduits = trierProduits($listeProduits, $triSelection);
 
 $tousLesProduits = count($listeProduits);
 $categories_affichage = preparercategories_affichage($listeCategories);
-$prixMaximum = 0;
-if (!empty($listeProduits)) {
-    $prixMaximumHT = max(array_column($listeProduits, 'p_prix'));
-    foreach ($listeProduits as $produit) {
-        if ($produit['p_prix'] === $prixMaximumHT) {
-            $prixMaximum = round(calcPrixTVA($produit['id_produit'], $produit['tva'], $prixMaximumHT));
-            break;
-        }
-    }
-}
-$totalProduitsSansFiltre = count($donnees['produits']);
 ?>
 
 <!DOCTYPE html>
