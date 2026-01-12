@@ -1101,10 +1101,22 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 }
 
                 if (e.target.closest('.btn-report-action')) {
+                    if (!idClient) {
+                        if (window.showError) showError('Connexion requise', 'Vous devez être connecté pour signaler un avis.');
+                        else alert('Vous devez être connecté pour signaler un avis.');
+                        // hide dropdowns
+                        document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
+                        return;
+                    }
                     const rev = e.target.closest('.review');
                     const aid = rev.dataset.avisId;
+                    if (!reportModal || !reportAvisIdInput || !reportMotif || !reportCommentaire) {
+                        console.error('Signalement: éléments UI manquants (modal/inputs)');
+                        return;
+                    }
                     reportAvisIdInput.value = aid;
-                    reportMotif.value = '';
+                    // Remettre sur un motif valide (sinon reportMotif.value == '' et le submit est bloqué)
+                    reportMotif.selectedIndex = 0;
                     reportCommentaire.value = '';
                     reportModal.style.display = 'flex';
                     // hide dropdowns
@@ -1123,6 +1135,12 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
             if (reportModal) reportModal.onclick = (ev) => { if (ev.target === reportModal) reportModal.style.display = 'none'; };
 
             if (confirmReport) confirmReport.onclick = () => {
+                if (!reportAvisIdInput || !reportMotif || !reportCommentaire || !reportModal) return;
+                if (!idClient) {
+                    if (window.showError) showError('Connexion requise', 'Vous devez être connecté pour signaler un avis.');
+                    else alert('Vous devez être connecté pour signaler un avis.');
+                    return;
+                }
                 const aid = reportAvisIdInput.value;
                 const motif = reportMotif.value;
                 const comm = reportCommentaire.value.trim();
@@ -1141,12 +1159,15 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                             notify(d.message || 'Signalement envoyé', 'success');
                             reportModal.style.display = 'none';
                         } else {
-                            showError('Erreur', d.message || 'Impossible d\'envoyer le signalement');
+                            const msg = d.message || 'Impossible d\'envoyer le signalement';
+                            if (window.showError) showError('Erreur', msg);
+                            else alert(msg);
                         }
                     })
                     .catch(err => {
                         console.error(err);
-                        showError('Erreur', 'Erreur réseau');
+                        if (window.showError) showError('Erreur', 'Erreur réseau');
+                        else alert('Erreur réseau');
                     })
                     .finally(() => { confirmReport.disabled = false; });
             };
