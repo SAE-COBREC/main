@@ -1214,8 +1214,10 @@ function filtrerProduits($listeProduits, $filtres)
         $reduction = (float)($produitCourant['reduction_pourcentage'] ?? 0);
         $prixFinal = $reduction > 0 ? $prixBase * (1 - $reduction / 100) : $prixBase;
         
-        // Filtrer par prix (utiliser le prix avec réduction si applicable)
-        if ($prixFinal > $filtres['prixMaximum'])
+        // Filtrer par prix (convertir en TTC avant comparaison)
+        $tvaProduit = isset($produitCourant['tva']) ? (float)$produitCourant['tva'] : 0.0;
+        $prixFinalTTC = calcPrixTVA($produitCourant['id_produit'], $tvaProduit, $prixFinal);
+        if ($prixFinalTTC > $filtres['prixMaximum'])
             continue;
         if ($filtres['categorieFiltre'] !== 'all') {
             $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
@@ -1244,4 +1246,4 @@ function recupInfoPourFactureArticle($pdo, $id_produit){
     $stmt->execute([':id_produit' => $id_produit]);
     $donnees = $stmt->fetch();
     return $donnees;
-}
+}     
