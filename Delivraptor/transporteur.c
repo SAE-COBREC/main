@@ -21,7 +21,7 @@ int chercher_commande(int id_commande, int *max_bordereau) {
     int cmd, bordereau, resultat = -1, st;
     char login[64], mdp[64];
 
-    while (fscanf(f, "%d;%d;%63s;%63s;%d", &cmd, &bordereau, login, mdp, &st) == 5) {
+    while (fscanf(f, "%d;%d;%d", &cmd, &bordereau, &st) == 5) {
         if (bordereau > *max_bordereau) {
             *max_bordereau = bordereau;
         }
@@ -33,10 +33,10 @@ int chercher_commande(int id_commande, int *max_bordereau) {
     return resultat;
 }
 
-void enregistrer_commande(int id_commande, int bordereau, const char *login, const char *mdp, int status) {
+void enregistrer_commande(int id_commande, int bordereau, int status) {
     FILE *f = fopen(FICHIER_COMMANDES, "a");
     if (f != NULL) {
-        fprintf(f, "%d;%d;%s;%s;%d\n", id_commande, bordereau, login, mdp, status);
+        fprintf(f, "%d;%d;%d;\n", id_commande, bordereau, status);
         fclose(f);
     } else {
         perror("erreur ouverture");
@@ -49,13 +49,12 @@ int chercher_status_par_bordereau(int bordereau_recherche, int *status) {
 
     int cmd, bordereau, st;
     char login[64], mdp[64];
-
     while (fscanf(f, "%d;%d;%63s;%63s;%d", &cmd, &bordereau, login, mdp, &st) == 5) {
         if (bordereau == bordereau_recherche) {
             *status = st;
             fclose(f);
             printf("Ligne lue: cmd=%d, bordereau=%d, login=%s, mdp=%s, st=%d\n",
-       cmd, bordereau, login, mdp, st);
+            cmd, bordereau, login, mdp, st);
 
             return 0;
         }
@@ -111,55 +110,15 @@ int main() {
             continue;
         }
 
-        //LOGIN
-        memset(buffer, 0, BUFFER_SIZE);
+        // CREATE_LABEL
+        memset(buffer2, 0, BUFFER_SIZE);
         ssize_t n = read(client_fd, buffer, BUFFER_SIZE - 1);
         if (n <= 0) {
             close(client_fd);
             continue;
         }
 
-        char *ligne_login = strtok(buffer, "\r\n");
-        if (!ligne_login) {
-            const char *rep = "EREUR\n";
-            write(client_fd, rep, strlen(rep));
-            close(client_fd);
-            continue;
-        }
-
-        if (strncmp(ligne_login, "LOGIN ", 6) != 0) {
-            const char *rep = "EREUR\n";
-            write(client_fd, rep, strlen(rep));
-            close(client_fd);
-            continue;
-        }
-
-        //recupere le login
-        char current_login[64] = "inconnu";
-        char current_mdp[64] = " ";
-        char user[64], pass[64];
-        user[0] = '\0';
-        pass[0] = '\0';
-
-        if (sscanf(ligne_login, "LOGIN %63s %63s", user, pass) >= 1) {
-            strncpy(current_login, user, sizeof(current_login) - 1);
-            strncpy(current_mdp, pass, sizeof(current_mdp) - 1);
-            current_login[sizeof(current_login) - 1] = '\0';
-        }
-
-        const char *rep_ok_login = "OK LOGGED_IN\n";
-        write(client_fd, rep_ok_login, strlen(rep_ok_login));
-        printf("LOGIN reçu: %s (user=%s)\n", ligne_login, current_login);
-
-        // CREATE_LABEL
-        memset(buffer2, 0, BUFFER_SIZE);
-        n = read(client_fd, buffer2, BUFFER_SIZE - 1);
-        if (n <= 0) {
-            close(client_fd);
-            continue;
-        }
-
-        char *ligne_cmd = strtok(buffer2, "\r\n");
+        char *ligne_cmd = strtok(buffer, "\r\n");
         if (!ligne_cmd) {
             close(client_fd);
             continue;
@@ -175,10 +134,10 @@ int main() {
             if (bordereau < 0) {
 
                 bordereau = max_bordereau + 1;
-                enregistrer_commande(id_commande, bordereau, current_login, current_mdp, status);
+                enregistrer_commande(id_commande, bordereau, status);
                 already = 0;
-                printf("Nouveau: commande %d -> bordereau %d (login=%s)\n",
-                       id_commande, bordereau, current_login);
+                printf("Nouveau: commande %d -> bordereau %d\n",
+                       id_commande, bordereau);
             } else {
 
                 already = 1;
@@ -197,15 +156,15 @@ int main() {
         }
         // STATUS
 
-    memset(buffer3, 0, BUFFER_SIZE);
-    n = read(client_fd, buffer3, BUFFER_SIZE - 1);
+    memset(buffer2, 0, BUFFER_SIZE);
+    n = read(client_fd, buffer2, BUFFER_SIZE - 1);
 
         if (n <= 0) {
             close(client_fd);
             continue;
         }
 
-        char *ligne_status = strtok(buffer3, "\r\n");
+        char *ligne_status = strtok(buffer2, "\r\n");
         
         fflush(stdout);
 
@@ -217,6 +176,7 @@ int main() {
 
         if (strncmp(ligne_status, "STATUS ", 7) == 0) {
             int label = atoi(ligne_status + 7);
+            printf("label:%d",label);
             int step = 0;
             int ret = chercher_status_par_bordereau(label, &step);
 
