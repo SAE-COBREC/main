@@ -154,6 +154,8 @@
             
             }else{
                 $_POST["produit"] = 0;
+                $_POST["debut"] = '';
+                $_POST["fin"] = '';
             }
 ?>
 
