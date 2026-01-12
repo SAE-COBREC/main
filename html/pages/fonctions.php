@@ -1209,7 +1209,13 @@ function filtrerProduits($listeProduits, $filtres)
 {
     $produits_filtres = [];
     foreach ($listeProduits as $produitCourant) {
-        if (($produitCourant['p_prix'] ?? 0) > $filtres['prixMaximum'])
+        // Calculer le prix final (avec réduction si applicable)
+        $prixBase = (float)($produitCourant['p_prix'] ?? 0);
+        $reduction = (float)($produitCourant['reduction_pourcentage'] ?? 0);
+        $prixFinal = $reduction > 0 ? $prixBase * (1 - $reduction / 100) : $prixBase;
+        
+        // Filtrer par prix (utiliser le prix avec réduction si applicable)
+        if ($prixFinal > $filtres['prixMaximum'])
             continue;
         if ($filtres['categorieFiltre'] !== 'all') {
             $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');

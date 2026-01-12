@@ -91,15 +91,28 @@ $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
 
+//récup la catégorie sélectionnée (par défaut: toutes les catégories)
+$categorieSelection = $_POST['categorie'] ?? 'all';
+
 //récup l'option de tri sélectionnée (par défaut: meilleures ventes)
 $triSelection = $_POST['tri'] ?? 'meilleures_ventes';
 
-//appliquer le tri sélectionné via la fonction
+//tableau contenant tous les filtres
+$filtres = [
+    'categorieFiltre' => $categorieSelection,
+    'noteMinimum' => 0,
+    'prixMaximum' => PHP_INT_MAX,
+    'enStockSeulement' => false
+];
+
+//appliquer les filtres et le tri sélectionnés via les fonctions
+$listeProduits = filtrerProduits($listeProduits, $filtres);
 $listeProduits = trierProduits($listeProduits, $triSelection);
 
 $tousLesProduits = count($listeProduits);
 $categories_affichage = preparercategories_affichage($listeCategories);
-$prixMaximum = max(array_column($listeProduits, 'p_prix'));
+$prixMaximum = !empty($listeProduits) ? max(array_column($listeProduits, 'p_prix')) : 0;
+$totalProduitsSansFiltre = count($donnees['produits']);
 ?>
 
 <!DOCTYPE html>
@@ -160,11 +173,13 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
 
                 <section>
                     <h4>Catégories</h4>
-                    <select>
-                        <option value="all">Tous les produits (<?= $tousLesProduits ?>)</option>
+                    <select name="categorie" id="categorieSelect">
+                        <option value="all" <?= $categorieSelection === 'all' ? 'selected' : '' ?>>Tous les produits
+                            (<?= $totalProduitsSansFiltre ?>)</option>
                         <?php foreach ($categories_affichage as $categorieCourante): ?>
                         <?php if ($categorieCourante['category'] !== 'all'): ?>
-                        <option value="<?= htmlspecialchars($categorieCourante['category']) ?>">
+                        <option value="<?= htmlspecialchars($categorieCourante['category']) ?>"
+                            <?= $categorieSelection === $categorieCourante['category'] ? 'selected' : '' ?>>
                             <?= htmlspecialchars($categorieCourante['category']) ?> (<?= $categorieCourante['count'] ?>)
                         </option>
                         <?php endif; ?>
@@ -292,6 +307,14 @@ $prixMaximum = max(array_column($listeProduits, 'p_prix'));
         const triSelect = document.getElementById('triSelect');
         if (triSelect) {
             triSelect.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+        }
+
+        // Gestion du changement de catégorie
+        const categorieSelect = document.getElementById('categorieSelect');
+        if (categorieSelect) {
+            categorieSelect.addEventListener('change', function() {
                 document.getElementById('filterForm').submit();
             });
         }
