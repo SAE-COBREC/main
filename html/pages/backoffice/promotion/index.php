@@ -152,6 +152,8 @@
                 }
            
             
+            }else{
+                $_POST["produit"] = 0;
             }
 ?>
 
