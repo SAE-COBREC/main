@@ -11,7 +11,8 @@
 #define BUFFER_SIZE 256
 #define FICHIER_COMMANDES "commandes.txt"
 
-int chercher_commande(int id_commande, int *mon_bordereau) {
+int chercher_commande(int id_commande, int *max_bordereau) {
+    *max_bordereau = 0;
     FILE *f = fopen(FICHIER_COMMANDES, "r");
     if (f == NULL) {
         return -1;
@@ -21,9 +22,12 @@ int chercher_commande(int id_commande, int *mon_bordereau) {
     char login[64], mdp[64];
 
     while (fscanf(f, "%d;%d;%d;\n", &cmd, &bordereau, &st) == 3) {
+        if (*max_bordereau < bordereau) {
+            *max_bordereau = bordereau;
+        }
         if (cmd == id_commande) {
             resultat = bordereau;
-            *mon_bordereau = bordereau;
+            *max_bordereau = bordereau;
         }
     }
     printf("num:commande: %d \n",resultat);
