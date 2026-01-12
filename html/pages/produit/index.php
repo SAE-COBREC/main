@@ -129,6 +129,9 @@ $tri = isset($_GET['tri']) ? trim($_GET['tri']) : 'date_desc';
 $allowedTri = ['date_desc','date_asc','note_desc','note_asc','popular'];
 if (!in_array($tri, $allowedTri)) $tri = 'date_desc';
 
+// Token "propriétaire" (si jamais avis anonymes / session navigateur)
+$ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
+
 // Chargement des avis (requête SQL directe pour un tri fiable)
 switch ($tri) {
     case 'date_asc':
@@ -145,6 +148,14 @@ switch ($tri) {
         break;
     default:
         $orderClauseAvis = 'a.a_timestamp_creation DESC, a.id_avis DESC';
+}
+
+// Épingler l'avis de l'utilisateur en haut, quel que soit le filtre
+$pinOrderPrefix = '';
+if ($idClient) {
+    $pinOrderPrefix = 'CASE WHEN a.id_client = :cid THEN 0 ELSE 1 END, ';
+} elseif (!empty($ownerTokenServer)) {
+    $pinOrderPrefix = 'CASE WHEN a.a_owner_token IS NOT NULL AND a.a_owner_token = :owner_token THEN 0 ELSE 1 END, ';
 }
 
 $sqlAvis = "
@@ -170,12 +181,16 @@ $sqlAvis = "
     LEFT JOIN cobrec1._represente_compte rc ON co.id_compte = rc.id_compte
     LEFT JOIN cobrec1._image i ON rc.id_image = i.id_image
     WHERE a.id_produit = :pid
-    ORDER BY $orderClauseAvis
+    ORDER BY $pinOrderPrefix$orderClauseAvis
 ";
 
 $stmtAvis = $pdo->prepare($sqlAvis);
 $paramsAvis = [':pid' => $idProduit];
-if ($idClient) $paramsAvis[':cid'] = $idClient;
+if ($idClient) {
+    $paramsAvis[':cid'] = $idClient;
+} elseif (!empty($ownerTokenServer)) {
+    $paramsAvis[':owner_token'] = $ownerTokenServer;
+}
 $stmtAvis->execute($paramsAvis);
 $avisTextes = $stmtAvis->fetchAll(PDO::FETCH_ASSOC);
 
@@ -222,7 +237,7 @@ if ($idClient) {
         $dejaAvis = (bool)$stmtCheck->fetchColumn();
     } catch (Exception $e) {}
 }
-$ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
+
 
 // Rendu HTML de la liste d'avis (réutilisé pour le mode fragment AJAX)
 function renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer) {
