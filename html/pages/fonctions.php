@@ -1269,7 +1269,7 @@ function trierProduits($listeProduits, $tri_par)
                 $comparison = $nombreVentesB <=> $nombreVentesA;
                 
                 if ($comparison === 0) {
-                    return $produitA['id_produit'] <=> $produitB['idproduit'];
+                    return $produitA['id_produit'] <=> $produitB['id_produit'];
                 }
                 
                 return $comparison;
