@@ -97,12 +97,21 @@ $categorieSelection = $_POST['categorie'] ?? 'all';
 //récup l'option de tri sélectionnée (par défaut: meilleures ventes)
 $triSelection = $_POST['tri'] ?? 'meilleures_ventes';
 
+//récup le prix maximum depuis le formulaire
+$prixMaximumFiltre = isset($_POST['price']) ? (float)$_POST['price'] : $prixMaximum;
+
+//récup la note minimum sélectionnée (par défaut: 0)
+$noteMinimumFiltre = isset($_POST['note_min']) ? (int)$_POST['note_min'] : 0;
+
+//récup le filtre en stock uniquement (par défaut: false)
+$enStockSeulement = isset($_POST['stock_only']) ? true : false;
+
 //tableau contenant tous les filtres
 $filtres = [
     'categorieFiltre' => $categorieSelection,
-    'noteMinimum' => 0,
+    'noteMinimum' => $noteMinimumFiltre,
     'prixMaximum' => PHP_INT_MAX,
-    'enStockSeulement' => false
+    'enStockSeulement' => $enStockSeulement
 ];
 
 //appliquer les filtres et le tri sélectionnés via les fonctions
@@ -177,7 +186,7 @@ $totalProduitsSansFiltre = count($donnees['produits']);
 
                 <div>
                     <h3>Filtres</h3>
-                    <button type="button">Effacer</button>
+                    <button type="button" id="clearFiltersBtn">Effacer</button>
                 </div>
 
                 <section>
@@ -204,11 +213,12 @@ $totalProduitsSansFiltre = count($donnees['produits']);
                 <section class="no-hover">
                     <h4 style="padding-top: 1em;">Prix</h4>
                     <div>
-                        <input type="range" name="price" min="0" max="<?= $prixMaximum ?>" value="<?= $prixMaximum ?>">
+                        <input type="range" name="price" id="priceRange" min="0" max="<?= $prixMaximum ?>"
+                            value="<?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>">
                     </div>
                     <div>
                         <span>0€</span>
-                        <span><?= $prixMaximum ?>€</span>
+                        <span id="priceValue"><?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>€</span>
                     </div>
                 </section>
 
@@ -221,13 +231,14 @@ $totalProduitsSansFiltre = count($donnees['produits']);
                         </button>
                         <?php endfor; ?>
                     </div>
-                    <input type="hidden" name="note_min" id="inputNoteMin" value="0">
+                    <input type="hidden" name="note_min" id="inputNoteMin" value="<?= $noteMinimumFiltre ?>">
                 </section>
 
                 <section>
                     <h4>Disponibilité</h4>
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="stock_only" id="stockOnlyCheckbox"
+                            <?= isset($_POST['stock_only']) ? 'checked' : '' ?>>
                         <span>En stock uniquement</span>
                     </label>
                 </section>
@@ -329,11 +340,64 @@ $totalProduitsSansFiltre = count($donnees['produits']);
         }
     });
 
+    // Gestion du slider de prix
+    document.addEventListener('DOMContentLoaded', () => {
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+
+        if (priceRange && priceValue) {
+            // Mise à jour de l'affichage en temps réel
+            priceRange.addEventListener('input', function() {
+                priceValue.textContent = this.value + '€';
+            });
+
+            // Soumettre le formulaire quand l'utilisateur relâche le slider
+            priceRange.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+        }
+    });
+
+    // Gestion du checkbox "En stock uniquement"
+    document.addEventListener('DOMContentLoaded', () => {
+        const stockOnlyCheckbox = document.getElementById('stockOnlyCheckbox');
+        if (stockOnlyCheckbox) {
+            stockOnlyCheckbox.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+        }
+    });
+
+    // Gestion du bouton Effacer les filtres
+    document.addEventListener('DOMContentLoaded', () => {
+        const clearBtn = document.getElementById('clearFiltersBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Réinitialiser tous les filtres
+                document.getElementById('categorieSelect').value = 'all';
+                document.getElementById('priceRange').value = document.getElementById('priceRange').max;
+                document.getElementById('priceValue').textContent = document.getElementById(
+                    'priceRange').max + '€';
+                document.getElementById('inputNoteMin').value = '0';
+                document.getElementById('triSelect').value = 'meilleures_ventes';
+                document.getElementById('stockOnlyCheckbox').checked = false;
+                // Réinitialiser les étoiles
+                const btns = document.querySelectorAll('.star-btn');
+                btns.forEach(b => {
+                    b.querySelector('img').src = '/img/svg/star-empty.svg';
+                });
+                // Soumettre le formulaire
+                document.getElementById('filterForm').submit();
+            });
+        }
+    });
+
     // Gestion du sélecteur d'étoiles (Filtres)
     document.addEventListener('DOMContentLoaded', () => {
         const widget = document.getElementById('starFilterWidget');
         const input = document.getElementById('inputNoteMin');
-        let selectedValue = 0;
+        let selectedValue = input ? parseInt(input.value) : 0;
 
         if (widget) {
             const btns = widget.querySelectorAll('.star-btn');
@@ -347,6 +411,9 @@ $totalProduitsSansFiltre = count($donnees['produits']);
                 });
             };
 
+            // Initialiser l'affichage avec la valeur sauvegardée
+            updateStars(selectedValue);
+
             btns.forEach(btn => {
                 // Survol : affiche les étoiles jusqu'au curseur
                 btn.addEventListener('mouseenter', () => updateStars(btn.dataset.value));
@@ -358,8 +425,8 @@ $totalProduitsSansFiltre = count($donnees['produits']);
                     if (input) input.value = selectedValue;
                     updateStars(selectedValue);
 
-                    // "Return" de la valeur sélectionnée
-                    console.log(selectedValue);
+                    // Soumettre le formulaire pour appliquer le filtre
+                    document.getElementById('filterForm').submit();
                 });
             });
 

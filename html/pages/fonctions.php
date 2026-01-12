@@ -1160,7 +1160,7 @@ function trierProduits($listeProduits, $tri_par)
 
     switch ($tri_par) {
         case 'prix_croissant':
-            // Trier par prix croissant (prix avec réduction appliquée)
+            //trier par prix croissant (prix avec réduction appliquée)
             usort($listeProduits, function ($a, $b) {
                 $discountA = (float)($a['reduction_pourcentage'] ?? 0);
                 $prixA = $a['p_prix'] * (1 - $discountA/100);
@@ -1172,7 +1172,7 @@ function trierProduits($listeProduits, $tri_par)
             });
             break;
         case 'prix_decroissant':
-            // Trier par prix décroissant
+            //trier par prix décroissant
             usort($listeProduits, function ($a, $b) {
                 $discountA = (float)($a['reduction_pourcentage'] ?? 0);
                 $prixA = $a['p_prix'] * (1 - $discountA/100);
@@ -1184,7 +1184,7 @@ function trierProduits($listeProduits, $tri_par)
             });
             break;
         case 'note':
-            // Trier par note (la plus élevée en premier)
+            //trier par note (la plus élevée en premier)
             usort($listeProduits, function ($a, $b) {
                 $noteA = (float)($a['note_moyenne'] ?? 0);
                 $noteB = (float)($b['note_moyenne'] ?? 0);
