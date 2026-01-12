@@ -154,7 +154,7 @@
                 }
            
             
-            }else{else{
+            }else{
                 if (empty($_POST["produit"])){
                     $_POST["produit"] = 0;
                     $_POST["debut"] = '';
