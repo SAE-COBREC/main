@@ -110,11 +110,11 @@
                         $_SESSION["creerArticle"]["tmp_file"]["name"] = [];
                         $_SESSION["creerArticle"]["tmp_file"]["tmp_name"] = [];
                         $_SESSION["creerArticle"]["_FILES"]['photo']['name'] = [];
-                        $fp = fopen('file.csv', 'w');
-                        foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
-                            fputcsv($fp, $fields, ',', '"', '');
-                        }
-                        fclose($fp);
+                        // $fp = fopen('file.csv', 'w');
+                        // foreach ($_SESSION["remise"]['bdd_errors'] as $fields) {
+                        //     fputcsv($fp, $fields, ',', '"', '');
+                        // }
+                        // fclose($fp);
 
 
                         foreach ($_SESSION["creerArticle"]['_GET']['imgs'] as $key => $value) {
