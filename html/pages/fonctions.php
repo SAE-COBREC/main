@@ -1180,7 +1180,7 @@ function trierProduits($listeProduits, $tri_par)
                 
                 // Critère secondaire en cas d'égalité
                 if ($comparison === 0) {
-                    return $a['idproduit'] <=> $b['idproduit'];
+                    return $a['id_produit'] <=> $b['id_produit'];
                 }
                 
                 return $comparison;
@@ -1195,7 +1195,7 @@ function trierProduits($listeProduits, $tri_par)
                 $comparison = $isPromoB <=> $isPromoA; // Inversé pour avoir les promos en premier
                 
                 if ($comparison === 0) {
-                    return $a['idproduit'] <=> $b['idproduit'];
+                    return $a['id_produit'] <=> $b['id_produit'];
                 }
                 
                 return $comparison;
@@ -1210,7 +1210,7 @@ function trierProduits($listeProduits, $tri_par)
                 $comparison = $reductionB <=> $reductionA;
                 
                 if ($comparison === 0) {
-                    return $a['idproduit'] <=> $b['idproduit'];
+                    return $a['id_produit'] <=> $b['id_produit'];
                 }
                 
                 return $comparison;
@@ -1238,7 +1238,7 @@ function trierProduits($listeProduits, $tri_par)
                 
                 // Critère secondaire
                 if ($comparison === 0) {
-                    return $a['idproduit'] <=> $b['idproduit'];
+                    return $a['id_produit'] <=> $b['id_produit'];
                 }
                 
                 return $comparison;
@@ -1253,7 +1253,7 @@ function trierProduits($listeProduits, $tri_par)
                 $comparison = $noteB <=> $noteA;
                 
                 if ($comparison === 0) {
-                    return $a['idproduit'] <=> $b['idproduit'];
+                    return $a['id_produit'] <=> $b['id_produit'];
                 }
                 
                 return $comparison;
