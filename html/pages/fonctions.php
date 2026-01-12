@@ -1186,6 +1186,36 @@ function trierProduits($listeProduits, $tri_par)
                 return $comparison;
             });
             break;
+
+        case 'en_promotion':
+            usort($listeProduits, function ($a, $b) {
+                $isPromoA = (isset($a['reduction_pourcentage']) && $a['reduction_pourcentage'] > 0) ? 1 : 0;
+                $isPromoB = (isset($b['reduction_pourcentage']) && $b['reduction_pourcentage'] > 0) ? 1 : 0;
+                
+                $comparison = $isPromoB <=> $isPromoA; // Inversé pour avoir les promos en premier
+                
+                if ($comparison === 0) {
+                    return $a['idproduit'] <=> $b['idproduit'];
+                }
+                
+                return $comparison;
+            });
+            break;
+
+        case 'en_reduction':
+            usort($listeProduits, function ($a, $b) {
+                $reductionA = (float)($a['reduction_pourcentage'] ?? 0);
+                $reductionB = (float)($b['reduction_pourcentage'] ?? 0);
+                
+                $comparison = $reductionB <=> $reductionA;
+                
+                if ($comparison === 0) {
+                    return $a['idproduit'] <=> $b['idproduit'];
+                }
+                
+                return $comparison;
+            });
+            break;
             
         case 'prix_decroissant':
             usort($listeProduits, function ($a, $b) {
