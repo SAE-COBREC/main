@@ -5,20 +5,20 @@
     include '../../../selectBDD.php';
     $pdo->exec("SET search_path to cobrec1");
 
-    if (!empty($_SESSION["remise"]['_GET']['id_reduction'])){
-        try {//suppr de l'objet reduction dans la base
+    if (!empty($_SESSION["promotion"]['_GET']['id_promotion'])){
+        try {//suppr de l'objet promotion dans la base
             $sql = '
-            DELETE FROM cobrec1._reduction 
-            WHERE id_reduction = :getId;
+            DELETE FROM cobrec1._promotion 
+            WHERE id_promotion = :getId;
             ';
             $stmt = $pdo->prepare($sql);
             $params = [
-                'getId' => $_SESSION["remise"]['_GET']['id_reduction']
+                'getId' => $_SESSION["promotion"]['_GET']['id_promotion']
             ];
             $stmt->execute($params);
         } catch (Exception $e) {}
-        $_SESSION['remise'] = [];
         $_SESSION['promotion'] = [];
+        $_SESSION['reduction'] = [];
     }
     header("Location: ../index.php");
     exit(0);
