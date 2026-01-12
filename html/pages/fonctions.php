@@ -1318,7 +1318,7 @@ function genererUrlTri($type_tri) {
     $params = $_GET;
     $params['tri'] = $type_tri;
     return "?" . http_build_query($params);
-
+}
 
 function recupInfoPourFactureArticle($pdo, $id_produit){
     //calcul le prix d'un produit apres les remises et la tva ne calcul pas avec la quantite
