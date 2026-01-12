@@ -4,8 +4,9 @@ session_start();
 ?>
 
 <?php
-// Inclusion du fichier de connexion à la base de données
+// Inclusion de fichier 
 include '../../selectBDD.php';
+include __DIR__ . '../fonctions.php';
 
 // Récupération de l'ID du vendeur connecté depuis la session
 if(empty($_SESSION['vendeur_id']) === false){
@@ -96,9 +97,9 @@ try {
 
           <div class="tabs">
             <div class="tabs__item tabs__item--active">En ligne</div>
-            <div class="tabs__item">Hors ligne</div>
-            <div class="tabs__item">Ébauche</div>
-            <div class="tabs__item">Épuisé</div>
+            <div class="tabs__item tabs__item--active">Hors ligne</div>
+            <div class="tabs__item tabs__item--active">Ébauche</div>
+            <div class="tabs__item tabs__item--active">Épuisé</div>
           </div>
 
           <div class="filters">
@@ -161,7 +162,7 @@ try {
                   <td class="products-table__cell col-stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
                   <td class="products-table__cell col-cate"><?php echo htmlspecialchars($article['categories']); ?></td>
                   <td class="products-table__cell col-promo">
-                    <?php if(((strtotime($article["debut_promo"]) <= time()) && (time() <= strtotime($article["fin_promo"])))): ?>
+                    <?php if(!empty($article['debut_promo']) && ((strtotime($article["debut_promo"]) <= time()) && (time() <= strtotime($article["fin_promo"])))): ?>
                       <p>En Promotion !</p>
                     <?php endif; ?>
                   </td>
@@ -230,6 +231,14 @@ try {
               }
             });
           });
+          const tabs = document.querySelectorAll('.tabs__item');
+            tabs.forEach(tab => {
+              tab.classList.add('tabs__item--active');
+
+              tab.addEventListener('click', (e) => {
+                tab.classList.toggle('tabs__item--active');
+              });
+            });
         });
       </script>
     </main>
