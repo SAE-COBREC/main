@@ -382,7 +382,13 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         // Determine avatar
                         $avatarUrl = $ta['client_image'] ?? null;
                     ?>
-                        <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>" data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;">
+                        <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>" data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;position:relative;padding-right:44px;">
+                            <button class="ghost btn-report-trigger" aria-label="Options avis" style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+                            </button>
+                            <div class="report-dropdown" style="display:none;position:absolute;right:8px;top:44px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;z-index:60;min-width:160px;box-shadow:0 6px 18px rgba(0,0,0,.06)">
+                                <button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l'avis</button>
+                            </div>
                             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
                                 <?php if ($avatarUrl): ?>
                                     <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
@@ -473,6 +479,27 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
             <div class="modal-actions">
                 <button class="btn-secondary" id="cancelEditReview">Annuler</button>
                 <button class="btn-primary" id="confirmEditReview">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Signalement Avis -->
+    <div id="reportModal" class="modal-overlay" style="display:none;">
+        <div class="modal-dialog">
+            <h3>Signaler cet avis</h3>
+            <input type="hidden" id="reportAvisId" value="0">
+            <label style="display:block;margin:8px 0 4px;font-weight:600">Motif</label>
+            <select id="reportMotif" style="width:100%;padding:8px;margin-bottom:8px">
+                <option value="Contenu haineux">Contenu haineux</option>
+                <option value="Spam / Publicité">Spam / Publicité</option>
+                <option value="Inapproprié">Inapproprié</option>
+                <option value="Autre">Autre</option>
+            </select>
+            <label style="display:block;margin:8px 0 4px;font-weight:600">Commentaire (optionnel)</label>
+            <textarea id="reportCommentaire" rows="4" style="width:100%;padding:8px" placeholder="Décrivez si besoin..."></textarea>
+            <div class="modal-actions" style="margin-top:12px">
+                <button class="btn-secondary" id="cancelReport">Annuler</button>
+                <button class="btn-primary" id="confirmReport">Envoyer</button>
             </div>
         </div>
     </div>
@@ -804,6 +831,81 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
             document.addEventListener('click', () => {
                 document.querySelectorAll('.mobile-menu-dropdown').forEach(d => d.classList.remove('show'));
             });
+        }
+
+        // Signalement - dropdown & modal handling
+        const reportModal = document.getElementById('reportModal');
+        const reportAvisIdInput = document.getElementById('reportAvisId');
+        const reportMotif = document.getElementById('reportMotif');
+        const reportCommentaire = document.getElementById('reportCommentaire');
+        const cancelReport = document.getElementById('cancelReport');
+        const confirmReport = document.getElementById('confirmReport');
+
+        if (listAvis && !listAvis.dataset.boundReport) {
+            listAvis.dataset.boundReport = 'true';
+            listAvis.addEventListener('click', (e) => {
+                const trigger = e.target.closest('.btn-report-trigger');
+                if (trigger) {
+                    const rev = trigger.closest('.review');
+                    const dropdown = rev.querySelector('.report-dropdown');
+
+                    // close other dropdowns
+                    document.querySelectorAll('.report-dropdown').forEach(d => { if (d !== dropdown) d.style.display = 'none'; });
+                    dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+                    e.stopPropagation();
+                    return;
+                }
+
+                if (e.target.closest('.btn-report-action')) {
+                    const rev = e.target.closest('.review');
+                    const aid = rev.dataset.avisId;
+                    reportAvisIdInput.value = aid;
+                    reportMotif.value = '';
+                    reportCommentaire.value = '';
+                    reportModal.style.display = 'flex';
+                    // hide dropdowns
+                    document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
+                    return;
+                }
+
+                // click outside to close dropdowns
+                if (!e.target.closest('.report-dropdown')) {
+                    document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
+                }
+            });
+
+            // close report modal
+            if (cancelReport) cancelReport.onclick = () => reportModal.style.display = 'none';
+            if (reportModal) reportModal.onclick = (ev) => { if (ev.target === reportModal) reportModal.style.display = 'none'; };
+
+            if (confirmReport) confirmReport.onclick = () => {
+                const aid = reportAvisIdInput.value;
+                const motif = reportMotif.value;
+                const comm = reportCommentaire.value.trim();
+                if (!motif) return notify('Sélectionnez un motif', 'warning');
+                confirmReport.disabled = true;
+                const fd = new FormData();
+                fd.append('action', 'report_avis');
+                fd.append('id_produit', productId);
+                fd.append('id_avis', aid);
+                fd.append('motif', motif);
+                fd.append('commentaire', comm);
+
+                fetchJson(window.location.href, { method: 'POST', body: fd })
+                    .then(d => {
+                        if (d.success) {
+                            notify(d.message || 'Signalement envoyé', 'success');
+                            reportModal.style.display = 'none';
+                        } else {
+                            showError('Erreur', d.message || 'Impossible d\'envoyer le signalement');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        showError('Erreur', 'Erreur réseau');
+                    })
+                    .finally(() => { confirmReport.disabled = false; });
+            };
         }
 
 
