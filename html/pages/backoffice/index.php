@@ -59,7 +59,25 @@ try {
 
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_vendeur' => $vendeur_id]);
-    $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $articles_bruts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $tous_les_statuts = ['En ligne', 'Hors ligne', 'Ébauche', 'Épuisé'];
+
+    $filtres_actifs = isset($_GET['st']) ? explode(',', $_GET['st']) : $tous_les_statuts;
+
+    if(isset($_GET['st']) && $_GET['st'] === 'aucun'){
+      $filtres_actifs = [];
+    }
+
+    $tout_est_selectionne = (count($filtres_actifs) === count($tous_les_statuts));
+
+    $articles = array_filter($articles_bruts, function($article) use ($filtres_actifs){
+      $statut_reel = $article['p_statut'];
+      if($article['p_statut'] == 'En ligne' && $article['p_stock'] <= 0){
+        $statut_reel = 'Épuisé';
+      }
+      return in_array($statut_reel, $filtres_actifs);
+    });
 
 } catch (PDOException $e) {
     die("Erreur de connexion : " . htmlspecialchars($e->getMessage()));
@@ -96,11 +114,17 @@ try {
           <h2 class="content-section__title">Articles en lignes</h2>
 
           <div class="tabs">
-            <div class="tabs__item tabs__item--active">En ligne</div>
-            <div class="tabs__item tabs__item--active">Hors ligne</div>
-            <div class="tabs__item tabs__item--active">Ébauche</div>
-            <div class="tabs__item tabs__item--active">Épuisé</div>
-          </div>
+            <div class="tabs__item <?= $tout_est_selectionne ? 'tabs__item--active' : '' ?>" id="tab-all">
+              Tous les articles
+            </div>
+            <?php foreach ($tous_les_statuts as $label): ?>
+              <?php $est_actif = in_array($label, $filtres_actifs); ?>
+                <div class="tabs__item <?= $est_actif ? 'tabs__item--active' : '' ?> tab-status" 
+                    data-label="<?= $label ?>">
+                    <?= $label ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
 
           <div class="filters">
             <div class="filters__item">------- --- --------</div>
@@ -231,14 +255,35 @@ try {
               }
             });
           });
-          const tabs = document.querySelectorAll('.tabs__item');
-            tabs.forEach(tab => {
-              tab.classList.add('tabs__item--active');
+          const tabAll = document.getElementById('tab-all');
+          const tabsStatuts = document.querySelectorAll('.tab-status');
 
-              tab.addEventListener('click', (e) => {
-                tab.classList.toggle('tabs__item--active');
-              });
+          tabAll.addEventListener('click', () => {
+            const isCurrentlyActive = tabAll.classList.contains('tabs__item--active');
+            let url = "";
+
+            if(!isCurrentlyActive){
+              const tous = Array.from(tabsStatuts).map(t => t.getAttribute('data-label'));
+              url = "?st=" + tous.join(',');
+            }else{
+              url = "?st=aucun";
+            }
+            window.location.href = url;
+          });
+
+          tabsStatuts.forEach(tab => {
+            tab.addEventListener('click', () => {
+              tab.classList.toggle('tabs__item--active');
+            
+              const actifs = Array.from(document.querySelectorAll('.tab-status.tabs__item--active')).map(t => t.getAttribute('data-label'));
+
+              if(actifs.length > 0){
+                window.location.href = "?st=" + actifs.join(',');
+              }else{
+                window.location.href = "?st=aucun";
+              }
             });
+          });
         });
       </script>
     </main>
