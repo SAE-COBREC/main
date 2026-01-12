@@ -1160,43 +1160,89 @@ function trierProduits($listeProduits, $tri_par)
 
     switch ($tri_par) {
         case 'prix_croissant':
-            //trier par prix croissant (prix avec réduction appliquée)
             usort($listeProduits, function ($a, $b) {
+                // Calculer le prix HT après réduction
                 $discountA = (float)($a['reduction_pourcentage'] ?? 0);
-                $prixA = $a['p_prix'] * (1 - $discountA/100);
+                $prixHT_A = $a['p_prix'] * (1 - $discountA/100);
                 
                 $discountB = (float)($b['reduction_pourcentage'] ?? 0);
-                $prixB = $b['p_prix'] * (1 - $discountB/100);
+                $prixHT_B = $b['p_prix'] * (1 - $discountB/100);
                 
-                return $prixA <=> $prixB;
+                // Ajouter la TVA pour obtenir le prix TTC
+                $tvaA = (float)($a['tva'] ?? 0);
+                $prixTTC_A = $prixHT_A * (1 + $tvaA/100);
+                
+                $tvaB = (float)($b['tva'] ?? 0);
+                $prixTTC_B = $prixHT_B * (1 + $tvaB/100);
+                
+                // Comparer les prix TTC
+                $comparison = $prixTTC_A <=> $prixTTC_B;
+                
+                // Critère secondaire en cas d'égalité
+                if ($comparison === 0) {
+                    return $a['idproduit'] <=> $b['idproduit'];
+                }
+                
+                return $comparison;
             });
             break;
+            
         case 'prix_decroissant':
-            //trier par prix décroissant
             usort($listeProduits, function ($a, $b) {
+                // Calculer le prix HT après réduction
                 $discountA = (float)($a['reduction_pourcentage'] ?? 0);
-                $prixA = $a['p_prix'] * (1 - $discountA/100);
+                $prixHT_A = $a['p_prix'] * (1 - $discountA/100);
                 
                 $discountB = (float)($b['reduction_pourcentage'] ?? 0);
-                $prixB = $b['p_prix'] * (1 - $discountB/100);
+                $prixHT_B = $b['p_prix'] * (1 - $discountB/100);
                 
-                return $prixB <=> $prixA;
+                // Ajouter la TVA pour obtenir le prix TTC
+                $tvaA = (float)($a['tva'] ?? 0);
+                $prixTTC_A = $prixHT_A * (1 + $tvaA/100);
+                
+                $tvaB = (float)($b['tva'] ?? 0);
+                $prixTTC_B = $prixHT_B * (1 + $tvaB/100);
+                
+                // Inverser pour décroissant
+                $comparison = $prixTTC_B <=> $prixTTC_A;
+                
+                // Critère secondaire
+                if ($comparison === 0) {
+                    return $a['idproduit'] <=> $b['idproduit'];
+                }
+                
+                return $comparison;
             });
             break;
+            
         case 'note':
-            //trier par note (la plus élevée en premier)
             usort($listeProduits, function ($a, $b) {
                 $noteA = (float)($a['note_moyenne'] ?? 0);
                 $noteB = (float)($b['note_moyenne'] ?? 0);
-                return $noteB <=> $noteA;
+                
+                $comparison = $noteB <=> $noteA;
+                
+                if ($comparison === 0) {
+                    return $a['idproduit'] <=> $b['idproduit'];
+                }
+                
+                return $comparison;
             });
             break;
+            
         case 'meilleures_ventes':
         default:
             usort($listeProduits, function ($produitA, $produitB) {
                 $nombreVentesA = (int)($produitA['p_nbventes'] ?? 0);
                 $nombreVentesB = (int)($produitB['p_nbventes'] ?? 0);
-                return $nombreVentesB <=> $nombreVentesA;
+                
+                $comparison = $nombreVentesB <=> $nombreVentesA;
+                
+                if ($comparison === 0) {
+                    return $produitA['idproduit'] <=> $produitB['idproduit'];
+                }
+                
+                return $comparison;
             });
             break;
     }
@@ -1214,10 +1260,8 @@ function filtrerProduits($listeProduits, $filtres)
         $reduction = (float)($produitCourant['reduction_pourcentage'] ?? 0);
         $prixFinal = $reduction > 0 ? $prixBase * (1 - $reduction / 100) : $prixBase;
         
-        // Filtrer par prix (convertir en TTC avant comparaison)
-        $tvaProduit = isset($produitCourant['tva']) ? (float)$produitCourant['tva'] : 0.0;
-        $prixFinalTTC = calcPrixTVA($produitCourant['id_produit'], $tvaProduit, $prixFinal);
-        if ($prixFinalTTC > $filtres['prixMaximum'])
+        // Filtrer par prix (utiliser le prix avec réduction si applicable)
+        if ($prixFinal > $filtres['prixMaximum'])
             continue;
         if ($filtres['categorieFiltre'] !== 'all') {
             $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
