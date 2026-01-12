@@ -6,7 +6,7 @@ session_start();
 <?php
 // Inclusion de fichier 
 include '../../selectBDD.php';
-include __DIR__ . '../fonctions.php';
+include __DIR__ . '../../fonctions.php';
 
 // Récupération de l'ID du vendeur connecté depuis la session
 if(empty($_SESSION['vendeur_id']) === false){
