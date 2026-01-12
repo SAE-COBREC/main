@@ -22,6 +22,7 @@ if(empty($_SESSION['vendeur_id']) === false){
 // Initialisation d'un tableau vide pour stocker éventuellement de nouveaux articles
 $_SESSION['creerArticle'] = [];
 $_SESSION['remise'] = [];
+$_SESSION['promotion'] = [];
 $fichiers = glob('create/temp_/*');
 foreach ($fichiers as $value) {
   unlink($value);
@@ -116,7 +117,7 @@ try {
                 <th class="products-table__head-cell col-statut">Statut</th>
                 <th class="products-table__head-cell col-stock">Stock</th>
                 <th class="products-table__head-cell col-cate">Catégorie</th>
-                <th class="products-table__head-cell col-desc">Description</th>
+                <th class="products-table__head-cell col-promo">Promotion</th>
               </tr>
             </thead>
             <tbody>
@@ -159,11 +160,10 @@ try {
                   </td>
                   <td class="products-table__cell col-stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
                   <td class="products-table__cell col-cate"><?php echo htmlspecialchars($article['categories']); ?></td>
-                  <td class="products-table__cell col-desc">
-                  <?php 
-                    $desc = $article['p_description'];
-                    echo htmlspecialchars(strlen($desc) > 100 ? substr($desc, 0, 100) . "..." : $desc);
-                  ?>
+                  <td class="products-table__cell col-promo">
+                    <?php if(((strtotime($article["debut_promo"]) <= time()) && (time() <= strtotime($article["fin_promo"])))): ?>
+                      <p>En Promotion !</p>
+                    <?php endif; ?>
                   </td>
                 </tr>
               <?php endforeach; ?>
