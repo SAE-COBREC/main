@@ -22,9 +22,9 @@ if ($idClient === null) {
     if (!isset($_SESSION['panierTemp'])) {
         $_SESSION['panierTemp'] = array();
     }
-    $panier = null; //pas de panier en BDD
+    $panier = null;
 } else {
-    //sinon on récupère l'id de son panier courant (celui qui est en train d'être rempli)
+    //sinon on récupère l'id de son panier courant
     $sqlPanierClient = "
         SELECT id_panier
         FROM _panier_commande
@@ -49,7 +49,6 @@ if ($idClient === null) {
     }
 
     $_SESSION["panierEnCours"] = $idPanier;
-
     transfererPanierTempVersBDD($connexionBaseDeDonnees, $idPanier);
 }
 
@@ -68,13 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     try {
         if ($idClient === null) {
-            //utilisateur non connecté : utiliser le panier temporaire en SESSION
             $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
         } else {
-            //utilisateur connecté : utiliser le panier en BDD
             $idPanier = $_SESSION['panierEnCours'] ?? null;
             if (!$idPanier) {
-                echo json_encode(['success' => false, 'message' => 'Aucun panier en cours pour ce client']);
+                echo json_encode(['success' => false, 'message' => 'Aucun panier en cours']);
                 exit;
             }
             $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
@@ -87,19 +84,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
+// ========================================
+// 🔥 SECTION UNIQUE DE CHARGEMENT DES PRODUITS
+// ========================================
+
+// Récupération des recherches
+$rechercheNom = $_GET['recherche'] ?? '';
+$rechercheVendeur = $_POST['vendeur'] ?? '';
+
+// 1. Charger tous les produits et catégories depuis la BDD
 $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
+$totalProduitsSansFiltre = count($listeProduits);
 
-$totalProduitsSansFiltre = count($donnees['produits']);
+// 2. Appliquer la recherche si présente (prioriser recherche nom)
+if (!empty(trim($rechercheNom))) {
+    // Recherche par nom de produit (depuis le header)
+    $listeProduits = rechercheNom($connexionBaseDeDonnees, trim($rechercheNom));
+    $totalProduitsSansFiltre = count($listeProduits);
+} elseif (!empty(trim($rechercheVendeur))) {
+    // Recherche par vendeur (depuis le sidebar)
+    $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, trim($rechercheVendeur));
+    $totalProduitsSansFiltre = count($listeProduits);
+}
 
-// Calculer le prix maximum global (TTC) à partir de tous les produits (avant filtrage)
+// Calculer le prix TTC maximum
 $prixMaximum = 0;
-if (!empty($donnees['produits'])) {
-    // prix HT maximum
-    $prixMaximumHT = max(array_column($donnees['produits'], 'p_prix'));
-    // trouver un produit qui a ce prix HT pour récupérer sa TVA
-    foreach ($donnees['produits'] as $produitTmp) {
+if (!empty($listeProduits)) {
+    $prixMaximumHT = max(array_column($listeProduits, 'p_prix'));
+    foreach ($listeProduits as $produitTmp) {
         if ((float)$produitTmp['p_prix'] === (float)$prixMaximumHT) {
             $prixMaximum = round(calcPrixTVA($produitTmp['id_produit'], $produitTmp['tva'], $prixMaximumHT));
             break;
@@ -107,22 +121,13 @@ if (!empty($donnees['produits'])) {
     }
 }
 
-//récup la catégorie sélectionnée (par défaut: toutes les catégories)
+// Récupération des filtres
 $categorieSelection = $_POST['categorie'] ?? 'all';
-
-//récup l'option de tri sélectionnée (par défaut: meilleures ventes)
 $triSelection = $_POST['tri'] ?? 'meilleures_ventes';
-
-//récup le prix maximum sélectionné depuis le formulaire (valeur du slider)
 $prixMaximumFiltre = isset($_POST['price']) ? (float)$_POST['price'] : $prixMaximum;
-
-//récup la note minimum sélectionnée (par défaut: 0)
 $noteMinimumFiltre = isset($_POST['note_min']) ? (int)$_POST['note_min'] : 0;
-
-//récup le filtre en stock uniquement (par défaut: false)
 $enStockSeulement = isset($_POST['stock_only']) ? true : false;
 
-//tableau contenant tous les filtres
 $filtres = [
     'categorieFiltre' => $categorieSelection,
     'noteMinimum' => $noteMinimumFiltre,
@@ -130,23 +135,7 @@ $filtres = [
     'enStockSeulement' => $enStockSeulement
 ];
 
-// Récupération de la recherche vendeur
-$rechercheVendeur = $_POST['vendeur'] ?? '';
-
-// Charger les produits depuis la BDD
-$donnees = chargerProduitsBDD($connexionBaseDeDonnees);
-$listeProduits = $donnees['produits'];
-$listeCategories = $donnees['categories'];
-
-// Si une recherche vendeur est effectuée, filtrer les résultats
-if (!empty(trim($rechercheVendeur))) {
-    $listeProduits = ProduitDenominationVendeur1($connexionBaseDeDonnees, trim($rechercheVendeur));
-}
-
-$totalProduitsSansFiltre = count($listeProduits);
-
-
-//appliquer les filtres et le tri sélectionnés via les fonctions
+// Appliquer les filtres et le tri
 $listeProduits = filtrerProduits($listeProduits, $filtres);
 $listeProduits = trierProduits($listeProduits, $triSelection);
 
@@ -564,6 +553,48 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     document.getElementById('filterForm').submit();
+                }
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('headerSearchInput');
+        const searchForm = document.getElementById('headerSearchForm');
+        const clearBtn = document.getElementById('clearSearchBtn');
+
+        // Recherche sur Enter
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.value.trim().length >= 2) {
+                        searchForm.submit();
+                    }
+                }
+            });
+        }
+
+        // Bouton clear
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                // Rediriger vers la page d'accueil sans paramètre recherche
+                const url = new URL(window.location.href);
+                url.searchParams.delete('recherche');
+                window.location.href = url.toString();
+            });
+        }
+
+        // Recherche en temps réel (optionnel - 500ms après la dernière frappe)
+        let timeoutId;
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeoutId);
+                if (this.value.trim().length >= 2) {
+                    timeoutId = setTimeout(() => {
+                        searchForm.submit();
+                    }, 500);
                 }
             });
         }
