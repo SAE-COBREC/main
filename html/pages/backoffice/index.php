@@ -95,10 +95,10 @@ try {
           <h2 class="content-section__title">Articles en lignes</h2>
 
           <div class="tabs">
-            <div class="tabs__item tabs__item--active">------</div>
-            <div class="tabs__item">-----</div>
-            <div class="tabs__item">---------</div>
-            <div class="tabs__item">-------</div>
+            <div class="tabs__item tabs__item--active">En ligne</div>
+            <div class="tabs__item">Hors ligne</div>
+            <div class="tabs__item">Ébauche</div>
+            <div class="tabs__item">Épuisé</div>
           </div>
 
           <div class="filters">
