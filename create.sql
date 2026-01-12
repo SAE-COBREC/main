@@ -892,6 +892,42 @@ BEFORE UPDATE on _reduction
 FOR EACH ROW
 EXECUTE PROCEDURE produit_deja_en_reduction_update();
 
+
+
+CREATE FUNCTION produit_deja_en_promotion_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM * FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
+    IF FOUND THEN
+        DELETE FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tgr_produit_deja_en_promotion_insert
+BEFORE INSERT on _promotion
+FOR EACH ROW
+EXECUTE PROCEDURE produit_deja_en_promotion_insert();
+
+CREATE FUNCTION produit_deja_en_promotion_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (NEW.id_produit != OLD.id_produit) THEN
+        PERFORM * FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
+        IF FOUND THEN
+            DELETE FROM cobrec1._promotion WHERE id_produit = NEW.id_produit;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tgr_produit_deja_en_promotion_update
+BEFORE UPDATE on _promotion
+FOR EACH ROW
+EXECUTE PROCEDURE produit_deja_en_promotion_update();
+
 -- ============================================
 -- PEUPLEMENT DE LA BASE DE DONNÉES
 -- ============================================
