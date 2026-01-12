@@ -130,6 +130,22 @@ $filtres = [
     'enStockSeulement' => $enStockSeulement
 ];
 
+// Récupération de la recherche vendeur
+$rechercheVendeur = $_POST['vendeur'] ?? '';
+
+// Charger les produits depuis la BDD
+$donnees = chargerProduitsBDD($connexionBaseDeDonnees);
+$listeProduits = $donnees['produits'];
+$listeCategories = $donnees['categories'];
+
+// Si une recherche vendeur est effectuée, filtrer les résultats
+if (!empty(trim($rechercheVendeur))) {
+    $listeProduits = ProduitDenominationVendeur1($connexionBaseDeDonnees, trim($rechercheVendeur));
+}
+
+$totalProduitsSansFiltre = count($listeProduits);
+
+
 //appliquer les filtres et le tri sélectionnés via les fonctions
 $listeProduits = filtrerProduits($listeProduits, $filtres);
 $listeProduits = trierProduits($listeProduits, $triSelection);
@@ -244,10 +260,17 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                     </select>
                 </section>
 
-                <div class="search-container" style="justify-content: normal;">
+                <!-- <div class="search-container" style="justify-content: normal;">
                     <img src="/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
                     <input type="text" placeholder="Rechercher vendeur..." class="search-input">
+                </div> -->
+
+                <div class="search-container" style="justify-content: normal;">
+                    <img src="/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
+                    <input type="text" id="searchVendeur" name="vendeur" placeholder="Rechercher vendeur..."
+                        class="search-input" value="<?= htmlspecialchars($_POST['vendeur'] ?? '') ?>">
                 </div>
+
 
                 <section class="no-hover">
                     <h4 style="padding-top: 1em;">Prix</h4>
@@ -525,6 +548,30 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                     'Erreur lors de l\'ajout au panier');
             });
     }
+
+    // Gestion de la recherche vendeur
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('searchVendeur');
+
+        if (searchInput) {
+            // Recherche en temps réel (500ms après la dernière frappe)
+            let timeoutId;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    document.getElementById('filterForm').submit();
+                }, 500);
+            });
+
+            // Recherche sur Enter
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('filterForm').submit();
+                }
+            });
+        }
+    });
     </script>
 </body>
 
