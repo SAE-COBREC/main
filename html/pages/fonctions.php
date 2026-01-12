@@ -1154,30 +1154,53 @@ function preparercategories_affichage($listeCategories)
 //fonction pour trier les produits selon le critère choisi
 function trierProduits($listeProduits, $tri_par)
 {
+    if (empty($listeProduits)) {
+        return $listeProduits;
+    }
+
     switch ($tri_par) {
-        case 'meilleures_ventes':
-            usort($listeProduits, function ($a, $b) {
-                return ($b['p_nb_ventes'] ?? 0) - ($a['p_nb_ventes'] ?? 0);
-            });
-            break;
         case 'prix_croissant':
+            // Trier par prix croissant (prix avec réduction appliquée)
             usort($listeProduits, function ($a, $b) {
-                return ($a['p_prix'] ?? 0) - ($b['p_prix'] ?? 0);
+                $discountA = (float)($a['reduction_pourcentage'] ?? 0);
+                $prixA = $a['p_prix'] * (1 - $discountA/100);
+                
+                $discountB = (float)($b['reduction_pourcentage'] ?? 0);
+                $prixB = $b['p_prix'] * (1 - $discountB/100);
+                
+                return $prixA <=> $prixB;
             });
             break;
         case 'prix_decroissant':
+            // Trier par prix décroissant
             usort($listeProduits, function ($a, $b) {
-                return ($b['p_prix'] ?? 0) - ($a['p_prix'] ?? 0);
+                $discountA = (float)($a['reduction_pourcentage'] ?? 0);
+                $prixA = $a['p_prix'] * (1 - $discountA/100);
+                
+                $discountB = (float)($b['reduction_pourcentage'] ?? 0);
+                $prixB = $b['p_prix'] * (1 - $discountB/100);
+                
+                return $prixB <=> $prixA;
             });
             break;
         case 'note':
+            // Trier par note (la plus élevée en premier)
             usort($listeProduits, function ($a, $b) {
-                $noteA = $a['note_moyenne'] ?? 0;
-                $noteB = $b['note_moyenne'] ?? 0;
-                return $noteB - $noteA;
+                $noteA = (float)($a['note_moyenne'] ?? 0);
+                $noteB = (float)($b['note_moyenne'] ?? 0);
+                return $noteB <=> $noteA;
+            });
+            break;
+        case 'meilleures_ventes':
+        default:
+            usort($listeProduits, function ($produitA, $produitB) {
+                $nombreVentesA = (int)($produitA['p_nbventes'] ?? 0);
+                $nombreVentesB = (int)($produitB['p_nbventes'] ?? 0);
+                return $nombreVentesB <=> $nombreVentesA;
             });
             break;
     }
+
     return $listeProduits;
 }
 
