@@ -11,194 +11,188 @@
 #define BUFFER_SIZE 256
 #define FICHIER_COMMANDES "commandes.txt"
 
-int chercher_commande(int id_commande, int *max_bordereau) {
+int chercher_commande(int id_commande, int *max_bordereau)
+{
     *max_bordereau = 0;
     FILE *f = fopen(FICHIER_COMMANDES, "r");
-    if (f == NULL) {
+    if (f == NULL)
         return -1;
-    }
 
     int cmd, bordereau, resultat = -1, st;
-    char login[64], mdp[64];
-
-    while (fscanf(f, "%d;%d;%d;\n", &cmd, &bordereau, &st) == 3) {
-        if (*max_bordereau < bordereau) {
+    while (fscanf(f, "%d;%d;%d;\n", &cmd, &bordereau, &st) == 3)
+    {
+        if (*max_bordereau < bordereau)
             *max_bordereau = bordereau;
-        }
-        if (cmd == id_commande) {
+        if (cmd == id_commande)
+        {
             resultat = bordereau;
-            *max_bordereau = bordereau;
+            *max_bordereau = bordereau; // mise à jour du max même si trouvé
         }
     }
-    printf("num:commande: %d \n",resultat);
     fclose(f);
     return resultat;
 }
 
-void enregistrer_commande(int id_commande, int bordereau, int status) {
+void enregistrer_commande(int id_commande, int bordereau, int status)
+{
     FILE *f = fopen(FICHIER_COMMANDES, "a");
-    if (f != NULL) {
+    if (f != NULL)
+    {
         fprintf(f, "%d;%d;%d;\n", id_commande, bordereau, status);
         fclose(f);
-    } else {
-        perror("erreur ouverture");
     }
+    else
+        perror("erreur ouverture");
 }
 
-int chercher_status_par_bordereau(int bordereau_recherche, int *status) {
+int chercher_status_par_bordereau(int bordereau_recherche, int *status)
+{
     FILE *f = fopen(FICHIER_COMMANDES, "r");
-    if (f == NULL) return -1;
+    if (f == NULL)
+        return -1;
 
     int cmd, bordereau, st;
-    char login[64], mdp[64];
-    while (fscanf(f, "%d;%d;%d; \n", &cmd, &bordereau, &st) == 3) {
-        if (bordereau == bordereau_recherche) {
+    while (fscanf(f, "%d;%d;%d; \n", &cmd, &bordereau, &st) == 3)
+    {
+        if (bordereau == bordereau_recherche)
+        {
             *status = st;
             fclose(f);
-            printf("Ligne lue: cmd=%d, bordereau=%d, st=%d\n",
-            cmd, bordereau, st);
-
             return 0;
         }
     }
-
     fclose(f);
     return -1;
 }
 
-
-
-int main() {
-    int server_fd, client_fd;
+int main()
+{
+    int sock, client_fd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
     char buffer[BUFFER_SIZE];
-    char buffer2[BUFFER_SIZE];
-    char buffer3[BUFFER_SIZE];
+    int opt = 1;
 
-
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd < 0) {
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) // si l'initialisatio na échoué erreur de socket
+    {
         perror("socket");
         return 1;
     }
 
-    int opt = 1;
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
+    {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
 
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
 
-    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+    if (bind(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    {
         perror("bind");
-        close(server_fd);
+        close(sock);
         return 1;
     }
 
-    if (listen(server_fd, 5) < 0) {
+    if (listen(sock, 5) < 0)
+    {
         perror("listen");
-        close(server_fd);
+        close(sock);
         return 1;
     }
 
     printf("Serveur en écoute sur le port %d\n", PORT);
 
-    while (1) {
-        client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
-        if (client_fd < 0) {
+    while (1)
+    {
+        printf("En attente de connexion...\n");
+        client_fd = accept(sock, (struct sockaddr *)&client_addr, &client_len); // attend que le client se connecte pour boucler
+        if (client_fd < 0)
+        {
             perror("accept");
             continue;
         }
 
-        // CREATE_LABEL
-        memset(buffer2, 0, BUFFER_SIZE);
-        ssize_t n = read(client_fd, buffer, BUFFER_SIZE - 1);
-        if (n <= 0) {
-            close(client_fd);
-            continue;
-        }
+        printf("Client connecté.\n");
 
-        char *ligne_cmd = strtok(buffer, "\r\n");
-        if (!ligne_cmd) {
-            close(client_fd);
-            continue;
-        }
+        do
+        {
+            memset(buffer, 0, BUFFER_SIZE); // nettoie le buffer
+            ssize_t n = read(client_fd, buffer, BUFFER_SIZE - 1);
 
-        if (strncmp(ligne_cmd, "CREATE_LABEL ", 12) == 0) {
-            int id_commande = atoi(ligne_cmd + 12);
-            int max_bordereau = 0;
-            int status = 0;
-            int bordereau = chercher_commande(id_commande, &max_bordereau);
-            int already = 0;
-
-            if (bordereau < 0) {
-
-                bordereau = max_bordereau + 1;
-                enregistrer_commande(id_commande, bordereau, status);
-                already = 0;
-                printf("Nouveau: commande %d -> bordereau %d\n",
-                       id_commande, bordereau);
-            } else {
-
-                already = 1;
-                printf("Existant: commande %d -> bordereau %d\n",
-                       id_commande, bordereau);
+            if (n <= 0) // si le client c'est déco
+            {
+                // on quitte la boucle et on arrete le programme
+                break;
             }
 
-            char response[BUFFER_SIZE];
-            snprintf(response, sizeof(response),
-                     "OK LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
-                     bordereau, already);
-            write(client_fd, response, strlen(response));
-        } else {
-            const char *rep = "ERREUR\n";
-            write(client_fd, rep, strlen(rep));
-        }
-        // STATUS
+            char *ligne = strtok(buffer, "\r\n");
+            if (!ligne)
+                continue;
 
-    memset(buffer2, 0, BUFFER_SIZE);
-    n = read(client_fd, buffer2, BUFFER_SIZE - 1);
+            if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
+            {
+                int id_commande = atoi(ligne + 13);
+                int max_bordereau = 0;
+                int bordereau = chercher_commande(id_commande, &max_bordereau);
+                int already = 0;
 
-        if (n <= 0) {
-            close(client_fd);
-            continue;
-        }
+                if (bordereau < 0)
+                {
+                    bordereau = max_bordereau + 1;
+                    enregistrer_commande(id_commande, bordereau, 0); // status a 0 par défaut
+                    already = 0;
+                    printf("Nouveau: commande %d -> bordereau %d\n", id_commande, bordereau);
+                }
+                else
+                {
+                    already = 1;
+                    printf("Existant: commande %d -> bordereau %d\n", id_commande, bordereau);
+                }
 
-        char *ligne_status = strtok(buffer2, "\r\n");
-        
-        fflush(stdout);
-
-
-        if (!ligne_status) {
-            close(client_fd);
-            continue;
-        }
-
-        if (strncmp(ligne_status, "STATUS ", 7) == 0) {
-            int label = atoi(ligne_status + 7);
-            int step = 0;
-            int ret = chercher_status_par_bordereau(label, &step);
-
-            if (ret != 0) {
-                const char *rep = "ERROR UNKNOWN_PARCEL\n";
-                write(client_fd, rep, strlen(rep));
-            } else {
-                const char *libelle = "Chez Alizon"; 
                 char response[BUFFER_SIZE];
                 snprintf(response, sizeof(response),
-                        "OK STEP=%d LABEL_STEP=\"%s\"\n", step, libelle);
+                         "OK LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
+                         bordereau, already);
                 write(client_fd, response, strlen(response));
             }
-        } else {
-            const char *rep = "ERROR UNKNOWN_COMMAND\n";
-            write(client_fd, rep, strlen(rep));
-        }
+            else if (strncmp(ligne, "STATUS ", 7) == 0)
+            {
+                int label = atoi(ligne + 7);
+                int step = 0;
+                int ret = chercher_status_par_bordereau(label, &step);
 
+                if (ret != 0)
+                {
+                    const char *rep = "ERROR UNKNOWN_PARCEL\nAucune commande trouvé.";
+                    write(client_fd, rep, strlen(rep));
+                }
+                else
+                {
+                    const char *libelle = "Chez Alizon";
+                    char response[BUFFER_SIZE];
+                    snprintf(response, sizeof(response),
+                             "OK STEP=%d LABEL_STEP=\"%s\"\n", step, libelle);
+                    write(client_fd, response, strlen(response));
+                }
+            }
+            else
+            {
+                // Commande inconnue
+                const char *rep = "ERROR UNKNOWN_COMMAND\nLa commande que vous avez tapez n'existe pas.\n";
+                write(client_fd, rep, strlen(rep));
+            }
 
+        } while (1);
+
+        printf("Client déconnecté.\n");
+        close(client_fd);
     }
 
-    close(server_fd);
+    close(sock);
     return 0;
 }
