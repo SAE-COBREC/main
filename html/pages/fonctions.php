@@ -1255,10 +1255,17 @@ function filtrerProduits($listeProduits, $filtres)
 {
     $produits_filtres = [];
     foreach ($listeProduits as $produitCourant) {
-        // Calculer le prix final (avec réduction si applicable)
+        // Calculer le prix final (avec réduction et TVA)
         $prixBase = (float)($produitCourant['p_prix'] ?? 0);
         $reduction = (float)($produitCourant['reduction_pourcentage'] ?? 0);
-        $prixFinal = $reduction > 0 ? $prixBase * (1 - $reduction / 100) : $prixBase;
+        $tva = (float)($produitCourant['tva'] ?? 0);
+
+        // Prix HT après réduction
+        $prixHT = $reduction > 0 ? $prixBase * (1 - $reduction / 100) : $prixBase;
+
+        // Prix TTC (avec TVA)
+        $prixFinal = $prixHT * (1 + $tva / 100);
+
         
         // Filtrer par prix (utiliser le prix avec réduction si applicable)
         if ($prixFinal > $filtres['prixMaximum'])
