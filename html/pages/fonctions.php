@@ -1417,7 +1417,15 @@ function rechercheNom($pdo, $nomProduit) {
                  v.denomination, v.raison_sociale
         ORDER BY p.id_produit
     ";
+    $nomProduit = formaterNomProduit($nomProduit);
     $stmt = $pdo->prepare($reqNom);
     $stmt->execute(['nomProduit' => '%' . $nomProduit . '%']);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function formaterNomProduit($nomProduit) {
+    $nomProduit = trim($nomProduit);
+    $nomProduit = preg_replace('/\s+/', ' ', $nomProduit);
+    $nomProduit = htmlspecialchars($nomProduit, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    return $nomProduit;
 }
