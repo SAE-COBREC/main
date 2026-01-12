@@ -4303,3 +4303,12 @@ UPDATE _vendeur SET nb_produits_crees = 7 WHERE id_vendeur = 3;
 UPDATE cobrec1._produit SET p_note = 0;
 
 UPDATE cobrec1._commentaire SET a_note = 0.0;
+
+--------------------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS _bordereau;
+
+CREATE TABLE _bordereau (
+    id_bordereau int NOT NULL PRIMARY KEY,
+    id_commande int NOT NULL,
+    etat_suivis int NOT NULL
+);
