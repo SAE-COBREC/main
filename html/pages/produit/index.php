@@ -65,6 +65,20 @@ $idProduit = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // 3. Traitement POST (AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Si PHP n'a pas rempli $_POST (ex: requête JSON ou autre Content-Type), essayer de parser le corps
+    if (empty($_POST)) {
+        $rawBody = file_get_contents('php://input');
+        $ct = $_SERVER['CONTENT_TYPE'] ?? '';
+        if ($rawBody) {
+            if (stripos($ct, 'application/json') !== false) {
+                $decoded = json_decode($rawBody, true);
+                if (is_array($decoded)) $_POST = $decoded;
+            } elseif (stripos($ct, 'application/x-www-form-urlencoded') !== false) {
+                parse_str($rawBody, $parsed);
+                if (is_array($parsed)) $_POST = $parsed;
+            }
+        }
+    }
     if (isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
         header('Content-Type: application/json');
         
@@ -84,6 +98,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['id_produit'])) {
         gererActionsAvis($pdo, $idClient, $idProduit);
     }
+    // Si aucun handler POST n'a répondu (pour éviter de renvoyer la page HTML complète),
+    // retourner un JSON d'erreur utile pour le debug.
+    header('Content-Type: application/json');
+    $raw = file_get_contents('php://input');
+    $hdrs = function_exists('getallheaders') ? getallheaders() : [];
+    // journaliser côté serveur pour debug
+    error_log('POST non traité dans produit/index.php - _POST: ' . json_encode(array_keys($_POST)) . ' CONTENT_TYPE:' . ($_SERVER['CONTENT_TYPE'] ?? '') );
+    echo json_encode([
+        'success' => false,
+        'message' => 'Aucun handler POST exécuté',
+        '_post_keys' => array_keys($_POST),
+        '_post' => $_POST,
+        '_raw' => $raw,
+        '_content_type' => $_SERVER['CONTENT_TYPE'] ?? null,
+        '_headers' => $hdrs
+    ]);
+    exit;
 }
 
 // 4. Chargement Données
@@ -509,10 +540,43 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
     <script>
         // Fonctions utilitaires
         async function fetchJson(url, options) {
-            const resp = await fetch(url, options || {});
-            if (!resp.ok) throw new Error('Erreur réseau');
-            return resp.json();
-        }
+                // Debug: journaliser le contenu du FormData envoyé (utile pour voir clés envoyées)
+                try {
+                    if (options && options.body && typeof FormData !== 'undefined' && options.body instanceof FormData) {
+                        for (const e of options.body.entries()) console.debug('AJAX POST', e[0], e[1]);
+                    }
+                } catch (err) { /* ignore */ }
+
+                const resp = await fetch(url, options || {});
+                // Lire le corps en texte d'abord pour diagnostiquer les erreurs côté serveur
+                const txt = await resp.text();
+                // Détecter redirections suivies automatiquement par fetch
+                if (resp.redirected || (resp.status >= 300 && resp.status < 400)) {
+                    const loc = resp.headers.get('Location') || '(location inconnue)';
+                    console.warn('Requête redirigée:', resp.status, loc);
+                    // fournir le HTML reçu pour debug
+                    throw new Error('Requête redirigée (HTTP ' + resp.status + '). Contenu: ' + txt.slice(0, 800));
+                }
+                if (!resp.ok) {
+                    // essayer à extraire un message JSON si présent
+                    try {
+                        const j = JSON.parse(txt);
+                        throw new Error(j.message || 'Erreur réseau');
+                    } catch (e) {
+                        throw new Error(txt || 'Erreur réseau');
+                    }
+                }
+                // tenter de parser JSON, tolérer BOM/espaces
+                const trimmed = txt.trim();
+                if (trimmed === '') return {};
+                try {
+                    return JSON.parse(trimmed);
+                } catch (e) {
+                    // inclure un extrait pour debug
+                    const snippet = trimmed.slice(0, 300);
+                    throw new Error('Réponse invalide du serveur: ' + snippet);
+                }
+            }
 
         function escapeHtml(str) {
             return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -605,8 +669,8 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 fd.append('id_produit', productId);
                 fd.append('id_avis', aid);
                 fd.append('value', value);
-                
-                fetchJson(window.location.href, { method: 'POST', body: fd })
+        
+                fetchJson('actions_avis.php', { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success && d.counts) {
                             rev.querySelector('.like-count').textContent = d.counts.a_pouce_bleu;
@@ -671,7 +735,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 fd.append('commentaire', txt);
                 fd.append('note', note);
                 
-                fetchJson(window.location.href, { method: 'POST', body: fd })
+                fetchJson('actions_avis.php', { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success) {
                             localStorage.setItem('pendingNotification', 'Avis publié');
@@ -704,7 +768,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                         fd.append('id_produit', productId);
                         fd.append('id_avis', rev.dataset.avisId);
                         
-                        fetchJson(window.location.href, { method: 'POST', body: fd })
+                        fetchJson('actions_avis.php', { method: 'POST', body: fd })
                             .then(d => {
                                 if (d.success) {
                                     localStorage.setItem('pendingNotification', 'Avis supprimé');
@@ -769,7 +833,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 fd.append('commentaire', newTxt);
                 fd.append('note', newNote);
                 
-                fetchJson(window.location.href, { method: 'POST', body: fd })
+                fetchJson('actions_avis.php', { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success) {
                             localStorage.setItem('pendingNotification', 'Avis modifié');
@@ -891,7 +955,7 @@ $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
                 fd.append('motif', motif);
                 fd.append('commentaire', comm);
 
-                fetchJson(window.location.href, { method: 'POST', body: fd })
+                fetchJson('actions_avis.php', { method: 'POST', body: fd })
                     .then(d => {
                         if (d.success) {
                             notify(d.message || 'Signalement envoyé', 'success');
