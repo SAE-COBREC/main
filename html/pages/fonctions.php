@@ -1335,7 +1335,7 @@ function recupInfoPourFactureArticle($pdo, $id_produit){
     return $donnees;
 }     
 
-function ProduitDenominationVendeur1($pdo, $denomination) {
+function ProduitDenominationVendeur($pdo, $denomination) {
     $reqDenomination = "
         SELECT DISTINCT ON (p.id_produit)
             p.id_produit,
@@ -1374,4 +1374,50 @@ function ProduitDenominationVendeur1($pdo, $denomination) {
     $donnees = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     return $donnees;
+}
+
+function rechercheNom($pdo, $nomProduit) {
+    $reqNom = "
+        SELECT 
+            p.id_produit,
+            p.p_nom,
+            p.p_description,
+            p.p_prix,
+            p.p_stock,
+            r.reduction_pourcentage,
+            t.montant_tva as tva,
+            pr.id_produit as estEnpromo,
+            COUNT(DISTINCT av.id_avis) FILTER (WHERE av.a_note IS NOT NULL) as nombre_avis,
+            ROUND(COALESCE(AVG(av.a_note) FILTER (WHERE av.a_note IS NOT NULL), 0)::numeric, 1) as note_moyenne,
+            COALESCE(
+                (SELECT i2.i_lien 
+                 FROM cobrec1._represente_produit rp2 
+                 LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image 
+                 WHERE rp2.id_produit = p.id_produit 
+                 LIMIT 1), 
+                '/img/photo/smartphone_xpro.jpg'
+            ) as image_url,
+            STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories,
+            v.denomination,
+            v.raison_sociale AS vendeur_nom
+        FROM cobrec1._produit p
+        INNER JOIN cobrec1._vendeur v ON p.id_vendeur = v.id_vendeur
+        LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit 
+            AND CURRENT_TIMESTAMP BETWEEN r.reduction_debut AND r.reduction_fin
+        LEFT JOIN cobrec1._promotion pr ON p.id_produit = pr.id_produit 
+            AND CURRENT_TIMESTAMP BETWEEN pr.promotion_debut AND pr.promotion_fin
+        LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
+        LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+        LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+        LEFT JOIN cobrec1._avis av ON p.id_produit = av.id_produit
+        WHERE p.p_nom ILIKE :nomProduit
+            AND p.p_statut = 'En ligne'
+        GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock,
+                 r.reduction_pourcentage, pr.id_produit, t.montant_tva,
+                 v.denomination, v.raison_sociale
+        ORDER BY p.id_produit
+    ";
+    $stmt = $pdo->prepare($reqNom);
+    $stmt->execute(['nomProduit' => '%' . $nomProduit . '%']);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
