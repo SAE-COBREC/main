@@ -167,6 +167,36 @@ $categories_affichage = preparercategories_affichage($listeCategories);
     .star-btn:hover {
         transform: scale(1.1);
     }
+
+    .price-input {
+        max-width: 150px;
+        padding: 12px 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        font-family: 'Poppins', sans-serif;
+        background-color: #fff;
+        color: #333;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .price-input:focus {
+        outline: none;
+        border-color: #000;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .price-input:hover {
+        border-color: #999;
+    }
+
+    /* Style des flèches du number input */
+    .price-input::-webkit-inner-spin-button,
+    .price-input::-webkit-outer-spin-button {
+        opacity: 1;
+        height: 40px;
+    }
     </style>
 </head>
 
@@ -186,6 +216,10 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                         <option value="prix_decroissant" <?= $triSelection === 'prix_decroissant' ? 'selected' : '' ?>>
                             Prix décroissant</option>
                         <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>Mieux notés</option>
+                        <option value="en_promotion" <?= $triSelection === 'en_promotion' ? 'selected' : '' ?>>
+                            En promotion</option>
+                        <option value="en_reduction" <?= $triSelection === 'en_reduction' ? 'selected' : '' ?>>
+                            En réduction</option>
                     </select>
                 </div>
 
@@ -223,8 +257,10 @@ $categories_affichage = preparercategories_affichage($listeCategories);
                     </div>
                     <div>
                         <span>0€</span>
-                        <input type="number" name="price" id="priceValue" step="0.01" min="0" max="<?= $prixMaximum ?>"
-                            value="<?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>" style="width:100px;">
+                        <input type="number" name="price" id="priceValue" class="price-input" step="1" min="0"
+                            max="<?= $prixMaximum ?>"
+                            value="<?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>">
+
                     </div>
                 </section>
 
