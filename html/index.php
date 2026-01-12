@@ -111,7 +111,16 @@ $listeProduits = trierProduits($listeProduits, $triSelection);
 
 $tousLesProduits = count($listeProduits);
 $categories_affichage = preparercategories_affichage($listeCategories);
-$prixMaximum = !empty($listeProduits) ? max(array_column($listeProduits, 'p_prix')) : 0;
+$prixMaximum = 0;
+if (!empty($listeProduits)) {
+    $prixMaximumHT = max(array_column($listeProduits, 'p_prix'));
+    foreach ($listeProduits as $produit) {
+        if ($produit['p_prix'] === $prixMaximumHT) {
+            $prixMaximum = round(calcPrixTVA($produit['id_produit'], $produit['tva'], $prixMaximumHT));
+            break;
+        }
+    }
+}
 $totalProduitsSansFiltre = count($donnees['produits']);
 ?>
 
