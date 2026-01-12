@@ -548,6 +548,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (age < 18) {
         dateInput.setCustomValidity('Vous devez avoir au moins 18 ans.');
         return false;
+      }else if (age > 130){
+          dateInput.setCustomValidity("Vous ne pouvez avoir plus de 130 ans.");
+          return false;
       }
       
       dateInput.setCustomValidity('');
