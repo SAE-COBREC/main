@@ -675,180 +675,334 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     ?>
 
     <script>
+    //attend que la page HTML soit complètement chargée avant d'exécuter le code
+    document.addEventListener('DOMContentLoaded', () => {
+        //récupère le champ caché qui stockera l'URL de l'image
+        const champCacheLienImage = document.getElementById('lien_image');
+        //récupère l'ID du client connecté depuis PHP
+        const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
+
+
+        //configure le système de drag & drop pour l'upload d'image
+        configurerUploadImage(champCacheLienImage, identifiantClientConnecte);
+
+
+        //affiche les notifications de succès ou d'erreur si elles existent
+        <?php if (isset($messageSucces) && $messageSucces !== null): ?>
+        //affiche une notification de succès
+        notify(<?= json_encode($messageSucces) ?>, 'success');
+        <?php endif; ?>
+
+
+        <?php if (isset($messageErreur) && $messageErreur !== null): ?>
+        //affiche une notification d'erreur
+        notify(<?= json_encode($messageErreur) ?>, 'error');
+        <?php endif; ?>
+    });
+
+
     //fonction pour ouvrir le modal de modification d'adresse
     function ouvrirModalModificationAdresse(id, num, adresse, pays, ville, codePostal, complement) {
+        //remplit le champ du numéro de rue
         document.getElementById('modification_num').value = num;
+        //remplit le champ caché de l'ID de l'adresse
         document.getElementById('modification_id_adresse').value = id;
+        //remplit le champ du pays
         document.getElementById('modification_pays').value = pays;
+        //remplit le champ de l'adresse
         document.getElementById('modification_adresse').value = adresse;
+        //remplit le champ de la ville
         document.getElementById('modification_ville').value = ville;
+        //remplit le champ du code postal
         document.getElementById('modification_code_postal').value = codePostal;
+        //remplit le champ du complément d'adresse
         document.getElementById('modification_complement').value = complement;
+        //affiche le modal de modification
         document.getElementById('modalModificationAdresse').style.display = 'block';
     }
 
+
     //fonction pour fermer le modal de modification d'adresse
     function fermerModalModificationAdresse() {
+        //cache le modal de modification
         document.getElementById('modalModificationAdresse').style.display = 'none';
     }
 
+
     //fonction pour ouvrir le modal d'ajout d'adresse
     function ouvrirModalAjoutAdresse() {
-        //réinitialiser les champs du formulaire
+        //réinitialise le champ du numéro de rue
         document.getElementById('ajout_num').value = '';
+        //réinitialise le champ de l'adresse
         document.getElementById('ajout_adresse').value = '';
+        //réinitialise le champ du pays
         document.getElementById('ajout_pays').value = '';
+        //réinitialise le champ de la ville
         document.getElementById('ajout_ville').value = '';
+        //réinitialise le champ du code postal
         document.getElementById('ajout_code_postal').value = '';
+        //réinitialise le champ du complément d'adresse
         document.getElementById('ajout_complement').value = '';
+        //affiche le modal d'ajout
         document.getElementById('modalAjoutAdresse').style.display = 'block';
     }
 
+
     //fonction pour fermer le modal d'ajout d'adresse
     function fermerModalAjoutAdresse() {
+        //cache le modal d'ajout
         document.getElementById('modalAjoutAdresse').style.display = 'none';
     }
 
-    const champCacheLienImage = document.getElementById('lien_image');
-    const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
 
+    //fonction pour prévisualiser une image depuis une URL saisie
     function previsualiserImageDepuisURL() {
+        //récupère le champ de saisie de l'URL
         const champSaisieURL = document.getElementById('url_image_input');
+        //récupère l'URL saisie et supprime les espaces
         const urlImageSaisie = champSaisieURL.value.trim();
 
+
+        //vérifie que l'utilisateur a bien saisi une URL
         if (!urlImageSaisie) {
+            //affiche un message d'erreur si le champ est vide
             alert('Veuillez saisir une URL d\'image');
             return;
         }
 
+
+        //vérifie que l'URL saisie est valide
         try {
+            //tente de créer un objet URL pour valider le format
             new URL(urlImageSaisie);
         } catch {
+            //affiche un message d'erreur si l'URL est invalide
             alert('URL invalide. Veuillez saisir une URL complète (ex: https://exemple.com/image.jpg)');
             return;
         }
 
+
+        //crée un nouvel objet Image pour tester le chargement
         const imageTest = new Image();
+        //fonction exécutée si l'image se charge correctement
         imageTest.onload = function() {
+            //récupère l'élément de l'image de profil actuelle
             const elementImageActuelle = document.getElementById('current-profile-image');
+            //vérifie si l'élément existe déjà
             if (elementImageActuelle) {
+                //met à jour la source de l'image existante
                 elementImageActuelle.src = urlImageSaisie;
             } else {
+                //crée une nouvelle image si elle n'existe pas
                 document.querySelector('.profile-image-container').innerHTML =
                     `<img src="${urlImageSaisie}" alt="Photo de profil" class="profile-image" id="current-profile-image">`;
             }
+            //récupère le champ caché qui stocke l'URL de l'image
+            const champCacheLienImage = document.getElementById('lien_image');
+            //sauvegarde l'URL dans le champ caché pour l'enregistrement
             champCacheLienImage.value = urlImageSaisie;
+            //informe l'utilisateur que l'image est chargée
             alert('Image chargée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.');
         };
+        //fonction exécutée si l'image ne peut pas être chargée
         imageTest.onerror = function() {
+            //affiche un message d'erreur si le chargement échoue
             alert(
-                'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.'
-            );
+                'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.');
         };
+        //démarre le chargement de l'image de test
         imageTest.src = urlImageSaisie;
     }
 
-    const zoneDepotFichier = document.getElementById('drop-zone');
-    const champSelectionFichier = document.getElementById('file-input');
-    const zoneApercuImage = document.getElementById('preview-zone');
-    const zoneStatutUpload = document.getElementById('upload-status');
 
-    zoneDepotFichier.addEventListener('click', () => champSelectionFichier.click());
+    //fonction principale pour configurer le système d'upload d'image
+    function configurerUploadImage(champCacheLienImage, identifiantClientConnecte) {
+        //récupère la zone de dépôt (drag & drop)
+        const zoneDepotFichier = document.getElementById('drop-zone');
+        //récupère le champ de sélection de fichier caché
+        const champSelectionFichier = document.getElementById('file-input');
+        //récupère la zone d'aperçu de l'image
+        const zoneApercuImage = document.getElementById('preview-zone');
+        //récupère la zone d'affichage du statut d'upload
+        const zoneStatutUpload = document.getElementById('upload-status');
 
-    function empecherComportementParDefaut(evenement) {
-        evenement.preventDefault();
-        evenement.stopPropagation();
+
+        //vérifie que tous les éléments nécessaires existent
+        if (!zoneDepotFichier || !champSelectionFichier || !zoneApercuImage || !zoneStatutUpload) {
+            //arrête la fonction si un élément manque
+            return;
+        }
+
+
+        //ouvre la fenêtre de sélection de fichier quand on clique sur la zone
+        zoneDepotFichier.addEventListener('click', () => champSelectionFichier.click());
+
+
+        //fonction pour empêcher le comportement par défaut du navigateur
+        function empecherComportementParDefaut(evenement) {
+            //empêche l'action par défaut (ouvrir l'image dans le navigateur)
+            evenement.preventDefault();
+            //arrête la propagation de l'événement
+            evenement.stopPropagation();
+        }
+
+
+        //liste des événements de drag & drop à gérer
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(nomEvenement => {
+            //empêche le comportement par défaut sur la zone de dépôt
+            zoneDepotFichier.addEventListener(nomEvenement, empecherComportementParDefaut);
+            //empêche le comportement par défaut sur toute la page
+            document.body.addEventListener(nomEvenement, empecherComportementParDefaut);
+        });
+
+
+        //ajoute un effet visuel quand on survole la zone avec un fichier
+        ['dragenter', 'dragover'].forEach(nomEvenement => {
+            //ajoute la classe CSS pour l'effet de survol
+            zoneDepotFichier.addEventListener(nomEvenement, () => zoneDepotFichier.classList.add('drag-over'));
+        });
+
+
+        //retire l'effet visuel quand on quitte la zone ou dépose le fichier
+        ['dragleave', 'drop'].forEach(nomEvenement => {
+            //retire la classe CSS de l'effet de survol
+            zoneDepotFichier.addEventListener(nomEvenement, () => zoneDepotFichier.classList.remove(
+                'drag-over'));
+        });
+
+
+        //gère le dépôt de fichier par drag & drop
+        zoneDepotFichier.addEventListener('drop', (evenement) => gererDepotFichier(evenement, champCacheLienImage,
+            identifiantClientConnecte, zoneApercuImage, zoneStatutUpload));
+        //gère la sélection de fichier par clic
+        champSelectionFichier.addEventListener('change', (evenement) => gererSelectionFichier(evenement,
+            champCacheLienImage, identifiantClientConnecte, zoneApercuImage, zoneStatutUpload));
     }
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(nomEvenement => {
-        zoneDepotFichier.addEventListener(nomEvenement, empecherComportementParDefaut);
-        document.body.addEventListener(nomEvenement, empecherComportementParDefaut);
-    });
 
-    ['dragenter', 'dragover'].forEach(nomEvenement => {
-        zoneDepotFichier.addEventListener(nomEvenement, () => zoneDepotFichier.classList.add('drag-over'));
-    });
-
-    ['dragleave', 'drop'].forEach(nomEvenement => {
-        zoneDepotFichier.addEventListener(nomEvenement, () => zoneDepotFichier.classList.remove('drag-over'));
-    });
-
-    zoneDepotFichier.addEventListener('drop', gererDepotFichier);
-    champSelectionFichier.addEventListener('change', gererSelectionFichier);
-
-    function gererDepotFichier(evenement) {
+    //fonction appelée quand un fichier est déposé dans la zone
+    function gererDepotFichier(evenement, champCacheLienImage, identifiantClientConnecte, zoneApercuImage,
+        zoneStatutUpload) {
+        //récupère les fichiers déposés
         const fichiersDePoses = evenement.dataTransfer.files;
-        if (fichiersDePoses.length > 0) envoyerFichierVersServeur(fichiersDePoses[0]);
+        //vérifie qu'au moins un fichier a été déposé
+        if (fichiersDePoses.length > 0) {
+            //envoie le premier fichier au serveur
+            envoyerFichierVersServeur(fichiersDePoses[0], champCacheLienImage, identifiantClientConnecte,
+                zoneApercuImage, zoneStatutUpload);
+        }
     }
 
-    function gererSelectionFichier(evenement) {
+
+    //fonction appelée quand un fichier est sélectionné par clic
+    function gererSelectionFichier(evenement, champCacheLienImage, identifiantClientConnecte, zoneApercuImage,
+        zoneStatutUpload) {
+        //récupère les fichiers sélectionnés
         const fichiersSelectionnes = evenement.target.files;
-        if (fichiersSelectionnes.length > 0) envoyerFichierVersServeur(fichiersSelectionnes[0]);
+        //vérifie qu'au moins un fichier a été sélectionné
+        if (fichiersSelectionnes.length > 0) {
+            //envoie le premier fichier au serveur
+            envoyerFichierVersServeur(fichiersSelectionnes[0], champCacheLienImage, identifiantClientConnecte,
+                zoneApercuImage, zoneStatutUpload);
+        }
     }
 
-    function envoyerFichierVersServeur(fichierImage) {
+
+    //fonction pour envoyer le fichier image au serveur
+    function envoyerFichierVersServeur(fichierImage, champCacheLienImage, identifiantClientConnecte, zoneApercuImage,
+        zoneStatutUpload) {
+        //vérifie que le fichier est bien une image
         if (!fichierImage.type.startsWith('image/')) {
-            afficherMessageStatut('Veuillez sélectionner une image valide (JPEG, PNG, GIF, WebP)', 'error');
+            //affiche un message d'erreur si ce n'est pas une image
+            afficherMessageStatut('Veuillez sélectionner une image valide (JPEG, PNG, GIF, WebP)', 'error',
+                zoneStatutUpload);
             return;
         }
 
+
+        //vérifie que la taille du fichier ne dépasse pas 5 MB
         if (fichierImage.size > 5 * 1024 * 1024) {
-            afficherMessageStatut('L\'image est trop volumineuse (max 5 MB)', 'error');
+            //affiche un message d'erreur si le fichier est trop volumineux
+            afficherMessageStatut('L\'image est trop volumineuse (max 5 MB)', 'error', zoneStatutUpload);
             return;
         }
 
+
+        //crée un objet FormData pour envoyer le fichier
         const donneesFormulaireUpload = new FormData();
+        //ajoute le fichier image aux données
         donneesFormulaireUpload.append('image', fichierImage);
+        //ajoute l'ID du client aux données
         donneesFormulaireUpload.append('id_client', identifiantClientConnecte);
 
+
+        //crée un lecteur de fichier pour afficher l'aperçu
         const lecteurFichier = new FileReader();
+        //fonction exécutée quand le fichier est lu
         lecteurFichier.onload = (evenement) => {
+            //affiche l'aperçu de l'image dans la zone prévue
             zoneApercuImage.innerHTML = `<img src="${evenement.target.result}" alt="Aperçu">`;
+            //récupère l'élément de l'image de profil actuelle
             const elementImageActuelle = document.getElementById('current-profile-image');
+            //met à jour l'image de profil si elle existe
             if (elementImageActuelle) elementImageActuelle.src = evenement.target.result;
         };
+        //lit le fichier comme une URL de données
         lecteurFichier.readAsDataURL(fichierImage);
 
-        afficherMessageStatut('Upload en cours...', 'success');
 
+        //affiche un message d'upload en cours
+        afficherMessageStatut('Upload en cours...', 'success', zoneStatutUpload);
+
+
+        //envoie la requête AJAX au serveur
         fetch('upload_image.php', {
+                //méthode POST pour envoyer les données
                 method: 'POST',
+                //données du formulaire avec le fichier
                 body: donneesFormulaireUpload
             })
+            //attend la réponse et la convertit en JSON
             .then(reponse => reponse.json())
+            //traite la réponse du serveur
             .then(donneesReponse => {
+                //vérifie si l'upload a réussi
                 if (donneesReponse.success) {
+                    //sauvegarde le chemin de l'image dans le champ caché
                     champCacheLienImage.value = donneesReponse.path;
+                    //affiche un message de succès
                     afficherMessageStatut(
                         'Image uploadée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.',
-                        'success');
+                        'success', zoneStatutUpload);
                 } else {
-                    afficherMessageStatut('Erreur: ' + donneesReponse.message, 'error');
+                    //affiche le message d'erreur retourné par le serveur
+                    afficherMessageStatut('Erreur: ' + donneesReponse.message, 'error', zoneStatutUpload);
                 }
             })
+            //capture les erreurs de la requête
             .catch(erreur => {
+                //affiche l'erreur dans la console du navigateur
                 console.error('Erreur:', erreur);
-                afficherMessageStatut('Erreur lors de l\'upload', 'error');
+                //affiche un message d'erreur à l'utilisateur
+                afficherMessageStatut('Erreur lors de l\'upload', 'error', zoneStatutUpload);
             });
     }
 
-    function afficherMessageStatut(messageTexte, typeMessage) {
+
+    //fonction pour afficher un message de statut d'upload
+    function afficherMessageStatut(messageTexte, typeMessage, zoneStatutUpload) {
+        //affiche le texte du message
         zoneStatutUpload.textContent = messageTexte;
+        //applique la classe CSS correspondant au type de message
         zoneStatutUpload.className = 'upload-status ' + typeMessage;
+        //rend la zone visible
+        zoneStatutUpload.style.display = 'block';
+        //si c'est un message de succès, le cache après 5 secondes
         if (typeMessage === 'success') {
+            //cache automatiquement le message après 5 secondes
             setTimeout(() => zoneStatutUpload.style.display = 'none', 5000);
         }
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        <?php if (isset($messageSucces) && $messageSucces !== null): ?>
-        notify(<?= json_encode($messageSucces) ?>, 'success');
-        <?php endif; ?>
-
-        <?php if (isset($messageErreur) && $messageErreur !== null): ?>
-        notify(<?= json_encode($messageErreur) ?>, 'error');
-        <?php endif; ?>
-    });
     </script>
     <script src="/js/notifications.js"></script>
 </body>
