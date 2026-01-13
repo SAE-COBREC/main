@@ -299,7 +299,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         </option>
 
                         <!--boucle sur toutes les catégories-->
-                        <?php foreach ($categories_affichage as $categorieCourante): ?>
+                        <?php foreach ($categoriesAffichage as $categorieCourante): ?>
                         <!--affiche chaque catégorie sauf "all"-->
                         <?php if ($categorieCourante['category'] !== 'all'): ?>
                         <option value="<?= htmlspecialchars($categorieCourante['category']) ?>"
