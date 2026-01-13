@@ -188,37 +188,24 @@ void change_status(PGconn *conn, int bordereau_recherche, int new_stat)
     snprintf(id_bordereau_bdd, sizeof(id_bordereau_bdd), "%d", bordereau_recherche);
     snprintf(new_status_bdd, sizeof(new_status_bdd), "%d", new_stat);
     const char *params[2] = {
-        id_bordereau_bdd,
-        new_status_bdd};
+        new_status_bdd,
+        id_bordereau_bdd};
 
-    PQexecParams(conn, "UPDATE cobrec1._bordereau SET etat_suivis = $1  WHERE id_bordereau = $2",
+    PGresult *res = PQexecParams(conn, "UPDATE cobrec1._bordereau SET etat_suivis = $1  WHERE id_bordereau = $2",
                  2,
                  NULL,
                  params,
                  NULL,
                  NULL,
                  0);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        fprintf(stderr, "Erreur UPDATE: %s\n", PQerrorMessage(conn));
+    }
+    PQclear(res);
 }
 
 int main()
 {
-    // initialisation de la variable de connexion
-    PGconn *conn;
-    // variable de la connexion a la base de donnée en local
-    conn = PQconnectdb(
-        "host=localhost "
-        "port=5432 "
-        "dbname=leo "
-        "user=leo "
-        "password=leo");
-
-    if (PQstatus(conn) != CONNECTION_OK) // si la connexion écouche
-    {
-        fprintf(stderr, "Erreur connexion: %s\n", PQerrorMessage(conn)); // print le message d'erreur renvoyé par PQerrorMessage
-        PQfinish(conn);                                                  // ferme la connexion a la base
-        return 1;
-    }
-
     int sock, client_fd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
@@ -272,6 +259,36 @@ int main()
 
         printf("Client connecté.\n");
 
+        // Fork
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("fork");
+            close(client_fd);
+            continue;
+        }
+        if (pid > 0) {
+            close(client_fd);
+            continue;
+        }
+        close(sock);
+
+        // Connexion à la base de données dans le processus fils
+        PGconn *conn;
+        conn = PQconnectdb(
+            "host=localhost "
+            "port=5432 "
+            "dbname=leo "
+            "user=leo "
+            "password=leo");
+
+        if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
+        {
+            fprintf(stderr, "Erreur connexion: %s\n", PQerrorMessage(conn));
+            PQfinish(conn);
+            close(client_fd);
+            exit(1);
+        }
+
         do
         {
             memset(buffer, 0, BUFFER_SIZE); // nettoie le buffer
@@ -316,7 +333,7 @@ int main()
                         printf("Nouveau bordereau : %d\n", bordereau);
                         // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
                         // init a 0 car le statut de départ est 0
-                        enregistrer_commande(conn, id_commande, bordereau, 0);
+                        enregistrer_commande(conn, id_commande, bordereau, 1);
 
                         // Ajouter la ligne dans script.bash pour ajouter la commande a cron
                         FILE *script = fopen(FICHIER_SCRIPT, "a");
@@ -365,8 +382,28 @@ int main()
                 int label = atoi(ligne + 10);
                 // récupere le statut actuel
                 int status_act = chercher_status_par_bordereau(conn, label);
-                //verifie si la commande est arrivé
+                //verifie si la commande est arrivée
                 if (status_act >= 5) {
+                    // Suppression de la ligne correspondante dans script.bash
+                    FILE *src = fopen(FICHIER_SCRIPT, "r");
+                    FILE *tmp = fopen("script_tmp.bash", "w");
+                    if (src && tmp) {
+                        char line[256];
+                        char pattern[64];
+                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000", label);
+                        while (fgets(line, sizeof(line), src)) {
+                            if (strstr(line, pattern) == NULL) {
+                                fputs(line, tmp);
+                            }
+                        }
+                        fclose(src);
+                        fclose(tmp);
+                        remove(FICHIER_SCRIPT);
+                        rename("script_tmp.bash", FICHIER_SCRIPT);
+                    } else {
+                        if (src) fclose(src);
+                        if (tmp) fclose(tmp);
+                    }
                     const char *msg = "COMMANDE FINI\n";
                     write(client_fd, msg, strlen(msg));
                 //incremente le status
@@ -376,7 +413,7 @@ int main()
 
                     char response[BUFFER_SIZE];
                     snprintf(response, sizeof(response),
-                            "OK STEP=%d\n", new_status);
+                            "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
                     write(client_fd, response, strlen(response));
                 } else if (status_act == -2) {
                     const char *msg = "ERREUR, aucune commande trouvee\n";
@@ -396,8 +433,9 @@ int main()
 
         printf("Client déconnecté.\n");
         close(client_fd);
+        PQfinish(conn); // coupe la connexion a postgresql
+        exit(0); // Termine le processus fils proprement
     }
-    PQfinish(conn); // coupe la connexion a postgresql
     close(sock);
     return 0;
 }
