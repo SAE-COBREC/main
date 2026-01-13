@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 priceEl.value = maxVal;
             }
             document.getElementById('searchVendeur').value = '';
+            document.getElementById('nomChercher').value = maxVal;
             document.getElementById('inputNoteMin').value = '0';
             document.getElementById('triSelect').value = 'meilleures_ventes';
             document.getElementById('stockOnlyCheckbox').checked = false;
@@ -161,3 +162,27 @@ function ajouterAuPanier(idProduit) {
                 'Erreur lors de l\'ajout au panier');
         });
 }
+
+// Gestion de la recherche vendeur
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchVendeur');
+
+    if (searchInput) {
+        // Recherche en temps réel (500ms après la dernière frappe)
+        let timeoutId;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                document.getElementById('filterForm').submit();
+            }, 500);
+        });
+
+        // Recherche sur Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('filterForm').submit();
+            }
+        });
+    }
+});
