@@ -208,9 +208,9 @@ int main()
     conn = PQconnectdb(
         "host=localhost "
         "port=5432 "
-        "dbname=base_sae "
-        "user=nom_utilisateur "
-        "password=motdepasse");
+        "dbname=leo "
+        "user=leo "
+        "password=leo");
 
     if (PQstatus(conn) != CONNECTION_OK) // si la connexion écouche
     {
@@ -317,6 +317,16 @@ int main()
                         // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
                         // init a 0 car le statut de départ est 0
                         enregistrer_commande(conn, id_commande, bordereau, 0);
+
+                        // Ajouter la ligne dans script.bash pour ajouter la commande a cron
+                        FILE *script = fopen(FICHIER_SCRIPT, "a");
+                        if (script != NULL) {
+                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
+                            fclose(script);
+                            printf("Ajouté au script: STATUS_UP %d\n", bordereau);
+                        } else {
+                            perror("Erreur ouverture script.bash");
+                        }
                     }
                 }
 
@@ -347,6 +357,33 @@ int main()
                     snprintf(response, sizeof(response),
                              "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
                     write(client_fd, response, strlen(response));
+                }
+            }
+            // STAT evo
+
+            else if (strncmp(ligne, "STATUS_UP", 9) == 0) {
+                int label = atoi(ligne + 10);
+                // récupere le statut actuel
+                int status_act = chercher_status_par_bordereau(conn, label);
+                //verifie si la commande est arrivé
+                if (status_act >= 5) {
+                    const char *msg = "COMMANDE FINI\n";
+                    write(client_fd, msg, strlen(msg));
+                //incremente le status
+                } else if (status_act >= 0) {
+                    int new_status = status_act + 1;  
+                    change_status(conn, label, new_status);
+
+                    char response[BUFFER_SIZE];
+                    snprintf(response, sizeof(response),
+                            "OK STEP=%d\n", new_status);
+                    write(client_fd, response, strlen(response));
+                } else if (status_act == -2) {
+                    const char *msg = "ERREUR, aucune commande trouvee\n";
+                    write(client_fd, msg, strlen(msg));
+                } else { // -1
+                    const char *msg = "ERREUR SELECT\n";
+                    write(client_fd, msg, strlen(msg));
                 }
             }
             else
