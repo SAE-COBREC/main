@@ -157,9 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $resultatSuppressionAdresse = supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $identifiantCompteClient);
 
             if ($resultatSuppressionAdresse['success']) {
-                $url = 'index.php?success=address_deleted';
-                echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
-                exit;
+                $messageSucces = "Votre adresse a été supprimée avec succès";
             } else {
                 $messageErreur = $resultatSuppressionAdresse['message'];
             }
@@ -808,7 +806,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         imageTest.onerror = function() {
             //affiche un message d'erreur si le chargement échoue
             alert(
-                'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.');
+                'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.'
+                );
         };
         //démarre le chargement de l'image de test
         imageTest.src = urlImageSaisie;
