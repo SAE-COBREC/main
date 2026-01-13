@@ -209,45 +209,25 @@ button {
   }
 }
 
-.barre {
+.steps, .steps2 {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  position: relative;
-  margin: 80px auto;
-  max-width: 1200px;
-  padding: 0 20px;
+  justify-content: space-around;
+  width: 1300px;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
-.barre::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 20px;
-  right: 20px;
-  height: 4px;
-  background-color: black;
-  transform: translateY(-50%);
-  z-index: 0;
+.steps2 {
+  width: 1400px;
+  margin-left: 150px;
 }
-
-.barre div {
-  width: 20px;
-  height: 20px;
-  background-color: black;
-  border-radius: 50%;
-  margin: 0;
-  z-index: 1;
-  position: relative;
-}
-
-.barre div p {
-  position: absolute;
-  top: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 12px;
-  margin: 0;
+.steps2 p {
+  width: 312px;
   text-align: center;
+}
+
+#steps {
+  width: 100%;
+  height: auto;
 }/*# sourceMappingURL=stylesPanier.css.map */
