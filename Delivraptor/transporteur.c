@@ -277,9 +277,9 @@ int main()
         conn = PQconnectdb(
             "host=localhost "
             "port=5432 "
-            "dbname=leo "
-            "user=leo "
-            "password=leo");
+            "dbname=saeadb "
+            "user=sae "
+            "password=kira13");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -338,7 +338,7 @@ int main()
                         // Ajouter la ligne dans script.bash pour ajouter la commande a cron
                         FILE *script = fopen(FICHIER_SCRIPT, "a");
                         if (script != NULL) {
-                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
+                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
                             fclose(script);
                             printf("Ajouté au script: STATUS_UP %d\n", bordereau);
                         } else {
@@ -390,7 +390,7 @@ int main()
                     if (src && tmp) {
                         char line[256];
                         char pattern[64];
-                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000", label);
+                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 10.253.5.101 9000", label);
                         while (fgets(line, sizeof(line), src)) {
                             if (strstr(line, pattern) == NULL) {
                                 fputs(line, tmp);
