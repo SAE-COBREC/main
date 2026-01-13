@@ -43,10 +43,9 @@ if (isset($_SESSION['idClient'])) {
 
         <div class="search-container">
             <form method="POST" class="search-form">
-                <input type="search" name="nomChercher"
+                <input type="search" id="nomChercher" name="nomChercher"
                     placeholder="Rechercher un produit (ex: Smartphone, Pull, Bracelet...)"
-                    value="<?= htmlspecialchars($search) ?>" autofocus>
-                <button type="submit">Rechercher</button>
+                    value="<?= htmlspecialchars($rechercheNom) ?>" autofocus>
             </form>
         </div>
 
