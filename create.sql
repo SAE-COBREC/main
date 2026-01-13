@@ -4234,7 +4234,140 @@ VALUES (1, '2025-11-05', 'Livré'),
     (6, NULL, 'En préparation');
 
 -- 23. AVIS
--- Supprimer
+-- Peuplement : on crée un avis par produit (lié à un client) avec note, titre, texte, pouces et timestamps
+INSERT INTO _avis (id_produit, id_client, a_texte, a_note, a_owner_token, a_pouce_bleu, a_pouce_rouge, a_nb_signalements, a_timestamp_creation, a_timestamp_modification, a_titre)
+SELECT p.id_produit,
+       ((row_number() OVER (ORDER BY p.id_produit)-1) % (SELECT COUNT(*) FROM _client)) + 1,
+       'Avis client sur le produit ' || p.id_produit || ' : Très satisfait(e) du produit ' || COALESCE(p.p_nom,''),
+       round((random()*4 + 1)::numeric,1),
+       md5(random()::text),
+       (CASE WHEN random() > 0.6 THEN 1 ELSE 0 END),
+       (CASE WHEN random() > 0.95 THEN 1 ELSE 0 END),
+       (CASE WHEN random() > 0.98 THEN 1 ELSE 0 END),
+       now() - (floor(random()*10000) || ' minutes')::interval,
+       now() - (floor(random()*9000) || ' minutes')::interval,
+       'Avis sur ' || COALESCE(p.p_nom,'produit ' || p.id_produit)
+FROM _produit p;
+
+-- Votes (pouces) : un vote par avis, votants choisis cycliquement parmi les clients (peut inclure l'auteur)
+INSERT INTO _vote_avis (id_client, id_avis, vote_type)
+SELECT ((row_number() OVER (ORDER BY a.id_avis)-1) % (SELECT COUNT(*) FROM _client)) + 1,
+       a.id_avis,
+       CASE WHEN random() > 0.4 THEN 'like' ELSE 'dislike' END
+FROM _avis a;
+
+-- Mise à jour des compteurs de pouces dans _avis (synchronise a_pouce_bleu/a_pouce_rouge avec _vote_avis)
+UPDATE _avis av
+SET a_pouce_bleu = COALESCE(v.cnt_like,0),
+    a_pouce_rouge = COALESCE(v.cnt_dislike,0)
+FROM (
+    SELECT id_avis,
+           SUM(CASE WHEN vote_type='like' THEN 1 ELSE 0 END) AS cnt_like,
+           SUM(CASE WHEN vote_type='dislike' THEN 1 ELSE 0 END) AS cnt_dislike
+    FROM _vote_avis
+    GROUP BY id_avis
+) v
+WHERE av.id_avis = v.id_avis;
+
+WITH lc AS (SELECT COUNT(*) AS cnt FROM _livraison)
+INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client)
+SELECT a.id_avis,
+       round((random()*4 + 1)::numeric,1),
+       ((row_number() OVER (ORDER BY a.id_avis)-1) % (SELECT cnt FROM lc)) + 1,
+       (random() > 0.7),
+       a.id_client
+FROM _avis a
+WHERE a.id_client IS NOT NULL
+LIMIT (SELECT cnt FROM lc);
+
+
+-- 23b. AVIS (ajout réaliste)
+-- Génère 1 à 3 avis par produit avec titres et textes variés, ajoute plusieurs votes par avis et crée des commentaires liés aux livraisons
+WITH
+titles AS (
+    SELECT unnest(ARRAY[
+        'Excellent, très satisfait',
+        'Bon produit, je recommande',
+        'Décevant, attendais mieux',
+        'Très bon rapport qualité/prix',
+        'Pas fiable sur le long terme',
+        'Super design et performant',
+        'Livraison rapide, produit conforme',
+        'Mauvaise qualité, à éviter',
+        'Très bon SAV',
+        'Produit correct pour le prix'
+    ]) AS title
+),
+bodies AS (
+    SELECT unnest(ARRAY[
+        'J''ai utilisé ce produit pendant 2 semaines et il est vraiment top. Aucun problème à signaler.',
+        'La finition est bonne mais la batterie se décharge vite. Je m''attendais à mieux.',
+        'Produit arrivé en retard et légèrement endommagé; le SAV a été réactif et a proposé une solution.',
+        'Très satisfaite, les fonctionnalités correspondent parfaitement à la description.',
+        'Prix correct mais qualité moyenne, semble fragile après quelques utilisations.',
+        'Parfait pour un usage quotidien, je recommande sans hésiter.',
+        'Le produit chauffe un peu mais reste utilisable; sinon très bien.',
+        'Mauvaise expérience, fonctionne mal au bout d''une semaine.',
+        'Excellente tenue dans le temps, je l''ai offert et la personne est ravie.',
+        'Bon achat, rapport qualité/prix intéressant pour ce tarif.'
+    ]) AS body
+),
+new_avis AS (
+    INSERT INTO _avis (id_produit, id_client, a_texte, a_note, a_owner_token, a_pouce_bleu, a_pouce_rouge, a_nb_signalements, a_timestamp_creation, a_timestamp_modification, a_titre)
+    SELECT p.id_produit,
+           (SELECT id_client FROM _client OFFSET (floor(random()* (SELECT COUNT(*) FROM _client))::int) LIMIT 1),
+           (SELECT body FROM bodies ORDER BY random() LIMIT 1),
+           round((random()*4 + 1)::numeric,1),
+           md5(random()::text),
+           0, 0, 0,
+           now() - (floor(random()*525600) || ' minutes')::interval,
+           now() - (floor(random()*525000) || ' minutes')::interval,
+           (SELECT title FROM titles ORDER BY random() LIMIT 1)
+    FROM _produit p,
+         generate_series(1, (floor(random()*3)+1)) gs
+    RETURNING id_avis, id_produit, id_client
+)
+INSERT INTO _vote_avis (id_client, id_avis, vote_type)
+SELECT (SELECT id_client FROM _client OFFSET (floor(random()* (SELECT COUNT(*) FROM _client))::int) LIMIT 1),
+       na.id_avis,
+       CASE WHEN random() > 0.35 THEN 'like' ELSE 'dislike' END
+FROM new_avis na
+CROSS JOIN generate_series(1,5) gs
+WHERE random() < 0.6;
+
+-- Mise à jour des compteurs de pouces dans _avis (synchronise a_pouce_bleu/a_pouce_rouge avec _vote_avis)
+UPDATE _avis av
+SET a_pouce_bleu = COALESCE(v.cnt_like,0),
+    a_pouce_rouge = COALESCE(v.cnt_dislike,0)
+FROM (
+    SELECT id_avis,
+           SUM(CASE WHEN vote_type='like' THEN 1 ELSE 0 END) AS cnt_like,
+           SUM(CASE WHEN vote_type='dislike' THEN 1 ELSE 0 END) AS cnt_dislike
+    FROM _vote_avis
+    GROUP BY id_avis
+) v
+WHERE av.id_avis = v.id_avis;
+
+-- Commentaires liés aux livraisons : on associe, au maximum, une livraison distincte par commentaire via un appariement par rang
+WITH na_ranked AS (
+    SELECT id_avis, id_client, ROW_NUMBER() OVER (ORDER BY id_avis) rn FROM new_avis
+),
+liv_ranked AS (
+    SELECT id_livraison, ROW_NUMBER() OVER (ORDER BY random()) rn FROM _livraison
+),
+pairs AS (
+    SELECT na.id_avis, na.id_client, l.id_livraison
+    FROM na_ranked na
+    JOIN liv_ranked l ON na.rn = l.rn
+)
+INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client)
+SELECT p.id_avis,
+       round((random()*4 + 1)::numeric,1),
+       p.id_livraison,
+       (random() > 0.6),
+       p.id_client
+FROM pairs p;
+
 
 -- 24. COMMENTAIRES (liés aux livraisons)
 -- Supprimer
