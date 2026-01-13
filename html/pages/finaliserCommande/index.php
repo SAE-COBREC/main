@@ -158,9 +158,11 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             $resultatAdresse = ajouterNouvelleAdresse($pdo, $nomPrenom["id_compte"], $_POST['numero'], $_POST['rue'], $_POST['ville'], $_POST['codePostal'], $_POST['complement']);
             insererFacture($pdo, $panierEnCours, $_POST['nom_destinataire'], $_POST['prenom_destinataire'], 
             $f_total_ht ?? 0, $f_total_remise ?? 0, $prixTotalFinal, $resultatAdresse['id_adresse']);
+            $_SESSION['finaliserCommande'] = $pdo->lastInsertId();
         } else {
             insererFacture($pdo, $panierEnCours, $nomPrenom["nom"], $nomPrenom["prenom"],
             $f_total_ht ?? 0, $f_total_remise ?? 0, $prixTotalFinal, $_POST['adresse']);
+            $_SESSION['finaliserCommande'] = $pdo->lastInsertId();
         }
 
         //on créer un session pour le panier qui vient d'être commandé car le panierEnCours on doit le supprimé pour éviter

@@ -1,0 +1,15 @@
+@use '../_variable.scss' as *;
+
+
+table{
+    border-collapse: collapse;
+    empty-cells: hide;
+}
+
+th, td{
+    padding: 10px;
+}
+
+td {
+  border: 1px solid;
+}

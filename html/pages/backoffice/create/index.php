@@ -942,13 +942,12 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                     $sql = '
                                     INSERT INTO cobrec1._represente_produit(id_produit,id_image)
                                     VALUES (
-                                    :idProduit,
-                                    '. $pdo->lastInsertId() . '
-                                    );
+                                    :idProduit, :idImage);
                                     ';
                                     $stmt = $pdo->prepare($sql);
                                     $params = [
-                                        'idProduit' => $id_produit
+                                        'idProduit' => $id_produit,
+                                        'idImage' => $pdo->lastInsertId()
                                     ];
                                     $stmt->execute($params);
                                 } catch (Exception $e) {
@@ -1143,13 +1142,14 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                             $sql = '
                             INSERT INTO cobrec1._represente_produit(id_produit,id_image)
                             VALUES (
-                            :getId, 
-                            '. $pdo->lastInsertId() . '
+                            :getId, :idImage
                             );
                             ';
                             $stmt = $pdo->prepare($sql);
                             $params = [
                                 'getId' => $_SESSION["creerArticle"]['_GET']['id_produit'],
+                                'idImage' => $pdo->lastInsertId()
+
                             ];
                             $stmt->execute($params);
                         } catch (Exception $e) {
