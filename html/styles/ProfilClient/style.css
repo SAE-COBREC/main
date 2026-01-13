@@ -534,7 +534,6 @@ main section:nth-of-type(4) article input[type=password]:focus {
   max-width: 720px;
   display: flex;
   align-items: center;
-  background-color: #F0F4F8;
   border-radius: 14px;
   padding: 8px 12px;
   box-sizing: border-box;
