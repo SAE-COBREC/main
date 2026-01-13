@@ -84,29 +84,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// ========================================
-// 🔥 SECTION UNIQUE DE CHARGEMENT DES PRODUITS
-// ========================================
-
 // Récupération des recherches
 $rechercheNom = $_GET['recherche'] ?? '';
 $rechercheVendeur = $_POST['vendeur'] ?? '';
 
-// 1. Charger tous les produits et catégories depuis la BDD
 $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
 $totalProduitsSansFiltre = count($listeProduits);
 
-// 2. Appliquer la recherche si présente (prioriser recherche nom)
-if (!empty(trim($rechercheNom))) {
-    // Recherche par nom de produit (depuis le header)
-    $listeProduits = rechercheNom($connexionBaseDeDonnees, trim($rechercheNom));
-    $totalProduitsSansFiltre = count($listeProduits);
-} elseif (!empty(trim($rechercheVendeur))) {
+if (!empty(trim($rechercheVendeur))) {
     // Recherche par vendeur (depuis le sidebar)
     $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, trim($rechercheVendeur));
     $totalProduitsSansFiltre = count($listeProduits);
+}
+
+// Récupération de la recherche
+$search = $_POST['nomChercher'] ?? '';
+
+if (!empty($search)) {
+    try {
+        $listeProduits = chercherProduitsNom($connexionBaseDeDonnees, $search);
+
+    } catch (PDOException $e) {
+        echo "<p style='color: red;'>Erreur lors de la recherche : " . htmlspecialchars($e->getMessage()) . "</p>";
+    }
 }
 
 // Calculer le prix TTC maximum
