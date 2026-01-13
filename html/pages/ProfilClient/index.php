@@ -850,7 +850,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         <?php endif; ?>
     });
     </script>
-    </script>
     <script src="/js/notifications.js"></script>
 </body>
 
