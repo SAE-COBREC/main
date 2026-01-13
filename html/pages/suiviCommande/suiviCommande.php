@@ -5,27 +5,18 @@ session_start();
 $id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? $_SESSION['id_commande'] ?? 0;
 
 function envoyerCommande($id_commande) {
-    $host = '10.253.5.101';
+    $host = '127.0.0.1';
     $port = 9000;
-    
-    $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if ($socket === false) {
-        return ['success' => false, 'error' => 'Erreur création socket', 'bordereau' => null];
+    $fp = @fsockopen($host, $port, $errno, $errstr, 2);
+    if (!$fp) {
+        return ['success' => false, 'error' => "Transporteur non disponible: $errstr ($errno)", 'bordereau' => null];
     }
-    
-    if (@socket_connect($socket, $host, $port) === false) {
-        socket_close($socket);
-        return ['success' => false, 'error' => 'Transporteur non disponible', 'bordereau' => null];
-    }
-    
     // Envoyer CREATE_LABEL
     $createCmd = "CREATE_LABEL $id_commande\n";
-    socket_write($socket, $createCmd, strlen($createCmd));
-    
+    fwrite($fp, $createCmd);
     // Lire la réponse
-    $response = socket_read($socket, 256);
-    socket_close($socket);
-    
+    $response = fgets($fp, 256);
+    fclose($fp);
     if (preg_match('/LABEL=(\d+)/', $response, $matches)) {
         $bordereau = (int)$matches[1];
         $already = preg_match('/ALREADY_EXISTS=1/', $response);
@@ -35,7 +26,6 @@ function envoyerCommande($id_commande) {
         }
         return ['success' => true, 'bordereau' => $bordereau, 'already' => $already, 'step' => $step];
     }
-    
     return ['success' => false, 'error' => 'Réponse invalide du transporteur', 'bordereau' => null];
 }
 
