@@ -1376,8 +1376,8 @@ function ProduitDenominationVendeur($pdo, $denomination) {
     return $donnees;
 }
 
-function rechercheNom($pdo, $nomProduit) {
-    $reqNom = "
+function chercherProduitsNom($pdo, $nomProduit) {
+    $reqNomProduit = "
         SELECT 
             p.id_produit,
             p.p_nom,
@@ -1387,16 +1387,17 @@ function rechercheNom($pdo, $nomProduit) {
             r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
-            COUNT(DISTINCT av.id_avis) FILTER (WHERE av.a_note IS NOT NULL) as nombre_avis,
-            ROUND(COALESCE(AVG(av.a_note) FILTER (WHERE av.a_note IS NOT NULL), 0)::numeric, 1) as note_moyenne,
-            COALESCE(
-                (SELECT i2.i_lien 
-                 FROM cobrec1._represente_produit rp2 
-                 LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image 
-                 WHERE rp2.id_produit = p.id_produit 
-                 LIMIT 1), 
-                '/img/photo/smartphone_xpro.jpg'
-            ) as image_url,
+            (SELECT COUNT(*) 
+             FROM cobrec1._avis av2 
+             WHERE av2.id_produit = p.id_produit AND av2.a_note IS NOT NULL) as nombre_avis,
+            (SELECT ROUND(COALESCE(AVG(av3.a_note), 0)::numeric, 1) 
+             FROM cobrec1._avis av3 
+             WHERE av3.id_produit = p.id_produit AND av3.a_note IS NOT NULL) as note_moyenne,
+            (SELECT COALESCE(i2.i_lien, '/img/photo/smartphone_xpro.jpg') 
+             FROM cobrec1._represente_produit rp2 
+             LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image 
+             WHERE rp2.id_produit = p.id_produit 
+             LIMIT 1) as image_url,
             STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories,
             v.denomination,
             v.raison_sociale AS vendeur_nom
@@ -1409,23 +1410,17 @@ function rechercheNom($pdo, $nomProduit) {
         LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
         LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
         LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
-        LEFT JOIN cobrec1._avis av ON p.id_produit = av.id_produit
         WHERE p.p_nom ILIKE :nomProduit
             AND p.p_statut = 'En ligne'
-        GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock,
-                 r.reduction_pourcentage, pr.id_produit, t.montant_tva,
+        GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
+                 p.p_statut, r.reduction_pourcentage, pr.id_produit, t.montant_tva,
                  v.denomination, v.raison_sociale
-        ORDER BY p.id_produit
+        ORDER BY p.p_nom ASC
     ";
-    $nomProduit = formaterNomProduit($nomProduit);
-    $stmt = $pdo->prepare($reqNom);
-    $stmt->execute(['nomProduit' => '%' . $nomProduit . '%']);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 
-function formaterNomProduit($nomProduit) {
-    $nomProduit = trim($nomProduit);
-    $nomProduit = preg_replace('/\s+/', ' ', $nomProduit);
-    $nomProduit = htmlspecialchars($nomProduit, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    return $nomProduit;
+    $stmt = $pdo->prepare($reqNomProduit);
+    $stmt->execute(['nomProduit' => "%$nomProduit%"]);
+    $donnees = $stmt->fetchAll();
+
+    return $donnees;
 }
