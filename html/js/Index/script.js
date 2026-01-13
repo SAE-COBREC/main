@@ -90,10 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('filterForm').submit();
         });
     }
-});
 
-//attend que la page HTML soit complètement chargée
-document.addEventListener('DOMContentLoaded', () => {
     //récupère le bouton pour effacer tous les filtres
     const clearBtn = document.getElementById('clearFiltersBtn');
     //vérifie que le bouton existe
@@ -118,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             //vide la barre de recherche vendeur
             document.getElementById('searchVendeur').value = '';
             //réinitialise le champ de recherche par nom
-            document.getElementById('nomChercher').value = maxVal;
+            document.getElementById('nomChercher').value = '';
             //remet la note minimum à 0
             document.getElementById('inputNoteMin').value = '0';
             //remet le tri sur "meilleures ventes"
@@ -136,10 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('filterForm').submit();
         });
     }
-});
 
-//attend que la page HTML soit complètement chargée
-document.addEventListener('DOMContentLoaded', () => {
     //récupère le widget des étoiles pour le filtre de note
     const widget = document.getElementById('starFilterWidget');
     //récupère le champ caché qui stocke la note sélectionnée

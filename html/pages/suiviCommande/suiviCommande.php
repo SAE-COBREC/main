@@ -1,21 +1,6 @@
 <?php
 session_start();
 
-
-$SIGNAL_FILE = '/tmp/php_signal.flag';
-$action_effectuee = false;
-
-if (file_exists($SIGNAL_FILE)) {
-    $timestamp = (int)file_get_contents($SIGNAL_FILE);
-    $dernier_check = isset($_SESSION['last_signal_check']) ? $_SESSION['last_signal_check'] : 0;
-    
-    if ($timestamp > $dernier_check) {
-        $_SESSION['last_signal_check'] = $timestamp;
-        $action_effectuee = true;
-    }
-}
-
-
 // Récupérer le num de commande
 $id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? $_SESSION['id_commande'] ?? 0;
 
@@ -54,33 +39,38 @@ function envoyerCommande($id_commande) {
     return ['success' => false, 'error' => 'Réponse invalide du transporteur', 'bordereau' => null];
 }
 
-// Recuperer le status
-function getStatus($bordereau) {
-    $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if ($socket === false) return null;
-    
-    if (@socket_connect($socket, '127.0.0.1', 9000) === false) {
-        socket_close($socket);
-        return null;
+function getStatusFromSocket($bordereau) {
+    $fp = fsockopen('127.0.0.1', 9000, $errno, $errstr, 2);
+    if (!$fp) {
+        return "Erreur de connexion: $errstr ($errno)";
     }
-    
-    socket_write($socket, "STATUS $bordereau\n");
-    $response = socket_read($socket, 256);
-    socket_close($socket);
-    
-    if (preg_match('/STEP=(\d+)/', $response, $m)) {
-        return (int)$m[1];
+    fwrite($fp, "STATUS $bordereau\n");
+    $response = fgets($fp, 256);
+    if (preg_match('/STEP=(\d+)/', $response, $matches)) {
+        $response = (int)$matches[1];
     }
-    return null;
+    fclose($fp);
+    return $response;
 }
 
-// Envoyer la commmande
 $resultat = null;
 $status = null;
 if ($id_commande > 0) {
-    $resultat = envoyerCommande($id_commande);
-    if ($resultat && $resultat['success'] && $resultat['bordereau']) {
-        $status = getStatus($resultat['bordereau']);
+    if (isset($_SESSION['bordereau']) && $_SESSION['id_commande'] == $id_commande) {
+        $bordereau = $_SESSION['bordereau'];
+        $resultat = [
+            'success' => true,
+            'bordereau' => $bordereau,
+            'already' => true,
+        ];
+        $status = getStatusFromSocket($bordereau);
+    } else {
+        $resultat = envoyerCommande($id_commande);
+        if ($resultat && $resultat['success'] && $resultat['bordereau']) {
+            $_SESSION['bordereau'] = $resultat['bordereau'];
+            $_SESSION['id_commande'] = $id_commande;
+            $status = getStatusFromSocket($resultat['bordereau']);
+        }
     }
 }
 ?>
@@ -135,39 +125,6 @@ if ($id_commande > 0) {
         </div>
 
     </body>
-   
-    <?php if ($resultat && $resultat['success']): ?>
-    <script>
-        const bordereau = <?= $resultat['bordereau'] ?>;
-        let lastCheck = Math.floor(Date.now() / 1000);
-        let lastStatus = document.getElementById('status-value').textContent;
-        
-        function checkForSignal() {
-            fetch('checkSignal.php?bordereau=' + bordereau + '&lastCheck=' + lastCheck)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.signal && data.status !== null) {
-                        // Signal reçu ! Mettre à jour le status
-                        lastCheck = data.timestamp;
-                        if (data.status != lastStatus) {
-                            lastStatus = data.status;
-                            document.getElementById('status-value').textContent = data.status;
-                            // Mettre à jour l'image
-                            document.getElementById('steps').src = '../../img/svg//Delivrator/' + data.status + 'steps.svg';
-                            console.log('🔔 Signal reçu ! Nouveau status:', data.status);
-                        }
-                    }
-                })
-                .catch(err => console.error('Erreur:', err));
-        }
-        
-        // Vérifier les signaux toutes les 2 secondes
-        setInterval(checkForSignal, 2000);
-        
-        // Premier check immédiat
-        checkForSignal();
-    </script>
-    <?php endif; ?>
     
     <?php include __DIR__ . '/../../partials/footer.html';?>
 </html>
