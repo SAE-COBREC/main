@@ -174,7 +174,7 @@ $sqlAvis = "
         co.nom,
         cl.c_pseudo,
         i.i_lien as client_image,
-        " . ($idClient ? "(SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM cobrec1._vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote" : "NULL as user_vote") . "
+        " . ($idClient ? "(SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM cobrec1._vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote, (SELECT CASE WHEN EXISTS(SELECT 1 FROM cobrec1._signale_avis sa JOIN cobrec1._envoie_signalement es ON es.id_signalement = sa.id_signalement JOIN cobrec1._client c ON es.id_compte = c.id_compte WHERE sa.id_avis = a.id_avis AND c.id_client = :cid) THEN true ELSE false END) as user_reported" : "NULL as user_vote, NULL as user_reported") . "
     FROM cobrec1._avis a
     LEFT JOIN cobrec1._client cl ON a.id_client = cl.id_client
     LEFT JOIN cobrec1._compte co ON cl.id_compte = co.id_compte
@@ -263,12 +263,18 @@ function renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer)
         $avatarUrl = $ta['client_image'] ?? null;
         ?>
         <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>" data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;position:relative;padding-right:44px;">
-            <button class="ghost btn-report-trigger" aria-label="Options avis" style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
-            </button>
-            <div class="report-dropdown" style="display:none;position:absolute;right:8px;top:44px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;z-index:60;min-width:160px;box-shadow:0 6px 18px rgba(0,0,0,.06)">
-                <button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l'avis</button>
-            </div>
+            <?php if (!($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) ))): ?>
+                <button class="ghost btn-report-trigger" aria-label="Options avis" style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+                </button>
+                <div class="report-dropdown" style="display:none;position:absolute;right:8px;top:44px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;z-index:60;min-width:160px;box-shadow:0 6px 18px rgba(0,0,0,.06)">
+                    <?php if (isset($ta['user_reported']) && $ta['user_reported']): ?>
+                        <button class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler le signalement</button>
+                    <?php else: ?>
+                        <button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l'avis</button>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
                 <?php if ($avatarUrl): ?>
                     <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
@@ -1100,6 +1106,40 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                     return;
                 }
 
+                if (e.target.closest('.btn-unreport-action')) {
+                    if (!idClient) {
+                        if (window.showError) showError('Connexion requise', 'Vous devez être connecté pour annuler un signalement.');
+                        else alert('Vous devez être connecté pour annuler un signalement.');
+                        document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
+                        return;
+                    }
+                    const rev = e.target.closest('.review');
+                    const aid = rev.dataset.avisId;
+                    const fd = new FormData();
+                    fd.append('action','unreport_avis');
+                    fd.append('id_produit', productId);
+                    fd.append('id_avis', aid);
+                    // effectuer l'annulation
+                    fetchJson('actions_avis.php', { method: 'POST', body: fd })
+                        .then(d => {
+                            if (d.success) {
+                                notify(d.message || 'Signalement annulé.', 'success');
+                                // remplacer le bouton par Signaler
+                                const dropdown = rev.querySelector('.report-dropdown');
+                                if (dropdown) dropdown.innerHTML = '<button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l\'avis</button>';
+                            } else {
+                                const msg = d.message || 'Impossible d\'annuler le signalement';
+                                if (window.showError) showError('Erreur', msg);
+                                else alert(msg);
+                            }
+                        })
+                        .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); else alert('Erreur réseau'); })
+                        .finally(() => { /* nothing */ });
+                    // hide dropdowns
+                    document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
+                    return;
+                }
+
                 if (e.target.closest('.btn-report-action')) {
                     if (!idClient) {
                         if (window.showError) showError('Connexion requise', 'Vous devez être connecté pour signaler un avis.');
@@ -1158,6 +1198,15 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                         if (d.success) {
                             notify(d.message || 'Signalement envoyé', 'success');
                             reportModal.style.display = 'none';
+                            // transformer le bouton en 'Annuler le signalement'
+                            try {
+                                const currentAid = reportAvisIdInput ? reportAvisIdInput.value : null;
+                                const rev = currentAid ? document.querySelector('.review[data-avis-id="' + currentAid + '"]') : null;
+                                if (rev) {
+                                    const dropdown = rev.querySelector('.report-dropdown');
+                                    if (dropdown) dropdown.innerHTML = '<button class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler le signalement</button>';
+                                }
+                            } catch (e) { /* silent */ }
                         } else {
                             const msg = d.message || 'Impossible d\'envoyer le signalement';
                             if (window.showError) showError('Erreur', msg);

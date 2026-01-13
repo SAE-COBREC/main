@@ -47,6 +47,17 @@ try {
         $idCompte = $stmtCompte->fetchColumn();
         if (!$idCompte) throw new Exception('Compte introuvable pour ce client.');
 
+        // Vérifier si ce compte a déjà signalé cet avis
+        $stmtCheck = $pdo->prepare("SELECT s.id_signalement FROM cobrec1._signalement s JOIN cobrec1._signale_avis sa ON sa.id_signalement = s.id_signalement JOIN cobrec1._envoie_signalement es ON es.id_signalement = s.id_signalement WHERE es.id_compte = :idc AND sa.id_avis = :ida LIMIT 1");
+        $stmtCheck->execute([':idc' => $idCompte, ':ida' => $idAvis]);
+        $existing = $stmtCheck->fetchColumn();
+        if ($existing) {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['success' => true, 'message' => 'Signalement déjà enregistré.', 'already' => true]);
+            exit;
+        }
+
         $pdo->beginTransaction();
         try {
             $stmtIns = $pdo->prepare("INSERT INTO cobrec1._signalement (id_compte, type_signalement, motif_signalement, commentaire_libre) VALUES (:idc, 'signale_avis', :motif, :comm) RETURNING id_signalement");
@@ -67,7 +78,63 @@ try {
 
         ob_clean();
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['success' => true, 'message' => 'Signalement envoyé.']);
+        echo json_encode(['success' => true, 'message' => 'Signalement envoyé.', 'created' => true]);
+        exit;
+    }
+
+    if ($action === 'unreport_avis') {
+        if (!$idClient) {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['success' => false, 'message' => 'Connexion requise pour annuler un signalement.']);
+            exit;
+        }
+
+        $idAvis = (int)($_POST['id_avis'] ?? 0);
+        if ($idAvis <= 0) throw new Exception('Avis invalide.');
+
+        $stmtCompte = $pdo->prepare('SELECT id_compte FROM cobrec1._client WHERE id_client = :cid');
+        $stmtCompte->execute([':cid' => $idClient]);
+        $idCompte = $stmtCompte->fetchColumn();
+        if (!$idCompte) throw new Exception('Compte introuvable pour ce client.');
+
+        // Trouver le signalement existant
+        $stmtFind = $pdo->prepare("SELECT s.id_signalement FROM cobrec1._signalement s JOIN cobrec1._signale_avis sa ON sa.id_signalement = s.id_signalement JOIN cobrec1._envoie_signalement es ON es.id_signalement = s.id_signalement WHERE es.id_compte = :idc AND sa.id_avis = :ida LIMIT 1");
+        $stmtFind->execute([':idc' => $idCompte, ':ida' => $idAvis]);
+        $idSignal = $stmtFind->fetchColumn();
+        if (!$idSignal) {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['success' => true, 'message' => 'Aucun signalement trouvé.']);
+            exit;
+        }
+
+        $pdo->beginTransaction();
+        try {
+            $stmtDel1 = $pdo->prepare('DELETE FROM cobrec1._signale_avis WHERE id_signalement = :ids AND id_avis = :ida');
+            $stmtDel1->execute([':ids' => $idSignal, ':ida' => $idAvis]);
+
+            $stmtDel2 = $pdo->prepare('DELETE FROM cobrec1._envoie_signalement WHERE id_signalement = :ids AND id_compte = :idc');
+            $stmtDel2->execute([':ids' => $idSignal, ':idc' => $idCompte]);
+
+            // Supprimer l'entrée signalement si plus de liens
+            $stmtCheckLinks = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._envoie_signalement WHERE id_signalement = :ids');
+            $stmtCheckLinks->execute([':ids' => $idSignal]);
+            $cntLinks = (int)$stmtCheckLinks->fetchColumn();
+            if ($cntLinks === 0) {
+                $stmtDel3 = $pdo->prepare('DELETE FROM cobrec1._signalement WHERE id_signalement = :ids');
+                $stmtDel3->execute([':ids' => $idSignal]);
+            }
+
+            $pdo->commit();
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+
+        ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => true, 'message' => 'Signalement annulé.']);
         exit;
     }
 
