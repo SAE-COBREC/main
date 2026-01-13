@@ -259,3 +259,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+//pour gérer l'ouverture et la fermeture des filtres sur les petits écrans
+document.addEventListener('DOMContentLoaded', function () {
+    const aside = document.querySelector('aside');
+
+    if (aside) {
+        aside.addEventListener('click', function () {
+            this.classList.toggle('open');
+        });
+    }
+});
