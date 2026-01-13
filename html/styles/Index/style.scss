@@ -1,21 +1,30 @@
+// ============================================
+// IMPORTS ET MIXINS
+// ============================================
+
+//importe les variables depuis le fichier variable
 @use "../variable" as *;
 
+//mixin pour centrer avec flexbox
 @mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+//mixin pour espacer les éléments entre eux
 @mixin flex-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+//mixin pour ajouter une transition fluide
 @mixin transition($property: all, $duration: 0.2s) {
   transition: $property $duration ease;
 }
 
+//mixin pour effet de survol avec élévation
 @mixin hover-lift {
   transition: transform 0.2s, box-shadow 0.2s;
 
@@ -25,6 +34,7 @@
   }
 }
 
+//mixin pour rendre un élément sticky
 @mixin sticky-aside {
   position: sticky;
   top: 6em;
@@ -32,6 +42,7 @@
   transition: all 0.3s ease;
 }
 
+//mixin pour centrer un élément en absolu
 @mixin centre-absolu {
   position: absolute;
   top: 50%;
@@ -39,12 +50,18 @@
   transform: translate(-50%, -50%);
 }
 
+// ============================================
+// STYLES GLOBAUX
+// ============================================
+
+//réinitialise les marges et paddings
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+//style du body avec grille principale
 body {
   font-family: $font-family-secondaire;
   background: $secondary-color-gris-clair;
@@ -54,6 +71,7 @@ body {
   min-height: 100vh;
 }
 
+//conteneur principal avec barre latérale et contenu
 .container {
   grid-column: 1 / -1;
   display: grid;
@@ -62,6 +80,11 @@ body {
   position: relative;
 }
 
+// ============================================
+// BARRE LATÉRALE (ASIDE) - FILTRES
+// ============================================
+
+//style de la barre latérale des filtres
 aside {
   background: $primary-color-blanc;
   padding: 1.5rem;
@@ -70,17 +93,19 @@ aside {
   margin: 2rem 0 2rem 2rem;
   @include sticky-aside;
 
-  // En-tête du formulaire
+  //section du tri en haut du formulaire
   form > div:first-child {
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
     gap: 1rem;
 
+    //label du select
     span {
       color: $secondary-color-gris-fonce;
     }
 
+    //style du select de tri
     select {
       padding: 2px 7px;
       border: 1px solid $primary-color-bleu;
@@ -91,15 +116,17 @@ aside {
     }
   }
 
-  // Titre et bouton reset
+  //section titre "Filtres" avec bouton effacer
   form > div:nth-child(2) {
     @include flex-between;
     margin-bottom: 1.5rem;
 
+    //titre "Filtres"
     h3 {
       font-size: 1.1rem;
     }
 
+    //bouton "Effacer"
     button {
       color: $secondary-color-gris-fonce;
       background: none;
@@ -109,17 +136,19 @@ aside {
     }
   }
 
-  // Sections de filtres
-section {
-  margin-bottom: 2rem;
+  //style de toutes les sections de filtres
+  section {
+    margin-bottom: 2rem;
 
-  h4 {
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-  }
+    //titre de chaque section
+    h4 {
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
 
-  select {
+    //select des catégories
+    select {
       padding: 0.2em;
       border: 1px solid #7171A3;
       color: #7171A3;
@@ -128,54 +157,57 @@ section {
       cursor: pointer;
       width: 100%;
       text-align: center;
-  }
-
-  // Items de catégorie
-  &:not(.no-hover) > div {
-    @include flex-between;
-    padding: 0.5rem 0;
-    cursor: pointer;
-    color: $secondary-color-gris-fonce;
-    @include transition(all);
-
-    span {
-      color: $primary-color-bleu;
-      font-size: 0.9rem;
-    }
-  }
-
-  // Styles pour les divs de la section Prix (sans hover)
-  &.no-hover > div {
-    @include flex-between;
-    padding: 0.5rem 0;
-    
-    span {
-      color: $primary-color-bleu;
-      font-size: 1.3rem;
-    }
-  }
-
-  // Checkboxes
-  label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    @include transition(color);
-
-    &:hover {
-      color: $primary-color-bleu;
     }
 
-    input[type="checkbox"] {
+    //items cliquables avec hover (catégories)
+    &:not(.no-hover) > div {
+      @include flex-between;
+      padding: 0.5rem 0;
       cursor: pointer;
+      color: $secondary-color-gris-fonce;
+      @include transition(all);
+
+      //compteur de produits en bleu
+      span {
+        color: $primary-color-bleu;
+        font-size: 0.9rem;
+      }
+    }
+
+    //items sans hover (prix)
+    &.no-hover > div {
+      @include flex-between;
+      padding: 0.5rem 0;
+      
+      //affichage du prix en bleu
+      span {
+        color: $primary-color-bleu;
+        font-size: 1.3rem;
+      }
+    }
+
+    //style des cases à cocher
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.5rem 0;
+      @include transition(color);
+
+      //change la couleur au survol
+      &:hover {
+        color: $primary-color-bleu;
+      }
+
+      //style du checkbox
+      input[type="checkbox"] {
+        cursor: pointer;
+      }
     }
   }
-}
 
-
-  // Range slider
+  //style du curseur de prix (range slider)
   input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -185,6 +217,7 @@ section {
     background: $secondary-color-gris-clair;
     outline: none;
 
+    //style du bouton du curseur (Chrome/Safari)
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -195,6 +228,7 @@ section {
       cursor: pointer;
     }
 
+    //style du bouton du curseur (Firefox)
     &::-moz-range-thumb {
       appearance: none;
       width: 18px;
@@ -205,6 +239,7 @@ section {
       border: none;
     }
 
+    //style de la barre du curseur (Firefox)
     &::-moz-range-track {
       background: $secondary-color-gris-clair;
       border-radius: 8px;
@@ -213,15 +248,22 @@ section {
   }
 }
 
+// ============================================
+// ZONE PRINCIPALE (MAIN) - PRODUITS
+// ============================================
+
+//zone principale qui contient les produits
 main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
 
+  //grille des produits
   > div:first-child {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
 
+    //message quand aucun produit trouvé
     > p {
       grid-column: 1 / -1;
       text-align: center;
@@ -232,6 +274,11 @@ main {
   }
 }
 
+// ============================================
+// CARTES PRODUITS (ARTICLE)
+// ============================================
+
+//style d'une carte produit
 article {
   background: $primary-color-blanc;
   border-radius: 12px;
@@ -239,7 +286,7 @@ article {
   cursor: pointer;
   @include hover-lift;
 
-  // Section image
+  //section de l'image du produit
   > div:first-child {
     position: relative;
     width: 100%;
@@ -248,12 +295,14 @@ article {
     display: flex;
     justify-content: center;
 
+    //image du produit
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
+    //badge de réduction (ex: -20%)
     .badge-reduction {
       position: absolute;
       top: 10px;
@@ -267,6 +316,7 @@ article {
       z-index: 1;
     }
 
+    //message de rupture de stock
     .rupture-stock {
       @include centre-absolu;
       background-color: rgba($secondary-color-gris-clair, 0.9);
@@ -279,11 +329,13 @@ article {
       z-index: 2;
     }
 
+    //effet grisé sur image en rupture
     .image-rupture {
       filter: grayscale(100%) opacity(0.7);
       transition: filter 0.3s ease;
     }
 
+    //icône du panier dans le bouton
     .panier-icon {
       width: 16px;
       height: 16px;
@@ -292,10 +344,11 @@ article {
     }
   }
 
-  // Section informations
+  //section des informations du produit
   > div:last-child {
     padding: 1.25rem;
 
+    //nom du produit
     h3 {
       font-size: 1rem;
       font-weight: 600;
@@ -303,30 +356,33 @@ article {
       color: $primary-color-noir;
     }
 
-    // Évaluation
+    //section des étoiles et nombre d'avis
     > div:nth-child(2) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 0.75rem;
 
+      //étoiles de notation
       span:first-child {
         color: $secondary-color-etoile;
       }
 
+      //nombre d'avis entre parenthèses
       span:last-child {
         color: $secondary-color-gris-fonce;
         font-size: 0.85rem;
       }
     }
 
-    // Prix
+    //section du prix
     > div:nth-child(3) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 1rem;
 
+      //prix final du produit
       span:last-child {
         font-size: 1.5rem;
         font-weight: bold;
@@ -335,7 +391,7 @@ article {
     }
   }
 
-  // Bouton d'action
+  //bouton "Ajouter au panier"
   button {
     width: 100%;
     padding: 0.75rem;
@@ -348,10 +404,12 @@ article {
     font-size: 1.2em;
     @include transition(background);
 
+    //effet hover sur le bouton
     &:hover:not(:disabled) {
       background: $primary-color-bleu;
     }
 
+    //style du bouton désactivé
     &:disabled {
       background: $secondary-color-gris-fonce;
       cursor: not-allowed;
@@ -360,24 +418,117 @@ article {
   }
 }
 
+// ============================================
+// STYLES SPÉCIAUX - PROMOTIONS ET RUPTURE
+// ============================================
 
+//bordure spéciale pour les produits en promotion
+.produit-promotion {
+  border: 3px solid $secondary-color-bordure !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); 
+}
 
-// Tablette et desktop moyen
+//style spécial du bouton pour les promotions
+.produit-promotion button:not(:disabled) {
+  background: #FFFFFF !important;
+  color: $secondary-color-rouge !important;
+  border: 2px solid $secondary-color-rouge !important;
+}
+
+//effet hover du bouton en promotion
+.produit-promotion button:hover:not(:disabled) {
+  background: $secondary-color-rouge !important;
+  color: #FFFFFF !important;
+}
+
+//style pour produit en rupture ET en promotion
+.produit-rupture.produit-promotion {
+  border: 3px solid $secondary-color-rouge !important;
+  opacity: 0.7;
+}
+
+// ============================================
+// COMPOSANTS SPÉCIFIQUES - FILTRES
+// ============================================
+
+//widget des étoiles pour filtrer par note
+.star-rating-filter {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+//bouton d'étoile individuel
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s;
+}
+
+//effet d'agrandissement au survol
+.star-btn:hover {
+  transform: scale(1.1);
+}
+
+//champ numérique pour le prix
+.price-input {
+  max-width: 150px;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fff;
+  color: #333;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+//style du champ quand il a le focus
+.price-input:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+//effet hover sur le champ de prix
+.price-input:hover {
+  border-color: #999;
+}
+
+//style des flèches du champ numérique
+.price-input::-webkit-inner-spin-button,
+.price-input::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 40px;
+}
+
+// ============================================
+// RESPONSIVE - TABLETTE ET DESKTOP MOYEN
+// ============================================
+
+//styles pour tablettes et écrans moyens
 @media (min-width: 429px) and (max-width: 1440px) {
   aside {
+    //agrandit les textes dans les filtres
     section > div span {
       font-size: 1.5em;
     }
     
+    //cache le label "Tri par"
     form > div:first-child span {
       display: none;
     } 
     
+    //agrandit le select de tri
     form > div:first-child select {
       font-size: 1.2em;
       padding: 5px 10px;
     }
 
+    //agrandit le select de catégories
     form > section select {
       font-size: 1.0em;
       padding: 5px 10px;
@@ -385,28 +536,38 @@ article {
   }
 }
 
-// Tablette
+// ============================================
+// RESPONSIVE - TABLETTE
+// ============================================
+
+//styles pour tablettes
 @media (max-width: $breakpoint-tablette) {
+  //passe en une seule colonne
   .container {
     grid-template-columns: 1fr;
   }
 
+  //place la barre latérale en bas
   aside {
     position: static;
     margin: 1rem;
     order: 2;
   }
 
+  //place le contenu principal en haut
   main {
     order: 1;
     padding: 1rem;
   }
-
-
 }
 
-// Mobile
+// ============================================
+// RESPONSIVE - MOBILE
+// ============================================
+
+//styles pour mobile
 @media (max-width: 428px) {
+  //change le layout du body
   body {
     display: block;
     max-width: 428px;
@@ -414,13 +575,14 @@ article {
     width: 100%;
   }
 
+  //passe en colonne avec flexbox
   .container {
     grid-template-columns: 1fr;
     display: flex;
     flex-direction: column;
   }
 
-  // Aside mobile avec accordéon
+  //barre latérale en accordéon sur mobile
   aside {
     order: -1;
     margin: 1rem;
@@ -432,16 +594,19 @@ article {
     transition: max-height 0.3s ease;
     cursor: pointer;
     
+    //réduit le padding quand fermé
     &:not(.open) {
       padding-bottom: 0;
     }
     
+    //affiche tout le contenu quand ouvert
     &.open {
       max-height: none;
       height: auto;
       overflow: visible;
     }
     
+    //affiche "Filtres" avec icône quand fermé
     &::before {
       content: "Filtres";
       display: block;
@@ -456,6 +621,7 @@ article {
       color: $primary-color-bleu;
     }
     
+    //affiche "Masquer les filtres" quand ouvert
     &.open::before {
       content: "Masquer les filtres";
       background-image: url('../../img/svg/filtre.png');
@@ -468,20 +634,24 @@ article {
       color: $primary-color-bleu;
     }
 
+    //agrandit le select de tri sur mobile
     form > div:first-child select {
       padding: 15px;
       font-size: 1.5em;
     }
 
+    //cache le formulaire quand l'accordéon est fermé
     &:not(.open) form {
       display: none;
     }
 
+    //affiche le formulaire quand l'accordéon est ouvert
     &.open form {
       display: block;
     }
   }
 
+  //style du select de tri en pleine largeur
   select[name="sort"] {
     width: 100%;
     text-align: center;
@@ -491,126 +661,59 @@ article {
     padding: 10px;
   }
 
+  //augmente l'espacement des sections
   aside section > div {
     padding: 1em 0;
   }
 
+  //cache le label "Tri par" sur mobile
   aside form > div:first-child span {
     display: none;
-  } 
+  }
 
+  //agrandit tous les textes dans les filtres
   aside span, aside h3, aside h4 {
     font-size: 1.5em !important;
   }
 
-  // Main mobile
+  //zone principale sur mobile
   main {
     padding: 1rem;
     order: 1;
   }
 
+  //grille à 2 colonnes pour les produits
   main > div:first-child {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 
-  // Article mobile
+  //cartes produits adaptées au mobile
   article {
+    //réduit la hauteur de l'image
     > div:first-child {
       height: 150px;
     }
 
+    //ajuste le padding et les tailles de texte
     > div:last-child {
       padding: 1rem;
       
+      //réduit la taille du titre
       h3 {
         font-size: 0.9rem;
       }
       
+      //réduit la taille du prix
       > div:nth-child(3) span:last-child {
         font-size: 1.1rem;
       }
     }
 
+    //réduit la taille du bouton
     button {
       padding: 0.6rem;
       font-size: 0.9rem;
     }
   }
-
-
 }
-
-
-/* Style pour les articles en promotion */
-.produit-promotion {
-    border: 3px solid $secondary-color-bordure !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); 
-}
-
-/* Style pour le bouton des articles en promotion */
-.produit-promotion button:not(:disabled) {
-    background: #FFFFFF !important; /* Fond blanc */
-    color: $secondary-color-rouge  !important; /* Texte rouge */
-    border: 2px solid $secondary-color-rouge  !important; /* Bordure rouge */
-}
-
-/* Hover sur le bouton en promotion */
-.produit-promotion button:hover:not(:disabled) {
-    background: $secondary-color-rouge  !important; /* Fond rouge au survol */
-    color: #FFFFFF !important; /* Texte blanc au survol */
-}
-
-/* Si l'article est à la fois en rupture ET en promotion */
-.produit-rupture.produit-promotion {
-    border: 3px solid $secondary-color-rouge  !important;
-    opacity: 0.7;
-}
-
-    .star-rating-filter {
-        display: flex;
-        gap: 5px;
-        margin-top: 10px;
-    }
-
-    .star-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        transition: transform 0.1s;
-    }
-
-    .star-btn:hover {
-        transform: scale(1.1);
-    }
-
-    .price-input {
-        max-width: 150px;
-        padding: 12px 15px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        font-size: 16px;
-        font-family: 'Poppins', sans-serif;
-        background-color: #fff;
-        color: #333;
-        transition: all 0.3s ease;
-        box-sizing: border-box;
-    }
-
-    .price-input:focus {
-        outline: none;
-        border-color: #000;
-        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .price-input:hover {
-        border-color: #999;
-    }
-
-    /* Style des flèches du number input */
-    .price-input::-webkit-inner-spin-button,
-    .price-input::-webkit-outer-spin-button {
-        opacity: 1;
-        height: 40px;
-    }
