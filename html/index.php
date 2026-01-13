@@ -1,64 +1,68 @@
 <?php
-//démarrer la session pour récupérer les informations du client
+// ============================================
+// CONFIGURATION ET INITIALISATION
+// ============================================
+
 session_start();
 
-//inclure le fichier de configuration pour la connexion à la base de données
-include __DIR__ . '/selectBDD.php';
+// Inclusion des fichiers nécessaires
+require_once __DIR__ . '/selectBDD.php';
+require_once __DIR__ . '/pages/fonctions.php';
 
-//inclure les fonctions utilitaires
-include __DIR__ . '/pages/fonctions.php';
-
-//récupérer la connexion PDO depuis le fichier de configuration
+// Configuration de la base de données
 $connexionBaseDeDonnees = $pdo;
-
-//définir le schéma de la base de données à utiliser
 $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
-//récupérer l'ID client si connecté
+// ============================================
+// GESTION DE LA SESSION ET DU PANIER
+// ============================================
+
 $idClient = $_SESSION['idClient'] ?? null;
+$idPanier = null;
 
 if ($idClient === null) {
-    //si l'utilisateur n'est pas connecté, on utilise un panier temporaire en SESSION
+    // Utilisateur non connecté : panier temporaire en session
     if (!isset($_SESSION['panierTemp'])) {
-        $_SESSION['panierTemp'] = array();
+        $_SESSION['panierTemp'] = [];
     }
-    $panier = null;
 } else {
-    //sinon on récupère l'id de son panier courant
+    // Utilisateur connecté : récupération ou création du panier
     $sqlPanierClient = "
         SELECT id_panier
         FROM _panier_commande
-        WHERE timestamp_commande IS NULL
-        AND id_client = :idClient
+        WHERE timestamp_commande IS NULL AND id_client = :idClient
     ";
     $stmtPanier = $connexionBaseDeDonnees->prepare($sqlPanierClient);
-    $stmtPanier->execute([":idClient" => $idClient]);
+    $stmtPanier->execute([':idClient' => $idClient]);
     $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
 
     if ($panier) {
         $idPanier = (int) $panier['id_panier'];
     } else {
+        // Création d'un nouveau panier
         $sqlCreatePanier = "
             INSERT INTO _panier_commande (id_client, timestamp_commande)
             VALUES (:idClient, NULL)
             RETURNING id_panier
         ";
         $stmtCreate = $connexionBaseDeDonnees->prepare($sqlCreatePanier);
-        $stmtCreate->execute([":idClient" => $idClient]);
+        $stmtCreate->execute([':idClient' => $idClient]);
         $idPanier = (int) $stmtCreate->fetchColumn();
     }
 
-    $_SESSION["panierEnCours"] = $idPanier;
+    $_SESSION['panierEnCours'] = $idPanier;
     transfererPanierTempVersBDD($connexionBaseDeDonnees, $idPanier);
 }
 
-//gérer l'ajout au panier via AJAX
+// ============================================
+// TRAITEMENT AJAX : AJOUT AU PANIER
+// ============================================
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
     header('Content-Type: application/json');
 
     $idProduit = $_POST['idProduit'] ?? null;
-    $quantite = $_POST['quantite'] ?? 1;
-    $idClient = $_SESSION['idClient'] ?? null;
+    $quantite = (int) ($_POST['quantite'] ?? 1);
 
     if (!$idProduit) {
         echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
@@ -69,66 +73,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if ($idClient === null) {
             $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
         } else {
-            $idPanier = $_SESSION['panierEnCours'] ?? null;
             if (!$idPanier) {
                 echo json_encode(['success' => false, 'message' => 'Aucun panier en cours']);
                 exit;
             }
             $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
         }
+        echo json_encode($resultat);
     } catch (Exception $e) {
-        $resultat = ['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()];
+        echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
     }
-
-    echo json_encode($resultat);
     exit;
 }
 
-// Récupération des recherches
-$rechercheNom = $_GET['recherche'] ?? '';
-$rechercheVendeur = $_POST['vendeur'] ?? '';
+// ============================================
+// CHARGEMENT DES DONNÉES PRODUITS
+// ============================================
 
 $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 $listeProduits = $donnees['produits'];
 $listeCategories = $donnees['categories'];
 $totalProduitsSansFiltre = count($listeProduits);
 
-if (!empty(trim($rechercheVendeur))) {
-    // Recherche par vendeur (depuis le sidebar)
-    $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, trim($rechercheVendeur));
+// ============================================
+// GESTION DES RECHERCHES
+// ============================================
+
+$rechercheVendeur = trim($_POST['vendeur'] ?? '');
+$rechercheNom = trim($_POST['nomChercher'] ?? '');
+
+// Recherche par vendeur
+if (!empty($rechercheVendeur)) {
+    $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $rechercheVendeur);
     $totalProduitsSansFiltre = count($listeProduits);
 }
 
-// Récupération de la recherche
-$search = $_POST['nomChercher'] ?? '';
-
-if (!empty($search)) {
+// Recherche par nom de produit
+if (!empty($rechercheNom)) {
     try {
-        $listeProduits = chercherProduitsNom($connexionBaseDeDonnees, $search);
-
+        $listeProduits = chercherProduitsNom($connexionBaseDeDonnees, $rechercheNom);
+        $totalProduitsSansFiltre = count($listeProduits);
     } catch (PDOException $e) {
-        echo "<p style='color: red;'>Erreur lors de la recherche : " . htmlspecialchars($e->getMessage()) . "</p>";
+        $messageErreur = htmlspecialchars($e->getMessage());
     }
 }
 
-// Calculer le prix TTC maximum
+// ============================================
+// CALCUL DU PRIX MAXIMUM
+// ============================================
+
 $prixMaximum = 0;
 if (!empty($listeProduits)) {
     $prixMaximumHT = max(array_column($listeProduits, 'p_prix'));
+    
     foreach ($listeProduits as $produitTmp) {
-        if ((float)$produitTmp['p_prix'] === (float)$prixMaximumHT) {
-            $prixMaximum = round(calcPrixTVA($produitTmp['id_produit'], $produitTmp['tva'], $prixMaximumHT));
+        if ((float) $produitTmp['p_prix'] === (float) $prixMaximumHT) {
+            $prixMaximum = round(calcPrixTVA(
+                $produitTmp['id_produit'],
+                $produitTmp['tva'],
+                $prixMaximumHT
+            ));
             break;
         }
     }
 }
 
-// Récupération des filtres
+// ============================================
+// RÉCUPÉRATION ET APPLICATION DES FILTRES
+// ============================================
+
 $categorieSelection = $_POST['categorie'] ?? 'all';
 $triSelection = $_POST['tri'] ?? 'meilleures_ventes';
-$prixMaximumFiltre = isset($_POST['price']) ? (float)$_POST['price'] : $prixMaximum;
-$noteMinimumFiltre = isset($_POST['note_min']) ? (int)$_POST['note_min'] : 0;
-$enStockSeulement = isset($_POST['stock_only']) ? true : false;
+$prixMaximumFiltre = isset($_POST['price']) ? (float) $_POST['price'] : $prixMaximum;
+$noteMinimumFiltre = isset($_POST['note_min']) ? (int) $_POST['note_min'] : 0;
+$enStockSeulement = isset($_POST['stock_only']);
 
 $filtres = [
     'categorieFiltre' => $categorieSelection,
@@ -137,12 +155,17 @@ $filtres = [
     'enStockSeulement' => $enStockSeulement
 ];
 
-// Appliquer les filtres et le tri
-$listeProduits = filtrerProduits($listeProduits, $filtres);
+// Application des filtres (sauf si recherche par nom)
+if (empty($rechercheNom)) {
+    $listeProduits = filtrerProduits($listeProduits, $filtres);
+}
+
+// Application du tri
 $listeProduits = trierProduits($listeProduits, $triSelection);
 
+// Préparation des catégories pour l'affichage
 $tousLesProduits = count($listeProduits);
-$categories_affichage = preparercategories_affichage($listeCategories);
+$categoriesAffichage = preparercategories_affichage($listeCategories);
 ?>
 
 <!DOCTYPE html>
