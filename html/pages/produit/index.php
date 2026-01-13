@@ -344,11 +344,11 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer);
     $html = ob_get_clean();
     $optionsForLabel = [
+        'popular' => 'Pertinence (pouces)',
         'date_desc' => 'Les plus récentes',
         'date_asc' => 'Les plus anciennes',
         'note_desc' => 'Note décroissante',
-        'note_asc' => 'Note croissante',
-        'popular' => 'Pertinence (pouces)'
+        'note_asc' => 'Note croissante'
     ];
     echo json_encode([
         'success' => true,
