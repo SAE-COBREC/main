@@ -42,14 +42,11 @@ if (isset($_SESSION['idClient'])) {
         </div>
 
         <div class="search-container">
-            <form method="GET" action="/index.php" id="headerSearchForm">
-                <img src="/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
-                <input type="text" name="recherche" id="headerSearchInput" placeholder="Rechercher des produits..."
-                    class="search-input" value="<?= htmlspecialchars($_GET['recherche'] ?? '') ?>" autocomplete="off">
-                <?php if (isset($_GET['recherche']) && !empty($_GET['recherche'])): ?>
-                <button type="button" id="clearSearchBtn" class="clear-search-btn"
-                    aria-label="Effacer la recherche">×</button>
-                <?php endif; ?>
+            <form method="POST" class="search-form">
+                <input type="search" name="nomChercher"
+                    placeholder="Rechercher un produit (ex: Smartphone, Pull, Bracelet...)"
+                    value="<?= htmlspecialchars($search) ?>" autofocus>
+                <button type="submit">Rechercher</button>
             </form>
         </div>
 
