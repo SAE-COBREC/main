@@ -116,10 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchVendeur').value = '';
             //réinitialise le champ de recherche par nom
             document.getElementById('nomChercher').value = '';
-            //remet la note minimum à 0
-            document.getElementById('inputNoteMin').value = '0';
-            //remet le tri sur "meilleures ventes"
-            document.getElementById('triSelect').value = 'meilleures_ventes';
             //décoche la case "en stock uniquement"
             document.getElementById('stockOnlyCheckbox').checked = false;
             //récupère tous les boutons d'étoiles
