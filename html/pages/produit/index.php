@@ -362,7 +362,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     ?>
 
     <nav class="page-breadcrumb">
-        <a class="btn btn-retour-catalogue back-link" href="/index.php" onclick="if (history.length>1) { history.back(); return false; }" aria-label="Retour au catalogue">
+        <a class="btn btn-retour-catalogue back-link" href="/index.php" aria-label="Retour au catalogue">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span>Retour au catalogue</span>
         </a>
