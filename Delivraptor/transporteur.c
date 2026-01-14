@@ -275,11 +275,11 @@ int main()
         // Connexion à la base de données dans le processus fils
         PGconn *conn;
         conn = PQconnectdb(
-            "host=10.253.5.101"
+            "host=10.253.5.101 "
             "port=5432 "
             "dbname=saedb "
             "user=sae "
-            "password=kira13");
+            "password=kira13 ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
