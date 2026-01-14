@@ -391,6 +391,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         $noteArrondie = round($produitCourant['note_moyenne'] ?? 0);
                         //vérifie si le produit est en promotion
                         $estEnPromotion = !empty($produitCourant['estenpromo']); 
+                        $nomVendeur = recupNomVendeurIdProduit($connexionBaseDeDonnees, $produitCourant['id_produit']);
                         ?>
                 <!--carte de produit cliquable-->
                 <article
@@ -446,6 +447,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             <!--affiche le prix final-->
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
+                        <p>Vendeur : <?= htmlspecialchars($nomVendeur) ?></p>
                         <!--bouton pour ajouter au panier-->
                         <button <?= $estEnRupture ? 'disabled' : '' ?>
                             onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
