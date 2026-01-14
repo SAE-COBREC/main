@@ -277,7 +277,7 @@ int main()
         conn = PQconnectdb(
             "host=10.253.5.101"
             "port=5432 "
-            "dbname=saeadb "
+            "dbname=saedb "
             "user=sae "
             "password=kira13");
 
