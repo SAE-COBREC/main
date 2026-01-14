@@ -256,8 +256,6 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'p_description' => $produitCourant['p_description'],
                 'i_lien' => str_replace("html/img/photo", "/img/photo", $produitCourant['image_url'] ?? '/img/default-product.jpg'),
                 'i_alt' => $produitCourant['image_alt'],
-                'tva' => $produitCourant['tva'],
-                'reduction_pourcentage' => $produitCourant['pourcentage_reduction'],
                 'i_title' => $produitCourant['image_title'],
                 'quantite' => $aAjouter,
                 'p_prix' => $prixUnitaire,
@@ -398,6 +396,112 @@ function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantC
         return $identifiantCompte !== false ? (int) $identifiantCompte : null;
     } catch (Exception $erreurException) {
         return null;
+    }
+}
+
+// Rendu HTML des avis (extrait de pages/produit/index.php pour réutilisation)
+if (!function_exists('renderAvisHtml')) {
+    function renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer) {
+        if (empty($avisTextes)) {
+            echo '<p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>';
+            return;
+        }
+
+        foreach ($avisTextes as $ta) {
+            $aNote = (float)($ta['a_note'] ?? 0);
+            $aTitre = $ta['a_titre'] ?? '';
+            $aNoteEntiere = (int)floor($aNote);
+
+            // Determine display name
+            $displayName = 'Utilisateur';
+            if (!empty($ta['c_pseudo'])) {
+                $displayName = $ta['c_pseudo'];
+            } elseif (!empty($ta['prenom']) || !empty($ta['nom'])) {
+                $displayName = trim(($ta['prenom'] ?? '') . ' ' . ($ta['nom'] ?? ''));
+            }
+
+            // Determine avatar
+            $avatarUrl = $ta['client_image'] ?? null;
+            ?>
+            <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>" data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;position:relative;padding-right:44px;">
+                <?php if (!($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) ))): ?>
+                    <button class="ghost btn-report-trigger" aria-label="Options avis" style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+                    </button>
+                    <div class="report-dropdown" style="display:none;position:absolute;right:8px;top:44px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;z-index:60;min-width:160px;box-shadow:0 6px 18px rgba(0,0,0,.06)">
+                        <?php if (isset($ta['user_reported']) && $ta['user_reported']): ?>
+                            <button class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler le signalement</button>
+                        <?php else: ?>
+                            <button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l'avis</button>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                    <?php if ($avatarUrl): ?>
+                        <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                    <?php else: ?>
+                        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper(substr($displayName, 0, 1)) ?></div>
+                    <?php endif; ?>
+                    <div>
+                        <div style="font-weight:700"><?= htmlspecialchars($displayName) ?></div>
+                        <div style="color:var(--muted);font-size:13px">Avis</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                            <span class="stars" aria-hidden="true">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <img src="/img/svg/star-<?= $i <= $aNoteEntiere ? 'full' : 'empty' ?>.svg" alt="Etoile" width="16">
+                                <?php endfor; ?>
+                            </span>
+                            <span class="review-rating-value" style="color:var(--muted);font-weight:600;"><?= number_format($aNote, 1) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <?php if (!empty($aTitre)): ?>
+                    <strong style="display:block;margin-bottom:8px;color:var(--text);font-size:16px;"><?= htmlspecialchars($aTitre) ?></strong>
+                <?php endif; ?>
+                <div class="review-content" style="color:var(--muted)"><?= htmlspecialchars($ta['a_texte']) ?></div>
+                <div class="review-votes">
+                    <div class="vote-section">
+                        <span class="vote-label">Évaluer ce commentaire :</span>
+                        <div class="vote-buttons">
+                            <button type="button" class="ghost btn-vote" data-type="J'aime" aria-label="Vote plus" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
+                                <img src="/img/svg/PouceHaut.svg" alt="J'aime" width="16" height="16"> <span class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
+                            </button>
+                            <button type="button" class="ghost btn-vote" data-type="Je n'aime pas" aria-label="Vote moins" <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
+                                <img src="/img/svg/PouceBas.svg" alt="Je n'aime pas" width="16" height="16"> <span class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
+                            </button>
+                        </div>
+                    </div>
+                    <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
+                    <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
+                        <div class="review-actions">
+                            <button class="ghost btn-edit-review desktop-only">Modifier</button>
+                            <button class="ghost btn-delete-review desktop-only">Supprimer</button>
+
+                            <div class="mobile-menu-container mobile-only">
+                                <button class="ghost btn-menu-trigger" aria-label="Options">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                </button>
+                                <div class="mobile-menu-dropdown">
+                                    <button class="btn-edit-review">Modifier</button>
+                                    <button class="btn-delete-review">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <?php if(isset($reponsesMap[(int)$ta['id_avis']])): $rep = $reponsesMap[(int)$ta['id_avis']]; ?>
+                    <div class="review" style="margin:12px 0 4px 48px;padding:10px 12px;background:#fff6e6;border:1px solid #ffe0a3;border-radius:8px">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                            <div style="width:32px;height:32px;border-radius:50%;background:#ffc860;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#7a4d00">V</div>
+                            <div style="font-weight:600;color:#7a4d00">Réponse du vendeur</div>
+                            <span style="margin-left:auto;font-size:11px;color:#b07200;"><?= htmlspecialchars($rep['a_timestamp_fmt'] ?? '') ?></span>
+                        </div>
+                        <div style="font-size:13px;color:#7a4d00;line-height:1.4"><?= htmlspecialchars($rep['a_texte']) ?></div>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <?php
+        }
     }
 }
 
@@ -881,7 +985,12 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             $stmtUp->execute($params);
             $updated = $stmtUp->fetch(PDO::FETCH_ASSOC);
 
-            echo json_encode(['success' => true, 'updated_at_fmt' => $updated['fmt'], 'avis' => $updated]);
+            // Recalculer stats globales après modification
+            $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) as avg, COUNT(*) as cnt FROM _avis WHERE id_produit = ? AND a_note IS NOT NULL');
+            $stmtAvg->execute([$idProduit]);
+            $stats = $stmtAvg->fetch(PDO::FETCH_ASSOC);
+
+            echo json_encode(['success' => true, 'updated_at_fmt' => $updated['fmt'], 'avis' => $updated, 'avg' => (float)$stats['avg'], 'countAvis' => (int)$stats['cnt']]);
             exit;
 
         } elseif ($action === 'delete_avis') {
@@ -899,7 +1008,11 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
              $stmtDel->execute([$idAvis, $idProduit, $idClient, $owner]);
              
              if ($stmtDel->rowCount() > 0) {
-                 echo json_encode(['success' => true]);
+                 // Recalculer stats (note moyenne et nombre d'avis) après suppression
+                 $stmtAvg = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) as avg, COUNT(*) as cnt FROM _avis WHERE id_produit = ? AND a_note IS NOT NULL');
+                 $stmtAvg->execute([$idProduit]);
+                 $stats = $stmtAvg->fetch(PDO::FETCH_ASSOC);
+                 echo json_encode(['success' => true, 'avg' => (float)$stats['avg'], 'countAvis' => (int)$stats['cnt']]);
              } else {
                  throw new Exception('Impossible de supprimer cet avis.');
              }
@@ -1191,10 +1304,10 @@ function trierProduits($listeProduits, $tri_par)
 
         case 'en_promotion':
             usort($listeProduits, function ($a, $b) {
-                $enpromoA = !empty($a['estenpromo']) ? 1 : 0;
-                $enpromoB = !empty($b['estenpromo']) ? 1 : 0;
+                $isPromoA = (isset($a['reduction_pourcentage']) && $a['reduction_pourcentage'] > 0) ? 1 : 0;
+                $isPromoB = (isset($b['reduction_pourcentage']) && $b['reduction_pourcentage'] > 0) ? 1 : 0;
                 
-                $comparison = $enpromoB <=> $enpromoA;
+                $comparison = $isPromoB <=> $isPromoA; // Inversé pour avoir les promos en premier
                 
                 if ($comparison === 0) {
                     return $a['id_produit'] <=> $b['id_produit'];
@@ -1203,7 +1316,6 @@ function trierProduits($listeProduits, $tri_par)
                 return $comparison;
             });
             break;
-
 
         case 'en_reduction':
             usort($listeProduits, function ($a, $b) {

@@ -338,6 +338,54 @@ input[type="number"] {
     .star-input button {
         border: 0;
         background: transparent;
+    }
+
+    /* Smooth star hover */
+    .stars img {
+        transition: transform .18s ease, opacity .18s ease;
+    }
+    .stars img:hover {
+        transform: translateY(-3px) scale(1.06);
+    }
+
+    /* Highlight animation when a review is updated */
+    .review.flash-updated {
+        animation: flashUpdate .9s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes flashUpdate {
+        0% { transform: translateY(-6px); box-shadow: 0 8px 26px rgba(0,0,0,0.12); background: linear-gradient(90deg,#fffbe6,#fff9e6); }
+        60% { transform: translateY(0); }
+        100% { transform: none; box-shadow: none; background: transparent; }
+    }
+
+    /* Modal overlay / dialog animations (used by edit/report modals) */
+    .modal-overlay {
+        display: none; /* shown via JS */
+        position: fixed;
+        inset: 0;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0);
+        transition: background .28s ease;
+        z-index: 1200;
+    }
+
+    .modal-overlay.modal-open {
+        display: flex;
+        background: rgba(0,0,0,0.45);
+    }
+
+    .modal-overlay .modal-dialog {
+        transform: translateY(8px) scale(.98);
+        opacity: 0;
+        transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease;
+        will-change: transform, opacity;
+    }
+
+    .modal-overlay.modal-open .modal-dialog {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
         padding: 0;
         cursor: pointer;
         display: inline-flex;
