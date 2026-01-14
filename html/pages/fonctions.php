@@ -1189,10 +1189,10 @@ function trierProduits($listeProduits, $tri_par)
 
         case 'en_promotion':
             usort($listeProduits, function ($a, $b) {
-                $isPromoA = (isset($a['reduction_pourcentage']) && $a['reduction_pourcentage'] > 0) ? 1 : 0;
-                $isPromoB = (isset($b['reduction_pourcentage']) && $b['reduction_pourcentage'] > 0) ? 1 : 0;
+                $enpromoA = !empty($a['estenpromo']) ? 1 : 0;
+                $enpromoB = !empty($b['estenpromo']) ? 1 : 0;
                 
-                $comparison = $isPromoB <=> $isPromoA; // Inversé pour avoir les promos en premier
+                $comparison = $enpromoB <=> $enpromoA;
                 
                 if ($comparison === 0) {
                     return $a['id_produit'] <=> $b['id_produit'];
@@ -1201,6 +1201,7 @@ function trierProduits($listeProduits, $tri_par)
                 return $comparison;
             });
             break;
+
 
         case 'en_reduction':
             usort($listeProduits, function ($a, $b) {
