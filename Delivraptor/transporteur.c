@@ -275,7 +275,7 @@ int main()
         // Connexion à la base de données dans le processus fils
         PGconn *conn;
         conn = PQconnectdb(
-            "host=localhost "
+            "host=10.253.5.101"
             "port=5432 "
             "dbname=saeadb "
             "user=sae "
