@@ -102,7 +102,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 
         //calculer le prix avec remise
         $prixUnitaire = $produitCourant['p_prix'];
-        $remiseUnitaire = ($produitCourant['pourcentage_reduction'] / 100) * $prixUnitaire;
+        $remiseUnitaire = $produitCourant['pourcentage_reduction'];
         $fraisDePort = $produitCourant['p_frais_de_port'];
         $tva = $produitCourant['tva'];
         $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
