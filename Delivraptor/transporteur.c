@@ -263,7 +263,7 @@ int main()
         pid_t pid = fork();
         if (pid < 0) {
             perror("fork");
-            close(client_fd);
+            close(client_fd);67
             continue;
         }
         if (pid > 0) {
