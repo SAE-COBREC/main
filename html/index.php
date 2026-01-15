@@ -413,7 +413,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <span class="badge-reduction">-<?= round($produitCourant['reduction_pourcentage']) ?>%</span>
                         <?php endif; ?>
                         <?php if ($origineProduit == "Bretagne"): ?>
-                        <span class="badge-bretagne"><img src="/img/png/bretagne.png" alt="Bretagne"></span>
+                        <span class="badge-bretagne"><img src="/img/png/badge-bretagne.png" alt="Bretagne"></span>
                         <?php endif; ?>
                         <!--affiche le message de rupture de stock si nécessaire-->
                         <?php if ($estEnRupture): ?>
@@ -454,7 +454,10 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             <!--affiche le prix final-->
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
-                        <p style="padding-bottom: 10px;">Vendeur : <?= htmlspecialchars($nomVendeur) ?></p>
+                        <div class="vendeur-info">
+                            <img src="/img/svg/market.svg" alt="Vendeur">
+                            <span><?= htmlspecialchars($nomVendeur) ?></span>
+                        </div>
                         <!--bouton pour ajouter au panier-->
                         <button <?= $estEnRupture ? 'disabled' : '' ?>
                             onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">

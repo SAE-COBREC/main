@@ -286,6 +286,30 @@ article > div:last-child > div:nth-child(3) span:last-child {
   font-weight: bold;
   color: #030212;
 }
+article > div:last-child .vendeur-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 4px 10px;
+  background-color: #F0F4F8;
+  border-radius: 20px;
+  max-width: 100%;
+  border: 1px solid rgba(113, 113, 163, 0.1);
+}
+article > div:last-child .vendeur-info img {
+  width: 24px;
+  height: 24px;
+  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+}
+article > div:last-child .vendeur-info span {
+  font-size: 0.85rem;
+  color: #7171A3;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 article button {
   width: 100%;
   padding: 0.75rem;
@@ -455,7 +479,7 @@ article button:disabled {
     content: "Filtres";
     display: block;
     font-weight: bold;
-    background-image: url("../../img/png/filtre.png");
+    background-image: url("../../img/svg/filtre.png");
     background-repeat: no-repeat;
     background-size: 1.1em 1.1em;
     background-position: left center;
@@ -466,7 +490,7 @@ article button:disabled {
   }
   aside.open::before {
     content: "Masquer les filtres";
-    background-image: url("../../img/png/filtre.png");
+    background-image: url("../../img/svg/filtre.png");
     background-repeat: no-repeat;
     background-size: 1.1em 1.1em;
     background-position: left center;

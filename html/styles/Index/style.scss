@@ -406,6 +406,34 @@ article {
         color: $primary-color-noir;
       }
     }
+
+    //infos vendeur stylisé
+    .vendeur-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 4px 10px;
+      background-color: $secondary-color-bleu-clair; 
+      border-radius: 20px;
+      max-width: 100%;
+      border: 1px solid rgba($primary-color-bleu, 0.1);
+
+      img {
+        width: 24px;
+        height: 24px;
+        filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%); // approximate color for #7171A3
+      }
+
+      span {
+        font-size: 0.85rem;
+        color: $primary-color-bleu;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
   }
 
   //bouton "Ajouter au panier"
