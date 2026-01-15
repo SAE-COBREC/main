@@ -391,7 +391,10 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         $noteArrondie = round($produitCourant['note_moyenne'] ?? 0);
                         //vérifie si le produit est en promotion
                         $estEnPromotion = !empty($produitCourant['estenpromo']); 
+                        //récupère le nom du vendeur
                         $nomVendeur = recupNomVendeurIdProduit($connexionBaseDeDonnees, $produitCourant['id_produit']);
+                        //récupère l'origine du produit
+                        $origineProduit = recupOrigineProduit($connexionBaseDeDonnees, $produitCourant['id_produit']);
                         ?>
                 <!--carte de produit cliquable-->
                 <article
@@ -407,6 +410,9 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <!--affiche le badge de réduction s'il y en a une-->
                         <?php if ($possedePourcentageRemise): ?>
                         <span class="badge-reduction">-<?= round($produitCourant['reduction_pourcentage']) ?>%</span>
+                        <?php endif; ?>
+                        <?php if ($origineProduit == "Bretagne"): ?>
+                        <span class="badge-bretagne"><img src="/img/svg/bretagne.png" alt="Bretagne"></span>
                         <?php endif; ?>
                         <!--affiche le message de rupture de stock si nécessaire-->
                         <?php if ($estEnRupture): ?>
@@ -447,7 +453,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             <!--affiche le prix final-->
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
-                        <p>Vendeur : <?= htmlspecialchars($nomVendeur) ?></p>
+                        <p style="padding-bottom: 10px;">Vendeur : <?= htmlspecialchars($nomVendeur) ?></p>
                         <!--bouton pour ajouter au panier-->
                         <button <?= $estEnRupture ? 'disabled' : '' ?>
                             onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
