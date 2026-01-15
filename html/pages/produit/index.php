@@ -206,7 +206,7 @@ foreach ($rowsRep as $r) {
 $estEnRupture = ($produit['p_stock'] <= 0);
 $discount = (float)$produit['pourcentage_reduction'];
 $prixDiscount = ($discount > 0) ? $produit['p_prix'] * (1 - $discount/100) : $produit['p_prix'];
-$prixFinal = calcPrixTVA($produit['id_produit'], $produit['tva'], $prixDiscount);
+$prixFinal = calcPrixTVA($produit['tva'], $prixDiscount);
 
 // Note moyenne (recalculée pour être sûr)
 try {
@@ -421,7 +421,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 <div class="price">
                     <?= number_format($prixFinal, 2, ',', ' ') ?> €
                     <?php if ($discount > 0): ?>
-                        <span class="old"><?= number_format(calcPrixTVA($produit['id_produit'], $produit['tva'], $produit['p_prix']), 2, ',', ' ') ?> €</span>
+                        <span class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?> €</span>
                         <span style="background:#D4183D;color:#fff;padding:6px 10px;border-radius:24px;font-size:13px; margin-left: 1em;">-<?= round($discount) ?>%</span>
                     <?php endif; ?>
                 </div>

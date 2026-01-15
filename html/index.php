@@ -179,7 +179,6 @@ if (!empty($listeProduits)) {
         if ((float) $produitTmp['p_prix'] === (float) $prixMaximumHT) {
             //calcule le prix TTC et l'arrondit
             $prixMaximum = round(calcPrixTVA(
-                $produitTmp['id_produit'],
                 $produitTmp['tva'],
                 $prixMaximumHT
             ));
@@ -384,9 +383,9 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         //calcule le prix après réduction
                         $prixDiscount = ($discount > 0) ? $produitCourant['p_prix'] * (1 - $discount/100) : $produitCourant['p_prix'];
                         //calcule le prix final TTC
-                        $prixFinal = calcPrixTVA($produitCourant['id_produit'], $produitCourant['tva'], $prixDiscount);
+                        $prixFinal = calcPrixTVA($produitCourant['tva'], $prixDiscount);
                         //calcule le prix original TTC
-                        $prixOriginalTTC = calcPrixTVA($produitCourant['id_produit'], $produitCourant['tva'], $produitCourant['p_prix']);
+                        $prixOriginalTTC = calcPrixTVA($produitCourant['tva'], $produitCourant['p_prix']);
                         //arrondit la note moyenne
                         $noteArrondie = round($produitCourant['note_moyenne'] ?? 0);
                         //vérifie si le produit est en promotion
