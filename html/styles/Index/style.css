@@ -213,6 +213,22 @@ article > div:first-child .badge-reduction {
   font-weight: bold;
   z-index: 1;
 }
+article > div:first-child .badge-bretagne {
+  position: absolute;
+  top: 215px;
+  left: 300px;
+  background: #FFFFFF;
+  color: #FFFFFF;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  z-index: 2;
+}
+article > div:first-child .badge-bretagne img {
+  width: 24px;
+  height: 24px;
+}
 article > div:first-child .rupture-stock {
   position: absolute;
   top: 50%;
