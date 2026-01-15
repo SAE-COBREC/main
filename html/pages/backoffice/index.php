@@ -30,32 +30,62 @@ foreach ($fichiers as $value) {
 }
 
 try {
+    $rechercheNom = $_GET['search'] ?? '';
     $tri = $_GET['tri'] ?? 'id_asc';
-    $order_sql = "id_produit ASC";
+    $categorieSelection = $_GET['cat'] ?? 'all';
 
-    if($tri === 'prix_asc'){
-      $order_sql = "p_prix ASC";
-    }elseif($tri === 'prix_desc'){
-      $order_sql = "p_prix DESC";
-    }
+    $sqlToutesCats = "
+        SELECT cp.nom_categorie, COUNT(DISTINCT p.id_produit) as nb
+        FROM cobrec1._produit p
+        JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+        JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+        WHERE p.id_vendeur = :id_vendeur
+        GROUP BY cp.nom_categorie";
     
-    // Requête SQL pour récupérer les produits du vendeur
+    $stmtCats = $pdo->prepare($sqlToutesCats);
+    $stmtCats->execute([':id_vendeur' => $vendeur_id]);
+    $resCats = $stmtCats->fetchAll(PDO::FETCH_ASSOC);
+
+    $listeCategoriesStatic = [];
+    foreach($resCats as $row) {
+        $listeCategoriesStatic[$row['nom_categorie']] = $row['nb'];
+    }
+    $afficheCategorie = preparercategories_affichage($listeCategoriesStatic);
+
+    $sqlTotal = "SELECT COUNT(*) FROM cobrec1._produit WHERE id_vendeur = :id_vendeur";
+    $stTot = $pdo->prepare($sqlTotal);
+    $stTot->execute([':id_vendeur' => $vendeur_id]);
+    $total_article = $stTot->fetchColumn();
+    $afficheCategorie[0]['count'] = $total_article;
+
+    $paramsQuery = [':id_vendeur' => $vendeur_id];
+    $clauseSearch = "";
+    $clauseCategorie = "";
+
+    if (!empty($rechercheNom)) {
+        $clauseSearch = " AND p.p_nom ILIKE :search";
+        $paramsQuery[':search'] = '%' . $rechercheNom . '%';
+    }
+
+    if ($categorieSelection !== 'all') {
+        $clauseCategorie = " AND EXISTS (
+            SELECT 1 FROM cobrec1._fait_partie_de f2 
+            JOIN cobrec1._categorie_produit cp2 ON f2.id_categorie = cp2.id_categorie 
+            WHERE f2.id_produit = p.id_produit AND cp2.nom_categorie = :cat_nom
+        )";
+        $paramsQuery[':cat_nom'] = $categorieSelection;
+    }
+
+    $order_sql = ($tri === 'prix_asc') ? "p_prix ASC" : (($tri === 'prix_desc') ? "p_prix DESC" : "id_produit ASC");
+
     $query = "
     SELECT * FROM (
-      SELECT DISTINCT on (id_produit)
-        p.id_produit,
-        p.p_nom AS nom_article,
-        p.p_description,
-        p.p_stock,
-        p.p_prix,
-        p.p_statut,
-        i.i_lien AS image_url,
-        r.reduction_pourcentage AS pourcentage,
-        r.reduction_debut AS debut_reduc,
-        r.reduction_fin AS fin_reduc,
-        promo.promotion_debut AS debut_promo,
-        promo.promotion_fin AS fin_promo,
-        STRING_AGG(c.nom_categorie, ', ') AS categories
+      SELECT DISTINCT on (p.id_produit)
+        p.id_produit, p.p_nom AS nom_article, p.p_description, p.p_stock, p.p_prix, p.p_statut,
+        i.i_lien AS image_url, r.reduction_pourcentage AS pourcentage,
+        r.reduction_debut AS debut_reduc, r.reduction_fin AS fin_reduc,
+        promo.promotion_debut AS debut_promo, promo.promotion_fin AS fin_promo,
+        STRING_AGG(DISTINCT c.nom_categorie, ', ') AS categories
     FROM cobrec1._produit p
     LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
     LEFT JOIN cobrec1._promotion promo ON p.id_produit = promo.id_produit
@@ -63,51 +93,32 @@ try {
     LEFT JOIN cobrec1._categorie_produit c ON fpd.id_categorie = c.id_categorie
     LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
     LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
-    WHERE p.id_vendeur = :id_vendeur
+    WHERE p.id_vendeur = :id_vendeur $clauseSearch $clauseCategorie
     GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, pourcentage, debut_reduc, fin_reduc, debut_promo, fin_promo, i.i_lien
     ) AS subquery
-     ORDER BY $order_sql";
+    ORDER BY $order_sql";
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute(['id_vendeur' => $vendeur_id]);
+    $stmt->execute($paramsQuery);
     $articles_bruts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $tous_les_statuts = ['En ligne', 'Hors ligne', 'Ébauche', 'Épuisé'];
-
     $filtres_actifs = isset($_GET['st']) ? explode(',', $_GET['st']) : $tous_les_statuts;
-
-    if(isset($_GET['st']) && $_GET['st'] === 'aucun'){
-      $filtres_actifs = [];
+    
+    if (isset($_GET['st']) && $_GET['st'] === 'aucun') {
+        $filtres_actifs = [];
     }
 
     $tout_est_selectionne = (count($filtres_actifs) === count($tous_les_statuts));
 
     $articles = array_filter($articles_bruts, function($article) use ($filtres_actifs){
-      $statut_reel = $article['p_statut'];
-      if($article['p_statut'] == 'En ligne' && $article['p_stock'] <= 0){
-        $statut_reel = 'Épuisé';
-      }
-      return in_array($statut_reel, $filtres_actifs);
+        $statut_reel = $article['p_statut'];
+        if($article['p_statut'] == 'En ligne' && $article['p_stock'] <= 0) $statut_reel = 'Épuisé';
+        return in_array($statut_reel, $filtres_actifs);
     });
 
-    $categorieSelection = $_POST['categorie'] ?? 'all';
-
-    $listeCategoriesCompte = [];
-    foreach ($articles_bruts as $art) {
-        if (!empty($art['categories'])) {
-            $cats = explode(', ', $art['categories']);
-            foreach ($cats as $c) {
-                $c = trim($c); 
-                $listeCategoriesCompte[$c] = ($listeCategoriesCompte[$c] ?? 0) + 1;
-            }
-        }
-    }
-    $totalProduitsSansFiltre = count($articles_bruts);
-    $afficheCategorie = preparercategories_affichage($listeCategoriesCompte);
-    $afficheCategorie[0]['count'] = $totalProduitsSansFiltre;
-
 } catch (PDOException $e) {
-    die("Erreur de connexion : " . htmlspecialchars($e->getMessage()));
+    die("Erreur : " . htmlspecialchars($e->getMessage()));
 }
 ?>
 
@@ -131,7 +142,7 @@ try {
         <div class="search-bar">
           <div class="search-bar__input">
             <span class="search-bar__icon"><img src="../../img/svg/loupe.svg" alt="loupe"></span>
-            <input type="search" placeholder="Rechercher des produits..." />
+            <input type="search" id="search_bar" placeholder="Rechercher..." value="<?= htmlspecialchars($rechercheNom) ?>" />
           </div>
         </div>
       </div>
@@ -142,7 +153,7 @@ try {
 
           <div class="tabs">
             <div class="tabs__item <?= $tout_est_selectionne ? 'tabs__item--active' : '' ?>" id="tab-all">
-              Tous les articles
+              Tous les statuts
             </div>
             <?php foreach ($tous_les_statuts as $label): ?>
               <?php $est_actif = in_array($label, $filtres_actifs); ?>
@@ -169,7 +180,7 @@ try {
             <span class="filtre__label">Trier par catégorie :</span>
             <select name="categorie" id="categorie" class="filtre__item">
                <option value="all" <?= $categorieSelection === 'all' ? 'selected' : '' ?>>
-                  Tous les produits (<?= $totalProduitsSansFiltre ?>)
+                  Tous les produits (<?= $total_article ?>)
                 </option>
                 <!--boucle sur toutes les catégories-->
                 <?php foreach($afficheCategorie as $cate):?>
@@ -335,6 +346,43 @@ try {
                 window.location.href = "?st=aucun";
               }
             });
+          });
+
+          const selectCate = document.getElementById('categorie');
+          selectCate.addEventListener('change', () => {
+              const val = selectCate.value;
+              const url = new URL(window.location.href);
+              
+              if (val === 'all') {
+                  url.searchParams.delete('cat');
+              } else {
+                  url.searchParams.set('cat', val);
+              }
+              
+              window.location.href = url.href;
+          });
+
+          const searchInput = document.getElementById('search_bar');
+          searchInput.addEventListener('keypress', (e) => {
+            if (searchInput.value !== "") {
+              searchInput.focus();
+              const val = searchInput.value;
+              searchInput.value = '';
+              searchInput.value = val;
+            }
+            if (e.key === 'Enter') {
+                const val = searchInput.value.trim();
+                const url = new URL(window.location.href);
+                
+                if (val !== "") {
+                    url.searchParams.set('search', val);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                
+                // On recharge la page avec le nouveau paramètre de recherche
+                window.location.href = url.href;
+            }
           });
         });
       </script>
