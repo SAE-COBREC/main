@@ -490,8 +490,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                     <footer>
                         <button type="button"
-                            onclick="location.href='suivi-commande.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>'">
-                            Voir les détails
+                            onclick="location.href='facture.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>'">
+                            Voir la facture
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                 <polyline points="12 5 19 12 12 19"></polyline>
@@ -807,7 +807,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             //affiche un message d'erreur si le chargement échoue
             alert(
                 'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.'
-                );
+            );
         };
         //démarre le chargement de l'image de test
         imageTest.src = urlImageSaisie;
