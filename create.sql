@@ -406,7 +406,7 @@ CREATE TABLE cobrec1._avis (
     id_produit integer NOT NULL,
     id_client integer,
     a_texte text,
-    a_note numeric(2, 1),
+    a_note integer,
     a_owner_token text,
     a_pouce_bleu integer DEFAULT 0,
     a_pouce_rouge integer DEFAULT 0,
@@ -444,25 +444,12 @@ CREATE TABLE cobrec1._vote_avis (
 CREATE TABLE cobrec1._commentaire (
     id_commentaire SERIAL NOT NULL,
     id_avis integer NOT NULL,
-    a_note numeric(2, 1),
+    a_note integer,
     id_livraison integer UNIQUE NOT NULL,
     a_achat_verifie boolean DEFAULT FALSE,
     id_client integer NOT NULL,
     CONSTRAINT verif_commentaire_note CHECK (
-        a_note IN (
-            NULL,
-            0.0,
-            0.5,
-            1.0,
-            1.5,
-            2.0,
-            2.5,
-            3.0,
-            3.5,
-            4.0,
-            4.5,
-            5.0
-        )
+        a_note IS NULL OR (a_note >= 1 AND a_note <= 5)
     )
 );
 
@@ -4240,7 +4227,7 @@ VALUES (1, '2025-11-05', 'Livré'),
 WITH lc AS (SELECT COUNT(*) AS cnt FROM _livraison)
 INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client)
 SELECT a.id_avis,
-       round((random()*4 + 1)::numeric,1),
+       (floor(random()*5)+1)::int,
        ((row_number() OVER (ORDER BY a.id_avis)-1) % (SELECT cnt FROM lc)) + 1,
        (random() > 0.7),
        a.id_client
@@ -4262,11 +4249,13 @@ DECLARE
     i int;
     v_id int;
     cid int;
+    m int;
+    j int;
     a_text text;
     a_title text;
 BEGIN
     FOR prod IN SELECT id_produit FROM _produit LOOP
-        n := (floor(random()*15)+1)::int;
+        n := (floor(random()*2)+1)::int;
         FOR i IN 1..n LOOP
             cid := (SELECT id_client FROM _client OFFSET (floor(random()* (SELECT COUNT(*) FROM _client))::int) LIMIT 1);
             a_text := (ARRAY[
@@ -4295,10 +4284,21 @@ BEGIN
             ])[(floor(random()*10)+1)::int];
 
             INSERT INTO _avis (id_produit, id_client, a_texte, a_note, a_owner_token, a_pouce_bleu, a_pouce_rouge, a_nb_signalements, a_timestamp_creation, a_timestamp_modification, a_titre)
-            VALUES (prod.id_produit, cid, a_text, round((random()*4 + 1)::numeric,1), md5(random()::text), 0, 0, 0, now() - (floor(random()*525600) || ' minutes')::interval, now() - (floor(random()*525000) || ' minutes')::interval, a_title)
+            VALUES (prod.id_produit, cid, a_text, (floor(random()*5)+1)::int, md5(random()::text), 0, 0, 0, now() - (floor(random()*525600) || ' minutes')::interval, now() - (floor(random()*525000) || ' minutes')::interval, a_title)
             RETURNING id_avis INTO v_id;
 
             INSERT INTO temp_new_avis VALUES (v_id, prod.id_produit, cid);
+
+            -- Générer 1 à 2 votes pour cet avis, liés à des clients
+            m := (floor(random()*2)+1)::int;
+            FOR j IN 1..m LOOP
+                INSERT INTO _vote_avis (id_client, id_avis, vote_type)
+                VALUES (
+                    (SELECT id_client FROM _client OFFSET (floor(random()* (SELECT COUNT(*) FROM _client))::int) LIMIT 1),
+                    v_id,
+                    CASE WHEN random() > 0.7 THEN 'dislike' ELSE 'like' END
+                ) ON CONFLICT DO NOTHING;
+            END LOOP;
         END LOOP;
     END LOOP;
 END;$$ LANGUAGE plpgsql;
@@ -4332,17 +4332,14 @@ pairs AS (
 )
 INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client)
 SELECT p.id_avis,
-       round((random()*4 + 1)::numeric,1),
+       (floor(random()*5)+1)::int,
        p.id_livraison,
        (random() > 0.6),
        p.id_client
 FROM pairs p
 WHERE NOT EXISTS (SELECT 1 FROM _commentaire c WHERE c.id_livraison = p.id_livraison);
 
--- Après création finale des avis et commentaires, définir des compteurs de pouces aléatoires 0..100 pour chaque avis
-UPDATE _avis
-SET a_pouce_bleu = (floor(random()*101))::int,
-    a_pouce_rouge = (floor(random()*101))::int;
+-- Les compteurs de pouces sont synchronisés depuis _vote_avis (via mise à jour ci-dessus) — pas d'écrasement aléatoire ici.
 
 
 -- 24. COMMENTAIRES (liés aux livraisons)
@@ -4411,7 +4408,7 @@ UPDATE _vendeur SET nb_produits_crees = 7 WHERE id_vendeur = 3;
 
 UPDATE cobrec1._produit SET p_note = 0;
 
-UPDATE cobrec1._commentaire SET a_note = 0.0;
+UPDATE cobrec1._commentaire SET a_note = 1;
 
 --------------------------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS _bordereau;
