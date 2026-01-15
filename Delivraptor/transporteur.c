@@ -317,11 +317,11 @@ int main()
         // Connexion à la base de données dans le processus fils
         PGconn *conn;
         conn = PQconnectdb(
-            "host=10.253.5.101 "
+            "host=127.0.0.1 "
             "port=5432 "
-            "dbname=saedb "
-            "user=sae "
-            "password=kira13 ");
+            "dbname=leo "
+            "user=leo "
+            "password=leo ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -346,6 +346,24 @@ int main()
             if (!ligne)
                 continue;
 
+            if (strncmp(ligne, "LOGIN ", 6) == 0)
+            {
+                char *email = NULL;
+                char *mdp = NULL;
+                char *login = ligne + 6;
+                email = strtok(login, " ");
+                mdp = strtok(NULL, " \r\n");
+
+                if (email && mdp) {
+                    printf("Email: %s, Mot de passe: %s\n", email, mdp);
+                } else {
+                    const char *rep = "ERROR LOGIN_FORMAT\n";
+                    write(client_fd, rep, strlen(rep));
+                }
+                continue;
+            }
+            {
+            }
             if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
             {
                 int already = 0;
@@ -382,7 +400,7 @@ int main()
                         FILE *script = fopen(FICHIER_SCRIPT, "a");
                         if (script != NULL)
                         {
-                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
+                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
                             fclose(script);
                             printf("Ajouté au script: STATUS_UP %d\n", bordereau);
                         }
@@ -448,7 +466,7 @@ int main()
                     {
                         char line[256];
                         char pattern[64];
-                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 10.253.5.101 9000", label);
+                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000", label);
                         while (fgets(line, sizeof(line), src))
                         {
                             if (strstr(line, pattern) == NULL)

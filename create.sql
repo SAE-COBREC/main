@@ -712,7 +712,7 @@ ADD CONSTRAINT fk_envoie_signalement_compte FOREIGN KEY (id_compte) REFERENCES c
 ALTER TABLE ONLY cobrec1._envoie_signalement
 ADD CONSTRAINT fk_envoie_signalement_signalement FOREIGN KEY (id_signalement) REFERENCES cobrec1._signalement (id_signalement) ON DELETE CASCADE;
 
--- TABLE DEFINIE_POUR
+-- TABLE DEFINIE_POURF
 CREATE TABLE cobrec1._definie_pour (
     id_seuil integer NOT NULL,
     id_compte integer NOT NULL
@@ -734,6 +734,11 @@ ADD CONSTRAINT fk_definie_pour_compte FOREIGN KEY (id_compte) REFERENCES cobrec1
 CREATE TABLE cobrec1.bordereau (
     id_bordereau integer NOT NULL,
     id_commande integer NOT NULL
+);
+
+CREATE TABLE cobrec1._login (
+    email Varchar(255) NOT NULL,
+    mdp varchar(255) NOT NULL
 );
 
 -- ============================================
@@ -4338,6 +4343,10 @@ SELECT p.id_avis,
        p.id_client
 FROM pairs p
 WHERE NOT EXISTS (SELECT 1 FROM _commentaire c WHERE c.id_livraison = p.id_livraison);
+
+INSERT INTO
+    _login (email, mdp)
+VALUES ('Client1@gmail.com', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS');
 
 -- Les compteurs de pouces sont synchronisés depuis _vote_avis (via mise à jour ci-dessus) — pas d'écrasement aléatoire ici.
 
