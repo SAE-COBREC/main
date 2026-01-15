@@ -317,12 +317,12 @@ article {
 
     .badge-bretagne {
       position: absolute;
-      top: 215px;
+      top: 150px;
       left: 80%;
       background: $primary-color-blanc;
       color: $primary-color-blanc;
       padding: 0.25rem 0.5rem;
-      border-radius: 8px;
+      border-radius: 8px 0 0 0;
       font-size: 1rem;
       font-weight: bold;
       z-index: 2;
@@ -553,7 +553,7 @@ article {
   }
   
   article > div:first-child .badge-bretagne{
-    top: 215px;
+    top: 138px;
     left: 80%;
   }
 
@@ -699,6 +699,7 @@ article {
   }
 
   article > div:first-child .badge-bretagne{
+    border-radius: 8px;
     left: 70%;
     right: 10px;
     top: 10px;
