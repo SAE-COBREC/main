@@ -195,7 +195,7 @@ if (!empty($listeProduits)) {
 //récupère la catégorie sélectionnée
 $categorieSelection = $_POST['categorie'] ?? 'all';
 //récupère le type de tri choisi
-$triSelection = $_POST['tri'] ?? 'meilleures_ventes';
+$triSelection = $_POST['tri'] ?? 'en_promotion';
 //récupère le prix maximum du filtre
 $prixMaximumFiltre = isset($_POST['price']) ? (float) $_POST['price'] : $prixMaximum;
 //récupère la note minimum du filtre
@@ -259,25 +259,26 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
 
                 <!--section pour choisir le tri-->
                 <div>
-                    <span>Tri par :</span>
+                    <h3>Tri</h3>
                     <select name="tri" id="triSelect">
                         <!--option meilleures ventes-->
-                        <option value="meilleures_ventes"
-                            <?= $triSelection === 'meilleures_ventes' ? 'selected' : '' ?>>Meilleures ventes</option>
+                        <option value="meilleures_ventes" <?= $triSelection === 'meilleures_ventes' ? 'selected' : '' ?>>
+                            Meilleures ventes</option>
                         <!--option prix croissant-->
-                        <option value="prix_croissant" <?= $triSelection === 'prix_croissant' ? 'selected' : '' ?>>Prix
-                            croissant</option>
+                        <option value="prix_croissant" <?= $triSelection === 'prix_croissant' ? 'selected' : '' ?>>
+                            Prix croissant</option>
                         <!--option prix décroissant-->
                         <option value="prix_decroissant" <?= $triSelection === 'prix_decroissant' ? 'selected' : '' ?>>
                             Prix décroissant</option>
                         <!--option mieux notés-->
-                        <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>Mieux notés</option>
+                        <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>
+                            Mieux notés</option>
                         <!--option en promotion-->
-                        <option selected value="en_promotion" <?= $triSelection === 'en_promotion' ? 'selected' : '' ?>>En
-                            promotion</option>
+                        <option value="en_promotion" <?= $triSelection === 'en_promotion' ? 'selected' : '' ?>>
+                            En promotion</option>
                         <!--option en réduction-->
-                        <option value="en_reduction" <?= $triSelection === 'en_reduction' ? 'selected' : '' ?>>En
-                            réduction</option>
+                        <option value="en_reduction" <?= $triSelection === 'en_reduction' ? 'selected' : '' ?>>
+                            En réduction</option>
                     </select>
                 </div>
 

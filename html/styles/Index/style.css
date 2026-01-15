@@ -39,9 +39,6 @@ aside {
 }
 aside form > div:first-child {
   margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 aside form > div:first-child span {
   color: #c0c0c0;
@@ -53,6 +50,9 @@ aside form > div:first-child select {
   border-radius: 20px;
   background: #FFFFFF;
   cursor: pointer;
+  margin-top: 0.9em;
+  width: 100%;
+  text-align: center;
 }
 aside form > div:nth-child(2) {
   display: flex;

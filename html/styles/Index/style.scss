@@ -96,9 +96,6 @@ aside {
   //section du tri en haut du formulaire
   form > div:first-child {
     margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
 
     //label du select
     span {
@@ -113,6 +110,9 @@ aside {
       border-radius: 20px;
       background: $primary-color-blanc;
       cursor: pointer;
+      margin-top: 0.9em;
+      width: 100%;
+      text-align: center;
     }
   }
 
