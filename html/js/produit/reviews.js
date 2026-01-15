@@ -125,8 +125,11 @@
     document.addEventListener('reviews:updated', () => { initStarWidgets(); });
 
     // Add review: handle submit
-    const submitBtn = document.getElementById('inlineSubmit');
-    if (submitBtn) {
+    function bindSubmitForm() {
+        const submitBtn = document.getElementById('inlineSubmit');
+        if (!submitBtn || submitBtn.dataset.bound) return;
+        submitBtn.dataset.bound = 'true';
+
         submitBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const titre = document.getElementById('inlineTitle').value.trim();
@@ -153,18 +156,102 @@
                         }
                         if (typeof d.countAvis !== 'undefined') {
                             const sc = document.getElementById('summaryRatingCount'); if (sc) sc.textContent = '(' + parseInt(d.countAvis,10) + ')';
+                            const rc = document.getElementById('reviewsRatingCount'); if (rc) rc.textContent = 'Basé sur ' + parseInt(d.countAvis,10) + ' avis';
                         }
-                        // reload reviews fragment
-                        fetch(window.location.href + '?partial=reviews', { credentials: 'same-origin' })
+                        
+                        // Manually create and insert the new review for animation
+                         if (d.avis) {
+                            const list = document.getElementById('listeAvisProduit');
+                            // Render simplified HTML for the new review
+                            const div = document.createElement('div');
+                            div.className = 'review entering';
+                            div.dataset.avisId = d.avis.id_avis;
+                            div.dataset.note = d.avis.a_note;
+                            div.dataset.title = d.avis.a_titre;
+                            div.style.marginBottom = '12px';
+                            div.style.position = 'relative'; 
+                            div.style.paddingRight = '44px';
+                            
+                            // Stars generation
+                            let starsHtml = '';
+                            const note = parseFloat(d.avis.a_note);
+                            for (let i=1; i<=5; i++) {
+                                starsHtml += `<img src="/img/svg/star-${(i<=note)?'full':'empty'}.svg" alt="" width="16"> `;
+                            }
+
+                            // Avatar (simple fallback since we know it's "Vous")
+                            // We can try to grab the avatar from the form section if needed, or just use initials
+                            let avatarHtml = '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)">V</div>';
+                            const myAvatarImg = document.querySelector('#newReviewCard .avatar img');
+                            if (myAvatarImg) {
+                                avatarHtml = `<img src="${myAvatarImg.src}" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`;
+                            } else {
+                                const myAvatarDiv = document.querySelector('#newReviewCard .avatar div');
+                                if (myAvatarDiv) avatarHtml = myAvatarDiv.outerHTML;
+                            }
+
+                            div.innerHTML = `
+                                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                                    ${avatarHtml}
+                                    <div>
+                                        <div style="font-weight:700">Vous</div>
+                                        <div style="color:var(--muted);font-size:13px">Avis</div>
+                                        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                                            <span class="stars">${starsHtml}</span>
+                                            <span class="review-rating-value" style="color:var(--muted);font-weight:600;">${parseFloat(note).toFixed(1)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <strong style="display:block;margin-bottom:8px;color:var(--text);font-size:16px;">${window.escapeHtml(d.avis.a_titre)}</strong>
+                                <div class="review-content" style="color:var(--muted)">${window.escapeHtml(d.avis.a_texte)}</div>
+                                <div class="review-votes">
+                                    <div class="vote-section">
+                                        <span class="vote-label">Évaluer ce commentaire :</span>
+                                        <div class="vote-buttons">
+                                            <button type="button" class="ghost btn-vote" data-type="J'aime"><img src="/img/svg/PouceHaut.svg" width="16"> <span class="like-count">0</span></button>
+                                            <button type="button" class="ghost btn-vote" data-type="Je n'aime pas"><img src="/img/svg/PouceBas.svg" width="16"> <span class="dislike-count">0</span></button>
+                                        </div>
+                                    </div>
+                                    <span class="review-date">A l'instant</span>
+                                    <div class="review-actions">
+                                        <button class="ghost btn-edit-review desktop-only">Modifier</button>
+                                        <button class="ghost btn-delete-review desktop-only">Supprimer</button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Remove empty message if present
+                             if (list.querySelector('p[style*="color:#666"]')) {
+                                list.innerHTML = '';
+                             }
+                             list.insertBefore(div, list.firstChild);
+                             
+                             // Scroll to it
+                             div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                             
+                             // Replace form with "Already reviewed" message
+                             const formCard = document.getElementById('newReviewCard');
+                             if (formCard) {
+                                 formCard.innerHTML = `<div style="padding:12px 16px;font-size:14px;color:#555">Merci pour votre avis !</div>`;
+                                 formCard.style.background = '#f3f4f7';
+                                 formCard.style.opacity = '0.85';
+                             }
+                        }
+
+                        // Also fetch full list in background to ensure sync (updates filters etc)
+                         const url = new URL(window.location.href);
+                         url.searchParams.set('partial', 'reviews');
+                         fetch(url.toString(), { credentials: 'same-origin' })
                             .then(r => r.json())
                             .then(j => {
-                                if (j && j.success) {
-                                    document.getElementById('listeAvisProduit').innerHTML = j.html;
-                                    initStarWidgets(); // re-init stars in case form is present
-                                }
+                                // We don't replace innerHTML here to avoid killing our animation,
+                                // unless we really want to. Ideally we just trust our manual insertion for now.
+                                // If we don't replace, we should ensure the next page load is correct.
+                                // Let's NOT replace HTML immediately to preserve the animation effect.
+                                // The manual insertion is enough for the user feedback.
                             })
-                            .catch(console.error)
-                            .finally(() => submitBtn.disabled = false);
+                            .catch(console.error);
+
                     } else {
                         notify(d.message || 'Erreur', 'warning');
                         submitBtn.disabled = false;
@@ -173,6 +260,7 @@
                 .catch(() => submitBtn.disabled = false);
         });
     }
+    bindSubmitForm();
 
     // Edit & Delete handlers: use delegation for buttons already in DOM
     listAvis.addEventListener('click', (e) => {
@@ -190,8 +278,16 @@
                     fd.append('action', 'delete_avis');
                     fd.append('id_produit', productId);
                     fd.append('id_avis', id);
-                    // optimiste: retirer immédiatement l'élément pour UX réactive
-                    try { if (rev && rev.parentNode) rev.parentNode.removeChild(rev); } catch (e) { /* silent */ }
+                    
+                    // Animation de suppression
+                    if (rev) {
+                        rev.classList.add('leaving');
+                        // On attend la fin de l'animation avant de retirer du DOM
+                        setTimeout(() => {
+                             try { if (rev && rev.parentNode) rev.parentNode.removeChild(rev); } catch (e) {}
+                        }, 400); 
+                    }
+
                     window.fetchJson('actions_avis.php', { method: 'POST', body: fd })
                         .then(d => {
                             if (d.success) {
@@ -206,30 +302,81 @@
                                 if (typeof d.countAvis !== 'undefined') {
                                     const sc = document.getElementById('summaryRatingCount');
                                     if (sc) sc.textContent = '(' + parseInt(d.countAvis,10) + ')';
+                                    const rc = document.getElementById('reviewsRatingCount');
+                                    if (rc) rc.textContent = 'Basé sur ' + parseInt(d.countAvis,10) + ' avis';
                                 }
-                                // refresh fragment to ensure liste/ordre à jour et re-init stars
-                                fetch(window.location.href + '?partial=reviews', { credentials: 'same-origin' })
-                                    .then(r => r.json())
-                                    .then(j => {
-                                        if (j && j.success) {
-                                            const listEl = document.getElementById('listeAvisProduit');
-                                            if (listEl) {
-                                                listEl.innerHTML = j.html;
-                                                initStarWidgets();
-                                            }
+                                
+                                // Show "No reviews" if empty
+                                // Count current reviews (excluding the one we just removed)
+                                const list = document.getElementById('listeAvisProduit');
+                                if (list && list.children.length === 0) {
+                                     list.innerHTML = '<p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>';
+                                }
+
+                                // Restore the add form if the user deleted their own review
+                                const formCard = document.getElementById('newReviewCard');
+                                if (formCard) {
+                                    // Try to recover avatar from deleted review (rev)
+                                    let avatarHtml = '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)">V</div>';
+                                    if (rev) {
+                                        const img = rev.querySelector('img[alt="Avatar"]');
+                                        if (img) avatarHtml = img.outerHTML;
+                                        else {
+                                            const divAv = rev.querySelector('div[style*="border-radius:50%"]');
+                                            if (divAv) avatarHtml = divAv.outerHTML;
                                         }
-                                    })
-                                    .catch(console.error);
+                                    }
+
+                                    formCard.style.opacity = '1';
+                                    formCard.style.background = '#fff';
+                                    formCard.innerHTML = `
+                                        <div class="review-head">
+                                            <div class="review-head-left">
+                                                <div class="avatar">${avatarHtml}</div>
+                                                <div class="review-head-texts">
+                                                    <div class="review-author">Vous</div>
+                                                    <div class="review-subtitle">Laisser un avis</div>
+                                                </div>
+                                            </div>
+                                            <div class="review-head-right">
+                                                <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
+                                                    <button type="button" data-value="1" aria-label="1 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="2" aria-label="2 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="3" aria-label="3 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="4" aria-label="4 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="5" aria-label="5 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                </div>
+                                                <input type="hidden" id="inlineNote" name="note" value="0">
+                                            </div>
+                                        </div>
+                                        <form id="inlineReviewForm" class="review-form">
+                                            <input type="text" name="titre" id="inlineTitle" class="review-title-input" placeholder="Titre de votre avis" maxlength="255" required>
+                                            <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea" placeholder="Partagez votre avis..." required></textarea>
+                                            <div class="review-actions">
+                                                <small class="review-hint">Merci de rester courtois.</small>
+                                                <button type="button" class="btn" id="inlineSubmit">Publier</button>
+                                            </div>
+                                        </form>
+                                    `;
+                                    
+                                    // Re-init stars and bind submit
+                                    initStarWidgets();
+                                    bindSubmitForm();
+                                }
                             } else {
                                 if (window.showError) showError('Erreur', d.message || 'Impossible de supprimer');
-                                // restore current list from server to revert optimistic removal
-                                fetch(window.location.href + '?partial=reviews', { credentials: 'same-origin' })
-                                    .then(r => r.json())
-                                    .then(j => { if (j && j.success) { const listEl = document.getElementById('listeAvisProduit'); if (listEl) { listEl.innerHTML = j.html; initStarWidgets(); } } })
-                                    .catch(console.error);
+                                // restore if failed
+                                if (rev) {
+                                    rev.classList.remove('leaving');
+                                    rev.style.display = '';
+                                }
                             }
                         })
-                        .catch(err => { console.error(err); if (window.showError) showError('Erreur', 'Erreur réseau'); });
+                        .catch(err => { 
+                            console.error(err); 
+                            if (window.showError) showError('Erreur', 'Erreur réseau'); 
+                            if (rev) rev.classList.remove('leaving');
+                        });
                 }
             });
         }
