@@ -635,7 +635,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
         </div>
     </div>
 
-    <script src="/js/HL_import.js"></script>
+    
     <script src="/js/notifications.js"></script>
     <script>
         window.PRODUCT_ID = <?= (int)$idProduit ?>;

@@ -55,7 +55,7 @@ http_response_code(404);
 </head>
 
 <body>
-    <div id="header"></div>
+    <?php include_once __DIR__ . '/../../components/header.php'; ?>
 
     <main class="container">
         <div class="not-found">
@@ -76,7 +76,8 @@ http_response_code(404);
     <div id="footer"></div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="/js/HL_import.js"></script>
+
+    <?php include_once __DIR__ . '/../../components/footer.php'; ?>
 </body>
 
 </html>
