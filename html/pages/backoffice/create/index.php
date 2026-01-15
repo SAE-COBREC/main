@@ -125,7 +125,7 @@
                             $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);
                             $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] = str_replace(' ','_',$_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key]);
                             
-                            print_r("\n" . $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] . "\n" . 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] . "\n");
+                            //print_r("\n" . $_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key] . "\n" . 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key] . "\n");
                             if (file_exists($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key])){
                                 copy($_SESSION["creerArticle"]["_FILES"]['photo']['tmp_name'][$key], 
                                 'temp_/' . $_SESSION["creerArticle"]["_FILES"]['photo']['name'][$key]);

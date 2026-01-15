@@ -53,32 +53,8 @@
         }catch (Exception $e){}
     }
 
-?>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Récapitulatif d'achat</title>
-        <link rel="icon" type="image/png" href="../../img/favicon.svg">
-        <link rel="stylesheet" href="/styles/Panier/stylesPanier.css">
-        <link rel="stylesheet" href="/styles/post-achat/post-achat.css">
-        <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-        <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
-    </head>
-    <?php
-    include __DIR__ . '/../../partials/header.php';
-    ?>
-    <body>
-        <main>
-            <article class="recapCommande">
-                <button>Télécharger la facture</button>
-            </article>
-        </main>
-    </body>
-    <?php
-    include __DIR__ . '/../../partials/footer.html';
-    include __DIR__ . '/../../partials/toast.html';
-    include __DIR__ . '/../../partials/modal.html';
-    ?>
 
-</html>
+    header("Location: /impression.php");
+    exit(0);
+
+?>

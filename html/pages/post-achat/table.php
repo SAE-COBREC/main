@@ -1,5 +1,4 @@
 <?php
-    session_start();
     $totalHT = 0;
     $netCom = 0;
     $totalTTC = 0;
@@ -37,34 +36,36 @@
             
             ?></td>
             <td><?php  echo $value["quantite"]; ?></td>
-            <td><?php  echo $value["prix_unitaire"] . ' €'; ?></td>
+            <td><?php  echo number_format($value["prix_unitaire"] , 2, ',') . ' €'; ?></td>
             <td><?php  
-                    echo ($value["quantite"] * $value["prix_unitaire"]) . ' €'; 
+                    echo number_format(($value["quantite"] * $value["prix_unitaire"]) , 2, ',') . ' €'; 
                     $totalHT += $value["quantite"] * $value["prix_unitaire"];
             ?></td>
-            <td><?php echo $value["remise_unitaire"] . ' %'; ?></td>
-            <td><?php  echo $value["tva"] . ' %'; ?></td>
+            <td><?php if ($value["remise_unitaire"] != 0) echo number_format($value["remise_unitaire"] , 2, ',') . ' %'; ?></td>
+            <td><?php  echo number_format($value["tva"] , 2, ',') . ' %'; ?></td>
             <td><?php  
-                echo ((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * $value["tva"]) . ' €'; 
-                $netCom += ($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"]);
-                $totalTTC += (($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * $value["tva"];
+                echo number_format(round(((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * $value["tva"]),2) , 2, ',') . ' €'; 
+                $netCom += round(($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"]),2);
+                $totalTTC += round((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * $value["tva"], 2);
             ?></td>
         </tr>
         <?php
             }
         ?>
-        <tr><td colspan="5"></td></tr>
+        </tbody>
+    </table>
+    <br>
+    <table>
         <tr>
-            <td colspan="4">Montant brut HT</td>
-            <td><?php echo $totalHT . ' €' ?></td>
+            <td colspan="7">Montant brut HT</td>
+            <td><?php echo number_format($totalHT , 2, ',') . ' €' ?></td>
         </tr>
         <tr>
-            <td colspan="5">= Net commercial</td>
-            <td><?php echo $netCom . ' €' ?></td>
+            <td colspan="7">Net commercial  </td>
+            <td><?php echo number_format($netCom , 2, ',') . ' €' ?></td>
         </tr>
         <tr>
             <td colspan="7">Net à payer TTC</td>
-            <td><?php echo $totalTTC . ' €' ?></td>
+            <td><strong><?php echo number_format($totalTTC, 2, ',', ' ') . ' €' ?></strong></td>
         </tr>
-    </tbody>
 </table>

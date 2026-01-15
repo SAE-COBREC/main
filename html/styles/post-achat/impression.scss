@@ -1,0 +1,122 @@
+@use '../_variable.scss' as *;
+
+body{
+    aside{
+        position: absolute;
+        left: 80%;
+        background-color: $secondary-color-bleu-info-fond;
+        width: 20%;
+        border: 3px solid $primary-color-bleu;
+        border-radius: 5%;
+        hr{
+            color: $primary-color-bleu;
+            margin: 2%;
+        }
+        table{
+            thead{
+                font-size:20px;
+                font-weight: bold;
+            }
+            tr {
+                margin: 10px;
+            }
+            td{
+                padding: 2px;
+            }
+        }
+    }
+    article:first-of-type{
+        margin-top:7%;
+    }
+    article:nth-of-type(2){
+        table{
+            border: 3px solid $secondary-color-gris-fonce;
+        }
+        table:first-of-type{
+            width: 75%;
+            tr, td {
+                padding: 2px;
+            }
+            thead{
+                tr, td {
+                    border: 1px solid;
+                }
+            }
+            tbody{
+                tr, td{
+                    border-right: 1px solid;   
+                    border-left: 0px;
+                }
+                tr:nth-child(2n){
+                    background-color: $secondary-color-gris-clair;
+                }
+            }
+        }
+        table:nth-of-type(2){
+            width: 20%;
+            position: relative;
+            left: 55%;
+            tr, td{
+                border: 1px solid;   
+            }
+        }
+    }
+}
+footer{
+    position: absolute;
+    bottom: 2%;
+}
+
+@media print {
+    *{
+        margin:0;
+        padding:0;
+    }
+    body{
+        size: A4;
+        aside{
+            width: 80mm;
+            left: 65%;
+            tr {
+                margin: 1mm;
+            }
+            td{
+                padding: 1mm;
+            }
+        }
+        article:nth-of-type(2){
+            print-color-adjust: exact !important;
+            margin-top:80mm;
+            width:250mm;
+            table{
+                border: 5px solid black exact !important;
+                thead{
+                    text-align: center;
+                }
+                tbody{
+                    text-align: right;
+                }
+            }
+
+            table:first-of-type{
+                width:250mm;
+                tr:nth-child(2n){
+                    background-color: $secondary-color-gris-fonce;
+                }
+            }
+            table:nth-of-type(2){
+                width: 100mm;
+                left: 60%;
+                tr{
+                    td:first-of-type{
+                        text-align: center;
+                    }
+                }
+            }
+        }
+    }
+    footer{
+        position: absolute;
+        bottom: 2mm;
+    }
+}

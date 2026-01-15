@@ -1,0 +1,113 @@
+* {
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body aside {
+  position: absolute;
+  left: 80%;
+  background-color: #D1ECF1;
+  width: 20%;
+  border: 3px solid #7171A3;
+  border-radius: 5%;
+}
+body aside hr {
+  color: #7171A3;
+  margin: 2%;
+}
+body aside table thead {
+  font-size: 20px;
+  font-weight: bold;
+}
+body aside table tr {
+  margin: 10px;
+}
+body aside table td {
+  padding: 2px;
+}
+body article:first-of-type {
+  margin-top: 7%;
+}
+body article:nth-of-type(2) tr, body article:nth-of-type(2) td {
+  border: 3px solid #c0c0c0;
+}
+body article:nth-of-type(2) table:first-of-type {
+  width: 75%;
+}
+body article:nth-of-type(2) table:first-of-type tr, body article:nth-of-type(2) table:first-of-type td {
+  padding: 2px;
+}
+body article:nth-of-type(2) table:first-of-type thead tr, body article:nth-of-type(2) table:first-of-type thead td {
+  border: 1px solid;
+}
+body article:nth-of-type(2) table:first-of-type tbody tr, body article:nth-of-type(2) table:first-of-type tbody td {
+  border-right: 1px solid;
+  border-left: 0px;
+}
+body article:nth-of-type(2) table:first-of-type tbody tr:nth-child(2n) {
+  background-color: #EFEFEF;
+}
+body article:nth-of-type(2) table:nth-of-type(2) {
+  width: 20%;
+  position: relative;
+  left: 55%;
+}
+body article:nth-of-type(2) table:nth-of-type(2) tr, body article:nth-of-type(2) table:nth-of-type(2) td {
+  border: 1px solid;
+}
+
+footer {
+  position: absolute;
+  bottom: 2%;
+}
+
+@media print {
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    size: A4;
+  }
+  body aside {
+    width: 80mm;
+    left: 65%;
+  }
+  body aside tr {
+    margin: 1mm;
+  }
+  body aside td {
+    padding: 1mm;
+  }
+  body article:nth-of-type(2) {
+    -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+    margin-top: 80mm;
+    width: 250mm;
+  }
+  body article:nth-of-type(2) table {
+    border: 5px solid black exact !important;
+  }
+  body article:nth-of-type(2) table thead {
+    text-align: center;
+  }
+  body article:nth-of-type(2) table tbody {
+    text-align: right;
+  }
+  body article:nth-of-type(2) table:first-of-type {
+    width: 250mm;
+  }
+  body article:nth-of-type(2) table:first-of-type tr:nth-child(2n) {
+    background-color: #c0c0c0;
+  }
+  body article:nth-of-type(2) table:nth-of-type(2) {
+    width: 100mm;
+    left: 60%;
+  }
+  body article:nth-of-type(2) table:nth-of-type(2) tr td:first-of-type {
+    text-align: center;
+  }
+  footer {
+    position: absolute;
+    bottom: 2mm;
+  }
+}/*# sourceMappingURL=impression.css.map */
