@@ -41,12 +41,12 @@ if (isset($_SESSION['idClient'])) {
             </a>
         </div>
 
-        <!--barre de recherche par vendeur-->
+        <!--barre de recherche par nom de produit-->
         <div class="search-container" style="justify-content: normal;">
             <form method="POST" class="search-form">
                 <!--icône de loupe-->
                 <img src="/img/svg/loupe.svg" alt="Loupe de recherche" class="fas fa-shopping-cart icon loupe-icon">
-                <!--champ de saisie pour le nom du vendeur-->
+                <!--champ de saisie pour le nom de produit-->
                 <input type="search" id="nomChercher" name="nomChercher"
                     placeholder="Rechercher un produit (ex: Smartphone, Pull, Bracelet...)" class="search-input"
                     value="<?= htmlspecialchars($rechercheNom) ?>" autofocus>
