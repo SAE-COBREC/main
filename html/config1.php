@@ -1,7 +1,8 @@
 <?php
-$serveur = '127.0.0.1';
-$port = '5432';
+$serveur = '10.253.5.101';
 $driver = 'pgsql';
-$dbname = 'base_sae';
-$user = 'nom_utilisateur';
-$password = 'motdepasse';
+$dbname = 'saedb';
+$user = 'sae';
+$pass = 'kira13';
+$port = 5432;
+?> 
