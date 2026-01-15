@@ -15,6 +15,7 @@ function chargerProduitsBDD($pdo)
             p.p_description,
             p.p_prix,
             p.p_stock,
+            p.p_nb_ventes,
             r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
@@ -797,6 +798,7 @@ function chargerProduitBDD($pdo, $idProduit) {
                 p.p_stock,
                 p.p_statut,
                 p.p_description,
+                p.p_nb_ventes,
                 COALESCE(p.p_nb_ventes, 0) AS p_nb_ventes,
                 COALESCE(p.p_note, 0) AS p_note,
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
@@ -1290,8 +1292,8 @@ function trierProduits($listeProduits, $tri_par)
         case 'meilleures_ventes':
         default:
             usort($listeProduits, function ($produitA, $produitB) {
-                $nombreVentesA = (int)($produitA['p_nbventes'] ?? 0);
-                $nombreVentesB = (int)($produitB['p_nbventes'] ?? 0);
+                $nombreVentesA = (int)($produitA['p_nb_ventes'] ?? 0);
+                $nombreVentesB = (int)($produitB['p_nb_ventes'] ?? 0);
                 
                 $comparison = $nombreVentesB <=> $nombreVentesA;
                 
@@ -1370,6 +1372,7 @@ function ProduitDenominationVendeur($pdo, $denomination) {
             p.p_description,
             p.p_prix,
             p.p_stock,
+            p.p_nb_ventes,
             r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
@@ -1411,6 +1414,7 @@ function chercherProduitsNom($pdo, $nomProduit) {
             p.p_description,
             p.p_prix,
             p.p_stock,
+            p.p_nb_ventes,
             r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
