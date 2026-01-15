@@ -490,7 +490,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                     <footer>
                         <button type="button"
-                            onclick="location.href='facture.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>'">
+                            onclick="location.href='../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>'">
                             Voir la facture
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
