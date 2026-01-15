@@ -435,7 +435,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                             else
                                                 $s = 'empty';
                                             ?>
-                                <img src="/img/svg/star-yellow-<?= $s ?>.svg" alt="Etoile" width="20">
+                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                                 <?php endfor; ?>
                             </span>
                             <!--affiche le nombre d'avis-->
