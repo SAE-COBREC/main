@@ -412,7 +412,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <span class="badge-reduction">-<?= round($produitCourant['reduction_pourcentage']) ?>%</span>
                         <?php endif; ?>
                         <?php if ($origineProduit == "Bretagne"): ?>
-                        <span class="badge-bretagne"><img src="/img/svg/bretagne.png" alt="Bretagne"></span>
+                        <span class="badge-bretagne"><img src="/img/png/badge-bretagne.png" alt="Bretagne"></span>
                         <?php endif; ?>
                         <!--affiche le message de rupture de stock si nécessaire-->
                         <?php if ($estEnRupture): ?>

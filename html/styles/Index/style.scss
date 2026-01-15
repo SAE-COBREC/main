@@ -441,27 +441,52 @@ article {
 
 //bordure spéciale pour les produits en promotion
 .produit-promotion {
-  border: 2px solid $primary-color-bronze !important;
-  box-shadow: 0 4px 15px rgba(205, 127, 50, 0.2); 
+  border: 2px solid $primary-color-bleu !important;
+  background-color: $secondary-color-promotion !important;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // ensure card content stays above the blur layer
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 //style spécial du bouton pour les promotions
 .produit-promotion button:not(:disabled) {
-  background: $primary-color-bronze !important;
+  background: $primary-color-bleu !important;
   color: $primary-color-blanc !important;
-  border: 2px solid $primary-color-bronze !important;
+  border: 2px solid $secondary-color-promotion !important;
 }
 
 //effet hover du bouton en promotion
 .produit-promotion button:hover:not(:disabled) {
   background: $primary-color-blanc !important;
-  color: $primary-color-bronze !important;
+  color: $primary-color-bleu !important;
 }
 
 //style pour produit en rupture ET en promotion
 .produit-rupture.produit-promotion {
   border: 2px solid $secondary-color-rouge !important;
   opacity: 0.7;
+}
+
+//change le fond du badge bretagne quand en promotion
+.produit-promotion .badge-bretagne {
+  background-color: $secondary-color-promotion !important;
 }
 
 // ============================================
