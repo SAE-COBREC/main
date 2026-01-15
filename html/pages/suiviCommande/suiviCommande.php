@@ -5,7 +5,7 @@ session_start();
 $id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? $_SESSION['id_commande'] ?? 0;
 
 function envoyerCommande($id_commande) {
-    $host = '127.0.0.1';
+    $host = '10.253.5.101';
     $port = 9000;
     $fp = @fsockopen($host, $port, $errno, $errstr, 2);
     if (!$fp) {
@@ -30,7 +30,7 @@ function envoyerCommande($id_commande) {
 }
 
 function getStatusFromSocket($bordereau) {
-    $fp = fsockopen('127.0.0.1', 9000, $errno, $errstr, 2);
+    $fp = fsockopen('10.253.5.101', 9000, $errno, $errstr, 2);
     if (!$fp) {
         return "Erreur de connexion: $errstr ($errno)";
     }

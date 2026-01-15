@@ -317,11 +317,11 @@ int main()
         // Connexion à la base de données dans le processus fils
         PGconn *conn;
         conn = PQconnectdb(
-            "host=127.0.0.1 "
+            "host=10.253.5.101 "
             "port=5432 "
-            "dbname=base_sae "
-            "user=nom_utilisateur "
-            "password=motdepasse ");
+            "dbname=saedb "
+            "user=sae "
+            "password=kira13 ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -382,7 +382,7 @@ int main()
                         FILE *script = fopen(FICHIER_SCRIPT, "a");
                         if (script != NULL)
                         {
-                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
+                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
                             fclose(script);
                             printf("Ajouté au script: STATUS_UP %d\n", bordereau);
                         }
@@ -448,7 +448,7 @@ int main()
                     {
                         char line[256];
                         char pattern[64];
-                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000", label);
+                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 10.253.5.101 9000", label);
                         while (fgets(line, sizeof(line), src))
                         {
                             if (strstr(line, pattern) == NULL)
