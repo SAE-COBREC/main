@@ -8,6 +8,7 @@
 #include <string.h>
 #include <postgresql/libpq-fe.h>
 #include <stdbool.h>
+#include <signal.h>
 
 #define PORT 9000
 #define BUFFER_SIZE 256
@@ -192,26 +193,65 @@ void change_status(PGconn *conn, int bordereau_recherche, int new_stat)
         id_bordereau_bdd};
 
     PGresult *res = PQexecParams(conn, "UPDATE cobrec1._bordereau SET etat_suivis = $1  WHERE id_bordereau = $2",
-                 2,
-                 NULL,
-                 params,
-                 NULL,
-                 NULL,
-                 0);
-    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+                                 2,
+                                 NULL,
+                                 params,
+                                 NULL,
+                                 NULL,
+                                 0);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
         fprintf(stderr, "Erreur UPDATE: %s\n", PQerrorMessage(conn));
     }
     PQclear(res);
 }
 
+int cherche_bordereau(PGconn *conn, int id_commande, int *bordereau)
+{
+    char id_commande_bdd[TAILLE_CHAINE_MAX];
+    PGresult *res;
+    snprintf(id_commande_bdd, sizeof(id_commande_bdd), "%d", id_commande);
+    const char *params[1] = {id_commande_bdd};
+    res = PQexecParams(conn, "SELECT id_bordereau FROM cobrec1._bordereau WHERE id_commande = $1",
+                       1,
+                       NULL,
+                       params,
+                       NULL,
+                       NULL,
+                       0);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) // est-ce que PostgreSQL a exécuté la requête SELECT sans erreur ? si oui PGRES_TUPLES_OK si non Erreur SQL
+    {
+        fprintf(stderr, "Erreur SELECT: %s\n", PQerrorMessage(conn)); // PQerrorMessage affichera un emssage plus claire et précis que juste Erreur SELECT (par ex relation not exist)
+        PQclear(res);                                                 // libère la mémoire de PGresult sinon la mémoire s'acumulent
+        return -1;                                                    // renvoie -1 si erreur
+    }
+    if ((PQntuples(res) > 0)) // PQntuples renvoie le nombre de ligne retourné par la reqeute select
+    {
+        *bordereau = atoi(PQgetvalue(res, 0, 0));
+        PQclear(res);
+        return 1;
+    }
+    else
+    {
+        PQclear(res); // libère la mémoire de PGresult sinon la mémoire s'acumulent
+        return 0;     // renvoi 0 si rien n'est trouvé
+    }
+}
+
 int main()
 {
+    signal(SIGCHLD, SIG_IGN);
     int sock, client_fd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
     char buffer[BUFFER_SIZE];
     int opt = 1;
     int bordereau;
+
+    char livre_en_quoi[3][40] = {
+        "Livré en main propre",
+        "Livré en absence du destinataire",
+        "Refusé"};
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) // si l'initialisatio na échoué erreur de socket
@@ -261,12 +301,14 @@ int main()
 
         // Fork
         pid_t pid = fork();
-        if (pid < 0) {
+        if (pid < 0)
+        {
             perror("fork");
             close(client_fd);
             continue;
         }
-        if (pid > 0) {
+        if (pid > 0)
+        {
             close(client_fd);
             continue;
         }
@@ -277,9 +319,9 @@ int main()
         conn = PQconnectdb(
             "host=127.0.0.1 "
             "port=5432 "
-            "dbname=leo "
-            "user=leo "
-            "password=leo ");
+            "dbname=base_sae "
+            "user=nom_utilisateur "
+            "password=motdepasse ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -317,6 +359,7 @@ int main()
                 else if (existe == 1)
                 {
                     already = 1;
+                    int re = cherche_bordereau(conn, id_commande, &bordereau);
                 }
                 else
                 {
@@ -337,11 +380,14 @@ int main()
 
                         // Ajouter la ligne dans script.bash pour ajouter la commande a cron
                         FILE *script = fopen(FICHIER_SCRIPT, "a");
-                        if (script != NULL) {
+                        if (script != NULL)
+                        {
                             fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
                             fclose(script);
                             printf("Ajouté au script: STATUS_UP %d\n", bordereau);
-                        } else {
+                        }
+                        else
+                        {
                             perror("Erreur ouverture script.bash");
                         }
                     }
@@ -378,21 +424,35 @@ int main()
             }
             // STAT evo
 
-            else if (strncmp(ligne, "STATUS_UP", 9) == 0) {
+            else if (strncmp(ligne, "STATUS_UP", 9) == 0)
+            {
                 int label = atoi(ligne + 10);
                 // récupere le statut actuel
                 int status_act = chercher_status_par_bordereau(conn, label);
-                //verifie si la commande est arrivée
-                if (status_act >= 5) {
+                int new_status = status_act + 1;
+                // verifie si la commande est arrivée
+                if (new_status == 5)
+                {
+                    int max = 2;
+                    int id_raison = rand() % (max + 1);
+                    char comment_livre[40];
+                    strcpy(comment_livre, livre_en_quoi[id_raison]);
+                    write(client_fd, comment_livre, strlen(comment_livre));
+                }
+                else if (status_act >= 5)
+                {
                     // Suppression de la ligne correspondante dans script.bash
                     FILE *src = fopen(FICHIER_SCRIPT, "r");
                     FILE *tmp = fopen("script_tmp.bash", "w");
-                    if (src && tmp) {
+                    if (src && tmp)
+                    {
                         char line[256];
                         char pattern[64];
                         snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000", label);
-                        while (fgets(line, sizeof(line), src)) {
-                            if (strstr(line, pattern) == NULL) {
+                        while (fgets(line, sizeof(line), src))
+                        {
+                            if (strstr(line, pattern) == NULL)
+                            {
                                 fputs(line, tmp);
                             }
                         }
@@ -400,25 +460,35 @@ int main()
                         fclose(tmp);
                         remove(FICHIER_SCRIPT);
                         rename("script_tmp.bash", FICHIER_SCRIPT);
-                    } else {
-                        if (src) fclose(src);
-                        if (tmp) fclose(tmp);
+                    }
+                    else
+                    {
+                        if (src)
+                            fclose(src);
+                        if (tmp)
+                            fclose(tmp);
                     }
                     const char *msg = "COMMANDE FINI\n";
                     write(client_fd, msg, strlen(msg));
-                //incremente le status
-                } else if (status_act >= 0) {
-                    int new_status = status_act + 1;  
+                    // incremente le status
+                }
+                else if (status_act >= 0)
+                {
+                    int new_status = status_act + 1;
                     change_status(conn, label, new_status);
 
                     char response[BUFFER_SIZE];
                     snprintf(response, sizeof(response),
-                            "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
+                             "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
                     write(client_fd, response, strlen(response));
-                } else if (status_act == -2) {
+                }
+                else if (status_act == -2)
+                {
                     const char *msg = "ERREUR, aucune commande trouvee\n";
                     write(client_fd, msg, strlen(msg));
-                } else { // -1
+                }
+                else
+                { // -1
                     const char *msg = "ERREUR SELECT\n";
                     write(client_fd, msg, strlen(msg));
                 }
@@ -434,7 +504,7 @@ int main()
         printf("Client déconnecté.\n");
         close(client_fd);
         PQfinish(conn); // coupe la connexion a postgresql
-        exit(0); // Termine le processus fils proprement
+        exit(0);        // Termine le processus fils proprement
     }
     close(sock);
     return 0;
