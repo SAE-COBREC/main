@@ -1157,6 +1157,7 @@ VALUES (
 INSERT INTO
     _adresse (
         id_compte,
+        a_numero,
         a_adresse,
         a_ville,
         a_code_postal,
@@ -1164,66 +1165,83 @@ INSERT INTO
     )
 VALUES (
         4,
-        '15 rue de la Paix',
+        15,
+        'rue de la Paix',
         'Paris',
         '75001',
         'Apt 5'
     ),
     (
         5,
-        '23 avenue des Champs',
+        23,
+        'avenue des Champs',
         'Lyon',
         '69001',
         NULL
     ),
     (
         6,
-        '8 boulevard Victor Hugo',
+        8,
+        'boulevard Victor Hugo',
         'Marseille',
         '13001',
         'Bâtiment B'
     ),
     (
         7,
-        '42 rue du Commerce',
+        42,
+        'rue du Commerce',
         'Toulouse',
         '31000',
         NULL
     ),
     (
         8,
-        '67 place de la République',
+        67,
+        'place de la République',
         'Nice',
         '06000',
         '3ème étage'
     ),
     (
         9,
-        '91 rue Principale',
+        91,
+        'rue Principale',
         'Bordeaux',
         '33000',
         NULL
     ),
     (
         2,
-        '12 avenue du Commerce',
+        12,
+        'avenue du Commerce',
         'Paris',
         '75015',
         'Entrepôt A'
     ),
     (
         3,
-        '55 rue de la Mode',
+        55,
+        'rue de la Mode',
         'Lyon',
         '69002',
         NULL
     ),
     (
         10,
-        '78 boulevard du Sport',
+        78,
+        'boulevard du Sport',
         'Marseille',
         '13008',
         'Zone industrielle'
+    ),
+    (
+        4,
+        13,
+        'rue du Pillard',
+        'Rennes',
+        35590,
+        'France'
     );
 
 -- 6. COULEURS
@@ -3976,24 +3994,6 @@ VALUES (
     (
         1,
         'Rupture de stock - Produit indisponible'
-    );
-
-INSERT INTO
-    _adresse (
-        id_compte,
-        a_numero,
-        a_adresse,
-        a_ville,
-        a_code_postal,
-        a_pays
-    )
-VALUES (
-        4,
-        13,
-        'rue du Pillard',
-        'Rennes',
-        35590,
-        'France'
     );
 
 -- 18. PANIERS/COMMANDES

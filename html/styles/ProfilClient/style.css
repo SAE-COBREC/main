@@ -181,7 +181,10 @@ main section article > footer {
   border-top: 1px solid #EFEFEF;
   background: #FAFAFA;
 }
-main section article > footer > button {
+main section article > footer a:link {
+  text-decoration: none;
+}
+main section article > footer > button, main section article > footer a > button {
   width: 100%;
   border: 2px solid #7171A3;
   color: #7171A3;
@@ -197,19 +200,19 @@ main section article > footer > button {
   justify-content: center;
   gap: 0.5em;
 }
-main section article > footer > button:hover {
+main section article > footer > button:hover, main section article > footer a > button:hover {
   background: #7171A3;
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
 }
-main section article > footer > button > svg {
+main section article > footer > button > svg, main section article > footer a > button > svg {
   width: 18px;
   height: 18px;
   stroke-width: 2.5;
   transition: transform 0.3s ease;
 }
-main section article > footer > button:hover > svg {
+main section article > footer > button:hover > svg, main section article > footer a > button:hover > svg {
   transform: translateX(4px);
 }
 main section:nth-of-type(1) article > header > span[data-type=profil] {

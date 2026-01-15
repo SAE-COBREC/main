@@ -65,5 +65,5 @@
 </html>
 <script>
     print();
-    document.location.href="/index.php"; 
+    close();
 </script>

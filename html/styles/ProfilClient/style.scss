@@ -246,8 +246,10 @@ main {
             padding: 1.5em;
             border-top: 1px solid $secondary-color-gris-clair;
             background: #FAFAFA;
-
-            > button {
+            a:link{
+                text-decoration: none;
+            }
+            > button, a > button {
                 width: 100%;
                 border: 2px solid $primary-color-bleu;
                 color: $primary-color-bleu;

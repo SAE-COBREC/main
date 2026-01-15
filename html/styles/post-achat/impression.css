@@ -27,7 +27,7 @@ body aside table td {
 body article:first-of-type {
   margin-top: 7%;
 }
-body article:nth-of-type(2) tr, body article:nth-of-type(2) td {
+body article:nth-of-type(2) table {
   border: 3px solid #c0c0c0;
 }
 body article:nth-of-type(2) table:first-of-type {
@@ -42,6 +42,9 @@ body article:nth-of-type(2) table:first-of-type thead tr, body article:nth-of-ty
 body article:nth-of-type(2) table:first-of-type tbody tr, body article:nth-of-type(2) table:first-of-type tbody td {
   border-right: 1px solid;
   border-left: 0px;
+}
+body article:nth-of-type(2) table:first-of-type tbody td:nth-of-type(-n+3) {
+  text-align: center;
 }
 body article:nth-of-type(2) table:first-of-type tbody tr:nth-child(2n) {
   background-color: #EFEFEF;
@@ -98,6 +101,9 @@ footer {
   }
   body article:nth-of-type(2) table:first-of-type tr:nth-child(2n) {
     background-color: #c0c0c0;
+  }
+  body article:nth-of-type(2) table:first-of-type tbody td:nth-of-type(-n+3) {
+    text-align: center;
   }
   body article:nth-of-type(2) table:nth-of-type(2) {
     width: 100mm;

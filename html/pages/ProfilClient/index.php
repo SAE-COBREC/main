@@ -482,21 +482,22 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                 <span><?php echo date('d/m/Y', strtotime($commandeIndividuelle['timestamp_commande'])); ?></span>
                             </div>
                             <div>
-                                <em><?php echo number_format($commandeIndividuelle['montant_total'], 2, ',', ' '); ?>
+                                <em><?php echo number_format(calcul_f_total_ttc($connexionBaseDeDonnees, $commandeIndividuelle['id_panier']), 2, ',', ' '); ?>
                                     €</em>
                             </div>
                         </div>
                     </main>
 
                     <footer>
-                        <button type="button"
-                            onclick="location.href='../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>'">
-                            Voir la facture
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                        </button>
+                        <a href="../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>" target="_blank" rel="noopener noreferrer">
+                            <button type="button">
+                                Télécharger la facture
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </button>
+                        </a>
                     </footer>
                 </article>
                 <?php endforeach; ?>

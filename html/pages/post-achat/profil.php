@@ -10,15 +10,15 @@
         header("Location: ../connexionClient/index.php");
     }
 
-    if (!empty($_GET['facture'])){
+    if (!empty($_GET['id'])){
         try {//Récupération des infos de la reduc
             $sql = '
             SELECT id_facture, id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ttc FROM cobrec1._facture
-            WHERE id_facture = :lastFacture;'
+            WHERE id_panier = :panier;'
             ;
             $stmt = $pdo->prepare($sql);
             $params = [
-                'lastFacture' => $_GET['facture']
+                'panier' => $_GET['id']
             ];
             $stmt->execute($params);
             $_SESSION["post-achat"]["facture"] = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -54,7 +54,7 @@
     }
 
 
-    header("Location: /impression.php");
+    header("Location: /pages/post-achat/impression.php");
     exit(0);
 
 ?>

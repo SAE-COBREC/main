@@ -1,5 +1,9 @@
 <?php
 session_start();
+$sth = null ;
+$dbh = null ;
+include '../../selectBDD.php';
+$pdo->exec("SET search_path to cobrec1");
 
 // Récupérer le num de commande
 $id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? $_SESSION['id_commande'] ?? 0;
@@ -7,7 +11,7 @@ $id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? $_SESSION['id_co
 try {//Récupération des infos de la reduc
     $sql = '
     SELECT id_facture, id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ttc FROM cobrec1._facture
-    WHERE id_panier = : panier;'
+    WHERE id_panier = :panier;'
     ;
     $stmt = $pdo->prepare($sql);
     $params = [
@@ -39,7 +43,9 @@ try {//Récupération des infos de la reduc
     ];
     $stmt->execute($params);
     $_SESSION["post-achat"]["panier"] = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
-}catch (Exception $e){}
+}catch (Exception $e){
+    print_r($e);
+}
 
 
 
@@ -153,6 +159,9 @@ if ($id_commande > 0) {
                 </p>
             </div>
         </div>
+        <article class="recapCommande">
+            <a href="../post-achat/impression.php" target="_blank" rel="noopener noreferrer"><button>Télécharger la facture</button></a>
+        </article>
 
     </body>
     
