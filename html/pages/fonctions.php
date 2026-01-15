@@ -1583,3 +1583,15 @@ function recupNomVendeurIdProduit($pdo, $id_produit){
     $donnees = $stmt->fetch();
     return $donnees['denomination'];
 }
+
+function recupOrigineProduit($pdo, $id_produit){
+    $reqOrigine = "
+                SELECT p.p_origine 
+                FROM _produit p
+                WHERE p.id_produit = :id_produit;
+    ";
+    $stmt = $pdo->prepare($reqOrigine);
+    $stmt->execute([':id_produit' => $id_produit]);
+    $donnees = $stmt->fetch();
+    return $donnees['p_origine'];
+}
