@@ -315,6 +315,24 @@ article {
       z-index: 1;
     }
 
+    .badge-bretagne {
+      position: absolute;
+      top: 215px;
+      left: 300px;
+      background: $primary-color-blanc;
+      color: $primary-color-blanc;
+      padding: 0.25rem 0.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    .badge-bretagne img {
+      width: 24px;
+      height: 24px;
+    }
+
     //message de rupture de stock
     .rupture-stock {
       @include centre-absolu;
