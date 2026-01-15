@@ -441,26 +441,26 @@ article {
 
 //bordure spéciale pour les produits en promotion
 .produit-promotion {
-  border: 3px solid $secondary-color-bordure !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); 
+  border: 2px solid $primary-color-bronze !important;
+  box-shadow: 0 4px 15px rgba(205, 127, 50, 0.2); 
 }
 
 //style spécial du bouton pour les promotions
 .produit-promotion button:not(:disabled) {
-  background: #FFFFFF !important;
-  color: $secondary-color-rouge !important;
-  border: 2px solid $secondary-color-rouge !important;
+  background: $primary-color-bronze !important;
+  color: $primary-color-blanc !important;
+  border: 2px solid $primary-color-bronze !important;
 }
 
 //effet hover du bouton en promotion
 .produit-promotion button:hover:not(:disabled) {
-  background: $secondary-color-rouge !important;
-  color: #FFFFFF !important;
+  background: $primary-color-blanc !important;
+  color: $primary-color-bronze !important;
 }
 
 //style pour produit en rupture ET en promotion
 .produit-rupture.produit-promotion {
-  border: 3px solid $secondary-color-rouge !important;
+  border: 2px solid $secondary-color-rouge !important;
   opacity: 0.7;
 }
 

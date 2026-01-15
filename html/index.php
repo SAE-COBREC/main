@@ -273,7 +273,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <!--option mieux notés-->
                         <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>Mieux notés</option>
                         <!--option en promotion-->
-                        <option value="en_promotion" <?= $triSelection === 'en_promotion' ? 'selected' : '' ?>>En
+                        <option selected value="en_promotion" <?= $triSelection === 'en_promotion' ? 'selected' : '' ?>>En
                             promotion</option>
                         <!--option en réduction-->
                         <option value="en_reduction" <?= $triSelection === 'en_reduction' ? 'selected' : '' ?>>En

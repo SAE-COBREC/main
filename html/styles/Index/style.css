@@ -308,23 +308,23 @@ article button:disabled {
 }
 
 .produit-promotion {
-  border: 3px solid #FFFFFF !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  border: 2px solid #CD7F32 !important;
+  box-shadow: 0 4px 15px rgba(205, 127, 50, 0.2);
 }
 
 .produit-promotion button:not(:disabled) {
-  background: #FFFFFF !important;
-  color: #D4183D !important;
-  border: 2px solid #D4183D !important;
+  background: #CD7F32 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #CD7F32 !important;
 }
 
 .produit-promotion button:hover:not(:disabled) {
-  background: #D4183D !important;
-  color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  color: #CD7F32 !important;
 }
 
 .produit-rupture.produit-promotion {
-  border: 3px solid #D4183D !important;
+  border: 2px solid #D4183D !important;
   opacity: 0.7;
 }
 
