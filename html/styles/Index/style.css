@@ -216,7 +216,7 @@ article > div:first-child .badge-reduction {
 article > div:first-child .badge-bretagne {
   position: absolute;
   top: 215px;
-  left: 300px;
+  left: 80%;
   background: #FFFFFF;
   color: #FFFFFF;
   padding: 0.25rem 0.5rem;
@@ -226,8 +226,8 @@ article > div:first-child .badge-bretagne {
   z-index: 2;
 }
 article > div:first-child .badge-bretagne img {
-  width: 24px;
-  height: 24px;
+  width: 100%;
+  height: 100%;
 }
 article > div:first-child .rupture-stock {
   position: absolute;
@@ -390,19 +390,13 @@ article button:disabled {
     font-size: 1em;
     padding: 5px 10px;
   }
-}
-@media (max-width: 1024px) {
-  .container {
-    grid-template-columns: 1fr;
+  article > div:first-child .badge-bretagne {
+    top: 215px;
+    left: 80%;
   }
-  aside {
-    position: static;
-    margin: 1rem;
-    order: 2;
-  }
-  main {
-    order: 1;
-    padding: 1rem;
+  article > div:first-child .badge-bretagne img {
+    width: 100%;
+    height: 100%;
   }
 }
 @media (max-width: 428px) {
@@ -463,6 +457,12 @@ article button:disabled {
   aside form > div:first-child select {
     padding: 15px;
     font-size: 1.5em;
+    width: 100%;
+    text-align: center;
+  }
+  aside form > section select {
+    padding: 15px;
+    font-size: 1.5em;
   }
   aside:not(.open) form {
     display: none;
@@ -495,6 +495,11 @@ article button:disabled {
   main > div:first-child {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+  }
+  article > div:first-child .badge-bretagne {
+    left: 70%;
+    right: 10px;
+    top: 10px;
   }
   article > div:first-child {
     height: 150px;
