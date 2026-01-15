@@ -183,7 +183,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
         $_SESSION["panierEnCours"] = $idPanier; // on stock l'id du panier créer dans le panier en cours
 
       
-        $url = '../post-achat/index.php?facture=' . $idFacture;
+        $url = '../suiviCommande/index.php';
         echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
 
     }
