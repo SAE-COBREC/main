@@ -90,6 +90,22 @@ try {
       return in_array($statut_reel, $filtres_actifs);
     });
 
+    $categorieSelection = $_POST['categorie'] ?? 'all';
+
+    $listeCategoriesCompte = [];
+    foreach ($articles_bruts as $art) {
+        if (!empty($art['categories'])) {
+            $cats = explode(', ', $art['categories']);
+            foreach ($cats as $c) {
+                $c = trim($c); 
+                $listeCategoriesCompte[$c] = ($listeCategoriesCompte[$c] ?? 0) + 1;
+            }
+        }
+    }
+    $totalProduitsSansFiltre = count($articles_bruts);
+    $afficheCategorie = preparercategories_affichage($listeCategoriesCompte);
+    $afficheCategorie[0]['count'] = $totalProduitsSansFiltre;
+
 } catch (PDOException $e) {
     die("Erreur de connexion : " . htmlspecialchars($e->getMessage()));
 }
@@ -150,8 +166,22 @@ try {
                   <a href="<?= genererUrlTri('id_asc') ?>" class="tri__item" style="color: #666; font-size: 0.8em;">Réinitialiser</a>
               <?php endif; ?>
             </div>
-            <div class="tri__item">------- -- -------</div>
-            <div class="tri__item">---- -- -------</div>
+            <span class="filtre__label">Trier par catégorie :</span>
+            <select name="categorie" id="categorie" class="filtre__item">
+               <option value="all" <?= $categorieSelection === 'all' ? 'selected' : '' ?>>
+                  Tous les produits (<?= $totalProduitsSansFiltre ?>)
+                </option>
+                <!--boucle sur toutes les catégories-->
+                <?php foreach($afficheCategorie as $cate):?>
+                  <!--affiche chaque catégorie sauf "all"-->
+                  <?php if ($cate['category'] !== 'all'): ?>
+                    <option value="<?= htmlspecialchars($cate['category']) ?>"
+                        <?= $categorieSelection === $cate['category'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($cate['category']) ?> (<?= $cate['count'] ?>)
+                    </option>
+                  <?php endif; ?>
+                <?php endforeach;?>
+            </select>
           </div>
         </div>
 
