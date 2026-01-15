@@ -238,6 +238,33 @@ int cherche_bordereau(PGconn *conn, int id_commande, int *bordereau)
     }
 }
 
+int verif_login(PGconn *conn, char *email, char *mdp)
+{
+    PGresult *res;
+    const char *params[1] = {email};
+    
+    res = PQexecParams(conn, 
+                      "SELECT mdp FROM cobrec1._login WHERE identifiant = $1",
+                      1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        fprintf(stderr, "Erreur SELECT: %s\n", PQerrorMessage(conn));
+        PQclear(res);
+        return -1;
+    }
+    
+    if (PQntuples(res) > 0) {
+        char *mdp_bdd = PQgetvalue(res, 0, 0);
+        int match = strcmp(mdp, mdp_bdd);
+        PQclear(res);
+        return (match == 0) ? 1 : 0;
+    } else {
+        PQclear(res);
+        return 0;
+    }
+}
+
+
 int main()
 {
     signal(SIGCHLD, SIG_IGN);
@@ -247,6 +274,7 @@ int main()
     char buffer[BUFFER_SIZE];
     int opt = 1;
     int bordereau;
+    bool connecte = false;
 
     char livre_en_quoi[3][40] = {
         "Livré en main propre",
@@ -355,89 +383,110 @@ int main()
                 mdp = strtok(NULL, " \r\n");
 
                 if (email && mdp) {
-                    printf("Email: %s, Mot de passe: %s\n", email, mdp);
+                    int result = verif_login(conn, email, mdp);
+                    if (result == 1) {
+                        const char *rep = "OK LOGIN_SUCCESS\n";
+                        write(client_fd, rep, strlen(rep));
+                        printf("Email: %s, Mot de passe: %s\n", email, mdp);
+                        connecte = true;
+                    } else if (result == 0) {
+                        const char *rep = "ERROR LOGIN_INCORRECT\n";
+                        write(client_fd, rep, strlen(rep));
+                    } else {
+                        const char *rep = "ERROR DATABASE\n";
+                        write(client_fd, rep, strlen(rep));
+                    }
                 } else {
                     const char *rep = "ERROR LOGIN_FORMAT\n";
                     write(client_fd, rep, strlen(rep));
                 }
                 continue;
             }
-            {
-            }
-            if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
-            {
-                int already = 0;
-                int id_commande = atoi(ligne + 13);
-                int existe = cherche_si_commande_exist(conn, id_commande);
-                if (existe == -1)
-                {
-                    write(client_fd, "ERROR DATABASE\n", 15);
-                    continue;
-                }
-                else if (existe == 1)
-                {
-                    already = 1;
-                    int re = cherche_bordereau(conn, id_commande, &bordereau);
-                }
-                else
-                {
-                    already = 0;
-                    bordereau = nouveau_bordereau(conn);
-                    if (bordereau == -1)
-                    {
-                        fprintf(stderr, "Erreur à la création du bordereau.");
-                    }
-                    else if (bordereau >= 0)
-                    {
-                        // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
-                        bordereau++;
-                        printf("Nouveau bordereau : %d\n", bordereau);
-                        // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
-                        // init a 0 car le statut de départ est 0
-                        enregistrer_commande(conn, id_commande, bordereau, 1);
 
-                        // Ajouter la ligne dans script.bash pour ajouter la commande a cron
-                        FILE *script = fopen(FICHIER_SCRIPT, "a");
-                        if (script != NULL)
+            else if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
+            {
+                if (connecte == false){
+                    const char *rep = "LOGIN FIRST\n";
+                        write(client_fd, rep, strlen(rep));
+                }else{
+                    
+                    int already = 0;
+                    int id_commande = atoi(ligne + 13);
+                    int existe = cherche_si_commande_exist(conn, id_commande);
+                    if (existe == -1)
+                    {
+                        write(client_fd, "ERROR DATABASE\n", 15);
+                        continue;
+                    }
+                    else if (existe == 1)
+                    {
+                        already = 1;
+                        int re = cherche_bordereau(conn, id_commande, &bordereau);
+                    }
+                    else
+                    {
+                        already = 0;
+                        bordereau = nouveau_bordereau(conn);
+                        if (bordereau == -1)
                         {
-                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
-                            fclose(script);
-                            printf("Ajouté au script: STATUS_UP %d\n", bordereau);
+                            fprintf(stderr, "Erreur à la création du bordereau.");
                         }
-                        else
+                        else if (bordereau >= 0)
                         {
-                            perror("Erreur ouverture script.bash");
+                            // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
+                            bordereau++;
+                            printf("Nouveau bordereau : %d\n", bordereau);
+                            // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
+                            // init a 0 car le statut de départ est 0
+                            enregistrer_commande(conn, id_commande, bordereau, 1);
+
+                            // Ajouter la ligne dans script.bash pour ajouter la commande a cron
+                            FILE *script = fopen(FICHIER_SCRIPT, "a");
+                            if (script != NULL)
+                            {
+                                fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
+                                fclose(script);
+                                printf("Ajouté au script: STATUS_UP %d\n", bordereau);
+                            }
+                            else
+                            {
+                                perror("Erreur ouverture script.bash");
+                            }
                         }
                     }
+                    char response[BUFFER_SIZE];
+                    snprintf(response, sizeof(response),
+                            "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
+                            bordereau, already);
+                    write(client_fd, response, strlen(response));
                 }
-
-                char response[BUFFER_SIZE];
-                snprintf(response, sizeof(response),
-                         "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
-                         bordereau, already);
-                write(client_fd, response, strlen(response));
             }
             else if (strncmp(ligne, "STATUS ", 7) == 0)
             {
-                int label = atoi(ligne + 7);
-                int ret = chercher_status_par_bordereau(conn, label);
-                if (ret == -1)
-                {
-                    const char *rep = "ERREUR de SELECT.\n";
-                    write(client_fd, rep, strlen(rep));
-                }
-                else if (ret == -2)
-                {
-                    const char *rep = "ERREUR, aucune commande trouvé\n";
-                    write(client_fd, rep, strlen(rep));
-                }
-                else
-                {
-                    const char *libelle = "Chez Alizon";
-                    char response[BUFFER_SIZE];
-                    snprintf(response, sizeof(response),
-                             "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
-                    write(client_fd, response, strlen(response));
+                if (connecte == false){
+                    const char *rep = "LOGIN FIRST\n";
+                        write(client_fd, rep, strlen(rep));
+                }else{
+                    int label = atoi(ligne + 7);
+                    int ret = chercher_status_par_bordereau(conn, label);
+                    if (ret == -1)
+                    {
+                        const char *rep = "ERREUR de SELECT.\n";
+                        write(client_fd, rep, strlen(rep));
+                    }
+                    else if (ret == -2)
+                    {
+                        const char *rep = "ERREUR, aucune commande trouvé\n";
+                        write(client_fd, rep, strlen(rep));
+                    }
+                    else
+                    {
+                        const char *libelle = "Chez Alizon";
+                        char response[BUFFER_SIZE];
+                        snprintf(response, sizeof(response),
+                                "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
+                        write(client_fd, response, strlen(response));
+                    }
                 }
             }
             // STAT evo
@@ -497,7 +546,7 @@ int main()
 
                     char response[BUFFER_SIZE];
                     snprintf(response, sizeof(response),
-                             "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
+                            "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
                     write(client_fd, response, strlen(response));
                 }
                 else if (status_act == -2)

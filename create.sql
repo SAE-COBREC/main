@@ -736,8 +736,9 @@ CREATE TABLE cobrec1.bordereau (
     id_commande integer NOT NULL
 );
 
+DROP TABLE IF EXISTS _login;
 CREATE TABLE cobrec1._login (
-    email Varchar(255) NOT NULL,
+    identifiant Varchar(255) NOT NULL,
     mdp varchar(255) NOT NULL
 );
 
@@ -4345,8 +4346,9 @@ FROM pairs p
 WHERE NOT EXISTS (SELECT 1 FROM _commentaire c WHERE c.id_livraison = p.id_livraison);
 
 INSERT INTO
-    _login (email, mdp)
-VALUES ('Client1@gmail.com', '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS');
+    _login (identifiant, mdp)
+VALUES ('Alizon', 'mdp')
+;
 
 -- Les compteurs de pouces sont synchronisés depuis _vote_avis (via mise à jour ci-dessus) — pas d'écrasement aléatoire ici.
 
