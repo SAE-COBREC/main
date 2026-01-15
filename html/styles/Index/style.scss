@@ -308,11 +308,14 @@ article {
       left: 10px;
       background: $secondary-color-rouge;
       color: $primary-color-blanc;
-      padding: 0.25rem 0.5rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: bold;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       z-index: 1;
+      backdrop-filter: blur(4px);
     }
 
     .badge-bretagne {
@@ -756,11 +759,21 @@ article {
     gap: 1rem;
   }
 
-  article > div:first-child .badge-bretagne{
-    border-radius: 8px;
-    left: 70%;
-    right: 10px;
-    top: 10px;
+  article > div:first-child .badge-bretagne {
+    width: 40px;
+    top: auto;
+    bottom: 5px;
+    right: 5px;
+    left: auto;
+    border-radius: 50%;
+    padding: 3px;
+  }
+
+  article > div:first-child .badge-reduction {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    top: 5px;
+    left: 5px;
   }
 
   //cartes produits adaptées au mobile
