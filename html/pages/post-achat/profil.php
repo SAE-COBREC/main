@@ -31,7 +31,7 @@
                 ;
                 $stmt = $pdo->prepare($sql);
                 $params = [
-                'panier_commande' => $_SESSION["post-achat"]["facture"]["id_panier"]
+                    'panier_commande' => $_SESSION["post-achat"]["facture"]["id_panier"]
                 ];
             }else{
                 $sql = '

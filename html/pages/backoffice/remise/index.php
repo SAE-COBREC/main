@@ -181,8 +181,8 @@
 
 //print_r($_GET);
 // print_r($_SESSION["remise"]['_GET']);
-print_r($_POST);
-print_r($_SESSION["remise"]);
+// print_r($_POST);
+// print_r($_SESSION["remise"]);
 
 if ($_POST !== []) {
 
