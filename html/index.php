@@ -163,30 +163,44 @@ if (!empty($rechercheNom)) {
 }
 
 // ============================================
-// CALCUL DU PRIX MAXIMUM
+// CALCUL DU PRIX MAXIMUM ET MINIMUM
 // ============================================
 
-//initialise le prix maximum à zéro
+//initialise le prix maximum et minimum
 $prixMaximum = 0;
+$prixMinimum = 0;
 //vérifie qu'il y a des produits dans la liste
 if (!empty($listeProduits)) {
-    //trouve le prix HT le plus élevé parmi tous les produits
+    //trouve le prix HT le plus élevé et le plus bas parmi tous les produits
     $prixMaximumHT = max(array_column($listeProduits, 'p_prix'));
-    
+    $prixMinimumHT = min(array_column($listeProduits, 'p_prix'));
+
     //parcourt tous les produits pour trouver celui au prix maximum
     foreach ($listeProduits as $produitTmp) {
         //vérifie si c'est le produit au prix maximum
         if ((float) $produitTmp['p_prix'] === (float) $prixMaximumHT) {
-            //calcule le prix TTC et l'arrondit
+            //calcule le prix TTC et l'arrondit (2 décimales)
             $prixMaximum = round(calcPrixTVA(
                 $produitTmp['tva'],
                 $prixMaximumHT
-            ));
+            ), 2);
             //arrête la boucle une fois trouvé
             break;
         }
     }
+
+    //parcourt tous les produits pour trouver celui au prix minimum
+    foreach ($listeProduits as $produitTmp) {
+        if ((float) $produitTmp['p_prix'] === (float) $prixMinimumHT) {
+            $prixMinimum = round(calcPrixTVA(
+                $produitTmp['tva'],
+                $prixMinimumHT
+            ), 2);
+            break;
+        }
+    }
 }
+
 
 // ============================================
 // RÉCUPÉRATION ET APPLICATION DES FILTRES
@@ -197,7 +211,21 @@ $categorieSelection = $_POST['categorie'] ?? 'all';
 //récupère le type de tri choisi
 $triSelection = $_POST['tri'] ?? 'en_promotion';
 //récupère le prix maximum du filtre
-$prixMaximumFiltre = isset($_POST['price']) ? (float) $_POST['price'] : $prixMaximum;
+$prixMaximumFiltre = isset($_POST['filterMaxPrice']) && $_POST['filterMaxPrice'] !== '' ? (float) str_replace(',', '.', $_POST['filterMaxPrice']) : (float) $prixMaximum;
+
+//récupère le prix minimum du filtre
+$prixMinimumFiltre = isset($_POST['filterMinPrice']) && $_POST['filterMinPrice'] !== '' ? (float) str_replace(',', '.', $_POST['filterMinPrice']) : (float) $prixMinimum;
+
+// Normaliser et s'assurer que min et max sont cohérents
+$prixMinimumFiltre = max(0.0, $prixMinimumFiltre);
+$prixMaximumFiltre = max(0.0, $prixMaximumFiltre);
+if ($prixMinimumFiltre > $prixMaximumFiltre) {
+    $tmp = $prixMinimumFiltre;
+    $prixMinimumFiltre = $prixMaximumFiltre;
+    $prixMaximumFiltre = $tmp;
+}
+
+
 //récupère la note minimum du filtre
 $noteMinimumFiltre = isset($_POST['note_min']) ? (int) $_POST['note_min'] : 0;
 //vérifie si le filtre "en stock" est activé
@@ -208,6 +236,7 @@ $filtres = [
     'categorieFiltre' => $categorieSelection,
     'noteMinimum' => $noteMinimumFiltre,
     'prixMaximum' => $prixMaximumFiltre,
+    'prixMinimum' => $prixMinimumFiltre,
     'enStockSeulement' => $enStockSeulement
 ];
 
@@ -321,20 +350,29 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         class="search-input" value="<?= htmlspecialchars($_POST['vendeur'] ?? '') ?>">
                 </div>
 
-                <!--filtre par prix avec curseur-->
-                <section class="no-hover">
+                <!--filtre par prix -->
+                <section class="no-hover price-filter">
                     <h4 style="padding-top: 1em;">Prix</h4>
-                    <div>
-                        <!--curseur pour sélectionner le prix maximum-->
-                        <input type="range" id="priceRange" min="0" max="<?= $prixMaximum ?>"
-                            value="<?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>">
+                    
+                    <!-- Container pour le slider double -->
+                    <div class="slider-container">
+                        <div class="slider-track-bg"></div>
+                        <div class="slider-track-active" id="sliderTrackActive"></div>
+                        <input type="range" class="range-min" id="rangeMin" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" value="<?= $prixMinimumFiltre ?>" step="0.01">
+                        <input type="range" class="range-max" id="rangeMax" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" value="<?= $prixMaximumFiltre ?>" step="0.01">
                     </div>
-                    <div>
-                        <span>0€</span>
-                        <!--champ numérique pour le prix-->
-                        <input type="number" name="price" id="priceValue" class="price-input" step="1" min="0"
-                            max="<?= $prixMaximum ?>"
-                            value="<?= isset($_POST['price']) ? $_POST['price'] : $prixMaximum ?>">
+
+                    <!-- Champs numériques -->
+                    <div class="price-inputs">
+                        <div class="price-field">
+                            <input type="number" name="filterMinPrice" id="inputMin" value="<?= $prixMinimumFiltre ?>" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" step="0.01">
+                            <span>€</span>
+                        </div>
+                        <div class="separator">-</div>
+                        <div class="price-field">
+                            <input type="number" name="filterMaxPrice" id="inputMax" value="<?= $prixMaximumFiltre ?>" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" step="0.01">
+                            <span>€</span>
+                        </div>
                     </div>
                 </section>
 

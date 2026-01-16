@@ -207,43 +207,127 @@ aside {
     }
   }
 
-  //style du curseur de prix (range slider)
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
+  // NOUVEAU STYLE DOUBLE SLIDER (Reset complet)
+  .slider-container {
+    position: relative;
     width: 100%;
-    height: 8px;
-    border-radius: 8px;
-    background: $secondary-color-gris-clair;
-    outline: none;
+    height: 40px; /* Plus d'espace */
+    margin-bottom: 5px;
 
-    //style du bouton du curseur (Chrome/Safari)
-    &::-webkit-slider-thumb {
+    /* Arrière-plan (piste grise) */
+    .slider-track-bg {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      height: 6px;
+      background-color: #e0e0e0;
+      border-radius: 3px;
+      z-index: 1;
+    }
+
+    /* Piste active (bleue) gérée par JS */
+    .slider-track-active {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 6px;
+      background-color: $primary-color-bleu;
+      border-radius: 3px;
+      z-index: 2;
+    }
+
+    /* Les inputs range eux-mêmes */
+    input[type="range"] {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
       -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: $primary-color-bleu;
-      cursor: pointer;
+      background: none;
+      pointer-events: none; /* Important pour cliquer à travers */
+      z-index: 3;
+      margin: 0;
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        pointer-events: auto; /* Réactive le pointeur sur le thumb */
+        width: 20px;
+        height: 20px;
+        background: $primary-color-bleu;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        margin-top: -1px; /* Ajustement fin */
+        transition: transform 0.1s;
+      }
+
+      &::-moz-range-thumb {
+        pointer-events: auto;
+        width: 20px;
+        height: 20px;
+        background: $primary-color-bleu;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        transition: transform 0.1s;
+      }
+      
+      /* Thumb au survol */
+      &:hover::-webkit-slider-thumb { transform: scale(1.1); }
+      &:hover::-moz-range-thumb { transform: scale(1.1); }
+    }
+  }
+
+  .price-inputs {
+    @include flex-between;
+    gap: 10px;
+
+    .price-field {
+      display: flex;
+      align-items: center;
+      background-color: #f8f9fa;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      padding: 0.3rem 0.5rem;
+      width: 48%;
+
+      &:focus-within {
+        border-color: $primary-color-bleu;
+        box-shadow: 0 0 0 2px rgba($primary-color-bleu, 0.2);
+      }
+
+      input {
+        width: 100%;
+        border: none;
+        background: transparent;
+        font-size: 0.9rem;
+        color: #333;
+        font-weight: 600;
+        text-align: right;
+        outline: none;
+        
+        /* Enlever les flèches */
+        -moz-appearance: textfield;
+        &::-webkit-outer-spin-button, 
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+
+      span {
+        margin-left: 4px;
+        color: #666;
+        font-size: 0.9rem;
+      }
     }
 
-    //style du bouton du curseur (Firefox)
-    &::-moz-range-thumb {
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: $primary-color-bleu;
-      cursor: pointer;
-      border: none;
-    }
-
-    //style de la barre du curseur (Firefox)
-    &::-moz-range-track {
-      background: $secondary-color-gris-clair;
-      border-radius: 8px;
-      border: none;
+    .separator {
+      color: #666;
+      font-weight: bold;
     }
   }
 }

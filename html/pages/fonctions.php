@@ -1327,8 +1327,16 @@ function filtrerProduits($listeProduits, $filtres)
 
         
         // Filtrer par prix (utiliser le prix avec réduction si applicable)
-        if ($prixFinal > $filtres['prixMaximum'])
-            continue;
+        // Comparaison en centimes pour éviter problèmes d'arrondi
+        $minFilter = isset($filtres['prixMinimum']) ? (float) $filtres['prixMinimum'] : 0.0;
+        $maxFilter = isset($filtres['prixMaximum']) ? (float) $filtres['prixMaximum'] : INF;
+
+        $prixFinalCents = (int) round($prixFinal * 100);
+        $minFilterCents = (int) round($minFilter * 100);
+        $maxFilterCents = is_infinite($maxFilter) ? PHP_INT_MAX : (int) round($maxFilter * 100);
+
+        if ($prixFinalCents > $maxFilterCents) continue;
+        if ($prixFinalCents < $minFilterCents) continue;
         if ($filtres['categorieFiltre'] !== 'all') {
             $categoriesProduit = explode(', ', $produitCourant['categories'] ?? '');
             if (!in_array($filtres['categorieFiltre'], $categoriesProduit))

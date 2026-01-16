@@ -25,56 +25,89 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //attend que la page HTML soit complètement chargée
 document.addEventListener('DOMContentLoaded', () => {
-    //récupère le curseur de prix (slider)
-    const priceRange = document.getElementById('priceRange');
-    //récupère le champ numérique de prix
-    const priceInput = document.getElementById('priceValue');
 
-    //vérifie que les deux éléments existent
-    if (priceRange && priceInput) {
-        //fonction pour synchroniser le curseur et le champ numérique
-        const setAll = (v) => {
-            //arrondit le prix à 2 décimales
-            const num = Math.round((parseFloat(v) || 0) * 100) / 100;
-            //met à jour la valeur du curseur
-            priceRange.value = num;
-            //met à jour la valeur du champ numérique
-            priceInput.value = num;
+    const rangeMin = document.getElementById("rangeMin");
+    const rangeMax = document.getElementById("rangeMax");
+    const inputMin = document.getElementById("inputMin");
+    const inputMax = document.getElementById("inputMax");
+    const sliderTrackActive = document.getElementById("sliderTrackActive");
+
+    if (rangeMin && rangeMax && inputMin && inputMax && sliderTrackActive) {
+
+        let minGap = 0; // Ecart minimum
+        const sliderMaxValue = Number(rangeMax.max) || 1;
+        const sliderMinValue = Number(rangeMin.min) || 0;
+
+        const toNumber = (v, fallback = 0) => {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : fallback;
         };
 
-        //synchronise les valeurs au chargement de la page
-        setAll(priceInput.value);
+        // Met à jour la barre colorée
+        function updateTrack() {
+            const maxVal = sliderMaxValue || 1;
+            const percent1 = (toNumber(rangeMin.value, sliderMinValue) / maxVal) * 100;
+            const percent2 = (toNumber(rangeMax.value, maxVal) / maxVal) * 100;
+            sliderTrackActive.style.left = Math.max(0, Math.min(100, percent1)) + "%";
+            sliderTrackActive.style.width = Math.max(0, Math.min(100, percent2 - percent1)) + "%";
+        }
 
-        //écoute quand l'utilisateur bouge le curseur
-        priceRange.addEventListener('input', function() {
-            //met à jour le champ numérique en temps réel
-            setAll(this.value);
+        // Helpers pour setter et clamp
+        function setMinValue(v) {
+            let minVal = toNumber(v, sliderMinValue);
+            const maxVal = toNumber(rangeMax.value, sliderMaxValue);
+            if (minVal < sliderMinValue) minVal = sliderMinValue;
+            if (minVal > maxVal) minVal = maxVal;
+            rangeMin.value = minVal;
+            inputMin.value = minVal;
+        }
+
+        function setMaxValue(v) {
+            let maxVal = toNumber(v, sliderMaxValue);
+            const minVal = toNumber(rangeMin.value, sliderMinValue);
+            if (maxVal > sliderMaxValue) maxVal = sliderMaxValue;
+            if (maxVal < minVal) maxVal = minVal;
+            rangeMax.value = maxVal;
+            inputMax.value = maxVal;
+        }
+
+        // Gestion Range Min
+        rangeMin.addEventListener("input", function() {
+            setMinValue(rangeMin.value);
+            updateTrack();
         });
 
-        //écoute quand l'utilisateur relâche le curseur
-        priceRange.addEventListener('change', function() {
-            //soumet le formulaire pour appliquer le filtre de prix
-            document.getElementById('filterForm').submit();
+        // Gestion Range Max
+        rangeMax.addEventListener("input", function() {
+            setMaxValue(rangeMax.value);
+            updateTrack();
         });
 
-        //écoute quand l'utilisateur tape dans le champ numérique
-        priceInput.addEventListener('input', function() {
-            //récupère le prix maximum autorisé
-            const max = parseFloat(this.max) || parseFloat(priceRange.max) || 0;
-            //récupère la valeur tapée par l'utilisateur
-            let v = parseFloat(this.value) || 0;
-            //empêche les valeurs négatives
-            if (v < 0) v = 0;
-            //empêche de dépasser le prix maximum
-            if (v > max) v = max;
-            //met à jour le curseur avec la nouvelle valeur
-            setAll(v);
+        // Gestion Input Min
+        inputMin.addEventListener("input", function() {
+            const v = inputMin.value === '' ? sliderMinValue : inputMin.value;
+            setMinValue(v);
+            updateTrack();
         });
-        //écoute quand l'utilisateur a fini de taper
-        priceInput.addEventListener('change', function() {
-            //soumet le formulaire pour appliquer le filtre
-            document.getElementById('filterForm').submit();
+
+         // Gestion Input Max
+         inputMax.addEventListener("input", function() {
+            const v = inputMax.value === '' ? sliderMaxValue : inputMax.value;
+            setMaxValue(v);
+            updateTrack();
         });
+
+        // Submission du formulaire au changement final (relâchement de souris ou entrée)
+        [rangeMin, rangeMax, inputMin, inputMax].forEach(el => {
+            el.addEventListener("change", () => {
+                document.getElementById('filterForm').submit();
+            });
+        });
+
+        // Initialisation : s'assurer que valeurs sont valides
+        setMinValue(rangeMin.value);
+        setMaxValue(rangeMax.value);
+        updateTrack();
     }
 });
 
@@ -101,23 +134,34 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             //remet la catégorie sur "tous les produits"
             document.getElementById('categorieSelect').value = 'all';
-            //récupère le prix maximum possible
-            const maxVal = document.getElementById('priceRange').max;
-            //remet le curseur de prix au maximum
-            document.getElementById('priceRange').value = maxVal;
-            //récupère le champ numérique de prix
-            const priceEl = document.getElementById('priceValue');
-            //vérifie que le champ existe
-            if (priceEl) {
-                //remet le prix au maximum
-                priceEl.value = maxVal;
+            
+            // RESET DOUBLE SLIDER (sécurisé)
+            const inputMin = document.getElementById("inputMin");
+            const inputMax = document.getElementById("inputMax");
+            const rangeMin = document.getElementById("rangeMin");
+            const rangeMax = document.getElementById("rangeMax");
+
+            if (rangeMin && rangeMax && inputMin && inputMax) {
+                const maxVal = Number(rangeMax.max) || 0;
+                const minVal = Number(rangeMin.min) || 0;
+                rangeMin.value = minVal;
+                rangeMax.value = maxVal;
+                inputMin.value = minVal;
+                inputMax.value = maxVal;
+                // forcer mise à jour visuelle du track
+                rangeMin.dispatchEvent(new Event('input'));
+                rangeMax.dispatchEvent(new Event('input'));
             }
+
             //vide la barre de recherche vendeur
-            document.getElementById('searchVendeur').value = '';
-            //réinitialise le champ de recherche par nom
-            document.getElementById('nomChercher').value = '';
-            //décoche la case "en stock uniquement"
-            document.getElementById('stockOnlyCheckbox').checked = false;
+            const searchVendeurEl = document.getElementById('searchVendeur');
+            if (searchVendeurEl) searchVendeurEl.value = '';
+            //réinitialise le champ de recherche par nom (protégé)
+            const nomChercherEl = document.getElementById('nomChercher');
+            if (nomChercherEl) nomChercherEl.value = '';
+            //décoche la case "en stock uniquement" (protégé)
+            const stockEl = document.getElementById('stockOnlyCheckbox');
+            if (stockEl) stockEl.checked = false;
             //récupère tous les boutons d'étoiles
             const btns = document.querySelectorAll('.star-btn');
             //parcourt chaque bouton d'étoile
