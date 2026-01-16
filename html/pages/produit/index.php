@@ -181,6 +181,7 @@ $sqlAvis = "
     LEFT JOIN cobrec1._represente_compte rc ON co.id_compte = rc.id_compte
     LEFT JOIN cobrec1._image i ON rc.id_image = i.id_image
     WHERE a.id_produit = :pid
+    AND a.id_avis NOT IN (SELECT id_avis FROM cobrec1._reponse)
     ORDER BY $pinOrderPrefix$orderClauseAvis
 ";
 

@@ -1,0 +1,117 @@
+html,
+body {
+  overflow: auto !important;
+  height: auto !important;
+}
+
+.main {
+  overflow: visible !important;
+  height: auto !important;
+}
+.main .content-section {
+  border: none !important;
+  border-radius: 0 !important;
+}
+.main .content-section .avis-card {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 1.5rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 1em;
+}
+.main .content-section .avis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+.main .content-section .product-name a {
+  color: #2c3e50;
+  text-decoration: none;
+  font-weight: bold;
+}
+.main .content-section .product-name a:hover {
+  text-decoration: underline;
+}
+.main .content-section .avis-meta {
+  color: #7f8c8d;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+.main .content-section .avis-reponse {
+  background: #fdfae0;
+  padding: 1rem;
+  border-left: 4px solid #f39c12;
+  margin-top: 1rem;
+  border-radius: 4px;
+}
+.main .content-section .reponse-form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-height: 100px;
+  margin-bottom: 0.5rem;
+}
+.main .content-section .stars {
+  color: #f1c40f;
+}
+.main .content-section .alert {
+  padding: 1rem;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+.main .content-section .alert.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+.main .content-section .alert.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+.main .content-section .btn-submit {
+  background-color: #E67E22;
+  color: white;
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.main .content-section .btn-submit:hover {
+  background-color: #d35400;
+}
+.main .content-section .btn-action {
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85em;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  display: inline-block;
+  border: 1px solid;
+}
+.main .content-section .btn-edit {
+  color: #3498db;
+  border-color: #3498db;
+  background: #fff;
+}
+.main .content-section .btn-edit:hover {
+  background: #3498db;
+  color: #fff;
+}
+.main .content-section .btn-delete {
+  color: #e74c3c;
+  border-color: #e74c3c;
+  background: #fff;
+}
+.main .content-section .btn-delete:hover {
+  background: #e74c3c;
+  color: #fff;
+}/*# sourceMappingURL=avisVendeur.css.map */

@@ -131,6 +131,9 @@ aside .slider-container {
   width: 100%;
   height: 40px; /* Plus d'espace */
   margin-bottom: 5px;
+  /* Arrière-plan (piste grise) */
+  /* Piste active (bleue) gérée par JS */
+  /* Les inputs range eux-mêmes */
 }
 aside .slider-container .slider-track-bg {
   position: absolute;
@@ -161,6 +164,7 @@ aside .slider-container input[type=range] {
   pointer-events: none; /* Important pour cliquer à travers */
   z-index: 3;
   margin: 0;
+  /* Thumb au survol */
 }
 aside .slider-container input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
