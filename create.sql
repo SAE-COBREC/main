@@ -4423,8 +4423,7 @@ UPDATE cobrec1._commentaire SET a_note = 1;
 
 --------------------------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS _bordereau;
-
-CREATE TABLE _bordereau (
+_bordereau (
     id_bordereau int NOT NULL PRIMARY KEY,
     id_commande int NOT NULL,
     etat_suivis int NOT NULL
