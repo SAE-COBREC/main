@@ -3550,6 +3550,11 @@ VALUES (
         '/img/photo/bol_breton_bio.jpg',
         'Bol Breton Bio',
         'Photo de Bol Breton Bio'
+    ),
+    (
+        '/img/photo/robe_d_ete.jpg',
+        'Robe d été',
+        'Photo de Robe d été'
     );
 
 -- 13. RELATIONS IMAGES-PRODUITS
@@ -3658,7 +3663,8 @@ VALUES (1, 1),
     (105, 102),
     (106, 103),
     (107, 104),
-    (108, 105);
+    (108, 105),
+    (109,5);
 
 -- 14. RELATIONS IMAGES-COMPTES
 INSERT INTO
