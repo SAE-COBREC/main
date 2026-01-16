@@ -242,28 +242,31 @@ int verif_login(PGconn *conn, char *email, char *mdp)
 {
     PGresult *res;
     const char *params[1] = {email};
-    
-    res = PQexecParams(conn, 
-                      "SELECT mdp FROM cobrec1._login WHERE identifiant = $1",
-                      1, NULL, params, NULL, NULL, 0);
 
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    res = PQexecParams(conn,
+                       "SELECT mdp FROM cobrec1._login WHERE identifiant = $1",
+                       1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+    {
         fprintf(stderr, "Erreur SELECT: %s\n", PQerrorMessage(conn));
         PQclear(res);
         return -1;
     }
-    
-    if (PQntuples(res) > 0) {
+
+    if (PQntuples(res) > 0)
+    {
         char *mdp_bdd = PQgetvalue(res, 0, 0);
         int match = strcmp(mdp, mdp_bdd);
         PQclear(res);
         return (match == 0) ? 1 : 0;
-    } else {
+    }
+    else
+    {
         PQclear(res);
         return 0;
     }
 }
-
 
 int main()
 {
@@ -277,9 +280,16 @@ int main()
     bool connecte = false;
 
     char livre_en_quoi[3][40] = {
-        "Livré en main propre",
-        "Livré en absence du destinataire",
-        "Refusé"};
+        "Livré en main propre\n",
+        "Livré en l'absence du destinataire\n",
+        "Refusé par le destinataire :\n"};
+
+    char raison_refus[5][60] = {
+        "Colis dégradé\n",
+        "Le colis ne correspond pas à l'article commandé\n",
+        "Quantité incorrecte\n",
+        "Colis déjà ouvert\n",
+        "Retard du colis important\n"};
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) // si l'initialisatio na échoué erreur de socket
@@ -347,9 +357,9 @@ int main()
         conn = PQconnectdb(
             "host=127.0.0.1 "
             "port=5432 "
-            "dbname=leo "
-            "user=leo "
-            "password=leo ");
+            "dbname=base_sae "
+            "user=nom_utilisateur "
+            "password=motdepasse ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -382,21 +392,29 @@ int main()
                 email = strtok(login, " ");
                 mdp = strtok(NULL, " \r\n");
 
-                if (email && mdp) {
+                if (email && mdp)
+                {
                     int result = verif_login(conn, email, mdp);
-                    if (result == 1) {
+                    if (result == 1)
+                    {
                         const char *rep = "OK LOGIN_SUCCESS\n";
                         write(client_fd, rep, strlen(rep));
                         printf("Email: %s, Mot de passe: %s\n", email, mdp);
                         connecte = true;
-                    } else if (result == 0) {
+                    }
+                    else if (result == 0)
+                    {
                         const char *rep = "ERROR LOGIN_INCORRECT\n";
                         write(client_fd, rep, strlen(rep));
-                    } else {
+                    }
+                    else
+                    {
                         const char *rep = "ERROR DATABASE\n";
                         write(client_fd, rep, strlen(rep));
                     }
-                } else {
+                }
+                else
+                {
                     const char *rep = "ERROR LOGIN_FORMAT\n";
                     write(client_fd, rep, strlen(rep));
                 }
@@ -405,11 +423,14 @@ int main()
 
             else if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
             {
-                if (connecte == false){
+                if (connecte == false)
+                {
                     const char *rep = "LOGIN FIRST\n";
-                        write(client_fd, rep, strlen(rep));
-                }else{
-                    
+                    write(client_fd, rep, strlen(rep));
+                }
+                else
+                {
+
                     int already = 0;
                     int id_commande = atoi(ligne + 13);
                     int existe = cherche_si_commande_exist(conn, id_commande);
@@ -456,17 +477,20 @@ int main()
                     }
                     char response[BUFFER_SIZE];
                     snprintf(response, sizeof(response),
-                            "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
-                            bordereau, already);
+                             "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
+                             bordereau, already);
                     write(client_fd, response, strlen(response));
                 }
             }
             else if (strncmp(ligne, "STATUS ", 7) == 0)
             {
-                if (connecte == false){
+                if (connecte == false)
+                {
                     const char *rep = "LOGIN FIRST\n";
-                        write(client_fd, rep, strlen(rep));
-                }else{
+                    write(client_fd, rep, strlen(rep));
+                }
+                else
+                {
                     int label = atoi(ligne + 7);
                     int ret = chercher_status_par_bordereau(conn, label);
                     if (ret == -1)
@@ -484,7 +508,7 @@ int main()
                         const char *libelle = "Chez Alizon";
                         char response[BUFFER_SIZE];
                         snprintf(response, sizeof(response),
-                                "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
+                                 "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
                         write(client_fd, response, strlen(response));
                     }
                 }
@@ -498,13 +522,56 @@ int main()
                 int status_act = chercher_status_par_bordereau(conn, label);
                 int new_status = status_act + 1;
                 // verifie si la commande est arrivée
-                if (new_status == 5)
+                if (new_status == 5) // si le nouveau status est 5
                 {
-                    int max = 2;
-                    int id_raison = rand() % (max + 1);
-                    char comment_livre[40];
-                    strcpy(comment_livre, livre_en_quoi[id_raison]);
-                    write(client_fd, comment_livre, strlen(comment_livre));
+                    int max = 2;                                            // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
+                    int id_comment_livre = rand() % (max + 1);              // on créé un id pour choisir aléatoirement comment il est livré
+                    char comment_livre[40];                                 // on initialise une variable de comment on livre
+                    strcpy(comment_livre, livre_en_quoi[id_comment_livre]); // on copie la raison dans la variable
+                    if (strcmp(comment_livre, "Refusé\n") == 0)             // on regarde si la raison est == à Refusé pour pouvoir init une raison de pourquoi il est refusé
+                    {
+                        char raison_du_refus[40];                               // on initialise une variable de la raison du refus
+                        int max_raison_refus = 4;                               // c'est le nombre de facon de pourquoi le colis à été refusé par le client (0,1,2,3,4 car il y a 5 raisons)
+                        int id_raison_refus = rand() % (max + 1);               // on créé un id pour choisir aléatoirement comment il est refusé
+                        strcpy(raison_du_refus, raison_refus[id_raison_refus]); // on copie la raison du refus dans raison_du_refus
+                        strcat(comment_livre, raison_du_refus);                 // on concatene la chaine de comment_livre avec raison_du_refus pour afficher
+                    }
+                    else if (strcmp(comment_livre, "Livré en l'absence du destinataire\n") == 0) // regarde si le colis à été livré en l'absence du destinataire pour envoyer la boite au lettre
+                    {
+                        // envoyer d'abord le texte de notification
+                        char msg_text[BUFFER_SIZE];
+                        snprintf(msg_text, sizeof(msg_text), "LIVRE: %s", comment_livre); // on convetit la variable en tableau de caractere
+                        write(client_fd, msg_text, strlen(msg_text));
+
+                        const char *imageVendeur = "../html/img/photo/Delivraptor/boite_au_lettre.jpg";
+                        FILE *fp = fopen(imageVendeur, "rb");
+
+                        if (fp)
+                        {
+                            fseek(fp, 0, SEEK_END);    // place le pointeur a la fin du fichier pour avoir la taille
+                            long filesize = ftell(fp); // demande la taille du fichier
+                            fseek(fp, 0, SEEK_SET);    // remet le pointeur au début du fichier
+
+                            char *bufferimage = malloc(filesize); // on alloue un tampon a la taille du fichier
+                            if (bufferimage)
+                            {
+                                fread(bufferimage, 1, filesize, fp);
+                                char imageInfo[64];
+                                snprintf(imageInfo, sizeof(imageInfo), "IMG_START %ld\n", filesize);
+                                write(client_fd, imageInfo, strlen(imageInfo));
+                                write(client_fd, bufferimage, filesize);
+
+                                free(bufferimage);
+                            }
+                            fclose(fp);
+                        }
+                        else
+                        {
+                            perror("Erreur ouverture image");
+                            write(client_fd, "IMG_ERROR\n", 10);
+                        }
+                    }
+                    write(client_fd, comment_livre, strlen(comment_livre)); // on affiche comment il a été livré
                 }
                 else if (status_act >= 5)
                 {
@@ -546,7 +613,7 @@ int main()
 
                     char response[BUFFER_SIZE];
                     snprintf(response, sizeof(response),
-                            "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
+                             "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
                     write(client_fd, response, strlen(response));
                 }
                 else if (status_act == -2)

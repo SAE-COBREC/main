@@ -9,6 +9,30 @@
 
     if(empty($_SESSION['vendeur_id']) === false){
         $_SESSION["promotion"]['etat'] = 'pasSvg';
+        function nombre_limite($pdo){
+            try {//recherche nb de Promotions appartenant au vendeur
+                $sql = '
+                SELECT id_vendeur FROM cobrec1._promotion
+                INNER JOIN cobrec1._produit ON 
+                _promotion.id_produit = _produit.id_produit
+                WHERE id_vendeur = :idVendeur;
+                ';
+                $stmt = $pdo->prepare($sql);
+                $params = [
+                    'idVendeur' => $_SESSION['vendeur_id']
+                ];
+                $stmt->execute($params);
+                if (count($stmt->fetchAll(PDO::FETCH_ASSOC)) >= 2){?>
+                <script>
+                    alert("Vous avez créé plus de deux promotions. Vous ne pouvez donc plus créer de promotion. Vous pouvez toutefois toujours modifier ou supprimer des promotions.");
+                    document.location.href = "/pages/backoffice/index.php"; 
+                </script>
+                <?php
+                exit(0);
+            }
+            } catch (Exception $e) {}
+        }
+
             if (empty($_GET['modifier']) === false){
                 //si US modifier reduc
                 //print_r("detect modif\n");
@@ -34,6 +58,7 @@
                             $_SESSION["promotion"]['_GET']['id_produit'] = 0;
                             $_SESSION["promotion"]['_GET']['id_vendeur'] = [];
                             $_SESSION["promotion"]['_GET']['id_vendeur']['id_vendeur'] = 0;
+                            nombre_limite($pdo);
                         }
                         $_SESSION["promotion"]['_GET'] = $_SESSION["promotion"]['_GET'][0];
                         if (!empty($_SESSION["promotion"]['_GET']['id_produit'])){
@@ -154,6 +179,7 @@
             
             }else{
                 if (empty($_POST["produit"])){
+                    nombre_limite($pdo);
                     $_POST["produit"] = 0;
                     $_POST["debut"] = '';
                     $_POST["fin"] = '';
@@ -178,8 +204,8 @@
 
 //print_r($_GET);
 // print_r($_SESSION["promotion"]['_GET']);
-print_r($_POST);
-print_r($_SESSION["promotion"]);
+// print_r($_POST);
+// print_r($_SESSION["promotion"]);
 
 if ($_POST !== []) {
 
@@ -378,22 +404,20 @@ if ($_POST !== []) {
                         $time = time();
                         // print_r("WARNS : " . $_SESSION["promotion"]["warn"]);
 
-                            //Si pas de warning et formulaire soumis via le bouton Sauvegarder ou le bouton Annuler
+                        //Si pas de warning et formulaire soumis via le bouton Sauvegarder ou le bouton Annuler
 
-                            //sert à ne pas avoir de warnings php sur le serv
-                            if (empty($_POST["publier"])){
-                                $_POST["publier"] = '';
-                            }
-                            if (empty($_POST["svgModif"])){
-                                $_POST["svgModif"] = '';
-                            }
-
-                            
-                        
-                            
+                        //sert à ne pas avoir de warnings php sur le serv
+                        if (empty($_POST["publier"])){
+                            $_POST["publier"] = '';
+                        }
+                        if (empty($_POST["svgModif"])){
+                            $_POST["svgModif"] = '';
+                        }
                         
                         if ($_POST["publier"] == "Publier la promotion dans le catalogue client"  || (empty($_SESSION["promotion"]['_GET']['id_promotion']) && ($_POST["svgModif"] == "Sauvegarder les modifications"))){
                             //si la promotion n'existe pas (même si l'URL nous fait croire que l'on en modifie une, ce qui en fait n'est pas le cas)
+                            
+                            
                             try {//création de l'objet promotion
                                 $sql = '
                                 INSERT INTO cobrec1._promotion(id_produit, promotion_debut, promotion_fin)
@@ -406,7 +430,6 @@ if ($_POST !== []) {
                                     'produit' => $_POST['produit']
                                 ];
                                 $stmt->execute($params);
-                                $_SESSION["promotion"]['_GET']['id_promotion'] = $pdo->lastInsertId();
                                 ?>
                                 <script>
                                     btnSupprimer.disabled = false; //dégrisage du bouton
