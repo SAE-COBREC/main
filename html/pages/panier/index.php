@@ -13,7 +13,7 @@
         $requetePanier = "
             SELECT DISTINCT ON (_produit.id_produit)
                 _produit.id_produit,
-                p_nom, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt, denomination, reduction_pourcentage
+                p_nom, p_prix, i_lien, p_stock, quantite, montant_tva, i_title, i_alt, denomination, reduction_pourcentage, reduction_debut, reduction_fin
             FROM _contient
             JOIN _produit ON _produit.id_produit = _contient.id_produit
             JOIN _vendeur ON _produit.id_vendeur = _vendeur.id_vendeur
@@ -87,11 +87,21 @@
                     <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
                     <p><strong>Vendu par :
                         </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
-                        <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.', ' ')?> €
+                        <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
+                        <?php
+                        if (!empty($article['reduction_pourcentage'])){
+                            if ((strtotime($article["reduction_debut"]) > time()) && (strtotime($article["reduction_fin"]) > time())){
+                                $article['reduction_pourcentage'] = 0;
+                            }
+                        }
+                        if (!empty($article['reduction_pourcentage']) && $article['reduction_pourcentage'] != 0){
+                        ?>
+                            <strong>Remise : </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
+                        <?php } ?>
                     </p>
                     <div class="basArticleP">
                         <p class="articlePrix">TTC :
-                            <?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.', ' ')?>
+                            <?php echo number_format(($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
                             €</p>
                         <div class="quantite">
 
@@ -117,13 +127,13 @@
         <aside class="recapCommande">
             <div class="recapTete">
                 <h3 id="totalArticles"></h3>
-                <!--est tremplit avec le js-->
+                <!--est remplit avec le js-->
                 <div id="listeProduits"></div>
-                <!--est tremplit avec le js-->
+                <!--est remplit avec le js-->
             </div>
             <div class="recapTotal">
                 <h3>Prix TTC :</h3>
-                <!--est tremplit avec le js-->
+                <!--est remplit avec le js-->
                 <h3 class="prixTotal" id="prixTotal"></h3>
             </div>
             <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
@@ -140,7 +150,8 @@
         <?php elseif (isset($panierTemp) && count($panierTemp) > 0): ?>
 
         <div>
-            <?php foreach ($panierTemp as $idProduit => $article): ?>
+            <?php foreach ($panierTemp as $idProduit => $article): 
+                print_r($article); ?>
             <article class="unArticleP"
                 data-prix="<?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.')?>"
                 data-stock="<?php echo intval($article['p_stock'])?>"
@@ -154,11 +165,16 @@
                     <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
                     <p><strong>Vendu par :
                         </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
-                        <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, '.', ' ')?> €
+                        <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
+                        <?php
+                        if (!empty($article['pourcentage_reduction'])){
+                        ?>
+                            <strong>Remise : </strong><?php echo number_format($article['pourcentage_reduction'], 2, ',', ' '); ?> %
+                        <?php } ?>
                     </p>
                     <div class="basArticleP">
                         <p class="articlePrix">TTC :
-                            <?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.', ' ')?>
+                            <?php echo number_format(($article['p_prix'] - (($article['pourcentage_reduction'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
                             €</p>
                         <div class="quantite">
 
