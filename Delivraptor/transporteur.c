@@ -423,95 +423,95 @@ int main()
 
             else if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
             {
-                if (connecte == false)
+                /*if (connecte == false)
                 {
                     const char *rep = "LOGIN FIRST\n";
                     write(client_fd, rep, strlen(rep));
                 }
                 else
+                {*/
+
+                int already = 0;
+                int id_commande = atoi(ligne + 13);
+                int existe = cherche_si_commande_exist(conn, id_commande);
+                if (existe == -1)
                 {
-
-                    int already = 0;
-                    int id_commande = atoi(ligne + 13);
-                    int existe = cherche_si_commande_exist(conn, id_commande);
-                    if (existe == -1)
-                    {
-                        write(client_fd, "ERROR DATABASE\n", 15);
-                        continue;
-                    }
-                    else if (existe == 1)
-                    {
-                        already = 1;
-                        int re = cherche_bordereau(conn, id_commande, &bordereau);
-                    }
-                    else
-                    {
-                        already = 0;
-                        bordereau = nouveau_bordereau(conn);
-                        if (bordereau == -1)
-                        {
-                            fprintf(stderr, "Erreur à la création du bordereau.");
-                        }
-                        else if (bordereau >= 0)
-                        {
-                            // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
-                            bordereau++;
-                            printf("Nouveau bordereau : %d\n", bordereau);
-                            // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
-                            // init a 0 car le statut de départ est 0
-                            enregistrer_commande(conn, id_commande, bordereau, 1);
-
-                            // Ajouter la ligne dans script.bash pour ajouter la commande a cron
-                            FILE *script = fopen(FICHIER_SCRIPT, "a");
-                            if (script != NULL)
-                            {
-                                fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
-                                fclose(script);
-                                printf("Ajouté au script: STATUS_UP %d\n", bordereau);
-                            }
-                            else
-                            {
-                                perror("Erreur ouverture script.bash");
-                            }
-                        }
-                    }
-                    char response[BUFFER_SIZE];
-                    snprintf(response, sizeof(response),
-                             "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
-                             bordereau, already);
-                    write(client_fd, response, strlen(response));
+                    write(client_fd, "ERROR DATABASE\n", 15);
+                    continue;
                 }
+                else if (existe == 1)
+                {
+                    already = 1;
+                    int re = cherche_bordereau(conn, id_commande, &bordereau);
+                }
+                else
+                {
+                    already = 0;
+                    bordereau = nouveau_bordereau(conn);
+                    if (bordereau == -1)
+                    {
+                        fprintf(stderr, "Erreur à la création du bordereau.");
+                    }
+                    else if (bordereau >= 0)
+                    {
+                        // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
+                        bordereau++;
+                        printf("Nouveau bordereau : %d\n", bordereau);
+                        // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
+                        // init a 0 car le statut de départ est 0
+                        enregistrer_commande(conn, id_commande, bordereau, 1);
+
+                        // ajoute la ligne dans script.bash pour ajouter la commande a cron
+                        FILE *script = fopen(FICHIER_SCRIPT, "a");
+                        if (script != NULL)
+                        {
+                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
+                            fclose(script);
+                            printf("Ajouté au script: STATUS_UP %d\n", bordereau);
+                        }
+                        else
+                        {
+                            perror("Erreur ouverture script.bash");
+                        }
+                    }
+                }
+                char response[BUFFER_SIZE];
+                snprintf(response, sizeof(response),
+                         "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
+                         bordereau, already);
+                write(client_fd, response, strlen(response));
+                //}
             }
             else if (strncmp(ligne, "STATUS ", 7) == 0)
             {
-                if (connecte == false)
+                /*if (connecte == false)
                 {
                     const char *rep = "LOGIN FIRST\n";
                     write(client_fd, rep, strlen(rep));
                 }
                 else
+                {*/
+                int label = atoi(ligne + 7);
+                int ret = chercher_status_par_bordereau(conn, label);
+                if (ret == -1)
                 {
-                    int label = atoi(ligne + 7);
-                    int ret = chercher_status_par_bordereau(conn, label);
-                    if (ret == -1)
-                    {
-                        const char *rep = "ERREUR de SELECT.\n";
-                        write(client_fd, rep, strlen(rep));
-                    }
-                    else if (ret == -2)
-                    {
-                        const char *rep = "ERREUR, aucune commande trouvé\n";
-                        write(client_fd, rep, strlen(rep));
-                    }
-                    else
-                    {
-                        const char *libelle = "Chez Alizon";
-                        char response[BUFFER_SIZE];
-                        snprintf(response, sizeof(response),
-                                 "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
-                        write(client_fd, response, strlen(response));
-                    }
+                    const char *rep = "ERREUR de SELECT.\n";
+                    write(client_fd, rep, strlen(rep));
                 }
+                else if (ret == -2)
+                {
+                    const char *rep = "ERREUR, aucune commande trouvé\n";
+                    write(client_fd, rep, strlen(rep));
+                }
+                else
+                {
+                    const char *libelle = "Chez Alizon";
+                    char response[BUFFER_SIZE];
+                    snprintf(response, sizeof(response),
+                             "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
+                    write(client_fd, response, strlen(response));
+                }
+                //}
             }
             // STAT evo
 
@@ -524,11 +524,12 @@ int main()
                 // verifie si la commande est arrivée
                 if (new_status == 5) // si le nouveau status est 5
                 {
-                    int max = 2;                                            // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
-                    int id_comment_livre = rand() % (max + 1);              // on créé un id pour choisir aléatoirement comment il est livré
-                    char comment_livre[40];                                 // on initialise une variable de comment on livre
-                    strcpy(comment_livre, livre_en_quoi[id_comment_livre]); // on copie la raison dans la variable
-                    if (strcmp(comment_livre, "Refusé\n") == 0)             // on regarde si la raison est == à Refusé pour pouvoir init une raison de pourquoi il est refusé
+                    change_status(conn, label, new_status);
+                    int max = 2;                                                      // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
+                    int id_comment_livre = rand() % (max + 1);                        // on créé un id pour choisir aléatoirement comment il est livré
+                    char comment_livre[40];                                           // on initialise une variable de comment on livre
+                    strcpy(comment_livre, livre_en_quoi[id_comment_livre]);           // on copie la raison dans la variable
+                    if (strcmp(comment_livre, "Refusé par le destinataire :\n") == 0) // on regarde si la raison est == à Refusé pour pouvoir init une raison de pourquoi il est refusé
                     {
                         char raison_du_refus[40];                               // on initialise une variable de la raison du refus
                         int max_raison_refus = 4;                               // c'est le nombre de facon de pourquoi le colis à été refusé par le client (0,1,2,3,4 car il y a 5 raisons)

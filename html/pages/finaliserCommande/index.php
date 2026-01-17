@@ -169,7 +169,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
         //les problèmes ave la page panier qui ne reset pas le panier  en cours et donc on aura encore le panier en cours dans notre 
         //panier alors qu'on vient de payer. Il servira pour la page de suivi de commande vu qu'on est redirigé sur celle-ci après le paiement
         $_SESSION["id_commande"] = $_SESSION["panierEnCours"];
-
+        unset($_SESSION['bordereau']); 
         //une fois que tout le panier a été traité on créer un nouveau pour eviter les erreurs
         $sqlCreatePanier = "
             INSERT INTO _panier_commande (id_client, timestamp_commande)
