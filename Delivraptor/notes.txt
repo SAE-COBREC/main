@@ -1,0 +1,3 @@
+horodater toutes les etapes
+hasher mdp
+charge limite transporteur

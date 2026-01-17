@@ -257,9 +257,10 @@ int verif_login(PGconn *conn, char *email, char *mdp)
     if (PQntuples(res) > 0)
     {
         char *mdp_bdd = PQgetvalue(res, 0, 0);
-        int match = strcmp(mdp, mdp_bdd);
+        // Note : Attention aux espaces finaux potentiels en BDD
+        int match = (strcmp(mdp, mdp_bdd) == 0) ? 1 : 0;
         PQclear(res);
-        return (match == 0) ? 1 : 0;
+        return match;
     }
     else
     {
@@ -355,11 +356,11 @@ int main()
         // Connexion à la base de données dans le processus fils
         PGconn *conn;
         conn = PQconnectdb(
-            "host=127.0.0.1 "
+            "host=10.253.5.101 "
             "port=5432 "
-            "dbname=base_sae "
-            "user=nom_utilisateur "
-            "password=motdepasse ");
+            "dbname=saedb "
+            "user=sae "
+            "password=kira13 ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -399,7 +400,7 @@ int main()
                     {
                         const char *rep = "OK LOGIN_SUCCESS\n";
                         write(client_fd, rep, strlen(rep));
-                        printf("Email: %s, Mot de passe: %s\n", email, mdp);
+                        printf("Email: %s, Mot de passe: %s - CONNECTE\n", email, mdp);
                         connecte = true;
                     }
                     else if (result == 0)
@@ -423,209 +424,225 @@ int main()
 
             else if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
             {
-                /*if (connecte == false)
+                if (connecte == false)
                 {
                     const char *rep = "LOGIN FIRST\n";
                     write(client_fd, rep, strlen(rep));
                 }
                 else
-                {*/
-
-                int already = 0;
-                int id_commande = atoi(ligne + 13);
-                int existe = cherche_si_commande_exist(conn, id_commande);
-                if (existe == -1)
                 {
-                    write(client_fd, "ERROR DATABASE\n", 15);
-                    continue;
-                }
-                else if (existe == 1)
-                {
-                    already = 1;
-                    int re = cherche_bordereau(conn, id_commande, &bordereau);
-                }
-                else
-                {
-                    already = 0;
-                    bordereau = nouveau_bordereau(conn);
-                    if (bordereau == -1)
+                    int already = 0;
+                    int id_commande = atoi(ligne + 13);
+                    int existe = cherche_si_commande_exist(conn, id_commande);
+                    if (existe == -1)
                     {
-                        fprintf(stderr, "Erreur à la création du bordereau.");
+                        write(client_fd, "ERROR DATABASE\n", 15);
+                        continue;
                     }
-                    else if (bordereau >= 0)
+                    else if (existe == 1)
                     {
-                        // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
-                        bordereau++;
-                        printf("Nouveau bordereau : %d\n", bordereau);
-                        // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
-                        // init a 0 car le statut de départ est 0
-                        enregistrer_commande(conn, id_commande, bordereau, 1);
-
-                        // ajoute la ligne dans script.bash pour ajouter la commande a cron
-                        FILE *script = fopen(FICHIER_SCRIPT, "a");
-                        if (script != NULL)
-                        {
-                            fprintf(script, "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
-                            fclose(script);
-                            printf("Ajouté au script: STATUS_UP %d\n", bordereau);
-                        }
-                        else
-                        {
-                            perror("Erreur ouverture script.bash");
-                        }
-                    }
-                }
-                char response[BUFFER_SIZE];
-                snprintf(response, sizeof(response),
-                         "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
-                         bordereau, already);
-                write(client_fd, response, strlen(response));
-                //}
-            }
-            else if (strncmp(ligne, "STATUS ", 7) == 0)
-            {
-                /*if (connecte == false)
-                {
-                    const char *rep = "LOGIN FIRST\n";
-                    write(client_fd, rep, strlen(rep));
-                }
-                else
-                {*/
-                int label = atoi(ligne + 7);
-                int ret = chercher_status_par_bordereau(conn, label);
-                if (ret == -1)
-                {
-                    const char *rep = "ERREUR de SELECT.\n";
-                    write(client_fd, rep, strlen(rep));
-                }
-                else if (ret == -2)
-                {
-                    const char *rep = "ERREUR, aucune commande trouvé\n";
-                    write(client_fd, rep, strlen(rep));
-                }
-                else
-                {
-                    const char *libelle = "Chez Alizon";
-                    char response[BUFFER_SIZE];
-                    snprintf(response, sizeof(response),
-                             "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
-                    write(client_fd, response, strlen(response));
-                }
-                //}
-            }
-            // STAT evo
-
-            else if (strncmp(ligne, "STATUS_UP", 9) == 0)
-            {
-                int label = atoi(ligne + 10);
-                // récupere le statut actuel
-                int status_act = chercher_status_par_bordereau(conn, label);
-                int new_status = status_act + 1;
-                // verifie si la commande est arrivée
-                if (new_status == 5) // si le nouveau status est 5
-                {
-                    change_status(conn, label, new_status);
-                    int max = 2;                                                      // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
-                    int id_comment_livre = rand() % (max + 1);                        // on créé un id pour choisir aléatoirement comment il est livré
-                    char comment_livre[40];                                           // on initialise une variable de comment on livre
-                    strcpy(comment_livre, livre_en_quoi[id_comment_livre]);           // on copie la raison dans la variable
-                    if (strcmp(comment_livre, "Refusé par le destinataire :\n") == 0) // on regarde si la raison est == à Refusé pour pouvoir init une raison de pourquoi il est refusé
-                    {
-                        char raison_du_refus[40];                               // on initialise une variable de la raison du refus
-                        int max_raison_refus = 4;                               // c'est le nombre de facon de pourquoi le colis à été refusé par le client (0,1,2,3,4 car il y a 5 raisons)
-                        int id_raison_refus = rand() % (max + 1);               // on créé un id pour choisir aléatoirement comment il est refusé
-                        strcpy(raison_du_refus, raison_refus[id_raison_refus]); // on copie la raison du refus dans raison_du_refus
-                        strcat(comment_livre, raison_du_refus);                 // on concatene la chaine de comment_livre avec raison_du_refus pour afficher
-                    }
-                    else if (strcmp(comment_livre, "Livré en l'absence du destinataire\n") == 0) // regarde si le colis à été livré en l'absence du destinataire pour envoyer la boite au lettre
-                    {
-                        // envoyer d'abord le texte de notification
-                        char msg_text[BUFFER_SIZE];
-                        snprintf(msg_text, sizeof(msg_text), "LIVRE: %s", comment_livre); // on convetit la variable en tableau de caractere
-                        write(client_fd, msg_text, strlen(msg_text));
-
-                        const char *imageVendeur = "../html/img/photo/Delivraptor/boite_au_lettre.jpg";
-                        FILE *fp = fopen(imageVendeur, "rb");
-
-                        if (fp)
-                        {
-                            fseek(fp, 0, SEEK_END);    // place le pointeur a la fin du fichier pour avoir la taille
-                            long filesize = ftell(fp); // demande la taille du fichier
-                            fseek(fp, 0, SEEK_SET);    // remet le pointeur au début du fichier
-
-                            char *bufferimage = malloc(filesize); // on alloue un tampon a la taille du fichier
-                            if (bufferimage)
-                            {
-                                fread(bufferimage, 1, filesize, fp);
-                                char imageInfo[64];
-                                snprintf(imageInfo, sizeof(imageInfo), "IMG_START %ld\n", filesize);
-                                write(client_fd, imageInfo, strlen(imageInfo));
-                                write(client_fd, bufferimage, filesize);
-
-                                free(bufferimage);
-                            }
-                            fclose(fp);
-                        }
-                        else
-                        {
-                            perror("Erreur ouverture image");
-                            write(client_fd, "IMG_ERROR\n", 10);
-                        }
-                    }
-                    write(client_fd, comment_livre, strlen(comment_livre)); // on affiche comment il a été livré
-                }
-                else if (status_act >= 5)
-                {
-                    // Suppression de la ligne correspondante dans script.bash
-                    FILE *src = fopen(FICHIER_SCRIPT, "r");
-                    FILE *tmp = fopen("script_tmp.bash", "w");
-                    if (src && tmp)
-                    {
-                        char line[256];
-                        char pattern[64];
-                        snprintf(pattern, sizeof(pattern), "echo \"STATUS_UP %d\" | nc -q 1 127.0.0.1 9000", label);
-                        while (fgets(line, sizeof(line), src))
-                        {
-                            if (strstr(line, pattern) == NULL)
-                            {
-                                fputs(line, tmp);
-                            }
-                        }
-                        fclose(src);
-                        fclose(tmp);
-                        remove(FICHIER_SCRIPT);
-                        rename("script_tmp.bash", FICHIER_SCRIPT);
+                        already = 1;
+                        int re = cherche_bordereau(conn, id_commande, &bordereau);
                     }
                     else
                     {
-                        if (src)
-                            fclose(src);
-                        if (tmp)
-                            fclose(tmp);
-                    }
-                    const char *msg = "COMMANDE FINI\n";
-                    write(client_fd, msg, strlen(msg));
-                    // incremente le status
-                }
-                else if (status_act >= 0)
-                {
-                    int new_status = status_act + 1;
-                    change_status(conn, label, new_status);
+                        already = 0;
+                        bordereau = nouveau_bordereau(conn);
+                        if (bordereau == -1)
+                        {
+                            fprintf(stderr, "Erreur à la création du bordereau.");
+                        }
+                        else if (bordereau >= 0)
+                        {
+                            // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
+                            bordereau++;
+                            printf("Nouveau bordereau : %d\n", bordereau);
+                            // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
+                            // init a 0 car le statut de départ est 0
+                            enregistrer_commande(conn, id_commande, bordereau, 1);
 
+                            // ajoute la ligne dans script.bash pour ajouter la commande a cron
+                            // MODIF CRON : on ajoute la séquence de LOGIN dans le script pour qu'il s'authentifie
+                            FILE *script = fopen(FICHIER_SCRIPT, "a");
+                            if (script != NULL)
+                            {
+                                fprintf(script, "echo -e \"LOGIN Alizon mdp\\nSTATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
+                                fclose(script);
+                                printf("Ajouté au script: STATUS_UP %d\n", bordereau);
+                            }
+                            else
+                            {
+                                perror("Erreur ouverture script.bash");
+                            }
+                        }
+                    }
                     char response[BUFFER_SIZE];
                     snprintf(response, sizeof(response),
-                             "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
+                             "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
+                             bordereau, already);
                     write(client_fd, response, strlen(response));
                 }
-                else if (status_act == -2)
+            }
+            else if (strncmp(ligne, "STATUS ", 7) == 0)
+            {
+                if (connecte == false)
                 {
-                    const char *msg = "ERREUR, aucune commande trouvee\n";
-                    write(client_fd, msg, strlen(msg));
+                    const char *rep = "LOGIN FIRST\n";
+                    write(client_fd, rep, strlen(rep));
                 }
                 else
-                { // -1
-                    const char *msg = "ERREUR SELECT\n";
-                    write(client_fd, msg, strlen(msg));
+                {
+                    int label = atoi(ligne + 7);
+                    int ret = chercher_status_par_bordereau(conn, label);
+                    
+                    // AJOUT DEBUG STATUS
+                    printf("Demande STATUS pour bordereau %d : ret=%d\n", label, ret);
+
+                    if (ret == -1)
+                    {
+                        const char *rep = "ERREUR de SELECT.\n";
+                        write(client_fd, rep, strlen(rep));
+                    }
+                    else if (ret == -2)
+                    {
+                        const char *rep = "ERREUR, aucune commande trouvé\n";
+                        write(client_fd, rep, strlen(rep));
+                    }
+                    else
+                    {
+                        const char *libelle = "Chez Alizon";
+                        char response[BUFFER_SIZE];
+                        snprintf(response, sizeof(response),
+                                 "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
+                        write(client_fd, response, strlen(response));
+                    }
+                }
+            }
+            // STAT evo
+            else if (strncmp(ligne, "STATUS_UP", 9) == 0)
+            {
+                // Ici aussi, on pourrait forcer le login si on voulait
+                if (connecte == false)
+                {
+                    const char *rep = "LOGIN FIRST\n";
+                    write(client_fd, rep, strlen(rep));
+                }
+                else
+                {
+                    int label = atoi(ligne + 10);
+                    // récupere le statut actuel
+                    int status_act = chercher_status_par_bordereau(conn, label);
+                    int new_status = status_act + 1;
+                    
+                    printf("STATUS_UP pour %d : %d -> %d\n", label, status_act, new_status);
+
+                    // verifie si la commande est arrivée
+                    if (new_status == 5) // si le nouveau status est 5
+                    {
+                        change_status(conn, label, new_status);
+                        int max = 2;                                                      // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
+                        int id_comment_livre = rand() % (max + 1);                        // on créé un id pour choisir aléatoirement comment il est livré
+                        char comment_livre[40];                                           // on initialise une variable de comment on livre
+                        strcpy(comment_livre, livre_en_quoi[id_comment_livre]);           // on copie la raison dans la variable
+                        if (strcmp(comment_livre, "Refusé par le destinataire :\n") == 0) // on regarde si la raison est == à Refusé pour pouvoir init une raison de pourquoi il est refusé
+                        {
+                            char raison_du_refus[40];                               // on initialise une variable de la raison du refus
+                            int max_raison_refus = 4;                               // c'est le nombre de facon de pourquoi le colis à été refusé par le client (0,1,2,3,4 car il y a 5 raisons)
+                            int id_raison_refus = rand() % (max + 1);               // on créé un id pour choisir aléatoirement comment il est refusé
+                            strcpy(raison_du_refus, raison_refus[id_raison_refus]); // on copie la raison du refus dans raison_du_refus
+                            strcat(comment_livre, raison_du_refus);                 // on concatene la chaine de comment_livre avec raison_du_refus pour afficher
+                        }
+                        else if (strcmp(comment_livre, "Livré en l'absence du destinataire\n") == 0) // regarde si le colis à été livré en l'absence du destinataire pour envoyer la boite au lettre
+                        {
+                            // envoyer d'abord le texte de notification
+                            char msg_text[BUFFER_SIZE];
+                            snprintf(msg_text, sizeof(msg_text), "LIVRE: %s", comment_livre); // on convetit la variable en tableau de caractere
+                            write(client_fd, msg_text, strlen(msg_text));
+
+                            const char *imageVendeur = "../html/img/photo/Delivraptor/boite_au_lettre.jpg";
+                            FILE *fp = fopen(imageVendeur, "rb");
+
+                            if (fp)
+                            {
+                                fseek(fp, 0, SEEK_END);    // place le pointeur a la fin du fichier pour avoir la taille
+                                long filesize = ftell(fp); // demande la taille du fichier
+                                fseek(fp, 0, SEEK_SET);    // remet le pointeur au début du fichier
+
+                                char *bufferimage = malloc(filesize); // on alloue un tampon a la taille du fichier
+                                if (bufferimage)
+                                {
+                                    fread(bufferimage, 1, filesize, fp);
+                                    char imageInfo[64];
+                                    snprintf(imageInfo, sizeof(imageInfo), "IMG_START %ld\n", filesize);
+                                    write(client_fd, imageInfo, strlen(imageInfo));
+                                    write(client_fd, bufferimage, filesize);
+
+                                    free(bufferimage);
+                                }
+                                fclose(fp);
+                            }
+                            else
+                            {
+                                perror("Erreur ouverture image");
+                                write(client_fd, "IMG_ERROR\n", 10);
+                            }
+                        }
+                        write(client_fd, comment_livre, strlen(comment_livre)); // on affiche comment il a été livré
+                    }
+                    else if (status_act >= 5)
+                    {
+                        // Suppression de la ligne correspondante dans script.bash
+                        FILE *src = fopen(FICHIER_SCRIPT, "r");
+                        FILE *tmp = fopen("script_tmp.bash", "w");
+                        if (src && tmp)
+                        {
+                            char line[256];
+                            char pattern[64];
+                            // MODIF PATTERN : on cherche la nouvelle ligne avec le LOGIN
+                            snprintf(pattern, sizeof(pattern), "STATUS_UP %d", label);
+                            while (fgets(line, sizeof(line), src))
+                            {
+                                if (strstr(line, pattern) == NULL)
+                                {
+                                    fputs(line, tmp);
+                                }
+                            }
+                            fclose(src);
+                            fclose(tmp);
+                            remove(FICHIER_SCRIPT);
+                            rename("script_tmp.bash", FICHIER_SCRIPT);
+                        }
+                        else
+                        {
+                            if (src)
+                                fclose(src);
+                            if (tmp)
+                                fclose(tmp);
+                        }
+                        const char *msg = "COMMANDE FINI\n";
+                        write(client_fd, msg, strlen(msg));
+                        // incremente le status
+                    }
+                    else if (status_act >= 0)
+                    {
+                        int new_status = status_act + 1;
+                        change_status(conn, label, new_status);
+
+                        char response[BUFFER_SIZE];
+                        snprintf(response, sizeof(response),
+                                 "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
+                        write(client_fd, response, strlen(response));
+                    }
+                    else if (status_act == -2)
+                    {
+                        const char *msg = "ERREUR, aucune commande trouvee\n";
+                        write(client_fd, msg, strlen(msg));
+                    }
+                    else
+                    { // -1
+                        const char *msg = "ERREUR SELECT\n";
+                        write(client_fd, msg, strlen(msg));
+                    }
                 }
             }
             else

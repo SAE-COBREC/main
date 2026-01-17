@@ -4,7 +4,7 @@ session_start();
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
 
-// Gestion de la vérification de l'email
+// gestion de la vérification de l'email
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_email') {
     $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
     try {
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// Gestion de la vérification du numéro de téléphone
+// gestion de la vérification du numéro de téléphone
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_phone') {
     $telephone = htmlspecialchars($_POST['telephone'] ?? '', ENT_QUOTES, 'UTF-8');
     try {
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// Gestion de la vérification du pseudo
+// gestion de la vérification du pseudo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'check_pseudo') {
     $pseudo = htmlspecialchars($_POST['pseudo'] ?? '', ENT_QUOTES, 'UTF-8');
     try {
@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   .debutant a {
     color: #7171A3;
   }
-  /* style pour entourer en rouge les champs qui ont une erreur */
+  
   .field-error {
     border-color: #dc143c !important;
     box-shadow: 0 0 0 4px rgba(220,20,60,0.18);
