@@ -1501,7 +1501,7 @@ function calcul_f_total_ttc($pdo, $id_panier){
     ];
     $stmt->execute($params);
     $contient = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $totalTTC;
+    $totalTTC = 0;
     foreach ($contient as $key => $value) {
         $totalTTC += round((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * (1 + $value["tva"]/100), 2);
     }

@@ -30,7 +30,7 @@
                     <td><?php 
                         $TTC = 0;
                         foreach ($_SESSION["post-achat"]["contient"] as $key => $value) {
-                            $TTC += round((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * $value["tva"], 2) . ' €';
+                            $TTC += round((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * $value["tva"], 2);
                         }
                         echo number_format($TTC, 2, ',', ' ') . ' €';
                     ?></td>
