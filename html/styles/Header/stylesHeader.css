@@ -58,6 +58,7 @@
   max-width: 500px;
   background-color: #EFEFEF;
   color: #7171A3;
+  display: none;
 }
 
 .search-form {

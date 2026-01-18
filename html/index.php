@@ -267,9 +267,9 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
     <link rel="icon" type="image/png" href="/img/favicon.svg">
 
     <!--charge les feuilles de style CSS-->
-    <link rel="stylesheet" href="/styles/Index/style.css">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
+    <link rel="stylesheet" href="/styles/Index/style.css">
 </head>
 
 <body>

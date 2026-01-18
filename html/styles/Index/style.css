@@ -26,6 +26,10 @@ body {
   position: relative;
 }
 
+.search-container {
+  display: flex;
+}
+
 aside {
   background: #FFFFFF;
   padding: 1.5rem;
