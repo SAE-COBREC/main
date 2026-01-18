@@ -234,7 +234,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             </select>
             <div id="nouvelleAdresse" style="display: none;">
                 <label>Numéro *</label>
-                <input type="text" name="numero" placeholder="Ex : 4">
+                <input type="number" name="numero" min="0" max="9999999" placeholder="Ex : 4">
 
                 <label>Rue *</label>
                 <input type="text" name="rue" placeholder="Ex : Edouard Branly">
@@ -246,12 +246,12 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
                 <input type="text" name="ville" placeholder="Ex : Lannion">
                 
                 <label>Code postal *</label>
-                <input type="text" name="codePostal" placeholder="Ex : 22970">
+                <input type="text" name="codePostal" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$" maxlength="5" placeholder="Ex : 22970">
 
-                <label>Nom du destinataire*</label>
+                <label>Nom du destinataire *</label>
                 <input type="text" name="nom_destinataire" placeholder="Ex : Dupont">
 
-                <label>Prenom du destinataire*</label>
+                <label>Prenom du destinataire *</label>
                 <input type="text" name="prenom_destinataire" placeholder="Ex : Jean">
             </div>
 

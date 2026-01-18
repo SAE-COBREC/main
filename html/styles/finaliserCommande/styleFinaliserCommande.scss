@@ -73,7 +73,7 @@ a {
     }
 
     /* Input par défaut */
-    input[type="text"] {
+    input[type="text"], input[type="number"] {
         height: 45px;
         border: 1px $secondary-color-gris-fonce solid;
         border-radius: $border-radius-primary;

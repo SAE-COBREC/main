@@ -73,7 +73,7 @@ a {
 .infoPaiement h2 img {
   width: 32px;
 }
-.infoPaiement input[type=text] {
+.infoPaiement input[type=text], .infoPaiement input[type=number] {
   height: 45px;
   border: 1px #c0c0c0 solid;
   border-radius: 14px;

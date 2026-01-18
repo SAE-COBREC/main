@@ -107,6 +107,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8');
   $telephone = htmlspecialchars($_POST['telephone'] ?? '', ENT_QUOTES, 'UTF-8');
   $rue = htmlspecialchars($_POST['rue'] ?? '', ENT_QUOTES, 'UTF-8');
+  if (!empty($_POST['complement'])){
+    $complement = htmlspecialchars($_POST['complement'] ?? '', ENT_QUOTES, 'UTF-8');
+  }
   $num = htmlspecialchars($_POST['num'] ?? '', ENT_QUOTES, 'UTF-8');
   $pays = htmlspecialchars($_POST['pays'] ?? '', ENT_QUOTES, 'UTF-8');
   $codeP = htmlspecialchars($_POST['codeP'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -170,17 +173,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       $_SESSION['vendeur_id'] = $vendeurId;
       
-      $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays)
+      if (!empty($complement)){
+        $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_complement, a_ville, a_code_postal, a_pays)
+                VALUES (:id_compte, :numero, :adresse, :complement, :ville, :code_postal, :pays)';
+        $stmtAdrss = $pdo->prepare($sqlAdrss);
+        $stmtAdrss->execute([
+          'id_compte' => $id_compte,
+          'numero'    => $num,
+          'adresse' => $rue,
+          'complement' => $complement,
+          'ville'    => $commune,
+          'code_postal'    => $codeP,
+          'pays'    => $pays
+        ]);
+      }else{
+        $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays)
                 VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays)';
         $stmtAdrss = $pdo->prepare($sqlAdrss);
         $stmtAdrss->execute([
           'id_compte' => $id_compte,
+          'numero'    => $num,
           'adresse' => $rue,
           'ville'    => $commune,
           'code_postal'    => $codeP,
-          'numero'    => $num,
           'pays'    => $pays
         ]);
+      }
     } catch (Exception $e) {
       $hasError = true;
       $error_card = 4;
@@ -342,7 +360,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="card hidden" id="3">
       <div class="logo">
-        <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
+        <img src="../../../img/svg/logo-text.svg" alt="Logo Alizon">
       </div>
       <h1>Créer un compte</h1>
       <p class="subtitle">Coordonnées</p>
@@ -393,13 +411,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex">
           <label for="num">Numéro</label>
-          <input type="text" id="num" name="num" maxlength="10" placeholder="ex: 1bis">
+          <input type="number" id="num" name="num" min="0" max="9999999" placeholder="ex: 1">
         </div>
 
         <div class="culumn-flex">
           <label for="rue">Rue</label>
           <input type="text" id="rue" name="rue" placeholder="ex: rue Hant koz" required>
         </div>
+      </div>
+
+      <div>
+        <label for="complement">Complément d'adresse (optionnel)</label>
+        <input type="text" id="compelement" name="complement" 
+           placeholder="ex: appartement 207" >
       </div>
 
       <div class="inline-flex address-row">
