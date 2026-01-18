@@ -185,7 +185,9 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
                 COALESCE(i.i_lien, '/img/photo/smartphone_xpro.jpg') as image_url,
                 i.i_alt as image_alt,
-                i.i_title as image_title
+                i.i_title as image_title,
+                r.reduction_debut,
+                r.reduction_fin
             FROM cobrec1._produit p
             JOIN cobrec1._tva t ON p.id_tva = t.id_tva
             JOIN cobrec1._vendeur v ON v.id_vendeur = p.id_vendeur
@@ -259,6 +261,9 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'i_alt' => $produitCourant['image_alt'],
                 'i_title' => $produitCourant['image_title'],
                 'quantite' => $aAjouter,
+                'pourcentage_reduction' => $produitCourant['pourcentage_reduction'],
+                'reduction_debut' => $produitCourant['reduction_debut'],
+                'reduction_fin' => $produitCourant['reduction_fin'],
                 'p_prix' => $prixUnitaire,
                 'p_stock' => $stock,
                 'p_frais_de_port' => $fraisDePort,
@@ -276,6 +281,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
         return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
+
 
 //fonction pour vérifier l'unicité du pseudo
 function verifierUnicitePseudo($connexionBaseDeDonnees, $pseudo, $idClientExclure = null)
