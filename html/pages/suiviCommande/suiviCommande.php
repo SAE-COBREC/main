@@ -1,20 +1,19 @@
 <?php
 session_start();
 
-// Récupérer le num de commande
+// Recupérer le num de commande
 $id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? $_SESSION['id_commande'] ?? 0;
 
-/**
- * Ouvre une connexion socket et s'authentifie automatiquement
- */
+
+// Ouvre une connexion socket et s'authentifie automatiquement
+
 function connectAndLogin($host, $port) {
     $fp = @fsockopen($host, $port, $errno, $errstr, 2);
     if (!$fp) {
         return ['fp' => false, 'error' => "Transporteur non disponible: $errstr ($errno)"];
     }
 
-    // AUTHENTIFICATION AUTOMATIQUE (Hardcodée)
-    // On envoie LOGIN avant toute autre chose
+    // LOGIN au serveur
     fwrite($fp, "LOGIN Alizon mdp\n");
     $loginResponse = fgets($fp, 256);
 
@@ -23,28 +22,37 @@ function connectAndLogin($host, $port) {
         fclose($fp);
         return ['fp' => false, 'error' => "Échec authentification transporteur: $loginResponse"];
     }
-
-    // Si succès, on retourne le pointeur de fichier ouvert
     return ['fp' => $fp, 'error' => null];
 }
 
 function envoyerCommande($id_commande) {
     $host = '10.253.5.101';
     $port = 9000;
-
-    // 1. Connexion + Login
     $conn = connectAndLogin($host, $port);
     if (!$conn['fp']) {
         return ['success' => false, 'error' => $conn['error'], 'bordereau' => null];
     }
     $fp = $conn['fp'];
 
-    // 2. Envoyer CREATE_LABEL une fois authentifié
+    // 2. Envoyer CREATE_LABEL
     $createCmd = "CREATE_LABEL $id_commande\n";
     fwrite($fp, $createCmd);
 
-    // 3. Lire la réponse
+    // Gestion bloquaga
+    stream_set_timeout($fp, 2); 
     $response = fgets($fp, 256);
+    
+    // Vérifier si serv a bloquer l'acces
+    $info = stream_get_meta_data($fp);
+    if ($info['timed_out']) {
+        fclose($fp);
+        return [
+            'success' => false, 
+            'error' => "Le service de livraison est momentanément saturé. Veuillez réessayer.", 
+            'bordereau' => null
+        ];
+    }
+
     fclose($fp);
 
     if (preg_match('/LABEL=(\d+)/', $response, $matches)) {
@@ -64,17 +72,14 @@ function getStatusFromSocket($bordereau) {
     $host = '10.253.5.101';
     $port = 9000;
 
-    // 1. Connexion + Login
     $conn = connectAndLogin($host, $port);
     if (!$conn['fp']) {
         return "Erreur connexion: " . $conn['error'];
     }
     $fp = $conn['fp'];
 
-    // 2. Envoyer STATUS une fois authentifié
+    // Envoyer STATUS
     fwrite($fp, "STATUS $bordereau\n");
-    
-    // 3. Lire la réponse
     $response = fgets($fp, 256);
     $status = null;
     
