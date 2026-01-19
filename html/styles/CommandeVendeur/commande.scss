@@ -1,0 +1,44 @@
+// Variables
+@use "../variable" as *;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: $font-family-secondaire;
+  background: $secondary-color-rose-claire;
+  width: 1440px;
+  height: 1024px;
+  overflow: hidden; // Empêche le scroll de la page entière
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 1024px;
+  background: $primary-color-blanc;
+}
+
+.main {
+  background: $secondary-color-rose-claire;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  height: 1024px;
+}
+
+.header {
+  margin-bottom: 24px;
+  flex-shrink: 0;
+
+  &__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: $primary-color-noir;
+    margin-bottom: 16px;
+    font-family: $font-family-primaire;
+  }
+}
