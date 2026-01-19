@@ -9,36 +9,117 @@
 }
 
 body {
-  font-family: "Quicksand", sans-serif;
+  font-family: "Baloo", sans-serif;
   background: #FFF7F1;
-  width: 1440px;
-  height: 1024px;
-  overflow: hidden;
 }
 
 .app {
   display: grid;
   grid-template-columns: 240px 1fr;
-  height: 1024px;
+  min-height: 100vh;
   background: #FFFFFF;
 }
 
 .main {
   background: #FFF7F1;
-  padding: 32px 40px;
-  display: flex;
-  flex-direction: column;
-  height: 1024px;
+  padding: 40px;
+  overflow-y: auto;
+}
+.main .header {
+  margin-bottom: 30px;
+}
+.main .header h1 {
+  color: #030212;
+  font-size: 2rem;
 }
 
-.header {
-  margin-bottom: 24px;
-  flex-shrink: 0;
+.liste-commandes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-.header__title {
-  font-size: 28px;
-  font-weight: 700;
+.liste-commandes .facture-card {
+  background: #FFFFFF;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px #030212;
+  overflow: hidden;
+  border: 1px solid rgba(3, 2, 18, 0.1);
+}
+.liste-commandes .facture-card .facture-header {
+  background: rgba(3, 2, 18, 0.02);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(3, 2, 18, 0.05);
+}
+.liste-commandes .facture-card .facture-header h3 {
   color: #030212;
-  margin-bottom: 16px;
+  font-size: 1.7em;
+  margin: 0;
+}
+.liste-commandes .facture-card .facture-header p {
+  font-size: 1.2em;
+  color: #666;
+  margin-top: 5px;
+}
+.liste-commandes .facture-card .facture-header a {
+  text-decoration: none;
+}
+.liste-commandes .facture-card .facture-header .btn-download {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #CD7F32;
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 14px;
+  cursor: pointer;
   font-family: "Baloo", sans-serif;
+  font-size: 1.1em;
+  transition: opacity 0.3s ease;
+}
+.liste-commandes .facture-card .facture-header .btn-download svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+.liste-commandes .facture-card .facture-header .btn-download:hover {
+  opacity: 0.8;
+}
+.liste-commandes .facture-card .facture-content {
+  padding: 20px;
+}
+.liste-commandes .facture-card .facture-content .produits-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #666;
+}
+.liste-commandes .facture-card .facture-content .produit-item {
+  display: flex;
+  padding: 8px 0;
+  font-size: 1.2em;
+  border-bottom: 1px dashed #030212;
+}
+.liste-commandes .facture-card .facture-content .produit-item:last-child {
+  border-bottom: none;
+}
+.liste-commandes .facture-card .facture-content .produit-item .prod-id {
+  font-size: 1.2em;
+  width: 100px;
+  font-family: monospace;
+  color: #888;
+}
+.liste-commandes .facture-card .facture-content .produit-item .prod-name {
+  font-weight: 500;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 50px;
+  background: #FFFFFF;
+  border-radius: 14px;
+  color: #888;
 }/*# sourceMappingURL=commande.css.map */

@@ -1,6 +1,6 @@
-// Variables
 @use "../variable" as *;
 
+// Reset de base et police
 * {
   box-sizing: border-box;
   margin: 0;
@@ -8,37 +8,133 @@
 }
 
 body {
-  font-family: $font-family-secondaire;
+  font-family: $font-family-primaire;
   background: $secondary-color-rose-claire;
-  width: 1440px;
-  height: 1024px;
-  overflow: hidden; // Empêche le scroll de la page entière
 }
 
 .app {
   display: grid;
   grid-template-columns: 240px 1fr;
-  height: 1024px;
+  min-height: 100vh;
   background: $primary-color-blanc;
 }
 
 .main {
   background: $secondary-color-rose-claire;
-  padding: 32px 40px;
-  display: flex;
-  flex-direction: column;
-  height: 1024px;
+  padding: 40px;
+  overflow-y: auto;
+
+  .header {
+    margin-bottom: 30px;
+    h1 {
+      color: $primary-color-noir;
+      font-size: 2rem;
+    }
+  }
 }
 
-.header {
-  margin-bottom: 24px;
-  flex-shrink: 0;
+.liste-commandes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
-  &__title {
-    font-size: 28px;
-    font-weight: 700;
-    color: $primary-color-noir;
-    margin-bottom: 16px;
-    font-family: $font-family-primaire;
+  .facture-card {
+    background: $primary-color-blanc;
+    border-radius: $border-radius-primary;
+    box-shadow: 0 1px 2px $primary-color-noir;
+    overflow: hidden;
+    border: 1px solid rgba($primary-color-noir, 0.1);
+
+    .facture-header {
+        background: rgba($primary-color-noir, 0.02);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between; // Aligne les textes à gauche et le bouton à droite
+        align-items: center;
+        border-bottom: 1px solid rgba($primary-color-noir, 0.05);
+
+        h3 { 
+            color: $primary-color-noir;
+            font-size: 1.7em;
+            margin: 0;
+        }
+        
+        p {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        a{
+          text-decoration: none;
+        }
+
+        // Style du bouton de téléchargement dans le header
+        .btn-download {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: $primary-color-bronze;
+            color: $primary-color-blanc;
+            border: none;
+            padding: 8px 16px;
+            border-radius: $border-radius-primary;
+            cursor: pointer;
+            font-family: $font-family-primaire;
+            font-size: 1.1em;
+            transition: opacity 0.3s ease;
+
+            svg {
+                width: 18px;
+                height: 18px;
+                stroke-width: 2;
+            }
+
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+    }
+
+    .facture-content {
+      padding: 20px;
+
+      .produits-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+        color: #666;
+      }
+
+      .produit-item {
+        display: flex;
+        padding: 8px 0;
+        font-size: 1.2em;
+        border-bottom: 1px dashed $primary-color-noir;
+        
+        &:last-child { 
+            border-bottom: none; 
+        }
+
+        .prod-id {
+            font-size: 1.2em;
+            width: 100px;
+            font-family: monospace;
+            color: #888;
+        }
+        
+        .prod-name {
+          font-weight: 500;
+        }
+      }
+    }
   }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 50px;
+  background: $primary-color-blanc;
+  border-radius: $border-radius-primary;
+  color: #888;
 }
