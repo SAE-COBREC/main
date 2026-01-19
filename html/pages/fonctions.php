@@ -1112,17 +1112,17 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
     }
 }
 
-
-
-
+//fonction pour calculer le prix TTC à partir du prix HT et du taux de TVA
 function calcPrixTVA($TVA, $prixHT) {
     $resultat = $prixHT;
     if ($TVA > 0) {
-        $resultat += ($prixHT * ($TVA / 100));
+        $resultat = $prixHT * (1 + $TVA / 100);  
     }
-
     return $resultat;
-}//fonction pour transférer le panier temporaire vers la BDD lors de la connexion
+}
+
+
+//fonction pour transférer le panier temporaire vers la BDD lors de la connexion
 function transfererPanierTempVersBDD($pdo, $idPanier)
 {
     if (!isset($_SESSION['panierTemp']) || empty($_SESSION['panierTemp'])) {
