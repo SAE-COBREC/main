@@ -96,13 +96,12 @@ function envoyerCommande($id_commande) {
     }
 
     fclose($fp);
-
     if (preg_match('/LABEL=(\d+)/', $response, $matches)) {
         $bordereau = (int)$matches[1];
         $already = preg_match('/ALREADY_EXISTS=1/', $response);
         $step = 1;
         if (preg_match('/STEP=(\d+)/', $response, $m)) {
-            $step = (int)$m[1];
+            $step = (int)$m[1];   
         }
         return ['success' => true, 'bordereau' => $bordereau, 'already' => $already, 'step' => $step];
     }
@@ -113,29 +112,83 @@ function envoyerCommande($id_commande) {
 function getStatusFromSocket($bordereau) {
     $host = '127.0.0.1';
     $port = 9000;
-
-    $conn = connectAndLogin($host, $port);
-    if (!$conn['fp']) {
-        return "Erreur connexion: " . $conn['error'];
+    
+    // Timeout de connexion court (1s)
+    $fp = @fsockopen($host, $port, $errno, $errstr, 1);
+    if (!$fp) {
+        return ['success' => false, 'error' => "Serveur injoignable", 'bordereau' => null];
     }
-    $fp = $conn['fp'];
 
-    // Envoyer STATUS
-    fwrite($fp, "STATUS $bordereau\n");
+    // Définir un timeout de lecture court (ex: 2 secondes) pour éviter que la page charge indéfiniment
+    stream_set_timeout($fp, 2);
+
+    fwrite($fp, "LOGIN Alizon mdp\n");
+    fgets($fp, 256); // Ignorer la réponse login pour l'exemple
+
+    // 1. Demander le statut
+    fwrite($fp, "STATUS $bordereau\n"); 
+    
+    // 2. Lire la réponse principale (STEP)
     $response = fgets($fp, 256);
-    $status = null;
-    
-    if (preg_match('/STEP=(\d+)/', $response, $matches)) {
-        $status = (int)$matches[1];
+    $result = ['step' => 0, 'detail' => '', 'img_data' => null];
+
+    if ($response && preg_match('/STEP=(\d+)/', $response, $matches)) {
+        $result['step'] = (int)$matches[1];
     }
-    
+
+    // 3. Si étape 5, on tente de lire la suite
+    if ($result['step'] == 5) {
+        // On essaie de lire la ligne de détail
+        $detailLine = fgets($fp, 256);
+        
+        if ($detailLine) {
+            // Nettoyage du texte "LIVRE: "
+            if (strpos($detailLine, "LIVRE:") !== false) {
+                 $result['detail'] = trim(str_replace("LIVRE: ", "", $detailLine));
+            } else {
+                 $result['detail'] = trim($detailLine);
+            }
+
+            // On regarde si une ligne IMG_START suit
+            // Note: fgets peut bloquer si le serveur n'envoie rien. 
+            // Grâce au stream_set_timeout plus haut, ça ne bloquera que 2s max.
+            $imgHeader = fgets($fp, 256);
+            
+            if ($imgHeader && preg_match('/IMG_START (\d+)/', $imgHeader, $m)) {
+                $size = (int)$m[1];
+                $imgData = '';
+                $bytesRead = 0;
+
+                // Lecture binaire stricte
+                while ($bytesRead < $size) {
+                    // On lit par paquets (max 8192 ou ce qu'il reste)
+                    $chunkSize = min(8192, $size - $bytesRead);
+                    $chunk = fread($fp, $chunkSize);
+                    
+                    if ($chunk === false || strlen($chunk) === 0) {
+                        // Arrêt si connexion coupée ou timeout
+                        break;
+                    }
+                    
+                    $imgData .= $chunk;
+                    $bytesRead += strlen($chunk);
+                }
+
+                if ($bytesRead == $size) {
+                    $result['img_data'] = base64_encode($imgData);
+                }
+            }
+        }
+    }
+
     fclose($fp);
-    return $status;
+    return $result;
 }
+
+
 
 $resultat = null;
 $status = null;
-
 if ($id_commande > 0) {
     if (isset($_SESSION['bordereau']) && $_SESSION['id_commande'] == $id_commande) {
         $bordereau = $_SESSION['bordereau'];
@@ -171,17 +224,33 @@ if ($id_commande > 0) {
     <?php include __DIR__ . '/../../partials/header.php';?>
     <body>
         <h1>Suivi de commande #<?= htmlspecialchars($id_commande) ?></h1>
-        <?php if ($resultat): ?>
-            <?php if ($resultat['success']): ?>
+        <?php if (isset($status) && $status['step'] == 5): ?>
+            <?php echo "pipi";?>
+            <div class="delivery-info">
+                <p>Status actuel : <strong>Livré</strong></p>
+                <p>Détail : <?= htmlspecialchars($status['detail']) ?></p>
+                
+                <?php if (!empty($status['img_data'])): ?>
+                    <div class="proof-photo">
+                        <p>Preuve de livraison :</p>
+                        <img src="data:image/jpeg;base64,<?= $status['img_data'] ?>" 
+                            alt="Photo boite aux lettres" 
+                            style="max-width: 300px; border: 2px solid #333;">
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php elseif ($status['step']): ?>
+            <?php if ($resultat['success']): //regarde si il y a pas d'erreur?>
                 <p>Numéro de bordereau : <strong><?= htmlspecialchars($resultat['bordereau']) ?></strong></p>
-                <p>Status actuel : <strong id="status-value"><?= $status !== null ? $status : 'Inconnu' ?></strong></p>
+                <p>Status actuel : <strong id="status-value"><?= $status['step'] !== null ? $status['step'] : 'Inconnu' ?></strong></p>
             <?php else: ?>
                 <p>Erreur : <?= htmlspecialchars($resultat['error']) ?></p>
             <?php endif; ?>
         <?php endif; ?>
 
+
         <div class="steps">
-            <img id="steps" src="../../img/svg//Delivrator/<?= $status !== null ? $status : 1 ?>steps.svg" alt="Box">
+            <img id="steps" src="../../img/svg//Delivrator/<?= $status['step'] !== null ? $status['step'] : 1 ?>steps.svg" alt="Box">
         </div>
         <div class="steps2">
             <div><p>Chez Alizon</p></div>
