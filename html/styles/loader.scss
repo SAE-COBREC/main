@@ -1,0 +1,49 @@
+@use "variable" as *;
+
+#global-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    
+    &.hidden {
+        display: none !important;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .loader-inner {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid $secondary-color-gris-clair;
+        border-top: 4px solid $primary-color-bronze;
+        border-radius: 50%;
+        animation: loader-spin 1s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+    }
+
+    .loader-text {
+        font-family: $font-family-secondaire;
+        color: $primary-color-noir;
+        font-weight: 600;
+        font-size: 1.1em;
+        letter-spacing: 0.5px;
+    }
+}
+
+@keyframes loader-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

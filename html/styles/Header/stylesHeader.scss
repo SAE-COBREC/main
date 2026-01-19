@@ -1,4 +1,5 @@
 @use '../_variable.scss' as *;
+@use '../loader' as *;
 
 .site-header {
     grid-column: 1 / -1;
