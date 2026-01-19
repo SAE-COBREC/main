@@ -96,7 +96,7 @@ try {
                         
                         <div class="produit-item">
                             <span class="prod-id">Ref: <?php echo htmlspecialchars($commande['id_produit']); ?></span>
-                            <span class="prod-name"><?php echo htmlspecialchars($commande['p_nom'] ?? 'Produit inconnu');?> x<?php echo htmlspecialchars($commande['quantite']);?></span>
+                            <span class="prod-name"><?php echo htmlspecialchars($commande['p_nom'] ?? 'Produit inconnu');?> <strong>x<?php echo htmlspecialchars($commande['quantite']);?></strong></span>
                         </div>
                     <?php endforeach; ?>
                     </div></div> <?php endif; ?>
