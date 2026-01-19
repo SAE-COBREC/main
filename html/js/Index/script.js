@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             //remet la catégorie sur "tous les produits"
             document.getElementById('categorieSelect').value = 'all';
             
-            // RESET DOUBLE SLIDER (sécurisé)
+            //reset les valeurs des sliders de prix
             const inputMin = document.getElementById("inputMin");
             const inputMax = document.getElementById("inputMax");
             const rangeMin = document.getElementById("rangeMin");
