@@ -119,4 +119,80 @@ a {
   height: 45px;
   width: 100%;
   margin: 1em 0;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #FFFFFF;
+  color: #030212;
+  padding: 20px 24px;
+  border-radius: 14px;
+  width: 520px;
+  max-width: calc(100% - 40px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.modal-content h2 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  color: #7171A3;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid #030212;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-confirm {
+  background: #030212;
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#cgvModal .modal-content {
+  max-height: 80vh;
+  width: 700px;
+  overflow-y: auto;
+}
+#cgvModal .cgv-content {
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.6;
+}
+#cgvModal .cgv-content h3 {
+  font-size: 16px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  color: #7171A3;
+}
+#cgvModal .cgv-content p {
+  margin-bottom: 12px;
+}
+
+#openCgv {
+  color: #7171A3;
 }/*# sourceMappingURL=styleFinaliserCommande.css.map */

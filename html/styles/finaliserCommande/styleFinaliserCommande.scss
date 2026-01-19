@@ -130,3 +130,87 @@ a {
         margin: 1em 0;
     }
 }
+
+// Modal générique
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.modal-content {
+  background: $primary-color-blanc;
+  color: $primary-color-noir;
+  padding: 20px 24px;
+  border-radius: $border-radius-primary;
+  width: 520px;
+  max-width: calc(100% - 40px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  h2 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    color: $primary-color-bleu;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid $primary-color-noir;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-confirm {
+  background: $primary-color-noir;
+  color: $primary-color-blanc;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+// Modal CGV spécifique
+#cgvModal {
+  .modal-content {
+    max-height: 80vh;
+    width: 700px;
+    overflow-y: auto;
+  }
+
+  .cgv-content {
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.6;
+
+    h3 {
+      font-size: 16px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      color: $primary-color-bleu;
+    }
+
+    p {
+      margin-bottom: 12px;
+    }
+  }
+}
+#openCgv{
+    color: $primary-color-bleu;
+}
