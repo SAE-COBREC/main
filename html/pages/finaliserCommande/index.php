@@ -176,9 +176,18 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             $sqlUpdateStock = "UPDATE _produit SET p_stock = p_stock - :quantite WHERE id_produit = :id_produit";
             $stmtUpdateStock = $pdo->prepare($sqlUpdateStock);
 
+            $sqlUpdateNbVentes = "UPDATE _produit SET p_nb_ventes = p_nb_ventes + :quantite WHERE id_produit = :id_produit";
+            $stmtUpdateNbVentes = $pdo->prepare($sqlUpdateNbVentes);
+
             //déduire chaque article
             foreach($articlesAStock as $artStock){
                 $stmtUpdateStock->execute([
+                    ':quantite' => $artStock['quantite'],
+                    ':id_produit' => $artStock['id_produit']
+                ]);
+
+                //mettre à jour le nombre de ventes
+                $stmtUpdateNbVentes->execute([
                     ':quantite' => $artStock['quantite'],
                     ':id_produit' => $artStock['id_produit']
                 ]);
