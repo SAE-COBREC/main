@@ -27,6 +27,7 @@ try {
     SELECT f.id_facture,
            f.id_panier,
            c.id_produit,
+           c.quantite,
            p.p_nom,
            p.p_prix,
            pc.timestamp_commande AS date
@@ -95,7 +96,7 @@ try {
                         
                         <div class="produit-item">
                             <span class="prod-id">Ref: <?php echo htmlspecialchars($commande['id_produit']); ?></span>
-                            <span class="prod-name"><?php echo htmlspecialchars($commande['p_nom'] ?? 'Produit inconnu'); ?></span>
+                            <span class="prod-name"><?php echo htmlspecialchars($commande['p_nom'] ?? 'Produit inconnu');?> x<?php echo htmlspecialchars($commande['quantite']);?></span>
                         </div>
                     <?php endforeach; ?>
                     </div></div> <?php endif; ?>
