@@ -21,7 +21,7 @@
             var mroot = document.createElement('div');
             mroot.id = 'modal-root';
             document.body.appendChild(mroot);
-            mroot.innerHTML = '\n<div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">\n  <div id="modal-dialog" class="default">\n    <div id="modal-header">\n      <div id="modal-title">Notification</div>\n      <button id="modal-close" aria-label="Fermer">×</button>\n    </div>\n    <div id="modal-body"></div>\n    <div id="modal-footer">\n      <button class="button" id="modal-cancel" style="display:none">Annuler</button>\n      <button class="button primary" id="modal-ok">OK</button>\n    </div>\n  </div>\n</div>';
+            mroot.innerHTML = '\n<style>\n#modal-overlay {\n  position: fixed; inset: 0; background: rgba(9, 12, 19, 0.5);\n  display: none; align-items: center; justify-content: center; z-index: 10000;\n}\n#modal-dialog {\n  width: min(560px, 92vw);\n  background: #fff; border-radius: 12px; box-shadow: 0 12px 32px rgba(9, 30, 66, .18);\n  border: 1px solid #eef1f6; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, \"Helvetica Neue\", Arial;\n}\n#modal-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid #eef1f6; }\n#modal-title { font-weight: 700; color: #1f2430; font-size: 16px; }\n#modal-close { margin-left: auto; background: transparent; border: none; font-size: 18px; line-height: 1; color: #8a90a2; cursor: pointer; }\n#modal-body { padding: 16px; color: #2b2f3a; line-height: 1.5; }\n#modal-footer { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid #eef1f6; justify-content: flex-end; }\n.button {\n  appearance: none; border: 1px solid #e2e6f0; border-radius: 10px; padding: 8px 12px;\n  background: #fff; color: #2b2f3a; cursor: pointer; font-weight: 600; font-size: 14px;\n}\n.button.primary { background: #6c7ae0; color: #fff; border-color: #6c7ae0; }\n.button.danger  { background: #e74c3c; color: #fff; border-color: #e74c3c; }\n#modal-dialog.error #modal-header { border-bottom-color: #fde2e0; }\n#modal-dialog.error #modal-title { color: #b00020; }\n</style>\n<div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">\n  <div id="modal-dialog" class="default">\n    <div id="modal-header">\n      <div id="modal-title">Notification</div>\n      <button id="modal-close" aria-label="Fermer">×</button>\n    </div>\n    <div id="modal-body"></div>\n    <div id="modal-footer">\n      <button class="button" id="modal-cancel" style="display:none">Annuler</button>\n      <button class="button primary" id="modal-ok">OK</button>\n    </div>\n  </div>\n</div>';
         }
     }
 
@@ -125,7 +125,9 @@
             btnCancel.style.display = 'none';
         }
 
-        function close() { overlay.style.display = 'none'; document.body.style.overflow = ''; } // Fermer la modale et restaurer le défilement
+        // allow caller to prevent blocking scroll when modal opens
+        var blockScroll = !(options && options.blockScroll === false);
+        function close() { overlay.style.display = 'none'; if (blockScroll) document.body.style.overflow = ''; } // Fermer la modale et restaurer le défilement
         function ok() { try { onOk && onOk(); } finally { close(); } } // Fermer la modale et restaurer le défilement
         function cancel() { try { onCancel && onCancel(); } finally { close(); } }  // Fermer la modale et restaurer le défilement
 
@@ -134,7 +136,7 @@
         document.addEventListener('keydown', function onEsc(ev) { if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', onEsc); } });
 
         overlay.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        if (blockScroll) document.body.style.overflow = 'hidden';
     }
 
     function showError(titleOrMessage, messageOrOpts, maybeOpts) {
@@ -160,7 +162,8 @@
             message = String(titleOrMessage || 'Une erreur est survenue.');
             opts = messageOrOpts || {};
         }
-        showModal({ title: title, message: message, okText: opts.okText || 'OK', cancelText: '', variant: 'error', onOk: opts.onOk });
+        var block = (typeof opts.blockScroll === 'undefined') ? true : !!opts.blockScroll;
+        showModal({ title: title, message: message, okText: opts.okText || 'OK', cancelText: '', variant: 'error', onOk: opts.onOk, blockScroll: block });
     }
 
     window.notify = notify;

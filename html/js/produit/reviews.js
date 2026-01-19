@@ -496,7 +496,7 @@
 
         // unreport
         if (e.target.closest('.btn-unreport-action')) {
-            if (!idClient) { if (window.showError) showError('Connexion requise', 'Vous devez être connecté pour annuler un signalement.'); else alert('Vous devez être connecté pour annuler un signalement.'); document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none'); return; }
+            if (!idClient) { showError('Connexion requise', 'Vous devez être connecté pour annuler un signalement.', { okText: 'OK', blockScroll: false }); document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none'); return; }
             const rev = e.target.closest('.review');
             const aid = rev.dataset.avisId;
             const fd = new FormData();
@@ -520,7 +520,7 @@
         }
 
         if (e.target.closest('.btn-report-action')) {
-            if (!idClient) { if (window.showError) showError('Connexion requise', 'Vous devez être connecté pour signaler un avis.'); else alert('Vous devez être connecté pour signaler un avis.'); document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none'); return; }
+            if (!idClient) { showError('Connexion requise', 'Vous devez être connecté pour signaler un avis.', { okText: 'OK', blockScroll: false }); document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none'); return; }
             const rev = e.target.closest('.review');
             const aid = rev.dataset.avisId;
             if (!reportModal || !reportAvisIdInput || !reportMotif || !reportCommentaire) { console.error('Signalement: éléments UI manquants (modal/inputs)'); return; }
@@ -546,7 +546,7 @@
         confirmReport.dataset.bound = 'true';
         confirmReport.onclick = () => {
             if (!reportAvisIdInput || !reportMotif || !reportCommentaire || !reportModal) return;
-            if (!idClient) { if (window.showError) showError('Connexion requise', 'Vous devez être connecté pour signaler un avis.'); else alert('Vous devez être connecté pour signaler un avis.'); return; }
+            if (!idClient) { showError('Connexion requise', 'Vous devez être connecté pour signaler un avis.', { okText: 'OK', blockScroll: false }); return; }
             const aid = reportAvisIdInput.value;
             const motif = reportMotif.value;
             const comm = reportCommentaire.value.trim();
