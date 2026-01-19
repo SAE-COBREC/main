@@ -31,10 +31,10 @@ try {
            p.p_nom,
            p.p_prix,
            pc.timestamp_commande AS date
-    FROM _facture f
-    LEFT JOIN _panier_commande pc ON f.id_panier = pc.id_panier
-    LEFT JOIN _contient c ON pc.id_panier = c.id_panier
-    LEFT JOIN _produit p ON c.id_produit = p.id_produit
+    FROM cobrec1._facture f
+    LEFT JOIN cobrec1._panier_commande pc ON f.id_panier = pc.id_panier
+    LEFT JOIN cobrec1._contient c ON pc.id_panier = c.id_panier
+    LEFT JOIN cobrec1._produit p ON c.id_produit = p.id_produit
     WHERE p.id_vendeur = :id_vendeur
     ORDER BY f.id_facture DESC"; // Les plus récentes en premier
 
@@ -79,7 +79,7 @@ try {
                             <div class="facture-header">
                                 <h3>Facture #<?php echo htmlspecialchars($commande['id_facture']); ?></h3>
                                 <p><?php echo date("j/m/Y H:m", strtotime($commande['date'])); ?></p>
-                                <a href="../../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>"
+                                <a href="../../post-achat/profil.php?id=<?php echo $commande['id_panier']; ?>"
                                     target="_blank" rel="noopener noreferrer">
                                     <button type="button" class="btn-download">
                                         Télécharger la facture
