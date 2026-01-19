@@ -317,6 +317,9 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <!--option Plus anciens-->
                         <option value="anciens" <?= $triSelection === 'anciens' ? 'selected' : '' ?>>
                             Plus anciens</option>
+                        <!--option A à Z-->
+                        <option value="a_z" <?= $triSelection === 'a_z' ? 'selected' : '' ?>>
+                            A à Z</option>
                         <!--option Z à A-->
                         <option value="z_a" <?= $triSelection === 'z_a' ? 'selected' : '' ?>>
                             Z à A</option>
