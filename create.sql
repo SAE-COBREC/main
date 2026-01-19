@@ -124,7 +124,7 @@ ADD CONSTRAINT fk_client_compte FOREIGN KEY (id_compte) REFERENCES cobrec1._comp
 CREATE TABLE cobrec1._adresse (
     id_adresse serial NOT NULL,
     id_compte integer NOT NULL,
-    a_numero varchar(25) DEFAULT 0 NOT NULL,
+    a_numero varchar(25) DEFAULT '0' NOT NULL,
     a_adresse varchar(255) NOT NULL,
     a_ville varchar(100) NOT NULL,
     a_code_postal varchar(10) NOT NULL,
@@ -448,7 +448,11 @@ CREATE TABLE cobrec1._commentaire (
     a_achat_verifie boolean DEFAULT FALSE,
     id_client integer NOT NULL,
     CONSTRAINT verif_commentaire_note CHECK (
-        a_note IS NULL OR (a_note >= 1 AND a_note <= 5)
+        a_note IS NULL
+        OR (
+            a_note >= 1
+            AND a_note <= 5
+        )
     )
 );
 
@@ -736,6 +740,7 @@ CREATE TABLE cobrec1.bordereau (
 );
 
 DROP TABLE IF EXISTS _login;
+
 CREATE TABLE cobrec1._login (
     identifiant Varchar(255) NOT NULL,
     mdp varchar(255) NOT NULL
@@ -883,8 +888,6 @@ CREATE TRIGGER tgr_produit_deja_en_reduction_update
 BEFORE UPDATE on _reduction
 FOR EACH ROW
 EXECUTE PROCEDURE produit_deja_en_reduction_update();
-
-
 
 CREATE FUNCTION produit_deja_en_promotion_insert()
 RETURNS TRIGGER AS $$
@@ -3663,7 +3666,7 @@ VALUES (1, 1),
     (106, 103),
     (107, 104),
     (108, 105),
-    (109,5);
+    (109, 5);
 
 -- 14. RELATIONS IMAGES-COMPTES
 INSERT INTO
@@ -4230,23 +4233,47 @@ VALUES (1, '2025-11-05', 'Livré'),
 -- Peuplement : suppression de l'ancien double-peuplement. Les avis sont générés plus bas (section réaliste) et les compteurs de pouces sont définis aléatoirement (0..100) pour chaque avis.
 -- (Ancienne insertion et génération de votes supprimées pour éviter des doublons et des limites liées au nombre de clients.)
 
-WITH lc AS (SELECT COUNT(*) AS cnt FROM _livraison)
-INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client)
-SELECT a.id_avis,
-       (floor(random()*5)+1)::int,
-       ((row_number() OVER (ORDER BY a.id_avis)-1) % (SELECT cnt FROM lc)) + 1,
-       (random() > 0.7),
-       a.id_client
+WITH
+    lc AS (
+        SELECT COUNT(*) AS cnt
+        FROM _livraison
+    )
+INSERT INTO
+    _commentaire (
+        id_avis,
+        a_note,
+        id_livraison,
+        a_achat_verifie,
+        id_client
+    )
+SELECT a.id_avis, (floor(random() * 5) + 1)::int, (
+        (
+            row_number() OVER (
+                ORDER BY a.id_avis
+            ) -1
+        ) % (
+            SELECT cnt
+            FROM lc
+        )
+    ) + 1, (random() > 0.7), a.id_client
 FROM _avis a
-WHERE a.id_client IS NOT NULL
-LIMIT (SELECT cnt FROM lc);
-
+WHERE
+    a.id_client IS NOT NULL
+LIMIT (
+        SELECT cnt
+        FROM lc
+    );
 
 -- 23b. AVIS (ajout réaliste)
 -- Génère 1 à 3 avis par produit avec titres et textes variés, ajoute plusieurs votes par avis et crée des commentaires liés aux livraisons
 -- Insère les avis dans _avis et stocke les lignes insérées dans une table temporaire pour réutilisation
 DROP TABLE IF EXISTS temp_new_avis;
-CREATE TEMP TABLE temp_new_avis (id_avis int, id_produit int, id_client int);
+
+CREATE TEMP TABLE temp_new_avis (
+    id_avis int,
+    id_produit int,
+    id_client int
+);
 
 DO $$
 DECLARE
@@ -4309,49 +4336,71 @@ BEGIN
     END LOOP;
 END;$$ LANGUAGE plpgsql;
 
-
-
 -- Mise à jour des compteurs de pouces dans _avis (synchronise a_pouce_bleu/a_pouce_rouge avec _vote_avis)
 UPDATE _avis av
-SET a_pouce_bleu = COALESCE(v.cnt_like,0),
-    a_pouce_rouge = COALESCE(v.cnt_dislike,0)
+SET
+    a_pouce_bleu = COALESCE(v.cnt_like, 0),
+    a_pouce_rouge = COALESCE(v.cnt_dislike, 0)
 FROM (
-    SELECT id_avis,
-           SUM(CASE WHEN vote_type='like' THEN 1 ELSE 0 END) AS cnt_like,
-           SUM(CASE WHEN vote_type='dislike' THEN 1 ELSE 0 END) AS cnt_dislike
-    FROM _vote_avis
-    GROUP BY id_avis
-) v
-WHERE av.id_avis = v.id_avis;
+        SELECT
+            id_avis, SUM(
+                CASE
+                    WHEN vote_type = 'like' THEN 1
+                    ELSE 0
+                END
+            ) AS cnt_like, SUM(
+                CASE
+                    WHEN vote_type = 'dislike' THEN 1
+                    ELSE 0
+                END
+            ) AS cnt_dislike
+        FROM _vote_avis
+        GROUP BY
+            id_avis
+    ) v
+WHERE
+    av.id_avis = v.id_avis;
 
 -- Commentaires liés aux livraisons : on associe, au maximum, une livraison distincte par commentaire via un appariement par rang
-WITH na_ranked AS (
-    SELECT id_avis, id_client, ROW_NUMBER() OVER (ORDER BY id_avis) rn FROM temp_new_avis
-),
-liv_ranked AS (
-    SELECT id_livraison, ROW_NUMBER() OVER (ORDER BY random()) rn FROM _livraison
-),
-pairs AS (
-    SELECT na.id_avis, na.id_client, l.id_livraison
-    FROM na_ranked na
-    JOIN liv_ranked l ON na.rn = l.rn
-)
-INSERT INTO _commentaire (id_avis, a_note, id_livraison, a_achat_verifie, id_client)
-SELECT p.id_avis,
-       (floor(random()*5)+1)::int,
-       p.id_livraison,
-       (random() > 0.6),
-       p.id_client
-FROM pairs p
-WHERE NOT EXISTS (SELECT 1 FROM _commentaire c WHERE c.id_livraison = p.id_livraison);
-
+WITH
+    na_ranked AS (
+        SELECT id_avis, id_client, ROW_NUMBER() OVER (
+                ORDER BY id_avis
+            ) rn
+        FROM temp_new_avis
+    ),
+    liv_ranked AS (
+        SELECT id_livraison, ROW_NUMBER() OVER (
+                ORDER BY random()
+            ) rn
+        FROM _livraison
+    ),
+    pairs AS (
+        SELECT na.id_avis, na.id_client, l.id_livraison
+        FROM na_ranked na
+            JOIN liv_ranked l ON na.rn = l.rn
+    )
 INSERT INTO
-    _login (identifiant, mdp)
-VALUES ('Alizon', 'mdp')
-;
+    _commentaire (
+        id_avis,
+        a_note,
+        id_livraison,
+        a_achat_verifie,
+        id_client
+    )
+SELECT p.id_avis, (floor(random() * 5) + 1)::int, p.id_livraison, (random() > 0.6), p.id_client
+FROM pairs p
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM _commentaire c
+        WHERE
+            c.id_livraison = p.id_livraison
+    );
+
+INSERT INTO _login (identifiant, mdp) VALUES ('Alizon', 'mdp');
 
 -- Les compteurs de pouces sont synchronisés depuis _vote_avis (via mise à jour ci-dessus) — pas d'écrasement aléatoire ici.
-
 
 -- 24. COMMENTAIRES (liés aux livraisons)
 -- Supprimer
@@ -4423,6 +4472,7 @@ UPDATE cobrec1._commentaire SET a_note = 1;
 
 --------------------------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS _bordereau;
+
 _bordereau (
     id_bordereau int NOT NULL PRIMARY KEY,
     id_commande int NOT NULL,
