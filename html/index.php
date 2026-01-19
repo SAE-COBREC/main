@@ -179,11 +179,12 @@ if (!empty($listeProduits)) {
     foreach ($listeProduits as $produitTmp) {
         //vérifie si c'est le produit au prix maximum
         if ((float) $produitTmp['p_prix'] === (float) $prixMaximumHT) {
-            //calcule le prix TTC et l'arrondit (2 décimales)
+            //calcule le prix TTC et l'arrondit
             $prixMaximum = round(calcPrixTVA(
                 $produitTmp['tva'],
                 $prixMaximumHT
-            ), 2);
+            ));
+            
             //arrête la boucle une fois trouvé
             break;
         }
@@ -192,10 +193,11 @@ if (!empty($listeProduits)) {
     //parcourt tous les produits pour trouver celui au prix minimum
     foreach ($listeProduits as $produitTmp) {
         if ((float) $produitTmp['p_prix'] === (float) $prixMinimumHT) {
+            //calcule le prix TTC et l'arrondit
             $prixMinimum = round(calcPrixTVA(
                 $produitTmp['tva'],
                 $prixMinimumHT
-            ), 2);
+            ));
             break;
         }
     }
@@ -211,10 +213,10 @@ $categorieSelection = $_POST['categorie'] ?? 'all';
 //récupère le type de tri choisi
 $triSelection = $_POST['tri'] ?? 'en_promotion';
 //récupère le prix maximum du filtre
-$prixMaximumFiltre = isset($_POST['filterMaxPrice']) && $_POST['filterMaxPrice'] !== '' ? (float) str_replace(',', '.', $_POST['filterMaxPrice']) : (float) $prixMaximum;
+$prixMaximumFiltre = isset($_POST['filterMaxPrice'])  ? (float) $_POST['filterMaxPrice'] : $prixMaximum;
 
 //récupère le prix minimum du filtre
-$prixMinimumFiltre = isset($_POST['filterMinPrice']) && $_POST['filterMinPrice'] !== '' ? (float) str_replace(',', '.', $_POST['filterMinPrice']) : (float) $prixMinimum;
+$prixMinimumFiltre = isset($_POST['filterMinPrice']) ? (float) $_POST['filterMinPrice'] : $prixMinimum;
 
 // Normaliser et s'assurer que min et max sont cohérents
 $prixMinimumFiltre = max(0.0, $prixMinimumFiltre);
@@ -303,12 +305,27 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <!--option mieux notés-->
                         <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>
                             Mieux notés</option>
+                        <!--option moins bien notés-->
+                        <option value="note_moins" <?= $triSelection === 'note_moins' ? 'selected' : '' ?>>
+                            Moins bien notés</option>
                         <!--option en promotion-->
                         <option value="en_promotion" <?= $triSelection === 'en_promotion' ? 'selected' : '' ?>>
                             En promotion</option>
                         <!--option en réduction-->
                         <option value="en_reduction" <?= $triSelection === 'en_reduction' ? 'selected' : '' ?>>
                             En réduction</option>
+                        <!--option pires ventes-->
+                        <option value="pires_ventes" <?= $triSelection === 'pires_ventes' ? 'selected' : '' ?>>
+                            Moins vendus</option>
+                        <!--option nouveauté-->
+                        <option value="nouveaute" <?= $triSelection === 'nouveaute' ? 'selected' : '' ?>>
+                            Nouveautés</option>
+                        <!--option Plus anciens-->
+                        <option value="anciens" <?= $triSelection === 'anciens' ? 'selected' : '' ?>>
+                            Plus anciens</option>
+                        <!--option Z à A-->
+                        <option value="z_a" <?= $triSelection === 'z_a' ? 'selected' : '' ?>>
+                            Z à A</option>
                     </select>
                 </div>
 
@@ -353,24 +370,28 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                 <!--filtre par prix -->
                 <section class="no-hover price-filter">
                     <h4 style="padding-top: 1em;">Prix</h4>
-                    
+
                     <!-- Container pour le slider double -->
                     <div class="slider-container">
                         <div class="slider-track-bg"></div>
                         <div class="slider-track-active" id="sliderTrackActive"></div>
-                        <input type="range" class="range-min" id="rangeMin" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" value="<?= $prixMinimumFiltre ?>" step="0.01">
-                        <input type="range" class="range-max" id="rangeMax" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" value="<?= $prixMaximumFiltre ?>" step="0.01">
+                        <input type="range" class="range-min" id="rangeMin" min="<?= $prixMinimum ?>"
+                            max="<?= $prixMaximum ?>" value="<?= $prixMinimumFiltre ?>" step="0.01">
+                        <input type="range" class="range-max" id="rangeMax" min="<?= $prixMinimum ?>"
+                            max="<?= $prixMaximum ?>" value="<?= $prixMaximumFiltre ?>" step="0.01">
                     </div>
 
                     <!-- Champs numériques -->
                     <div class="price-inputs">
                         <div class="price-field">
-                            <input type="number" name="filterMinPrice" id="inputMin" value="<?= $prixMinimumFiltre ?>" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" step="0.01">
+                            <input type="number" name="filterMinPrice" id="inputMin" value="<?= $prixMinimumFiltre ?>"
+                                min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" step="0.01">
                             <span>€</span>
                         </div>
                         <div class="separator">-</div>
                         <div class="price-field">
-                            <input type="number" name="filterMaxPrice" id="inputMax" value="<?= $prixMaximumFiltre ?>" min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" step="0.01">
+                            <input type="number" name="filterMaxPrice" id="inputMax" value="<?= $prixMaximumFiltre ?>"
+                                min="<?= $prixMinimum ?>" max="<?= $prixMaximum ?>" step="0.01">
                             <span>€</span>
                         </div>
                     </div>
