@@ -1,0 +1,390 @@
+// ============================================
+// IMPORTS ET MIXINS
+// ============================================
+
+//importe les variables depuis le fichier variable
+@use "../variable" as *;
+
+// Mixin pour centrer avec flexbox
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Mixin pour espacer les éléments entre eux
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Mixin pour ajouter une transition fluide
+@mixin transition($property: all, $duration: 0.3s) {
+  transition: $property $duration ease;
+}
+
+// Mixin pour effet de survol avec élévation (boutons)
+@mixin hover-lift {
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
+  }
+}
+
+// ============================================
+// STYLES GLOBAUX
+// ============================================
+
+// Réinitialise les marges et paddings + transition globale
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  // Transition douce sur les couleurs comme demandé dans le CSS d'origine
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+// Style du body avec grille principale
+body {
+  font-family: $font-family-secondaire;
+  background: $secondary-color-gris-clair;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+// ============================================
+// ZONE PRINCIPALE (MAIN)
+// ============================================
+
+main {
+  padding: 2em;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+
+  // Titre principal de la page
+  h1 {
+    color: $primary-color-bleu;
+    font-size: 2em;
+    text-align: center;
+    margin: 2rem 0 3rem 0;
+  }
+
+  // Message d'erreur
+  .error-message {
+    background: $secondary-color-rouge-erreur;
+    color: $secondary-color-erreur;
+    padding: 1.5em;
+    border-radius: $border-radius-primary; // Utilisation de la variable border-radius
+    border: 1px solid $secondary-color-rouge;
+    margin-bottom: 2em;
+    text-align: center;
+    font-weight: 600;
+  }
+}
+
+// ============================================
+// SECTION DE SUIVI (TRACKING)
+// ============================================
+
+.tracking-section {
+  background: $primary-color-blanc;
+  border-radius: $border-radius-primary;
+  padding: 2.5em;
+  margin-bottom: 2em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  // En-tête du suivi (Titre + Badge)
+  .tracking-header {
+    @include flex-between; // Utilisation du mixin
+    padding-bottom: 1.5em;
+    margin-bottom: 2em;
+    border-bottom: 2px solid $secondary-color-gris-clair;
+
+    h2 {
+      color: $primary-color-bleu;
+      font-size: 1.5em;
+    }
+
+    .bordereau-badge {
+      background: $primary-color-bleu;
+      color: $primary-color-blanc;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+  }
+
+  // Barre de progression
+  .progress-container {
+    margin: 3em 0;
+
+    .progress-steps {
+      @include flex-between; // Utilisation du mixin
+      position: relative;
+      margin-bottom: 2em;
+
+      // Ligne grise de fond
+      .progress-line {
+        position: absolute;
+        top: 24px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: $secondary-color-gris-clair;
+        z-index: 1;
+
+        // Remplissage coloré de la ligne
+        .progress-line-fill {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          // Dégradé utilisant la couleur primaire
+          background: linear-gradient(90deg, $primary-color-bleu, #9191C3);
+          transition: width 0.6s ease;
+          border-radius: 2px;
+        }
+      }
+
+      // Étapes individuelles (boules)
+      .step {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+
+        // Cercle de l'étape
+        .step-circle {
+          @include flex-center; // Utilisation du mixin
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: $primary-color-blanc;
+          border: 4px solid $secondary-color-gris-clair;
+          font-weight: 700;
+          color: #999;
+          font-size: 1.1em;
+          @include transition(all, 0.3s);
+          margin-bottom: 1em;
+        }
+
+        // Libellé de l'étape
+        .step-label {
+          text-align: center;
+          font-size: 0.9em;
+          color: #666;
+          font-weight: 600;
+          max-width: 120px;
+          line-height: 1.4;
+        }
+
+        // État actif
+        &.active {
+          .step-circle {
+            background: $primary-color-bleu;
+            border-color: $primary-color-bleu;
+            color: $primary-color-blanc;
+            box-shadow: 0 4px 12px rgba(113, 113, 163, 0.4);
+            transform: scale(1.1);
+          }
+
+          .step-label {
+            color: $primary-color-bleu;
+            font-weight: 700;
+          }
+        }
+
+        // État complété (avec le check)
+        &.completed {
+          .step-circle {
+            background: $primary-color-bleu;
+            border-color: $primary-color-bleu;
+            color: $primary-color-blanc;
+
+            &::after {
+              content: '✓';
+              font-size: 1.3em;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Section de livraison confirmée
+  .delivery-complete {
+    background: linear-gradient(135deg, $secondary-color-vert-fond 0%, #C3E6CB 100%);
+    border: 2px solid #28A745; // Pas de variable pour ce vert spécifique
+    border-radius: 12px;
+    padding: 2em;
+    margin-bottom: 2em;
+    text-align: center;
+
+    h3 {
+      color: $secondary-color-vert-succes;
+      font-size: 1.8em;
+      margin-bottom: 0.5em;
+      @include flex-center; // Utilisation du mixin (flex + center + justify center)
+      gap: 0.5em;
+
+      &::before {
+        content: '✓';
+        background: #28A745;
+        color: $primary-color-blanc;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        @include flex-center;
+        font-size: 1.2em;
+      }
+    }
+
+    .delivery-detail {
+      color: $secondary-color-vert-succes;
+      font-size: 1.1em;
+      margin-top: 1em;
+      font-weight: 600;
+    }
+
+    // Photo de preuve de livraison
+    .proof-photo {
+      margin-top: 2em;
+      padding: 1.5em;
+      background: $primary-color-blanc;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      p {
+        color: $secondary-color-vert-succes;
+        font-weight: 600;
+        margin-bottom: 1em;
+        font-size: 1.1em;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        border: 3px solid $primary-color-bleu;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+
+  // Bouton téléchargement facture
+  .invoice-section {
+    background: $primary-color-blanc;
+    border-radius: 12px;
+    padding: 2em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    .invoice-btn {
+      display: inline-flex; // Spécifique ici, donc pas le mixin flex-center pur
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+      padding: 14px 28px;
+      background: $primary-color-bleu;
+      color: $primary-color-blanc;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 600;
+      font-family: $font-family-secondaire;
+      cursor: pointer;
+      text-decoration: none;
+      
+      // Utilisation du mixin personnalisé pour l'effet levé
+      @include hover-lift;
+
+      // Surcharge spécifique pour la couleur de fond au hover si besoin
+      &:hover {
+        background: darken($primary-color-bleu, 10%); // Calcul automatique de la couleur sombre
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE - MOBILE
+// ============================================
+
+@media (max-width: 768px) {
+  main {
+    padding: 1.5em;
+
+    h1 {
+      font-size: 1.5em;
+      margin: 1.5rem 0 2rem 0;
+    }
+
+    .tracking-section {
+      padding: 1.5em;
+
+      // Passage en colonne pour l'header
+      .tracking-header {
+        flex-direction: column;
+        gap: 1em;
+        align-items: flex-start;
+      }
+
+      // Ajustement de la timeline en vertical
+      .progress-steps {
+        flex-direction: column;
+        gap: 2em;
+
+        .progress-line {
+          top: 0;
+          left: 24px;
+          width: 4px;
+          height: 100%;
+
+          .progress-line-fill {
+            width: 100% !important;
+          }
+        }
+
+        .step {
+          flex-direction: row;
+          width: 100%;
+          justify-content: flex-start;
+          gap: 1em;
+
+          .step-circle {
+            margin-bottom: 0;
+          }
+
+          .step-label {
+            text-align: left;
+            max-width: none;
+          }
+        }
+      }
+
+      // Ajustement de la section livraison
+      .delivery-complete h3 {
+        font-size: 1.4em;
+        flex-direction: column;
+      }
+
+      .proof-photo img {
+        max-width: 100%;
+      }
+    }
+  }
+}
