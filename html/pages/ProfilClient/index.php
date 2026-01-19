@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //mise à jour d'une adresse
     if (isset($_POST['update_address'])) {
         $idAdresse = (int) $_POST['id_adresse'];
-        $numSaisi = (int) ($_POST['num'] ?? 1);
+        $numSaisi = $_POST['num'];
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //traitement POST pour l'ajout d'une nouvelle adresse
     if (isset($_POST['add_address'])) {
-        $numSaisi = (int) ($_POST['num'] ?? 1);
+        $numSaisi = $_POST['num'];
         $adresseSaisie = htmlspecialchars($_POST['adresse'] ?? '');
         $villeSaisie = htmlspecialchars($_POST['ville'] ?? '');
         $codePostalSaisi = htmlspecialchars($_POST['code_postal'] ?? '');
@@ -631,9 +631,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Numéro</span>
-                    <input type="text" name="num" id="ajout_num" inputmode="numeric" pattern="[0-9]+"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                    <input type="text" name="num" id="ajout_num"
+                        pattern="^[1-9][0-9]{0,12}(bis|ter|quater|quinquies|sexies|septies|octies|nonies)?$"
+                        placeholder="Ex: 12bis" required>
                 </label>
+
 
                 <label>
                     <span>Adresse</span>
