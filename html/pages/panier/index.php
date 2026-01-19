@@ -96,7 +96,8 @@
                         }
                         if (!empty($article['reduction_pourcentage']) && $article['reduction_pourcentage'] != 0){
                         ?>
-                            <strong>Remise : </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
+                        <strong>Remise :
+                        </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
                         <?php } ?>
                     </p>
                     <div class="basArticleP">
@@ -168,7 +169,8 @@
                         <?php
                         if (!empty($article['pourcentage_reduction'])){
                         ?>
-                            <strong>Remise : </strong><?php echo number_format($article['pourcentage_reduction'], 2, ',', ' '); ?> %
+                        <strong>Remise :
+                        </strong><?php echo number_format($article['pourcentage_reduction'], 2, ',', ' '); ?> %
                         <?php } ?>
                     </p>
                     <div class="basArticleP">
