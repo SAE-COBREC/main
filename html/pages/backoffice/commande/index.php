@@ -78,7 +78,7 @@ try {
                             <div class="facture-header">
                                 <h3>Facture #<?php echo htmlspecialchars($commande['id_facture']); ?></h3>
                                 <p><?php echo date("j/m/Y H:m", strtotime($commande['date'])); ?></p>
-                                <a href="../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>"
+                                <a href="../../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>"
                                     target="_blank" rel="noopener noreferrer">
                                     <button type="button" class="btn-download">
                                         Télécharger la facture
