@@ -107,7 +107,7 @@
                         <div class="quantite">
 
                             <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
-                            <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
+                            <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php" data-no-loader>
                                 <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>">
                                 <!--stock l'id du produit pour la suppression-->
                                 <!--bouton pour envoyer le formulaire-->
@@ -142,7 +142,7 @@
             </form>
 
             <!--FORMULAIRE POUR VIDER LE PANIER-->
-            <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php">
+            <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
                 <button type="submit" id="viderPanier" class>Vider le panier</button>
             </form>
         </aside>
@@ -180,7 +180,7 @@
                         <div class="quantite">
 
                             <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
-                            <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php">
+                            <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php" data-no-loader>
                                 <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>">
                                 <!--stock l'id du produit pour la suppression-->
                                 <!--bouton pour envoyer le formulaire-->
@@ -216,7 +216,7 @@
             </form>
 
             <!--FORMULAIRE POUR VIDER LE PANIER-->
-            <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php">
+            <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
                 <button type="submit" id="viderPanier" class>Vider le panier</button>
             </form>
         </aside>
@@ -355,6 +355,7 @@ document.querySelectorAll('.unArticleP').forEach(article => {
             cancelText: 'Annuler',
             variant: 'default',
             onOk: () => {
+                if (window.Loader) Loader.show();
                 formSupp.submit();
             }
         });

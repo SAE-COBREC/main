@@ -1042,6 +1042,16 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
 
              $owner = $_COOKIE['alizon_owner'] ?? '';
 
+             // Supprimer aussi l'éventuelle réponse du vendeur
+             $stmtRep = $pdo->prepare("SELECT id_avis FROM cobrec1._reponse WHERE id_avis_parent = ?");
+             $stmtRep->execute([$idAvis]);
+             $reponsesIds = $stmtRep->fetchAll(PDO::FETCH_COLUMN);
+
+             if (!empty($reponsesIds)) {
+                 $placeholdersRep = implode(',', array_fill(0, count($reponsesIds), '?'));
+                 $pdo->prepare("DELETE FROM _avis WHERE id_avis IN ($placeholdersRep)")->execute($reponsesIds);
+             }
+
              $sqlDel = "DELETE FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (a_owner_token = ? AND id_client IS NULL))";
              $stmtDel = $pdo->prepare($sqlDel);
              $stmtDel->execute([$idAvis, $idProduit, $idClient, $owner]);

@@ -791,6 +791,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION delete_reponse_avis_child()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- On supprime l'avis du vendeur (le fils) qui est lié au parent qu'on est en train de supprimer
+    DELETE FROM cobrec1._avis 
+    WHERE id_avis IN (SELECT id_avis FROM cobrec1._reponse WHERE id_avis_parent = OLD.id_avis);
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER tgr_moyenne_notes_produit_apres_insertion
 AFTER INSERT on _avis
 FOR EACH ROW
@@ -805,6 +815,11 @@ CREATE TRIGGER tgr_moyenne_notes_produit_apres_suppression
 AFTER DELETE on _avis
 FOR EACH ROW
 EXECUTE PROCEDURE maj_moyenne_notes_produit_apres_suppression();
+
+CREATE TRIGGER tgr_delete_reponse_avis_child
+BEFORE DELETE ON _avis
+FOR EACH ROW
+EXECUTE PROCEDURE delete_reponse_avis_child();
 
 CREATE FUNCTION mise_sur_marche_produit()
 RETURNS TRIGGER AS $$
