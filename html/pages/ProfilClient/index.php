@@ -489,7 +489,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     </main>
 
                     <footer>
-                        <a href="../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>" target="_blank" rel="noopener noreferrer">
+                        <a href="../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>"
+                            target="_blank" rel="noopener noreferrer">
                             <button type="button">
                                 Télécharger la facture
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -580,10 +581,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Numéro</span>
-                    <input type="text" name="num" id="modification_num" 
-          pattern="^([1-9]{0,13}(bis|ter|quater|quinquies|sexies|septies|octies|nonies){0,1})$" 
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                    <input type="text" name="num" id="modification_num"
+                        pattern="^[1-9][0-9]{0,12}(bis|ter|quater|quinquies|sexies|septies|octies|nonies)?$"
+                        placeholder="Ex: 12bis" required>
                 </label>
+
 
 
                 <label>
