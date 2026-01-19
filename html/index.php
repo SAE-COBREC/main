@@ -180,10 +180,7 @@ if (!empty($listeProduits)) {
         //vérifie si c'est le produit au prix maximum
         if ((float) $produitTmp['p_prix'] === (float) $prixMaximumHT) {
             //calcule le prix TTC et l'arrondit
-            $prixMaximum = round(calcPrixTVA(
-                $produitTmp['tva'],
-                $prixMaximumHT
-            ));
+            $prixMaximum = round(calcPrixTVA($produitTmp['tva'], $prixMaximumHT));
             
             //arrête la boucle une fois trouvé
             break;
@@ -192,12 +189,9 @@ if (!empty($listeProduits)) {
 
     //parcourt tous les produits pour trouver celui au prix minimum
     foreach ($listeProduits as $produitTmp) {
-        if ((float) $produitTmp['p_prix'] === (float) $prixMinimumHT) {
-            //calcule le prix TTC et l'arrondit
-            $prixMinimum = round(calcPrixTVA(
-                $produitTmp['tva'],
-                $prixMinimumHT
-            ));
+        if ((float) $produitTmp['p_prix'] == (float) $prixMinimumHT) {
+            // Calcule le prix TTC puis arrondit à la valeur inférieure
+            $prixMinimum = floor(calcPrixTVA($produitTmp['tva'], $prixMinimumHT));
             break;
         }
     }
@@ -375,10 +369,10 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                     <div class="slider-container">
                         <div class="slider-track-bg"></div>
                         <div class="slider-track-active" id="sliderTrackActive"></div>
-                        <input type="range" class="range-min" id="rangeMin" min="<?= $prixMinimum ?>"
-                            max="<?= $prixMaximum ?>" value="<?= $prixMinimumFiltre ?>" step="0.01">
-                        <input type="range" class="range-max" id="rangeMax" min="<?= $prixMinimum ?>"
-                            max="<?= $prixMaximum ?>" value="<?= $prixMaximumFiltre ?>" step="0.01">
+                        <input type="range" class="range-min" id="rangeMin" min="0" max="<?= $prixMaximum ?>"
+                            value="<?= $prixMinimumFiltre ?>" step="0.01">
+                        <input type="range" class="range-max" id="rangeMax" min="0" max="<?= $prixMaximum ?>"
+                            value="<?= $prixMaximumFiltre ?>" step="0.01">
                     </div>
 
                     <!-- Champs numériques -->
