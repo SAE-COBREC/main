@@ -106,6 +106,21 @@ body {
     width: 100%;
   }
 
+  .form-group-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+
+    .form-row {
+      flex: 1;
+    }
+
+    .form-row--small {
+      flex: 0 0 200px !important;
+      width: 200px !important; 
+    }
+  }
+
   label {
     font-size: 18px;
     font-weight: 600;
