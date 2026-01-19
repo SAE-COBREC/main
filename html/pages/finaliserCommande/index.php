@@ -165,6 +165,28 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             $idFacture = $pdo->lastInsertId();
         }
 
+        try {
+            //récupérer les articles du panier validé
+            $sqlStock = "SELECT id_produit, quantite FROM _contient WHERE id_panier = :id_panier";
+            $stmtStock = $pdo->prepare($sqlStock);
+            $stmtStock->execute([':id_panier' => $panierEnCours]);
+            $articlesAStock = $stmtStock->fetchAll(PDO::FETCH_ASSOC);
+
+            //préparer la requête de déduction
+            $sqlUpdateStock = "UPDATE _produit SET p_stock = p_stock - :quantite WHERE id_produit = :id_produit";
+            $stmtUpdateStock = $pdo->prepare($sqlUpdateStock);
+
+            //déduire chaque article
+            foreach($articlesAStock as $artStock){
+                $stmtUpdateStock->execute([
+                    ':quantite' => $artStock['quantite'],
+                    ':id_produit' => $artStock['id_produit']
+                ]);
+            }
+        } catch (Exception $e) {
+            error_log("Erreur lors de la mise à jour du stock : " . $e->getMessage());
+        }
+
         //on créer un session pour le panier qui vient d'être commandé car le panierEnCours on doit le supprimé pour éviter
         //les problèmes ave la page panier qui ne reset pas le panier  en cours et donc on aura encore le panier en cours dans notre 
         //panier alors qu'on vient de payer. Il servira pour la page de suivi de commande vu qu'on est redirigé sur celle-ci après le paiement
@@ -228,7 +250,9 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
             <select name="adresse" id="adresse">
                 <option value="invalide">Choisir l'adresse de livraison</option>
                 <?php foreach($adresses as $adresse) : ?>
-                    <option value="<?php echo $adresse["id_adresse"] ?>"><?php echo $adresse["a_numero"] . " " . $adresse["a_adresse"] . " (" . $adresse["a_code_postal"] . ") " . $adresse["a_ville"];?></option>
+                <option value="<?php echo $adresse["id_adresse"] ?>">
+                    <?php echo $adresse["a_numero"] . " " . $adresse["a_adresse"] . " (" . $adresse["a_code_postal"] . ") " . $adresse["a_ville"];?>
+                </option>
                 <?php endforeach; ?>
                 <option value="nouvelle">Nouvelle adresse</option>
             </select>
@@ -241,12 +265,13 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
 
                 <label>Complément (optionnel)</label>
                 <input type="text" name="complement">
-                
+
                 <label>Ville *</label>
                 <input type="text" name="ville" placeholder="Ex : Lannion">
-                
+
                 <label>Code postal *</label>
-                <input type="text" name="codePostal" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$" maxlength="5" placeholder="Ex : 22970">
+                <input type="text" name="codePostal" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$"
+                    maxlength="5" placeholder="Ex : 22970">
 
                 <label>Nom du destinataire *</label>
                 <input type="text" name="nom_destinataire" placeholder="Ex : Dupont">
@@ -262,75 +287,74 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
                 </div>
             </div>
             <?php if ($boolErreur == true): ?>
-                <p><span><?php echo $erreur ?></span></p>
+            <p><span><?php echo $erreur ?></span></p>
             <?php endif; ?>
             <button>Payer: <?php echo $prixTotalFinal ?>€</button>
-            </form>
+        </form>
     </section>
     <script>
-        //récup l'input du numéro de la carte
-        const inputCarte = document.getElementById("numCarte");
+    //récup l'input du numéro de la carte
+    const inputCarte = document.getElementById("numCarte");
 
-        //pour chaque entré dans l'input
-        inputCarte.addEventListener("input", function () {
-            let valeur = this.value; //stock la valeur de l'input
+    //pour chaque entré dans l'input
+    inputCarte.addEventListener("input", function() {
+        let valeur = this.value; //stock la valeur de l'input
 
-            //on remplace tout sauf les chiffres
-            valeur = valeur.replace(/\D/g, "");
-
-
-            //(.{4}) chaque groupe de 4 caractères. le g pour dire que c'est dans toutes la chaine de caractere
-            //$1 remplace chaque groupe de 4 chiffres par le même groupe + un espace
-            //trim suprrime le derniere espace
-            valeur = valeur.replace(/(.{4})/g, "$1 ").trim();
-
-            //met la valeur changé (après tous les regex)
-            this.value = valeur;
-        });
-
-        //récup l'input de la date d'expiration
-        const dateInput = document.getElementById("dateExpiration");
-
-        //pour chaque entré dans l'input
-        dateInput.addEventListener("input", function () {
-            let valeur = this.value; //stock la valeur de l'input
-
-            //on remplace tout sauf les chiffres
-            valeur = valeur.replace(/\D/g, "");
-
-            // Ajouter le "/" après les 2 chiffres
-            if (valeur.length > 2) {
-                valeur = valeur.slice(0, 2) + "/" + valeur.slice(2, 4);
-            }
-
-            this.value = valeur;
-        });
+        //on remplace tout sauf les chiffres
+        valeur = valeur.replace(/\D/g, "");
 
 
-        //récup l'input du CVC
-        const cvcInput = document.getElementById("cvc");
+        //(.{4}) chaque groupe de 4 caractères. le g pour dire que c'est dans toutes la chaine de caractere
+        //$1 remplace chaque groupe de 4 chiffres par le même groupe + un espace
+        //trim suprrime le derniere espace
+        valeur = valeur.replace(/(.{4})/g, "$1 ").trim();
 
-        //pour chaque entré dans l'input
-        cvcInput.addEventListener("input", function () {
-            let valeur = this.value; //stock la valeur de l'input
-            //on remplace tout sauf les chiffres
-            valeur = valeur.replace(/\D/g, "");
+        //met la valeur changé (après tous les regex)
+        this.value = valeur;
+    });
+
+    //récup l'input de la date d'expiration
+    const dateInput = document.getElementById("dateExpiration");
+
+    //pour chaque entré dans l'input
+    dateInput.addEventListener("input", function() {
+        let valeur = this.value; //stock la valeur de l'input
+
+        //on remplace tout sauf les chiffres
+        valeur = valeur.replace(/\D/g, "");
+
+        // Ajouter le "/" après les 2 chiffres
+        if (valeur.length > 2) {
+            valeur = valeur.slice(0, 2) + "/" + valeur.slice(2, 4);
+        }
+
+        this.value = valeur;
+    });
 
 
-            this.value = valeur;
-        });
+    //récup l'input du CVC
+    const cvcInput = document.getElementById("cvc");
 
-        //a chaque changement de valeur du select
-        document.getElementById('adresse').addEventListener('change', function() {
-            let champsAdresse = document.getElementById('nouvelleAdresse');
-            
-            if (this.value === 'nouvelle') { //regarde si la valeur est nouvelle
-                champsAdresse.style.display = 'block'; //si oui faire apparaitre les block
-            } else { //sinon les rendre invisible
-                champsAdresse.style.display = 'none';
-            }
-        });
+    //pour chaque entré dans l'input
+    cvcInput.addEventListener("input", function() {
+        let valeur = this.value; //stock la valeur de l'input
+        //on remplace tout sauf les chiffres
+        valeur = valeur.replace(/\D/g, "");
 
+
+        this.value = valeur;
+    });
+
+    //a chaque changement de valeur du select
+    document.getElementById('adresse').addEventListener('change', function() {
+        let champsAdresse = document.getElementById('nouvelleAdresse');
+
+        if (this.value === 'nouvelle') { //regarde si la valeur est nouvelle
+            champsAdresse.style.display = 'block'; //si oui faire apparaitre les block
+        } else { //sinon les rendre invisible
+            champsAdresse.style.display = 'none';
+        }
+    });
     </script>
 </body>
 
