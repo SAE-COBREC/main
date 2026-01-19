@@ -338,9 +338,9 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <label style="display:block;margin-bottom:8px;font-weight:600;color:#d35400;">Modifier votre réponse :</label>
                                 <textarea name="reponse" required maxlength="255" oninput="updateCounter(this)" style="width:100%;padding:10px;border:1px solid #fab1a0;border-radius:6px;min-height:100px;font-family:inherit;font-size:0.95em;resize:vertical;"><?= htmlspecialchars($avis['reponse_texte']) ?></textarea>
                                 <div class="char-counter" style="text-align:right;font-size:0.85em;color:#e67e22;margin-top:4px;"><?= strlen($avis['reponse_texte']) ?>/255</div>
-                                <div style="margin-top:12px;display:flex;gap:12px;align-items:center;">
-                                    <button type="submit" class="btn-submit" name="submit_edit" style="background:#e67e22;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-weight:bold;cursor:pointer;display:inline-block;">Enregistrer les modifications</button>
-                                    <button type="button" onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='none';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='block';" style="background:#f0f2f5;color:#7f8c8d;border:none;padding:10px 20px;border-radius:6px;font-weight:bold;cursor:pointer;display:inline-block;">Annuler</button>
+                                <div class="edit-actions">
+                                    <button type="submit" class="btn-submit btn-save" name="submit_edit">Enregistrer les modifications</button>
+                                    <button type="button" class="btn-cancel" onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='none';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='block';">Annuler</button>
                                 </div>
                             </form>
                         <?php else: ?>
@@ -351,9 +351,9 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <label for="reponse_<?= $avis['id_avis'] ?>" style="display:block;margin-bottom:8px;font-weight:600;">Votre réponse :</label>
                                 <textarea name="reponse" id="reponse_<?= $avis['id_avis'] ?>" required maxlength="255" oninput="updateCounter(this)" placeholder="Écrivez votre réponse ici..." style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;min-height:100px;font-family:inherit;resize:vertical;"></textarea>
                                 <div class="char-counter" style="text-align:right;font-size:0.85em;color:#7f8c8d;margin-top:4px;">0/255</div>
-                                <div style="display:flex;gap:12px;margin-top:12px;align-items:center;">
-                                    <button type="submit" class="btn-submit" style="background:#e67e22;color:#fff;border:none;padding:8px 16px;border-radius:4px;font-weight:bold;cursor:pointer;">Publier la réponse</button>
-                                    <button type="button" onclick="this.closest('form').style.display='none';this.closest('form').previousElementSibling.style.display='inline-block';" style="background:none;border:none;cursor:pointer;color:#7f8c8d;font-size:0.9em;text-decoration:underline;">Annuler</button>
+                                <div class="edit-actions">
+                                    <button type="submit" class="btn-submit btn-save">Publier la réponse</button>
+                                    <button type="button" class="btn-cancel" onclick="this.closest('form').style.display='none';this.closest('form').previousElementSibling.style.display='inline-block';">Annuler</button>
                                 </div>
                             </form>
                         <?php endif; ?>

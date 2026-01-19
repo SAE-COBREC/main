@@ -128,6 +128,35 @@ body {
 .main .content-section .btn-submit:hover {
   background-color: #d35400;
 }
+.main .content-section .edit-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  align-items: center;
+}
+.main .content-section .edit-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+.main .content-section .edit-actions button.btn-save, .main .content-section .edit-actions button.btn-submit {
+  background: #e67e22;
+  color: white;
+}
+.main .content-section .edit-actions button.btn-save:hover, .main .content-section .edit-actions button.btn-submit:hover {
+  background: #d35400;
+}
+.main .content-section .edit-actions button.btn-cancel {
+  background: #f0f2f5;
+  color: #7f8c8d;
+}
+.main .content-section .edit-actions button.btn-cancel:hover {
+  background: #e4e6e9;
+  color: #65676b;
+}
 .main .content-section .btn-action {
   padding: 5px 10px;
   border-radius: 4px;
