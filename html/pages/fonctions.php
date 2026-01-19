@@ -1349,6 +1349,17 @@ function trierProduits($listeProduits, $tri_par)
                 return $comparison;
             });
             break;
+        case 'a_z':
+            usort($listeProduits, function ($a, $b) {
+                $comparison = strcmp($a['p_nom'], $b['p_nom']);
+                
+                if ($comparison === 0) {
+                    return $a['id_produit'] <=> $b['id_produit'];
+                }
+                
+                return $comparison;
+            });
+            break;
             
         case 'meilleures_ventes':
         default:
