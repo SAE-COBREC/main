@@ -24,7 +24,7 @@
             <table>
                 <tr>
                     <td>Date de facturation</td>
-                    <td><?php echo date('j F Y', strtotime($_SESSION["post-achat"]["panier"]["timestamp_commande"])); ?></td>
+                    <td><?php echo date('j F Y H:s', strtotime($_SESSION["post-achat"]["panier"]["timestamp_commande"])); ?></td>
                 </tr>
                 <tr>
                     <td>Total à payer</td>
