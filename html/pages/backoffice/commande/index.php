@@ -36,7 +36,14 @@ try {
         _produit.id_vendeur
         FROM _fature
         LEFT JOIN _panier ON _facture.id_panier = _panier.id_panier
-        "
+        LEFT JOIN _contient ON _panier.id_panier = _contient.id_panier
+        LEFT JOIN _produit ON _contient.id_produit = _produit.id_produit
+        WHERE _produit.id_vendeur = :id_vendeur
+        ORDER BY id_facture";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($vendeur_id);
+    $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     die("Erreur : " . htmlspecialchars($e->getMessage()));
