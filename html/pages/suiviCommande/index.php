@@ -1,8 +1,50 @@
 <?php
 session_start();
+$sth = null ;
+$dbh = null ;
+include '../../selectBDD.php';
+$pdo->exec("SET search_path to cobrec1");
 
 // Recupérer le num de commande
 $id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? $_SESSION['id_commande'] ?? 0;
+
+try {//Récupération des infos de la reduc
+    $sql = '
+    SELECT id_facture, id_panier, id_adresse, nom_destinataire, prenom_destinataire, f_total_ht, f_total_remise, f_total_ttc FROM cobrec1._facture
+    WHERE id_panier = :panier;'
+    ;
+    $stmt = $pdo->prepare($sql);
+    $params = [
+        'panier' => $id_commande
+    ];
+    $stmt->execute($params);
+    $_SESSION["post-achat"]["facture"] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $_SESSION["post-achat"]["facture"] = $_SESSION["post-achat"]["facture"][0];
+
+    $sql = '
+    SELECT id_panier, id_produit, quantite, prix_unitaire, remise_unitaire, frais_de_port, TVA FROM cobrec1._contient
+    WHERE id_panier = :panier_commande;'
+    ;
+    $stmt = $pdo->prepare($sql);
+    $params = [
+        'panier_commande' => $_SESSION["post-achat"]["facture"]["id_panier"]
+    ];
+    $stmt->execute($params);
+    $_SESSION["post-achat"]["contient"] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    $sql = 'SELECT id_client, timestamp_commande FROM cobrec1._panier_commande
+    WHERE id_panier = :panier_commande;'
+    ;
+    $stmt = $pdo->prepare($sql);
+    $params = [
+        'panier_commande' => $_SESSION["post-achat"]["facture"]["id_panier"]
+    ];
+    $stmt->execute($params);
+    $_SESSION["post-achat"]["panier"] = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
+}catch (Exception $e){
+    print_r($e);
+}
 
 
 // Ouvre une connexion socket et s'authentifie automatiquement
@@ -148,6 +190,9 @@ if ($id_commande > 0) {
             <div><p>Au centre local</p></div>
             <div><p>Livré</p></div>
         </div>
+        <article class="recapCommande">
+            <a href="../post-achat/impression.php" target="_blank" rel="noopener noreferrer"><button>Télécharger la facture</button></a>
+        </article>
 
     </body>
 

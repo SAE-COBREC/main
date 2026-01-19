@@ -150,10 +150,9 @@
         <?php elseif (isset($panierTemp) && count($panierTemp) > 0): ?>
 
         <div>
-            <?php foreach ($panierTemp as $idProduit => $article): 
-                print_r($article); ?>
+            <?php foreach ($panierTemp as $idProduit => $article): ?>
             <article class="unArticleP"
-                data-prix="<?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.')?>"
+                data-prix="<?php echo number_format(($article['p_prix'] * (1 - ($article['pourcentage_reduction'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.')?>"
                 data-stock="<?php echo intval($article['p_stock'])?>"
                 data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                 <div class="imageArticleP">
