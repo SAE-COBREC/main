@@ -107,6 +107,18 @@ body {
   gap: 6px;
   width: 100%;
 }
+.edit-form .form-group-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+.edit-form .form-group-row .form-row {
+  flex: 1;
+}
+.edit-form .form-group-row .form-row--small {
+  flex: 0 0 200px !important;
+  width: 200px !important;
+}
 .edit-form label {
   font-size: 18px;
   font-weight: 600;

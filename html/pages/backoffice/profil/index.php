@@ -447,33 +447,34 @@ function safe($array, $key, $default = "") {
             <input type="file" name="image" accept="image/*">
           </div>
 
-          <div class="form-row">
-            <label>Nom</label>
-            <input type="text" id="nom" name="nom" value="<?= safe($vendeur, 'nom') ?>" required>
-            <span class="error" id="error-nom"></span>
-          </div>
+            <div class="form-group-row"> <div class="form-row">
+                    <label>Nom</label>
+                    <input type="text" id="nom" name="nom" value="<?= safe($vendeur, 'nom') ?>" required>
+                    <span class="error" id="error-nom"></span>
+                </div>
+                <div class="form-row">
+                    <label>Prénom</label>
+                    <input type="text" id="prenom" name="prenom" value="<?= safe($vendeur, 'prenom') ?>" required>
+                    <span class="error" id="error-prenom"></span>
+                </div>
+            </div>
 
-          <div class="form-row">
-            <label>Prénom</label>
-            <input type="text" id="prenom" name="prenom" value="<?= safe($vendeur, 'prenom') ?>" required>
-            <span class="error" id="error-prenom"></span>
-          </div>
+        <div class="form-group-row">
+            <div class="form-row" style="flex: 0 0 150px;"> <label>Civilité</label>
+                <select name="civilite" id="civilite" required>
+                    <option value="">-- Sélectionnez --</option>
+                    <option value="M." <?php echo (safe($vendeur, 'civilite') ?? '') === 'M.' ? 'selected' : ''; ?>>M.</option>
+                    <option value="Mme" <?php echo (safe($vendeur, 'civilite') ?? '') === 'Mme' ? 'selected' : ''; ?>>Mme</option>
+                    <option value="Inconnu" <?php echo (safe($vendeur, 'civilite') ?? '') === 'Inconnu' ? 'selected' : ''; ?>>Inconnu</option>
+                </select>
+            </div>
 
-          <div class="form-row">
-            <label>Civilité</label>
-            <select name="civilite" id="civilite" required>
-                <option value="">-- Sélectionnez --</option>
-                <option value="M."
-                    <?php echo ( safe($vendeur, 'civilite') ?? '') === 'M.' ? 'selected' : ''; ?>>
-                    M.</option>
-                <option value="Mme"
-                    <?php echo (safe($vendeur, 'civilite') ?? '') === 'Mme' ? 'selected' : ''; ?>>
-                    Mme</option>
-                <option value="Inconnu"
-                    <?php echo (safe($vendeur, 'civilite') ?? '') === 'Inconnu' ? 'selected' : ''; ?>>
-                    Inconnu</option>
-            </select>
-          </div>
+            <div class="form-row">
+                <label>Téléphone</label>
+                <input type="text" id="telephone" name="telephone" value="<?= safe($vendeur, 'telephone') ?>" required>
+                <span class="error" id="error-telephone"></span>
+            </div>
+        </div>
 
           <div class="form-row">
             <label>Dénomination</label>
@@ -487,53 +488,53 @@ function safe($array, $key, $default = "") {
             <span class="error" id="error-rsociale"></span>
           </div>
 
-          <div class="form-row">
-            <label>SIREN</label>
-            <input type="text" id="siren" name="siren" value="<?= safe($vendeur, 'siren') ?>" required>
-            <span class="error" id="error-siren"></span>
-          </div>
+        <div class="form-group-row">
+            <div class="form-row">
+                <label>Email</label>
+                <input type="email" id="email" name="email" value="<?= safe($vendeur, 'email') ?>" required>
+                <span class="error" id="error-email"></span>
+            </div>
 
-          <div class="form-row">
-            <label>Email</label>
-            <input type="email" id="email" name="email" value="<?= safe($vendeur, 'email') ?>" required>
-            <span class="error" id="error-email"></span>
-          </div>
+            <div class="form-row form-row--small">
+                <label>SIREN</label>
+                <input type="text" id="siren" name="siren" value="<?= safe($vendeur, 'siren') ?>" required>
+                <span class="error" id="error-siren"></span>
+            </div>
+        </div>
 
-          <div class="form-row">
-            <label>Téléphone</label>
-            <input type="text" id="telephone" name="telephone" value="<?= safe($vendeur, 'telephone') ?>" required>
-            <span class="error" id="error-telephone"></span>
-          </div>
+          <div class="form-group-row">
+            <div class="form-row form-row--small">
+                <label>Numéro de rue</label>
+                <input type="text" id="numero" name="numero" value="<?= safe($vendeur, 'numero') ?>" required>
+                <span class="error" id="error-numero"></span>
+            </div>
 
-          <div class="form-row">
-            <label>Numéro de rue</label>
-            <input type="text" id="numero" name="numero" value="<?= safe($vendeur, 'numero') ?>" required>
-            <span class="error" id="error-numero"></span>
-          </div>
+            <div class="form-row">
+                <label>Adresse</label>
+                <input type="text" id="adresse" name="adresse" value="<?= safe($vendeur, 'adresse') ?>" required>
+                <span class="error" id="error-adresse"></span>
+            </div>
+        </div>
 
-          <div class="form-row">
-            <label>Adresse</label>
-            <input type="text" id="adresse" name="adresse" value="<?= safe($vendeur, 'adresse') ?>" required>
-            <span class="error" id="error-adresse"></span>
-          </div>
-
-          <div class="form-row">
+        <div class="form-row">
             <label>Complément d'adresse</label>
             <input type="text" id="complement" name="complement" value="<?= safe($vendeur, 'complement') ?>">
             <span class="error" id="error-complement"></span>
-          </div>
+        </div>
 
-          <div class="form-row">
-            <label>Ville</label>
-            <input type="text" id="ville" name="ville" value="<?= safe($vendeur, 'ville') ?>" required>
-            <span class="error" id="error-ville"></span>
-          </div>
+        <div class="form-group-row">
+            <div class="form-row">
+                <label>Ville</label>
+                <input type="text" id="ville" name="ville" value="<?= safe($vendeur, 'ville') ?>" required>
+                <span class="error" id="error-ville"></span>
+            </div>
 
-          <div class="form-row">
-            <label>Code postal</label>
-            <input type="text" id="codep" name="codep" value="<?= safe($vendeur, 'codep') ?>" required>
-            <span class="error" id="error-codep"></span>
-          </div>
+            <div class="form-row form-row--small">
+                <label>Code postal</label>
+                <input type="text" id="codep" name="codep" value="<?= safe($vendeur, 'codep') ?>" required>
+                <span class="error" id="error-codep"></span>
+            </div>
+        </div>
 
           <button class="btn btn--primary" type="submit">Enregistrer</button>
         </form>
