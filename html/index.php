@@ -290,39 +290,43 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <option value="meilleures_ventes"
                             <?= $triSelection === 'meilleures_ventes' ? 'selected' : '' ?>>
                             Meilleures ventes</option>
+                        <!--option nouveauté-->
+                        <option value="nouveaute" <?= $triSelection === 'nouveaute' ? 'selected' : '' ?>>
+                            Nouveautés</option>
+                        <!--option mieux notés-->
+                        <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>
+                            Mieux notés</option>
+
                         <!--option prix croissant-->
                         <option value="prix_croissant" <?= $triSelection === 'prix_croissant' ? 'selected' : '' ?>>
                             Prix croissant</option>
                         <!--option prix décroissant-->
                         <option value="prix_decroissant" <?= $triSelection === 'prix_decroissant' ? 'selected' : '' ?>>
                             Prix décroissant</option>
-                        <!--option mieux notés-->
-                        <option value="note" <?= $triSelection === 'note' ? 'selected' : '' ?>>
-                            Mieux notés</option>
-                        <!--option moins bien notés-->
-                        <option value="note_moins" <?= $triSelection === 'note_moins' ? 'selected' : '' ?>>
-                            Moins bien notés</option>
+
                         <!--option en promotion-->
                         <option value="en_promotion" <?= $triSelection === 'en_promotion' ? 'selected' : '' ?>>
                             En promotion</option>
                         <!--option en réduction-->
                         <option value="en_reduction" <?= $triSelection === 'en_reduction' ? 'selected' : '' ?>>
                             En réduction</option>
-                        <!--option pires ventes-->
-                        <option value="pires_ventes" <?= $triSelection === 'pires_ventes' ? 'selected' : '' ?>>
-                            Moins vendus</option>
-                        <!--option nouveauté-->
-                        <option value="nouveaute" <?= $triSelection === 'nouveaute' ? 'selected' : '' ?>>
-                            Nouveautés</option>
-                        <!--option Plus anciens-->
-                        <option value="anciens" <?= $triSelection === 'anciens' ? 'selected' : '' ?>>
-                            Plus anciens</option>
+
                         <!--option A à Z-->
                         <option value="a_z" <?= $triSelection === 'a_z' ? 'selected' : '' ?>>
                             A à Z</option>
                         <!--option Z à A-->
                         <option value="z_a" <?= $triSelection === 'z_a' ? 'selected' : '' ?>>
                             Z à A</option>
+
+                        <!--option Plus anciens-->
+                        <option value="anciens" <?= $triSelection === 'anciens' ? 'selected' : '' ?>>
+                            Plus anciens</option>
+                        <!--option moins bien notés-->
+                        <option value="note_moins" <?= $triSelection === 'note_moins' ? 'selected' : '' ?>>
+                            Moins bien notés</option>
+                        <!--option pires ventes-->
+                        <option value="pires_ventes" <?= $triSelection === 'pires_ventes' ? 'selected' : '' ?>>
+                            Moins vendus</option>
                     </select>
                 </div>
 
@@ -348,7 +352,8 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <?php if ($categorieCourante['category'] !== 'all'): ?>
                         <option value="<?= htmlspecialchars($categorieCourante['category']) ?>"
                             <?= $categorieSelection === $categorieCourante['category'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($categorieCourante['category']) ?> (<?= $categorieCourante['count'] ?>)
+                            <?= htmlspecialchars($categorieCourante['category']) ?>
+                            (<?= $categorieCourante['count'] ?>)
                         </option>
                         <?php endif; ?>
                         <?php endforeach; ?>
