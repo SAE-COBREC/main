@@ -159,6 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
             //réinitialise le champ de recherche par nom (protégé)
             const nomChercherEl = document.getElementById('nomChercher');
             if (nomChercherEl) nomChercherEl.value = '';
+            const inputNoteMin = document.getElementById('inputNoteMin');
+            if (inputNoteMin) {
+                inputNoteMin.value = '0'; // remet la note minimale à 0
+            }
             //décoche la case "en stock uniquement" (protégé)
             const stockEl = document.getElementById('stockOnlyCheckbox');
             if (stockEl) stockEl.checked = false;

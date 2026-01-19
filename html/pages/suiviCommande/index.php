@@ -211,59 +211,72 @@ if ($id_commande > 0) {
 
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Suivi Commande</title>
-        <link rel="icon" type="image/png" href="../../img/favicon.svg">
-        <link rel="stylesheet" href="/styles/Panier/stylesPanier.css">
-        <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-        <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
-    </head>
 
-    <?php include __DIR__ . '/../../partials/header.php';?>
-    <body>
-        <h1>Suivi de commande #<?= htmlspecialchars($id_commande) ?></h1>
-        <?php if (isset($status) && $status['step'] == 5): ?>
-            <?php echo "pipi";?>
-            <div class="delivery-info">
-                <p>Status actuel : <strong>Livré</strong></p>
-                <p>Détail : <?= htmlspecialchars($status['detail']) ?></p>
-                
-                <?php if (!empty($status['img_data'])): ?>
-                    <div class="proof-photo">
-                        <p>Preuve de livraison :</p>
-                        <img src="data:image/jpeg;base64,<?= $status['img_data'] ?>" 
-                            alt="Photo boite aux lettres" 
-                            style="max-width: 300px; border: 2px solid #333;">
-                    </div>
-                <?php endif; ?>
-            </div>
-        <?php elseif ($status['step']): ?>
-            <?php if ($resultat['success']): //regarde si il y a pas d'erreur?>
-                <p>Numéro de bordereau : <strong><?= htmlspecialchars($resultat['bordereau']) ?></strong></p>
-                <p>Status actuel : <strong id="status-value"><?= $status['step'] !== null ? $status['step'] : 'Inconnu' ?></strong></p>
-            <?php else: ?>
-                <p>Erreur : <?= htmlspecialchars($resultat['error']) ?></p>
-            <?php endif; ?>
+<head>
+    <meta charset="UTF-8">
+    <title>Suivi Commande</title>
+    <link rel="icon" type="image/png" href="../../img/favicon.svg">
+    <link rel="stylesheet" href="/styles/Panier/stylesPanier.css">
+    <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
+    <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
+</head>
+
+<?php include __DIR__ . '/../../partials/header.php';?>
+
+<body>
+    <h1>Suivi de commande #<?= htmlspecialchars($id_commande) ?></h1>
+    <?php if (isset($status) && $status['step'] == 5): ?>
+    <div class="delivery-info">
+        <p>Status actuel : <strong>Livré</strong></p>
+        <p>Détail : <?= htmlspecialchars($status['detail']) ?></p>
+
+        <?php if (!empty($status['img_data'])): ?>
+        <div class="proof-photo">
+            <p>Preuve de livraison :</p>
+            <img src="data:image/jpeg;base64,<?= $status['img_data'] ?>" alt="Photo boite aux lettres"
+                style="max-width: 300px; border: 2px solid #333;">
+        </div>
         <?php endif; ?>
+    </div>
+    <?php elseif ($status['step']): ?>
+    <?php if ($resultat['success']): //regarde si il y a pas d'erreur?>
+    <p>Numéro de bordereau : <strong><?= htmlspecialchars($resultat['bordereau']) ?></strong></p>
+    <p>Status actuel : <strong id="status-value"><?= $status['step'] !== null ? $status['step'] : 'Inconnu' ?></strong>
+    </p>
+    <?php else: ?>
+    <p>Erreur : <?= htmlspecialchars($resultat['error']) ?></p>
+    <?php endif; ?>
+    <?php endif; ?>
 
 
-        <div class="steps">
-            <img id="steps" src="../../img/svg//Delivrator/<?= $status['step'] !== null ? $status['step'] : 1 ?>steps.svg" alt="Box">
+    <div class="steps">
+        <img id="steps" src="../../img/svg//Delivrator/<?= $status['step'] !== null ? $status['step'] : 1 ?>steps.svg"
+            alt="Box">
+    </div>
+    <div class="steps2">
+        <div>
+            <p>Chez Alizon</p>
         </div>
-        <div class="steps2">
-            <div><p>Chez Alizon</p></div>
-            <div><p>Chez le transporteur</p></div>
-            <div><p>Sur la plateforme régionale</p></div>
-            <div><p>Au centre local</p></div>
-            <div><p>Livré</p></div>
+        <div>
+            <p>Chez le transporteur</p>
         </div>
-        <article class="recapCommande">
-            <a href="../post-achat/impression.php" target="_blank" rel="noopener noreferrer"><button>Télécharger la facture</button></a>
-        </article>
+        <div>
+            <p>Sur la plateforme régionale</p>
+        </div>
+        <div>
+            <p>Au centre local</p>
+        </div>
+        <div>
+            <p>Livré</p>
+        </div>
+    </div>
+    <article class="recapCommande">
+        <a href="../post-achat/impression.php" target="_blank" rel="noopener noreferrer"><button>Télécharger la
+                facture</button></a>
+    </article>
 
-    </body>
+</body>
 
-    <?php include __DIR__ . '/../../partials/footer.html';?>
+<?php include __DIR__ . '/../../partials/footer.html';?>
+
 </html>
