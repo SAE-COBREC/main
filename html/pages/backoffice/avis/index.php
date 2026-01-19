@@ -176,6 +176,7 @@ $sqlAvis = "
         a.a_timestamp_creation, 
         p.p_nom, 
         p.id_produit,
+        p.p_stock,
         (SELECT ROUND(AVG(av.a_note), 1) FROM cobrec1._avis av WHERE av.id_produit = p.id_produit AND av.id_client IS NOT NULL) as produit_moyenne,
         (SELECT COUNT(*) FROM cobrec1._avis av WHERE av.id_produit = p.id_produit AND av.id_client IS NOT NULL) as produit_nb_avis,
         cl.c_pseudo,
@@ -216,6 +217,13 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
   <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
   <link rel="stylesheet" href="/styles/AvisVendeur/avisVendeur.css" />
+  <style>
+    /* ⚠️ Visuel : cartes hors-stock légèrement grisées */
+    .avis-card.out-of-stock { background:#fafafa; color:#666; }
+    .avis-card.out-of-stock { filter:grayscale(10%); }
+    .avis-card.out-of-stock .product-name a { pointer-events:none; cursor:default; text-decoration:none; color:inherit; }
+    .out-of-stock-badge { font-size:0.9em; color:#e74c3c; margin-left:6px; font-weight:600; }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -233,17 +241,26 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         <?php else: ?>
             <?php foreach ($avisList as $avis): ?>
-                <div class="avis-card">
+                <?php $estEnRupture = isset($avis['p_stock']) && $avis['p_stock'] <= 0; ?>
+                <div class="avis-card<?= $estEnRupture ? ' out-of-stock' : '' ?>" <?php if ($estEnRupture) echo 'style="background-color: #f0f0f0;"'; ?>>
                     <div class="avis-header">
                         <div>
                             <div class="product-name">
-                                <a href="/pages/produit/index.php?id=<?= $avis['id_produit'] ?>" target="_blank">
-                                    <?= htmlspecialchars($avis['p_nom']) ?>
-                                    <span style="font-weight:normal;font-size:0.9em;color:#666;margin-left:5px;">
+                                <?php if (!$estEnRupture): ?>
+                                    <a href="/pages/produit/index.php?id=<?= $avis['id_produit'] ?>" target="_blank">
+                                        <?= htmlspecialchars($avis['p_nom']) ?>
+                                        <span style="font-weight:normal;font-size:0.9em;color:#666;margin-left:5px;">
+                                            (★ <?= $avis['produit_moyenne'] ?>/5 - <?= $avis['produit_nb_avis'] ?> avis)
+                                        </span>
+                                        <img src="/img/svg/external.svg" alt="" width="12" style="opacity:0.6;margin-left:4px">
+                                    </a>
+                                <?php else: ?>
+                                    <span style="font-weight:bold;"><?= htmlspecialchars($avis['p_nom']) ?></span>
+                                    <span class="out-of-stock-badge">Rupture de stock</span>
+                                    <span style="font-weight:normal;font-size:0.9em;color:#666;margin-left:8px;">
                                         (★ <?= $avis['produit_moyenne'] ?>/5 - <?= $avis['produit_nb_avis'] ?> avis)
                                     </span>
-                                    <img src="/img/svg/external.svg" alt="" width="12" style="opacity:0.6;margin-left:4px">
-                                </a>
+                                <?php endif; ?>
                             </div>
                             <div class="avis-meta">
                                 Par <strong><?= htmlspecialchars($avis['c_pseudo'] ?? $avis['prenom'] . ' ' . $avis['nom'] ?? 'Anonyme') ?></strong> 
