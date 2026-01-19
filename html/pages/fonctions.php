@@ -261,6 +261,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'i_alt' => $produitCourant['image_alt'],
                 'i_title' => $produitCourant['image_title'],
                 'quantite' => $aAjouter,
+                'tva' => $produitCourant['tva'],
                 'pourcentage_reduction' => $produitCourant['pourcentage_reduction'],
                 'reduction_debut' => $produitCourant['reduction_debut'],
                 'reduction_fin' => $produitCourant['reduction_fin'],
@@ -1286,6 +1287,60 @@ function trierProduits($listeProduits, $tri_par)
                 $noteB = (float)($b['note_moyenne'] ?? 0);
                 
                 $comparison = $noteB <=> $noteA;
+                
+                if ($comparison === 0) {
+                    return $a['id_produit'] <=> $b['id_produit'];
+                }
+                
+                return $comparison;
+            });
+            break;
+        
+        case 'note_moins':
+            usort($listeProduits, function ($a, $b) {
+                $noteA = (float)($a['note_moyenne'] ?? 0);
+                $noteB = (float)($b['note_moyenne'] ?? 0);
+                
+                $comparison = $noteA <=> $noteB;
+                
+                if ($comparison === 0) {
+                    return $a['id_produit'] <=> $b['id_produit'];
+                }
+                
+                return $comparison;
+            });
+            break;
+
+        case 'pires_ventes':
+            usort($listeProduits, function ($produitA, $produitB) {
+                $nombreVentesA = (int)($produitA['p_nb_ventes'] ?? 0);
+                $nombreVentesB = (int)($produitB['p_nb_ventes'] ?? 0);
+                
+                $comparison = $nombreVentesA <=> $nombreVentesB;
+                
+                if ($comparison === 0) {
+                    return $produitA['id_produit'] <=> $produitB['id_produit'];
+                }
+                
+                return $comparison;
+            });
+            break;
+        
+        case 'nouveaute':
+            usort($listeProduits, function ($produitA, $produitB) {
+                return $produitB['id_produit'] <=> $produitA['id_produit'];
+            });
+            break;
+        
+        case 'anciens':
+            usort($listeProduits, function ($produitA, $produitB) {
+                return $produitA['id_produit'] <=> $produitB['id_produit'];
+            });
+            break;
+
+        case 'z_a':
+            usort($listeProduits, function ($a, $b) {
+                $comparison = strcmp($b['p_nom'], $a['p_nom']);
                 
                 if ($comparison === 0) {
                     return $a['id_produit'] <=> $b['id_produit'];
