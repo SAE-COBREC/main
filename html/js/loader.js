@@ -46,10 +46,18 @@
   const origFetch = window.fetch;
   if (origFetch) {
     window.fetch = function(...args){
-      show();
-      return origFetch.apply(this,args)
-        .catch(err=>{ showError('Erreur réseau — vérifiez votre connexion'); throw err; })
-        .finally(()=>{ hide(); });
+      const options = args[1] || {};
+      const skip = options.noLoader === true;
+      if (!skip) show();
+      
+      const p = origFetch.apply(this,args);
+      
+      if (!skip) {
+        return p
+          .catch(err=>{ showError('Erreur réseau — vérifiez votre connexion'); throw err; })
+          .finally(()=>{ hide(); });
+      }
+      return p;
     };
   }
 

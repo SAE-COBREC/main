@@ -20,7 +20,7 @@ function ajouterAuPanier(id) {
     fd.append('idProduit', id);
     fd.append('quantite', qty);
 
-    window.fetchJson(window.location.href, { method: 'POST', body: fd })
+    window.fetchJson(window.location.href, { method: 'POST', body: fd, noLoader: true })
         .then(d => {
             if (d.success) { if(window.notify) notify(d.message, 'success'); }
             else { if(window.showError) showError('Erreur', d.message); }

@@ -248,7 +248,8 @@ function ajouterAuPanier(idProduit) {
             //type de requête POST
             method: 'POST',
             //données à envoyer
-            body: formData
+            body: formData,
+            noLoader: true
         })
         //attend la réponse et la convertit en JSON
         .then(response => response.json())

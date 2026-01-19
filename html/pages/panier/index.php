@@ -399,6 +399,7 @@ formViderPanier.addEventListener('submit', (event) => {
         cancelText: 'Annuler',
         variant: 'default',
         onOk: () => {
+            if (window.Loader) Loader.show();
             formViderPanier.submit();
         }
     });
