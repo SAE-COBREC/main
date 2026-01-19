@@ -5,6 +5,7 @@
     include '../../selectBDD.php';
     $pdo->exec("SET search_path to cobrec1");
     $rechercheNom='';
+    include '../fonctions.php';
 ?>
 
 <html>
@@ -28,11 +29,11 @@
                 <tr>
                     <td>Total à payer</td>
                     <td><?php 
-                        $TTC = 0;
-                        foreach ($_SESSION["post-achat"]["contient"] as $key => $value) {
-                            $TTC += round((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * $value["tva"], 2);
-                        }
-                        echo number_format($TTC, 2, ',', ' ') . ' €';
+                    if (empty($_SESSION['vendeur_id'])){
+                        echo number_format(calcul_f_total_ttc($pdo, $_SESSION["post-achat"]["facture"]["id_panier"]), 2, ',', ' ') . ' €';
+                    }else{
+                        echo number_format(calcul_f_total_ttc($pdo, $_SESSION["post-achat"]["facture"]["id_panier"], $_SESSION['vendeur_id']), 2, ',', ' ') . ' €';
+                    }
                     ?></td>
                 </tr>
                 <tr><td>Vendu par Alizon</td></tr>

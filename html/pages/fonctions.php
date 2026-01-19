@@ -1562,15 +1562,28 @@ function recupOrigineProduit($pdo, $id_produit){
     return $donnees['p_origine'];
 }
 
-function calcul_f_total_ttc($pdo, $id_panier){
-    $sql = '
-    SELECT quantite, prix_unitaire, remise_unitaire, TVA FROM cobrec1._contient
-    WHERE id_panier = :panier_commande;'
-    ;
-    $stmt = $pdo->prepare($sql);
-    $params = [
-        'panier_commande' => $id_panier
-    ];
+function calcul_f_total_ttc($pdo, $id_panier, $vendeur=-1){
+    if ($vendeur == -1){
+        $sql = '
+        SELECT quantite, prix_unitaire, remise_unitaire, TVA FROM cobrec1._contient
+        WHERE id_panier = :panier_commande;'
+        ;
+        $stmt = $pdo->prepare($sql);
+        $params = [
+            'panier_commande' => $id_panier
+        ];
+    }else{
+        $sql = '
+        SELECT id_vendeur, quantite, prix_unitaire, remise_unitaire, TVA FROM cobrec1._contient
+        INNER JOIN cobrec1._produit ON _contient.id_produit = _produit.id_produit
+        WHERE id_panier = :panier_commande AND id_vendeur = :id_vendeur;'
+        ;
+        $stmt = $pdo->prepare($sql);
+        $params = [
+            'panier_commande' => $id_panier,
+            'id_vendeur' => $vendeur
+        ];
+    }
     $stmt->execute($params);
     $contient = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $totalTTC = 0;
