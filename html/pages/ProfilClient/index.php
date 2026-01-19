@@ -580,7 +580,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Numéro</span>
-                    <input type="text" name="num" id="modification_num" inputmode="numeric" pattern="[0-9]+"
+                    <input type="text" name="num" id="modification_num" 
+          pattern="^([1-9]{0,13}(bis|ter|quater|quinquies|sexies|septies|octies|nonies){0,1})$" 
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                 </label>
 
