@@ -12,6 +12,7 @@
 #include <semaphore.h>
 #include <fcntl.h>
 #include <getopt.h>
+#include <time.h>
 
 #define PORT 9000
 #define BUFFER_SIZE 256
@@ -284,6 +285,7 @@ int verif_login(PGconn *conn, char *email, char *mdp)
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     signal(SIGCHLD, SIG_IGN);
     int sock, client_fd;
     struct sockaddr_in server_addr, client_addr;
@@ -323,12 +325,13 @@ int main(int argc, char *argv[])
         perror("sem_open");
         return 1;
     }
-
-    char livre_en_quoi[3][40] = {
+    // comment le colis à été livré
+    char livre_en_quoi[3][60] = {
         "Livré en main propre\n",
-        "Livré en l'absence du destinataire\n",
-        "Refusé par le destinataire :\n"};
+        "Livré dans la boite aux lettres du destinataire\n",
+        "Refusé par le destinataire : "};
 
+    // comment le colis à été refusé
     char raison_refus[5][60] = {
         "Colis dégradé\n",
         "Le colis ne correspond pas à l'article commandé\n",
@@ -554,44 +557,54 @@ int main(int argc, char *argv[])
                     {
                         const char *libelle = "Chez Alizon"; // Simplifié pour l'exemple
                         char response[BUFFER_SIZE];
-                        // 1. Envoyer la ligne de statut standard
+                        // envoie la ligne de status
                         snprintf(response, sizeof(response),
                                  "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
                         write(client_fd, response, strlen(response));
 
-                        // --- CORRECTION : ENVOYER L'IMAGE SI LIVRÉ (STEP 5) ---
                         if (ret == 5)
                         {
-                            // Simuler le message de détail (ou aller le chercher en BDD idéalement)
-                            const char *detail = "LIVRE: Livré en boîte aux lettres\n";
-                            write(client_fd, detail, strlen(detail));
+                            // on récupère le mode de livraison depuis la bdd pour l'envoyer au socket
+                            char id_bordereau_bdd[TAILLE_CHAINE_MAX];
+                            snprintf(id_bordereau_bdd, sizeof(id_bordereau_bdd), "%d", label);
+                            const char *params[1] = {id_bordereau_bdd};
 
-                            // Envoyer l'image
-                            const char *imageVendeur = "../html/img/photo/Delivraptor/boite_au_lettre.jpg";
-                            FILE *fp = fopen(imageVendeur, "rb");
-                            if (fp)
+                            PGresult *res_comment_livre = PQexecParams(conn,
+                                                                       "SELECT mode_livraison FROM cobrec1._bordereau WHERE id_bordereau = $1",
+                                                                       1, NULL, params, NULL, NULL, 0);
+                            if (PQresultStatus(res_comment_livre) == PGRES_TUPLES_OK) // est-ce que PostgreSQL a exécuté la requête SELECT sans erreur ? si oui PGRES_TUPLES_OK si non Erreur SQL
                             {
-                                fseek(fp, 0, SEEK_END);    // place le pointeur a la fin du fichier pour avoir la taille
-                                long filesize = ftell(fp); // demande la taille du fichier
-                                fseek(fp, 0, SEEK_SET);    // remet le pointeur au début du fichier
+                                char *mode_livraison = PQgetvalue(res_comment_livre, 0, 0);
 
-                                char *bufferimage = malloc(filesize);
-                                if (bufferimage)
-                                {
-                                    fread(bufferimage, 1, filesize, fp);
-                                    char imageInfo[64];
-                                    // envoie de l'entete
-                                    snprintf(imageInfo, sizeof(imageInfo), "IMG_START %ld\n", filesize);
-                                    write(client_fd, imageInfo, strlen(imageInfo));
-                                    // envoie les donées
-                                    write(client_fd, bufferimage, filesize);
-                                    free(bufferimage);
+                                char detail_msg[BUFFER_SIZE];
+                                snprintf(detail_msg, sizeof(detail_msg), "LIVRE: %s", mode_livraison);
+                                write(client_fd, mode_livraison, strlen(mode_livraison));
+                                if (strcmp(mode_livraison, "Livré dans la boite aux lettres du destinataire\n") == 0)
+                                { // on envoie l'image seulement si le destinataire était absent
+                                    const char *image_vendeur = "../html/img/photo/Delivraptor/boite_au_lettre.jpg";
+                                    FILE *fp = fopen(image_vendeur, "rb");
+                                    if (fp)
+                                    {
+                                        // cette partie permet de savoir la taille du fichier
+                                        fseek(fp, 0, SEEK_END);    // place le pointeur a la fin du fichier pour avoir la taille
+                                        long filesize = ftell(fp); // demande la taille du fichier
+                                        fseek(fp, 0, SEEK_SET);    // remet le pointeur au début du fichier
+
+                                        char *bufferimage = malloc(filesize);
+                                        if (bufferimage)
+                                        {
+                                            fread(bufferimage, 1, filesize, fp);
+                                            char imageInfo[64];
+                                            // envoie de l'entete
+                                            snprintf(imageInfo, sizeof(imageInfo), "IMG_START %ld\n", filesize);
+                                            write(client_fd, imageInfo, strlen(imageInfo));
+                                            // envoie les donées
+                                            write(client_fd, bufferimage, filesize);
+                                            free(bufferimage);
+                                        }
+                                        fclose(fp);
+                                    }
                                 }
-                                fclose(fp);
-                            }
-                            else
-                            {
-                                printf("pas d'image");
                             }
                         }
                     }
@@ -618,25 +631,37 @@ int main(int argc, char *argv[])
                     {
                         change_status(conn, label, new_status); // change le status de la commande
                         sem_post(sem);
-                        int max = 2;                                                      // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
-                        int id_comment_livre = rand() % (max + 1);                        /// on créé un id pour choisir aléatoirement comment il est livré
-                        char comment_livre[40];                                           // on initialise une variable de comment on livre
-                        strcpy(comment_livre, livre_en_quoi[id_comment_livre]);           // on copie la raison dans la variable
-                        if (strcmp(comment_livre, "Refusé par le destinataire :\n") == 0) // on regarde si la raison est == à Refusé pour pouvoir init une raison de pourquoi il est refusé
+                        int max = 2;                                                     // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
+                        int id_comment_livre = rand() % (max + 1);                       /// on créé un id pour choisir aléatoirement comment il est livré
+                        char comment_livre[40];                                          // on initialise une variable de comment on livre
+                        strcpy(comment_livre, livre_en_quoi[id_comment_livre]);          // on copie la raison dans la variable
+                        if (strcmp(comment_livre, "Refusé par le destinataire : ") == 0) // on regarde si la raison est == à Refusé pour pouvoir init une raison de pourquoi il est refusé
                         {
                             char raison_du_refus[40];                               // on initialise une variable de la raison du refus
                             int max_raison_refus = 4;                               // c'est le nombre de facon de pourquoi le colis à été refusé par le client (0,1,2,3,4 car il y a 5 raisons)
                             int id_raison_refus = rand() % (max + 1);               // on créé un id pour choisir aléatoirement comment il est refusé
                             strcpy(raison_du_refus, raison_refus[id_raison_refus]); // on copie la raison du refus dans raison_du_refus
                             strcat(comment_livre, raison_du_refus);                 // on concatene la chaine de comment_livre avec raison_du_refus pour afficher
+                            write(client_fd, comment_livre, strlen(comment_livre));
                         }
-                        else if (strcmp(comment_livre, "Livré en l'absence du destinataire\n") == 0) // regarde si le colis à été livré en l'absence du destinataire pour envoyer la boite au lettre
+                        char id_bordereau_update[128];
+                        snprintf(id_bordereau_update, sizeof(id_bordereau_update), "%d", label);
+                        const char *params[2] = {
+                            comment_livre,
+                            id_bordereau_update};
+
+                        PGresult *res_update = PQexecParams(conn, "UPDATE cobrec1._bordereau SET mode_livraison = $1  WHERE id_bordereau = $2",
+                                                            2,
+                                                            NULL,
+                                                            params,
+                                                            NULL,
+                                                            NULL,
+                                                            0);
+                        if (PQresultStatus(res_update) != PGRES_COMMAND_OK)
                         {
-                            // envoyer d'abord le texte de notification
-                            char msg_text[BUFFER_SIZE];
-                            snprintf(msg_text, sizeof(msg_text), "LIVRE: %s", comment_livre); // on convetit la variable en tableau de caractere
-                            write(client_fd, msg_text, strlen(msg_text));
+                            fprintf(stderr, "Erreur UPDATE mode_livraison: %s\n", PQerrorMessage(conn));
                         }
+                        PQclear(res_update); // libère la mémoire de PGresult sinon la mémoire s'acumulent
                         write(client_fd, comment_livre, strlen(comment_livre));
                     }
                     else if (status_act >= 5)
