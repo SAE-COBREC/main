@@ -4492,4 +4492,5 @@ CREATE TABLE _bordereau (
     id_bordereau int NOT NULL PRIMARY KEY,
     id_commande int NOT NULL,
     etat_suivis int NOT NULL
+    mode_livraison TEXT
 );
