@@ -124,13 +124,12 @@ ADD CONSTRAINT fk_client_compte FOREIGN KEY (id_compte) REFERENCES cobrec1._comp
 CREATE TABLE cobrec1._adresse (
     id_adresse serial NOT NULL,
     id_compte integer NOT NULL,
-    a_numero integer DEFAULT 0 NOT NULL,
+    a_numero varchar(25) DEFAULT 0 NOT NULL,
     a_adresse varchar(255) NOT NULL,
     a_ville varchar(100) NOT NULL,
     a_code_postal varchar(10) NOT NULL,
     a_pays varchar(255) DEFAULT 'France' NOT NULL,
-    a_complement varchar(255),
-    CONSTRAINT verif_adresse_numero CHECK (a_numero >= 0)
+    a_complement varchar(255)
 );
 
 ALTER TABLE ONLY cobrec1._adresse

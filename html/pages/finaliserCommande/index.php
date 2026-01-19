@@ -58,7 +58,7 @@ if (isset($_SESSION['idClient'])) {
         $reduc = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
         $f_total_remise = $f_total_remise + $reduc;
         $prixTotalFinal = $prixTotalFinal + ((($donnees["p_prix"] - $reduc) * (1 + $donnees["montant_tva"] / 100)) * $article["quantite"]);
-        echo $prixTotalFinal . "_";
+        //echo $prixTotalFinal . "_";
     }
     $prixTotalFinal = round($prixTotalFinal, 2);
 

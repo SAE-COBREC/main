@@ -58,6 +58,7 @@ try {
             c.nom as nom,
             c.civilite as civilite,
             a.a_adresse AS adresse,
+            a.a_numero AS numero,
             a.a_code_postal AS codep,
             a.a_ville AS ville,
             a.a_complement AS complement,
@@ -232,6 +233,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([
             'val' => trim($_POST['adresse']),
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+    // NUMERO
+    if (isset($_POST['numero']) && $_POST['numero'] !== $old['numero']) {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._adresse
+            SET a_numero = :val
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'val' => trim($_POST['numero']),
             'id'  => $vendeur['compte']
         ]);
     }
@@ -492,9 +506,21 @@ function safe($array, $key, $default = "") {
           </div>
 
           <div class="form-row">
+            <label>Numéro de rue</label>
+            <input type="text" id="numero" name="numero" value="<?= safe($vendeur, 'numero') ?>" required>
+            <span class="error" id="error-numero"></span>
+          </div>
+
+          <div class="form-row">
             <label>Adresse</label>
             <input type="text" id="adresse" name="adresse" value="<?= safe($vendeur, 'adresse') ?>" required>
             <span class="error" id="error-adresse"></span>
+          </div>
+
+          <div class="form-row">
+            <label>Complément d'adresse</label>
+            <input type="text" id="complement" name="complement" value="<?= safe($vendeur, 'complement') ?>">
+            <span class="error" id="error-complement"></span>
           </div>
 
           <div class="form-row">
@@ -507,12 +533,6 @@ function safe($array, $key, $default = "") {
             <label>Code postal</label>
             <input type="text" id="codep" name="codep" value="<?= safe($vendeur, 'codep') ?>" required>
             <span class="error" id="error-codep"></span>
-          </div>
-
-          <div class="form-row">
-            <label>Complément d'adresse</label>
-            <input type="text" id="complement" name="complement" value="<?= safe($vendeur, 'complement') ?>">
-            <span class="error" id="error-complement"></span>
           </div>
 
           <button class="btn btn--primary" type="submit">Enregistrer</button>
@@ -580,6 +600,7 @@ function safe($array, $key, $default = "") {
         siren: /^[0-9]{9}$/,
         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         telephone: /^(?:\+33|0)[1-9](?:[0-9]{8})$/,
+        numero: /^([1-9]{0,13}(bis|ter|quater|quinquies|sexies|septies|octies|nonies){0,1})$/,
         adresse: /^[0-9a-zA-ZÀ-ÿ,' .-]{3,80}$/,
         ville: /^[a-zA-ZÀ-ÿ' -]{2,50}$/,
         codep: /^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B)) *([0-9]{3})?$/,
@@ -626,6 +647,7 @@ function safe($array, $key, $default = "") {
         "siren",
         "email",
         "telephone",
+        "numero",
         "adresse",
         "ville",
         "codep",
