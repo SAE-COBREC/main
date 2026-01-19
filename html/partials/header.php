@@ -69,5 +69,7 @@ if (isset($_SESSION['idClient'])) {
         </div>
     </div>
 </header>
+<?php include __DIR__ . '/loader.html'; ?>
+<script src="/js/loader.js"></script>
 
 <div class="separator"></div>

@@ -1,0 +1,52 @@
+@use 'variable' as *;
+
+#global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    transition: all 0.3s ease;
+    
+    &.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        display: none !important;
+    }
+
+    .loader-inner {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .loader-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid $secondary-color-gris-clair;
+        border-top: 4px solid $primary-color-bleu;
+        border-radius: 50%;
+        animation: loader-spin 0.8s linear infinite;
+    }
+
+    .loader-text {
+        font-family: $font-family-secondaire;
+        color: $primary-color-noir;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin: 0;
+    }
+}
+
+@keyframes loader-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

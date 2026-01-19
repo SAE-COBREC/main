@@ -29,23 +29,31 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 try {
     if ($action === 'report_avis') {
-        if (!$idClient) {
-            ob_clean();
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['success' => false, 'message' => 'Connexion requise pour signaler un avis.']);
-            exit;
-        }
-
+        // Support both client and vendor reporters. Resolve an id_compte from the session.
         $idAvis = (int)($_POST['id_avis'] ?? 0);
         $motif = trim($_POST['motif'] ?? '');
         $commentaire = trim($_POST['commentaire'] ?? '');
         if ($idAvis <= 0) throw new Exception('Avis invalide.');
         if ($motif === '') throw new Exception('Motif requis.');
 
-        $stmtCompte = $pdo->prepare('SELECT id_compte FROM cobrec1._client WHERE id_client = :cid');
-        $stmtCompte->execute([':cid' => $idClient]);
-        $idCompte = $stmtCompte->fetchColumn();
-        if (!$idCompte) throw new Exception('Compte introuvable pour ce client.');
+        // Determine reporting account id
+        $idCompte = null;
+        if ($idClient) {
+            $stmtCompte = $pdo->prepare('SELECT id_compte FROM cobrec1._client WHERE id_client = :cid');
+            $stmtCompte->execute([':cid' => $idClient]);
+            $idCompte = $stmtCompte->fetchColumn();
+            if (!$idCompte) throw new Exception('Compte introuvable pour ce client.');
+        } elseif (!empty($_SESSION['vendeur_id'])) {
+            $stmtV = $pdo->prepare('SELECT id_compte FROM cobrec1._vendeur WHERE id_vendeur = :vid');
+            $stmtV->execute([':vid' => (int)$_SESSION['vendeur_id']]);
+            $idCompte = $stmtV->fetchColumn();
+            if (!$idCompte) throw new Exception('Compte introuvable pour ce vendeur.');
+        } else {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['success' => false, 'message' => 'Connexion requise pour signaler un avis.']);
+            exit;
+        }
 
         // Vérifier si ce compte a déjà signalé cet avis
         $stmtCheck = $pdo->prepare("SELECT s.id_signalement FROM cobrec1._signalement s JOIN cobrec1._signale_avis sa ON sa.id_signalement = s.id_signalement JOIN cobrec1._envoie_signalement es ON es.id_signalement = s.id_signalement WHERE es.id_compte = :idc AND sa.id_avis = :ida LIMIT 1");
@@ -83,20 +91,27 @@ try {
     }
 
     if ($action === 'unreport_avis') {
-        if (!$idClient) {
+        $idAvis = (int)($_POST['id_avis'] ?? 0);
+        if ($idAvis <= 0) throw new Exception('Avis invalide.');
+
+        // Determine account id (client or vendor)
+        $idCompte = null;
+        if ($idClient) {
+            $stmtCompte = $pdo->prepare('SELECT id_compte FROM cobrec1._client WHERE id_client = :cid');
+            $stmtCompte->execute([':cid' => $idClient]);
+            $idCompte = $stmtCompte->fetchColumn();
+            if (!$idCompte) throw new Exception('Compte introuvable pour ce client.');
+        } elseif (!empty($_SESSION['vendeur_id'])) {
+            $stmtV = $pdo->prepare('SELECT id_compte FROM cobrec1._vendeur WHERE id_vendeur = :vid');
+            $stmtV->execute([':vid' => (int)$_SESSION['vendeur_id']]);
+            $idCompte = $stmtV->fetchColumn();
+            if (!$idCompte) throw new Exception('Compte introuvable pour ce vendeur.');
+        } else {
             ob_clean();
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode(['success' => false, 'message' => 'Connexion requise pour annuler un signalement.']);
             exit;
         }
-
-        $idAvis = (int)($_POST['id_avis'] ?? 0);
-        if ($idAvis <= 0) throw new Exception('Avis invalide.');
-
-        $stmtCompte = $pdo->prepare('SELECT id_compte FROM cobrec1._client WHERE id_client = :cid');
-        $stmtCompte->execute([':cid' => $idClient]);
-        $idCompte = $stmtCompte->fetchColumn();
-        if (!$idCompte) throw new Exception('Compte introuvable pour ce client.');
 
         // Trouver le signalement existant
         $stmtFind = $pdo->prepare("SELECT s.id_signalement FROM cobrec1._signalement s JOIN cobrec1._signale_avis sa ON sa.id_signalement = s.id_signalement JOIN cobrec1._envoie_signalement es ON es.id_signalement = s.id_signalement WHERE es.id_compte = :idc AND sa.id_avis = :ida LIMIT 1");

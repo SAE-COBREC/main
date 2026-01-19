@@ -60,10 +60,12 @@
             <td colspan="7">Montant brut HT</td>
             <td><?php echo number_format($totalHT , 2, ',', ' ') . ' €' ?></td>
         </tr>
+        <?php if($netCom != $totalHT){ ?>
         <tr>
             <td colspan="7">Net commercial  </td>
             <td><?php echo number_format($netCom , 2, ',', ' ') . ' €' ?></td>
         </tr>
+        <?php } ?>
         <tr>
             <td colspan="7">Net à payer TTC</td>
             <td><strong><?php echo number_format($totalTTC, 2, ',', ' ') . ' €' ?></strong></td>
