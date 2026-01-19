@@ -586,11 +586,10 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         placeholder="Ex: 12bis" required>
                 </label>
 
-
-
                 <label>
                     <span>Adresse</span>
-                    <input type="text" name="adresse" id="modification_adresse" required>
+                    <input type="text" name="adresse" id="modification_adresse" placeholder="Ex: Rue de la Paix"
+                        required>
                 </label>
 
                 <label>
@@ -600,22 +599,20 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Pays</span>
-                    <input type="text" name="pays" id="modification_pays" required>
+                    <input type="text" name="pays" id="modification_pays" placeholder="Ex: France" required>
                 </label>
 
                 <label>
                     <span>Ville</span>
-                    <input type="text" name="ville" id="modification_ville" required>
+                    <input type="text" name="ville" id="modification_ville" placeholder="Ex: Lannion" required>
                 </label>
 
                 <label>
                     <span>Code postal</span>
                     <input type="text" name="code_postal" id="modification_code_postal" inputmode="numeric"
                         pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
-                        placeholder="ex: 22300" required>
+                        placeholder="Ex: 22300" required>
                 </label>
-
-
 
                 <button type="submit" name="update_address">Mettre à jour</button>
                 <button type="button" onclick="fermerModalModificationAdresse()">Annuler</button>
@@ -639,7 +636,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Adresse</span>
-                    <input type="text" name="adresse" id="ajout_adresse" required>
+                    <input type="text" name="adresse" id="ajout_adresse" placeholder="Ex: Rue de la Paix" required>
                 </label>
 
                 <label>
@@ -649,19 +646,19 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
                 <label>
                     <span>Pays</span>
-                    <input type="text" name="pays" id="ajout_pays" required>
+                    <input type="text" name="pays" id="ajout_pays" placeholder="Ex: France" required>
                 </label>
 
                 <label>
                     <span>Ville</span>
-                    <input type="text" name="ville" id="ajout_ville" required>
+                    <input type="text" name="ville" id="ajout_ville" placeholder="Ex: Lannion" required>
                 </label>
 
                 <label>
                     <span>Code postal</span>
                     <input type="text" name="code_postal" id="ajout_code_postal" inputmode="numeric"
                         pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B)) *([0-9]{3})?$" maxlength="5"
-                        placeholder="ex: 22300" required>
+                        placeholder="Ex: 22300" required>
                 </label>
 
 
