@@ -279,46 +279,47 @@ main {
       }
     }
   }
+}
 
-  // Bouton téléchargement facture
-  .invoice-section {
-    background: $primary-color-blanc;
-    border-radius: 12px;
-    padding: 2em;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+// Bouton téléchargement facture
+.invoice-section {
+  background: $primary-color-blanc;
+  border-radius: 12px;
+  padding: 2em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
 
-    .invoice-btn {
-      display: inline-flex; // Spécifique ici, donc pas le mixin flex-center pur
-      align-items: center;
-      justify-content: center;
-      gap: 0.5em;
-      padding: 14px 28px;
-      background: $primary-color-bleu;
-      color: $primary-color-blanc;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      font-weight: 600;
-      font-family: $font-family-secondaire;
-      cursor: pointer;
-      text-decoration: none;
-      
-      // Utilisation du mixin personnalisé pour l'effet levé
-      @include hover-lift;
+  .invoice-btn {
+    display: inline-flex; // Spécifique ici, donc pas le mixin flex-center pur
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 14px 28px;
+    background: $primary-color-bleu;
+    color: $primary-color-blanc;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    font-family: $font-family-secondaire;
+    cursor: pointer;
+    text-decoration: none;
+    
+    // Utilisation du mixin personnalisé pour l'effet levé
+    @include hover-lift;
 
-      // Surcharge spécifique pour la couleur de fond au hover si besoin
-      &:hover {
-        background: darken($primary-color-bleu, 10%); // Calcul automatique de la couleur sombre
-      }
+    // Surcharge spécifique pour la couleur de fond au hover si besoin
+    &:hover {
+      background: darken($primary-color-bleu, 10%); // Calcul automatique de la couleur sombre
+    }
 
-      svg {
-        width: 20px;
-        height: 20px;
-      }
+    svg {
+      width: 20px;
+      height: 20px;
     }
   }
 }
+
 
 // ============================================
 // RESPONSIVE - MOBILE
