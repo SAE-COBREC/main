@@ -1,3 +1,35 @@
+# Lien du Repo
+> https://github.com/SAE-COBREC/main.git
+
+# Liste des bugs
+## Panier
+- Augmenter la quantité depuis le panier partir et revenir n'update pas la bdd
+
+## Ajout Panier 
+- Si on n'est pas connecté ça ne marche pas 
+
+## Profil
+- édite les infos marche pas.
+
+# Parcoure review
+- achat de produits (catalogue, page produit, panier)
+- paiement (panier, paiement, profil compte, déconnexion)
+- compte (création compte)
+- vendeur (connexion, catalogue, profil vendeur [vite fait], modifier produit, catalogue vendeur, catalogue client)
+
+
+# Connexion au serveur
+```php
+<?php
+    $serveur = '10.253.5.101';
+    $driver = 'pgsql';
+    $dbname = 'saedb';
+    $user = 'sae';
+    $pass = 'kira13';
+    $port = 5432;
+?> 
+```
+
 # Structure du Repo
 
 ```
