@@ -351,8 +351,9 @@ article > div:first-child {
 }
 article > div:first-child img {
   height: 100%;
-  -o-object-fit: cover;
-     object-fit: cover;
+  -o-object-fit: contain;
+     object-fit: contain;
+  width: 100em;
 }
 article > div:first-child .badge-reduction {
   position: absolute;
