@@ -302,7 +302,7 @@ int verif_login(PGconn *conn, char *email, char *mdp)
 
 int main(int argc, char *argv[])
 {
-    srand(time(NULL));
+    srand(time(NULL)); // pour le rand obligatoire sinon on aura tout le temps le mem résultat
     signal(SIGCHLD, SIG_IGN);
     int sock, client_fd;
     struct sockaddr_in server_addr, client_addr;
@@ -352,9 +352,9 @@ int main(int argc, char *argv[])
     char raison_refus[5][60] = {
         "Colis dégradé\n",
         "Le colis ne correspond pas à l'article commandé\n",
-        "Quantité incorrecte\n",
+        "Quantité livrée incorrecte\n",
         "Colis déjà ouvert\n",
-        "Retard du colis important\n"};
+        "Retard du colis trop important\n"};
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) // si l'initialisatio na échoué erreur de socket
@@ -419,11 +419,11 @@ int main(int argc, char *argv[])
 
         PGconn *conn;
         conn = PQconnectdb(
-            "host=127.0.0.1 "
+            "host=10.253.5.101 "
             "port=5432 "
-            "dbname=base_sae "
-            "user=nom_utilisateur "
-            "password=motdepasse ");
+            "dbname=saedb "
+            "user=sae "
+            "password=kira13 ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -535,7 +535,7 @@ int main(int argc, char *argv[])
                             FILE *script = fopen(FICHIER_SCRIPT, "a");
                             if (script != NULL)
                             {
-                                fprintf(script, "echo -e \"LOGIN Alizon mdp\\nSTATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
+                                fprintf(script, "echo -e \"LOGIN Alizon mdp\\nSTATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
                                 fclose(script);
                                 printf("Ajouté au script: STATUS_UP %d\n", bordereau);
                             }
@@ -664,7 +664,6 @@ int main(int argc, char *argv[])
                             int id_raison_refus = rand() % (max + 1);               // on créé un id pour choisir aléatoirement comment il est refusé
                             strcpy(raison_du_refus, raison_refus[id_raison_refus]); // on copie la raison du refus dans raison_du_refus
                             strcat(comment_livre, raison_du_refus);                 // on concatene la chaine de comment_livre avec raison_du_refus pour afficher
-                            write(client_fd, comment_livre, strlen(comment_livre));
                         }
                         char id_bordereau_update[128];
                         snprintf(id_bordereau_update, sizeof(id_bordereau_update), "%d", label);
