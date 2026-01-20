@@ -44,7 +44,7 @@ require_once '../../pages/fonctions.php';
         [
             'id' => 'la-gambling-squad',
             'name' => 'La Gambling Squad',
-            'logo' => '/img/partner/la-gambling-squad.png',
+            'logo' => '/img/partner/la_gambling_squad.png',
             'description' => "Collectif créatif spécialisé dans les expériences interactives et les campagnes à fort impact.",
             'website' => '#'
         ],
@@ -58,7 +58,7 @@ require_once '../../pages/fonctions.php';
         [
             'id' => 'alizon-et-les-sept-nains',
             'name' => 'Alizon et les sept nains',
-            'logo' => '/img/partner/alizon-et-les-sept-nains.png',
+            'logo' => '/img/partner/alizon_et_les_sept_nains.png',
             'description' => "Partenaire interne — initiatives communautaires et micro‑services produit.",
             'website' => '#'
         ],
