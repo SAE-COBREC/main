@@ -3578,24 +3578,72 @@ VALUES (
 
 -- 12.b IMAGES SUPPLÉMENTAIRES (Peuplement additionnel)
 -- Ajoute des images supplémentaires pour certains produits (exemples)
-INSERT INTO _image (i_lien, i_title, i_alt)
-VALUES
-    ('/img/photo/product_1_extra_1.jpg', 'Product 1 - vue 2', 'Vue secondaire du produit 1'),
-    ('/img/photo/product_1_extra_2.jpg', 'Product 1 - vue 3', 'Vue supplémentaire du produit 1'),
-    ('/img/photo/product_5_extra_1.jpg', 'Product 5 - vue 2', 'Vue secondaire du produit 5'),
-    ('/img/photo/product_5_extra_2.jpg', 'Product 5 - vue 3', 'Vue supplémentaire du produit 5'),
-    ('/img/photo/product_12_extra_1.jpg', 'Product 12 - vue 2', 'Vue secondaire du produit 12'),
-    ('/img/photo/product_12_extra_2.jpg', 'Product 12 - vue 3', 'Vue supplémentaire du produit 12');
+INSERT INTO
+    _image (i_lien, i_title, i_alt)
+VALUES (
+        '/img/photo/product_1_extra_1.jpg',
+        'Product 1 - vue 2',
+        'Vue secondaire du produit 1'
+    ),
+    (
+        '/img/photo/product_1_extra_2.jpg',
+        'Product 1 - vue 3',
+        'Vue supplémentaire du produit 1'
+    ),
+    (
+        '/img/photo/product_5_extra_1.jpg',
+        'Product 5 - vue 2',
+        'Vue secondaire du produit 5'
+    ),
+    (
+        '/img/photo/product_5_extra_2.jpg',
+        'Product 5 - vue 3',
+        'Vue supplémentaire du produit 5'
+    ),
+    (
+        '/img/photo/product_12_extra_1.jpg',
+        'Product 12 - vue 2',
+        'Vue secondaire du produit 12'
+    ),
+    (
+        '/img/photo/product_12_extra_2.jpg',
+        'Product 12 - vue 3',
+        'Vue supplémentaire du produit 12'
+    );
 
 -- 12.c MAPPINGS IMAGES -> PRODUITS POUR LES IMAGES AJOUTÉES
 -- On insère les relations en récupérant l'id_image via le chemin (i_lien)
-INSERT INTO _represente_produit (id_image, id_produit)
-SELECT id_image, 1 FROM _image WHERE i_lien = '/img/photo/product_1_extra_1.jpg'
-UNION ALL SELECT id_image, 1 FROM _image WHERE i_lien = '/img/photo/product_1_extra_2.jpg'
-UNION ALL SELECT id_image, 5 FROM _image WHERE i_lien = '/img/photo/product_5_extra_1.jpg'
-UNION ALL SELECT id_image, 5 FROM _image WHERE i_lien = '/img/photo/product_5_extra_2.jpg'
-UNION ALL SELECT id_image, 12 FROM _image WHERE i_lien = '/img/photo/product_12_extra_1.jpg'
-UNION ALL SELECT id_image, 12 FROM _image WHERE i_lien = '/img/photo/product_12_extra_2.jpg';
+INSERT INTO
+    _represente_produit (id_image, id_produit)
+SELECT id_image, 1
+FROM _image
+WHERE
+    i_lien = '/img/photo/product_1_extra_1.jpg'
+UNION ALL
+SELECT id_image, 1
+FROM _image
+WHERE
+    i_lien = '/img/photo/product_1_extra_2.jpg'
+UNION ALL
+SELECT id_image, 5
+FROM _image
+WHERE
+    i_lien = '/img/photo/product_5_extra_1.jpg'
+UNION ALL
+SELECT id_image, 5
+FROM _image
+WHERE
+    i_lien = '/img/photo/product_5_extra_2.jpg'
+UNION ALL
+SELECT id_image, 12
+FROM _image
+WHERE
+    i_lien = '/img/photo/product_12_extra_1.jpg'
+UNION ALL
+SELECT id_image, 12
+FROM _image
+WHERE
+    i_lien = '/img/photo/product_12_extra_2.jpg';
 
 -- 13. RELATIONS IMAGES-PRODUITS
 INSERT INTO
@@ -3717,16 +3765,16 @@ VALUES (6, 4),
 -- 15. RELATIONS PRODUITS-CATÉGORIES
 INSERT INTO
     _fait_partie_de (id_produit, id_categorie)
-VALUES (1, 1),
-    (2, 1),
-    (3, 2),
-    (4, 2),
+VALUES (1, 11),
+    (2, 11),
+    (3, 12),
+    (4, 11),
     (5, 2),
-    (6, 1),
+    (6, 11),
     (7, 3),
-    (8, 3),
-    (9, 5),
-    (10, 1),
+    (8, 11),
+    (9, 11),
+    (10, 12),
     (11, 5),
     (12, 2),
     (13, 6),
