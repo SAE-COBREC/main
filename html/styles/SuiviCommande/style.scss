@@ -185,6 +185,10 @@ main {
           font-weight: 600;
           max-width: 120px;
           line-height: 1.4;
+          min-height: 2.8em; /* 1.4 (line-height) * 2 lignes */
+          display: flex;
+          align-items: flex-start; /* Aligne le texte en haut si une seule ligne */
+          justify-content: center;
         }
 
         // État actif
@@ -223,7 +227,7 @@ main {
   // Section de livraison confirmée
   .delivery-complete {
     background: linear-gradient(135deg, $secondary-color-vert-fond 0%, #C3E6CB 100%);
-    border: 2px solid #28A745; // Pas de variable pour ce vert spécifique
+    border: 2px solid $secondary-color-vert-succes-fond;
     border-radius: 12px;
     padding: 2em;
     margin-bottom: 2em;
@@ -233,12 +237,12 @@ main {
       color: $secondary-color-vert-succes;
       font-size: 1.8em;
       margin-bottom: 0.5em;
-      @include flex-center; // Utilisation du mixin (flex + center + justify center)
+      @include flex-center;
       gap: 0.5em;
 
       &::before {
         content: '✓';
-        background: #28A745;
+        background: $secondary-color-vert-succes-fond;
         color: $primary-color-blanc;
         width: 48px;
         height: 48px;
@@ -325,7 +329,7 @@ main {
 // RESPONSIVE - MOBILE
 // ============================================
 
-@media (max-width: 768px) {
+@media (max-width: 428px) {
   main {
     padding: 1.5em;
 
