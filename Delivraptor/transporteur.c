@@ -508,7 +508,7 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        sem_wait(sem);
+                        sem_wait(sem); // bloque une commande et la met en attente si il y a plus de place pour le transporteur
                         already = 0;
                         int dernierBordereau = cherche_dernier_bordereau(conn);
                         char temp2[25];
@@ -535,7 +535,7 @@ int main(int argc, char *argv[])
                             FILE *script = fopen(FICHIER_SCRIPT, "a");
                             if (script != NULL)
                             {
-                                fprintf(script, "echo -e \"LOGIN Alizon mdp\\nSTATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
+                                fprintf(script, "echo -e \"LOGIN Alizon Alizon1!\\nSTATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
                                 fclose(script);
                                 printf("Ajouté au script: STATUS_UP %d\n", bordereau);
                             }
@@ -652,7 +652,8 @@ int main(int argc, char *argv[])
                     if (new_status == 5) // si le nouveau status est 5
                     {
                         change_status(conn, label, new_status); // change le status de la commande
-                        sem_post(sem);
+                        sem_post(sem);                          // débloque une commande en attente si il y a une place pour le transporteur
+
                         int max = 2;                                                     // c'est le nombre de facon de comment le colis à été livré (0,1,2 car il y a 3 raisons)
                         int id_comment_livre = rand() % (max + 1);                       /// on créé un id pour choisir aléatoirement comment il est livré
                         char comment_livre[40];                                          // on initialise une variable de comment on livre

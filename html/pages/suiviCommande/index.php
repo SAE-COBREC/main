@@ -195,6 +195,17 @@ if ($id_commande > 0) {
     }
 }
 
+/*if ($status['step'] == 5){
+        //une fois que tout le panier a été traité on créer un nouveau pour eviter les erreurs
+        $sqlCreatePanier = "
+            INSERT INTO _livraison (id_livraison, date_livraison, etat_livraison)
+            VALUES (:id_client, NULL)
+            RETURNING id_panier
+        ";
+        $stmtCreate = $pdo->prepare($sqlCreatePanier);
+        $stmtCreate->execute([":id_client" => $id_client]);
+        $idPanier = (int) $stmtCreate->fetchColumn();
+}*/
 ?>
 
 <!DOCTYPE html>
