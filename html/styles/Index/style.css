@@ -787,21 +787,41 @@ article button:disabled {
   font-weight: bold;
   color: #7171A3;
 }
-.carousel-container .carousel-slide .carousel-info .btn-carousel-add {
+.carousel-container .carousel-slide .carousel-info .carousel-actions {
+  display: flex;
+  gap: 1rem;
   margin-top: 1rem;
+}
+.carousel-container .carousel-slide .carousel-info .btn-carousel-add, .carousel-container .carousel-slide .carousel-info .btn-carousel-cart {
   padding: 0.75rem 1.5rem;
-  background: #030212;
-  color: #fff;
-  border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
-  width: -moz-fit-content;
-  width: fit-content;
-  transition: background 0.3s;
+  font-weight: 600;
+  transition: all 0.3s;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-container .carousel-slide .carousel-info .btn-carousel-add {
+  background: transparent;
+  color: #030212;
+  border: 2px solid #030212;
 }
 .carousel-container .carousel-slide .carousel-info .btn-carousel-add:hover {
+  background: #030212;
+  color: #fff;
+}
+.carousel-container .carousel-slide .carousel-info .btn-carousel-cart {
   background: #7171A3;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(113, 113, 163, 0.3);
+}
+.carousel-container .carousel-slide .carousel-info .btn-carousel-cart:hover {
+  background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(113, 113, 163, 0.4);
 }
 .carousel-container .carousel-btn {
   position: absolute;

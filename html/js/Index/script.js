@@ -393,4 +393,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentSlide = track.querySelector('.active') || slides[0];
         track.style.transform = 'translateX(-' + currentSlide.offsetLeft + 'px)';
     });
+
+    // --- AUTO SCROLL - AUTOMATISATION DU DEFILEMENT ---
+    let autoPlayInterval;
+    const intervalTime = 5000; // 5 secondes
+
+    const startAutoPlay = () => {
+        // Évite d'avoir plusieurs intervalles en même temps
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(() => {
+            // Simule un clic sur le bouton suivant
+            nextButton.click();
+        }, intervalTime);
+    };
+
+    const stopAutoPlay = () => {
+        clearInterval(autoPlayInterval);
+    };
+
+    // Démarre le défilement automatique
+    startAutoPlay();
+
+    // Arrête le défilement au survol de la souris
+    const carouselContainer = document.querySelector('.carousel-container');
+    if (carouselContainer) {
+        carouselContainer.addEventListener('mouseenter', stopAutoPlay);
+        carouselContainer.addEventListener('mouseleave', startAutoPlay);
+    }
 });
