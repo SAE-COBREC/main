@@ -50,7 +50,7 @@ function connectAndLogin($host, $port) {
         return ['fp' => false, 'error' => "Transporteur non disponible: $errstr ($errno)"];
     }
 
-    fwrite($fp, "LOGIN Alizon mdp\n");
+    fwrite($fp, "LOGIN Alizon Alizon1!\n");
     $loginResponse = fgets($fp, 256);
 
     if (strpos($loginResponse, 'LOGIN_SUCCESS') === false) {
@@ -69,7 +69,7 @@ function envoyerCommande($id_commande) {
     }
     $fp = $conn['fp'];
 
-    $createCmd = "CREATE_LABEL $id_commande\n";
+    $createCmd = "CREATE_BORDEREAU $id_commande\n";
     fwrite($fp, $createCmd);
 
     stream_set_timeout($fp, 2);
@@ -110,7 +110,7 @@ function getStatusFromSocket($bordereau) {
 
     stream_set_timeout($fp, 2);
 
-    fwrite($fp, "LOGIN Alizon mdp\n");
+    fwrite($fp, "LOGIN Alizon Alizon1!\n");
     fgets($fp, 256);
 
     fwrite($fp, "STATUS $bordereau\n");

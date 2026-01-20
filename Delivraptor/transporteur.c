@@ -727,6 +727,16 @@ int main(int argc, char *argv[])
                     }
                 }
             }
+            else if (strcmp(ligne, "--help") == 0 || strcmp(ligne, "HELP") == 0)
+            {
+                const char *rep =
+                    "LOGIN <param1> <param2> : identifiant=<param1>, mot_de_passe=<param2>\n"
+                    "STATUS <param1>        : statut actuel via bordereau=<param1>\n"
+                    "STATUS_UP <param1>     : incremente le statut via bordereau=<param1>\n"
+                    "CREATE_BORDEREAU <p1>  : cree et stocke un bordereau pour commande=<param1>\n";
+                write(client_fd, rep, strlen(rep));
+            }
+
             else
             {
                 const char *rep = "ERROR UNKNOWN_COMMAND\nLa commande que vous avez tapez n'existe pas.\n";

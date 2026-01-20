@@ -4422,7 +4422,7 @@ VALUES (
         '7b113cde9379ae4632cabc46cd3ca99b3a5ef08e2ff2ddbd9a1f41af3c97cdb8'
     );
 
--- Les compteurs de pouces sont synchronisés depuis _vote_avis (via mise à jour ci-dessus) — pas d'écrasement aléatoire ici.
+-- Les compteurs de pouces sont synchronisés depuis _vote_avis (via mise à jour ci-dessus) - pas d'écrasement aléatoire ici.
 
 -- 24. COMMENTAIRES (liés aux livraisons)
 -- Supprimer
@@ -4498,5 +4498,6 @@ DROP TABLE IF EXISTS _bordereau;
 CREATE TABLE _bordereau (
     id_bordereau int NOT NULL PRIMARY KEY,
     id_commande int NOT NULL,
-    etat_suivis int NOT NULL mode_livraison TEXT
+    etat_suivis int NOT NULL,
+    mode_livraison TEXT
 );
