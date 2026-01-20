@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -11,8 +10,10 @@
   <link rel="stylesheet" href="../../styles/Header/stylesHeader.css">
   <link rel="stylesheet" href="../../styles/Footer/stylesFooter.css">
 </head>
-<?php require_once "../../partials/header.php" ?>
-
+<?php require_once "../../partials/header.php";
+    session_start();
+    session_close();
+?>
 <h1>Conditions Générales d'utilisations</h1>
 
 <article>

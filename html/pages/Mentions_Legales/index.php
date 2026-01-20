@@ -11,7 +11,10 @@
   <link rel="stylesheet" href="../../styles/Header/stylesHeader.css">
   <link rel="stylesheet" href="../../styles/Footer/stylesFooter.css">
 </head>
-<?php require_once "../../partials/header.php" ?>
+<?php require_once "../../partials/header.php";
+    session_start();
+    session_close();
+?>
 
 <h1>MENTIONS LÉGALES</h1>
 
