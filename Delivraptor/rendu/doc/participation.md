@@ -2,11 +2,11 @@
 
 **Répartition des tâches :**
 
-- **Conception du protocole** : 100% Léo
+- **Conception du protocole** : 100 % Léo
 - **Codage et tests** :
-    - Léo : 49%
-    - Gaetan : 49%
-    - Marceau : 2%
+    - Léo : 49 %
+    - Gaëtan : 49 %
+    - Marceau : 2 %
 - **Documentation**
 
 
