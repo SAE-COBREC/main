@@ -1,5 +1,0 @@
-achat de produits (catalogue, page produit, panier)
-paiement (panier, paiement, profil compte, déconnexion)
-compte (création compte)
-
-vendeur (connexion, catalogue, profil vendeur [vite fait], modifier produit, catalogue vendeur, catalogue client)

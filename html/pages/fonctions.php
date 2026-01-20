@@ -1445,7 +1445,8 @@ function recupInfoPourFactureArticle($pdo, $id_produit){
                 SELECT p_prix, montant_tva, reduction_pourcentage 
                 FROM _produit 
                 JOIN _tva ON _produit.id_tva = _tva.id_tva
-                JOIN _reduction ON _produit.id_produit = _reduction.id_produit
+                LEFT JOIN _reduction ON _reduction.id_produit = _produit.id_produit 
+                AND NOW() BETWEEN _reduction.reduction_debut AND _reduction.reduction_fin
                 WHERE _produit.id_produit = :id_produit;
     ";
     $stmt = $pdo->prepare($reqFacture);

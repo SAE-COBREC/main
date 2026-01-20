@@ -127,6 +127,10 @@ main .error-message {
   font-weight: 600;
   max-width: 120px;
   line-height: 1.4;
+  min-height: 2.8em; /* 1.4 (line-height) * 2 lignes */
+  display: flex;
+  align-items: flex-start; /* Aligne le texte en haut si une seule ligne */
+  justify-content: center;
 }
 .tracking-section .progress-container .progress-steps .step.active .step-circle {
   background: #7171A3;
@@ -203,14 +207,15 @@ main .error-message {
   border: 3px solid #7171A3;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-.tracking-section .invoice-section {
+
+.invoice-section {
   background: #FFFFFF;
   border-radius: 12px;
   padding: 2em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
-.tracking-section .invoice-section .invoice-btn {
+.invoice-section .invoice-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -227,14 +232,14 @@ main .error-message {
   text-decoration: none;
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
-.tracking-section .invoice-section .invoice-btn:hover {
+.invoice-section .invoice-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
-.tracking-section .invoice-section .invoice-btn:hover {
+.invoice-section .invoice-btn:hover {
   background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
 }
-.tracking-section .invoice-section .invoice-btn svg {
+.invoice-section .invoice-btn svg {
   width: 20px;
   height: 20px;
 }

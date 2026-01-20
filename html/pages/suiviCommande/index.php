@@ -243,7 +243,8 @@ if ($id_commande > 0) {
                 <?php if (!empty($status['img_data'])): ?>
                 <div class="proof-photo">
                     <p>Preuve de livraison</p>
-                    <img src="data:image/jpeg;base64,<?= $status['img_data'] ?>" alt="Photo de livraison" tile="Photo de livraison">
+                    <img src="data:image/jpeg;base64,<?= $status['img_data'] ?>" alt="Photo de livraison"
+                        tile="Photo de livraison">
                 </div>
 
                 <?php endif; ?>

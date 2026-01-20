@@ -76,7 +76,7 @@
 
             <?php foreach ($articles as $article): ?>
             <article class="unArticleP"
-                data-prix="<?php echo ($article['p_prix'] - (($article['pourcentage_reduction'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
+                data-prix="<?php echo ($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
                 data-stock="<?php echo intval($article['p_stock'])?>"
                 data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                 <div class="imageArticleP">
@@ -149,6 +149,7 @@
         </aside>
 
         <!-- SI LE CLIENT N'EST PAS CONNECTÉ PARCOURS CHAQUE ARTICLES, et affiche son contenu-->
+        <!--attention qand le client n'est pas connecté reduction_pourcentage devient a pourcentage_reduction-->
         <?php elseif (isset($panierTemp) && count($panierTemp) > 0): ?>
 
         <div>
@@ -169,6 +170,11 @@
                         <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
                         <?php
                         if (!empty($article['pourcentage_reduction'])){
+                            if ((strtotime($article["reduction_debut"]) > time()) && (strtotime($article["reduction_fin"]) > time())){
+                                $article['pourcentage_reduction'] = 0;
+                            }
+                        }
+                        if (!empty($article['pourcentage_reduction']) && $article['pourcentage_reduction'] != 0){
                         ?>
                         <strong>Remise :
                         </strong><?php echo number_format($article['pourcentage_reduction'], 2, ',', ' '); ?> %
