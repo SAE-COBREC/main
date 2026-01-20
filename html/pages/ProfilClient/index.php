@@ -458,6 +458,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <?php if (empty($listeCommandesRecentes)): ?>
                 <p>Aucune commande effectuée</p>
                 <?php else: ?>
+                <article>
+                    <header>
+                        <div>
+                            <span>Nombre de commandes : <?php echo count($listeCommandesRecentes); ?></span>
+                        </div>
+                    </header>
+                </article>
                 <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
                 <article>
                     <header>
