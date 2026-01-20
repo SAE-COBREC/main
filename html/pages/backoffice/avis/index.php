@@ -219,7 +219,6 @@ $sqlAvis = "
     ) latest_rep ON a.id_avis = latest_rep.id_avis_parent
     WHERE p.id_vendeur = :idVendeur
     AND a.id_client IS NOT NULL
-    -- Exclure les produits marqués "Hors ligne" du backoffice des avis
     AND p.p_statut != 'Hors ligne'
     ORDER BY a.a_timestamp_creation DESC
 ";
