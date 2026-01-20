@@ -185,6 +185,10 @@ main {
           font-weight: 600;
           max-width: 120px;
           line-height: 1.4;
+          min-height: 2.8em; /* 1.4 (line-height) * 2 lignes */
+          display: flex;
+          align-items: flex-start; /* Aligne le texte en haut si une seule ligne */
+          justify-content: center;
         }
 
         // État actif
