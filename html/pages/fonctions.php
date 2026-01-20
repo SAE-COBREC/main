@@ -628,7 +628,7 @@ function recupererHistoriqueCommandesRecentes($connexionBaseDeDonnees, $identifi
         $requeteSQL = "
             SELECT p.id_panier, p.timestamp_commande,
                 COALESCE(f.f_total_ttc, 0) as montant_total,
-                COALESCE(l.etat_livraison, 'En attente') as statut
+                COALESCE(l.etat_livraison, 'En préparation') as statut
             FROM cobrec1._panier_commande p
             LEFT JOIN cobrec1._facture f ON p.id_panier = f.id_panier
             LEFT JOIN cobrec1._livraison l ON f.id_facture = l.id_facture

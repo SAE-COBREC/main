@@ -182,18 +182,17 @@ main {
                 font-weight: 600;
                 text-transform: capitalize;
 
-                &[data-statut="en-attente"] {
+                &[data-statut="en-préparation"] {
                     background: $secondary-color-jaune-fond;
                     color: $secondary-color-jaune-avertissement;
                 }
 
-                &[data-statut="en-cours"] {
+                &[data-statut="en-transit"] {
                     background: $secondary-color-bleu-info-fond;
                     color: $secondary-color-bleu-info;
                 }
 
-                &[data-statut="livree"],
-                &[data-statut="livrée"] {
+                &[data-statut="livré"] {
                     background: $secondary-color-vert-fond;
                     color: $secondary-color-vert-succes;
                 }

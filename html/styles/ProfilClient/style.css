@@ -128,15 +128,15 @@ main section article > header > span {
   font-weight: 600;
   text-transform: capitalize;
 }
-main section article > header > span[data-statut=en-attente] {
+main section article > header > span[data-statut=en-préparation] {
   background: #FFF3CD;
   color: #856404;
 }
-main section article > header > span[data-statut=en-cours] {
+main section article > header > span[data-statut=en-transit] {
   background: #D1ECF1;
   color: #0C5460;
 }
-main section article > header > span[data-statut=livree], main section article > header > span[data-statut=livrée] {
+main section article > header > span[data-statut=livré] {
   background: #D4EDDA;
   color: #155724;
 }
