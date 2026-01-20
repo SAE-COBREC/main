@@ -194,6 +194,7 @@ if ($id_commande > 0) {
         }
     }
 }
+
 ?>
 
 <!DOCTYPE html>
