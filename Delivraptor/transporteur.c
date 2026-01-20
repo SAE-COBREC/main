@@ -270,7 +270,11 @@ int verif_login(PGconn *conn, char *email, char *mdp)
 
     res = PQexecParams(conn,
                        "SELECT mdp FROM cobrec1._login WHERE identifiant = $1",
-                       1, NULL, params, NULL, NULL, 0);
+                    
+
+//focntion de hash du mot de passe
+void hash_sha256(const char *input, char *output) {
+    unsigned char h   1, NULL, params, NULL, NULL, 0);
 
     if (PQresultStatus(res) != PGRES_TUPLES_OK)
     {

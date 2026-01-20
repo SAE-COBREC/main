@@ -86,11 +86,11 @@ function envoyerCommande($id_commande) {
     }
 
     fclose($fp);
-    if (preg_match('/LABEL=(\d+)/', $response, $matches)) {
+    if (preg_match('/BORDEREAU=(\d+)/', $response, $matches)) {
         $bordereau = (int)$matches[1];
         $already = preg_match('/ALREADY_EXISTS=1/', $response);
         $step = 1;
-        if (preg_match('/STEP=(\d+)/', $response, $m)) {
+        if (preg_match('/STATUS=(\d+)/', $response, $m)) {
             $step = (int)$m[1];
         }
         return ['success' => true, 'bordereau' => $bordereau, 'already' => $already, 'step' => $step];
@@ -118,7 +118,7 @@ function getStatusFromSocket($bordereau) {
     $response = fgets($fp, 256);
     $result = ['step' => 0, 'detail' => '', 'img_data' => null];
 
-    if ($response && preg_match('/STEP=(\d+)/', $response, $matches)) {
+    if ($response && preg_match('/STATUS=(\d+)/', $response, $matches)) {
         $result['step'] = (int)$matches[1];
     }
 
