@@ -1351,8 +1351,8 @@ INSERT INTO
 VALUES (
         1,
         1,
-        'Smartphone XPro',
-        'Smartphone dernière génération avec écran OLED 6.7 pouces, 256Go stockage, 5G',
+        'Mini-beurriers aromatisés Le Gall',
+        'Sélection de beurres de baratte de Quimper en format individuel, déclinés aux cristaux de sel, algues et poivre.',
         599.99,
         35,
         'En ligne',
@@ -1366,8 +1366,8 @@ VALUES (
     (
         1,
         1,
-        'Ordinateur portable Ultra',
-        'PC portable 15 pouces, 16Go RAM, SSD 512Go, processeur i7',
+        'Crous’ty Caramel de la Maison Brieuc',
+        'Pâte à tartiner onctueuse au caramel au beurre salé agrémentée d éclats croustillants de galettes bretonnes.',
         899.99,
         22,
         'En ligne',
@@ -1381,8 +1381,8 @@ VALUES (
     (
         1,
         2,
-        'T-shirt coton bio',
-        'T-shirt 100% coton biologique, coupe regular, diverses couleurs',
+        'Makis de Galettes Apéro Breizh',
+        'Bouchées apéritives modernes composées de galettes de blé noir roulées et garnies de produits du terroir.',
         24.99,
         58,
         'En ligne',
@@ -1396,8 +1396,8 @@ VALUES (
     (
         1,
         2,
-        'Jean slim',
-        'Jean coupe slim stretch, denim premium',
+        'Breizh Cola Saveur Cerise',
+        'Nouvelle version du cola régional brassé en Bretagne, associant les notes de caramel et de cerise griotte.',
         49.99,
         62,
         'En ligne',
@@ -1426,8 +1426,8 @@ VALUES (
     (
         2,
         1,
-        'Casque audio Bluetooth',
-        'Casque sans fil avec réduction de bruit active, autonomie 30h',
+        'Kouign-Amann Artisanal',
+        'Pâtisserie traditionnelle de Douarnenez au feuilletage caramélisé, réalisée avec une forte proportion de beurre salé.',
         149.99,
         15,
         'En ligne',
@@ -1456,8 +1456,8 @@ VALUES (
     (
         1,
         1,
-        'Montre connectée',
-        'Montre sport avec GPS, cardiofréquencemètre, étanche 50m',
+        'Far Breton aux Pruneaux',
+        'Dessert typique à la texture dense et fondante, préparé avec des œufs frais, du lait entier et des pruneaux.',
         199.99,
         15,
         'En ligne',
@@ -1471,8 +1471,8 @@ VALUES (
     (
         1,
         3,
-        'Chaussures running',
-        'Chaussures de course avec amorti premium, semelle respirante',
+        'Andouille de Guémené Véritable',
+        'Charcuterie authentique du Morbihan, fumée au bois de hêtre et reconnaissable à ses cercles concentriques.',
         89.99,
         54,
         'En ligne',
@@ -1486,8 +1486,8 @@ VALUES (
     (
         1,
         1,
-        'Tablette 10 pouces',
-        'Tablette Android, écran Full HD, 64Go, stylet inclus',
+        'Cidre de Cornouaille AOP',
+        'Boisson pétillante pur jus issue de variétés de pommes locales, offrant une amertume équilibrée et fruitée.',
         299.99,
         16,
         'En ligne',
@@ -1501,8 +1501,8 @@ VALUES (
     (
         1,
         3,
-        'Ballon de football',
-        'Ballon officiel en cuir synthétique, taille 5',
+        'Rillettes de Saint-Jacques à la Bretonne',
+        'Préparation tartinable fine à base de noix de Saint-Jacques, cuisinées avec du beurre, des échalotes et du vin blanc.',
         29.99,
         85,
         'En ligne',
@@ -1516,8 +1516,8 @@ VALUES (
     (
         1,
         2,
-        'Veste en cuir',
-        'Veste en cuir véritable, coupe motard, doublure intérieure',
+        'Sardines Millésimées de Douarnenez',
+        'Conserves de sardines entières préparées à la main et maturées en cave dans de l huile d olive extra vierge.',
         189.99,
         15,
         'En ligne',
@@ -1531,8 +1531,8 @@ VALUES (
     (
         3,
         1,
-        'Livre cuisine française',
-        'Recettes traditionnelles de cuisine française, 300 pages',
+        'Tartare d Algues Iodé',
+        'Mélange croquant d algues fraîches (dulse, nori, laitue de mer) hachées avec des cornichons, câpres et huile de colza.',
         24.99,
         28,
         'En ligne',
@@ -1546,8 +1546,8 @@ VALUES (
     (
         1,
         3,
-        'Tapis de yoga',
-        'Tapis antidérapant, épaisseur 6mm, avec sac de transport',
+        'Huîtres Creuses de Cancale',
+        'Coquillages élevés face au Mont-Saint-Michel, réputés pour leur goût iodé prononcé et leur chair ferme.',
         34.99,
         52,
         'En ligne',
@@ -1561,8 +1561,8 @@ VALUES (
     (
         1,
         1,
-        'Clavier mécanique RGB',
-        'Clavier gamer avec rétroéclairage RGB, switches mécaniques',
+        'Palets Bretons Pur Beurre',
+        'Biscuits secs épais et sablés, à la texture friable et au goût intense de beurre demi-sel.',
         79.99,
         29,
         'En ligne',
@@ -1576,8 +1576,8 @@ VALUES (
     (
         1,
         1,
-        'Console NextGen',
-        'Console de jeu dernière génération, 1To SSD, 4K HDR',
+        'Caramel au Beurre Salé (Salidou) ',
+        'Crème onctueuse réalisée avec du sucre caramélisé, du beurre salé breton et une pointe de crème fraîche.',
         499.99,
         0,
         'Hors ligne',
@@ -1591,8 +1591,8 @@ VALUES (
     (
         1,
         2,
-        'Sweat à capuche premium',
-        'Sweat-shirt en coton bio, coupe oversize, poche kangourou',
+        'Niniches de Quiberon',
+        'Sucettes artisanales cylindriques et étirées, disponibles en multiples saveurs de fruits ou au caramel beurre salé.',
         59.99,
         0,
         'Hors ligne',
@@ -1606,8 +1606,8 @@ VALUES (
     (
         1,
         3,
-        'Raquette de tennis pro',
-        'Raquette carbone, tension 25kg, grip confort',
+        'Gâteau Breton Artisanal',
+        'Sablé géant et fondant à la croûte dorée, traditionnellement marqué de croisillons à la fourchette.',
         129.99,
         0,
         'Hors ligne',
@@ -1621,8 +1621,8 @@ VALUES (
     (
         1,
         1,
-        'Écran gaming 4K 27"',
-        'Écran IPS 27 pouces, 144Hz, HDR400, temps de réponse 1ms',
+        'Kig-ha-Farz du Léon',
+        'Pot-au-feu traditionnel finistérien composé de viandes, de légumes et d un far de sarrasin cuit dans un sac en tissu.',
         349.99,
         0,
         'Hors ligne',
@@ -1636,8 +1636,8 @@ VALUES (
     (
         1,
         2,
-        'Baskets limited edition',
-        'Baskets cuir véritable, édition limitée, semelle comfort',
+        'Galette Saucisse Rennaise',
+        'Véritable institution de Haute-Bretagne, composée d une saucisse de porc grillée enroulée dans une galette de blé noir froide.',
         179.99,
         0,
         'Hors ligne',
@@ -1651,8 +1651,8 @@ VALUES (
     (
         1,
         3,
-        'Vélo de route carbone',
-        'Vélo course cadre carbone, groupe Shimano 105, 11 vitesses',
+        'Oignons de Roscoff AOP',
+        'Oignons rosés du Finistère, célèbres pour leur saveur douce, leur texture croquante et leur longue conservation naturelle.',
         1299.99,
         0,
         'Hors ligne',
@@ -1666,8 +1666,8 @@ VALUES (
     (
         1,
         1,
-        'Drone professionnel 4K',
-        'Drone avec caméra 4K, stabilisation 3 axes, autonomie 30min',
+        'Lait Ribot de Bretagne',
+        'Lait fermenté traditionnel, onctueux et légèrement acide, historiquement servi pour accompagner les galettes de sarrasin',
         899.99,
         0,
         'Hors ligne',
@@ -1681,8 +1681,8 @@ VALUES (
     (
         1,
         2,
-        'Manteau d hiver imperméable',
-        'Manteau longueur genoux, doublure polaire, coupe-vent',
+        'Chouchen Artisanal',
+        'Boisson liquoreuse issue de la fermentation d eau et de miel, souvent vieillie en fûts de chêne pour une finale douce et fruitée.',
         179.99,
         0,
         'Hors ligne',
@@ -1696,8 +1696,8 @@ VALUES (
     (
         1,
         3,
-        'Tente 4 places',
-        'Tente familiale, double toit, arceaux aluminium, imperméable',
+        'Moutarde aux Algues de Roscoff',
+        'Condiment fort mariant la puissance de la moutarde à la saveur iodée et marine des algues fraîches du Finistère.',
         249.99,
         0,
         'Hors ligne',
@@ -1711,8 +1711,8 @@ VALUES (
     (
         1,
         1,
-        'Enceinte Bluetooth waterproof',
-        'Enceinte portable, autonomie 24h, résistance IP67',
+        'Fleur de Sel de Guérande',
+        'Cristaux de sel délicats récoltés manuellement à la surface des marais salants, appréciés pour leur croquant et leur richesse en minéraux.',
         129.99,
         0,
         'Hors ligne',
@@ -4491,6 +4491,5 @@ DROP TABLE IF EXISTS _bordereau;
 CREATE TABLE _bordereau (
     id_bordereau int NOT NULL PRIMARY KEY,
     id_commande int NOT NULL,
-    etat_suivis int NOT NULL
-    mode_livraison TEXT
+    etat_suivis int NOT NULL mode_livraison TEXT
 );
