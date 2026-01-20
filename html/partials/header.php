@@ -73,4 +73,4 @@ if (isset($_SESSION['idClient'])) {
 <script src="/js/loader.js"></script>
 
 <div class="separator"></div>
-<?php session_close() ?>
+<?php session_close(); ?>
