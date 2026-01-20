@@ -115,9 +115,9 @@
                                 <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg"
                                         alt="Supprimer" /></button>
                             </form>
-                            <button class="btn_moins">-</button>
-                            <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
-                            <button class="btn_plus">+</button>
+                            <button class="btn_moins" data-no-loader>-</button>
+                            <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>" data-no-loader>
+                            <button class="btn_plus" data-no-loader>+</button>
                         </div>
                     </div>
                 </div>
@@ -188,9 +188,9 @@
                                 <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg"
                                         alt="Supprimer" /></button>
                             </form>
-                            <button class="btn_moins">-</button>
-                            <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>">
-                            <button class="btn_plus">+</button>
+                            <button class="btn_moins" data-no-loader>-</button>
+                            <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>" data-no-loader>
+                            <button class="btn_plus" data-no-loader>+</button>
                         </div>
                     </div>
                 </div>
@@ -354,6 +354,9 @@ document.querySelectorAll('.unArticleP').forEach(article => {
             okText: 'Supprimer',
             cancelText: 'Annuler',
             variant: 'default',
+            onOk: () => {
+                formSupp.submit();
+            }
         });
     });
 
@@ -395,7 +398,6 @@ formViderPanier.addEventListener('submit', (event) => {
         cancelText: 'Annuler',
         variant: 'default',
         onOk: () => {
-            if (window.Loader) Loader.show();
             formViderPanier.submit();
         }
     });
