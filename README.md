@@ -58,24 +58,24 @@ Utilisez ces paramètres pour `PDO` :
 
 ```mermaid
 graph TD;
-    Repo[📂 Racine du Projet] --> Web[🌐 Application Web (html/)]
-    Repo --> Tools[🚚 Outils Logistiques (Delivraptor/)]
-    Repo --> Configs[⚙️ Config & DB]
+    Repo["📂 Racine du Projet"] --> Web["🌐 Application Web (html/)"]
+    Repo --> Tools["🚚 Outils Logistiques (Delivraptor/)"]
+    Repo --> Configs["⚙️ Config & DB"]
 
     subgraph Web_App [Partie Web]
-        Web --> Pages[🐘 Pages PHP]
-        Web --> Assets[🎨 Assets (CSS/JS/Img)]
-        Web --> Partials[🧩 Composants (Header/Footer)]
+        Web --> Pages["🐘 Pages PHP"]
+        Web --> Assets["🎨 Assets (CSS/JS/Img)"]
+        Web --> Partials["🧩 Composants (Header/Footer)"]
         
-        Pages --> Client[👤 Espace Client]
-        Pages --> Backoffice[👔 Espace Vendeur]
-        Pages --> API[🔌 Scripts Fonctionnels]
+        Pages --> Client["👤 Espace Client"]
+        Pages --> Backoffice["👔 Espace Vendeur"]
+        Pages --> API["🔌 Scripts Fonctionnels"]
     end
 
     subgraph Logistics [Partie Logistique]
-        Tools --> Transp[🧱 Programme C Transporteur]
-        Tools --> Scripts[⌨️ Scripts Bash / Cron]
-        Tools --> Logiciel_Rendu[📄 Documents Rendu]
+        Tools --> Transp["🧱 Programme C Transporteur"]
+        Tools --> Scripts["⌨️ Scripts Bash / Cron"]
+        Tools --> Logiciel_Rendu["📄 Documents Rendu"]
     end
 ```
 
