@@ -56,17 +56,21 @@ if (isset($_SESSION['idClient'])) {
         $donnees = recupInfoPourFactureArticle($pdo, $article["id_produit"]);
         $qte = (int)$article["quantite"];
 
-        $prix_ht = $donnees["p_prix"] * $qte;
-        $reduc_unitaire = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
-        $reduc_totale = $reduc_unitaire * $qte;
+        $prix_ht = $donnees["p_prix"];
+        if ($donnees["reduction_pourcentage"] > 0){
+            $a_deduire = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
+        }
+
+        $a_deduire = $reduc_unitaire * $qte;
 
         $f_total_ht += $prix_ht;
-        $f_total_remise += $reduc_totale;
+        $f_total_remise += $a_deduire;
 
         $prixTotalFinal +=
             (($donnees["p_prix"] - $reduc_unitaire)
             * (1 + $donnees["montant_tva"] / 100))
             * $qte;
+        echo "<br><br><br>prix article : " . $donnees["p_prix"] . "<br>quantite " . $qte . "<br>prix_ht " . $prix_ht . "<br>a deduire " . $a_deduire . "<br>reduc total " . $a_deduire . "<br>prix total" . $prixTotalFinal;
     }
     $prixTotalFinal = round($prixTotalFinal, 2);
 
