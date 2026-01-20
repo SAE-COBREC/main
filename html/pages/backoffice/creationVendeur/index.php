@@ -412,7 +412,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="culumn-flex">
           <label for="num">Numéro</label>
           <input type="text" id="num" name="num" min="0" max="9999999" placeholder="ex: 1"
-          pattern="^([1-9]{0,13}(bis|ter|quater|quinquies|sexies|septies|octies|nonies){0,1})$">
+          pattern="^([1-9]{0,13}( ){0,1}(bis|ter|quater|quinquies|sexies|septies|octies|nonies){0,1})$">
         </div>
 
         <div class="culumn-flex">

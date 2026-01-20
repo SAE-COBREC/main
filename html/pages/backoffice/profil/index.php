@@ -601,7 +601,7 @@ function safe($array, $key, $default = "") {
         siren: /^[0-9]{9}$/,
         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         telephone: /^(?:\+33|0)[1-9](?:[0-9]{8})$/,
-        numero: /^([1-9]{0,13}(bis|ter|quater|quinquies|sexies|septies|octies|nonies){0,1})$/,
+        numero: /^([1-9]{0,13}( ){0,1}(bis|ter|quater|quinquies|sexies|septies|octies|nonies){0,1})$/,
         adresse: /^[0-9a-zA-ZÀ-ÿ,' .-]{3,80}$/,
         ville: /^[a-zA-ZÀ-ÿ' -]{2,50}$/,
         codep: /^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B)) *([0-9]{3})?$/,
