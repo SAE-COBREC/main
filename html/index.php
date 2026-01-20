@@ -472,7 +472,29 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                         <?= htmlspecialchars(strlen($prodCarousel['p_description']) > 200 ? substr($prodCarousel['p_description'], 0, 200) . '...' : (string)$prodCarousel['p_description']) ?>
                                     </p>
                                     <!-- Vendeur placé dans la zone d'actions pour être aligné bas -->
-                                    <p class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</p>
+                                    <?php $prixOriginalTTCC = calcPrixTVA($prodCarousel['tva'], $prodCarousel['p_prix']);
+                                          $noteArrondieC = round($prodCarousel['note_moyenne'] ?? 0);
+                                    ?>
+                                    <div class="carousel-price-block">
+                                        <?php if ($discountC > 0): ?>
+                                        <span class="carousel-original-price" style="text-decoration: line-through; color: #999; margin-right: 5px; font-size: 1em;">
+                                            <?= number_format($prixOriginalTTCC, 2, ',', ' ') ?>€
+                                        </span>
+                                        <?php endif; ?>
+                                        <span class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</span>
+                                    </div>
+                                    <div class="carousel-rating" style="margin-top:6px; display:flex; align-items:center; gap:6px;">
+                                        <span>
+                                            <?php for ($i = 1; $i <= 5; $i++):
+                                                if ($noteArrondieC >= $i) $s = 'full';
+                                                elseif ($noteArrondieC >= $i - 0.5) $s = 'alf';
+                                                else $s = 'empty';
+                                            ?>
+                                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="16">
+                                            <?php endfor; ?>
+                                        </span>
+                                        <span>(<?= $prodCarousel['nombre_avis'] ?? 0 ?>)</span>
+                                    </div>
                                     <div class="carousel-actions">
                                         <div class="carousel-vendeur-block">
                                             <p class="carousel-vendeur">Vendu par :</p>
