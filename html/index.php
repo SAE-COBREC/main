@@ -127,6 +127,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $donnees = chargerProduitsBDD($connexionBaseDeDonnees);
 //extrait la liste des produits
 $listeProduits = $donnees['produits'];
+
+// ============================================
+// LOGIQUE CAROUSEL (PROMOTIONS)
+// ============================================
+$produitsCarousel = [];
+$promoAvecRemise = [];
+$promoSansRemise = [];
+
+foreach ($listeProduits as $p) {
+    if (!empty($p['estenpromo']) && $p['estenpromo']) {
+        $reduc = (float)$p['reduction_pourcentage'];
+        if ($reduc > 0) {
+            $promoAvecRemise[] = $p;
+        } else {
+            $promoSansRemise[] = $p;
+        }
+    }
+}
+// Concaténer : d'abord avec remise, puis sans remise
+$produitsCarousel = array_merge($promoAvecRemise, $promoSansRemise);
+
 //extrait la liste des catégories
 $listeCategories = $donnees['categories'];
 //compte le nombre total de produits
@@ -430,7 +451,55 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
 
         <!--zone principale pour afficher les produits-->
         <main>
-            <div>
+            <!-- SECTION CAROUSEL -->
+            <?php if (!empty($produitsCarousel)): ?>
+            <div class="carousel-container">
+                <button class="carousel-btn prev-btn" id="prevBtn">&#10094;</button>
+                <button class="carousel-btn next-btn" id="nextBtn">&#10095;</button>
+                
+                <div class="carousel-track-container">
+                    <ul class="carousel-track">
+                        <?php foreach ($produitsCarousel as $index => $prodCarousel): 
+                            $discountC = (float)$prodCarousel['reduction_pourcentage'];
+                            $prixDiscountC = ($discountC > 0) ? $prodCarousel['p_prix'] * (1 - $discountC/100) : $prodCarousel['p_prix'];
+                            $prixFinalC = calcPrixTVA($prodCarousel['tva'], $prixDiscountC);
+                            $nomVendeurC = recupNomVendeurIdProduit($connexionBaseDeDonnees, $prodCarousel['id_produit']);
+                        ?>
+                        <li class="carousel-slide <?= $index === 0 ? 'active' : '' ?>">
+                            <div class="carousel-content" onclick="window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
+                                <div class="carousel-image">
+                                    <img src="<?= str_replace("html/img/photo", "/img/photo", htmlspecialchars($prodCarousel['image_url'] ?? '/img/default-product.jpg')) ?>" 
+                                         alt="<?= htmlspecialchars($prodCarousel['p_nom']) ?>">
+                                    <?php if ($discountC > 0): ?>
+                                    <span class="badge-reduction">-<?= round($discountC) ?>%</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="carousel-info">
+                                    <h3><?= htmlspecialchars($prodCarousel['p_nom']) ?></h3>
+                                    <p class="carousel-description" title="<?= htmlspecialchars($prodCarousel['p_description']) ?>">
+                                        <?= htmlspecialchars(strlen($prodCarousel['p_description']) > 200 ? substr($prodCarousel['p_description'], 0, 200) . '...' : (string)$prodCarousel['p_description']) ?>
+                                    </p>
+                                    <p class="carousel-vendeur">Vendu par <?= htmlspecialchars($nomVendeurC) ?></p>
+                                    <p class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</p>
+                                    <button class="btn-carousel-add" onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
+                                        Voir le produit
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
+                <div class="carousel-nav">
+                    <?php foreach ($produitsCarousel as $index => $prodCarousel): ?>
+                    <button class="carousel-dot <?= $index === 0 ? 'active' : '' ?>" data-target="<?= $index ?>"></button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <div class="product-grid">
                 <!--vérifie s'il y a des produits à afficher-->
                 <?php if (empty($listeProduits)): ?>
                 <p>Aucun produit ne correspond à vos critères de recherche.</p>

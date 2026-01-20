@@ -315,3 +315,82 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+/* ============================================================ */
+/*  LOGIQUE DU CAROUSEL                                         */
+/* ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    const track = document.querySelector('.carousel-track');
+    if (!track) return;
+
+    const slides = Array.from(track.children);
+    const nextButton = document.querySelector('.next-btn');
+    const prevButton = document.querySelector('.prev-btn');
+    const dotsNav = document.querySelector('.carousel-nav');
+    const dots = Array.from(dotsNav.children);
+
+    const moveToSlide = (track, currentSlide, targetSlide) => {
+        track.style.transform = 'translateX(-' + targetSlide.offsetLeft + 'px)';
+        currentSlide.classList.remove('active');
+        targetSlide.classList.add('active');
+    }
+
+    const updateDots = (currentDot, targetDot) => {
+        currentDot.classList.remove('active');
+        targetDot.classList.add('active');
+    }
+
+    // Bouton suivant (droite)
+    nextButton.addEventListener('click', () => {
+        const currentSlide = track.querySelector('.active') || slides[0];
+        let nextSlide = currentSlide.nextElementSibling;
+        let currentDot = dotsNav.querySelector('.active') || dots[0];
+        let nextDot = currentDot.nextElementSibling;
+
+        // Boucle infini vers le début
+        if (!nextSlide) {
+            nextSlide = slides[0];
+            nextDot = dots[0];
+        }
+
+        moveToSlide(track, currentSlide, nextSlide);
+        updateDots(currentDot, nextDot);
+    });
+
+    // Bouton précédent (gauche)
+    prevButton.addEventListener('click', () => {
+        const currentSlide = track.querySelector('.active') || slides[0];
+        let prevSlide = currentSlide.previousElementSibling;
+        let currentDot = dotsNav.querySelector('.active') || dots[0];
+        let prevDot = currentDot.previousElementSibling;
+
+        // Boucle infini vers la fin
+        if (!prevSlide) {
+            prevSlide = slides[slides.length - 1];
+            prevDot = dots[dots.length - 1];
+        }
+
+        moveToSlide(track, currentSlide, prevSlide);
+        updateDots(currentDot, prevDot);
+    });
+
+    // Navigation par points
+    dotsNav.addEventListener('click', e => {
+        const targetDot = e.target.closest('button');
+        if (!targetDot) return;
+
+        const currentSlide = track.querySelector('.active') || slides[0];
+        const currentDot = dotsNav.querySelector('.active') || dots[0];
+        const targetIndex = dots.findIndex(dot => dot === targetDot);
+        const targetSlide = slides[targetIndex];
+
+        moveToSlide(track, currentSlide, targetSlide);
+        updateDots(currentDot, targetDot);
+    });
+
+    // Redimensionnement de la fenêtre
+    window.addEventListener('resize', () => {
+        const currentSlide = track.querySelector('.active') || slides[0];
+        track.style.transform = 'translateX(-' + currentSlide.offsetLeft + 'px)';
+    });
+});

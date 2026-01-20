@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $oldPasswordDB = $stmt->fetchColumn();
 
         // Vérifier que l'ancien mot de passe est correct
-        if (!check_same_string($old, $oldPasswordDB)) {
+        if (!password_verify($old, $oldPasswordDB)) {
             header("Location: index.php?password_error=" . urlencode("L'ancien mot de passe est incorrect."));
             exit;
         }
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             WHERE id_compte = :id
         ");
         $stmt->execute([
-            'new' => $new,
+            'new' => password_hash($new, PASSWORD_DEFAULT),
             'id'  => $vendeur['compte']
         ]);
 
