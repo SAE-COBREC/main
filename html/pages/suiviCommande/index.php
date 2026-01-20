@@ -44,6 +44,7 @@ if (!str_contains($_SERVER['HTTP_REFERER'], 'ProfilClient')){
     }
 }
 
+
 // Ouvre une connexion socket et s'authentifie automatiquement
 function connectAndLogin($host, $port) {
     $fp = @fsockopen($host, $port, $errno, $errstr, 2);
