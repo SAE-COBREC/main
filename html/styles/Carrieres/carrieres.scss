@@ -1,0 +1,184 @@
+:root {
+  // placeholder for browsers that read CSS variables
+}
+
+$bg: #0f1724;
+$card: #ffffff;
+$muted: #6b7280;
+$accent: #00b894;
+$accent-2: #5b6ef6;
+$glass: rgba(255,255,255,0.06);
+$radius: 12px;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #0b1020;
+  margin: 0;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.careers-page {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.hero {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  background: linear-gradient(135deg, $accent-2, $accent);
+  color: #fff;
+  border-radius: 16px;
+  padding: 48px;
+  overflow: hidden;
+  position: relative;
+
+  &-inner, .hero-inner {
+    max-width: 680px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 44px);
+    margin: 0 0 12px;
+  }
+
+  p { margin: 0 0 20px; opacity: 0.95; }
+
+  .cta {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 6px 18px rgba(11,16,32,0.18);
+  }
+
+  .hero-illustration {
+    position: absolute;
+    right: -120px;
+    top: 0;
+    bottom: 0;
+    width: 520px;
+    background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 20%), url('/img/svg/hero-pattern.svg');
+    background-size: cover;
+    opacity: 0.18;
+  }
+}
+
+.offers {
+  margin-top: 34px;
+
+  h2 { font-size: 22px; margin-bottom: 14px; }
+
+  .offers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .job-card {
+    background: $card;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 6px 18px rgba(15,23,36,0.06);
+    transition: transform .18s ease, box-shadow .18s ease;
+
+    &:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(11,16,32,0.08); }
+
+    .job-tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: $glass;
+      font-size: 13px;
+      color: $muted;
+      margin-bottom: 8px;
+
+      &.accent { background: linear-gradient(90deg, $accent, $accent-2); color: #fff; }
+    }
+
+    h3 { margin: 6px 0; }
+    .muted { color: $muted; font-size: 14px; margin: 0 0 10px; }
+
+    ul { margin: 10px 0 14px; padding-left: 18px; color: #222; }
+
+    .job-actions { display: flex; gap: 10px; }
+
+    .btn { @extend ._btn; }
+    .btn-outline { @extend ._btn-outline; }
+  }
+}
+
+// shared button helpers
+._btn {
+  background: linear-gradient(90deg, $accent, $accent-2);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+}
+
+._btn-outline {
+  background: transparent;
+  border: 1px solid rgba(11,16,32,0.06);
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: #0b1020;
+  text-decoration: none;
+}
+
+.culture {
+  margin: 42px 0;
+
+  h2 { margin-bottom: 10px; }
+
+  .culture-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+
+  div { background: linear-gradient(180deg,#fff,#fbfbff); padding: 18px; border-radius: 12px; box-shadow: 0 6px 18px rgba(11,16,32,0.04); }
+}
+
+.apply {
+  margin: 36px 0;
+  padding: 22px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(11,16,32,0.04);
+
+  .apply-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    label { display: block; font-size: 14px; }
+
+    input, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e6edf3; }
+
+    .form-actions { grid-column: 1/-1; display:flex; gap:10px; justify-content:flex-end; }
+    .btn-ghost { background: transparent; border: 1px solid rgba(11,16,32,0.06); color: #0b1020; }
+  }
+}
+
+@media (max-width: 980px) {
+  .offers .offers-grid { grid-template-columns: repeat(2, 1fr); }
+  .culture .culture-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .hero { padding: 28px; flex-direction: column; }
+  .hero .hero-illustration { display: none; }
+  .offers .offers-grid { grid-template-columns: 1fr; }
+  .culture .culture-grid { grid-template-columns: 1fr; }
+  .apply .apply-form { grid-template-columns: 1fr; }
+}
+
+// small helpers
+.muted { color: $muted; }
