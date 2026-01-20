@@ -524,6 +524,10 @@ main section:nth-of-type(4) article input[type=password]:focus {
   font-weight: 700;
 }
 
+.btn-text-mobile {
+  display: none;
+}
+
 .search-container {
   flex: 1 1 560px;
   display: flex;
@@ -970,6 +974,12 @@ main section:nth-of-type(2) article > footer > form button:hover {
   #formulaireAjoutAdresse button {
     font-size: 0.95em;
     padding: 10px 16px;
+  }
+  .btn-text-desktop {
+    display: none; /* Cache le texte long */
+  }
+  .btn-text-mobile {
+    display: inline; /* Affiche le texte court */
   }
 }
 main section:nth-of-type(1) article select {
