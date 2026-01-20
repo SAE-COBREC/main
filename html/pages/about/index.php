@@ -1,3 +1,8 @@
+<?php
+session_start();
+require_once '../../selectBDD.php';
+require_once '../../pages/fonctions.php';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
