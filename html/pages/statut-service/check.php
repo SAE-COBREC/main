@@ -9,12 +9,13 @@ function state($ok, $msg=''){
     return ['status'=>'Indisponible','message'=>$msg];
 }
 
-// Web check: prefer an actual HTTP probe to local webserver, fallback to PHP lint
+// Web check: try common HTTP ports on localhost, fallback to PHP lint
 $indexFile = realpath(__DIR__ . '/../../index.php');
 $webOk = false; $webMsg = '';
-// Try HTTP GET to localhost:80
-try {
-    $host = '127.0.0.1'; $port = 80; $fp = @stream_socket_client("tcp://{$host}:{$port}", $errno, $errstr, 2);
+$host = '127.0.0.1';
+$ports = [80, 5001, 8000, 8080, 3000, 8001];
+foreach($ports as $port){
+    $fp = @stream_socket_client("tcp://{$host}:{$port}", $errno, $errstr, 1);
     if ($fp) {
         $req = "GET / HTTP/1.1\r\nHost: {$host}\r\nConnection: close\r\n\r\n";
         fwrite($fp, $req);
@@ -22,16 +23,12 @@ try {
         fclose($fp);
         if ($line !== false && preg_match('#HTTP/\d\.\d\s+(\d{3})#', $line, $m)){
             $code = (int)$m[1];
-            if ($code >= 200 && $code < 400) { $webOk = true; $webMsg = "HTTP {$code}"; }
-            else { $webMsg = "HTTP {$code}"; }
+            $webMsg = "HTTP {$code} on port {$port}";
+            if ($code >= 200 && $code < 400) { $webOk = true; break; }
         } else {
-            $webMsg = 'Réponse HTTP invalide';
+            $webMsg = "Port {$port} responded but invalid HTTP";
         }
-    } else {
-        $webMsg = "Port 80 injoignable: {$errstr} ({$errno})";
     }
-} catch (Exception $e) {
-    $webMsg = 'Erreur HTTP probe: ' . $e->getMessage();
 }
 
 if (!$webOk) {
