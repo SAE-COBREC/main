@@ -4413,7 +4413,7 @@ WHERE
             c.id_livraison = p.id_livraison
     );
 
-INSERT INTO _login (identifiant, mdp) VALUES ('Alizon', 'mdp');
+INSERT INTO _login (identifiant, mdp) VALUES ('Alizon', '7b113cde9379ae4632cabc46cd3ca99b3a5ef08e2ff2ddbd9a1f41af3c97cdb8');
 
 -- Les compteurs de pouces sont synchronisés depuis _vote_avis (via mise à jour ci-dessus) — pas d'écrasement aléatoire ici.
 
