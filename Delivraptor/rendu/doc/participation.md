@@ -4,9 +4,8 @@
 
 - **Conception du protocole** : 100 % Léo
 - **Codage et tests** :
-    - Léo : 49 %
-    - Gaëtan : 49 %
-    - Marceau : 2 %
+    - Léo : 50 %
+    - Gaëtan : 50 %
 - **Documentation**
 
 
