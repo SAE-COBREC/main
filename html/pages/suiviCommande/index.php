@@ -61,7 +61,7 @@ function connectAndLogin($host, $port) {
 }
 
 function envoyerCommande($id_commande) {
-    $host = '127.0.0.1';
+    $host = '10.253.5.101';
     $port = 9000;
     $conn = connectAndLogin($host, $port);
     if (!$conn['fp']) {
@@ -100,7 +100,7 @@ function envoyerCommande($id_commande) {
 }
 
 function getStatusFromSocket($bordereau) {
-    $host = '127.0.0.1';
+    $host = '10.253.5.101';
     $port = 9000;
 
     $fp = @fsockopen($host, $port, $errno, $errstr, 1);

@@ -419,11 +419,11 @@ int main(int argc, char *argv[])
 
         PGconn *conn;
         conn = PQconnectdb(
-            "host=127.0.0.1 "
+            "host=10.253.5.101 "
             "port=5432 "
-            "dbname=base_sae "
-            "user=nom_utilisateur "
-            "password=motdepasse ");
+            "dbname=saedb "
+            "user=sae "
+            "password=kira13 ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -535,7 +535,7 @@ int main(int argc, char *argv[])
                             FILE *script = fopen(FICHIER_SCRIPT, "a");
                             if (script != NULL)
                             {
-                                fprintf(script, "echo -e \"LOGIN Alizon mdp\\nSTATUS_UP %d\" | nc -q 1 127.0.0.1 9000\n", bordereau);
+                                fprintf(script, "echo -e \"LOGIN Alizon mdp\\nSTATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
                                 fclose(script);
                                 printf("Ajouté au script: STATUS_UP %d\n", bordereau);
                             }
