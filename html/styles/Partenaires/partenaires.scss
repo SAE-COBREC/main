@@ -118,6 +118,7 @@ body {
     width: 92%;
     padding: 18px;
     box-shadow: 0 20px 60px rgba(2,6,23,0.4);
+    position: relative; // nécessaire pour position:absolute du bouton close
 
     .modal-close { position: absolute; right: 18px; top: 18px; background: transparent; border: none; font-size: 22px; }
 

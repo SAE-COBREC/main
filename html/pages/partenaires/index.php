@@ -3,16 +3,6 @@ session_start();
 require_once '../../selectBDD.php';
 require_once '../../pages/fonctions.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Partenaires - Alizon</title>
-  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link rel="stylesheet" href="../../styles/droit/styleDroit.css">
-  <link rel="stylesheet" href="../../styles/Header/stylesHeader.css">
-  <link rel="stylesheet" href="../../styles/Footer/stylesFooter.css">
 <!doctype html>
 <html lang="fr">
 <head>
@@ -41,27 +31,27 @@ require_once '../../pages/fonctions.php';
     <?php
     // Liste des partenaires (nom, logo, court texte, site)
     $partners = [
-        [
-            'id' => 'la-gambling-squad',
-            'name' => 'La Gambling Squad',
-            'logo' => '/img/partner/la_gambling_squad.png',
-            'description' => "Collectif créatif spécialisé dans les expériences interactives et les campagnes à fort impact.",
-            'website' => '#'
-        ],
-        [
-            'id' => 'skibidicorp',
-            'name' => 'SkibidiCorp',
-            'logo' => '/img/partner/SkibidiCorp.svg',
-            'description' => "Solutions techniques et services cloud pour e‑commerce.",
-            'website' => '#'
-        ],
-        [
-            'id' => 'alizon-et-les-sept-nains',
-            'name' => 'Alizon et les sept nains',
-            'logo' => '/img/partner/alizon_et_les_sept_nains.png',
-            'description' => "Partenaire interne — initiatives communautaires et micro‑services produit.",
-            'website' => '#'
-        ],
+      [
+        'id' => 'la-gambling-squad',
+        'name' => 'La Gambling Squad',
+        'logo' => '/img/partner/la_gambling_squad.png',
+        'description' => "Collectif créatif spécialisé dans les expériences interactives et les campagnes à fort impact.",
+        'website' => ''
+      ],
+      [
+        'id' => 'skibidicorp',
+        'name' => 'SkibidiCorp',
+        'logo' => '/img/partner/SkibidiCorp.svg',
+        'description' => "Solutions techniques et services cloud pour e‑commerce.",
+        'website' => ''
+      ],
+      [
+        'id' => 'alizon-et-les-sept-nains',
+        'name' => 'Alizon et les sept nains',
+        'logo' => '/img/partner/alizon_et_les_sept_nains.png',
+        'description' => "Partenaire interne — initiatives communautaires et micro‑services produit.",
+        'website' => ''
+      ],
     ];
     ?>
 
@@ -77,7 +67,8 @@ require_once '../../pages/fonctions.php';
               <p class="partner-desc"><?= htmlspecialchars($p['description']) ?></p>
               <div class="partner-actions">
                 <button class="btn btn-outline btn-details" data-id="<?= $p['id'] ?>">Voir détails</button>
-                <a class="btn btn-primary" href="<?= htmlspecialchars($p['website']) ?>" target="_blank" rel="noopener">Visiter le site</a>
+                <!-- Visite du site désactivée pour les partenaires -->
+                <button class="btn btn-primary" aria-disabled="true" title="Visite désactivée">Visite désactivée</button>
               </div>
             </div>
           </div>
@@ -96,7 +87,7 @@ require_once '../../pages/fonctions.php';
           <h2 id="modalTitle"></h2>
           <p id="modalDesc"></p>
           <div class="modal-cta">
-            <a id="modalSite" class="btn btn-primary" href="#" target="_blank" rel="noopener">Visiter le site</a>
+            <button id="modalSite" class="btn btn-primary" aria-disabled="true">Visite désactivée</button>
           </div>
         </div>
       </div>
@@ -128,8 +119,10 @@ const modalLogo = document.getElementById('modalLogo');
 const modalSite = document.getElementById('modalSite');
 const modalClose = document.getElementById('modalClose');
 
+let lastFocused = null;
 document.querySelectorAll('.btn-details').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
+    lastFocused = e.currentTarget;
     const id = btn.getAttribute('data-id');
     const p = partners.find(x => x.id === id);
     if (!p) return;
@@ -137,21 +130,34 @@ document.querySelectorAll('.btn-details').forEach(btn => {
     modalDesc.textContent = p.description;
     modalLogo.src = p.logo;
     modalLogo.alt = 'Logo ' + p.name;
-    modalSite.href = p.website || '#';
-    modal.style.display = 'block';
+    // site disabled intentionally
+    modal.style.display = 'flex';
     modal.setAttribute('aria-hidden', 'false');
+    // focus management
+    modalClose.focus();
   });
 });
 
 modalClose.addEventListener('click', () => {
   modal.style.display = 'none';
   modal.setAttribute('aria-hidden', 'true');
+  if (lastFocused) lastFocused.focus();
 });
 
 window.addEventListener('click', (e) => {
   if (e.target === modal) {
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
+    if (lastFocused) lastFocused.focus();
+  }
+});
+
+// fermer le modal avec Échap
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    if (lastFocused) lastFocused.focus();
   }
 });
 </script>
