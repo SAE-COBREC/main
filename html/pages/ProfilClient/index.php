@@ -582,7 +582,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <label>
                     <span>Numéro</span>
                     <input type="text" name="num" id="modification_num"
-                        pattern="^[1-9][0-9]{0,12}(bis|ter|quater|quinquies|sexies|septies|octies|nonies)?$"
+                        pattern="^[1-9]{0,13}( ){0,1}(bis|ter|quater|quinquies|sexies|septies|octies|nonies)?$"
                         placeholder="Ex: 12bis" required>
                 </label>
 
@@ -629,7 +629,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <label>
                     <span>Numéro</span>
                     <input type="text" name="num" id="ajout_num"
-                        pattern="^[1-9][0-9]{0,12}(bis|ter|quater|quinquies|sexies|septies|octies|nonies)?$"
+                        pattern="^[1-9]{0,13}( ){0,1}(bis|ter|quater|quinquies|sexies|septies|octies|nonies)?$"
                         placeholder="Ex: 12bis" required>
                 </label>
 
