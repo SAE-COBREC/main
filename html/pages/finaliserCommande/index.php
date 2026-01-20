@@ -282,7 +282,7 @@ function old($name, $default = '') {
 
             <div id="nouvelleAdresse" style="display: none;">
                 <label>Numéro *</label>
-                <input type="number" name="numero" min="0" max="9999999" placeholder="Ex : 4 " value="<?php echo old('numero')?>"
+                <input type="text" name="numero" placeholder="Ex : 4 " value="<?php echo old('numero')?>"
                 pattern="^[1-9]{0,13}( ){0,1}(bis|ter|quater|quinquies|sexies|septies|octies|nonies)?$"/>
 
                 <label>Rue *</label>

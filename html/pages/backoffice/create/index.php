@@ -177,7 +177,7 @@
 
 // print_r($_GET);
 // print_r($_SESSION["creerArticle"]['_GET']);
-// print_r($_POST);
+ print_r($_POST);
 // print_r($_SESSION["creerArticle"]);
 // print_r($_FILES);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
@@ -866,17 +866,17 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                                 $sql = '
                                 INSERT INTO cobrec1._fait_partie_de(id_produit,id_categorie)
                                 VALUES (
-                                (SELECT id_produit FROM cobrec1._produit WHERE p_nom = :titre), :tva);
+                                (SELECT id_produit FROM cobrec1._produit WHERE p_nom = :titre), :categorie);
                                 ';
                                 $stmt = $pdo->prepare($sql);
                                 $params = [
-                                    'tva' => $_POST['tva'], 
+                                    'categorie' => $_POST['categorie'], 
                                     'titre' => $_POST['titre']
                                 ];
                                 $stmt->execute($params);
                             } catch (Exception $e) {
-                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="création de l'affiliation entre catégorie et produit";
-                                // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                                print_r("PROBLEME CTAGEORIE");
+                                print_r($e);
                             }
 
                             try {//création de l'affiliation entre couleur et produit
@@ -1068,6 +1068,9 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         } catch (Exception $e) {
                             // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre catégorie et produit";
                             // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
+                            print_r("PROBLEME CTAGEORIE");
+                                print_r($e);
+                            
                         }
                     }
 
