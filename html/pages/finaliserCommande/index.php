@@ -55,22 +55,21 @@ if (isset($_SESSION['idClient'])) {
     foreach($articlesDansPanier as $article){
         $donnees = recupInfoPourFactureArticle($pdo, $article["id_produit"]);
         $qte = (int)$article["quantite"];
-
+        
+        //prix de hors taxe du produit
         $prix_ht = $donnees["p_prix"];
-        if ($donnees["reduction_pourcentage"] > 0){
-            $a_deduire = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
-        }
+        //calcul de la somme a déduire du produit car il est en réduction
+        $reduc_unitaire = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
+        //prix de la réduction avec la quantité de produit acheté (pour la facture)
+        $reduc_totale = $reduc_unitaire * $qte;
 
-        $a_deduire = $reduc_unitaire * $qte;
-
+        //variable qui servira pour la facture
         $f_total_ht += $prix_ht;
-        $f_total_remise += $a_deduire;
+        $f_total_remise += $reduc_totale;
+        
+        //on ajoute au prix total le ((prix ht - reduction unitaire) multiplié par la TVA) multiplié par la quantité
+        $prixTotalFinal += (($donnees["p_prix"] - $reduc_unitaire) * (1 + $donnees["montant_tva"] / 100)) * $qte;
 
-        $prixTotalFinal +=
-            (($donnees["p_prix"] - $reduc_unitaire)
-            * (1 + $donnees["montant_tva"] / 100))
-            * $qte;
-        echo "<br><br><br>prix article : " . $donnees["p_prix"] . "<br>quantite " . $qte . "<br>prix_ht " . $prix_ht . "<br>a deduire " . $a_deduire . "<br>reduc total " . $a_deduire . "<br>prix total" . $prixTotalFinal;
     }
     $prixTotalFinal = round($prixTotalFinal, 2);
 
@@ -317,7 +316,7 @@ function old($name, $default = '') {
             <?php if ($boolErreur == true): ?>
             <p><span><?php echo $erreur ?></span></p>
             <?php endif; ?>
-            <button>Payer: <?php echo $prixTotalFinal ?>€</button>
+            <button>Payer: <?php echo number_format($prixTotalFinal, 2, ',', " ") ?>€</button>
         </form>
     </section>
     <div id="cgvModal" class="modal hidden">

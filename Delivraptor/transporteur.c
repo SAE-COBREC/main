@@ -46,6 +46,8 @@ int cherche_si_commande_exist(PGconn *conn, int id_commande)
                        NULL,   // format des paramètres (1 pour binaire 0 pour texte)
                        0);     // format du resultat (1 pour binaire 0 pour texte)
 
+    fprintf(stderr, "DEBUG id_commande = %d\n", id_commande);
+
     if (PQresultStatus(res) != PGRES_TUPLES_OK) // est-ce que PostgreSQL a exécuté la requête SELECT sans erreur ? si oui PGRES_TUPLES_OK si non Erreur SQL
     {
         fprintf(stderr, "Erreur SELECT: %s\n", PQerrorMessage(conn)); // PQerrorMessage affichera un emssage plus claire et précis que juste Erreur SELECT (par ex relation not exist)
@@ -54,18 +56,20 @@ int cherche_si_commande_exist(PGconn *conn, int id_commande)
     }
     if ((PQntuples(res) > 0)) // PQntuples renvoie le nombre de ligne retourné par la reqeute select
     {
+        fprintf(stderr, "Erreur test");
         PQclear(res);
         return 1; // on renvoie 1 pour dire qu'on a bien trouvé
     }
     else
     {
+        fprintf(stderr, "Erreur test2");
         PQclear(res); // libère la mémoire de PGresult sinon la mémoire s'acumulent
         return 0;     // renvoi 0 si rien n'est trouvé
     }
 }
-int nouveau_bordereau(PGconn *conn)
+int cherche_dernier_bordereau(PGconn *conn)
 {
-    /*fonction qui créer un nouveau bordereau
+    /*fonction qui cherche le dernier bordereau
     elle renvoie :
     -1 en cas d'erreur
     un int si le bordereau a été crée (le nouveau bordereau)
@@ -254,10 +258,11 @@ int cherche_bordereau(PGconn *conn, int id_commande, int *bordereau)
     }
 }
 
-//focntion de hash du mot de passe
-void hash_sha256(const char *input, char *output) {
+// focntion de hash du mot de passe
+void hash_sha256(const char *input, char *output)
+{
     unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256((unsigned char*)input, strlen(input), hash);
+    SHA256((unsigned char *)input, strlen(input), hash);
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
         sprintf(output + (i * 2), "%02x", hash[i]);
     output[64] = 0;
@@ -281,9 +286,9 @@ int verif_login(PGconn *conn, char *email, char *mdp)
 
     if (PQntuples(res) > 0)
     {
-        char *mdp_bdd = PQgetvalue(res, 0, 0);  // hash stocké en BDD
+        char *mdp_bdd = PQgetvalue(res, 0, 0); // hash stocké en BDD
         char hash[65];
-        hash_sha256(mdp, hash);                 // hash du mot de passe en clair saisi
+        hash_sha256(mdp, hash); // hash du mot de passe en clair saisi
         int match = (strcmp(hash, mdp_bdd) == 0) ? 1 : 0;
         PQclear(res);
         return match;
@@ -304,7 +309,7 @@ int main(int argc, char *argv[])
     socklen_t client_len = sizeof(client_addr);
     char buffer[BUFFER_SIZE];
     int opt = 1;
-    int bordereau;
+    int bordereau = 0;
     bool connecte = false;
 
     int capacite = -1;
@@ -416,9 +421,9 @@ int main(int argc, char *argv[])
         conn = PQconnectdb(
             "host=127.0.0.1 "
             "port=5432 "
-            "dbname=leo "
-            "user=leo "
-            "password=leo ");
+            "dbname=base_sae "
+            "user=nom_utilisateur "
+            "password=motdepasse ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -478,7 +483,7 @@ int main(int argc, char *argv[])
                 continue;
             }
 
-            else if (strncmp(ligne, "CREATE_BORDEREAU ", 13) == 0)
+            else if (strncmp(ligne, "CREATE_BORDEREAU ", 17) == 0)
             {
                 if (connecte == false)
                 {
@@ -488,7 +493,7 @@ int main(int argc, char *argv[])
                 else
                 {
                     int already = 0;
-                    int id_commande = atoi(ligne + 13);
+                    int id_commande = atoi(ligne + 17);
                     int existe = cherche_si_commande_exist(conn, id_commande);
                     if (existe == -1)
                     {
@@ -505,15 +510,22 @@ int main(int argc, char *argv[])
                     {
                         sem_wait(sem);
                         already = 0;
-                        bordereau = nouveau_bordereau(conn);
-                        if (bordereau == -1)
+                        int dernierBordereau = cherche_dernier_bordereau(conn);
+                        char temp2[25];
+                        fflush(stdout);
+
+                        if (dernierBordereau == -1)
                         {
                             fprintf(stderr, "Erreur à la création du bordereau.");
                         }
-                        else if (bordereau >= 0)
+                        else if (dernierBordereau >= 0)
                         {
+                            bordereau = dernierBordereau;
+
                             // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
                             bordereau++;
+                            printf("DEBUG | dernierBordereau=%d | bordereau=%d | texte=%s\n",
+                                   dernierBordereau, bordereau, "CREATION BORDEREAU");
                             printf("Nouveau bordereau : %d\n", bordereau);
                             // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
                             // init a 0 car le statut de départ est 0
