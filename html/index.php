@@ -183,41 +183,31 @@ if (!empty($rechercheNom)) {
     }
 }
 
-// ============================================
-// CALCUL DU PRIX MAXIMUM ET MINIMUM
-// ============================================
+// ====================================================
+// CALCUL DU PRIX MAXIMUM ET MINIMUM (AVEC PROMO/REDUC)
+// ====================================================
 
-//initialise le prix maximum et minimum
 $prixMaximum = 0;
 $prixMinimum = 0;
-//vérifie qu'il y a des produits dans la liste
+
 if (!empty($listeProduits)) {
-    //trouve le prix HT le plus élevé et le plus bas parmi tous les produits
-    $prixMaximumHT = max(array_column($listeProduits, 'p_prix'));
-    $prixMinimumHT = min(array_column($listeProduits, 'p_prix'));
+    $prixCalcules = [];
 
-    //parcourt tous les produits pour trouver celui au prix maximum
-    foreach ($listeProduits as $produitTmp) {
-        //vérifie si c'est le produit au prix maximum
-        if ((float) $produitTmp['p_prix'] === (float) $prixMaximumHT) {
-            //calcule le prix TTC et l'arrondit
-            $prixMaximum = round(calcPrixTVA($produitTmp['tva'], $prixMaximumHT));
-            
-            //arrête la boucle une fois trouvé
-            break;
-        }
+    foreach ($listeProduits as $p) {
+        //calcul de la réduction
+        $reduction = (float)($p['reduction_pourcentage'] ?? 0);
+        $prixApresReduc = ($reduction > 0) ? $p['p_prix'] * (1 - $reduction / 100) : $p['p_prix'];
+
+        //application de la TVA pour obtenir le prix TTC final
+        $prixTTC = calcPrixTVA($p['tva'], $prixApresReduc);
+        
+        $prixCalcules[] = $prixTTC;
     }
 
-    //parcourt tous les produits pour trouver celui au prix minimum
-    foreach ($listeProduits as $produitTmp) {
-        if ((float) $produitTmp['p_prix'] == (float) $prixMinimumHT) {
-            // Calcule le prix TTC puis arrondit à la valeur inférieure
-            $prixMinimum = floor(calcPrixTVA($produitTmp['tva'], $prixMinimumHT));
-            break;
-        }
-    }
+    //détermination des bornes basées sur les prix réels affichés
+    $prixMaximum = !empty($prixCalcules) ? ceil(max($prixCalcules)) : 0;
+    $prixMinimum = !empty($prixCalcules) ? floor(min($prixCalcules)) : 0;
 }
-
 
 // ============================================
 // RÉCUPÉRATION ET APPLICATION DES FILTRES
@@ -456,7 +446,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
             <div class="carousel-container">
                 <button class="carousel-btn prev-btn" id="prevBtn">&#10094;</button>
                 <button class="carousel-btn next-btn" id="nextBtn">&#10095;</button>
-                
+
                 <div class="carousel-track-container">
                     <ul class="carousel-track">
                         <?php foreach ($produitsCarousel as $index => $prodCarousel): 
@@ -466,21 +456,23 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             $nomVendeurC = recupNomVendeurIdProduit($connexionBaseDeDonnees, $prodCarousel['id_produit']);
                         ?>
                         <li class="carousel-slide <?= $index === 0 ? 'active' : '' ?>">
-                            <div class="carousel-content" onclick="window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
+                            <div class="carousel-content"
+                                onclick="window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
                                 <div class="carousel-image">
-                                    <img src="<?= str_replace("html/img/photo", "/img/photo", htmlspecialchars($prodCarousel['image_url'] ?? '/img/default-product.jpg')) ?>" 
-                                         alt="<?= htmlspecialchars($prodCarousel['p_nom']) ?>">
+                                    <img src="<?= str_replace("html/img/photo", "/img/photo", htmlspecialchars($prodCarousel['image_url'] ?? '/img/default-product.jpg')) ?>"
+                                        alt="<?= htmlspecialchars($prodCarousel['p_nom']) ?>">
                                     <?php if ($discountC > 0): ?>
                                     <span class="badge-reduction">-<?= round($discountC) ?>%</span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="carousel-info">
                                     <h3><?= htmlspecialchars($prodCarousel['p_nom']) ?></h3>
-                                    <p class="carousel-description" title="<?= htmlspecialchars($prodCarousel['p_description']) ?>">
+                                    <p class="carousel-description"
+                                        title="<?= htmlspecialchars($prodCarousel['p_description']) ?>">
                                         <?= htmlspecialchars(strlen($prodCarousel['p_description']) > 200 ? substr($prodCarousel['p_description'], 0, 200) . '...' : (string)$prodCarousel['p_description']) ?>
                                     </p>
                                     <div style="display: flex; align-items: center; margin-top: -1em;">
-                                        <p class="carousel-vendeur" style="margin-right: 0.5em;">Vendu par :</p> 
+                                        <p class="carousel-vendeur" style="margin-right: 0.5em;">Vendu par :</p>
                                         <div class="vendeur-info">
                                             <img src="/img/svg/market.svg" alt="Vendeur">
                                             <span><?= htmlspecialchars($nomVendeurC) ?></span>
@@ -488,11 +480,14 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                     </div>
                                     <p class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</p>
                                     <div class="carousel-actions">
-                                        <button class="btn-carousel-add" onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
+                                        <button class="btn-carousel-add"
+                                            onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
                                             Voir le produit
                                         </button>
-                                        <button class="btn-carousel-cart" onclick="event.stopPropagation(); ajouterAuPanier(<?= $prodCarousel['id_produit'] ?>)">
-                                            <img src="/img/svg/panier.svg" alt="Panier" width="20" style="margin-right:8px; filter: brightness(0) invert(1);">
+                                        <button class="btn-carousel-cart"
+                                            onclick="event.stopPropagation(); ajouterAuPanier(<?= $prodCarousel['id_produit'] ?>)">
+                                            <img src="/img/svg/panier.svg" alt="Panier" width="20"
+                                                style="margin-right:8px; filter: brightness(0) invert(1);">
                                             Ajouter au panier
                                         </button>
                                     </div>
@@ -505,7 +500,8 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
 
                 <div class="carousel-nav">
                     <?php foreach ($produitsCarousel as $index => $prodCarousel): ?>
-                    <button class="carousel-dot <?= $index === 0 ? 'active' : '' ?>" data-target="<?= $index ?>"></button>
+                    <button class="carousel-dot <?= $index === 0 ? 'active' : '' ?>"
+                        data-target="<?= $index ?>"></button>
                     <?php endforeach; ?>
                 </div>
             </div>
