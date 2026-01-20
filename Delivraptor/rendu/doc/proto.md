@@ -39,10 +39,10 @@ STATUS <id_bordereau>
 **Réponses possibles**
 | Réponse                            | Signification                |
 |------------------------------------|------------------------------|
-| OK STATUS=(X entre 0 et 5)         | Statut de la commande        |
+| OK STATUS=X                        | Statut de la commande        |
 | ERREUR                             | Aucune commande trouvée      |
 
-
+*X étant un entier naturel compris entre 0 et 5.*
 
 
 ---
@@ -60,9 +60,10 @@ CREATE_BORDEREAU <id_commande>
 **Réponses possibles**
 | Réponse                                              | Signification                      |
 |------------------------------------------------------|------------------------------------|
-| LABEL=(X un entier) ALREADY_EXISTS=(0 ou 1) STATUS=1   | Bordereau créé ou déjà existant    |
+| LABEL=X           ALREADY_EXISTS=Y        STATUS=1   | Bordereau créé ou déjà existant    |
 
-
+*X étant un entier naturel.*
+*Y étant un entier naturel compris entre 0 et 1.*
 
 ---
 
