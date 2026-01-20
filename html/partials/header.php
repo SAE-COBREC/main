@@ -1,6 +1,11 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (!headers_sent()) {
+        session_start();
+    } else {
+        // Headers already sent: cannot start session here without causing a warning.
+        // Pages that require session should call session_start() before any output.
+    }
 }
 
 // Check if we are in an include or standalone (AJAX)
