@@ -17,6 +17,21 @@ if(empty($_SESSION['vendeur_id']) === false){
 $_SESSION['creerArticle'] = [];
 $_SESSION['remise'] = [];
 
+$notification = null;
+if (isset($_GET['success'])) {
+    $notification = ['message' => "Informations enregistrées avec succès !", 'type' => 'success'];
+} elseif (isset($_GET['error_email'])) {
+    $notification = ['message' => $_GET['error_email'], 'type' => 'error'];
+} elseif (isset($_GET['error_siren'])) {
+    $notification = ['message' => $_GET['error_siren'], 'type' => 'error'];
+} elseif (isset($_GET['error_rsociale'])) {
+    $notification = ['message' => $_GET['error_rsociale'], 'type' => 'error'];
+} elseif (isset($_GET['error_pseudo'])) {
+    $notification = ['message' => $_GET['error_pseudo'], 'type' => 'error'];
+} elseif (isset($_GET['error_num'])) {
+    $notification = ['message' => $_GET['error_num'], 'type' => 'error'];
+}   
+
 function check_same_string($a, $b) {
     return $a === $b;
 }
@@ -301,7 +316,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Nom unique
         $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-        $filename = "vendeur_id_" . $vendeur['compte'] . "." . $ext;
+        $filename = "vendeur_id_" . $vendeur['compte'] . $_FILES['image']['name'] . "." . $ext;
 
         // Chemin final disque
         $filePath = $uploadDir . $filename;
@@ -310,11 +325,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (move_uploaded_file($_FILES['image']['tmp_name'], $filePath)) {
 
             // Chemin à enregistrer dans la BDD
-            $dbPath = "html/img/photo/" . $filename;
+            $dbPath = "/img/photo/" . $filename;
 
             // Récupérer ancienne image pour la supprimer
             $oldImagePathDB = $vendeur['image'];  
-            $oldImagePathDisk = str_replace("html/img/photo", "../../../img/photo", $oldImagePathDB);
+            $oldImagePathDisk = str_replace("/img/photo", "../../../img/photo", $oldImagePathDB);
 
             // Supprimer l'ancienne image si elle existe ET si ce n’est pas une image par défaut
             if (!empty($oldImagePathDB) && file_exists($oldImagePathDisk)) {
@@ -426,18 +441,11 @@ function safe($array, $key, $default = "") {
 
         <a href="../connexionVendeur/index.php" class="logout-btn">Déconnexion</a>
     </div>
-
-
-      <?php if (isset($_GET['success'])): ?>
-        <div class="alert-success">Informations mises à jour avec succès !</div>
-      <?php endif; ?>
-
       <div class="profil-card">
-
         <h2 class="profil-card__title">Modifier mes informations</h2>
 
         <div class="profil-photo">
-          <img src="<?= str_replace("html/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>" alt="Photo vendeur">
+          <img src="<?= str_replace("/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>" alt="Photo vendeur">
         </div>
 
         <form id="edit-form" class="edit-form" action="" method="POST" enctype="multipart/form-data">
@@ -730,23 +738,23 @@ function safe($array, $key, $default = "") {
     }
 
     // POPUP ERREUR
-        const urlParams2 = new URLSearchParams(window.location.search);
+    const urlParams2 = new URLSearchParams(window.location.search);
 
-        if (urlParams2.has("password_error")) {
-            const popup = document.getElementById("popup-error");
-            const text = document.getElementById("popup-error-text");
+    if (urlParams2.has("password_error")) {
+        const popup = document.getElementById("popup-error");
+        const text = document.getElementById("popup-error-text");
 
-            text.textContent = urlParams2.get("password_error");
-            popup.classList.add("show");
+        text.textContent = urlParams2.get("password_error");
+        popup.classList.add("show");
 
-            // Disparaît après 3 sec
-            setTimeout(() => {
-                popup.classList.remove("show");
-            }, 3000);
+        // Disparaît après 3 sec
+        setTimeout(() => {
+            popup.classList.remove("show");
+        }, 3000);
 
-            // Nettoyage URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
+        // Nettoyage URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
     // ALERT VALEUR EXISTANTE
     if (urlParams.has("error_siren")) {
@@ -773,6 +781,31 @@ function safe($array, $key, $default = "") {
         alert("Erreur Numéro de téléphone déjà existant.");
         window.history.replaceState({}, document.title, window.location.pathname);
     }
+
+    function showCustomPopup(message, type = 'success') {
+    const popupId = type === 'success' ? 'custom-popup-success' : 'custom-popup-error';
+    const popup = document.getElementById(popupId);
+    
+    if (popup) {
+        popup.innerText = message;
+        popup.classList.add('show');
+
+        setTimeout(() => {
+            popup.classList.remove('show');
+            }, 3000);
+        }
+    }
+
+    <?php if ($notification): ?>
+        document.addEventListener('DOMContentLoaded', function() {
+            showCustomPopup("<?= addslashes($notification['message']) ?>", "<?= $notification['type'] ?>");
+            
+            // On nettoie l'URL pour éviter que la popup revienne au rafraîchissement (F5)
+            window.history.replaceState({}, document.title, window.location.pathname);
+        });
+    <?php endif; ?>
   </script>
+    <div id="custom-popup-success" class="popup-success"></div>
+    <div id="custom-popup-error" class="popup-error"></div>
 </body>
 </html>
