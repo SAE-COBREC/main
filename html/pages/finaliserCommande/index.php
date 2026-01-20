@@ -54,11 +54,19 @@ if (isset($_SESSION['idClient'])) {
     //pour chaque article dans le panier  
     foreach($articlesDansPanier as $article){
         $donnees = recupInfoPourFactureArticle($pdo, $article["id_produit"]);
-        $f_total_ht = $f_total_ht + $donnees["p_prix"];
-        $reduc = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
-        $f_total_remise = $f_total_remise + $reduc;
-        $prixTotalFinal = $prixTotalFinal + ((($donnees["p_prix"] - $reduc) * (1 + $donnees["montant_tva"] / 100)) * $article["quantite"]);
-        //echo $prixTotalFinal . "_";
+        $qte = (int)$article["quantite"];
+
+        $prix_ht = $donnees["p_prix"] * $qte;
+        $reduc_unitaire = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
+        $reduc_totale = $reduc_unitaire * $qte;
+
+        $f_total_ht += $prix_ht;
+        $f_total_remise += $reduc_totale;
+
+        $prixTotalFinal +=
+            (($donnees["p_prix"] - $reduc_unitaire)
+            * (1 + $donnees["montant_tva"] / 100))
+            * $qte;
     }
     $prixTotalFinal = round($prixTotalFinal, 2);
 
@@ -219,6 +227,11 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
 
     }
 }
+
+function old($name, $default = '') {
+    return htmlspecialchars($_POST[$name] ?? $default);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -238,23 +251,24 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
         <form id="payerPanier" method="POST" action="/pages/finaliserCommande/index.php">
             <label>Numéro de carte *</label>
             <input name="numCarte" id="numCarte" type="text" required maxlength="19" minlength="19"
-                placeholder="1111 2222 3333 4444" />
+                placeholder="1111 2222 3333 4444" value="<?php echo old('numCarte')?>"/>
             <!--maxlenght pour avoir une premiere vérification et minlenght pareil à 19 car il fuat compter les espaces-->
 
             <div class="dateCode">
                 <div>
                     <label>Date d'expriation *</label>
                     <input name="dateExpiration" id="dateExpiration" type="text" required maxlength="5" minlength="5"
-                        placeholder="MM/AA" />
+                        placeholder="MM/AA" value="<?php echo old('dateExpiration')?>"/>
                 </div>
                 <div>
                     <label>Code de sécurité *</label>
-                    <input name="cvc" id="cvc" type="text" required maxlength="3" minlength="3" placeholder="CVC" />
+                    <input name="cvc" id="cvc" type="text" required maxlength="3" minlength="3" placeholder="CVC" value="<?php echo old('dateExpiration')?>"/>
                 </div>
             </div>
             <label>Nom du titulaire *</label>
             <input name="nom" id="nom" type="text" required maxlength="100" placeholder="ex: Dupont"
                 value="<?php echo $nomPrenom['nom'] ?>" />
+
             <h2>Adresse de facturation</h2>
             <select name="adresse" id="adresse">
                 <option value="invalide">Choisir l'adresse de livraison</option>
@@ -265,28 +279,29 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
                 <?php endforeach; ?>
                 <option value="nouvelle">Nouvelle adresse</option>
             </select>
+
             <div id="nouvelleAdresse" style="display: none;">
                 <label>Numéro *</label>
-                <input type="number" name="numero" min="0" max="9999999" placeholder="Ex : 4">
+                <input type="number" name="numero" min="0" max="9999999" placeholder="Ex : 4 " value="<?php echo old('numero')?>"/>
 
                 <label>Rue *</label>
-                <input type="text" name="rue" placeholder="Ex : Edouard Branly">
+                <input type="text" name="rue" placeholder="Ex : Edouard Branly"value="<?php echo old('rue')?>"/>
 
                 <label>Complément (optionnel)</label>
-                <input type="text" name="complement">
+                <input type="text" name="complement" value="<?php echo old('complement')?>"/>
 
                 <label>Ville *</label>
-                <input type="text" name="ville" placeholder="Ex : Lannion">
+                <input type="text" name="ville" placeholder="Ex : Lannion" value="<?php echo old('ville')?>">
 
                 <label>Code postal *</label>
                 <input type="text" name="codePostal" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$"
-                    maxlength="5" placeholder="Ex : 22970">
+                    maxlength="5" placeholder="Ex : 22970" value="<?php echo old('codePostal')?>">
 
                 <label>Nom du destinataire *</label>
-                <input type="text" name="nom_destinataire" placeholder="Ex : Dupont">
+                <input type="text" name="nom_destinataire" placeholder="Ex : Dupont" value="<?php echo old('nom_destinataire')?>">
 
                 <label>Prenom du destinataire *</label>
-                <input type="text" name="prenom_destinataire" placeholder="Ex : Jean">
+                <input type="text" name="prenom_destinataire" placeholder="Ex : Jean" value="<?php echo old('prenom_destinataire')?>">
             </div>
 
             <div class="checkBox">

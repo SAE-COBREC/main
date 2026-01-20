@@ -21,7 +21,8 @@
             JOIN _image ON _represente_produit.id_image = _image.id_image
             JOIN _panier_commande ON _panier_commande.id_panier = _contient.id_panier
             JOIN _tva ON _produit.id_tva = _tva.id_tva 
-            LEFT JOIN _reduction ON _reduction.id_produit = _produit.id_produit
+            LEFT JOIN _reduction ON _reduction.id_produit = _produit.id_produit 
+            AND NOW() BETWEEN _reduction.reduction_debut AND _reduction.reduction_fin
             WHERE id_client = :id_client
                 AND _panier_commande.id_panier = :id_panier
                 AND p_statut = 'En ligne';
@@ -75,7 +76,7 @@
 
             <?php foreach ($articles as $article): ?>
             <article class="unArticleP"
-                data-prix="<?php echo number_format(($article['p_prix'] * (1 - ($article['reduction_pourcentage'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.')?>"
+                data-prix="<?php echo ($article['p_prix'] - (($article['pourcentage_reduction'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
                 data-stock="<?php echo intval($article['p_stock'])?>"
                 data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                 <div class="imageArticleP">
@@ -153,7 +154,7 @@
         <div>
             <?php foreach ($panierTemp as $idProduit => $article): ?>
             <article class="unArticleP"
-                data-prix="<?php echo number_format(($article['p_prix'] * (1 - ($article['pourcentage_reduction'] / 100))) * (1 + $article['montant_tva'] / 100), 2, '.')?>"
+                data-prix="<?php echo ($article['p_prix'] - (($article['pourcentage_reduction'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
                 data-stock="<?php echo intval($article['p_stock'])?>"
                 data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                 <div class="imageArticleP">
@@ -287,9 +288,8 @@ function updateRecap() {
 
     articles.forEach(article => { //pour chaque articles de la liste des articles
         const prix = parseFloat(article.dataset.prix); //récupère le prix et le mettre en float
+        console.log(prix);
         const quantiteEntre = article.querySelector('.quantite_input_entre'); //récupère l'input
-        console.log(article);
-        console.log(quantiteEntre);
         const quantite = parseInt(quantiteEntre.value); //converti en int et récupère la valeur dans l'input
         const titre = article.querySelector('.articleTitreP')
             .textContent; //récupère le titre pour pouvoir l'affiché dans le récap de la commande
@@ -354,10 +354,6 @@ document.querySelectorAll('.unArticleP').forEach(article => {
             okText: 'Supprimer',
             cancelText: 'Annuler',
             variant: 'default',
-            onOk: () => {
-                if (window.Loader) Loader.show();
-                formSupp.submit();
-            }
         });
     });
 

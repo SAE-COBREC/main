@@ -215,7 +215,7 @@ if ($id_commande > 0) {
     <?php include __DIR__ . '/../../partials/header.php'; ?>
 
     <main>
-        <h1>Suivi de commande #<?= htmlspecialchars($id_commande) ?></h1>
+        <h1>Suivi de commande #<?= htmlspecialchars($id_commande)?></h1>
 
         <?php if (!$resultat || !$resultat['success']): ?>
         <div class="error-message">
