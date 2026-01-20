@@ -382,7 +382,7 @@ ADD CONSTRAINT unique_paiement_facture UNIQUE (id_facture);
 ALTER TABLE ONLY cobrec1._paiement
 ADD CONSTRAINT fk_paiement_facture FOREIGN KEY (id_facture) REFERENCES cobrec1._facture (id_facture) ON DELETE CASCADE;
 
--- TABLE LIVRAISON
+-- TABLE
 CREATE TABLE cobrec1._livraison (
     id_livraison SERIAL NOT NULL,
     id_facture integer NOT NULL,
@@ -2940,8 +2940,8 @@ VALUES (
     ),
     (
         2,
-        '2026-01-01 00:00:00',
-        '2026-02-07 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     ),
     (
         3,
@@ -2950,8 +2950,8 @@ VALUES (
     ),
     (
         4,
-        '2026-01-01 00:00:00',
-        '2026-04-15 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     ),
     (
         9,
@@ -2960,8 +2960,8 @@ VALUES (
     ),
     (
         11,
-        '2026-06-10 00:00:00',
-        '2026-06-20 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     );
 
 -- 9. RÉDUCTIONS (futures)
@@ -2975,8 +2975,8 @@ INSERT INTO
 VALUES (
         1,
         10.00,
-        '2026-01-05 00:00:00',
-        '2026-09-19 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     ),
     (
         2,
@@ -2987,14 +2987,14 @@ VALUES (
     (
         3,
         20.00,
-        '2026-01-01 00:00:00',
-        '2026-05-15 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     ),
     (
         4,
         25.00,
-        '2026-01-20 00:00:00',
-        '2026-02-26 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     ),
     (
         5,
@@ -3005,14 +3005,14 @@ VALUES (
     (
         6,
         60.00,
-        '2026-01-01 00:00:00',
-        '2026-04-15 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     ),
     (
         7,
         55.00,
-        '2026-05-01 00:00:00',
-        '2026-05-07 23:59:00'
+        CURRENT_DATE + TIME '10:00:00',
+        CURRENT_DATE + INTERVAL '30 days'
     ),
     (
         8,
@@ -3574,6 +3574,36 @@ VALUES (
         '/img/photo/robe_d_ete.jpg',
         'Robe d été',
         'Photo de Robe d été'
+    ),
+    (
+        '/img/photo/Crous’ty_Caramel2.jpg',
+        'Crous’ty Caramel 2',
+        'Photo de Crous’ty Caramel'
+    ),
+    (
+        '/img/photo/Kouign-Amann2.jpg',
+        'Kouign-Amann 2',
+        'Photo de Kouign-Amann 2'
+    ),
+    (
+        '/img/photo/Kouign-Amann3.jpg',
+        'Kouign-Amann 3',
+        'Photo de Kouign-Amann 3'
+    ),
+    (
+        '/img/photo/mini-beurrier2.jpg',
+        'mini-beurrier 2',
+        'Photo de mini beurrier 2'
+    ),
+    (
+        '/img/photo/Huitres-Cancale2.jpg',
+        'Huitres-Cancale2.jpeg',
+        'Image d Huitres-Cancales 2'
+    ),
+    (
+        '/img/photo/palets-bretons2.jpg',
+        'palets-bretons2.jpeg',
+        'Image de palets bretons 2'
     );
 
 -- 13. RELATIONS IMAGES-PRODUITS
@@ -3684,7 +3714,13 @@ VALUES (1, 1),
     (106, 103),
     (107, 104),
     (108, 105),
-    (109, 5);
+    (109, 5),
+    (110, 2),
+    (111, 6),
+    (112, 6),
+    (113, 1),
+    (114, 14),
+    (115, 15);
 
 -- 14. RELATIONS IMAGES-COMPTES
 INSERT INTO
