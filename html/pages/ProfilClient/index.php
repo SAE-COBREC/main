@@ -489,10 +489,29 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     </main>
 
                     <footer>
+                        <a href="../suiviCommande/index.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>">
+                            <button type="button">
+                                <!-- Texte pour ordinateur -->
+                                <span class="btn-text-desktop">Voir les détails de la commande</span>
+                                <!-- Texte court pour mobile -->
+                                <span class="btn-text-mobile">Détails</span>
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </button>
+                        </a>
+
+
                         <a href="../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>"
                             target="_blank" rel="noopener noreferrer">
                             <button type="button">
-                                Télécharger la facture
+                                <!-- Texte pour ordinateur -->
+                                <span class="btn-text-desktop">Télécharger la facture</span>
+                                <!-- Texte court pour mobile -->
+                                <span class="btn-text-mobile">Facture</span>
+
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>
