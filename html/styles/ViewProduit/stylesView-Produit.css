@@ -87,6 +87,7 @@ body {
   overflow: hidden;
   aspect-ratio: 16/9;
   min-height: 240px;
+  position: relative; /* pour positionner les flèches */
 }
 .product-row .main-image img {
   width: 100%;
@@ -99,6 +100,36 @@ body {
   display: block;
   transition: opacity 180ms ease-in-out;
   opacity: 1;
+}
+
+/* Flèches de navigation sur l'image principale */
+.img-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg,#ffffff,#f6f8ff);
+  border: 1px solid rgba(16,24,40,0.06);
+  box-shadow: 0 8px 22px rgba(16,24,40,0.08);
+  cursor: pointer;
+  color: #4b4b6a;
+  transition: transform .12s ease, box-shadow .12s ease, color .12s ease;
+  z-index: 40;
+}
+.img-arrow svg { width: 18px; height: 18px; }
+.img-arrow.prev { left: 12px; }
+.img-arrow.next { right: 12px; }
+.img-arrow:hover { transform: translateY(-50%) scale(1.06); box-shadow: 0 12px 30px rgba(16,24,40,0.12); color: #7171A3; }
+.img-arrow:active { transform: translateY(-50%) scale(0.98); }
+
+/* small screens adjust */
+@media (max-width: 640px) {
+  .img-arrow { width: 40px; height: 40px; }
 }
 .product-row .summary .title {
   font-size: 20px;
@@ -159,26 +190,28 @@ body {
   height: 44px;
 }
 .product-row .summary .qty .qty-control button.ghost {
-  background: transparent;
-  border: 0;
-  color: #030212;
-  flex: 1 1 auto;
-  min-width: 48px;
-  height: 100%;
+  background: linear-gradient(180deg,#fff,#fbfdff);
+  border: 1px solid rgba(16,24,40,0.06);
+  color: #222;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 800;
+  font-size: 20px;
   line-height: 1;
-  border-radius: 0;
+  border-radius: 10px;
   padding: 0;
   box-sizing: border-box;
   touch-action: manipulation;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
 }
 .product-row .summary .qty .qty-control button.ghost:active,
 .product-row .summary .qty .qty-control button.ghost:focus {
-  background: rgba(0, 0, 0, 0.03);
+  transform: translateY(1px) scale(0.995);
+  background: linear-gradient(180deg,#f7f8fb,#eef2ff);
   outline: none;
 }
 .product-row .summary .qty .qty-control input[type=number] {
