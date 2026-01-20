@@ -12,6 +12,28 @@
   justify-content: center;
 }
 
+// Responsive: stack vendeur and button on small screens
+@media screen and (max-width: 560px) {
+  .product-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .product-bottom button {
+    width: 100%;
+  }
+
+  .carousel-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .carousel-actions-buttons {
+    justify-content: stretch;
+  }
+}
+
 //mixin pour espacer les éléments entre eux
 @mixin flex-between {
   display: flex;
@@ -37,7 +59,7 @@
 //mixin pour rendre un élément sticky
 @mixin sticky-aside {
   position: sticky;
-  top: 6em;
+  top: 5.1em;
   align-self: start;
   transition: all 0.3s ease;
 }
@@ -93,7 +115,7 @@ aside {
   padding: 1.5rem;
   border-radius: 12px;
   height: fit-content;
-  margin: 2rem 0 2rem 2rem;
+  margin: 0 0 1rem 1rem;
   @include sticky-aside;
 
   //section du tri en haut du formulaire
@@ -341,7 +363,7 @@ aside {
 
 //zone principale qui contient les produits
 main {
-  padding: 2rem 2rem 2rem 1rem;
+  padding: 1rem 1rem 1rem 1rem;
   min-height: calc(100vh - 200px);
 
   //grille des produits
@@ -391,6 +413,27 @@ main {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+// Bottom row for product cards: vendeur + add-to-cart button
+.product-bottom {
+  margin-top: auto; // push to bottom of card
+  display: flex;
+  flex-direction: column; // empile vendeur au-dessus du bouton
+  gap: 0.5rem;
+  align-items: stretch;
+
+  .vendeur-info {
+    margin: 0 0 6px 0;
+    width: fit-content; // garder seulement la largeur nécessaire
+    align-self: flex-start; // ne pas s'étirer
+  }
+
+  button {
+    margin: 0;
+    width: 100%;
+    flex: none;
   }
 }
 
@@ -1027,8 +1070,25 @@ article {
 
       .carousel-actions {
         display: flex;
-        gap: 1rem;
+        flex-direction: column; // empile vendeur au-dessus des boutons
+        gap: 0.75rem;
         margin-top: 1rem;
+        align-items: stretch;
+        justify-content: flex-start;
+      }
+
+      .carousel-vendeur-block {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .carousel-actions-buttons {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
       }
 
       .btn-carousel-add, .btn-carousel-cart {

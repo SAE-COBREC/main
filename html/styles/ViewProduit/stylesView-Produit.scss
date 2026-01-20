@@ -90,6 +90,7 @@ body {
         overflow: hidden;
         aspect-ratio: 16/9;
         min-height: 240px;
+        position: relative;
 
         img {
             width: 100%;
@@ -101,6 +102,29 @@ body {
             transition: opacity 180ms ease-in-out;
             opacity: 1;
         }
+
+        .img-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(20,20,40,0.06);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(20,20,40,0.06);
+            transition: transform .12s ease, background .12s ease, opacity .12s ease;
+        }
+
+        .img-arrow.prev { left: 12px; }
+        .img-arrow.next { right: 12px; }
+
+        .img-arrow:hover { transform: translateY(-50%) scale(1.03); background: rgba(255,255,255,1); }
+        .img-arrow:active { transform: translateY(-50%) scale(.98); }
     }
 
     .summary {

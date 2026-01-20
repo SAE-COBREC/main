@@ -471,25 +471,28 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                         title="<?= htmlspecialchars($prodCarousel['p_description']) ?>">
                                         <?= htmlspecialchars(strlen($prodCarousel['p_description']) > 200 ? substr($prodCarousel['p_description'], 0, 200) . '...' : (string)$prodCarousel['p_description']) ?>
                                     </p>
-                                    <div style="display: flex; align-items: center; margin-top: -1em;">
-                                        <p class="carousel-vendeur" style="margin-right: 0.5em;">Vendu par :</p>
-                                        <div class="vendeur-info">
-                                            <img src="/img/svg/market.svg" alt="Vendeur">
-                                            <span><?= htmlspecialchars($nomVendeurC) ?></span>
-                                        </div>
-                                    </div>
+                                    <!-- Vendeur placé dans la zone d'actions pour être aligné bas -->
                                     <p class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</p>
                                     <div class="carousel-actions">
-                                        <button class="btn-carousel-add"
-                                            onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
-                                            Voir le produit
-                                        </button>
-                                        <button class="btn-carousel-cart"
-                                            onclick="event.stopPropagation(); ajouterAuPanier(<?= $prodCarousel['id_produit'] ?>)">
-                                            <img src="/img/svg/panier.svg" alt="Panier" width="20"
-                                                style="margin-right:8px; filter: brightness(0) invert(1);">
-                                            Ajouter au panier
-                                        </button>
+                                        <div class="carousel-vendeur-block">
+                                            <p class="carousel-vendeur">Vendu par :</p>
+                                            <div class="vendeur-info">
+                                                <img src="/img/svg/market.svg" alt="Vendeur">
+                                                <span><?= htmlspecialchars($nomVendeurC) ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="carousel-actions-buttons">
+                                            <button class="btn-carousel-add"
+                                                onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
+                                                Voir le produit
+                                            </button>
+                                            <button class="btn-carousel-cart"
+                                                onclick="event.stopPropagation(); ajouterAuPanier(<?= $prodCarousel['id_produit'] ?>)">
+                                                <img src="/img/svg/panier.svg" alt="Panier" width="20"
+                                                    style="margin-right:8px; filter: brightness(0) invert(1);">
+                                                Ajouter au panier
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -592,15 +595,17 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             <!--affiche le prix final-->
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
-                        <div class="vendeur-info">
-                            <img src="/img/svg/market.svg" alt="Vendeur">
-                            <span><?= htmlspecialchars($nomVendeur) ?></span>
+                        <div class="product-bottom">
+                            <div class="vendeur-info">
+                                <img src="/img/svg/market.svg" alt="Vendeur">
+                                <span><?= htmlspecialchars($nomVendeur) ?></span>
+                            </div>
+                            <!--bouton pour ajouter au panier-->
+                            <button <?= $estEnRupture ? 'disabled' : '' ?>
+                                onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
+                                <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
+                            </button>
                         </div>
-                        <!--bouton pour ajouter au panier-->
-                        <button <?= $estEnRupture ? 'disabled' : '' ?>
-                            onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
-                            <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
-                        </button>
                     </div>
                 </article>
                 <?php endforeach; ?>

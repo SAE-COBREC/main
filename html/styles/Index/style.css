@@ -3,6 +3,23 @@
   transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
+@media screen and (max-width: 560px) {
+  .product-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .product-bottom button {
+    width: 100%;
+  }
+  .carousel-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  .carousel-actions-buttons {
+    justify-content: stretch;
+  }
+}
 * {
   margin: 0;
   padding: 0;
@@ -36,9 +53,9 @@ aside {
   border-radius: 12px;
   height: -moz-fit-content;
   height: fit-content;
-  margin: 2rem 0 2rem 2rem;
+  margin: 0 0 1rem 1rem;
   position: sticky;
-  top: 6em;
+  top: 5.1em;
   align-self: start;
   transition: all 0.3s ease;
 }
@@ -248,7 +265,7 @@ aside .price-inputs .separator {
 }
 
 main {
-  padding: 2rem 2rem 2rem 1rem;
+  padding: 1rem 1rem 1rem 1rem;
   min-height: calc(100vh - 200px);
 }
 main .product-grid {
@@ -288,6 +305,25 @@ main .product-grid > p {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.product-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.product-bottom .vendeur-info {
+  margin: 0 0 6px 0;
+  width: -moz-fit-content;
+  width: fit-content;
+  align-self: flex-start;
+}
+.product-bottom button {
+  margin: 0;
+  width: 100%;
+  flex: none;
 }
 
 article {
@@ -790,8 +826,23 @@ article button:disabled {
 }
 .carousel-container .carousel-slide .carousel-info .carousel-actions {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-top: 1rem;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+.carousel-container .carousel-slide .carousel-info .carousel-vendeur-block {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.carousel-container .carousel-slide .carousel-info .carousel-actions-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 .carousel-container .carousel-slide .carousel-info .btn-carousel-add, .carousel-container .carousel-slide .carousel-info .btn-carousel-cart {
   padding: 0.75rem 1.5rem;
