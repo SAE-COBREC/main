@@ -786,7 +786,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         //vérifie que l'utilisateur a bien saisi une URL
         if (!urlImageSaisie) {
             //affiche un message d'erreur si le champ est vide
-            alert('Veuillez saisir une URL d\'image');
+            notify('Veuillez saisir une URL d\'image');
             return;
         }
 
@@ -797,7 +797,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             new URL(urlImageSaisie);
         } catch {
             //affiche un message d'erreur si l'URL est invalide
-            alert('URL invalide. Veuillez saisir une URL complète (ex: https://exemple.com/image.jpg)');
+            notify('URL invalide. Veuillez saisir une URL complète (ex: https://exemple.com/image.jpg)');
             return;
         }
 
@@ -822,12 +822,12 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             //sauvegarde l'URL dans le champ caché pour l'enregistrement
             champCacheLienImage.value = urlImageSaisie;
             //informe l'utilisateur que l'image est chargée
-            alert('Image chargée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.');
+            notify('Image chargée avec succès ! N\'oubliez pas d\'enregistrer vos modifications.');
         };
         //fonction exécutée si l'image ne peut pas être chargée
         imageTest.onerror = function() {
             //affiche un message d'erreur si le chargement échoue
-            alert(
+            notify(
                 'Impossible de charger l\'image depuis cette URL. Vérifiez que l\'URL est correcte et accessible.'
             );
         };
@@ -1012,17 +1012,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     //fonction pour afficher un message de statut d'upload
     function afficherMessageStatut(messageTexte, typeMessage, zoneStatutUpload) {
-        //affiche le texte du message
-        zoneStatutUpload.textContent = messageTexte;
-        //applique la classe CSS correspondant au type de message
-        zoneStatutUpload.className = 'upload-status ' + typeMessage;
-        //rend la zone visible
-        zoneStatutUpload.style.display = 'block';
-        //si c'est un message de succès, le cache après 5 secondes
-        if (typeMessage === 'success') {
-            //cache automatiquement le message après 5 secondes
-            setTimeout(() => zoneStatutUpload.style.display = 'none', 5000);
-        }
+        notify(messageTexte, typeMessage);
+
+        zoneStatutUpload.style.display = "none";
     }
     </script>
     <script src="/js/notifications.js"></script>
