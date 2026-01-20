@@ -489,7 +489,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     </main>
 
                     <footer>
-                        <a href="../suiviCommande/index.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>">
+                        <a
+                            href="../suiviCommande/index.php?id_commande=<?php echo $commandeIndividuelle['id_panier']; ?>">
                             <button type="button">
                                 <!-- Texte pour ordinateur -->
                                 <span class="btn-text-desktop">Voir les détails de la commande</span>
