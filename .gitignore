@@ -5,5 +5,5 @@ html/config1.php
 html/index.php
 html/selectBDD.php
 
-html/img/photo
+# html/img/photo
 html/pages/backoffice/create/temp_
