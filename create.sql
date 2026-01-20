@@ -3031,19 +3031,19 @@ VALUES (
 INSERT INTO
     _image (i_lien, i_title, i_alt)
 VALUES (
-        '/img/photo/smartphone_xpro.jpg',
-        'Smartphone XPro.jpg',
-        'Image du smartphone'
+        '/img/photo/mini_beurrier.jpg',
+        'mini_beurrier.jpg',
+        'Image Mini beurrier'
     ),
     (
-        '/img/photo/ordinateur_portable_ultra.jpg',
-        'Ordinateur portable.jpeg',
-        'Image de l ordinateur'
+        '/img/photo/Crous’ty_Caramel.jpg',
+        'Crous’ty_Caramel.jpeg',
+        'Image de Crous’ty Caramel'
     ),
     (
-        '/img/photo/t_shirt_coton_bio.jpg',
-        'T-shirt.png',
-        'Image du t-shirt'
+        '/img/photo/Makis_de_Galettes.jpg',
+        'Makis_de_Galettes.png',
+        'Image du Makis de Galettes'
     ),
     (
         '/img/photo/jean_slim.jpg',
@@ -4289,7 +4289,8 @@ LIMIT (
 -- Insère les avis dans _avis et stocke les lignes insérées dans une table temporaire pour réutilisation
 DROP TABLE IF EXISTS temp_new_avis;
 
-CREATE TEMP TABLE temp_new_avis (
+CREATE TEMP
+TABLE temp_new_avis (
     id_avis int,
     id_produit int,
     id_client int

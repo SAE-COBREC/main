@@ -316,7 +316,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Nom unique
         $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-        $filename = "vendeur_id_" . $vendeur['compte'] . $_FILES['image']['name'] . "." . $ext;
+        $filename = "vendeur_id_" . $vendeur['compte'] . "." . $ext;
 
         // Chemin final disque
         $filePath = $uploadDir . $filename;
