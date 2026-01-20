@@ -686,6 +686,9 @@ article {
 
 //styles pour tablettes et écrans moyens
 @media (min-width: 429px) and (max-width: 1440px) {
+  .search-container{
+    display: flex;
+  }
   aside {
     //agrandit les textes dans les filtres
     section > div span {
@@ -727,6 +730,9 @@ article {
 
 //styles pour mobile
 @media (max-width: 428px) {
+  .search-container{
+    display: none;
+  }
   //change le layout du body
   body {
     display: block;

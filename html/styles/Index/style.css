@@ -526,6 +526,9 @@ article button:disabled {
 }
 
 @media (min-width: 429px) and (max-width: 1440px) {
+  .search-container {
+    display: flex;
+  }
   aside section > div span {
     font-size: 1.5em;
   }
@@ -550,6 +553,9 @@ article button:disabled {
   }
 }
 @media (max-width: 428px) {
+  .search-container {
+    display: none;
+  }
   body {
     display: block;
     max-width: 428px;
