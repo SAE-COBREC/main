@@ -481,9 +481,15 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                     </p>
                                     <p class="carousel-vendeur">Vendu par <?= htmlspecialchars($nomVendeurC) ?></p>
                                     <p class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</p>
-                                    <button class="btn-carousel-add" onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
-                                        Voir le produit
-                                    </button>
+                                    <div class="carousel-actions">
+                                        <button class="btn-carousel-add" onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
+                                            Voir le produit
+                                        </button>
+                                        <button class="btn-carousel-cart" onclick="event.stopPropagation(); ajouterAuPanier(<?= $prodCarousel['id_produit'] ?>)">
+                                            <img src="/img/svg/panier.svg" alt="Panier" width="20" style="margin-right:8px; filter: brightness(0) invert(1);">
+                                            Ajouter au panier
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </li>
