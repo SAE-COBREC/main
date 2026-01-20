@@ -454,7 +454,8 @@ article {
     position: relative;
     width: 100%;
     height: 200px;
-    background: linear-gradient(135deg, $secondary-color-gris-clair 0%, $secondary-color-gris-fonce 100%);
+    //background: linear-gradient(135deg, $secondary-color-gris-clair 0%, $secondary-color-gris-fonce 100%);
+    background: $primary-color-blanc;
     display: flex;
     justify-content: center;
 
