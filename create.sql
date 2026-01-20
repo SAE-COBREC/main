@@ -3056,9 +3056,9 @@ VALUES (
         'Image du Kouign-Amann'
     ),
     (
-        '/img/photo/avatar_jean.jpg',
-        'Avatar Jean.jpeg',
-        'Photo de profil Jean'
+        '/img/photo/robe_ete.jpg',
+        'robe_ete.jpeg',
+        'Photo de robe ete'
     ),
     (
         '/img/photo/avatar_marie.jpg',
@@ -3088,7 +3088,7 @@ VALUES (
     (
         '/img/photo/Andouille.jpg',
         'Andouille.jpeg',
-        "Image d'Andouille"
+        'Image d Andouille'
     ),
     (
         '/img/photo/Cidre-AOP-Le-Cornouaille.jpg',
@@ -3113,7 +3113,7 @@ VALUES (
     (
         '/img/photo/Huitres-Cancale.jpg',
         'Huitres-Cancale.jpeg',
-        "Image d'Huitres-Cancales"
+        'Image d Huitres-Cancales'
     ),
     (
         '/img/photo/palets-bretons.jpg',
@@ -3171,8 +3171,8 @@ VALUES (
         'Image de l enceinte'
     ),
     (
-        '/img/photo/pull_marin_de_saint_malo.jpg',
-        'Pull Marin de Saint-Malo',
+        '/img/photo/pull_saint-malo.jpg',
+        'pull_saint-malo.png',
         'Photo de Pull Marin de Saint-Malo'
     ),
     (
@@ -3181,9 +3181,9 @@ VALUES (
         'Photo de Bonnet Miki de Carnac'
     ),
     (
-        '/img/photo/galettes_local.jpg',
-        'Galettes Local',
-        'Photo de Galettes Local'
+        '/img/photo/galetteau_ble_noir.jpg',
+        'galetteau_ble_noir.jpg',
+        'Photo de galette ble noir'
     ),
     (
         '/img/photo/_charpe_ray_e_fait_main.jpg',
@@ -3540,7 +3540,7 @@ VALUES (
         'Marinière Authentique',
         'Photo de Marinière Authentique'
     ),
-    block (
+    (
         '/img/photo/bracelet_ancre_artisanal.jpg',
         'Bracelet Ancre Artisanal',
         'Photo de Bracelet Ancre Artisanal'
@@ -3584,6 +3584,7 @@ VALUES (1, 1),
     (3, 3),
     (4, 4),
     (5, 6),
+    (6, 5),
     (10, 8),
     (11, 7),
     (12, 9),
