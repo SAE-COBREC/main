@@ -80,6 +80,14 @@ footer > div > div:last-child span {
 footer > div > div:last-child span:hover {
   color: #FFFFFF;
 }
+footer > div > div:last-child span a {
+  color: #c0c0c0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+footer > div > div:last-child span a:hover {
+  color: #FFFFFF;
+}
 
 @media (max-width: 1024px) {
   footer > div > div:last-child {

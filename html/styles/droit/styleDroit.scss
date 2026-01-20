@@ -1,0 +1,36 @@
+@import "../_variable.scss";
+body {
+    font-family: Arial, sans-serif;
+    background: $secondary-color-bleu-clair;
+    color: $primary-color-noir;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    color: $primary-color-bleu;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-size: 2em;
+}
+
+h2 {
+    color: $primary-color-bleu;
+    margin-top: 1.2em;
+    margin-bottom: 0.4em;
+    font-size: 1.3em;
+}
+
+p {
+    margin-bottom: 1em;
+    line-height: 1.6;
+}
+
+article {
+    max-width: 1150px;
+    margin: 36px auto;
+    padding: 24px;
+    background: $primary-color-blanc;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(20, 20, 40, 0.06);
+}

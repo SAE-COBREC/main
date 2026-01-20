@@ -1,0 +1,39 @@
+* {
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #F0F4F8;
+  color: #030212;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+  color: #7171A3;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-size: 2em;
+}
+
+h2 {
+  color: #7171A3;
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+  font-size: 1.3em;
+}
+
+p {
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
+
+article {
+  max-width: 1150px;
+  margin: 36px auto;
+  padding: 24px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(20, 20, 40, 0.06);
+}/*# sourceMappingURL=styleDroit.css.map */
