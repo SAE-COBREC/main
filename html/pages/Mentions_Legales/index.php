@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="../../styles/Footer/stylesFooter.css">
 </head>
 <?php require_once "../../partials/header.php";
-    session_start();
     session_close();
 ?>
 
