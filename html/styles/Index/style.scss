@@ -515,6 +515,7 @@ article {
       display: inline-flex;
       align-items: center;
       margin-bottom: 12px;
+      width: fit-content; // Ajouté pour que l'élément ne prenne que sa taille
       background-color: $secondary-color-bleu-clair; 
       border-radius: 20px;
       border: 1px solid rgba($primary-color-bleu, 0.1);

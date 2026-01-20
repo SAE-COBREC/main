@@ -393,6 +393,8 @@ article > div:last-child .vendeur-info {
   display: inline-flex;
   align-items: center;
   margin-bottom: 12px;
+  width: -moz-fit-content;
+  width: fit-content;
   background-color: #F0F4F8;
   border-radius: 20px;
   border: 1px solid rgba(113, 113, 163, 0.1);
