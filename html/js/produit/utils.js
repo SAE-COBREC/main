@@ -1,10 +1,10 @@
 (function(){
     async function fetchJson(url, options) {
-        try {
+        /**  try {
             if (options && options.body && typeof FormData !== 'undefined' && options.body instanceof FormData) {
                 for (const e of options.body.entries()) console.debug('AJAX POST', e[0], e[1]);
             }
-        } catch (err) { /* ignore */ }
+        } catch (err) {} */
 
         const resp = await fetch(url, options || {});
         const txt = await resp.text();

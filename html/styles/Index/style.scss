@@ -365,6 +365,35 @@ main {
 // CARTES PRODUITS (ARTICLE)
 // ============================================
 
+//infos vendeur
+.vendeur-info {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  width: fit-content; // Ajouté pour que l'élément ne prenne que sa taille
+  background-color: $secondary-color-bleu-clair; 
+  border-radius: 20px;
+  border: 1px solid rgba($primary-color-bleu, 0.1);
+  gap: 6px;
+  padding: 4px 8px;
+  
+
+  img {
+    width: 24px;
+    height: 24px;
+    filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%); // approximate color for #7171A3
+  }
+
+  span {
+    font-size: 0.85rem;
+    color: $primary-color-bleu;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 //style d'une carte produit
 article {
   display: flex;
@@ -507,35 +536,6 @@ article {
         font-size: 1.5rem;
         font-weight: bold;
         color: $primary-color-noir;
-      }
-    }
-
-    //infos vendeur
-    .vendeur-info {
-      display: inline-flex;
-      align-items: center;
-      margin-bottom: 12px;
-      width: fit-content; // Ajouté pour que l'élément ne prenne que sa taille
-      background-color: $secondary-color-bleu-clair; 
-      border-radius: 20px;
-      border: 1px solid rgba($primary-color-bleu, 0.1);
-      gap: 6px;
-      padding: 4px 8px;
-      
-
-      img {
-        width: 24px;
-        height: 24px;
-        filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%); // approximate color for #7171A3
-      }
-
-      span {
-        font-size: 0.85rem;
-        color: $primary-color-bleu;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
     }
   }
@@ -1015,7 +1015,7 @@ article {
 
       .carousel-vendeur {
         font-size: 0.9rem;
-        color: #666;
+        color: $primary-color-bleu;
         margin-bottom: 0.5rem;
       }
 

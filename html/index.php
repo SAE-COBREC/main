@@ -479,7 +479,13 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                     <p class="carousel-description" title="<?= htmlspecialchars($prodCarousel['p_description']) ?>">
                                         <?= htmlspecialchars(strlen($prodCarousel['p_description']) > 200 ? substr($prodCarousel['p_description'], 0, 200) . '...' : (string)$prodCarousel['p_description']) ?>
                                     </p>
-                                    <p class="carousel-vendeur">Vendu par <?= htmlspecialchars($nomVendeurC) ?></p>
+                                    <div style="display: flex; align-items: center; margin-top: -1em;">
+                                        <p class="carousel-vendeur" style="margin-right: 0.5em;">Vendu par :</p> 
+                                        <div class="vendeur-info">
+                                            <img src="/img/svg/market.svg" alt="Vendeur">
+                                            <span><?= htmlspecialchars($nomVendeurC) ?></span>
+                                        </div>
+                                    </div>
                                     <p class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</p>
                                     <div class="carousel-actions">
                                         <button class="btn-carousel-add" onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">

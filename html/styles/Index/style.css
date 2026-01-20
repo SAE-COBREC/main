@@ -264,6 +264,32 @@ main .product-grid > p {
   font-size: 1.1rem;
 }
 
+.vendeur-info {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  width: -moz-fit-content;
+  width: fit-content;
+  background-color: #F0F4F8;
+  border-radius: 20px;
+  border: 1px solid rgba(113, 113, 163, 0.1);
+  gap: 6px;
+  padding: 4px 8px;
+}
+.vendeur-info img {
+  width: 24px;
+  height: 24px;
+  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+}
+.vendeur-info span {
+  font-size: 0.85rem;
+  color: #7171A3;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 article {
   display: flex;
   flex-direction: column;
@@ -388,31 +414,6 @@ article > div:last-child > div:nth-child(3) span:last-child {
   font-size: 1.5rem;
   font-weight: bold;
   color: #030212;
-}
-article > div:last-child .vendeur-info {
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: 12px;
-  width: -moz-fit-content;
-  width: fit-content;
-  background-color: #F0F4F8;
-  border-radius: 20px;
-  border: 1px solid rgba(113, 113, 163, 0.1);
-  gap: 6px;
-  padding: 4px 8px;
-}
-article > div:last-child .vendeur-info img {
-  width: 24px;
-  height: 24px;
-  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
-}
-article > div:last-child .vendeur-info span {
-  font-size: 0.85rem;
-  color: #7171A3;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 article button {
   margin-top: auto;
@@ -779,7 +780,7 @@ article button:disabled {
 }
 .carousel-container .carousel-slide .carousel-info .carousel-vendeur {
   font-size: 0.9rem;
-  color: #666;
+  color: #7171A3;
   margin-bottom: 0.5rem;
 }
 .carousel-container .carousel-slide .carousel-info .carousel-price {

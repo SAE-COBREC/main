@@ -395,21 +395,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- AUTO SCROLL - AUTOMATISATION DU DEFILEMENT ---
-    let autoPlayInterval;
+    let autoPlayInterval = null;
     const intervalTime = 5000; // 5 secondes
 
-    const startAutoPlay = () => {
-        // Évite d'avoir plusieurs intervalles en même temps
-        clearInterval(autoPlayInterval);
+    function startAutoPlay() {
+        if (autoPlayInterval) return; // Ne pas lancer plusieurs intervalles
         autoPlayInterval = setInterval(() => {
-            // Simule un clic sur le bouton suivant
-            nextButton.click();
+            if (nextButton && typeof nextButton.click === 'function') {
+                nextButton.click();
+            }
         }, intervalTime);
-    };
+    }
 
-    const stopAutoPlay = () => {
-        clearInterval(autoPlayInterval);
-    };
+    function stopAutoPlay() {
+        if (autoPlayInterval) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
+        }
+    }
 
     // Démarre le défilement automatique
     startAutoPlay();
