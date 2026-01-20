@@ -180,9 +180,13 @@ main section article > footer {
   padding: 1.5em;
   border-top: 1px solid #EFEFEF;
   background: #FAFAFA;
+  display: flex;
+  gap: 1em;
+  align-items: center;
 }
 main section article > footer a:link {
   text-decoration: none;
+  flex: 1;
 }
 main section article > footer > button, main section article > footer a > button {
   width: 100%;

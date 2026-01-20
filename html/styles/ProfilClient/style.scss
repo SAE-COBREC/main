@@ -246,9 +246,16 @@ main {
             padding: 1.5em;
             border-top: 1px solid $secondary-color-gris-clair;
             background: #FAFAFA;
-            a:link{
+
+            display: flex;         
+            gap: 1em;              
+            align-items: center;
+
+            a:link {
                 text-decoration: none;
+                flex: 1;
             }
+
             > button, a > button {
                 width: 100%;
                 border: 2px solid $primary-color-bleu;
@@ -282,6 +289,7 @@ main {
                 }
             }
         }
+
     }
 
     section:nth-of-type(1) {
