@@ -3046,14 +3046,14 @@ VALUES (
         'Image du Makis de Galettes'
     ),
     (
-        '/img/photo/jean_slim.jpg',
-        'Jean.jpg',
-        'Image du jean'
+        '/img/photo/cola.jpg',
+        'cola.jpg',
+        'Image du cola cerice'
     ),
     (
-        '/img/photo/casque_audio_bluetooth.jpg',
-        'Casque audio.jpg',
-        'Image du casque'
+        '/img/photo/Kouign-Amann.jpg',
+        'Kouign-Amann.jpg',
+        'Image du Kouign-Amann'
     ),
     (
         '/img/photo/avatar_jean.jpg',
@@ -3076,49 +3076,49 @@ VALUES (
         'Logo entreprise FashionHub'
     ),
     (
-        '/img/photo/montre_connect_e.jpg',
-        'Montre connectée.jpg',
-        'Image de la montre'
+        '/img/photo/far-breton-au-pruneaux.jpg',
+        'far-breton-au-pruneaux.jpg',
+        'Image de far breton au pruneaux'
     ),
     (
-        '/img/photo/sac___dos_urbain.jpg',
+        '/img/photo/Sac_Urbain.jpg',
         'Sac à dos.jpeg',
         'Image du sac'
     ),
     (
-        '/img/photo/chaussures_running.jpg',
-        'Chaussures running.jpeg',
-        'Image des chaussures'
+        '/img/photo/Andouille.jpg',
+        'Andouille.jpeg',
+        "Image d'Andouille"
     ),
     (
-        '/img/photo/tablette_10_pouces.jpg',
-        'Tablette.jpg',
-        'Image de la tablette'
+        '/img/photo/Cidre-AOP-Le-Cornouaille.jpg',
+        'Cidre-AOP-Le-Cornouaille.jpg',
+        'Image du Cidre AOP Le Cornouaille'
     ),
     (
-        '/img/photo/ballon_de_football.jpg',
-        'Ballon football.jpg',
-        'Image du ballon'
+        '/img/photo/Rillettes_Saint-Jacques.jpg',
+        'BRillettes_Saint-Jacques.jpg',
+        'Image du Rillettes de Saint-Jacques'
     ),
     (
-        '/img/photo/veste_en_cuir.jpg',
-        'Veste cuir.jpg',
-        'Image de la veste'
+        '/img/photo/Sardine.jpg',
+        'Sardine.jpg',
+        'Image de Sardine'
     ),
     (
-        '/img/photo/livre_cuisine_fran_aise.jpg',
-        'Livre cuisine.jpeg',
-        'Image du livre'
+        '/img/photo/tartare-algues.jpg',
+        'tartare-algues.jpeg',
+        'Image du tartare algues'
     ),
     (
-        '/img/photo/tapis_de_yoga.jpg',
-        'Tapis yoga.jpeg',
-        'Image du tapis'
+        '/img/photo/Huitres-Cancale.jpg',
+        'Huitres-Cancale.jpeg',
+        "Image d'Huitres-Cancales"
     ),
     (
-        '/img/photo/clavier_m_canique_rgb.jpg',
-        'Clavier.jpg',
-        'Image du clavier'
+        '/img/photo/palets-bretons.jpg',
+        'palets-bretons.jpg',
+        'Image de palets bretons'
     ),
     (
         '/img/photo/console_nextgen.jpg',
@@ -3540,7 +3540,7 @@ VALUES (
         'Marinière Authentique',
         'Photo de Marinière Authentique'
     ),
-    (
+    block (
         '/img/photo/bracelet_ancre_artisanal.jpg',
         'Bracelet Ancre Artisanal',
         'Photo de Bracelet Ancre Artisanal'
@@ -3575,75 +3575,6 @@ VALUES (
         'Robe d été',
         'Photo de Robe d été'
     );
-
--- 12.b IMAGES SUPPLÉMENTAIRES (Peuplement additionnel)
--- Ajoute des images supplémentaires pour certains produits (exemples)
-INSERT INTO
-    _image (i_lien, i_title, i_alt)
-VALUES (
-        '/img/photo/product_1_extra_1.jpg',
-        'Product 1 - vue 2',
-        'Vue secondaire du produit 1'
-    ),
-    (
-        '/img/photo/product_1_extra_2.jpg',
-        'Product 1 - vue 3',
-        'Vue supplémentaire du produit 1'
-    ),
-    (
-        '/img/photo/product_5_extra_1.jpg',
-        'Product 5 - vue 2',
-        'Vue secondaire du produit 5'
-    ),
-    (
-        '/img/photo/product_5_extra_2.jpg',
-        'Product 5 - vue 3',
-        'Vue supplémentaire du produit 5'
-    ),
-    (
-        '/img/photo/product_12_extra_1.jpg',
-        'Product 12 - vue 2',
-        'Vue secondaire du produit 12'
-    ),
-    (
-        '/img/photo/product_12_extra_2.jpg',
-        'Product 12 - vue 3',
-        'Vue supplémentaire du produit 12'
-    );
-
--- 12.c MAPPINGS IMAGES -> PRODUITS POUR LES IMAGES AJOUTÉES
--- On insère les relations en récupérant l'id_image via le chemin (i_lien)
-INSERT INTO
-    _represente_produit (id_image, id_produit)
-SELECT id_image, 1
-FROM _image
-WHERE
-    i_lien = '/img/photo/product_1_extra_1.jpg'
-UNION ALL
-SELECT id_image, 1
-FROM _image
-WHERE
-    i_lien = '/img/photo/product_1_extra_2.jpg'
-UNION ALL
-SELECT id_image, 5
-FROM _image
-WHERE
-    i_lien = '/img/photo/product_5_extra_1.jpg'
-UNION ALL
-SELECT id_image, 5
-FROM _image
-WHERE
-    i_lien = '/img/photo/product_5_extra_2.jpg'
-UNION ALL
-SELECT id_image, 12
-FROM _image
-WHERE
-    i_lien = '/img/photo/product_12_extra_1.jpg'
-UNION ALL
-SELECT id_image, 12
-FROM _image
-WHERE
-    i_lien = '/img/photo/product_12_extra_2.jpg';
 
 -- 13. RELATIONS IMAGES-PRODUITS
 INSERT INTO
@@ -3767,7 +3698,7 @@ INSERT INTO
     _fait_partie_de (id_produit, id_categorie)
 VALUES (1, 11),
     (2, 11),
-    (3, 12),
+    (3, 11),
     (4, 11),
     (5, 2),
     (6, 11),
