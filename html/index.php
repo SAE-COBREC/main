@@ -477,13 +477,16 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                     ?>
                                     <div class="carousel-price-block">
                                         <?php if ($discountC > 0): ?>
-                                        <span class="carousel-original-price" style="text-decoration: line-through; color: #999; margin-right: 5px; font-size: 1em;">
+                                        <span class="carousel-original-price"
+                                            style="text-decoration: line-through; color: #999; margin-right: 5px; font-size: 1em;">
                                             <?= number_format($prixOriginalTTCC, 2, ',', ' ') ?>€
                                         </span>
                                         <?php endif; ?>
-                                        <span class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</span>
+                                        <span
+                                            class="carousel-price"><?= number_format($prixFinalC, 2, ',', ' ') ?>€</span>
                                     </div>
-                                    <div class="carousel-rating" style="margin-top:6px; display:flex; align-items:center; gap:6px;">
+                                    <div class="carousel-rating"
+                                        style="margin-top:6px; display:flex; align-items:center; gap:6px;">
                                         <span>
                                             <?php for ($i = 1; $i <= 5; $i++):
                                                 if ($noteArrondieC >= $i) $s = 'full';
