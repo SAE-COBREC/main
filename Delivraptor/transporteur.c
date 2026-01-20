@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <time.h>
+#include <openssl/sha.h>
 
 #define PORT 9000
 #define BUFFER_SIZE 256
@@ -253,6 +254,15 @@ int cherche_bordereau(PGconn *conn, int id_commande, int *bordereau)
     }
 }
 
+//focntion de hash du mot de passe
+void hash_sha256(const char *input, char *output) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256((unsigned char*)input, strlen(input), hash);
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+        sprintf(output + (i * 2), "%02x", hash[i]);
+    output[64] = 0;
+}
+
 int verif_login(PGconn *conn, char *email, char *mdp)
 {
     PGresult *res;
@@ -271,8 +281,10 @@ int verif_login(PGconn *conn, char *email, char *mdp)
 
     if (PQntuples(res) > 0)
     {
-        char *mdp_bdd = PQgetvalue(res, 0, 0);
-        int match = (strcmp(mdp, mdp_bdd) == 0) ? 1 : 0;
+        char *mdp_bdd = PQgetvalue(res, 0, 0);  // hash stocké en BDD
+        char hash[65];
+        hash_sha256(mdp, hash);                 // hash du mot de passe en clair saisi
+        int match = (strcmp(hash, mdp_bdd) == 0) ? 1 : 0;
         PQclear(res);
         return match;
     }
@@ -404,9 +416,9 @@ int main(int argc, char *argv[])
         conn = PQconnectdb(
             "host=127.0.0.1 "
             "port=5432 "
-            "dbname=base_sae "
-            "user=nom_utilisateur "
-            "password=motdepasse ");
+            "dbname=leo "
+            "user=leo "
+            "password=leo ");
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -445,7 +457,6 @@ int main(int argc, char *argv[])
                     {
                         const char *rep = "OK LOGIN_SUCCESS\n";
                         write(client_fd, rep, strlen(rep));
-                        printf("Email: %s, Mot de passe: %s - CONNECTE\n", email, mdp);
                         connecte = true;
                     }
                     else if (result == 0)
@@ -467,7 +478,7 @@ int main(int argc, char *argv[])
                 continue;
             }
 
-            else if (strncmp(ligne, "CREATE_LABEL ", 13) == 0)
+            else if (strncmp(ligne, "CREATE_BORDEREAU ", 13) == 0)
             {
                 if (connecte == false)
                 {
@@ -524,7 +535,7 @@ int main(int argc, char *argv[])
                     }
                     char response[BUFFER_SIZE];
                     snprintf(response, sizeof(response),
-                             "LABEL=%d ALREADY_EXISTS=%d STEP=1 LABEL_STEP=\"Chez Alizon\"\n",
+                             "LABEL=%d ALREADY_EXISTS=%d STATUS=1\n",
                              bordereau, already);
                     write(client_fd, response, strlen(response));
                 }
@@ -555,11 +566,10 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        const char *libelle = "Chez Alizon"; // Simplifié pour l'exemple
                         char response[BUFFER_SIZE];
                         // envoie la ligne de status
                         snprintf(response, sizeof(response),
-                                 "OK STEP=%d LABEL_STEP=\"%s\"\n", ret, libelle);
+                                 "OK STEP=%d \n", ret);
                         write(client_fd, response, strlen(response));
 
                         if (ret == 5)

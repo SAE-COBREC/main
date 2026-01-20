@@ -1,72 +1,85 @@
-Le protocole sert a permmettre a un client de la marketplace de suivre l'avancé de sa commande et de valider
-ou non la récéption du colis .
 
-Données d’entrée / sortie :
+Protocole de suivi de commande
 
---------------- LOGIN --------------- 
+Ce protocole permet à un client de la marketplace de suivre l'avancée de sa commande et de valider ou non la réception du colis.
 
-Entrées coté client : 
+---
 
-identifiant, mot de passe
+## LOGIN
 
-Requete envoyé au service : 
+**Entrées côté client**
+- identifiant
+- mot de passe
 
-LOGIN identifiant mot_de_passe
+**Requête envoyée au service**
+```
+LOGIN <identifiant> <mot_de_passe>
+```
 
-Réponses possibles :
+**Réponses possibles**
+| Réponse                | Signification                |
+|------------------------|------------------------------|
+| ERROR LOGIN_FORMAT     | Format de login incorrect    |
+| ERROR LOGIN_INCORRECT  | Identifiants invalides       |
+| OK LOGIN_SUCESS        | Connexion réussie            |
 
-ERROR LOGIN_FORMAT
-ERROR LOGIN_INCORRECT
-OK LOGIN_SUCESS
 
-Scénario normal :
+---
 
---------------- STATUS --------------- 
+## STATUS
 
-Entrées coté client : 
+**Entrées côté client**
+- id_bordereau
 
-id_bordereau
+**Requête envoyée au service**
+```
+STATUS <id_bordereau>
+```
 
-Requete envoyé au service : 
-
-STATUS id_bordereau
-
-Réponses possibles :
-
-OK STATUS=... 
-ERREUR, aucune commande trouvé
-
-Scénario normal :
-
---------------- CREATE_BORDEREAU --------------- 
-
-Entrées coté client : 
-
-id_commande
-
-Requete envoyé au service : 
-
-CREATE_BORDEREAU id_commande
-
-Réponses possibles :
+**Réponses possibles**
+| Réponse                            | Signification                |
+|------------------------------------|------------------------------|
+| OK STATUS=(X entre 0 et 5)         | Statut de la commande        |
+| ERREUR                             | Aucune commande trouvée      |
 
 
 
-Scénario normal :
 
---------------- CREATE_BORDEREAU --------------- 
+---
 
-Entrées coté client : 
+## CREATE_BORDEREAU
+
+**Entrées côté client**
+- id_commande
+
+**Requête envoyée au service**
+```
+CREATE_BORDEREAU <id_commande>
+```
+
+**Réponses possibles**
+| Réponse                                              | Signification                      |
+|------------------------------------------------------|------------------------------------|
+| LABEL=(X un entier) ALREADY_EXISTS=(0 ou 1) STATUS=1   | Bordereau créé ou déjà existant    |
 
 
 
-Requete envoyé au service : 
+---
 
+## STATUS_UP
 
+**Entrées côté client**
+- id_bordereau
 
-Réponses possibles :
+**Requête envoyée au service**
+```
+STATUS_UP <id_bordereau>
+```
 
-
-Scénario normal :
+**Réponses possibles**
+| Réponse                        | Signification                                 |
+|--------------------------------|-----------------------------------------------|
+| LIVRE: Livré en l'absence      | Livré sans destinataire + image               |
+| LIVRE: Livré en main propre    | Livré en main propre                          |
 
 
