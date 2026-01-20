@@ -251,12 +251,12 @@ main {
   padding: 2rem 2rem 2rem 1rem;
   min-height: calc(100vh - 200px);
 }
-main > div:first-child {
+main .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
-main > div:first-child > p {
+main .product-grid > p {
   grid-column: 1/-1;
   text-align: center;
   padding: 2rem;
@@ -265,6 +265,10 @@ main > div:first-child > p {
 }
 
 article {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
   background: #FFFFFF;
   border-radius: 12px;
   overflow: hidden;
@@ -351,6 +355,9 @@ article > div:first-child .panier-icon {
 }
 article > div:last-child {
   padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 article > div:last-child h3 {
   font-size: 1rem;
@@ -385,13 +392,12 @@ article > div:last-child > div:nth-child(3) span:last-child {
 article > div:last-child .vendeur-info {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   margin-bottom: 12px;
-  padding: 4px 10px;
   background-color: #F0F4F8;
   border-radius: 20px;
-  max-width: 100%;
   border: 1px solid rgba(113, 113, 163, 0.1);
+  gap: 6px;
+  padding: 4px 8px;
 }
 article > div:last-child .vendeur-info img {
   width: 24px;
@@ -407,6 +413,7 @@ article > div:last-child .vendeur-info span {
   text-overflow: ellipsis;
 }
 article button {
+  margin-top: auto;
   width: 100%;
   padding: 0.75rem;
   background: #030212;
@@ -633,7 +640,7 @@ article button:disabled {
     padding: 1rem;
     order: 1;
   }
-  main > div:first-child {
+  .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
@@ -668,4 +675,172 @@ article button:disabled {
     padding: 0.6rem;
     font-size: 0.9rem;
   }
+}
+.carousel-container {
+  position: relative;
+  width: 100%;
+  margin: 0 0 2rem 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding-bottom: 30px;
+}
+.carousel-container .carousel-track-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+.carousel-container .carousel-track {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.carousel-container .carousel-slide {
+  min-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+.carousel-container .carousel-slide .carousel-content {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  .carousel-container .carousel-slide .carousel-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+.carousel-container .carousel-slide .carousel-image {
+  position: relative;
+  flex: 0 0 50%;
+  width: 100%;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.carousel-container .carousel-slide .carousel-image img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+  border-radius: 8px;
+}
+.carousel-container .carousel-slide .carousel-image .badge-reduction {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #e74c3c;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.carousel-container .carousel-slide .carousel-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.carousel-container .carousel-slide .carousel-info h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.carousel-container .carousel-slide .carousel-info .carousel-description {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  max-width: 90%;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.carousel-container .carousel-slide .carousel-info .carousel-vendeur {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+.carousel-container .carousel-slide .carousel-info .carousel-price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #7171A3;
+}
+.carousel-container .carousel-slide .carousel-info .btn-carousel-add {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #030212;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: -moz-fit-content;
+  width: fit-content;
+  transition: background 0.3s;
+}
+.carousel-container .carousel-slide .carousel-info .btn-carousel-add:hover {
+  background: #7171A3;
+}
+.carousel-container .carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+.carousel-container .carousel-btn:hover {
+  background: #7171A3;
+}
+.carousel-container .carousel-btn.prev-btn {
+  left: 10px;
+}
+.carousel-container .carousel-btn.next-btn {
+  right: 10px;
+}
+.carousel-container .carousel-nav {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+.carousel-container .carousel-nav .carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: #ccc;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s;
+}
+.carousel-container .carousel-nav .carousel-dot.active {
+  background: #7171A3;
+  transform: scale(1.2);
 }/*# sourceMappingURL=style.css.map */
