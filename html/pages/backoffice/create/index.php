@@ -177,7 +177,7 @@
 
 // print_r($_GET);
 // print_r($_SESSION["creerArticle"]['_GET']);
- print_r($_POST);
+// print_r($_POST);
 // print_r($_SESSION["creerArticle"]);
 // print_r($_FILES);
 $_SESSION["creerArticle"]["warn"]= 0; //réinitialisation des warnings
@@ -1068,8 +1068,6 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         } catch (Exception $e) {
                             // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] ="modif de l'affiliation entre catégorie et produit";
                             // $_SESSION["creerArticle"]['bdd_errors'][date("d-m-Y H:i:s",$time)][] = $e;
-                            print_r("PROBLEME CTAGEORIE");
-                                print_r($e);
                             
                         }
                     }
