@@ -63,7 +63,7 @@ function connectAndLogin($host, $port) {
 }
 
 function envoyerCommande($id_commande) {
-    $host = '10.253.5.101';
+    $host = '127.0.0.1';
     $port = 9000;
     $conn = connectAndLogin($host, $port);
     if (!$conn['fp']) {
@@ -102,7 +102,7 @@ function envoyerCommande($id_commande) {
 }
 
 function getStatusFromSocket($bordereau) {
-    $host = '10.253.5.101';
+    $host = '127.0.0.1';
     $port = 9000;
 
     $fp = @fsockopen($host, $port, $errno, $errstr, 1);
@@ -217,9 +217,6 @@ if ($id_commande > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suivi de commande #<?= htmlspecialchars($id_commande) ?> - Alizon</title>
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <link rel="stylesheet" href="/styles/SuiviCommande/style.css">
