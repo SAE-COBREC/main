@@ -376,6 +376,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     <?php
     //inclure l'en-tête du site
     include __DIR__ . '/../../partials/header.php';
+    include __DIR__ . '/../../partials/toast.html'
     ?>
 
     <nav class="page-breadcrumb">

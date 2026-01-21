@@ -251,24 +251,30 @@ function ajouterAuPanier(idProduit) {
             body: formData,
             noLoader: true
         })
-        //attend la réponse et la convertit en JSON
-        .then(response => response.json())
-        //traite la réponse du serveur
-        .then(data => {
-            //récupère le message de succès ou d'erreur
-            const message = data.success ? data.message : data.message;
-            //détermine le type de notification (succès ou erreur)
-            const type = data.success ? 'success' : 'error';
-            //affiche la notification (ou une alerte si la fonction notify n'existe pas)
-            window.notify ? notify(message, type) : alert((data.success ? '✓ ' : '✗ ') + message);
+        //gère la réponse de manière robuste (texte -> tentative JSON)
+        .then(async response => {
+            const text = await response.text();
+            try {
+                const data = JSON.parse(text);
+                return data;
+            } catch (err) {
+                //affiche la réponse brute pour débogage si elle n'est pas du JSON valide
+                console.error('Réponse serveur non JSON:', text);
+                //affiche une notification d'erreur claire
+                window.notify ? notify('Erreur serveur: réponse invalide', 'error') : alert('Erreur serveur: réponse invalide');
+                throw new Error('Invalid JSON response');
+            }
         })
-        //capture les erreurs de la requête
+        //traite la réponse JSON du serveur
+        .then(data => {
+            const message = data && data.message ? data.message : 'Réponse inconnue';
+            const type = data && data.success ? 'success' : 'error';
+            window.notify ? notify(message, type) : alert((type === 'success' ? '✓ ' : '✗ ') + message);
+        })
         .catch(error => {
-            //affiche l'erreur dans la console du navigateur
-            console.error('Erreur:', error);
-            //affiche un message d'erreur à l'utilisateur
-            window.notify ? notify('Erreur lors de l\'ajout au panier', 'error') : alert(
-                'Erreur lors de l\'ajout au panier');
+            console.error('Erreur ajout au panier:', error);
+            if (!error.message || error.message === 'Invalid JSON response') return; // message déjà affiché
+            window.notify ? notify('Erreur lors de l\'ajout au panier', 'error') : alert('Erreur lors de l\'ajout au panier');
         });
 }
 
