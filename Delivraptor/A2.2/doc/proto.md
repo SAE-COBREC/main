@@ -78,9 +78,13 @@ STATUS_UP <id_bordereau>
 ```
 
 **Réponses possibles**
-| Réponse                        | Signification                                 |
-|--------------------------------|-----------------------------------------------|
-| LIVRE: Livré en l'absence      | Livré sans destinataire + image               |
-| LIVRE: Livré en main propre    | Livré en main propre                          |
-
-
+| Réponse                                                                             | Signification                                             |
+|-------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| LIVRE: Livré en l'absence                                                           | Livré sans destinataire + image                           |
+| LIVRE: Livré en main propre                                                         | Livré en main propre                                      |
+| LIVRE: Refusé par le destinataire : Colis dégradé                                   | Livré mais le client à refusé le colis pour le cas décrit |
+| LIVRE: Refusé par le destinataire : Le colis ne correspond pas à l'article commandé | Livré mais le client à refusé le colis pour le cas décrit |
+| LIVRE: Refusé par le destinataire : Quantité livrée incorrecte                      | Livré mais le client à refusé le colis pour le cas décrit |
+| LIVRE: Refusé par le destinataire : Colis déjà ouvert                               | Livré mais le client à refusé le colis pour le cas décrit |
+| LIVRE: Refusé par le destinataire : Retard du colis trop important                  | Livré mais le client à refusé le colis pour le cas décrit |
+| Aucune réponse dans le délais                                                       | Le transporteur à atteint sa capacité maximum             |
