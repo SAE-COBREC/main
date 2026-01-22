@@ -196,17 +196,47 @@ if ($id_commande > 0) {
     }
 }
 
-/*if ($status['step'] == 5){
-        //une fois que tout le panier a été traité on créer un nouveau pour eviter les erreurs
-        $sqlCreatePanier = "
-            INSERT INTO _livraison (id_livraison, date_livraison, etat_livraison)
-            VALUES (:id_client, NULL)
-            RETURNING id_panier
-        ";
-        $stmtCreate = $pdo->prepare($sqlCreatePanier);
-        $stmtCreate->execute([":id_client" => $id_client]);
-        $idPanier = (int) $stmtCreate->fetchColumn();
-}*/
+
+
+//enregistre dans la BDD coté client du transoprteur (Alizon) pour pouvoir affiché sur la page de profilClient "l'état" de la commande
+if (isset($status) && isset($status['step']) && $id_commande) {
+
+//on regarde si il existe déjà une commande pour l'id sinon on execute le code tout le temps et ducoup on créé une erreur dans la 
+//base de donnée quand on vient de la page profilClient
+    $sql = '
+    SELECT etat_livraison
+    FROM cobrec1._livraison
+    WHERE id_livraison = :id_commande';
+    $stmt = $pdo->prepare($sql);
+    $params = ['id_commande' => $id_commande];
+    $stmt->execute($params);
+    $existe_deja = $stmt->fetchColumn();
+    $step = (int)$status['step'];
+
+    if (!$existe_deja && $step == 1){ //si rien n'existe && que l'étape est à 1 on insère dans la BDD 
+            $sqlInsert = "INSERT INTO cobrec1._livraison (id_livraison, id_facture, etat_livraison, date_livraison) 
+                            VALUES (:id_commande, :id_facture, 'En préparation', NULL)"; //NULL pour le moment car la commande n'est pas livré
+            $stmt = $pdo->prepare($sqlInsert);
+            $stmt->execute([':id_commande' => $id_commande,
+                            ':id_facture' => $_SESSION["post-achat"]["facture"]["id_facture"]]);
+    }
+    elseif ($step == 5) { //si le cas est à 5 'est à dire livré
+        $sqlUpdate = "UPDATE cobrec1._livraison 
+                        SET etat_livraison = 'Livré', 
+                            date_livraison = NOW() 
+                        WHERE id_livraison = :id_commande";
+        $stmt = $pdo->prepare($sqlUpdate);
+        $stmt->execute([':id_commande' => $id_commande]); //on marque comme livré dans la BDD
+    } 
+    else { //sinon elle est en transit
+        $sqlUpdate = "UPDATE cobrec1._livraison 
+                        SET etat_livraison = 'En transit' 
+                        WHERE id_livraison = :id_commande";
+        $stmt = $pdo->prepare($sqlUpdate);
+        $stmt->execute([':id_commande' => $id_commande]);
+    }
+}
+
 ?>
 
 <!DOCTYPE html>

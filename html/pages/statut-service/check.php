@@ -49,7 +49,6 @@ if (!$webOk) {
     $result['web'] = state(true, 'Site reachable (' . $webMsg . ')');
 }
 
-$dbHost = '10.253.5.101';
 $dbPort = 5432;
 $dbReachable = false;
 $fp = @fsockopen($dbHost, $dbPort, $errno, $errstr, 2);

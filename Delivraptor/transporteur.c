@@ -14,7 +14,7 @@
 #include <getopt.h>
 #include <time.h>
 #include <openssl/sha.h>
-
+#include <sys/stat.h> //pour le chmod +x
 
 #define PORT 9000
 #define BUFFER_SIZE 256
@@ -22,7 +22,6 @@
 #define FICHIER_COMMANDES "commandes.txt"
 #define FICHIER_SCRIPT "script.bash"
 #define NOM_SEMAPHORE "/sem_transporteur_v1"
-
 
 int cherche_si_commande_exist(PGconn *conn, int id_commande)
 {
@@ -49,10 +48,6 @@ int cherche_si_commande_exist(PGconn *conn, int id_commande)
                        NULL,   // format des paramètres (1 pour binaire 0 pour texte)
                        0);     // format du resultat (1 pour binaire 0 pour texte)
 
-
-    fprintf(stderr, "DEBUG id_commande = %d\n", id_commande);
-
-
     if (PQresultStatus(res) != PGRES_TUPLES_OK) // est-ce que PostgreSQL a exécuté la requête SELECT sans erreur ? si oui PGRES_TUPLES_OK si non Erreur SQL
     {
         fprintf(stderr, "Erreur SELECT: %s\n", PQerrorMessage(conn)); // PQerrorMessage affichera un emssage plus claire et précis que juste Erreur SELECT (par ex relation not exist)
@@ -64,12 +59,6 @@ int cherche_si_commande_exist(PGconn *conn, int id_commande)
         fprintf(stderr, "Erreur test");
         PQclear(res);
         return 1; // on renvoie 1 pour dire qu'on a bien trouvé
-    }
-    else
-    {
-        fprintf(stderr, "Erreur test2");
-        PQclear(res); // libère la mémoire de PGresult sinon la mémoire s'acumulent
-        return 0;     // renvoi 0 si rien n'est trouvé
     }
 }
 int cherche_dernier_bordereau(PGconn *conn)
@@ -84,7 +73,6 @@ int cherche_dernier_bordereau(PGconn *conn)
     la connexion*/
     PGresult *res = PQexec(conn, "SELECT MAX(id_bordereau) FROM cobrec1._bordereau");
 
-
     if (PQresultStatus(res) != PGRES_TUPLES_OK) // si il y a une erreur
     {
         fprintf(stderr, "Erreur SELECT: %s\n", PQerrorMessage(conn)); // on l'affiche su stderr
@@ -92,15 +80,12 @@ int cherche_dernier_bordereau(PGconn *conn)
         return -1;
     }
 
-
     char *val = PQgetvalue(res, 0, 0);
     int max = (val && strlen(val) > 0) ? atoi(val) : 0;
-
 
     PQclear(res);
     return max;
 }
-
 
 void enregistrer_commande(PGconn *conn, int id_commande, int bordereau, int status)
 {
@@ -116,25 +101,21 @@ void enregistrer_commande(PGconn *conn, int id_commande, int bordereau, int stat
     le status init a 0 car c'est le début du parcours
     */
 
-
     // initialisation des variable pour convertir en tableau de caaractère
     char id_bordereau_bdd[TAILLE_CHAINE_MAX];
     char id_commande_bdd[TAILLE_CHAINE_MAX];
     char status_bdd[TAILLE_CHAINE_MAX];
-
 
     // convertion des int en tableau de caractère
     snprintf(id_bordereau_bdd, sizeof(id_bordereau_bdd), "%d", bordereau);
     snprintf(id_commande_bdd, sizeof(id_commande_bdd), "%d", id_commande);
     snprintf(status_bdd, sizeof(status_bdd), "%d", status);
 
-
     // initialisation et remplissage du tableau des paramètres
     const char *params[3] = {
         id_bordereau_bdd,
         id_commande_bdd,
         status_bdd};
-
 
     // récupération des résultats de la requete
     PGresult *res = PQexecParams(
@@ -147,7 +128,6 @@ void enregistrer_commande(PGconn *conn, int id_commande, int bordereau, int stat
         NULL,
         0);
 
-
     if (PQresultStatus(res) != PGRES_COMMAND_OK) // si il y a une erreur
     {
         fprintf(stderr, "Erreur INSERT: %s\n", PQerrorMessage(conn)); // on l'affiche su stderr
@@ -155,7 +135,6 @@ void enregistrer_commande(PGconn *conn, int id_commande, int bordereau, int stat
     // libère la mémoire de PGresult sinon la mémoire s'acumulent
     PQclear(res);
 }
-
 
 int chercher_status_par_bordereau(PGconn *conn, int bordereau_recherche)
 {
@@ -181,7 +160,6 @@ int chercher_status_par_bordereau(PGconn *conn, int bordereau_recherche)
                        NULL,
                        0);
 
-
     if (PQresultStatus(res) != PGRES_TUPLES_OK)
     {
         fprintf(stderr, "Erreur SELECT: %s\n", PQerrorMessage(conn));
@@ -199,7 +177,6 @@ int chercher_status_par_bordereau(PGconn *conn, int bordereau_recherche)
     return atoi(val);
 }
 
-
 void change_status(PGconn *conn, int bordereau_recherche, int new_stat)
 {
     /*fonction qui change le status du bordereau passé en paramètre par le status passé en paramètre
@@ -212,18 +189,15 @@ void change_status(PGconn *conn, int bordereau_recherche, int new_stat)
     l'id du bordereau ou il faut changer le status
     le nouveau status de type int*/
 
-
     // même délire que toutes les autres fonction se référé à la fonction cherche_si_commande_exist qui est entièrement commenté
     char id_bordereau_bdd[TAILLE_CHAINE_MAX];
     char new_status_bdd[TAILLE_CHAINE_MAX];
-
 
     snprintf(id_bordereau_bdd, sizeof(id_bordereau_bdd), "%d", bordereau_recherche);
     snprintf(new_status_bdd, sizeof(new_status_bdd), "%d", new_stat);
     const char *params[2] = {
         new_status_bdd,
         id_bordereau_bdd};
-
 
     PGresult *res = PQexecParams(conn, "UPDATE cobrec1._bordereau SET etat_suivis = $1  WHERE id_bordereau = $2",
                                  2,
@@ -239,7 +213,6 @@ void change_status(PGconn *conn, int bordereau_recherche, int new_stat)
     PQclear(res);
 }
 
-
 int cherche_bordereau(PGconn *conn, int id_commande, int *bordereau)
 {
     /*fonction qui cherche le un bordereau passé en paramètre par le status passé en paramètre
@@ -253,7 +226,6 @@ int cherche_bordereau(PGconn *conn, int id_commande, int *bordereau)
     la connexion
     l'id du bordereau ou il faut changer le status
     le nouveau status de type int*/
-
 
     char id_commande_bdd[TAILLE_CHAINE_MAX];
     PGresult *res;
@@ -285,7 +257,6 @@ int cherche_bordereau(PGconn *conn, int id_commande, int *bordereau)
     }
 }
 
-
 // focntion de hash du mot de passe
 void hash_sha256(const char *input, char *output)
 {
@@ -296,17 +267,14 @@ void hash_sha256(const char *input, char *output)
     output[64] = 0;
 }
 
-
 int verif_login(PGconn *conn, char *email, char *mdp)
 {
     PGresult *res;
     const char *params[1] = {email};
 
-
     res = PQexecParams(conn,
                        "SELECT mdp FROM cobrec1._login WHERE identifiant = $1",
                        1, NULL, params, NULL, NULL, 0);
-
 
     if (PQresultStatus(res) != PGRES_TUPLES_OK)
     {
@@ -314,7 +282,6 @@ int verif_login(PGconn *conn, char *email, char *mdp)
         PQclear(res);
         return -1;
     }
-
 
     if (PQntuples(res) > 0)
     {
@@ -332,10 +299,8 @@ int verif_login(PGconn *conn, char *email, char *mdp)
     }
 }
 
-
 int main(int argc, char *argv[])
 {
-    srand(time(NULL)); // pour le rand obligatoire sinon on aura tout le temps le mem résultat
     signal(SIGCHLD, SIG_IGN);
     int sock, client_fd;
     struct sockaddr_in server_addr, client_addr;
@@ -344,7 +309,6 @@ int main(int argc, char *argv[])
     int opt = 1;
     int bordereau = 0;
     bool connecte = false;
-
 
     int capacite = -1;
     int c;
@@ -382,7 +346,6 @@ int main(int argc, char *argv[])
         "Livré dans la boite aux lettres du destinataire\n",
         "Refusé par le destinataire : "};
 
-
     // comment le colis à été refusé
     char raison_refus[5][60] = {
         "Colis dégradé\n",
@@ -391,16 +354,13 @@ int main(int argc, char *argv[])
         "Colis déjà ouvert\n",
         "Retard du colis trop important\n"};
 
-
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) // si l'initialisatio na échoué erreur de socket
-
 
     {
         perror("socket");
         return 1;
     }
-
 
     if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     {
@@ -408,12 +368,10 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
-
 
     if (bind(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
@@ -422,7 +380,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-
     if (listen(sock, 5) < 0)
     {
         perror("listen");
@@ -430,9 +387,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-
     printf("Serveur en écoute sur le port %d avec une capacité de %d\n", PORT, capacite);
-
 
     while (1)
     {
@@ -444,9 +399,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-
         printf("Client connecté.\n");
-
 
         pid_t pid = fork();
         if (pid < 0)
@@ -462,15 +415,11 @@ int main(int argc, char *argv[])
         }
         close(sock);
 
+        srand(time(NULL) ^ getpid()); // pour le rand obligatoire sinon on aura tout le temps le mem résultat et le getpid permet d'avoir un seed différent pour chaque processus fils
 
         PGconn *conn;
         conn = PQconnectdb(
-            "host=10.253.5.101 "
             "port=5432 "
-            "dbname=saedb "
-            "user=sae "
-            "password=kira13 ");
-
 
         if (PQstatus(conn) != CONNECTION_OK) // si la connexion échoue
         {
@@ -480,30 +429,25 @@ int main(int argc, char *argv[])
             exit(1);
         }
 
-
         do
         {
             memset(buffer, 0, BUFFER_SIZE); // nettoie le buffer
             ssize_t n = read(client_fd, buffer, BUFFER_SIZE - 1);
-
 
             if (n <= 0) // si le client c'est déco
             {
                 break; // o n sort de la boucle
             }
 
-
             char *ligne = strtok(buffer, "\r\n");
-            
-            // MODIFICATION ICI : Boucle while pour traiter TOUTES les commandes du buffer
-            while (ligne != NULL) 
+
+            while (ligne != NULL) // si la ligne n'est pas nulle on continue
             {
-                if (strncmp(ligne, "LOGIN ", 6) == 0)
+                if (strncmp(ligne, "LOGIN ", 6) == 0) // permet de se login au transporteur sinon on peut pas faire d'autre commande
                 {
-                    // MODIFICATION ICI : sscanf au lieu de strtok imbriqué
                     char email[64];
                     char mdp[64];
-                    
+
                     if (sscanf(ligne + 6, "%s %s", email, mdp) == 2)
                     {
                         int result = verif_login(conn, email, mdp);
@@ -531,10 +475,9 @@ int main(int argc, char *argv[])
                     }
                 }
 
-
-                else if (strncmp(ligne, "CREATE_BORDEREAU ", 17) == 0)
+                else if (strncmp(ligne, "CREATE_BORDEREAU ", 17) == 0) // cas ou on veut créer un bordereau
                 {
-                    if (connecte == false)
+                    if (connecte == false) // si on est pas connecté on peut pas créer de bordereau
                     {
                         const char *rep = "LOGIN FIRST\n";
                         write(client_fd, rep, strlen(rep));
@@ -548,7 +491,7 @@ int main(int argc, char *argv[])
                         {
                             write(client_fd, "ERROR DATABASE\n", 15);
                         }
-                        else 
+                        else
                         {
                             if (existe == 1)
                             {
@@ -564,7 +507,6 @@ int main(int argc, char *argv[])
                                 char temp2[25];
                                 fflush(stdout);
 
-
                                 if (dernierBordereau == -1)
                                 {
                                     fprintf(stderr, "Erreur à la création du bordereau.");
@@ -573,22 +515,18 @@ int main(int argc, char *argv[])
                                 {
                                     bordereau = dernierBordereau;
 
-
                                     // incrémente le bordereau car le numéro de bordereau renvoyé par la fonction est le plus grand de la BDD donc on ajoute 1 pour ne pas avoir de doublon
                                     bordereau++;
-                                    printf("DEBUG | dernierBordereau=%d | bordereau=%d | texte=%s\n",
-                                        dernierBordereau, bordereau, "CREATION BORDEREAU");
+
                                     printf("Nouveau bordereau : %d\n", bordereau);
                                     // appelle de la fonction enregistrer_commande pour enregistrer la nouvelle commande avec le bordereau créé
                                     // init a 0 car le statut de départ est 0
                                     enregistrer_commande(conn, id_commande, bordereau, 1);
 
-
                                     // ajoute la ligne dans script.bash pour ajouter la commande a cron
                                     FILE *script = fopen(FICHIER_SCRIPT, "a");
                                     if (script != NULL)
                                     {
-                                        fprintf(script, "echo -e \"LOGIN Alizon Alizon1!\\nSTATUS_UP %d\" | nc -q 1 10.253.5.101 9000\n", bordereau);
                                         fclose(script);
                                         printf("Ajouté au script: STATUS_UP %d\n", bordereau);
                                     }
@@ -600,17 +538,15 @@ int main(int argc, char *argv[])
                             }
                             char response[BUFFER_SIZE];
                             snprintf(response, sizeof(response),
-                                    "LABEL=%d ALREADY_EXISTS=%d STATUS=1\n",
-                                    bordereau, already);
+                                     "LABEL=%d ALREADY_EXISTS=%d STATUS=1\n",
+                                     bordereau, already);
                             write(client_fd, response, strlen(response));
                         }
                     }
                 }
-                
-                // IMPORTANT: STATUS_UP placé AVANT STATUS pour éviter conflit strncmp
-                else if (strncmp(ligne, "STATUS_UP", 9) == 0)
+                else if (strncmp(ligne, "STATUS_UP", 9) == 0) // cas ou on veut incrémenter le status
                 {
-                    if (connecte == false)
+                    if (connecte == false) // si on est pas connecté on peut pas créer de bordereau
                     {
                         const char *rep = "LOGIN FIRST\n";
                         write(client_fd, rep, strlen(rep));
@@ -621,7 +557,6 @@ int main(int argc, char *argv[])
                         // récupere le statut actuel
                         int status_act = chercher_status_par_bordereau(conn, label);
                         int new_status = status_act + 1;
-
 
                         printf("STATUS_UP pour %d : %d -> %d\n", label, status_act, new_status);
                         // verifie si la commande est arrivée
@@ -637,7 +572,7 @@ int main(int argc, char *argv[])
                             {
                                 char raison_du_refus[40];                               // on initialise une variable de la raison du refus
                                 int max_raison_refus = 4;                               // c'est le nombre de facon de pourquoi le colis à été refusé par le client (0,1,2,3,4 car il y a 5 raisons)
-                                int id_raison_refus = rand() % (max + 1);               // on créé un id pour choisir aléatoirement comment il est refusé
+                                int id_raison_refus = rand() % (max_raison_refus + 1);  // on créé un id pour choisir aléatoirement comment il est refusé
                                 strcpy(raison_du_refus, raison_refus[id_raison_refus]); // on copie la raison du refus dans raison_du_refus
                                 strcat(comment_livre, raison_du_refus);                 // on concatene la chaine de comment_livre avec raison_du_refus pour afficher
                             }
@@ -646,7 +581,6 @@ int main(int argc, char *argv[])
                             const char *params[2] = {
                                 comment_livre,
                                 id_bordereau_update};
-
 
                             PGresult *res_update = PQexecParams(conn, "UPDATE cobrec1._bordereau SET mode_livraison = $1  WHERE id_bordereau = $2",
                                                                 2,
@@ -681,27 +615,28 @@ int main(int argc, char *argv[])
                                 fclose(src);
                                 fclose(tmp);
                                 remove(FICHIER_SCRIPT);
+
                                 rename("script_tmp.bash", FICHIER_SCRIPT);
+                                chmod(FICHIER_SCRIPT, 0755); // redonne les droits au fichier sinon le cron ne pourra pas l'exécuter
                             }
-                            else
+                            else // si l'ouverture a échoué
                             {
-                                if (src)
+                                if (src) // ferme ce qui a été ouvert
                                     fclose(src);
-                                if (tmp)
+                                if (tmp) // ferme ce qui a été ouvert
                                     fclose(tmp);
                             }
-                            const char *msg = "COMMANDE FINI\n";
-                            write(client_fd, msg, strlen(msg));
+                            const char *msg = "COMMANDE FINI\n"; // si le status est déjà à 5 on ne peut pas l'incrémenter plus
+                            write(client_fd, msg, strlen(msg));  // donc on écrit commande fin
                         }
-                        else if (status_act >= 0)
+                        else if (status_act >= 0) // si le status est entre 0 et 4 on peut donc l'incrémenter
                         {
                             int new_status = status_act + 1;
                             change_status(conn, label, new_status);
 
-
                             char response[BUFFER_SIZE];
                             snprintf(response, sizeof(response),
-                                    "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
+                                     "OK BORDEREAU=%d STATUS=%d\n", label, new_status);
                             write(client_fd, response, strlen(response));
                         }
                         else if (status_act == -2)
@@ -716,10 +651,10 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-                
-                else if (strncmp(ligne, "STATUS ", 7) == 0)
+
+                else if (strncmp(ligne, "STATUS ", 7) == 0) // cas ou on veut le status
                 {
-                    if (connecte == false)
+                    if (connecte == false) // si on est pas connecté on peut pas créer de bordereau
                     {
                         const char *rep = "LOGIN FIRST\n";
                         write(client_fd, rep, strlen(rep));
@@ -729,9 +664,7 @@ int main(int argc, char *argv[])
                         int label = atoi(ligne + 7);
                         int ret = chercher_status_par_bordereau(conn, label);
 
-
                         printf("Demande STATUS pour bordereau %d : ret=%d\n", label, ret);
-
 
                         if (ret == -1)
                         {
@@ -748,9 +681,8 @@ int main(int argc, char *argv[])
                             char response[BUFFER_SIZE];
                             // envoie la ligne de status
                             snprintf(response, sizeof(response),
-                                    "OK STEP=%d \n", ret);
+                                     "OK STEP=%d \n", ret);
                             write(client_fd, response, strlen(response));
-
 
                             if (ret == 5)
                             {
@@ -759,14 +691,12 @@ int main(int argc, char *argv[])
                                 snprintf(id_bordereau_bdd, sizeof(id_bordereau_bdd), "%d", label);
                                 const char *params[1] = {id_bordereau_bdd};
 
-
                                 PGresult *res_comment_livre = PQexecParams(conn,
-                                                                        "SELECT mode_livraison FROM cobrec1._bordereau WHERE id_bordereau = $1",
-                                                                        1, NULL, params, NULL, NULL, 0);
+                                                                           "SELECT mode_livraison FROM cobrec1._bordereau WHERE id_bordereau = $1",
+                                                                           1, NULL, params, NULL, NULL, 0);
                                 if (PQresultStatus(res_comment_livre) == PGRES_TUPLES_OK) // est-ce que PostgreSQL a exécuté la requête SELECT sans erreur ? si oui PGRES_TUPLES_OK si non Erreur SQL
                                 {
                                     char *mode_livraison = PQgetvalue(res_comment_livre, 0, 0);
-
 
                                     char detail_msg[BUFFER_SIZE];
                                     snprintf(detail_msg, sizeof(detail_msg), "LIVRE: %s", mode_livraison);
@@ -781,7 +711,6 @@ int main(int argc, char *argv[])
                                             fseek(fp, 0, SEEK_END);    // place le pointeur a la fin du fichier pour avoir la taille
                                             long filesize = ftell(fp); // demande la taille du fichier
                                             fseek(fp, 0, SEEK_SET);    // remet le pointeur au début du fichier
-
 
                                             char *bufferimage = malloc(filesize);
                                             if (bufferimage)
@@ -804,7 +733,6 @@ int main(int argc, char *argv[])
                     }
                 }
 
-
                 else if (strcmp(ligne, "--help") == 0 || strcmp(ligne, "HELP") == 0)
                 {
                     const char *rep =
@@ -815,20 +743,17 @@ int main(int argc, char *argv[])
                     write(client_fd, rep, strlen(rep));
                 }
 
-
                 else
                 {
                     const char *rep = "ERROR UNKNOWN_COMMAND\nLa commande que vous avez tapez n'existe pas.\n";
                     write(client_fd, rep, strlen(rep));
                 }
 
-                // MODIFICATION ICI: Passage à la commande suivante dans le buffer
                 ligne = strtok(NULL, "\r\n");
 
-            } // Fin du while(ligne != NULL)
+            } // fin du while(ligne != NULL)
 
         } while (1);
-
 
         printf("Client déconnecté.\n");
         close(client_fd);
