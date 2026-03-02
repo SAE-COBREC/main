@@ -1,6 +1,6 @@
 @charset "UTF-8";
 * {
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.3s ease;
 }
 
 @media screen and (max-width: 560px) {
@@ -153,8 +153,6 @@ aside .slider-container {
   height: 40px; /* Plus d'espace */
   margin-bottom: 5px;
   /* Arrière-plan (piste grise) */
-  /* Piste active (bleue) gérée par JS */
-  /* Les inputs range eux-mêmes */
 }
 aside .slider-container .slider-track-bg {
   position: absolute;
@@ -166,6 +164,9 @@ aside .slider-container .slider-track-bg {
   border-radius: 3px;
   z-index: 1;
 }
+aside .slider-container {
+  /* Piste active (bleue) gérée par JS */
+}
 aside .slider-container .slider-track-active {
   position: absolute;
   top: 50%;
@@ -174,6 +175,9 @@ aside .slider-container .slider-track-active {
   background-color: #7171A3;
   border-radius: 3px;
   z-index: 2;
+}
+aside .slider-container {
+  /* Les inputs range eux-mêmes */
 }
 aside .slider-container input[type=range] {
   position: absolute;
@@ -185,7 +189,6 @@ aside .slider-container input[type=range] {
   pointer-events: none; /* Important pour cliquer à travers */
   z-index: 3;
   margin: 0;
-  /* Thumb au survol */
 }
 aside .slider-container input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -212,6 +215,9 @@ aside .slider-container input[type=range]::-moz-range-thumb {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   -moz-transition: transform 0.1s;
   transition: transform 0.1s;
+}
+aside .slider-container input[type=range] {
+  /* Thumb au survol */
 }
 aside .slider-container input[type=range]:hover::-webkit-slider-thumb {
   transform: scale(1.1);
@@ -368,8 +374,7 @@ article > div:first-child .badge-reduction {
   letter-spacing: 0.5px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1;
-  -webkit-backdrop-filter: blur(4px);
-          backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 article > div:first-child .badge-bretagne {
   position: absolute;
