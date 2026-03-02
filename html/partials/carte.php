@@ -1,6 +1,4 @@
 <?php 
-//démarre la session utilisateur
-session_start();
 
 //charge le fichier de connexion à la base de données
 require_once __DIR__ . '/../selectBDD.php';
