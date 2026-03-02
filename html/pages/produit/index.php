@@ -452,8 +452,6 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 <div class="section features">
                     <h3>Caractéristiques</h3>
                     <ul>
-                        <li>Catégorie : <?= htmlspecialchars(explode(', ', $produit['categories'])[0] ?? 'Général') ?></li>
-                        <li>Statut : <?= htmlspecialchars($produit['p_statut']) ?></li>
                         <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?> <div class="smaller">(<a href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)</div></li>
                         <li>Origine : <?= htmlspecialchars($produit['p_origine'] ?? 'Non spécifiée') ?></li>
                     </ul>
