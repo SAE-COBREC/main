@@ -14,7 +14,9 @@ $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 $listesVendeurs = $_SESSION['listesVendeurs'] ?? [];
 
-$adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs));
+$IdDesVendeurs = getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs);
+
+$adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $IdDesVendeurs);
 
 
 
@@ -58,15 +60,34 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Données des vendeurs transmises depuis index.php
-var vendeursData = <?= json_encode($vendeursUniques) ?>;
+// Données des adresses des vendeurs depuis PHP
+var adressesVendeurs = <?php echo json_encode($adresseDesVendeurs); ?>;
 
-// Afficher un marqueur pour chaque vendeur
-var marker = L.marker([48.75770187, -3.45408821]).addTo(map);
-marker.bindPopup("<b>Alizon</b><br>La meilleur equipe de dev !").openPopup();
+// Fonction pour géocoder et ajouter un marker
+function ajouterMarkerVendeur(adresse) {
+    // Construire l'URL de recherche pour Nominatim
+    var adresseEncodee = encodeURIComponent(adresse);
+    var urlNominatim = 'https://nominatim.openstreetmap.org/search?q=' + adresseEncodee + '&format=json&limit=1';
 
-// Données additionnelles des vendeurs (à obtenir de la base de données)
-console.log("Vendeurs filtrés:", vendeursData);
+    fetch(urlNominatim)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                var lat = data[0].lat;
+                var lon = data[0].lon;
+                var newMarker = L.marker([lat, lon]).addTo(map);
+                newMarker.bindPopup("<b>Vendeur</b><br>" + adresse);
+            }
+        })
+        .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
+}
+
+// Boucler sur chaque adresse de vendeur et ajouter les markers
+adressesVendeurs.forEach(function(vendeur) {
+    if (vendeur && vendeur.adresse) {
+        ajouterMarkerVendeur(vendeur.adresse);
+    }
+});
 </script>
 
 </html>

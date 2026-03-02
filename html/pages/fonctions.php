@@ -1781,7 +1781,7 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
             $adresse = $requetePreparee->fetch(PDO::FETCH_ASSOC);
             
             if ($adresse) {
-                $adresseFormatee = '+' . $adresse['a_numero'] . '+' . $adresse['a_adresse'] . '%2C+' . $adresse['a_code_postal'] . '+' . $adresse['a_ville'];
+                $adresseFormatee = $adresse['a_numero'] . ' ' . $adresse['a_adresse'] . ' ' . $adresse['a_code_postal'] . ' ' . $adresse['a_ville'];
                 $adresses[] = $adresseFormatee;
             }
         }
@@ -1790,4 +1790,21 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
     } catch (Exception $erreurException) {
         return [];
     }
+}
+
+function getCoordinates($address){
+ // replace all the white space with "+" sign to match with google search pattern 
+ $address = str_replace(" ", "+", $address); 
+
+ $url = "https://maps.google.com/maps/api/geocode/json?sensor=false&key=votrecle&address=$address";
+ $response = file_get_contents($url);
+ 
+ // generate array object from the response from the web
+ $json = json_decode($response,TRUE);
+ // Latitude
+ $latitude = ($json['results'][0]['geometry']['location']['lat']) ? $json['results'][0]['geometry']['location']['lat'] : '--';
+ // Longitude
+ $longitude = ($json['results'][0]['geometry']['location']['lng']) ? $json['results'][0]['geometry']['location']['lng'] : '--';
+
+ return $latitude . "," . $longitude;
 }
