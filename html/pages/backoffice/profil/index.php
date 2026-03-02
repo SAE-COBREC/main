@@ -544,7 +544,7 @@ function safe($array, $key, $default = "") {
             </div>
         </div>
 
-          <button class="btn btn--primary" type="submit">Enregistrer</button>
+          <button title="Enregistrer" class="btn btn--primary" type="submit">Enregistrer</button>
         </form>
       </div>
 
@@ -592,7 +592,7 @@ function safe($array, $key, $default = "") {
 
 
 
-        <button class="btn btn--primary" type="submit" name="change_password">Modifier mon mot de passe</button>
+        <button title="Modifier mon mot de passe" class="btn btn--primary" type="submit" name="change_password">Modifier mon mot de passe</button>
 
     </form>
     </div>

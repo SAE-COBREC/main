@@ -81,7 +81,7 @@ try {
                                 <p><?php echo date("j/m/Y H:m", strtotime($commande['date'])); ?></p>
                                 <a href="../../post-achat/profil.php?id=<?php echo $commande['id_panier']; ?>"
                                     target="_blank" rel="noopener noreferrer">
-                                    <button type="button" class="btn-download">
+                                    <button title="Télécharger la facture" type="button" class="btn-download">
                                         Télécharger la facture
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                             <line x1="5" y1="12" x2="19" y2="12"></line>

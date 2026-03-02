@@ -75,7 +75,7 @@ require_once "../../partials/header.php" ?>
           </div>
           <input type="text" name="subject" placeholder="Objet (facultatif)">
           <textarea name="message" rows="6" placeholder="Votre message" required></textarea>
-          <div style="margin-top:0.5rem;"><button type="submit">Envoyer</button></div>
+          <div style="margin-top:0.5rem;"><button title="Envoyer" type="submit">Envoyer</button></div>
         </form>
       <?php endif; ?>
 

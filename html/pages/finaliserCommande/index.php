@@ -75,7 +75,7 @@ if (isset($_SESSION['idClient'])) {
 
 } else {
     $url = '/pages/connexionClient/index.php';
-    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
 }
 
 
@@ -226,7 +226,7 @@ if (isset($_POST['numCarte'], $_POST['dateExpiration'], $_POST['cvc'], $_POST['a
 
       
         $url = '../suiviCommande/index.php';
-        echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+        echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
 
     }
 }

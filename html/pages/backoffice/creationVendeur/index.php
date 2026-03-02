@@ -231,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Redirection vers la page d'accueil uniquement si pas d'erreur
     if (!$hasError) {
       $url = '../index.php';
-      echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+      echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
       echo '<script>window.location.href="'.$url.'";</script></head><body>Si vous n\'êtes pas redirigé automatiquement, <a href="'.$url.'">cliquez ici</a>.</body></html>';
       exit;
     }
@@ -296,9 +296,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="step">étape 1 / 5</div>
 
-      <div class="next-btn" role="group" aria-label="Suivant action">
+      <div class="next-btn" role="group" title="Suivant action">
         <span class="next-text">Suivant</span>
-        <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+        <button type="button" class="arrow-only" title="Suivant" onclick="showNextCard()">
           <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow" aria-hidden="true">
         </button>
       </div>
@@ -341,15 +341,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="step">étape 2 / 5</div>
 
       <div class="inline-flex">
-        <div class="next-btn" role="group" aria-label="Précédent action">
+        <div class="next-btn" role="group" title="Précédent action">
           <span class="next-text">Précédent</span>
-          <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
+          <button type="button" class="arrow-only" title="Précédent" onclick="showPreviousCard()">
             <img src="../../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)" class="btn-arrow-left" aria-hidden="true">
           </button>
         </div>
-        <div class="next-btn" role="group" aria-label="Suivant action">
+        <div class="next-btn" role="group" title="Suivant action">
           <span class="next-text">Suivant</span>
-          <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+          <button type="button" class="arrow-only" title="Suivant" onclick="showNextCard()">
             <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow" aria-hidden="true">
           </button>
         </div>
@@ -384,15 +384,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="step">étape 3 / 5</div>
 
       <div class="inline-flex">
-        <div class="next-btn" role="group" aria-label="Précédent action">
+        <div class="next-btn" role="group" title="Précédent action">
           <span class="next-text">Précédent</span>
-          <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
+          <button type="button" class="arrow-only" title="Précédent" onclick="showPreviousCard()">
             <img src="../../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)" class="btn-arrow-left" aria-hidden="true">
           </button>
         </div>
-        <div class="next-btn" role="group" aria-label="Suivant action">
+        <div class="next-btn" role="group" title="Suivant action">
           <span class="next-text">Suivant</span>
-          <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+          <button type="button" class="arrow-only" title="Suivant" onclick="showNextCard()">
             <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow" aria-hidden="true">
           </button>
         </div>
@@ -449,15 +449,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="step">étape 4 / 5</div>
 
       <div class="inline-flex">
-        <div class="next-btn" role="group" aria-label="Précédent action">
+        <div class="next-btn" role="group" title="Précédent action">
           <span class="next-text">Précédent</span>
-          <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
+          <button type="button" class="arrow-only" title="Précédent" onclick="showPreviousCard()">
             <img src="../../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)" class="btn-arrow-left" aria-hidden="true">
           </button>
         </div>
-        <div class="next-btn" role="group" aria-label="Suivant action">
+        <div class="next-btn" role="group" title="Suivant action">
           <span class="next-text">Suivant</span>
-          <button type="button" class="arrow-only" aria-label="Suivant" onclick="showNextCard()">
+          <button type="button" class="arrow-only" title="Suivant" onclick="showNextCard()">
             <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow" aria-hidden="true">
           </button>
         </div>
@@ -492,15 +492,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="step">étape 5 / 5</div>
 
       <div class="inline-flex">
-        <div class="next-btn" role="group" aria-label="Précédent action">
+        <div class="next-btn" role="group" title="Précédent action">
           <span class="next-text">Précédent</span>
-          <button type="button" class="arrow-only" aria-label="Précédent" onclick="showPreviousCard()">
+          <button type="button" class="arrow-only" title="Précédent" onclick="showPreviousCard()">
             <img src="../../../img/svg/fleche-gauche.svg" alt="Précédent" style="filter : invert(1) saturate(0.9)" class="btn-arrow-left" aria-hidden="true">
           </button>
         </div>
-        <div class="next-btn" role="group" aria-label="Suivant action">
+        <div class="next-btn" role="group" title="Suivant action">
           <span class="next-text">Terminer</span>
-          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" title="Terminer">
             <img src="../../../img/svg/fleche-gauche.svg" alt="" style="filter : invert(1) saturate(0.9)" class="btn-arrow" aria-hidden="true">
           </button>
         </div>

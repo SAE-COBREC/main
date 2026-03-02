@@ -8,7 +8,7 @@
     include '../fonctions.php';
 ?>
 
-<html>
+<html lang="fr">
     <head>
         <link rel="stylesheet" href="/styles/post-achat/impression.css">
     </head>

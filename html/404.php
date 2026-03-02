@@ -3,7 +3,7 @@ http_response_code(404);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
