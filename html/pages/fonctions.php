@@ -1741,3 +1741,52 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
         return ['success' => false, 'message' => "Erreur lors de la suppression du compte: " . $erreurException->getMessage()];
     }
 }
+
+function getIdVendeurParliste($pdo, $listeVendeurs)
+{
+    try {
+        $listeIds = [];
+        
+        foreach ($listeVendeurs as $nomVendeur) {
+            $requeteSQL = "SELECT id_vendeur FROM cobrec1._vendeur WHERE denomination = ?";
+            $requetePreparee = $pdo->prepare($requeteSQL);
+            $requetePreparee->execute([$nomVendeur]);
+            $vendeur = $requetePreparee->fetch(PDO::FETCH_ASSOC);
+            
+            if ($vendeur) {
+                $listeIds[] = $vendeur['id_vendeur'];
+            }
+        }
+        
+        return $listeIds;
+    } catch (Exception $erreurException) {
+        return [];
+    }
+}
+
+function getAdresseVendeur($pdo, $listeIdVendeurs)
+{
+    try {
+        $adresses = [];
+        
+        foreach ($listeIdVendeurs as $idVendeur) {
+            $requeteSQL = "
+                SELECT a.id_adresse, a.a_numero, a.a_adresse, a.a_ville, a.a_code_postal, a.a_pays, a.a_complement
+                FROM cobrec1._adresse a
+                JOIN cobrec1._vendeur v ON a.id_compte = v.id_compte
+                WHERE v.id_vendeur = ?
+            ";
+            $requetePreparee = $pdo->prepare($requeteSQL);
+            $requetePreparee->execute([$idVendeur]);
+            $adresse = $requetePreparee->fetch(PDO::FETCH_ASSOC);
+            
+            if ($adresse) {
+                $adresses[] = $adresse;
+            }
+        }
+        
+        return $adresses;
+    } catch (Exception $erreurException) {
+        return [];
+    }
+}

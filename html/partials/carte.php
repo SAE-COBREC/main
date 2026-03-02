@@ -14,9 +14,7 @@ $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 $listesVendeurs = $_SESSION['listesVendeurs'] ?? [];
 
-$IdDesVendeurs = getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs);
-
-$adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $IdDesVendeurs);
+$adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs));
 
 
 
