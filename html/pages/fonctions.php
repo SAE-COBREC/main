@@ -806,6 +806,7 @@ function chargerProduitBDD($pdo, $idProduit) {
                 p.p_statut,
                 p.p_description,
                 p.p_nb_ventes,
+                p.p_origine,
                 COALESCE(p.p_nb_ventes, 0) AS p_nb_ventes,
                 COALESCE(p.p_note, 0) AS p_note,
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
