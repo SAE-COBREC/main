@@ -191,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
       //redirige sur la page d'acceuil
       $url = '../../index.php';
-      echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+      echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
       exit;
     }
   }

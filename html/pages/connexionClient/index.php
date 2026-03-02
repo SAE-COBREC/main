@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $_SESSION['idCompte'] = (int)$row['id_compte'];
           // Redirection sans header() (serveur peut bloquer header)
           $url = '../../index.php';
-          echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+          echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
       }

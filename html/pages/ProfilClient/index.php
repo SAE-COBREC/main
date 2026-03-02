@@ -17,7 +17,7 @@ $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 //vérifier si le client est connecté via la session
 if (!isset($_SESSION['idClient'])) {
     $url = '/pages/connexionClient/index.php';
-    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 
@@ -29,7 +29,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_unset();
     session_destroy();
     $url = '/index.php';
-    echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 

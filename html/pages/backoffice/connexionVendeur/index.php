@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           
           //redirige sur la page d'acceuil
           $url = '../index.php';
-          echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+          echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
       }
@@ -188,8 +188,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
 
 
-      <div class="connex-btn" role="group" aria-label="Suivant action">
-          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" aria-label="Terminer">
+      <div class="connex-btn" role="group" title="Suivant action">
+          <button type="button" onclick="finishRegistration()" id="finishBtn" class="arrow-only" title="Terminer">
             Terminer
           </button>
       </div>

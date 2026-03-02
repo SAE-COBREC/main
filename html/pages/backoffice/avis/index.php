@@ -300,9 +300,9 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </button>
                                 <div class="report-dropdown">
                                     <?php if ($avis['vendor_reported']): ?>
-                                        <button class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px;cursor:pointer;">Annuler le signalement</button>
+                                        <button class="btn-unreport-action" title="Annuler le signalement" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px;cursor:pointer;">Annuler le signalement</button>
                                     <?php else: ?>
-                                        <button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px;cursor:pointer;">Signaler l'avis</button>
+                                        <button class="btn-report-action" title="Signaler l'avis" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px;cursor:pointer;">Signaler l'avis</button>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -322,11 +322,11 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         Répondu le <?= date('d/m/Y à H:i', strtotime($avis['reponse_date'])) ?>
                                     </div>
                                     <div style="display:flex;gap:5px;">
-                                        <button onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='block';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='none';" class="btn-action btn-edit">Modifier</button>
+                                        <button title="Modifier" onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='block';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='none';" class="btn-action btn-edit">Modifier</button>
                                         <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer votre réponse ?');">
                                             <input type="hidden" name="action" value="supprimer">
                                             <input type="hidden" name="id_reponse" value="<?= $avis['id_reponse'] ?>">
-                                            <button type="submit" class="btn-action btn-delete">Supprimer</button>
+                                            <butto title="Supprimer" type="submit" class="btn-action btn-delete">Supprimer</button>
                                         </form>
                                     </div>
                                 </div>
@@ -341,11 +341,11 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="char-counter" style="text-align:right;font-size:0.85em;color:#e67e22;margin-top:4px;"><?= strlen($avis['reponse_texte']) ?>/255</div>
                                 <div class="edit-actions">
                                     <button type="submit" class="btn-submit btn-save" name="submit_edit">Enregistrer les modifications</button>
-                                    <button type="button" class="btn-cancel" onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='none';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='block';">Annuler</button>
+                                    <button type="button" title="Annuler" class="btn-cancel" onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='none';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='block';">Annuler</button>
                                 </div>
                             </form>
                         <?php else: ?>
-                            <button onclick="this.nextElementSibling.style.display='block'; this.style.display='none'; this.nextElementSibling.querySelector('textarea').focus();" class="btn-submit" style="background:#fff;color:#e67e22;border:1px solid #e67e22;padding:8px 16px;border-radius:4px;font-weight:bold;cursor:pointer;">Répondre à cet avis</button>
+                            <button title="Répondre à cet avis" onclick="this.nextElementSibling.style.display='block'; this.style.display='none'; this.nextElementSibling.querySelector('textarea').focus();" class="btn-submit" style="background:#fff;color:#e67e22;border:1px solid #e67e22;padding:8px 16px;border-radius:4px;font-weight:bold;cursor:pointer;">Répondre à cet avis</button>
                             <form id="form-reponse-<?= $avis['id_avis'] ?>" class="reponse-form" method="POST" style="display:none;margin-top:15px;background:#f9f9f9;padding:15px;border-radius:8px;border:1px solid #eee;">
                                 <input type="hidden" name="action" value="repondre">
                                 <input type="hidden" name="id_avis" value="<?= $avis['id_avis'] ?>">
@@ -353,8 +353,8 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <textarea name="reponse" id="reponse_<?= $avis['id_avis'] ?>" required maxlength="255" oninput="updateCounter(this)" placeholder="Écrivez votre réponse ici..." style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;min-height:100px;font-family:inherit;resize:vertical;"></textarea>
                                 <div class="char-counter" style="text-align:right;font-size:0.85em;color:#7f8c8d;margin-top:4px;">0/255</div>
                                 <div class="edit-actions">
-                                    <button type="submit" class="btn-submit btn-save">Publier la réponse</button>
-                                    <button type="button" class="btn-cancel" onclick="this.closest('form').style.display='none';this.closest('form').previousElementSibling.style.display='inline-block';">Annuler</button>
+                                    <button title="Publier la réponse" type="submit" class="btn-submit btn-save">Publier la réponse</button>
+                                    <button title="Annuler la réponse" type="button" class="btn-cancel" onclick="this.closest('form').style.display='none';this.closest('form').previousElementSibling.style.display='inline-block';">Annuler</button>
                                 </div>
                             </form>
                         <?php endif; ?>
@@ -384,8 +384,8 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <label style="display:block;margin:8px 0 4px;font-weight:600">Commentaire (optionnel)</label>
           <textarea id="reportCommentaireVendor" rows="4" style="width:100%;padding:8px" placeholder="Décrivez si besoin..."></textarea>
           <div class="modal-actions" style="margin-top:12px">
-              <button class="btn-secondary" id="cancelReportVendor">Annuler</button>
-              <button class="btn-primary" id="confirmReportVendor">Envoyer</button>
+              <button title="Annuler" class="btn-secondary" id="cancelReportVendor">Annuler</button>
+              <button title="Envoyer" class="btn-primary" id="confirmReportVendor">Envoyer</button>
           </div>
       </div>
   </div>
@@ -433,7 +433,7 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                       if (d.success) {
                           notify(d.message || 'Signalement annulé.', 'success');
                           const dropdown = card.querySelector('.report-dropdown');
-                          if (dropdown) dropdown.innerHTML = '<button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l\'avis</button>';
+                          if (dropdown) dropdown.innerHTML = '<button title="Signaler l avis" class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l\'avis</button>';
                       } else {
                           const msg = d.message || 'Impossible d\'annuler le signalement';
                           notify(msg, 'error');
@@ -491,7 +491,7 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                               const rev = document.querySelector('.avis-card[data-avis-id="' + aid + '"]');
                               if (rev) {
                                   const dropdown = rev.querySelector('.report-dropdown');
-                                  if (dropdown) dropdown.innerHTML = '<button class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler le signalement</button>';
+                                  if (dropdown) dropdown.innerHTML = '<button title="Annuler" class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler le signalement</button>';
                               }
                           } catch (e) { /* silent */ }
                           reportModal.classList.remove('modal-open');

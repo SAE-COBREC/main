@@ -434,7 +434,7 @@ if (!function_exists('renderAvisHtml')) {
 <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>"
     data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;position:relative;padding-right:44px;">
     <?php if (!($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) ))): ?>
-    <button class="ghost btn-report-trigger" aria-label="Options avis"
+    <button class="ghost btn-report-trigger" title="Options avis"
         style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -446,11 +446,11 @@ if (!function_exists('renderAvisHtml')) {
     <div class="report-dropdown"
         style="display:none;position:absolute;right:8px;top:44px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;z-index:60;min-width:160px;box-shadow:0 6px 18px rgba(0,0,0,.06)">
         <?php if (isset($ta['user_reported']) && $ta['user_reported']): ?>
-        <button class="btn-unreport-action"
+        <button class="btn-unreport-action" title="Annuler le signalement"
             style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler
             le signalement</button>
         <?php else: ?>
-        <button class="btn-report-action"
+        <button class="btn-report-action" title="Signaler l'avis"
             style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler
             l'avis</button>
         <?php endif; ?>
@@ -488,12 +488,12 @@ if (!function_exists('renderAvisHtml')) {
         <div class="vote-section">
             <span class="vote-label">Évaluer ce commentaire :</span>
             <div class="vote-buttons">
-                <button type="button" class="ghost btn-vote" data-type="J'aime" aria-label="Vote plus"
+                <button type="button" class="ghost btn-vote" data-type="J'aime" title="Vote plus"
                     <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'plus') ? 'aria-pressed="true"' : '' ?>>
                     <img src="/img/svg/PouceHaut.svg" alt="J'aime" width="16" height="16"> <span
                         class="like-count"><?= (int)$ta['a_pouce_bleu'] ?></span>
                 </button>
-                <button type="button" class="ghost btn-vote" data-type="Je n'aime pas" aria-label="Vote moins"
+                <button type="button" class="ghost btn-vote" data-type="Je n'aime pas" title="Vote moins"
                     <?= (isset($ta['user_vote']) && $ta['user_vote'] === 'minus') ? 'aria-pressed="true"' : '' ?>>
                     <img src="/img/svg/PouceBas.svg" alt="Je n'aime pas" width="16" height="16"> <span
                         class="dislike-count"><?= (int)$ta['a_pouce_rouge'] ?></span>
@@ -503,11 +503,11 @@ if (!function_exists('renderAvisHtml')) {
         <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
         <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
         <div class="review-actions">
-            <button class="ghost btn-edit-review desktop-only">Modifier</button>
-            <button class="ghost btn-delete-review desktop-only">Supprimer</button>
+            <button title="Modifier" class="ghost btn-edit-review desktop-only">Modifier</button>
+            <button title="Supprimer" class="ghost btn-delete-review desktop-only">Supprimer</button>
 
             <div class="mobile-menu-container mobile-only">
-                <button class="ghost btn-menu-trigger" aria-label="Options">
+                <button class="ghost btn-menu-trigger" title="Options">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="1"></circle>
@@ -516,8 +516,8 @@ if (!function_exists('renderAvisHtml')) {
                     </svg>
                 </button>
                 <div class="mobile-menu-dropdown">
-                    <button class="btn-edit-review">Modifier</button>
-                    <button class="btn-delete-review">Supprimer</button>
+                    <button title="Modifier" class="btn-edit-review">Modifier</button>
+                    <button title="Supprimer" class="btn-delete-review">Supprimer</button>
                 </div>
             </div>
         </div>

@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Redirection
         $url = '../connexionClient/index.php';
-        echo '<!doctype html><html><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+        echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
         exit;
       }
       }

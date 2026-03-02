@@ -208,14 +208,14 @@
                                     <div class="vote-section">
                                         <span class="vote-label">Évaluer ce commentaire :</span>
                                         <div class="vote-buttons">
-                                            <button type="button" class="ghost btn-vote" data-type="J'aime"><img src="/img/svg/PouceHaut.svg" width="16"> <span class="like-count">0</span></button>
-                                            <button type="button" class="ghost btn-vote" data-type="Je n'aime pas"><img src="/img/svg/PouceBas.svg" width="16"> <span class="dislike-count">0</span></button>
+                                            <button title="J'aime" type="button" class="ghost btn-vote" data-type="J'aime"><img src="/img/svg/PouceHaut.svg" width="16"> <span class="like-count">0</span></button>
+                                            <button title="J'aime pas" type="button" class="ghost btn-vote" data-type="Je n'aime pas"><img src="/img/svg/PouceBas.svg" width="16"> <span class="dislike-count">0</span></button>
                                         </div>
                                     </div>
                                     <span class="review-date">A l'instant</span>
                                     <div class="review-actions">
-                                        <button class="ghost btn-edit-review desktop-only">Modifier</button>
-                                        <button class="ghost btn-delete-review desktop-only">Supprimer</button>
+                                        <button title="Modifier" class="ghost btn-edit-review desktop-only">Modifier</button>
+                                        <button title="Supprimer" class="ghost btn-delete-review desktop-only">Supprimer</button>
                                     </div>
                                 </div>
                             `;
@@ -340,11 +340,11 @@
                                             </div>
                                             <div class="review-head-right">
                                                 <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
-                                                    <button type="button" data-value="1" aria-label="1 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                                    <button type="button" data-value="2" aria-label="2 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                                    <button type="button" data-value="3" aria-label="3 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                                    <button type="button" data-value="4" aria-label="4 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                                    <button type="button" data-value="5" aria-label="5 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="1" title="1 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="2" title="2 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="3" title="3 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="4" title="4 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                                                    <button type="button" data-value="5" title="5 étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
                                                 </div>
                                                 <input type="hidden" id="inlineNote" name="note" value="0">
                                             </div>
@@ -354,7 +354,7 @@
                                             <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea" placeholder="Partagez votre avis..." required></textarea>
                                             <div class="review-actions">
                                                 <small class="review-hint">Merci de rester courtois.</small>
-                                                <button type="button" class="btn" id="inlineSubmit">Publier</button>
+                                                <button title="Publier" type="button" class="btn" id="inlineSubmit">Publier</button>
                                             </div>
                                         </form>
                                     `;
@@ -508,7 +508,7 @@
                     if (d.success) {
                         notify(d.message || 'Signalement annulé.', 'success');
                         const dropdown = rev.querySelector('.report-dropdown');
-                        if (dropdown) dropdown.innerHTML = '<button class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l\'avis</button>';
+                        if (dropdown) dropdown.innerHTML = '<button title="Signaler l avis" class="btn-report-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Signaler l\'avis</button>';
                     } else {
                         const msg = d.message || 'Impossible d\'annuler le signalement';
                         if (window.showError) showError('Erreur', msg); else alert(msg);
@@ -569,7 +569,7 @@
                             const rev = currentAid ? document.querySelector('.review[data-avis-id="' + currentAid + '"]') : null;
                             if (rev) {
                                 const dropdown = rev.querySelector('.report-dropdown');
-                                if (dropdown) dropdown.innerHTML = '<button class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler le signalement</button>';
+                                if (dropdown) dropdown.innerHTML = '<button title="Annuler le signalement" class="btn-unreport-action" style="width:100%;text-align:left;padding:10px;border:none;background:transparent;border-radius:6px">Annuler le signalement</button>';
                             }
                         } catch (e) { /* silent */ }
                     } else {
