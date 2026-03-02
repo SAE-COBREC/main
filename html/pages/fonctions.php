@@ -1791,20 +1791,3 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
         return [];
     }
 }
-
-function getCoordinates($address){
- // replace all the white space with "+" sign to match with google search pattern 
- $address = str_replace(" ", "+", $address); 
-
- $url = "https://maps.google.com/maps/api/geocode/json?sensor=false&key=votrecle&address=$address";
- $response = file_get_contents($url);
- 
- // generate array object from the response from the web
- $json = json_decode($response,TRUE);
- // Latitude
- $latitude = ($json['results'][0]['geometry']['location']['lat']) ? $json['results'][0]['geometry']['location']['lat'] : '--';
- // Longitude
- $longitude = ($json['results'][0]['geometry']['location']['lng']) ? $json['results'][0]['geometry']['location']['lng'] : '--';
-
- return $latitude . "," . $longitude;
-}

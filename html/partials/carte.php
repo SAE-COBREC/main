@@ -63,31 +63,47 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Données des adresses des vendeurs depuis PHP
 var adressesVendeurs = <?php echo json_encode($adresseDesVendeurs); ?>;
 
+console.log('Adresses:', adressesVendeurs);
+
 // Fonction pour géocoder et ajouter un marker
-function ajouterMarkerVendeur(adresse) {
-    // Construire l'URL de recherche pour Nominatim
+function ajouterMarkerVendeur(adresse, nom = '') {
+    // Construire l'URL de recherche pour Nominatim avec encodeURIComponent
     var adresseEncodee = encodeURIComponent(adresse);
     var urlNominatim = 'https://nominatim.openstreetmap.org/search?q=' + adresseEncodee + '&format=json&limit=1';
+
+    console.log('URL générée:', urlNominatim);
 
     fetch(urlNominatim)
         .then(response => response.json())
         .then(data => {
-            if (data.length > 0) {
+            console.log('Résultat géocodage pour ' + adresse + ':', data);
+            if (data && data.length > 0) {
                 var lat = data[0].lat;
                 var lon = data[0].lon;
                 var newMarker = L.marker([lat, lon]).addTo(map);
-                newMarker.bindPopup("<b>Vendeur</b><br>" + adresse);
+                newMarker.bindPopup("<b>" + (nom || 'Vendeur') + "</b><br>" + adresse);
+            } else {
+                console.warn('Aucun résultat de géocodage pour:', adresse);
             }
         })
         .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
 }
 
 // Boucler sur chaque adresse de vendeur et ajouter les markers
-adressesVendeurs.forEach(function(vendeur) {
-    if (vendeur && vendeur.adresse) {
-        ajouterMarkerVendeur(vendeur.adresse);
-    }
-});
+if (Array.isArray(adressesVendeurs)) {
+    adressesVendeurs.forEach(function(vendeur) {
+        if (vendeur && typeof vendeur === 'object') {
+            // Essayer plusieurs clés possibles pour l'adresse
+            var adresse = vendeur.adresse || vendeur.p_adresse || vendeur.v_adresse || vendeur;
+            if (adresse && typeof adresse === 'string' && adresse.trim() !== '') {
+                ajouterMarkerVendeur(adresse, vendeur.nom || vendeur.denomination || '');
+            }
+        } else if (typeof vendeur === 'string' && vendeur.trim() !== '') {
+            // Si c'est directement une chaîne
+            ajouterMarkerVendeur(vendeur);
+        }
+    });
+}
 </script>
 
 </html>

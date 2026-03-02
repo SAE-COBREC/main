@@ -1225,32 +1225,32 @@ VALUES (
         91,
         'rue Principale',
         'Bordeaux',
-        '33000',
+        '22260',
         NULL
     ),
     (
         2,
-        12,
-        'avenue du Commerce',
-        'Paris',
-        '75015',
-        'Entrepôt A'
+        18,
+        'rue 19 Mars 1962',
+        'Ploezal',
+        '22260',
+        NULL
     ),
     (
         3,
-        55,
-        'rue de la Mode',
-        'Lyon',
-        '69002',
+        256,
+        'route de tregastel',
+        'Lannion',
+        '22300',
         NULL
     ),
     (
         10,
-        78,
-        'boulevard du Sport',
-        'Marseille',
-        '13008',
-        'Zone industrielle'
+        39,
+        'rue Sports',
+        'Plouisy',
+        '22200',
+        NULL
     ),
     (
         4,
