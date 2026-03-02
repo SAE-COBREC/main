@@ -1781,7 +1781,7 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
             $adresse = $requetePreparee->fetch(PDO::FETCH_ASSOC);
             
             if ($adresse) {
-                $adresseFormatee = $adresse['a_numero'] . ' ' . $adresse['a_adresse'] . ' ' . $adresse['a_code_postal'] . ' ' . $adresse['a_ville'] . ' ' . $adresse['a_pays'];
+                $adresseFormatee = '+' . $adresse['a_numero'] . '+' . $adresse['a_adresse'] . '%2C+' . $adresse['a_code_postal'] . '+' . $adresse['a_ville'];
                 $adresses[] = $adresseFormatee;
             }
         }

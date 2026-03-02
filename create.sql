@@ -1182,11 +1182,11 @@ INSERT INTO
     )
 VALUES (
         4,
-        15,
-        'rue de la Paix',
-        'Paris',
-        '75001',
-        'Apt 5'
+        7,
+        'rue Édouard Branly',
+        'Lannion',
+        '22300',
+        NULL
     ),
     (
         5,
@@ -4257,8 +4257,7 @@ LIMIT (
 -- Insère les avis dans _avis et stocke les lignes insérées dans une table temporaire pour réutilisation
 DROP TABLE IF EXISTS temp_new_avis;
 
-CREATE TEMP
-TABLE temp_new_avis (
+CREATE TEMP TABLE temp_new_avis (
     id_avis int,
     id_produit int,
     id_client int
