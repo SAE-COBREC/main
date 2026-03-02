@@ -29,11 +29,10 @@ try {
            p.p_prix,
            p.p_nb_ventes,
            pc.timestamp_commande AS date
-    FROM cobrec1._panier_commande pc ON f.id_panier = pc.id_panier
+    FROM cobrec1._panier_commande pc
     LEFT JOIN cobrec1._contient c ON pc.id_panier = c.id_panier
     LEFT JOIN cobrec1._produit p ON c.id_produit = p.id_produit
     WHERE p.id_vendeur = :id_vendeur";
-
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_vendeur' => $vendeur_id]);
     $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
