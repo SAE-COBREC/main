@@ -439,7 +439,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
 
                 <!-- Carte Partial -->
                 <section>
-                    <?php include __DIR__ . '/partials/carte.html'; ?>
+                    <?php include __DIR__ . '/partials/carte.php'; ?>
                 </section>
                 </main>
             </form>
