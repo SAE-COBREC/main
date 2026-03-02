@@ -30,7 +30,7 @@ body{
     }
     article:nth-of-type(2){
         table{
-            border: 3px solid $secondary-color-gris-fonce;
+            border: 3px $secondary-color-gris-fonce;
         }
         table:first-of-type{
             width: 75%;
@@ -46,10 +46,10 @@ body{
                 tr, td{
                     border-right: 1px solid;   
                     border-left: 0px;
-                }
+                }/*
                 td:nth-of-type(-n+3){
                     text-align: center;
-                }
+                }*/
                 tr:nth-child(2n){
                     background-color: $secondary-color-gris-clair;
                 }

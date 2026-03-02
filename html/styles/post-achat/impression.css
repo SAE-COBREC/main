@@ -28,7 +28,7 @@ body article:first-of-type {
   margin-top: 7%;
 }
 body article:nth-of-type(2) table {
-  border: 3px solid #c0c0c0;
+  border: 3px #c0c0c0;
 }
 body article:nth-of-type(2) table:first-of-type {
   width: 75%;
@@ -43,8 +43,11 @@ body article:nth-of-type(2) table:first-of-type tbody tr, body article:nth-of-ty
   border-right: 1px solid;
   border-left: 0px;
 }
-body article:nth-of-type(2) table:first-of-type tbody td:nth-of-type(-n+3) {
-  text-align: center;
+body article:nth-of-type(2) table:first-of-type tbody {
+  /*
+  td:nth-of-type(-n+3){
+      text-align: center;
+  }*/
 }
 body article:nth-of-type(2) table:first-of-type tbody tr:nth-child(2n) {
   background-color: #EFEFEF;
