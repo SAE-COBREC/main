@@ -14,15 +14,7 @@ $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 $listesVendeurs = $_SESSION['listesVendeurs'] ?? [];
 
-$IdDesVendeurs = getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs);
-
-$adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $IdDesVendeurs);
-
-
-
-echo "<pre>";
-print_r($adresseDesVendeurs);
-echo "</pre>";
+$adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs));;
 
 
 ?>
@@ -60,14 +52,12 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Données des adresses des vendeurs depuis PHP
 var adressesVendeurs = <?php echo json_encode($adresseDesVendeurs); ?>;
 
 console.log('Adresses:', adressesVendeurs);
 
-// Fonction pour géocoder et ajouter un marker
 function ajouterMarkerVendeur(adresse, nom = '') {
-    // Construire l'URL de recherche pour Nominatim avec encodeURIComponent
+
     var adresseEncodee = encodeURIComponent(adresse);
     var urlNominatim = 'https://nominatim.openstreetmap.org/search?q=' + adresseEncodee + '&format=json&limit=1';
 
@@ -87,19 +77,19 @@ function ajouterMarkerVendeur(adresse, nom = '') {
             }
         })
         .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
+
+    var marker = L.marker([48.75770187, -3.45408821]).addTo(map);
+    marker.bindPopup("<b>Alizon</b><br>La meilleur equipe de dev !").openPopup();
 }
 
-// Boucler sur chaque adresse de vendeur et ajouter les markers
 if (Array.isArray(adressesVendeurs)) {
     adressesVendeurs.forEach(function(vendeur) {
         if (vendeur && typeof vendeur === 'object') {
-            // Essayer plusieurs clés possibles pour l'adresse
             var adresse = vendeur.adresse || vendeur.p_adresse || vendeur.v_adresse || vendeur;
             if (adresse && typeof adresse === 'string' && adresse.trim() !== '') {
                 ajouterMarkerVendeur(adresse, vendeur.nom || vendeur.denomination || '');
             }
         } else if (typeof vendeur === 'string' && vendeur.trim() !== '') {
-            // Si c'est directement une chaîne
             ajouterMarkerVendeur(vendeur);
         }
     });
