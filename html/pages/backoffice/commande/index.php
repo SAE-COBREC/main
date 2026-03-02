@@ -22,7 +22,6 @@ foreach ($fichiers as $value) {
 }
 
 try {
-    // Requête optimisée pour récupérer les détails des produits
     $query = "
     SELECT f.id_facture,
            f.id_panier,

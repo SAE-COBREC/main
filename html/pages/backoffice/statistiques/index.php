@@ -20,6 +20,27 @@ $fichiers = glob('create/temp_/*');
 foreach ($fichiers as $value) {
     if(is_file($value)) unlink($value);
 }
+
+try {
+    $query = "
+    SELECT c.id_produit,
+           c.quantite,
+           p.p_nom,
+           p.p_prix,
+           p.p_nb_ventes,
+           pc.timestamp_commande AS date
+    FROM cobrec1._panier_commande pc ON f.id_panier = pc.id_panier
+    LEFT JOIN cobrec1._contient c ON pc.id_panier = c.id_panier
+    LEFT JOIN cobrec1._produit p ON c.id_produit = p.id_produit
+    WHERE p.id_vendeur = :id_vendeur";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['id_vendeur' => $vendeur_id]);
+    $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Erreur BDD : " . htmlspecialchars($e->getMessage()));
+}
 ?>
 
 <!doctype html>
