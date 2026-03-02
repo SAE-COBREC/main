@@ -370,6 +370,29 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
             animation: fadeOutReview 0.4s ease-in forwards;
             pointer-events: none;
         }
+        .review .btn-report-trigger,
+        .mobile-menu-container .btn-menu-trigger {
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 10px !important;
+            background: linear-gradient(180deg,#ffffff,#f6fbff) !important;
+            border: 1px solid rgba(17,24,39,0.06) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: var(--accent) !important;
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+        .review .btn-report-trigger:hover,
+        .mobile-menu-container .btn-menu-trigger:hover {
+            background: linear-gradient(180deg,#fff,#eaf4ff) !important;
+        }
+        .review .btn-report-trigger svg circle,
+        .mobile-menu-container .btn-menu-trigger svg circle {
+            fill: currentColor;
+            stroke: none;
+            opacity: .9;
+        }
     </style>
 </head>
 <body>
