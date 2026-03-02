@@ -4,4 +4,6 @@
 
 - Le HTML/CSS est-il fait ?
 
+- S'il est sur le Front Office est-il responsive ?
+
 - Le design a-t-il été validé par au moins 2 collègues ?

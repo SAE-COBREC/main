@@ -4,4 +4,4 @@
 
 - Une liste de critères d'acceptation (juste un nom) a-t-elle été remplie ?
 
-- Ladite liste a-t-elle été validé par le Product Owner ?
+- Ladite liste a-t-elle été validée par le Product Owner ?
