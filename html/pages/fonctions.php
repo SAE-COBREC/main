@@ -1771,7 +1771,7 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
         
         foreach ($listeIdVendeurs as $idVendeur) {
             $requeteSQL = "
-                SELECT a.id_adresse, a.a_numero, a.a_adresse, a.a_ville, a.a_code_postal, a.a_pays, a.a_complement
+                SELECT a.a_numero, a.a_adresse, a.a_ville, a.a_code_postal, a.a_pays, a.a_complement
                 FROM cobrec1._adresse a
                 JOIN cobrec1._vendeur v ON a.id_compte = v.id_compte
                 WHERE v.id_vendeur = ?
@@ -1781,7 +1781,8 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
             $adresse = $requetePreparee->fetch(PDO::FETCH_ASSOC);
             
             if ($adresse) {
-                $adresses[] = $adresse;
+                $adresseFormatee = $adresse['a_numero'] . ' ' . $adresse['a_adresse'] . ' ' . $adresse['a_code_postal'] . ' ' . $adresse['a_ville'] . ' ' . $adresse['a_pays'];
+                $adresses[] = $adresseFormatee;
             }
         }
         
