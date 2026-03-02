@@ -196,8 +196,7 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  -webkit-backdrop-filter: blur(4px);
-          backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   padding: 20px;
   box-sizing: border-box;
   opacity: 0;

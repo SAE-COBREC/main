@@ -44,8 +44,7 @@ body {
   padding: 12px 20px;
   border-radius: 10px;
   text-decoration: none;
-  -webkit-backdrop-filter: blur(4px);
-          backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   box-shadow: 0 6px 18px rgba(11, 16, 32, 0.18);
 }
 .hero .hero-illustration {
