@@ -1,6 +1,6 @@
 @charset "UTF-8";
 * {
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.3s ease;
 }
 
 html {
@@ -47,7 +47,6 @@ a {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  /* Input par défaut */
 }
 @media screen and (max-width: 428px) {
   .infoPaiement {
@@ -72,6 +71,9 @@ a {
 }
 .infoPaiement h2 img {
   width: 32px;
+}
+.infoPaiement {
+  /* Input par défaut */
 }
 .infoPaiement input[type=text], .infoPaiement input[type=number] {
   height: 45px;
