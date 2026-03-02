@@ -1,0 +1,34 @@
+* {
+  transition: all 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Baloo", sans-serif;
+  background: #FFF7F1;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: #FFFFFF;
+}
+
+.main {
+  background: #FFF7F1;
+  padding: 40px;
+  overflow-y: auto;
+}
+.main .header {
+  margin-bottom: 30px;
+}
+.main .header h1 {
+  color: #030212;
+  font-size: 2rem;
+}/*# sourceMappingURL=statistiuqe.css.map */
