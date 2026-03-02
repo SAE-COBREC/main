@@ -1,33 +1,43 @@
-<?php
-    session_start();
+<?php 
+session_start(); 
 
+// Utilisation de require_once avec __DIR__ pour éviter l'erreur "PDO on null"
+include '../../../selectBDD.php';
+include __DIR__ . '../../../fonctions.php';
+
+// Vérification de connexion
+if(empty($_SESSION['vendeur_id'])){
+    header("Location: /pages/backoffice/connexionVendeur/index.php");
+    exit();
+}
+$vendeur_id = $_SESSION['vendeur_id'];
+
+// Nettoyage session et dossiers temporaires
+$_SESSION['creerArticle'] = [];
+$_SESSION['remise'] = [];
+$_SESSION['promotion'] = [];
+$fichiers = glob('create/temp_/*');
+foreach ($fichiers as $value) {
+    if(is_file($value)) unlink($value);
+}
 ?>
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panier</title>
-    <link rel="icon" type="image/png" href="../../img/favicon.svg">
-    <link rel="stylesheet" href="/styles/Panier/stylesPanier.css">
-    <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-    <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
+    <meta charset="utf-8" />
+    <title>Alizon - Commandes Vendeur</title>
+    <link rel="stylesheet" href="/styles/CommandeVendeur/commande.css" />
 </head>
-
 <body>
-    <script>
-        const labels = Utils.months({count: 7});
-    const data = {
-    labels: labels,
-    datasets: [{
-        label: 'My First Dataset',
-        data: [65, 59, 80, 81, 56, 55, 40],
-        fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-    }]
-    };
-    </script>    
+    <div class="app">
+        <?php include __DIR__ . '/../../../partials/aside.html'; ?>
+        
+        <main class="main">
+            <header class="header">
+                <h1>Statistique</h1>
+            </header>
+        </main>
+    </div>
 </body>
+</html>
