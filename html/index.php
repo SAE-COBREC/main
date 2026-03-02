@@ -439,7 +439,18 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
 
                 <!-- Carte Partial -->
                 <section>
-                    <?php include __DIR__ . '/partials/carte.php'; ?>
+                    <?php 
+                    // Collecter les vendeurs uniques des produits filtrés
+                    $vendeursUniques = [];
+                    foreach ($listeProduits as $produit) {
+                        $nomVendeur = recupNomVendeurIdProduit($connexionBaseDeDonnees, $produit['id_produit']);
+                        if (!in_array($nomVendeur, $vendeursUniques)) {
+                            $vendeursUniques[] = $nomVendeur;
+                        }
+                    }
+                    $_SESSION['listesVendeurs'] = $vendeursUniques;
+                    include __DIR__ . '/partials/carte.php'; 
+                    ?>
                 </section>
                 </main>
             </form>

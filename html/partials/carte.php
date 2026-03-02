@@ -1,5 +1,29 @@
 <?php 
+//démarre la session utilisateur
 session_start();
+
+//charge le fichier de connexion à la base de données
+require_once __DIR__ . '/../selectBDD.php';
+//charge le fichier contenant toutes les fonctions personnalisées
+require_once __DIR__ . '/../pages/fonctions.php';
+
+//crée la connexion à la base de données
+$connexionBaseDeDonnees = $pdo;
+//définit le schéma de base de données à utiliser
+$connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
+
+$listesVendeurs = $_SESSION['listesVendeurs'] ?? [];
+
+$IdDesVendeurs = getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs);
+
+$adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $IdDesVendeurs);
+
+
+
+echo "<pre>";
+print_r($adresseDesVendeurs);
+echo "</pre>";
+
 
 ?>
 <!DOCTYPE html>
@@ -36,8 +60,15 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// Données des vendeurs transmises depuis index.php
+var vendeursData = <?= json_encode($vendeursUniques) ?>;
+
+// Afficher un marqueur pour chaque vendeur
 var marker = L.marker([48.75770187, -3.45408821]).addTo(map);
 marker.bindPopup("<b>Alizon</b><br>La meilleur equipe de dev !").openPopup();
+
+// Données additionnelles des vendeurs (à obtenir de la base de données)
+console.log("Vendeurs filtrés:", vendeursData);
 </script>
 
 </html>
