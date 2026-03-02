@@ -1604,3 +1604,140 @@ function calcul_f_total_ttc($pdo, $id_panier, $vendeur=-1){
     }
     return $totalTTC;
 }
+
+// Fonction pour supprimer complètement un compte client avec anonymisation des données
+function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $identifiantCompte)
+{
+    try {
+        // Démarrer une transaction pour assurer la cohérence des données
+        $connexionBaseDeDonnees->beginTransaction();
+
+        // 1. Anonymiser les avis du client (mettre id_client à NULL)
+        $requeteAnonymerAvis = "
+            UPDATE cobrec1._avis 
+            SET id_client = NULL 
+            WHERE id_client = ?
+        ";
+        $requetePrepareeAvis = $connexionBaseDeDonnees->prepare($requeteAnonymerAvis);
+        $requetePrepareeAvis->execute([$identifiantClient]);
+
+        // 2. Anonymiser les commentaires du client (mettre id_client à NULL)
+        $requeteAnonymerCommentaires = "
+            UPDATE cobrec1._commentaire 
+            SET id_client = NULL 
+            WHERE id_client = ?
+        ";
+        $requetePrepareeCommentaires = $connexionBaseDeDonnees->prepare($requeteAnonymerCommentaires);
+        $requetePrepareeCommentaires->execute([$identifiantClient]);
+
+        // 3. Supprimer les données bancaires (paiements associés aux factures du client)
+        $requeteSuppressionPaiements = "
+            DELETE FROM cobrec1._paiement 
+            WHERE id_facture IN (
+                SELECT f.id_facture 
+                FROM cobrec1._facture f 
+                INNER JOIN cobrec1._panier_commande p ON f.id_panier = p.id_panier 
+                WHERE p.id_client = ?
+            )
+        ";
+        $requetePrepareeSuppressionPaiements = $connexionBaseDeDonnees->prepare($requeteSuppressionPaiements);
+        $requetePrepareeSuppressionPaiements->execute([$identifiantClient]);
+
+        // 4. Supprimer les paniers clients (cela supprime aussi les factures et livraisons en cascade)
+        $requeteSuppressionPaniers = "
+            DELETE FROM cobrec1._panier_commande 
+            WHERE id_client = ?
+        ";
+        $requetePrepareeSuppressionPaniers = $connexionBaseDeDonnees->prepare($requeteSuppressionPaniers);
+        $requetePrepareeSuppressionPaniers->execute([$identifiantClient]);
+
+        // 5. Supprimer les votes de l'utilisateur sur les avis
+        $requeteSuppressionVotes = "
+            DELETE FROM cobrec1._vote_avis 
+            WHERE id_client = ?
+        ";
+        $requetePrepareeSuppressionVotes = $connexionBaseDeDonnees->prepare($requeteSuppressionVotes);
+        $requetePrepareeSuppressionVotes->execute([$identifiantClient]);
+
+        // 6. Supprimer les adresses du compte
+        $requeteSuppressionAdresses = "
+            DELETE FROM cobrec1._adresse 
+            WHERE id_compte = ?
+        ";
+        $requetePrepareeSuppressionAdresses = $connexionBaseDeDonnees->prepare($requeteSuppressionAdresses);
+        $requetePrepareeSuppressionAdresses->execute([$identifiantCompte]);
+
+        // 7. Supprimer la photo de profil du compte
+        $requeteRecuperationImageCompte = "
+            SELECT id_image 
+            FROM cobrec1._represente_compte 
+            WHERE id_compte = ?
+        ";
+        $requetePrepareeRecuperationImage = $connexionBaseDeDonnees->prepare($requeteRecuperationImageCompte);
+        $requetePrepareeRecuperationImage->execute([$identifiantCompte]);
+        $donneesImage = $requetePrepareeRecuperationImage->fetch(PDO::FETCH_ASSOC);
+
+        if ($donneesImage) {
+            $idImage = $donneesImage['id_image'];
+            
+            // Supprimer la liaison entre le compte et l'image
+            $requeteSuppressionLiaison = "
+                DELETE FROM cobrec1._represente_compte 
+                WHERE id_compte = ?
+            ";
+            $requetePrepareeSuppressionLiaison = $connexionBaseDeDonnees->prepare($requeteSuppressionLiaison);
+            $requetePrepareeSuppressionLiaison->execute([$identifiantCompte]);
+
+            // Vérifier si l'image est utilisée par d'autres comptes
+            $requeteVerificationImage = "
+                SELECT COUNT(*) as nombre_utilisations 
+                FROM cobrec1._represente_compte 
+                WHERE id_image = ?
+            ";
+            $requetePrepareeVerificationImage = $connexionBaseDeDonnees->prepare($requeteVerificationImage);
+            $requetePrepareeVerificationImage->execute([$idImage]);
+            $donneesVerification = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSOC);
+
+            // Si l'image n'est utilisée nulle part, la supprimer
+            if ($donneesVerification['nombre_utilisations'] == 0) {
+                $requeteSuppressionImage = "
+                    DELETE FROM cobrec1._image 
+                    WHERE id_image = ?
+                ";
+                $requetePrepareeSuppressionImage = $connexionBaseDeDonnees->prepare($requeteSuppressionImage);
+                $requetePrepareeSuppressionImage->execute([$idImage]);
+            }
+        }
+
+        // 8. Anonymiser le pseudo du client
+        $pseudoAnonymeClient = "Anonyme_" . $identifiantClient;
+        $requeteAnonymerPseudo = "
+            UPDATE cobrec1._client 
+            SET c_pseudo = ? 
+            WHERE id_client = ?
+        ";
+        $requetePrepareeAnonymerPseudo = $connexionBaseDeDonnees->prepare($requeteAnonymerPseudo);
+        $requetePrepareeAnonymerPseudo->execute([$pseudoAnonymeClient, $identifiantClient]);
+
+        // 9. Anonymiser le compte (nom et prénom)
+        $requeteAnonymerCompte = "
+            UPDATE cobrec1._compte 
+            SET prenom = 'Anonyme', nom = '' 
+            WHERE id_compte = ?
+        ";
+        $requetePrepareeAnonymerCompte = $connexionBaseDeDonnees->prepare($requeteAnonymerCompte);
+        $requetePrepareeAnonymerCompte->execute([$identifiantCompte]);
+
+        // Valider la transaction
+        $connexionBaseDeDonnees->commit();
+
+        return ['success' => true, 'message' => "Votre compte a été supprimé avec succès. Toutes vos données personnelles ont été supprimées."];
+
+    } catch (Exception $erreurException) {
+        // Annuler la transaction en cas d'erreur
+        if ($connexionBaseDeDonnees->inTransaction()) {
+            $connexionBaseDeDonnees->rollBack();
+        }
+        return ['success' => false, 'message' => "Erreur lors de la suppression du compte: " . $erreurException->getMessage()];
+    }
+}

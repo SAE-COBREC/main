@@ -856,6 +856,30 @@ main {
     text-align: center;
 }
 
+.del-form {
+    margin-top: 1rem;
+    text-align: center;
+
+    button {
+        background: transparent;
+        border: 2px solid $secondary-color-rouge;
+        color: $secondary-color-rouge;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        @include transition();
+
+        &:hover {
+            background: $secondary-color-rouge;
+            color: $primary-color-blanc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+    }
+}
+
 /* Responsive pour les champs image */
 @media (max-width: 768px) {
     .image-fields-grid {

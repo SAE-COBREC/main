@@ -37,6 +37,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 $messageErreur = null;
 $messageSucces = null;
 
+if (isset($_GET['erreur']) && $_GET['erreur'] !== '') {
+    $messageErreur = (string) $_GET['erreur'];
+}
+
+if (isset($_GET['compte_supprime']) && $_GET['compte_supprime'] === 'true') {
+    $messageSucces = "Votre compte a été supprimé avec succès.";
+}
+
 //récupérer l'identifiant du compte associé au client
 $identifiantCompteClient = recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantClientConnecte);
 
@@ -596,6 +604,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 </button>
             </form>
 
+            <form method="post" action="delete_account.php" class="del-form" id="delete-account-form">
+                <input type="hidden" name="delete_password" id="delete_password_field" value="">
+                <button type="button" onclick="ouvrirModalSuppressionCompte()">
+                    Supprimer mon compte
+                </button>
+            </form>
+
         </div>
     </main>
 
@@ -693,6 +708,24 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <button type="submit" name="add_address">Ajouter</button>
                 <button type="button" onclick="fermerModalAjoutAdresse()">Annuler</button>
             </form>
+        </div>
+    </div>
+
+    <div id="modalSuppressionMdp" style="display:none; position:fixed; inset:0; background:rgba(9, 12, 19, 0.5); z-index:10001; align-items:center; justify-content:center;">
+        <div style="width:min(420px, 92vw); background:#fff; border-radius:12px; border:1px solid #eef1f6; box-shadow:0 12px 32px rgba(9, 30, 66, .18); overflow:hidden;">
+            <div style="display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid #eef1f6;">
+                <h2 style="margin:0; font-size:16px; color:#b00020;">Confirmez avec votre mot de passe</h2>
+                <button type="button" onclick="fermerModalSuppressionMotDePasse()" style="margin-left:auto; background:transparent; border:none; font-size:20px; cursor:pointer; color:#8a90a2;">×</button>
+            </div>
+            <div style="padding:16px;">
+                <p style="margin-top:0;">Pour supprimer définitivement votre compte, saisissez votre mot de passe.</p>
+                <label for="delete-password-input" style="display:block; margin-bottom:8px; font-weight:600;">Mot de passe</label>
+                <input type="password" id="delete-password-input" autocomplete="current-password" style="width:100%; box-sizing:border-box; border:1px solid #d8deea; border-radius:8px; padding:10px 12px;">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; padding:12px 16px; border-top:1px solid #eef1f6;">
+                <button type="button" onclick="fermerModalSuppressionMotDePasse()" style="appearance:none; border:1px solid #e2e6f0; border-radius:10px; padding:8px 12px; background:#fff; color:#2b2f3a; cursor:pointer; font-weight:600;">Annuler</button>
+                <button type="button" onclick="confirmerSuppressionAvecMotDePasse()" style="appearance:none; border:1px solid #e74c3c; border-radius:10px; padding:8px 12px; background:#e74c3c; color:#fff; cursor:pointer; font-weight:600;">Supprimer définitivement</button>
+            </div>
         </div>
     </div>
 
@@ -1024,6 +1057,67 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
         zoneStatutUpload.style.display = "none";
     }
+
+    function ouvrirModalSuppressionCompte() {
+        showModal({
+            title: 'Êtes-vous sûr de vouloir supprimer votre compte ?',
+            message: 'Cette action est irréversible.',
+            variant: 'error',
+            okText: 'Continuer',
+            cancelText: 'Annuler',
+            onOk: function() {
+                ouvrirModalSuppressionMotDePasse();
+            }
+        });
+    }
+
+    function ouvrirModalSuppressionMotDePasse() {
+        const modal = document.getElementById('modalSuppressionMdp');
+        const input = document.getElementById('delete-password-input');
+        if (!modal || !input) return;
+        input.value = '';
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => input.focus(), 0);
+    }
+
+    function fermerModalSuppressionMotDePasse() {
+        const modal = document.getElementById('modalSuppressionMdp');
+        if (!modal) return;
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function confirmerSuppressionAvecMotDePasse() {
+        const input = document.getElementById('delete-password-input');
+        const hiddenField = document.getElementById('delete_password_field');
+        const form = document.getElementById('delete-account-form');
+
+        if (!input || !hiddenField || !form) return;
+
+        const password = input.value.trim();
+        if (password === '') {
+            notify('Veuillez saisir votre mot de passe.', 'error');
+            input.focus();
+            return;
+        }
+
+        hiddenField.value = password;
+        form.submit();
+    }
+
+    document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {
+        if (event.target === this) {
+            fermerModalSuppressionMotDePasse();
+        }
+    });
+
+    document.getElementById('delete-password-input')?.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            confirmerSuppressionAvecMotDePasse();
+        }
+    });
     </script>
     <script src="/js/notifications.js"></script>
 </body>
