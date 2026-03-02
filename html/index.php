@@ -436,6 +436,12 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <span>En stock uniquement</span>
                     </label>
                 </section>
+
+                <!-- Carte Partial -->
+                <section>
+                    <?php include __DIR__ . '/partials/carte.php'; ?>
+                </section>
+                </main>
             </form>
         </aside>
 

@@ -1,0 +1,34 @@
+@use "../variable" as *;
+
+// Reset de base et police
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: $font-family-primaire;
+  background: $secondary-color-rose-claire;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: $primary-color-blanc;
+}
+
+.main {
+  background: $secondary-color-rose-claire;
+  padding: 40px;
+  overflow-y: auto;
+
+  .header {
+    margin-bottom: 30px;
+    h1 {
+      color: $primary-color-noir;
+      font-size: 2rem;
+    }
+  }
+}
