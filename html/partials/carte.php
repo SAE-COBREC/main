@@ -73,8 +73,8 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     }).addTo(map);
 
     var iconVendeur = L.icon({
-        iconUrl: '/img/png/carte-et-localisation.png',
-        iconSize: [30, 30],
+        iconUrl: '/img/png/badge-bretagne.png',
+        iconSize: [33, 33],
         iconAnchor: [20, 20],
         popupAnchor: [-10, -20]
     });
