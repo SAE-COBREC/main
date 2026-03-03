@@ -52,18 +52,19 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     .vendor-popup button {
         margin-top: 10px;
         padding: 8px 12px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
         cursor: pointer;
         font-size: 13px;
         width: 100%;
         box-sizing: border-box;
+        background: #7171A3;
+        color: #FFFFFF;
+        border: 2px solid #e4e4f5;
+        border-radius: 8px;
     }
 
     .vendor-popup button:hover {
-        background-color: #0056b3;
+        background-color: #FFFFFF;
+        color: #7171A3;
     }
     </style>
 </head>
