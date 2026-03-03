@@ -19,51 +19,6 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     <!-- Cluster -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-
-    <style>
-    .leaflet-bottom {
-        display: none;
-    }
-
-    .vendor-popup {
-        font-family: Arial, sans-serif;
-    }
-
-    .vendor-popup h3 {
-        margin: 0 0 8px 0;
-        font-size: 16px;
-        color: #333;
-    }
-
-    .vendor-popup p {
-        margin: 4px 0;
-        font-size: 13px;
-        color: #666;
-    }
-
-    .vendor-popup .address-label {
-        color: #999;
-        font-size: 12px;
-    }
-
-    .vendor-popup button {
-        margin-top: 10px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 13px;
-        width: 100%;
-        box-sizing: border-box;
-        background: #7171A3;
-        color: #FFFFFF;
-        border: 2px solid #e4e4f5;
-        border-radius: 8px;
-    }
-
-    .vendor-popup button:hover {
-        background-color: #FFFFFF;
-        color: #7171A3;
-    }
-    </style>
 </head>
 
 <body>
@@ -105,7 +60,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
 
     var iconVendeur = L.icon({
         iconUrl: '/img/png/carte-et-localisation.png',
-        iconSize: [20, 20],
+        iconSize: [30, 30],
         iconAnchor: [20, 20],
         popupAnchor: [-10, -20]
     });
