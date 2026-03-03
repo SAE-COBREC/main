@@ -79,7 +79,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
     var iconVendeur = L.icon({
-        iconUrl: '/img/favicon.svg',
+        iconUrl: '/img/png/carte-et-localisation.png',
         iconSize: [20, 20],
         iconAnchor: [20, 20],
         popupAnchor: [-10, -20]
