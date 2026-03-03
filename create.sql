@@ -1075,6 +1075,150 @@ VALUES (
         0,
         0,
         0
+    ),
+    (
+        'Kermadec',
+        'Loïc',
+        'vendeur4@example.com',
+        '0612348765',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Le Gall',
+        'Solenn',
+        'vendeur5@example.com',
+        '0745981230',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Tanguy',
+        'Erwan',
+        'vendeur6@example.com',
+        '0688776655',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Guivarch',
+        'Maëlle',
+        'vendeur7@example.com',
+        '0710203040',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Prigent',
+        'Yannick',
+        'vendeur8@example.com',
+        '0654321098',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Le Goff',
+        'Gwenaëlle',
+        'vendeur9@example.com',
+        '0601010101',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Le Roux',
+        'Corentin',
+        'vendeur10@example.com',
+        '0789451236',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Jaffré',
+        'Nolwenn',
+        'vendeur11@example.com',
+        '0611223344',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Riou',
+        'Malo',
+        'vendeur12@example.com',
+        '0702030405',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Morvan',
+        'Rozenn',
+        'vendeur13@example.com',
+        '0699887766',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Coatrieux',
+        'Gaël',
+        'vendeur14@example.com',
+        '0633445566',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
+    ),
+    (
+        'Pennec',
+        'Enora',
+        'vendeur15@example.com',
+        '0722334455',
+        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
+        0,
+        0,
+        0,
+        0
     );
 
 -- 2. ADMINISTRATEURS
@@ -1109,6 +1253,90 @@ VALUES (
         'SportPro EURL',
         'SportPro',
         2
+    ),
+    (
+        11,
+        '123456787',
+        'Breizh Électronique EURL',
+        'BreizhElec',
+        5
+    ),
+    (
+        12,
+        '787654321',
+        'Atelier du Beurre SAS',
+        'AtelierBeurre',
+        5
+    ),
+    (
+        13,
+        '556789123',
+        'Vêtements Ouest SARL',
+        'WestClothing',
+        5
+    ),
+    (
+        14,
+        '321654987',
+        'Pêcheur & Fils SASU',
+        'MaréeBretonne',
+        5
+    ),
+    (
+        15,
+        '159263487',
+        'Délices de Quimper SARL',
+        'QuimperDélices',
+        5
+    ),
+    (
+        16,
+        '753951852',
+        'Artisanat Armor SAS',
+        'ArmorArt',
+        5
+    ),
+    (
+        17,
+        '852963741',
+        'Biscuiterie de la Mer SARL',
+        'MerBiscuits',
+        5
+    ),
+    (
+        18,
+        '963852741',
+        'Textiles Vannetais EURL',
+        'VannesTextile',
+        5
+    ),
+    (
+        19,
+        '147258369',
+        'Saveurs Argoat SAS',
+        'ArgoatSaveurs',
+        5
+    ),
+    (
+        20,
+        '741852963',
+        'Maison de la Galette SARL',
+        'GaletteMaison',
+        5
+    ),
+    (
+        21,
+        '258369147',
+        'Bijouterie Celtique SARL',
+        'CeltiqueJewels',
+        5
+    ),
+    (
+        22,
+        '369147258',
+        'Cidrerie de la Côte SASU',
+        'CidreCote',
+        5
     );
 
 -- 4. CLIENTS
@@ -1230,26 +1458,26 @@ VALUES (
     ),
     (
         2,
-        18,
-        'rue 19 Mars 1962',
-        'Ploezal',
-        '22260',
+        1,
+        'Place de la Mairie',
+        'Rennes',
+        '35000',
         NULL
     ),
     (
         3,
-        256,
-        'route de tregastel',
-        'Lannion',
-        '22300',
+        42,
+        'Rue de Siam',
+        'Brest',
+        '29200',
         NULL
     ),
     (
         10,
-        39,
-        'rue Sports',
-        'Plouisy',
-        '22200',
+        5,
+        'Place du Général de Gaulle',
+        'Vitré',
+        '35500',
         NULL
     ),
     (
@@ -1259,6 +1487,102 @@ VALUES (
         'Rennes',
         35590,
         'France'
+    ),
+    (
+        11,
+        12,
+        'Rue des Fontaines',
+        'Lorient',
+        '56100',
+        NULL
+    ),
+    (
+        12,
+        5,
+        'Place Maurice Marchais',
+        'Vannes',
+        '56000',
+        NULL
+    ),
+    (
+        13,
+        10,
+        'Rue du Roi Gradlon',
+        'Quimper',
+        '29000',
+        NULL
+    ),
+    (
+        14,
+        1,
+        'Esplanade Saint-Vincent',
+        'Saint-Malo',
+        '35400',
+        NULL
+    ),
+    (
+        15,
+        1,
+        'Place de l''Hôtel de Ville',
+        'Saint-Brieuc',
+        '22000',
+        NULL
+    ),
+    (
+        16,
+        2,
+        'Rue de la Mairie',
+        'Lannion',
+        '22300',
+        NULL
+    ),
+    (
+        17,
+        15,
+        'Rue de la Poissonnerie',
+        'Dinan',
+        '22100',
+        NULL
+    ),
+    (
+        18,
+        5,
+        'Place de l''Hôtel de Ville',
+        'Morlaix',
+        '29600',
+        NULL
+    ),
+    (
+        19,
+        18,
+        'Grand Rue',
+        'Redon',
+        '35600',
+        NULL
+    ),
+    (
+        20,
+        2,
+        'Rue de la Pinterie',
+        'Fougères',
+        '35300',
+        NULL
+    ),
+    (
+        21,
+        8,
+        'Rue du Fi',
+        'Pontivy',
+        '56300',
+        NULL
+    ),
+    (
+        22,
+        1,
+        'Quai de la Vigie',
+        'Concarneau',
+        '29900',
+        NULL
     );
 
 -- 6. COULEURS
@@ -1502,7 +1826,7 @@ VALUES (
     ),
     (
         1,
-        3,
+        4,
         'Rillettes de Saint-Jacques à la Bretonne',
         'Préparation tartinable fine à base de noix de Saint-Jacques, cuisinées avec du beurre, des échalotes et du vin blanc.',
         8.99,
@@ -1577,7 +1901,7 @@ VALUES (
     ),
     (
         1,
-        1,
+        4,
         'Caramel au Beurre Salé (Salidou) ',
         'Crème onctueuse réalisée avec du sucre caramélisé, du beurre salé breton et une pointe de crème fraîche.',
         4.99,
@@ -1667,7 +1991,7 @@ VALUES (
     ),
     (
         1,
-        1,
+        5,
         'Lait Ribot de Bretagne',
         'Lait fermenté traditionnel, onctueux et légèrement acide, historiquement servi pour accompagner les galettes de sarrasin',
         2.99,
@@ -1757,7 +2081,7 @@ VALUES (
     ),
     (
         2,
-        3,
+        5,
         'Galettes de blé noir de Vannes',
         'Produit breton authentique. Fabriqué avec passion à Vannes. Local. Qualité supérieure garantie.',
         4.92,
@@ -1802,7 +2126,7 @@ VALUES (
     ),
     (
         4,
-        2,
+        6,
         'Ciré Navy de Concarneau',
         'Produit breton authentique. Fabriqué avec passion à Concarneau. Premium. Qualité supérieure garantie.',
         60.35,
@@ -1832,7 +2156,7 @@ VALUES (
     ),
     (
         1,
-        3,
+        6,
         'Marinière Local',
         'Produit breton authentique. Fabriqué avec passion à Quimper. Local. Qualité supérieure garantie.',
         7.43,
@@ -1892,7 +2216,7 @@ VALUES (
     ),
     (
         2,
-        3,
+        7,
         'Écharpe Rayée de Saint-Malo',
         'Produit breton authentique. Fabriqué avec passion à Saint-Malo. Fait main. Qualité supérieure garantie.',
         21.13,
@@ -1922,7 +2246,7 @@ VALUES (
     ),
     (
         1,
-        3,
+        7,
         'Écharpe Rayée Authentique',
         'Produit breton authentique. Fabriqué avec passion à Concarneau. Authentique. Qualité supérieure garantie.',
         36.49,
@@ -2027,7 +2351,7 @@ VALUES (
     ),
     (
         1,
-        1,
+        8,
         'Affiche Vintage de Dinard',
         'Produit breton authentique. Fabriqué avec passion à Dinard. Artisanal. Qualité supérieure garantie.',
         15.74,
@@ -2072,7 +2396,7 @@ VALUES (
     ),
     (
         1,
-        3,
+        8,
         'Kabig Bio',
         'Produit breton authentique. Fabriqué avec passion à Quimper. Bio. Qualité supérieure garantie.',
         170.27,
@@ -2132,7 +2456,7 @@ VALUES (
     ),
     (
         1,
-        2,
+        9,
         'Caramels de Dinard',
         'Produit breton authentique. Fabriqué avec passion à Dinard. Traditionnel. Qualité supérieure garantie.',
         13.67,
@@ -2192,7 +2516,7 @@ VALUES (
     ),
     (
         4,
-        3,
+        9,
         'Bracelet Ancre Durable',
         'Produit breton authentique. Fabriqué avec passion à Roscoff. Durable. Qualité supérieure garantie.',
         5.55,
@@ -2237,7 +2561,7 @@ VALUES (
     ),
     (
         4,
-        1,
+        10,
         'Caramels de Roscoff',
         'Produit breton authentique. Fabriqué avec passion à Roscoff. Authentique. Qualité supérieure garantie.',
         61.58,
@@ -2267,7 +2591,7 @@ VALUES (
     ),
     (
         2,
-        1,
+        10,
         'Ciré Navy Artisanal',
         'Produit breton authentique. Fabriqué avec passion à Pont-Aven. Artisanal. Qualité supérieure garantie.',
         19.84,
@@ -2402,7 +2726,7 @@ VALUES (
     ),
     (
         1,
-        2,
+        11,
         'Vareuse Durable',
         'Produit breton authentique. Fabriqué avec passion à Pont-Aven. Fait main. Qualité supérieure garantie.',
         118.5,
@@ -2477,7 +2801,7 @@ VALUES (
     ),
     (
         1,
-        1,
+        11,
         'Bolée à Cidre Local',
         'Produit breton authentique. Fabriqué avec passion à Roscoff. Local. Qualité supérieure garantie.',
         103.33,
@@ -2522,7 +2846,7 @@ VALUES (
     ),
     (
         1,
-        1,
+        12,
         'Caramels Artisanal',
         'Produit breton authentique. Fabriqué avec passion à Carnac. Artisanal. Qualité supérieure garantie.',
         11.55,
@@ -2552,7 +2876,7 @@ VALUES (
     ),
     (
         2,
-        2,
+        13,
         'Lampe Tempête Traditionnel',
         'Produit breton authentique. Fabriqué avec passion à Quimper. Traditionnel. Qualité supérieure garantie.',
         145.44,
@@ -2612,7 +2936,7 @@ VALUES (
     ),
     (
         1,
-        2,
+        14,
         'Lampe Tempête de Saint-Malo',
         'Produit breton authentique. Fabriqué avec passion à Saint-Malo. Traditionnel. Qualité supérieure garantie.',
         133.75,
@@ -2642,7 +2966,7 @@ VALUES (
     ),
     (
         2,
-        1,
+        15,
         'Bolée à Cidre de Saint-Malo',
         'Produit breton authentique. Fabriqué avec passion à Saint-Malo. Artisanal. Qualité supérieure garantie.',
         20.61,
@@ -2702,7 +3026,7 @@ VALUES (
     ),
     (
         3,
-        2,
+        15,
         'Bonnet Miki Traditionnel',
         'Produit breton authentique. Fabriqué avec passion à Dinard. Traditionnel. Qualité supérieure garantie.',
         18.74,
