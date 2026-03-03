@@ -22,10 +22,10 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 
     <style>
-
     .marker-cluster {
         background-color: #7171A3;
     }
+
     .marker-cluster div {
         background-color: #7171A3;
         color: white;
@@ -43,7 +43,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <script>
-    var map = L.map('map').setView([48.733333, -3.466667], 10);
+    var map = L.map('map').setView([48.1700, -2.7500], 8);
 
     var baselayers = {
         OSM: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
