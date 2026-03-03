@@ -23,6 +23,9 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" />
 </head>
 
 <style>
@@ -43,6 +46,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js"></script>
 
 <script>
@@ -50,17 +54,19 @@ var map = L.map('map', {
     fullscreenControl: true
 }).setView([48.733333, -3.466667], 13);
 
-
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+
+// Créer le groupe de clusters
+var markers = L.markerClusterGroup();
+map.addLayer(markers);
 
 var adressesVendeurs = <?php echo json_encode($adresseDesVendeurs); ?>;
 
 console.log('Adresses:', adressesVendeurs);
 
 function ajouterMarkerVendeur(adresse, nom = '') {
-
     var adresseEncodee = encodeURIComponent(adresse);
     var urlNominatim = 'https://nominatim.openstreetmap.org/search?q=' + adresseEncodee + '&format=json&limit=1';
 
@@ -73,17 +79,18 @@ function ajouterMarkerVendeur(adresse, nom = '') {
             if (data && data.length > 0) {
                 var lat = data[0].lat;
                 var lon = data[0].lon;
-                var newMarker = L.marker([lat, lon]).addTo(map);
+                var newMarker = L.marker([lat, lon]);
                 newMarker.bindPopup("<b>" + (nom || 'Vendeur') + "</b><br>" + adresse);
+                markers.addLayer(newMarker);
             } else {
                 console.warn('Aucun résultat de géocodage pour:', adresse);
             }
         })
         .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
-
-    var marker = L.marker([48.75770187, -3.45408821]).addTo(map);
-    marker.bindPopup("<b>Alizon</b><br>La meilleur equipe de dev !").openPopup();
 }
+
+var markerAlizon = L.marker([48.75770187, -3.45408821]);
+markerAlizon.bindPopup("<b>Alizon</b><br>La meilleur equipe de dev !");
 
 if (Array.isArray(adressesVendeurs)) {
     adressesVendeurs.forEach(function(vendeur) {

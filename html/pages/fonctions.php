@@ -1794,3 +1794,4 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
         return [];
     }
 }
+
