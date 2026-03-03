@@ -1,5 +1,15 @@
 <?php
 
+
+function ensureAvisSchema($pdo)
+{
+    try {
+        $pdo->exec("ALTER TABLE cobrec1._avis ADD COLUMN IF NOT EXISTS id_compte integer");
+        $pdo->exec("ALTER TABLE ONLY cobrec1._avis ADD CONSTRAINT IF NOT EXISTS fk_avis_compte FOREIGN KEY (id_compte) REFERENCES cobrec1._compte (id_compte) ON DELETE SET NULL");
+    } catch (Exception $e) {
+    }
+}
+
 //fonction pour charger tous les produits depuis la base de données
 function chargerProduitsBDD($pdo)
 {
@@ -864,6 +874,7 @@ function chargerProduitBDD($pdo, $idProduit) {
 
 //charge les avis et réponses pour un produit
 function chargerAvisBDD($pdo, $idProduit, $idClient = null, $idCompte = null) {
+    ensureAvisSchema($pdo);
     $avis = [];
     $reponses = [];
     
@@ -920,6 +931,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null, $idCompte = null) {
 //gestion des actions AJAX pour les avis
 
 function gererActionsAvis($pdo, $idClient, $idCompte, $idProduit) {
+    ensureAvisSchema($pdo);
     header('Content-Type: application/json; charset=utf-8');
     
     $action = $_POST['action'] ?? '';
@@ -1857,4 +1869,3 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
         return [];
     }
 }
-

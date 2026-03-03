@@ -4,6 +4,9 @@ require_once '../../selectBDD.php';
 require_once '../../pages/fonctions.php';
 
 $pdo->exec("SET search_path TO cobrec1");
+// make sure avis table has the new id_compte column before running queries
+require_once '../../pages/fonctions.php';
+ensureAvisSchema($pdo);
 
 // --- LOGIQUE PRINCIPALE ---
 
