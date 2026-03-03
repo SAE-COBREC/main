@@ -153,7 +153,13 @@ try {
         exit;
     }
 
-    gererActionsAvis($pdo, $idClient, $idProduit);
+    // determine idCompte from client for ownership checks
+    $idCompte = null;
+    if ($idClient) {
+        require_once '../../pages/fonctions.php';
+        $idCompte = recupererIdentifiantCompteClient($pdo, $idClient);
+    }
+    gererActionsAvis($pdo, $idClient, $idCompte, $idProduit);
 } catch (Exception $e) {
     $out = ob_get_clean();
     error_log('actions_avis exception: ' . $e->getMessage() . '\nOutput:' . $out);

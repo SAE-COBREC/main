@@ -409,7 +409,8 @@ function recupererIdentifiantCompteClient($connexionBaseDeDonnees, $identifiantC
 
 // Rendu HTML des avis (extrait de pages/produit/index.php pour réutilisation)
 if (!function_exists('renderAvisHtml')) {
-    function renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer) {
+    // idCompte added so that ownership is tied to the compte, not only au client row
+    function renderAvisHtml($avisTextes, $reponsesMap, $idClient, $idCompte, $ownerTokenServer) {
         if (empty($avisTextes)) {
             echo '<p style="color:#666;">Aucun avis pour le moment. Soyez le premier !</p>';
             return;
@@ -433,7 +434,7 @@ if (!function_exists('renderAvisHtml')) {
             ?>
 <div class="review" data-avis-id="<?= (int)$ta['id_avis'] ?>" data-note="<?= $aNote ?>"
     data-title="<?= htmlspecialchars($aTitre) ?>" style="margin-bottom:12px;position:relative;padding-right:44px;">
-    <?php if (!($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) ))): ?>
+    <?php if (!($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || ($idCompte && isset($ta['id_compte']) && $ta['id_compte'] == $idCompte) || (!$ta['id_client'] && !$ta['id_compte'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) ))): ?>
     <button class="ghost btn-report-trigger" title="Options avis"
         style="position:absolute;right:3em;top:8px;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -501,7 +502,7 @@ if (!function_exists('renderAvisHtml')) {
             </div>
         </div>
         <span class="review-date"><?= htmlspecialchars($ta['a_timestamp_fmt'] ?? '') ?></span>
-        <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || (!$ta['id_client'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
+        <?php if ($idClient && ( ($ta['id_client'] && $ta['id_client'] == $idClient) || ($idCompte && isset($ta['id_compte']) && $ta['id_compte'] == $idCompte) || (!$ta['id_client'] && !$ta['id_compte'] && $ownerTokenServer && isset($ta['a_owner_token']) && $ta['a_owner_token'] === $ownerTokenServer) )): ?>
         <div class="review-actions">
             <button title="Modifier" class="ghost btn-edit-review desktop-only">Modifier</button>
             <button title="Supprimer" class="ghost btn-delete-review desktop-only">Supprimer</button>
@@ -862,7 +863,7 @@ function chargerProduitBDD($pdo, $idProduit) {
 
 
 //charge les avis et réponses pour un produit
-function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
+function chargerAvisBDD($pdo, $idProduit, $idClient = null, $idCompte = null) {
     $avis = [];
     $reponses = [];
     
@@ -878,6 +879,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
                 a.a_pouce_bleu,
                 a.a_pouce_rouge,
                 a.id_client,
+                a.id_compte,
                 a.a_owner_token,
                 TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt,
                 co.prenom,
@@ -917,7 +919,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null) {
 
 //gestion des actions AJAX pour les avis
 
-function gererActionsAvis($pdo, $idClient, $idProduit) {
+function gererActionsAvis($pdo, $idClient, $idCompte, $idProduit) {
     header('Content-Type: application/json; charset=utf-8');
     
     $action = $_POST['action'] ?? '';
@@ -941,8 +943,8 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (!$stmtAchat->fetchColumn()) throw new Exception('Vous devez avoir acheté ce produit.');
 
             // Déjà avis ?
-            $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = ? AND id_client = ?");
-            $stmtCheck->execute([$idProduit, $idClient]);
+            $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = ? AND (id_client = ? OR id_compte = ?)");
+            $stmtCheck->execute([$idProduit, $idClient, $idCompte]);
             if ($stmtCheck->fetchColumn()) throw new Exception('Vous avez déjà donné votre avis.');
 
             $titre = trim($_POST['titre'] ?? '');
@@ -956,10 +958,10 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             $ownerToken = $_COOKIE['alizon_owner'] ?? bin2hex(random_bytes(16));
             if (!isset($_COOKIE['alizon_owner'])) setcookie('alizon_owner', $ownerToken, time() + 3600*24*365, '/');
 
-            // Insertion
+            // Insertion (on enregistre aussi l'identifiant de compte)
             $sqlInsert = "
-                INSERT INTO _avis (id_produit, id_client, a_titre, a_texte, a_note, a_timestamp_creation, a_pouce_bleu, a_pouce_rouge, a_owner_token) 
-                VALUES (:pid, :cid, :titre, :txt, :note, NOW(), 0, 0, :owner) 
+                INSERT INTO _avis (id_produit, id_client, id_compte, a_titre, a_texte, a_note, a_timestamp_creation, a_pouce_bleu, a_pouce_rouge, a_owner_token) 
+                VALUES (:pid, :cid, :compte, :titre, :txt, :note, NOW(), 0, 0, :owner) 
                 RETURNING id_avis, a_titre, a_texte, a_note, TO_CHAR(a_timestamp_creation,'YYYY-MM-DD HH24:MI') as created_at_fmt
             ";
             
@@ -967,6 +969,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             $stmt->execute([
                 ':pid' => $idProduit,
                 ':cid' => $idClient,
+                ':compte' => $idCompte,
                 ':titre' => $titre,
                 ':txt' => $texte,
                 ':note' => $note,
@@ -1006,7 +1009,7 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
             if (empty($texte)) throw new Exception('Commentaire requis.');
 
             $owner = $_COOKIE['alizon_owner'] ?? '';
-            $checkSql = "SELECT 1 FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (a_owner_token = ? AND id_client IS NULL))";
+            $checkSql = "SELECT 1 FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (id_compte = ?) OR (a_owner_token = ? AND id_client IS NULL AND id_compte IS NULL))";
             $stmtC = $pdo->prepare($checkSql);
             $stmtC->execute([$idAvis, $idProduit, $idClient, $owner]);
             if (!$stmtC->fetchColumn()) throw new Exception('Action non autorisée.');
@@ -1053,9 +1056,9 @@ function gererActionsAvis($pdo, $idClient, $idProduit) {
                  $pdo->prepare("DELETE FROM _avis WHERE id_avis IN ($placeholdersRep)")->execute($reponsesIds);
              }
 
-             $sqlDel = "DELETE FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (a_owner_token = ? AND id_client IS NULL))";
+             $sqlDel = "DELETE FROM _avis WHERE id_avis = ? AND id_produit = ? AND ((id_client = ?) OR (id_compte = ?) OR (a_owner_token = ? AND id_client IS NULL AND id_compte IS NULL))";
              $stmtDel = $pdo->prepare($sqlDel);
-             $stmtDel->execute([$idAvis, $idProduit, $idClient, $owner]);
+             $stmtDel->execute([$idAvis, $idProduit, $idClient, $idCompte, $owner]);
              
              if ($stmtDel->rowCount() > 0) {
                  // Recalculer stats (note moyenne et nombre d'avis) après suppression
@@ -1608,66 +1611,94 @@ function calcul_f_total_ttc($pdo, $id_panier, $vendeur=-1){
 // Fonction pour supprimer complètement un compte client avec anonymisation des données
 function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $identifiantCompte)
 {
+    $logFile = '/tmp/delete_account_debug.log';
+    
     try {
+        // Créer la table _emails_deleted si elle n'existe pas
+        try {
+            $connexionBaseDeDonnees->exec("
+                CREATE TABLE IF NOT EXISTS cobrec1._emails_deleted (
+                    id_deleted SERIAL PRIMARY KEY,
+                    email VARCHAR(255) UNIQUE NOT NULL,
+                    id_compte_deleted INTEGER NOT NULL,
+                    date_suppression TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ");
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [TABLE EMAILS_DELETED] Créée ou existante\n", FILE_APPEND);
+        } catch (Exception $e) {
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [TABLE EMAILS_DELETED] Erreur création - " . $e->getMessage() . "\n", FILE_APPEND);
+        }
+        
+        error_log('SUPPRESSION: Début du processus - idClient=' . $identifiantClient . ' idCompte=' . $identifiantCompte);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [SUPPRESSION START] idClient=" . $identifiantClient . " idCompte=" . $identifiantCompte . "\n", FILE_APPEND);
+        
+        // Récupérer l'email original AVANT suppression
+        $requeteEmail = "SELECT email FROM cobrec1._compte WHERE id_compte = ?";
+        $requetePrepareeEmail = $connexionBaseDeDonnees->prepare($requeteEmail);
+        $requetePrepareeEmail->execute([$identifiantCompte]);
+        $emailOriginal = $requetePrepareeEmail->fetchColumn();
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [EMAIL ORIGINAL] " . ($emailOriginal ?? 'N/A') . "\n", FILE_APPEND);
+        
+        // Vérifier que le client existe
+        $verif = $connexionBaseDeDonnees->prepare('SELECT id_client FROM cobrec1._client WHERE id_client = ?');
+        $verif->execute([$identifiantClient]);
+        $clientExiste = $verif->fetchColumn();
+        error_log('SUPPRESSION: Client existe ? ' . ($clientExiste ? 'OUI' : 'NON'));
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [CLIENT EXISTE] " . ($clientExiste ? 'OUI' : 'NON') . "\n", FILE_APPEND);
+        
+        if (!$clientExiste) {
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [ERROR] Client n'existe pas\n", FILE_APPEND);
+            return ['success' => false, 'message' => 'Le client n\'existe pas.'];
+        }
+        
         // Démarrer une transaction pour assurer la cohérence des données
         $connexionBaseDeDonnees->beginTransaction();
+        error_log('SUPPRESSION: Transaction démarrée');
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [BEGIN TRANSACTION]\n", FILE_APPEND);
 
-        // 1. Anonymiser les avis du client (mettre id_client à NULL)
+        // 1. Anonymiser les avis du client (mettre id_client et id_compte à NULL et régénérer le token)
+        // en ajoutant id_compte nous garantissons qu'un compte recréé avec le même identifiant
+        // (si la réutilisation d'email était autorisée) ne pourra pas récupérer l'ancien avis.
         $requeteAnonymerAvis = "
             UPDATE cobrec1._avis 
-            SET id_client = NULL 
+            SET id_client = NULL, id_compte = NULL, a_owner_token = MD5(RANDOM()::text || NOW()::text)
             WHERE id_client = ?
         ";
         $requetePrepareeAvis = $connexionBaseDeDonnees->prepare($requeteAnonymerAvis);
-        $requetePrepareeAvis->execute([$identifiantClient]);
+        $res = $requetePrepareeAvis->execute([$identifiantClient]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [ANONYMIZE AVIS] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeAvis->rowCount() . " - Token régénéré\n", FILE_APPEND);
+        error_log('SUPPRESSION: Anonymiser avis - ' . ($res ? 'OK' : 'KO') . ' (' . $requetePrepareeAvis->rowCount() . ' avis)');
 
-        // 2. Anonymiser les commentaires du client (mettre id_client à NULL)
-        $requeteAnonymerCommentaires = "
-            UPDATE cobrec1._commentaire 
-            SET id_client = NULL 
-            WHERE id_client = ?
-        ";
-        $requetePrepareeCommentaires = $connexionBaseDeDonnees->prepare($requeteAnonymerCommentaires);
-        $requetePrepareeCommentaires->execute([$identifiantClient]);
-
-        // 3. Supprimer les données bancaires (paiements associés aux factures du client)
-        $requeteSuppressionPaiements = "
-            DELETE FROM cobrec1._paiement 
-            WHERE id_facture IN (
-                SELECT f.id_facture 
-                FROM cobrec1._facture f 
-                INNER JOIN cobrec1._panier_commande p ON f.id_panier = p.id_panier 
-                WHERE p.id_client = ?
-            )
-        ";
-        $requetePrepareeSuppressionPaiements = $connexionBaseDeDonnees->prepare($requeteSuppressionPaiements);
-        $requetePrepareeSuppressionPaiements->execute([$identifiantClient]);
-
-        // 4. Supprimer les paniers clients (cela supprime aussi les factures et livraisons en cascade)
+        // 2. Supprimer les votes de l'utilisateur sur les avis (cascade par FK)
+        // Les votes vont être supprimés via ON DELETE CASCADE quand on supprime le client
+        
+        // 3A. Créer un panier anonyme ou anonymiser les paniers avant suppression
+        // On va supprimer directement les paniers - cela supprimera les factures, paiements, livraisons, commentaires en cascade
+        
+        // 3B. Supprimer les données bancaires (paiements) - mais peuvent être supprimés via cascade des factures
+        // Qui vont être supprimées via cascade des paniers
+        
+        // 4. Supprimer les paniers clients (cela supprime aussi les factures, livraisons, commentaires en cascade)
         $requeteSuppressionPaniers = "
             DELETE FROM cobrec1._panier_commande 
             WHERE id_client = ?
         ";
         $requetePrepareeSuppressionPaniers = $connexionBaseDeDonnees->prepare($requeteSuppressionPaniers);
-        $requetePrepareeSuppressionPaniers->execute([$identifiantClient]);
+        $res = $requetePrepareeSuppressionPaniers->execute([$identifiantClient]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE PANIERS] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeSuppressionPaniers->rowCount() . "\n", FILE_APPEND);
+        error_log('SUPPRESSION: Supprimer paniers - ' . ($res ? 'OK' : 'KO') . ' (' . $requetePrepareeSuppressionPaniers->rowCount() . ' paniers)');
 
-        // 5. Supprimer les votes de l'utilisateur sur les avis
-        $requeteSuppressionVotes = "
-            DELETE FROM cobrec1._vote_avis 
-            WHERE id_client = ?
-        ";
-        $requetePrepareeSuppressionVotes = $connexionBaseDeDonnees->prepare($requeteSuppressionVotes);
-        $requetePrepareeSuppressionVotes->execute([$identifiantClient]);
-
-        // 6. Supprimer les adresses du compte
+        // 5. Supprimer les adresses du compte
         $requeteSuppressionAdresses = "
             DELETE FROM cobrec1._adresse 
             WHERE id_compte = ?
         ";
         $requetePrepareeSuppressionAdresses = $connexionBaseDeDonnees->prepare($requeteSuppressionAdresses);
-        $requetePrepareeSuppressionAdresses->execute([$identifiantCompte]);
+        $res = $requetePrepareeSuppressionAdresses->execute([$identifiantCompte]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ADRESSES] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeSuppressionAdresses->rowCount() . "\n", FILE_APPEND);
+        error_log('SUPPRESSION: Supprimer adresses - ' . ($res ? 'OK' : 'KO') . ' (' . $requetePrepareeSuppressionAdresses->rowCount() . ' adresses)');
 
-        // 7. Supprimer la photo de profil du compte
+        // 6. Supprimer la photo de profil du compte
         $requeteRecuperationImageCompte = "
             SELECT id_image 
             FROM cobrec1._represente_compte 
@@ -1679,6 +1710,8 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
 
         if ($donneesImage) {
             $idImage = $donneesImage['id_image'];
+            error_log('SUPPRESSION: Image trouvée - id=' . $idImage);
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [IMAGE FOUND] idImage=" . $idImage . "\n", FILE_APPEND);
             
             // Supprimer la liaison entre le compte et l'image
             $requeteSuppressionLiaison = "
@@ -1686,7 +1719,9 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
                 WHERE id_compte = ?
             ";
             $requetePrepareeSuppressionLiaison = $connexionBaseDeDonnees->prepare($requeteSuppressionLiaison);
-            $requetePrepareeSuppressionLiaison->execute([$identifiantCompte]);
+            $res = $requetePrepareeSuppressionLiaison->execute([$identifiantCompte]);
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE LIAISON IMAGE] res=" . ($res ? 'OK' : 'KO') . "\n", FILE_APPEND);
+            error_log('SUPPRESSION: Supprimer liaison image - ' . ($res ? 'OK' : 'KO'));
 
             // Vérifier si l'image est utilisée par d'autres comptes
             $requeteVerificationImage = "
@@ -1705,38 +1740,66 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
                     WHERE id_image = ?
                 ";
                 $requetePrepareeSuppressionImage = $connexionBaseDeDonnees->prepare($requeteSuppressionImage);
-                $requetePrepareeSuppressionImage->execute([$idImage]);
+                $res = $requetePrepareeSuppressionImage->execute([$idImage]);
+                file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ORPHAN IMAGE] res=" . ($res ? 'OK' : 'KO') . "\n", FILE_APPEND);
+                error_log('SUPPRESSION: Supprimer image orpheline - ' . ($res ? 'OK' : 'KO'));
             }
         }
 
-        // 8. Anonymiser le pseudo du client
-        $pseudoAnonymeClient = "Anonyme_" . $identifiantClient;
+        // 7. Anonymiser le pseudo du client
+        // Utiliser un timestamp et hash pour garantir l'unicité
+        $pseudoAnonymeClient = "Anonyme_" . substr(md5($identifiantClient . time()), 0, 8);
         $requeteAnonymerPseudo = "
             UPDATE cobrec1._client 
             SET c_pseudo = ? 
             WHERE id_client = ?
         ";
         $requetePrepareeAnonymerPseudo = $connexionBaseDeDonnees->prepare($requeteAnonymerPseudo);
-        $requetePrepareeAnonymerPseudo->execute([$pseudoAnonymeClient, $identifiantClient]);
+        $res = $requetePrepareeAnonymerPseudo->execute([$pseudoAnonymeClient, $identifiantClient]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [UPDATE PSEUDO] res=" . ($res ? 'OK' : 'KO') . " newPseudo=" . $pseudoAnonymeClient . " rowCount=" . $requetePrepareeAnonymerPseudo->rowCount() . "\n", FILE_APPEND);
+        error_log('SUPPRESSION: Anonymiser pseudo - ' . ($res ? 'OK' : 'KO') . ' (pseudo=' . $pseudoAnonymeClient . ')');
 
-        // 9. Anonymiser le compte (nom et prénom)
+        // 8. Anonymiser le compte (nom et prénom)
+        $emailAnonym = "anonyme_" . $identifiantCompte . "@anonymous.local";
+        $telephoneAnonym = "0100000000"; // Respecte la regex: ^(0|\+33|0033)[1-9][0-9]{8}$
         $requeteAnonymerCompte = "
             UPDATE cobrec1._compte 
-            SET prenom = 'Anonyme', nom = '' 
+            SET prenom = 'Anonyme', nom = '', email = ?, num_telephone = ?
             WHERE id_compte = ?
         ";
         $requetePrepareeAnonymerCompte = $connexionBaseDeDonnees->prepare($requeteAnonymerCompte);
-        $requetePrepareeAnonymerCompte->execute([$identifiantCompte]);
+        $res = $requetePrepareeAnonymerCompte->execute([$emailAnonym, $telephoneAnonym, $identifiantCompte]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [UPDATE COMPTE ANONYM] res=" . ($res ? 'OK' : 'KO') . " email=" . $emailAnonym . " phone=" . $telephoneAnonym . " rowCount=" . $requetePrepareeAnonymerCompte->rowCount() . "\n", FILE_APPEND);
+        error_log('SUPPRESSION: Anonymiser compte - ' . ($res ? 'OK' : 'KO'));
+
+        // 9. Insérer l'email original dans la table des emails supprimés
+        if (!empty($emailOriginal)) {
+            $requeteInserEnmailDelete = "
+                INSERT INTO cobrec1._emails_deleted (email, id_compte_deleted) 
+                VALUES (?, ?)
+                ON CONFLICT (email) DO NOTHING
+            ";
+            $requetePrepareeInsertEmail = $connexionBaseDeDonnees->prepare($requeteInserEnmailDelete);
+            $res = $requetePrepareeInsertEmail->execute([$emailOriginal, $identifiantCompte]);
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [INSERT EMAIL DELETED] res=" . ($res ? 'OK' : 'KO') . " email=" . $emailOriginal . "\n", FILE_APPEND);
+            error_log('SUPPRESSION: Insérer email supprimé - ' . ($res ? 'OK' : 'KO'));
+        }
 
         // Valider la transaction
         $connexionBaseDeDonnees->commit();
+        error_log('SUPPRESSION: Transaction validée - suppression complète réussie');
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [COMMIT SUCCESS]\n", FILE_APPEND);
 
         return ['success' => true, 'message' => "Votre compte a été supprimé avec succès. Toutes vos données personnelles ont été supprimées."];
 
     } catch (Exception $erreurException) {
         // Annuler la transaction en cas d'erreur
+        error_log('SUPPRESSION: ERREUR - ' . $erreurException->getMessage());
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [EXCEPTION] " . $erreurException->getMessage() . "\n", FILE_APPEND);
         if ($connexionBaseDeDonnees->inTransaction()) {
             $connexionBaseDeDonnees->rollBack();
+            error_log('SUPPRESSION: Transaction annulée (rollback)');
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [ROLLBACK]\n", FILE_APPEND);
         }
         return ['success' => false, 'message' => "Erreur lors de la suppression du compte: " . $erreurException->getMessage()];
     }

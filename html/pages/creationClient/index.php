@@ -13,7 +13,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmt->execute(['email' => $email]);
         $count = $stmt->fetchColumn();
         
-        echo json_encode(['exists' => ($count > 0)]);
+        $message = '';
+        if ($count > 0) {
+            $message = 'Email déjà utilisé';
+        } else {
+            // Vérifier si l'email a déjà été utilisé et supprimé
+            try {
+                $stmtDeleted = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._emails_deleted WHERE email = :email');
+                $stmtDeleted->execute(['email' => $email]);
+                $deletedCount = $stmtDeleted->fetchColumn();
+                
+                if ($deletedCount > 0) {
+                    $message = 'Email utilisé pour un compte supprimé - impossible à réutiliser';
+                }
+            } catch (Exception $e) {
+                // La table n'existe pas encore, ignorer
+            }
+        }
+        
+        echo json_encode(['exists' => ($count > 0 || !empty($message)), 'message' => $message]);
     } catch (Exception $e) {
         echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
     }
@@ -30,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmt->execute(['telephone' => $telephone]);
         $count = $stmt->fetchColumn();
         
-        echo json_encode(['exists' => ($count > 0)]);
+        echo json_encode(['exists' => ($count > 0), 'message' => '']);
     } catch (Exception $e) {
         echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
     }
@@ -47,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmt->execute(['pseudo' => $pseudo]);
         $count = $stmt->fetchColumn();
         
-        echo json_encode(['exists' => ($count > 0)]);
+        echo json_encode(['exists' => ($count > 0), 'message' => '']);
     } catch (Exception $e) {
         echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
     }
@@ -94,107 +112,152 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $error_message = '';
   if (!$hasError && isset($_POST['action']) === false) {
     try {
-      //insertion dans la bdd des données de compte
-      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite,nom,prenom)
-              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom)';
-      $stmt = $pdo->prepare($sql);
-      $stmt->execute([
-        'email' => $email,
-        'telephone' => $telephone,
-        'mdp' => $mdp,
-        'civilite' => $civilite,
-        'nom' => $nom,
-        'prenom' => $prenom
-      ]);
-
-      // Récupérer l'id du compte créé
+      // Vérifier si l'email a été supprimé précédemment
       try {
-        $id_compte = $pdo->lastInsertId();
-      } catch (Exception $e) {
-        $id_compte = null;
-      }
-      $_SESSION['idCompte'] = $id_compte;
-
-        //insérer les informations client
-        $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_datenaissance)
-                VALUES (:id_compte, :pseudo, :datenaissance)';
-        $stmtClient = $pdo->prepare($sqlClient);
-        $stmtClient->execute([
-          'id_compte' => $id_compte,
-          'pseudo'    => $pseudo,
-          'datenaissance' => $naissance
-        ]);
-
-          //recuperation idClient
-      $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
-        $clientStmt->execute([':id' => $id_compte]);
-        $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
-        if ($client) {
-          $clientId = (int)$client['id_client'];
+        $stmtCheckDeleted = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._emails_deleted WHERE email = :email');
+        $stmtCheckDeleted->execute(['email' => $email]);
+        $deletedCount = $stmtCheckDeleted->fetchColumn();
+        
+        if ($deletedCount > 0) {
+          $hasError = true;
+          $error_card = 2;
+          $error_message = "Cet email a été utilisé pour un compte supprimé. Vous ne pouvez pas réutiliser cet email.";
         }
-      $_SESSION['idClient'] = $clientId; 
-      if (!empty($complement)){
-        $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_complement, a_ville, a_code_postal, a_pays)
-                VALUES (:id_compte, :numero, :adresse, :complement, :ville, :code_postal, :pays)';
-        $stmtAdrss = $pdo->prepare($sqlAdrss);
-        $stmtAdrss->execute([
-          'id_compte' => $id_compte,
-          'numero'    => $num,
-          'adresse' => $rue,
-          'complement' => $complement,
-          'ville'    => $commune,
-          'code_postal'    => $codeP,
-          'pays'    => $pays
-        ]);
-      }else{
-        $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays)
-                VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays)';
-        $stmtAdrss = $pdo->prepare($sqlAdrss);
-        $stmtAdrss->execute([
-          'id_compte' => $id_compte,
-          'numero'    => $num,
-          'adresse' => $rue,
-          'ville'    => $commune,
-          'code_postal'    => $codeP,
-          'pays'    => $pays
-        ]);
+      } catch (Exception $e) {
+        // Table n'existe pas encore, ignorer
       }
       
+      if (!$hasError) {
+        // serveur : vérifier les unicités une dernière fois avant insertion
+        // email
+        $stmtCheck = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._compte WHERE email = :email');
+        $stmtCheck->execute(['email' => $email]);
+        if ($stmtCheck->fetchColumn() > 0) {
+          $hasError = true;
+          $error_card = 2;
+          $error_message = 'Cette adresse e-mail est déjà utilisée.';
+        }
+        // téléphone
+        if (!$hasError && !empty($telephone)) {
+          $stmtCheck = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._compte WHERE num_telephone = :telephone');
+          $stmtCheck->execute(['telephone' => $telephone]);
+          if ($stmtCheck->fetchColumn() > 0) {
+            $hasError = true;
+            $error_card = 2;
+            $error_message = 'Ce numéro de téléphone est déjà utilisé.';
+          }
+        }
+        // pseudo
+        if (!$hasError && !empty($pseudo)) {
+          $stmtCheck = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._client WHERE c_pseudo = :pseudo');
+          $stmtCheck->execute(['pseudo' => $pseudo]);
+          if ($stmtCheck->fetchColumn() > 0) {
+            $hasError = true;
+            $error_card = 1;
+            $error_message = 'Ce pseudonyme est déjà utilisé.';
+          }
+        }
+
+        //insertion dans la bdd des données de compte
+        $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite,nom,prenom)
+                VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom)';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+          'email' => $email,
+          'telephone' => $telephone,
+          'mdp' => $mdp,
+          'civilite' => $civilite,
+          'nom' => $nom,
+          'prenom' => $prenom
+        ]);
+
+        // Récupérer l'id du compte créé
+        try {
+          $id_compte = $pdo->lastInsertId();
+        } catch (Exception $e) {
+          $id_compte = null;
+        }
+        $_SESSION['idCompte'] = $id_compte;
+
+          //insérer les informations client
+          $sqlClient = 'INSERT INTO cobrec1._client(id_compte, c_pseudo, c_datenaissance)
+                  VALUES (:id_compte, :pseudo, :datenaissance)';
+          $stmtClient = $pdo->prepare($sqlClient);
+          $stmtClient->execute([
+            'id_compte' => $id_compte,
+            'pseudo'    => $pseudo,
+            'datenaissance' => $naissance
+          ]);
+
+            //recuperation idClient
+        $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
+          $clientStmt->execute([':id' => $id_compte]);
+          $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
+          if ($client) {
+            $clientId = (int)$client['id_client'];
+          }
+        $_SESSION['idClient'] = $clientId; 
+        if (!empty($complement)){
+          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_complement, a_ville, a_code_postal, a_pays)
+                  VALUES (:id_compte, :numero, :adresse, :complement, :ville, :code_postal, :pays)';
+          $stmtAdrss = $pdo->prepare($sqlAdrss);
+          $stmtAdrss->execute([
+            'id_compte' => $id_compte,
+            'numero'    => $num,
+            'adresse' => $rue,
+            'complement' => $complement,
+            'ville'    => $commune,
+            'code_postal'    => $codeP,
+            'pays'    => $pays
+          ]);
+        }else{
+          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays)
+                  VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays)';
+          $stmtAdrss = $pdo->prepare($sqlAdrss);
+          $stmtAdrss->execute([
+            'id_compte' => $id_compte,
+            'numero'    => $num,
+            'adresse' => $rue,
+            'ville'    => $commune,
+            'code_postal'    => $codeP,
+            'pays'    => $pays
+          ]);
+        }
+      }
 
     //definition du message d'erreur en cas d'erreur d'insertion 
     } catch (Exception $e) {
       $hasError = true;
-      $error_card = 4; 
+      // default to general database error on last card
+      $error_card = 4;
       $error_message = 'Une erreur est survenue lors de la création du compte.';
 
-      // Écriture de l'erreur dans le CSV bdd_errors.csv
-      $csvFile = __DIR__ . '/bdd_errors.csv';
-      $date = date('Y-m-d H:i:s');
-      $user = isset($_SESSION['idCompte']) ? $_SESSION['idCompte'] : 'inconnu';
-      $errorData = [
-        $date,
-        $user,
-        $e->getMessage(),
-        $e->getFile(),
-        $e->getLine()
-      ];
-      $header = ['date', 'id_compte', 'message', 'fichier', 'ligne'];
-      $writeHeader = !file_exists($csvFile) || filesize($csvFile) === 0;
-      $fp = fopen($csvFile, 'a');
-      if ($fp) {
-        if ($writeHeader) {
-          fputcsv($fp, $header);
+      // try to figure out if this is a duplicate key violation so we can give a friendly message
+      $code = $e->getCode(); // SQLSTATE
+      $msg  = $e->getMessage();
+      if ($code === '23505') {
+        // PostgreSQL unique violation
+        if (strpos($msg, '_compte_email_key') !== false) {
+          $error_card = 2;
+          $error_message = 'Cette adresse e-mail est déjà utilisée.';
+        } elseif (strpos($msg, '_compte_num_telephone_key') !== false) {
+          $error_card = 2;
+          $error_message = 'Ce numéro de téléphone est déjà utilisé.';
+        } elseif (strpos($msg, '_client_c_pseudo_key') !== false) {
+          $error_card = 1;
+          $error_message = 'Ce pseudonyme est déjà utilisé.';
         }
-        fputcsv($fp, $errorData);
-        fclose($fp);
       }
-    }
+    
+    // Redirection SEULEMENT en cas de succès (pas d'erreur)
+    if (!$hasError && isset($_POST['action']) === false && isset($_SESSION['idClient'])) {
       //redirige sur la page d'acceuil
       $url = '../../index.php';
       echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
       exit;
     }
   }
+}
 ?>
 
 <style>
@@ -211,19 +274,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     transition: box-shadow 120ms ease-in-out, border-color 120ms ease-in-out;
   }
 
-  .card[id="3"] {
-    label {
-      margin-left: 20px;
+  .card[id="3"] label {
+    margin-left: 20px;
+  }
 
-      &[for="commune"] {
-        padding-left: 15px;
-        margin-left: 0;
-      }
-
-      @media #{$mobile} {
-        margin-left: 0;
-      }
-    }
+  .card[id="3"] label[for="commune"] {
+    padding-left: 15px;
+    margin-left: 0;
   }
 </style>
 
@@ -239,17 +296,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="nom">Nom</label>
-        <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required>
+        <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required
+               value="<?php echo isset($nom) ? htmlspecialchars($nom, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
         <label for="prenom">Prénom</label>
-        <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required>
+        <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required
+               value="<?php echo isset($prenom) ? htmlspecialchars($prenom, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
         <label for="pseudo">Pseudonyme</label>
-        <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required>
+        <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required
+               value="<?php echo isset($pseudo) ? htmlspecialchars($pseudo, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div class="debutant">Retour a la page de <a href="../connexionClient/index.php"><strong>Connexion →</strong></a></div>
@@ -285,26 +345,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div>
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide.">
+        <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide."
+               value="<?php echo isset($email) ? htmlspecialchars($email, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
         <label for="telephone">Numéro de téléphone</label>
         <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}"
-          maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+          maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+          value="<?php echo isset($telephone) ? htmlspecialchars($telephone, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
         <label for="naissance">Date de naissance</label>
-        <input type="date" id="naissance" name="naissance" placeholder="JJ/MM/AAAA" required>
+        <input type="date" id="naissance" name="naissance" placeholder="JJ/MM/AAAA" required
+               value="<?php echo isset($naissance) ? htmlspecialchars($naissance, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
           <label>Civilité</label>
           <div class="radio-group">
-            <label><input type="radio" name="civilite" value="M." required> Homme</label>
-            <label><input type="radio" name="civilite" value="Mme"> Femme</label>
-            <label><input type="radio" name="civilite" value="Autre"> Autre</label>
+            <label><input type="radio" name="civilite" value="M." required <?php if(isset($civilite) && $civilite === 'M.') echo 'checked'; ?>> Homme</label>
+            <label><input type="radio" name="civilite" value="Mme" <?php if(isset($civilite) && $civilite === 'Mme') echo 'checked'; ?>> Femme</label>
+            <label><input type="radio" name="civilite" value="Autre" <?php if(isset($civilite) && $civilite === 'Autre') echo 'checked'; ?>> Autre</label>
           </div>
       </div>
 
@@ -347,37 +410,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="inline-flex address-row">
         <div class="culumn-flex">
           <label for="num">Numéro</label>
-          <input type="number" id="num" name="num" min="0" max="9999999" placeholder="ex: 1">
+          <input type="number" id="num" name="num" min="0" max="9999999" placeholder="ex: 1"
+                 value="<?php echo isset($num) ? htmlspecialchars($num, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
 
         <div class="culumn-flex">
           <label for="rue">Rue</label>
-          <input type="text" id="rue" name="rue" placeholder="ex: rue Hant koz" required>
+          <input type="text" id="rue" name="rue" placeholder="ex: rue Hant koz" required
+                 value="<?php echo isset($rue) ? htmlspecialchars($rue, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
       </div>
 
       <div>
         <label for="complement">Complément d'adresse (optionnel)</label>
         <input type="text" id="compelement" name="complement" 
-           placeholder="ex: appartement 207" >
+           placeholder="ex: appartement 207" 
+           value="<?php echo isset($complement) ? htmlspecialchars($complement, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div class="inline-flex address-row">
         <div class="culumn-flex">
           <label for="codeP">Code Postal</label>
-          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$" maxlength="5" placeholder="ex: 22300">
+          <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$" maxlength="5" placeholder="ex: 22300"
+                 value="<?php echo isset($codeP) ? htmlspecialchars($codeP, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
 
         <div class="culumn-flex">
           <label for="commune">Commune</label>
-          <input type="text" id="commune" name="commune" placeholder="ex: Lannion" required>
+          <input type="text" id="commune" name="commune" placeholder="ex: Lannion" required
+                 value="<?php echo isset($commune) ? htmlspecialchars($commune, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
       </div>
       
       <div>
         <label for="pays">Pays</label>
         <input type="text" id="pays" name="pays" 
-           placeholder="ex: France" required >
+           placeholder="ex: France" required 
+           value="<?php echo isset($pays) ? htmlspecialchars($pays, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
       <div class="error">
       </div>
@@ -597,12 +666,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           body: formData
         });
         
-        if (!response.ok) return false;
+        if (!response.ok) return { exists: false, message: '' };
         const data = await response.json();
-        return data.exists;
+        return { exists: data.exists, message: data.message || '' };
       } catch (e) {
         console.error('Erreur lors de la vérification de l\'email:', e);
-        return false;
+        return { exists: false, message: '' };
       }
     }
     //verif du téléphone
@@ -617,12 +686,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           body: formData
         });
         
-        if (!response.ok) return false;
+        if (!response.ok) return { exists: false, message: '' };
         const data = await response.json();
-        return data.exists;
+        return { exists: data.exists, message: data.message || '' };
       } catch (e) {
         console.error('Erreur lors de la vérification du téléphone:', e);
-        return false;
+        return { exists: false, message: '' };
       }
     }
     //verif du pseudo
@@ -637,12 +706,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           body: formData
         });
         
-        if (!response.ok) return false;
+        if (!response.ok) return { exists: false, message: '' };
         const data = await response.json();
-        return data.exists;
+        return { exists: data.exists, message: data.message || '' };
       } catch (e) {
         console.error('Erreur lors de la vérification du pseudo:', e);
-        return false;
+        return { exists: false, message: '' };
       }
     }
     //fonction pour passage a la suite du formulaire
@@ -667,11 +736,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (visible === 0) {
         const pseudoInput = document.getElementById('pseudo');
         if (pseudoInput && pseudoInput.value.trim()) {
-          const pseudoExists = await checkPseudoExists(pseudoInput.value.trim());
-          if (pseudoExists) {
+          const pseudoResult = await checkPseudoExists(pseudoInput.value.trim());
+          if (pseudoResult.exists) {
             if (errorEl) { 
               errorEl.classList.remove('hidden'); 
-              errorEl.innerHTML = '<strong>Erreur</strong> : Ce pseudonyme est déjà utilisé.'; 
+              errorEl.innerHTML = '<strong>Erreur</strong> : ' + (pseudoResult.message || 'Ce pseudonyme est déjà utilisé.'); 
             }
             return;
           }
@@ -684,11 +753,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const phoneInput = document.getElementById('telephone');
         
         if (emailInput && emailInput.value.trim()) {
-          const emailExists = await checkEmailExists(emailInput.value.trim());
-          if (emailExists) {
+          const emailResult = await checkEmailExists(emailInput.value.trim());
+          if (emailResult.exists) {
             if (errorEl) { 
               errorEl.classList.remove('hidden'); 
-              errorEl.innerHTML = '<strong>Erreur</strong> : Cette adresse email est déjà utilisée.'; 
+              errorEl.innerHTML = '<strong>Erreur</strong> : ' + (emailResult.message || 'Cette adresse email est déjà utilisée.'); 
             }
             return;
           }
@@ -696,11 +765,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Vérification du téléphone à la card 2
         if (phoneInput && phoneInput.value.trim()) {
-          const phoneExists = await checkPhoneExists(phoneInput.value.trim());
-          if (phoneExists) {
+          const phoneResult = await checkPhoneExists(phoneInput.value.trim());
+          if (phoneResult.exists) {
             if (errorEl) { 
               errorEl.classList.remove('hidden'); 
-              errorEl.innerHTML = '<strong>Erreur</strong> : Ce numéro de téléphone est déjà utilisé.'; 
+              errorEl.innerHTML = '<strong>Erreur</strong> : ' + (phoneResult.message || 'Ce numéro de téléphone est déjà utilisé.'); 
             }
             return;
           }

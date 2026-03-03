@@ -51,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                         // Créer l'avis "réponse"
                         $insertAvisSql = "
-                            INSERT INTO cobrec1._avis (id_produit, id_client, a_texte, a_titre, a_timestamp_creation)
-                            VALUES (:idProduit, NULL, :texte, 'Réponse du vendeur', CURRENT_TIMESTAMP)
+                            INSERT INTO cobrec1._avis (id_produit, id_client, id_compte, a_texte, a_titre, a_timestamp_creation)
+                            VALUES (:idProduit, NULL, NULL, :texte, 'Réponse du vendeur', CURRENT_TIMESTAMP)
                             RETURNING id_avis
                         ";
                         $stmtInsAvis = $pdo->prepare($insertAvisSql);
