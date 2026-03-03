@@ -2,7 +2,7 @@
 $serveur = '10.253.5.101';
 $driver = 'pgsql';
 $dbname = 'saedb';
-$user = 'saedb';
+$user = 'sae';
 $pass = 'kira13';
 $port = 5432;
 ?> 
