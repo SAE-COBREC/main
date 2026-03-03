@@ -277,6 +277,12 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <link rel="stylesheet" href="/styles/Index/style.css">
+
+    <style>
+    .marker-cluster-small div {
+        background-color: #7171A3;
+    }
+    </style>
 </head>
 
 <body>
