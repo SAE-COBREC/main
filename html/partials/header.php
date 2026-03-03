@@ -71,8 +71,8 @@ if (isset($_SESSION['idClient'])) {
                 <span class="status-dot"></span>
                 <?php endif; ?>
             </a>
-            <a href="" class="icon-link" id="cart-icon-container">
-                <img src="/img/png/carte-et-localisation.png" alt="Panier" class="fas fa-shopping-cart icon">
+            <a href="#" class="icon-link" id="toggle-map-btn" title="Afficher/Masquer la carte">
+                <img src="/img/png/carte-et-localisation.png" alt="Carte" class="fas fa-shopping-cart icon">
             </a>
         </div>
     </div>
