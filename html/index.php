@@ -282,6 +282,10 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
     .marker-cluster-small div {
         background-color: #7171A3;
     }
+
+    .leaflet-bottom {
+        display: none;
+    }
     </style>
 </head>
 
