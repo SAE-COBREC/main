@@ -27,6 +27,44 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     .leaflet-bottom {
         display: none;
     }
+
+    .vendor-popup {
+        font-family: Arial, sans-serif;
+    }
+
+    .vendor-popup h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .vendor-popup p {
+        margin: 4px 0;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .vendor-popup .address-label {
+        color: #999;
+        font-size: 12px;
+    }
+
+    .vendor-popup button {
+        margin-top: 10px;
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .vendor-popup button:hover {
+        background-color: #0056b3;
+    }
     </style>
 </head>
 
@@ -58,7 +96,14 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
 
     var adressesVendeurs = <?php echo json_encode($adresseDesVendeurs); ?>;
 
-    function ajouterMarkerVendeur(adresse, nom = '') {
+    function ajouterMarkerVendeur(vendeur) {
+        var adresse = vendeur.adresse || vendeur.p_adresse || vendeur.v_adresse || '';
+        var nom = vendeur.nom || vendeur.denomination || vendeur.v_denomination || 'Vendeur';
+
+        if (!adresse || adresse.trim() === '') {
+            return;
+        }
+
         var adresseEncodee = encodeURIComponent(adresse);
         var urlNominatim = 'https://nominatim.openstreetmap.org/search?q=' + adresseEncodee + '&format=json&limit=1';
 
@@ -71,18 +116,36 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
                     var newMarker = L.marker([lat, lon], {
                         icon: iconVendeur
                     });
-                    newMarker.bindPopup("<b>" + (nom || 'Vendeur') + "</b><br>" + adresse);
 
-                    newMarker.on('click', function() {
-                        var searchInput = document.getElementById(
-                            'searchVendeur'); // Champ de recherche vendeur
-                        var filterForm = document.getElementById('filterForm'); // Formulaire de filtres
+                    // Créer le contenu HTML de la popup
+                    var popupContent = '<div class="vendor-popup">' +
+                        '<h3>' + nom.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
+                        '<p class="address-label">Adresse :</p>' +
+                        '<p>' + adresse.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
+                        '<button class="btn-voir-produits" data-vendeur="' + nom.replace(/"/g, '&quot;') +
+                        '">Voir les produits</button>' +
+                        '</div>';
 
-                        // Si le formulaire et le champ existent, et qu'on a un nom de vendeur
-                        if (searchInput && filterForm && nom) {
-                            searchInput.value = nom; // Remplit le champ avec le nom du vendeur
-                            filterForm
-                                .submit(); // Soumet le formulaire pour actualiser la liste des produits
+                    newMarker.bindPopup(popupContent);
+
+                    // Ajouter l'event listener après l'ouverture de la popup
+                    newMarker.on('popupopen', function() {
+                        var btn = document.querySelector('.leaflet-popup-content .btn-voir-produits');
+                        if (btn) {
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                var nomVendeur = this.getAttribute('data-vendeur');
+                                // Chercher le champ vendeur dans le formulaire parent
+                                var searchVendeurInput = document.getElementById('searchVendeur');
+                                if (searchVendeurInput) {
+                                    searchVendeurInput.value = nomVendeur;
+                                    // Soumettre le formulaire de filtrage
+                                    var filterForm = document.getElementById('filterForm');
+                                    if (filterForm) {
+                                        filterForm.submit();
+                                    }
+                                }
+                            });
                         }
                     });
 
@@ -97,11 +160,6 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     if (Array.isArray(adressesVendeurs)) {
         adressesVendeurs.forEach(function(vendeur) {
             if (vendeur && typeof vendeur === 'object') {
-                var adresse = vendeur.adresse || vendeur.p_adresse || vendeur.v_adresse || vendeur;
-                if (adresse && typeof adresse === 'string' && adresse.trim() !== '') {
-                    ajouterMarkerVendeur(adresse, vendeur.nom || vendeur.denomination || '');
-                }
-            } else if (typeof vendeur === 'string' && vendeur.trim() !== '') {
                 ajouterMarkerVendeur(vendeur);
             }
         });
