@@ -4,8 +4,7 @@
     $dbh = null ;
     $_SESSION["promotion"]["warn"]= 0; //réinitialisation des warnings
     $_SESSION['remise'] = [];
-    include '../../../selectBDD.php';
-    $pdo->exec("SET search_path to cobrec1");
+    
 
     if(empty($_SESSION['vendeur_id']) === false){
         $_SESSION["promotion"]['etat'] = 'pasSvg';
