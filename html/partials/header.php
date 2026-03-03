@@ -72,8 +72,7 @@ if (isset($_SESSION['idClient'])) {
                 <?php endif; ?>
             </a>
             <a href="/pages/panier/index.php" class="icon-link" id="cart-icon-container">
-                <img src="/img/svg/svg-map.svg" alt="Panier" class="fas fa-shopping-cart icon"
-                    style="filter: invert(1) saturate(0.9);">
+                <img src="/img/svg/svg-map.svg" alt="Panier" class="fas fa-shopping-cart icon">
             </a>
         </div>
     </div>
