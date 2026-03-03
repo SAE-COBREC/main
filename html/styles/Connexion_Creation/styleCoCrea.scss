@@ -541,7 +541,7 @@ body {
 }
 
 // CGV checkbox - checkbox avant le texte
-.card label:has(input#cgv) {
+.card label:has(input#cgv), .card label:has(input#a2f) {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -567,7 +567,7 @@ body {
 }
 
 @media #{$mobile} {
-  .card label:has(input#cgv) {
+  .card label:has(input#cgv), .card label:has(input#a2f) {
     input[type="checkbox"] {
       width: 16px;
       height: 16px;

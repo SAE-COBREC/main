@@ -482,8 +482,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h1>Créer un compte</h1>
       <p class="subtitle">Mot de passe</p>
 
-
-
+      <hr>
+      <div>
+        <label><input type="checkbox" id="a2f" name="a2f"> J'active la vérification à double facteurs</label>
+      </div>
+      <hr>
       <div>
         <label for="mdp">Mot de passe </label>
         <input type="password" id="mdp" name="mdp" placeholder="8-16 caractère,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>

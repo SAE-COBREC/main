@@ -1,0 +1,13 @@
+{
+    "name": "alizon/otp",
+    "description": "N/A",
+    "type": "project",
+    "license": "N/A",
+    "authors": [
+        {
+            "name": "A2.2 Les Babies",
+            "email": "mael.udin--yver@etudiant.univ-rennes.fr"
+        }
+    ],
+    "require": {}
+}
