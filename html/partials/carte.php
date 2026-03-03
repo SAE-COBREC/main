@@ -131,13 +131,74 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
             .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
     }
 
-    if (Array.isArray(adressesVendeurs)) {
-        adressesVendeurs.forEach(function(vendeur) {
-            if (vendeur && typeof vendeur === 'object') {
-                ajouterMarkerVendeur(vendeur);
-            }
+    // if (Array.isArray(adressesVendeurs)) {
+    //     adressesVendeurs.forEach(function(vendeur) {
+    //         if (vendeur && typeof vendeur === 'object') {
+    //             ajouterMarkerVendeur(vendeur);
+    //         }
+    //     });
+    // }
+
+    // 10 points fixes en Bretagne
+    var pointsBretagne = [{
+            nom: "Rennes",
+            lat: 48.1173,
+            lon: -1.6778
+        },
+        {
+            nom: "Brest",
+            lat: 48.3904,
+            lon: -4.4861
+        },
+        {
+            nom: "Quimper",
+            lat: 47.9960,
+            lon: -4.1025
+        },
+        {
+            nom: "Lorient",
+            lat: 47.7482,
+            lon: -3.3702
+        },
+        {
+            nom: "Vannes",
+            lat: 47.6559,
+            lon: -2.7603
+        },
+        {
+            nom: "Saint-Malo",
+            lat: 48.6493,
+            lon: -2.0260
+        },
+        {
+            nom: "Saint-Brieuc",
+            lat: 48.5144,
+            lon: -2.7654
+        },
+        {
+            nom: "Fougères",
+            lat: 48.3524,
+            lon: -1.2027
+        },
+        {
+            nom: "Concarneau",
+            lat: 47.8703,
+            lon: -3.9173
+        },
+        {
+            nom: "Morlaix",
+            lat: 48.5779,
+            lon: -3.8280
+        }
+    ];
+
+    pointsBretagne.forEach(function(point) {
+        var marker = L.marker([point.lat, point.lon], {
+            icon: iconVendeur
         });
-    }
+        marker.bindPopup('<b>' + point.nom + '</b>');
+        markers.addLayer(marker);
+    });
     </script>
 </body>
 
