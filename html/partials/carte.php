@@ -70,7 +70,6 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
 </head>
 
 <body>
-    <h4>Carte des vendeurs</h4>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

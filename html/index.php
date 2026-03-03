@@ -437,20 +437,6 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                     </label>
                 </section>
 
-                <!-- Carte Partial -->
-                <section>
-                    <?php 
-                    // Collecter les vendeurs uniques des produits filtrés
-                    $vendeursUniques = [];
-                    foreach ($listeProduits as $produit) {
-                        $nomVendeur = recupNomVendeurIdProduit($connexionBaseDeDonnees, $produit['id_produit']);
-                        if (!in_array($nomVendeur, $vendeursUniques)) {
-                            $vendeursUniques[] = $nomVendeur;
-                        }
-                    }
-                    $_SESSION['listesVendeurs'] = $vendeursUniques;
-                    include __DIR__ . '/partials/carte.php'; 
-                    ?>
                 </section>
                 </main>
             </form>
@@ -551,6 +537,22 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                 </div>
             </div>
             <?php endif; ?>
+
+            <!-- SECTION CARTE DES VENDEURS -->
+            <div class="carousel-container" style="padding-bottom: 0px;">
+                <?php
+                // Collecter les vendeurs uniques des produits filtrés
+                $vendeursUniques = [];
+                foreach ($listeProduits as $produit) {
+                    $nomVendeur = recupNomVendeurIdProduit($connexionBaseDeDonnees, $produit['id_produit']);
+                    if (!in_array($nomVendeur, $vendeursUniques)) {
+                        $vendeursUniques[] = $nomVendeur;
+                    }
+                }
+                $_SESSION['listesVendeurs'] = $vendeursUniques;
+                include __DIR__ . '/partials/carte.php';
+                ?>
+            </div>
 
             <div class="product-grid">
                 <!--vérifie s'il y a des produits à afficher-->
