@@ -36,6 +36,20 @@ try {//recherche nb de Promotions appartenant au vendeur
     }
 } catch (Exception $e) {}
 
+ try {//recherche nb de Promotions appartenant au vendeur
+        $sql = '
+        SELECT secret_A2F FROM cobrec1._compte
+        WHERE id_compte = :idCompte;
+        ';
+        $stmt = $pdo->prepare($sql);
+        $params = [
+            'idCompte' => $_SESSION['idCompte']
+        ];
+        $stmt->execute($params);
+        print_r("Secret A2F :\n");
+        print_r(($stmt->fetchAll(PDO::FETCH_ASSOC))[0]);
+ }
+
 //stockage secret en BDD.
 
 // // Note: use your own way to load the user secret.
