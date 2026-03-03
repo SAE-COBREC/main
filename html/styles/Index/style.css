@@ -929,4 +929,10 @@ article button:disabled {
 .carousel-container .carousel-nav .carousel-dot.active {
   background: #7171A3;
   transform: scale(1.2);
-}/*# sourceMappingURL=style.css.map */
+}
+
+#map {
+    height: 150px;
+    width: 100%;
+    border: 1px solid #ccc;
+}

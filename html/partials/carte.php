@@ -72,6 +72,20 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
                         icon: iconVendeur
                     });
                     newMarker.bindPopup("<b>" + (nom || 'Vendeur') + "</b><br>" + adresse);
+
+                    newMarker.on('click', function() {
+                        var searchInput = document.getElementById(
+                            'searchVendeur'); // Champ de recherche vendeur
+                        var filterForm = document.getElementById('filterForm'); // Formulaire de filtres
+
+                        // Si le formulaire et le champ existent, et qu'on a un nom de vendeur
+                        if (searchInput && filterForm && nom) {
+                            searchInput.value = nom; // Remplit le champ avec le nom du vendeur
+                            filterForm
+                                .submit(); // Soumet le formulaire pour actualiser la liste des produits
+                        }
+                    });
+
                     markers.addLayer(newMarker);
                 } else {
                     console.warn('Aucun résultat de géocodage pour:', adresse);
@@ -79,9 +93,6 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
             })
             .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
     }
-
-    var markerAlizon = L.marker([48.75770187, -3.45408821]);
-    markerAlizon.bindPopup("<b>Alizon</b><br>La meilleur equipe de dev !");
 
     if (Array.isArray(adressesVendeurs)) {
         adressesVendeurs.forEach(function(vendeur) {

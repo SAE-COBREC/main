@@ -65,6 +65,11 @@ $idProduit = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // 3. Traitement POST (AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // si on a un client connecté, chercher son id_compte pour les avis
+    $idCompte = null;
+    if ($idClient) {
+        $idCompte = recupererIdentifiantCompteClient($pdo, $idClient);
+    }
     // Si PHP n'a pas rempli $_POST (ex: requête JSON ou autre Content-Type), essayer de parser le corps
     if (empty($_POST)) {
         $rawBody = file_get_contents('php://input');
@@ -96,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if (isset($_POST['id_produit'])) {
-        gererActionsAvis($pdo, $idClient, $idProduit);
+        gererActionsAvis($pdo, $idClient, $idCompte, $idProduit);
     }
     // Si aucun handler POST n'a répondu (pour éviter de renvoyer la page HTML complète),
     // retourner un JSON d'erreur utile pour le debug.
@@ -173,6 +178,7 @@ $sqlAvis = "
         co.prenom,
         co.nom,
         cl.c_pseudo,
+        a.id_compte,
         i.i_lien as client_image,
         " . ($idClient ? "(SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM cobrec1._vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote, (SELECT CASE WHEN EXISTS(SELECT 1 FROM cobrec1._signale_avis sa JOIN cobrec1._envoie_signalement es ON es.id_signalement = sa.id_signalement JOIN cobrec1._client c ON es.id_compte = c.id_compte WHERE sa.id_avis = a.id_avis AND c.id_client = :cid) THEN true ELSE false END) as user_reported" : "NULL as user_vote, NULL as user_reported") . "
     FROM cobrec1._avis a
@@ -233,8 +239,8 @@ if ($idClient) {
         $clientAachete = (bool)$stmt->fetchColumn();
 
         // Vérif si déjà avis
-        $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND id_client = :cid");
-        $stmtCheck->execute([':pid' => $idProduit, ':cid' => $idClient]);
+        $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND (id_client = :cid OR id_compte = :compte)");
+        $stmtCheck->execute([':pid' => $idProduit, ':cid' => $idClient, ':compte' => $idCompte]);
         $dejaAvis = (bool)$stmtCheck->fetchColumn();
     } catch (Exception $e) {}
 }
@@ -246,7 +252,7 @@ if ($idClient) {
 if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     header('Content-Type: application/json; charset=utf-8');
     ob_start();
-    renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer);
+    renderAvisHtml($avisTextes, $reponsesMap, $idClient, $idCompte, $ownerTokenServer);
     $html = ob_get_clean();
     $optionsForLabel = [
         'popular' => 'Pertinence (pouces)',
@@ -489,7 +495,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 </div>
             </div>
             <div id="listeAvisProduit">
-                <?php renderAvisHtml($avisTextes, $reponsesMap, $idClient, $ownerTokenServer); ?>
+                <?php renderAvisHtml($avisTextes, $reponsesMap, $idClient, $idCompte, $ownerTokenServer); ?>
             </div>
         </section>
     </main>
