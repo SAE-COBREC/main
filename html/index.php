@@ -283,7 +283,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
         background-color: #7171A3;
     }
 
-    .leaflet-bottom {
+    .leaflet-control-attribution {
         display: none;
     }
     </style>
