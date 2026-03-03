@@ -9,6 +9,7 @@ $listesVendeurs = $_SESSION['listesVendeurs'] ?? [];
 
 $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs));
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -19,6 +20,19 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     <!-- Cluster -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+    <style>
+
+    .marker-cluster {
+        background-color: #7171A3;
+    }
+    .marker-cluster div {
+        background-color: #7171A3;
+        color: white;
+        font-weight: bold;
+        border-radius: 50%;
+    }
+    </style>
 </head>
 
 <body>
