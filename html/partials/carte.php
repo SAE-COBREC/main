@@ -80,9 +80,6 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
             .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
     }
 
-    var markerAlizon = L.marker([48.75770187, -3.45408821]);
-    markerAlizon.bindPopup("<b>Alizon</b><br>La meilleur equipe de dev !");
-
     if (Array.isArray(adressesVendeurs)) {
         adressesVendeurs.forEach(function(vendeur) {
             if (vendeur && typeof vendeur === 'object') {
