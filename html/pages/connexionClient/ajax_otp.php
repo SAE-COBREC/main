@@ -20,9 +20,9 @@
         }else{
             $secret = ($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f']; //cherche dans BDD
             $_SESSION['A2F']['secret'] = $secret;
-            $otp = TOTP::createFromSecret(/*$secret*/ $otp->getSecret());
+            $otp = TOTP::createFromSecret($secret);
             $logFile = "ajax.txt";
-            if ($secret == $_POST['code']){
+            if ($otp->now() == $_POST['code']){
                 file_put_contents($logFile, "true");
             }else{
                 file_put_contents($logFile, "false");

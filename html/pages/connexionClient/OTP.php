@@ -35,53 +35,45 @@ try {//recherche nb de Promotions appartenant au vendeur
         print_r("empty");
     }
 } catch (Exception $e) {}
-
- try {//recherche nb de Promotions appartenant au vendeur
-        $sql = '
-        SELECT secret_A2F FROM cobrec1._compte
-        WHERE id_compte = :idCompte;
-        ';
-        $stmt = $pdo->prepare($sql);
-        $params = [
-            'idCompte' => $_SESSION['idCompte']
-        ];
-        $stmt->execute($params);
-        print_r("Secret A2F :\n");
-        print_r(($stmt->fetchAll(PDO::FETCH_ASSOC))[0]);
- }catch (Exception $e) {}
-
-//stockage secret en BDD.
-
-// // Note: use your own way to load the user secret.
-// // The function "load_user_secret" is simply a placeholder.
-
-
 ?>
+<form id="a2form">
+    <input type="number" name="code"/>
+    <button type="submit">Valider</button>
+</form>
+<p id="output"></p>
 <script>
-const xhttp = new XMLHttpRequest();
-xhttp.open("POST", "./ajax_otp.php", true);
-// xhttp.send("1234");
-xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-xhttp.onreadystatechange = () => {
-  // Call a function when the state changes.
-  if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200) {
-    // Request finished. Do processing here.
-  }
-};
-xhttp.send("code=1234");
+    document.getElementById('a2form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const code = formData.get('code');
+        document.getElementById('output').innerText = `code: ${code}`;
+    });
 
-xhttp.open("GET", "./ajax.txt", true);
-xhttp.send();
-xhttp.onreadystatechange = () => {
-  if (xhttp.readyState === xhttp.HEADERS_RECEIVED) {
-    const contentLength = xhttp.getResponseHeader("Content-Length");
-    if (contentLength === 4) {
-        xhttp.abort();
-        alert("Authentification à double facteur activée avec succès.");
-        //document.location.href = "/index.php"; 
-    }else{
-        alert("Echec.");
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "./ajax_otp.php", true);
+    // xhttp.send("1234");
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.onreadystatechange = () => {
+    // Call a function when the state changes.
+    if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200) {
+        // Request finished. Do processing here.
     }
-  }
-};
+    };
+    xhttp.send("code=1234");
+
+    xhttp.open("GET", "./ajax.txt", true);
+    xhttp.send();
+    xhttp.onreadystatechange = () => {
+    if (xhttp.readyState === xhttp.HEADERS_RECEIVED) {
+        const contentLength = xhttp.getResponseHeader("Content-Length");
+        if (contentLength === 4) {
+            xhttp.abort();
+            alert("Authentification à double facteur activée avec succès.");
+            //document.location.href = "/index.php"; 
+        }else{
+            alert("Echec.");
+        }
+    }
+    };
 </script>
