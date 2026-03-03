@@ -446,7 +446,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
         <main>
             <!-- SECTION CAROUSEL -->
             <?php if (!empty($produitsCarousel)): ?>
-            <div class="carousel-container">
+            <div class="carousel-container" id="main-carousel">
                 <button class="carousel-btn prev-btn" id="prevBtn">&#10094;</button>
                 <button class="carousel-btn next-btn" id="nextBtn">&#10095;</button>
 
@@ -539,7 +539,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
             <?php endif; ?>
 
             <!-- SECTION CARTE DES VENDEURS -->
-            <div class="carousel-container" style="padding-bottom: 0px;">
+            <div class="carousel-container" id="main-map" style="padding-bottom: 0px; display: none;">
                 <?php
                 // Collecter les vendeurs uniques des produits filtrés
                 $vendeursUniques = [];
@@ -671,6 +671,37 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
     <script src="/js/notifications.js"></script>
     <!--charge le script principal de la page-->
     <script src="/js/Index/script.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleMapBtn = document.getElementById('toggle-map-btn');
+        var mainCarousel = document.getElementById('main-carousel');
+        var mainMap = document.getElementById('main-map');
+
+        if (toggleMapBtn) {
+            toggleMapBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                var isMapHidden = !mainMap || mainMap.style.display === 'none' || mainMap.style
+                    .display === '';
+
+                if (isMapHidden && mainMap) {
+                    mainMap.style.display = 'block';
+                    if (mainCarousel) mainCarousel.style.display = 'none';
+                    // Re-calculer la taille de la carte pour éviter les bugs d'affichage de Leaflet
+                    if (typeof map !== 'undefined') {
+                        setTimeout(function() {
+                            map.invalidateSize();
+                        }, 100);
+                    }
+                } else if (mainMap) {
+                    mainMap.style.display = 'none';
+                    if (mainCarousel) mainCarousel.style.display = 'block';
+                }
+            });
+        }
+    });
+    </script>
 </body>
 
 </html>
