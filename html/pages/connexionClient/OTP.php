@@ -1,5 +1,6 @@
 <?php
 session_start();
+print_r($_SESSION['A2F']);
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
 require_once(__DIR__."/../../vendor/autoload.php");
@@ -19,16 +20,20 @@ echo "<img src='{$grCodeUri}'>";
 
 try {//recherche nb de Promotions appartenant au vendeur
     $sql = '
-    SELECT secret_A2F FROM cobrec1._compte
+    UPDATE cobrec1._compte
+    SET secret_A2F = :secret
     WHERE id_compte = :idCompte;
     ';
     $stmt = $pdo->prepare($sql);
     $params = [
-        'idCompte' => $_SESSION['idCompte']
+        'idCompte' => $_SESSION['idCompte'],
+        'secret' => $otp->getSecret()
     ];
     $stmt->execute($params);
     print_r("Secret A2F :\n");
-    print_r(empty(($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f']));
+    if(empty(($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f'])){
+        print_r("empty");
+    }
 } catch (Exception $e) {}
 
 //stockage secret en BDD.
