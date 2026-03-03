@@ -48,7 +48,7 @@ try {//recherche nb de Promotions appartenant au vendeur
         $stmt->execute($params);
         print_r("Secret A2F :\n");
         print_r(($stmt->fetchAll(PDO::FETCH_ASSOC))[0]);
- }
+ }catch (Exception $e) {}
 
 //stockage secret en BDD.
 
