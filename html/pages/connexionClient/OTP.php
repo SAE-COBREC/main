@@ -19,24 +19,16 @@ echo "<img src='{$grCodeUri}'>";
 
 try {//recherche nb de Promotions appartenant au vendeur
     $sql = '
-    SELECT  FROM cobrec1._promotion
-    INNER JOIN cobrec1._produit ON 
-    _promotion.id_produit = _produit.id_produit
-    WHERE id_vendeur = :idVendeur;
+    SELECT secret_A2F FROM cobrec1._compte
+    WHERE id_compte = :idCompte;
     ';
     $stmt = $pdo->prepare($sql);
     $params = [
         'idCompte' => $_SESSION['idCompte']
     ];
     $stmt->execute($params);
-    if (count($stmt->fetchAll(PDO::FETCH_ASSOC)) >= 2){?>
-    <script>
-        alert("Vous avez créé plus de deux promotions. Vous ne pouvez donc plus créer de promotion. Vous pouvez toutefois toujours modifier ou supprimer des promotions.");
-        document.location.href = "/pages/backoffice/index.php"; 
-    </script>
-    <?php
-    exit(0);
-}
+    print_r("Secret A2F :\n");
+    print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
 } catch (Exception $e) {}
 
 //stockage secret en BDD.
