@@ -46,42 +46,63 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="/styles/Carte/style.css">
     <style>
-        #map { height: 600px; width: 100%; }
-        .vendor-popup h3 { margin: 0 0 5px 0; color: #e60000; }
-        .btn-voir-produits { background: #000; color: #fff; border: none; padding: 5px 10px; cursor: pointer; margin-top: 10px; width: 100%; }
+    #map {
+        height: 600px;
+        width: 100%;
+    }
+
+    .vendor-popup h3 {
+        margin: 0 0 5px 0;
+        color: #e60000;
+    }
+
+    .btn-voir-produits {
+        background: #000;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        margin-top: 10px;
+        width: 100%;
+    }
     </style>
 </head>
+
 <body>
 
     <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <script>
-
     var map = L.map('map').setView([48.2500, -2.7500], 8);
 
     var baselayers = {
         "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap France'
         }),
-        "ESRI Topo": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '&copy; ESRI'
-        }),
+        "ESRI Topo": L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '&copy; ESRI'
+            }),
         "CartoDB": L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
             attribution: '&copy; CartoDB'
         }),
-        "Satellite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '&copy; ESRI World Imagery'
-        })
+        "Satellite": L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '&copy; ESRI World Imagery'
+            })
     };
 
     baselayers["ESRI Topo"].addTo(map);
@@ -101,7 +122,9 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
         position: 'topright'
     }).addTo(map);
 
-    L.control.scale({ imperial: false }).addTo(map);
+    L.control.scale({
+        imperial: false
+    }).addTo(map);
 
     var iconVendeur = L.icon({
         iconUrl: '/img/png/badge-bretagne.png',
@@ -113,15 +136,18 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     var adressesVendeurs = <?php echo json_encode($adresseDesVendeurs); ?>;
 
     function placerMarker(lat, lon, nom, adresse) {
-        var newMarker = L.marker([lat, lon], { icon: iconVendeur });
+        var newMarker = L.marker([lat, lon], {
+            icon: iconVendeur
+        });
         var popupContent = '<div class="vendor-popup">' +
             '<h3>' + nom.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
             '<p><b>Adresse :</b><br>' + adresse.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
-            '<button class="btn-voir-produits" data-vendeur="' + nom.replace(/"/g, '&quot;') + '">Voir les produits</button>' +
+            '<button class="btn-voir-produits" data-vendeur="' + nom.replace(/"/g, '&quot;') +
+            '">Voir les produits</button>' +
             '</div>';
 
         newMarker.bindPopup(popupContent);
-        
+
         newMarker.on('popupopen', function() {
             var btn = document.querySelector('.leaflet-popup-content .btn-voir-produits');
             if (btn) {
@@ -146,7 +172,10 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
         formData.append('id_adresse', idAdresse);
         formData.append('lat', lat);
         formData.append('lon', lon);
-        fetch(window.location.pathname, { method: 'POST', body: formData })
+        fetch(window.location.pathname, {
+                method: 'POST',
+                body: formData
+            })
             .catch(err => console.warn('Erreur sauvegarde:', err));
     }
 
@@ -160,7 +189,8 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
         if (vendeur.latitude && vendeur.longitude) {
             placerMarker(vendeur.latitude, vendeur.longitude, nom, adresse);
         } else {
-            fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(adresse) + '&format=json&limit=1')
+            fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(adresse) +
+                    '&format=json&limit=1')
                 .then(r => r.json())
                 .then(data => {
                     if (data.length > 0) {
@@ -174,22 +204,55 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     }
 
     if (Array.isArray(adressesVendeurs)) {
-        adressesVendeurs.forEach(v => { if(v) ajouterMarkerVendeur(v); });
+        adressesVendeurs.forEach(v => {
+            if (v) ajouterMarkerVendeur(v);
+        });
     }
 
-    var pointsBretagne = [
-        {nom: "Rennes", lat: 48.1173, lon: -1.6778},
-        {nom: "Brest", lat: 48.3904, lon: -4.4861},
-        {nom: "Quimper", lat: 47.9960, lon: -4.1025},
-        {nom: "Lorient", lat: 47.7482, lon: -3.3702},
-        {nom: "Vannes", lat: 47.6559, lon: -2.7603},
-        {nom: "Saint-Malo", lat: 48.6493, lon: -2.0260},
-        {nom: "Saint-Brieuc", lat: 48.5144, lon: -2.7654}
+    var pointsBretagne = [{
+            nom: "Rennes",
+            lat: 48.1173,
+            lon: -1.6778
+        },
+        {
+            nom: "Brest",
+            lat: 48.3904,
+            lon: -4.4861
+        },
+        {
+            nom: "Quimper",
+            lat: 47.9960,
+            lon: -4.1025
+        },
+        {
+            nom: "Lorient",
+            lat: 47.7482,
+            lon: -3.3702
+        },
+        {
+            nom: "Vannes",
+            lat: 47.6559,
+            lon: -2.7603
+        },
+        {
+            nom: "Saint-Malo",
+            lat: 48.6493,
+            lon: -2.0260
+        },
+        {
+            nom: "Saint-Brieuc",
+            lat: 48.5144,
+            lon: -2.7654
+        }
     ];
 
     pointsBretagne.forEach(function(p) {
         var m = L.marker([p.lat, p.lon]);
-        m.bindTooltip('<b>' + p.nom + '</b>', { permanent: true, direction: 'top', offset: [-15, -10] });
+        m.bindTooltip('<b>' + p.nom + '</b>', {
+            permanent: true,
+            direction: 'top',
+            offset: [-15, -10]
+        });
         m.addTo(layerVilles);
     });
 
@@ -203,11 +266,14 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
                     iconSize: [25, 41],
                     iconAnchor: [12, 41]
                 });
-                L.marker([lat, lon], {icon: iconPerso}).bindPopup('<b>Vous êtes ici</b>').addTo(map);
+                L.marker([lat, lon], {
+                    icon: iconPerso
+                }).bindPopup('<b>Vous êtes ici</b>').addTo(map);
             });
         }
     }
     ajouterPositionUtilisateur();
     </script>
 </body>
+
 </html>
