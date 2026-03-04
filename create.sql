@@ -130,8 +130,8 @@ CREATE TABLE cobrec1._adresse (
     a_code_postal varchar(10) NOT NULL,
     a_pays varchar(255) DEFAULT 'France' NOT NULL,
     a_complement varchar(255),
-    longitude numeric(11, 8) DEFAULT 48.733333,
-    latitude numeric(11, 8) DEFAULT -3.366667
+    longitude numeric(11, 8) DEFAULT NULL,
+    latitude numeric(11, 8) DEFAULT NULL
 );
 
 ALTER TABLE ONLY cobrec1._adresse
@@ -1395,6 +1395,8 @@ VALUES (
         'rue Édouard Branly',
         'Lannion',
         '22300',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1403,6 +1405,8 @@ VALUES (
         'avenue des Champs',
         'Lyon',
         '69001',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1411,7 +1415,9 @@ VALUES (
         'boulevard Victor Hugo',
         'Marseille',
         '13001',
-        'Bâtiment B'
+        'Bâtiment B',
+        NULL,
+        NULL
     ),
     (
         7,
@@ -1419,6 +1425,8 @@ VALUES (
         'rue du Commerce',
         'Toulouse',
         '31000',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1427,7 +1435,9 @@ VALUES (
         'place de la République',
         'Nice',
         '06000',
-        '3ème étage'
+        '3ème étage',
+        NULL,
+        NULL
     ),
     (
         9,
@@ -1435,6 +1445,8 @@ VALUES (
         'rue Principale',
         'Bordeaux',
         '22260',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1443,6 +1455,8 @@ VALUES (
         'Place de la Mairie',
         'Rennes',
         '35000',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1451,6 +1465,8 @@ VALUES (
         'Rue de Siam',
         'Brest',
         '29200',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1459,6 +1475,8 @@ VALUES (
         'Place du Général de Gaulle',
         'Vitré',
         '35500',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1467,7 +1485,9 @@ VALUES (
         'rue du Pillard',
         'Rennes',
         35590,
-        'France'
+        'France',
+        NULL,
+        NULL
     ),
     (
         11,
@@ -1475,6 +1495,8 @@ VALUES (
         'Rue des Fontaines',
         'Lorient',
         '56100',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1483,6 +1505,8 @@ VALUES (
         'Place Maurice Marchais',
         'Vannes',
         '56000',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1491,6 +1515,8 @@ VALUES (
         'Rue du Roi Gradlon',
         'Quimper',
         '29000',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1499,6 +1525,8 @@ VALUES (
         'Esplanade Saint-Vincent',
         'Saint-Malo',
         '35400',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1507,6 +1535,8 @@ VALUES (
         'Place de l''Hôtel de Ville',
         'Saint-Brieuc',
         '22000',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1515,6 +1545,8 @@ VALUES (
         'Rue de la Mairie',
         'Lannion',
         '22300',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1523,6 +1555,8 @@ VALUES (
         'Rue de la Poissonnerie',
         'Dinan',
         '22100',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1531,6 +1565,8 @@ VALUES (
         'Place de l''Hôtel de Ville',
         'Morlaix',
         '29600',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1539,6 +1575,8 @@ VALUES (
         'Grand Rue',
         'Redon',
         '35600',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1547,6 +1585,8 @@ VALUES (
         'Rue de la Pinterie',
         'Fougères',
         '35300',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1555,6 +1595,8 @@ VALUES (
         'Rue du Fi',
         'Pontivy',
         '56300',
+        NULL,
+        NULL,
         NULL
     ),
     (
@@ -1563,6 +1605,8 @@ VALUES (
         'Quai de la Vigie',
         'Concarneau',
         '29900',
+        NULL,
+        NULL,
         NULL
     );
 
