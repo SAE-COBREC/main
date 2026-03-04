@@ -346,14 +346,14 @@ document.addEventListener('DOMContentLoaded', () => {
         targetDot.classList.add('active');
     }
 
-    // Bouton suivant (droite)
+    //bouton suivant (droite)
     nextButton.addEventListener('click', () => {
         const currentSlide = track.querySelector('.active') || slides[0];
         let nextSlide = currentSlide.nextElementSibling;
         let currentDot = dotsNav.querySelector('.active') || dots[0];
         let nextDot = currentDot.nextElementSibling;
 
-        // Boucle infini vers le début
+        //boucle infini vers le début
         if (!nextSlide) {
             nextSlide = slides[0];
             nextDot = dots[0];
@@ -363,14 +363,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDots(currentDot, nextDot);
     });
 
-    // Bouton précédent (gauche)
+    //bouton précédent (gauche)
     prevButton.addEventListener('click', () => {
         const currentSlide = track.querySelector('.active') || slides[0];
         let prevSlide = currentSlide.previousElementSibling;
         let currentDot = dotsNav.querySelector('.active') || dots[0];
         let prevDot = currentDot.previousElementSibling;
 
-        // Boucle infini vers la fin
+        //boucle infini vers la fin
         if (!prevSlide) {
             prevSlide = slides[slides.length - 1];
             prevDot = dots[dots.length - 1];
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDots(currentDot, prevDot);
     });
 
-    // Navigation par points
+    //navigation par points
     dotsNav.addEventListener('click', e => {
         const targetDot = e.target.closest('button');
         if (!targetDot) return;
@@ -394,18 +394,17 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDots(currentDot, targetDot);
     });
 
-    // Redimensionnement de la fenêtre
+    //nedimensionnement de la fenêtre
     window.addEventListener('resize', () => {
         const currentSlide = track.querySelector('.active') || slides[0];
         track.style.transform = 'translateX(-' + currentSlide.offsetLeft + 'px)';
     });
 
-    // --- AUTO SCROLL - AUTOMATISATION DU DEFILEMENT ---
     let autoPlayInterval = null;
-    const intervalTime = 5000; // 5 secondes
+    const intervalTime = 5000;
 
     function startAutoPlay() {
-        if (autoPlayInterval) return; // Ne pas lancer plusieurs intervalles
+        if (autoPlayInterval) return; //ne pas lancer plusieurs intervalles
         autoPlayInterval = setInterval(() => {
             if (nextButton && typeof nextButton.click === 'function') {
                 nextButton.click();
@@ -420,10 +419,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Démarre le défilement automatique
+    //démarre le défilement automatique
     startAutoPlay();
 
-    // Arrête le défilement au survol de la souris
+    //arrête le défilement au survol de la souris
     const carouselContainer = document.querySelector('.carousel-container');
     if (carouselContainer) {
         carouselContainer.addEventListener('mouseenter', stopAutoPlay);
