@@ -15,7 +15,9 @@
     border-bottom: 1px solid $secondary-color-gris-clair;
 }
 
-
+.carte {
+    display: none;
+}
 .site-header .header-inner {
     max-width: 1200px;
     margin: 0 auto;
