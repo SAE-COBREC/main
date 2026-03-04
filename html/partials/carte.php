@@ -238,7 +238,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
             '<h3>' + nom.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
             '<p><b>Adresse :</b><br>' + adresse.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
             '<button class="btn-voir-produits" data-vendeur="' + nom.replace(/"/g, '&quot;') +
-            '">🛒 Voir les produits</button>' +
+            '">Voir les produits</button>' +
             '</div>';
 
         newMarker.bindPopup(popupContent);
