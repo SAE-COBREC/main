@@ -432,7 +432,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /* ---------------------------------------------------------
        Redirection
     --------------------------------------------------------- */
-    header("Location: index.php?success=1");
+    $url = '/pages/backoffice/profil/index.php';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 
