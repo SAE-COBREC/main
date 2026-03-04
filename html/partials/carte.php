@@ -181,7 +181,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     };
 
     L.control.layers(baselayers, overlays, {
-        collapsed: false,
+        collapsed: true,
         position: 'topright'
     }).addTo(map);
 
