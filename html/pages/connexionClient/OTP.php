@@ -19,7 +19,6 @@ use OTPHP\TOTP;
 // A random secret will be generated from this.
 // You should store the secret with the user for verification.
 $otp = TOTP::generate();
-echo "The OTP secret is: {$otp->getSecret()}\n";
 
 $otp = $otp->withLabel('Alizon');
 $grCodeUri = $otp->getQrCodeUri(
@@ -45,7 +44,14 @@ $result = $writer->write($qrCode, null, null);
 
 // Validate the result
 $writer->validateResult($result, $otp->getProvisioningUri());
-echo "<img src='{$result->getDataUri()}'>";
+?>
+<form id="a2form">
+<img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
+<label>
+<p>Code secret :</p>
+<small><?php echo $otp->getSecret() ?></small>
+</label>
+<?php
 
 try {//enregistrement du secret_A2F dans la BDD
     $sql = '
@@ -61,47 +67,37 @@ try {//enregistrement du secret_A2F dans la BDD
     $stmt->execute($params);
 } catch (Exception $e) {}
 ?>
-<form id="a2form">
-    <input type="number" name="code"/>
+    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code"/>
     <button type="submit">Valider</button>
 </form>
-<p id="output"></p>
 <script>
-    document.getElementById('a2form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const code = formData.get('code');
-        document.getElementById('output').innerText = `code: ${code}`;
+    // document.getElementById('a2form').addEventListener('submit', function(event) {
+    //     event.preventDefault();
+    //     const formData = new FormData(event.target);
+    //     const code = formData.get('code');
 
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "./ajax_otp.php", true);
-        // xhttp.send("1234");
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        // xhttp.onreadystatechange = () => {
-        // // Call a function when the state changes.
-        // if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200) {
-        //     // Request finished. Do processing here.
-        // }
-        // };
-        xhttp.send("code="+code);
+    //     const xhttp = new XMLHttpRequest();
+    //     xhttp.open("POST", "./ajax_otp.php", true);
+    //     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    //     xhttp.send("code="+code);
 
 
-        const xhttp2 = new XMLHttpRequest();
-        xhttp2.open("GET", "./ajax.txt", true);
-        xhttp2.send();
-        xhttp2.onreadystatechange = () => {
-        if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
-            const contentLength = xhttp2.getResponseHeader("Content-Length");
-            if (contentLength == 4) {
-                xhttp2.abort();
-                alert("Authentification à double facteur activée avec succès.");
-                //document.location.href = "/index.php"; 
-            }else{
-                alert("Echec." + contentLength);
-            }
-        }
-        };
-    });
+    //     const xhttp2 = new XMLHttpRequest();
+    //     xhttp2.open("GET", "./ajax.txt", true);
+    //     xhttp2.send();
+    //     xhttp2.onreadystatechange = () => {
+    //     if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+    //         const contentLength = xhttp2.getResponseHeader("Content-Length");
+    //         if (contentLength == 4) {
+    //             xhttp2.abort();
+    //             alert("Authentification à double facteur activée avec succès.");
+    //             //document.location.href = "/index.php"; 
+    //         }else{
+    //             alert("Echec." + contentLength);
+    //         }
+    //     }
+    //     };
+    // });
 
 
     
