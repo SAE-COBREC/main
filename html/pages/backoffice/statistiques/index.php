@@ -94,7 +94,8 @@ try {
         </main>
     </div>
     <script>
-        const ctx1 = document.getElementById('graphiqueVentes').getContext('2d');
+        const canva1 = document.getElementById('graphiqueVentes').getContext('2d');
+        const canva2 = document.getElementById('graphiqueQuoiVendu').getContext('2d');
         const selectModeAffichage = document.getElementById('modeAffichage');
         const groupeParAnnee = document.getElementById('groupeParAnnee');
         const groupeParPeriode = document.getElementById('groupeParPeriode');
@@ -110,13 +111,13 @@ try {
             chargerLesStats();
         });
 
-        const graph1 = new Chart(ctx1, {
+        const graph1 = new Chart(canva1, {
             type: 'bar',
             data: {
-                labels: <?php echo "['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],"?>
+                labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
                 datasets: [{
-                    label: 2025,
-                    data: <?php echo json_encode($donneesGraphique); ?>,
+                    label: 'gains en €',
+                    data: [],
                     backgroundColor: 'rgba(54, 162, 235, 0.5)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
@@ -128,6 +129,23 @@ try {
                         beginAtZero: true
                     }
                 }
+            }
+        });
+
+        const graph2 = new Chart(canva2, {
+            type: 'doughnut',
+            data:{
+                labels: [],
+                datasets: [{
+                    label: "nombres d'articles vendus",
+                    data: [],
+                    backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)'
+                    ],
+                    hoverOffset: 4
+                }]
             }
         });
 
@@ -151,9 +169,12 @@ try {
             fetch(url)
                 .then(reponse => reponse.json())
                 .then(donnees => {
-                    graph1.data.datasets[0].data = donnees;
-
+                    graph1.data.datasets[0].data = donnees.graph1;
                     graph1.update();
+
+                    graph2.data.labels = donnees.graph2.labels;
+                    graph2.data.datasets[0].data = donnees.graph2.data;
+                    graph2.update();
                 })
                 .catch(err => console.error("Erreur AJAX :", err));
         }
