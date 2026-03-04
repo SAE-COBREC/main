@@ -8,8 +8,8 @@ if(empty($_SESSION['vendeur_id']) === false){
 ?>
 
 <script>
-    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
-    document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+document.location.href = "/pages/backoffice/connexionVendeur/index.php";
 </script>
 <?php
 }
@@ -77,6 +77,8 @@ try {
             a.a_code_postal AS codep,
             a.a_ville AS ville,
             a.a_complement AS complement,
+            a.latitude AS latitude,
+            a.longitude AS longitude,
             i.id_image,
             i.i_lien AS image
         FROM cobrec1._compte c
@@ -411,6 +413,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     /* ---------------------------------------------------------
+       5. Mise à jour des coordonnées GPS
+    --------------------------------------------------------- */
+    if (isset($_POST['latitude']) && isset($_POST['longitude']) &&
+        $_POST['latitude'] !== '' && $_POST['longitude'] !== '') {
+        $stmt = $pdo->prepare("
+            UPDATE cobrec1._adresse
+            SET latitude = :lat, longitude = :lon
+            WHERE id_compte = :id
+        ");
+        $stmt->execute([
+            'lat' => (float)$_POST['latitude'],
+            'lon' => (float)$_POST['longitude'],
+            'id'  => $vendeur['compte']
+        ]);
+    }
+
+    /* ---------------------------------------------------------
        Redirection
     --------------------------------------------------------- */
     header("Location: index.php?success=1");
@@ -423,182 +442,232 @@ function safe($array, $key, $default = "") {
 ?>
 <!doctype html>
 <html lang="fr">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=1440, height=1024">
-  <title>Profil Vendeur - Alizon</title>
-  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link rel="stylesheet" href="/styles/ProfilVendeur/profil.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1440, height=1024">
+    <title>Profil Vendeur - Alizon</title>
+    <link rel="icon" type="image/png" href="../../../img/favicon.svg">
+    <link rel="stylesheet" href="/styles/ProfilVendeur/profil.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
+
 <body>
-  <div class="app">
+    <div class="app">
 
-    <?php include __DIR__ . '/../../../partials/aside.html'; ?>
+        <?php include __DIR__ . '/../../../partials/aside.html'; ?>
 
-    <main class="main">
-    <div class="page-header">
-        <h1 class="page-title">Mon Compte</h1>
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">Mon Compte</h1>
 
-        <a href="../connexionVendeur/index.php" class="logout-btn">Déconnexion</a>
-    </div>
-      <div class="profil-card">
-        <h2 class="profil-card__title">Modifier mes informations</h2>
+                <a href="../connexionVendeur/index.php" class="logout-btn">Déconnexion</a>
+            </div>
+            <div class="profil-card">
+                <h2 class="profil-card__title">Modifier mes informations</h2>
 
-        <div class="profil-photo">
-          <img src="<?= str_replace("/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>" alt="Photo vendeur">
-        </div>
-
-        <form id="edit-form" class="edit-form" action="" method="POST" enctype="multipart/form-data">
-
-          <div class="form-row">
-            <label>Changer l'image</label>
-            <input type="file" name="image" accept="image/*">
-          </div>
-
-            <div class="form-group-row"> <div class="form-row">
-                    <label>Nom</label>
-                    <input type="text" id="nom" name="nom" value="<?= safe($vendeur, 'nom') ?>" required>
-                    <span class="error" id="error-nom"></span>
+                <div class="profil-photo">
+                    <img src="<?= str_replace("/img/photo", "../../../img/photo" , htmlspecialchars($vendeur['image']))?>"
+                        alt="Photo vendeur">
                 </div>
-                <div class="form-row">
-                    <label>Prénom</label>
-                    <input type="text" id="prenom" name="prenom" value="<?= safe($vendeur, 'prenom') ?>" required>
-                    <span class="error" id="error-prenom"></span>
-                </div>
+
+                <form id="edit-form" class="edit-form" action="" method="POST" enctype="multipart/form-data">
+
+                    <div class="form-row">
+                        <label>Changer l'image</label>
+                        <input type="file" name="image" accept="image/*">
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-row">
+                            <label>Nom</label>
+                            <input type="text" id="nom" name="nom" value="<?= safe($vendeur, 'nom') ?>" required>
+                            <span class="error" id="error-nom"></span>
+                        </div>
+                        <div class="form-row">
+                            <label>Prénom</label>
+                            <input type="text" id="prenom" name="prenom" value="<?= safe($vendeur, 'prenom') ?>"
+                                required>
+                            <span class="error" id="error-prenom"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-row" style="flex: 0 0 150px;"> <label>Civilité</label>
+                            <select name="civilite" id="civilite" required>
+                                <option value="">-- Sélectionnez --</option>
+                                <option value="M."
+                                    <?php echo (safe($vendeur, 'civilite') ?? '') === 'M.' ? 'selected' : ''; ?>>M.
+                                </option>
+                                <option value="Mme"
+                                    <?php echo (safe($vendeur, 'civilite') ?? '') === 'Mme' ? 'selected' : ''; ?>>Mme
+                                </option>
+                                <option value="Inconnu"
+                                    <?php echo (safe($vendeur, 'civilite') ?? '') === 'Inconnu' ? 'selected' : ''; ?>>
+                                    Inconnu</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Téléphone</label>
+                            <input type="text" id="telephone" name="telephone"
+                                value="<?= safe($vendeur, 'telephone') ?>" required>
+                            <span class="error" id="error-telephone"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Dénomination</label>
+                        <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
+                        <span class="error" id="error-pseudo"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Raison sociale</label>
+                        <input type="text" id="rsociale" name="rsociale" value="<?= safe($vendeur, 'rsociale') ?>"
+                            required>
+                        <span class="error" id="error-rsociale"></span>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-row">
+                            <label>Email</label>
+                            <input type="email" id="email" name="email" value="<?= safe($vendeur, 'email') ?>" required>
+                            <span class="error" id="error-email"></span>
+                        </div>
+
+                        <div class="form-row form-row--small">
+                            <label>SIREN</label>
+                            <input type="text" id="siren" name="siren" value="<?= safe($vendeur, 'siren') ?>" required>
+                            <span class="error" id="error-siren"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-row form-row--small">
+                            <label>Numéro de rue</label>
+                            <input type="text" id="numero" name="numero" value="<?= safe($vendeur, 'numero') ?>"
+                                required>
+                            <span class="error" id="error-numero"></span>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Adresse</label>
+                            <input type="text" id="adresse" name="adresse" value="<?= safe($vendeur, 'adresse') ?>"
+                                required>
+                            <span class="error" id="error-adresse"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Complément d'adresse</label>
+                        <input type="text" id="complement" name="complement"
+                            value="<?= safe($vendeur, 'complement') ?>">
+                        <span class="error" id="error-complement"></span>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-row">
+                            <label>Ville</label>
+                            <input type="text" id="ville" name="ville" value="<?= safe($vendeur, 'ville') ?>" required>
+                            <span class="error" id="error-ville"></span>
+                        </div>
+
+                        <div class="form-row form-row--small">
+                            <label>Code postal</label>
+                            <input type="text" id="codep" name="codep" value="<?= safe($vendeur, 'codep') ?>" required>
+                            <span class="error" id="error-codep"></span>
+                        </div>
+                    </div>
+
+                    <!-- ===== SECTION GPS ===== -->
+                    <div class="form-row">
+                        <button type="button" id="btn-geocode" class="btn btn--secondary">
+                            📍 Valider les coordonnées GPS
+                        </button>
+                    </div>
+
+                    <div id="gps-result" style="display:none; margin-top: 12px;">
+                        <div class="form-group-row">
+                            <div class="form-row form-row--small">
+                                <label>Latitude</label>
+                                <input type="text" id="latitude-display" readonly
+                                    style="background:#f5f5f5;cursor:default;">
+                            </div>
+                            <div class="form-row form-row--small">
+                                <label>Longitude</label>
+                                <input type="text" id="longitude-display" readonly
+                                    style="background:#f5f5f5;cursor:default;">
+                            </div>
+                        </div>
+                        <div id="map"
+                            style="height: 320px; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd;"></div>
+                        <p style="font-size: 0.83em; color: #666; margin-top: 6px;">
+                            Vous pouvez faire glisser le marqueur ou cliquer sur la carte pour ajuster la position.
+                        </p>
+                    </div>
+
+                    <input type="hidden" id="latitude" name="latitude"
+                        value="<?= htmlspecialchars($vendeur['latitude']  ?? '') ?>">
+                    <input type="hidden" id="longitude" name="longitude"
+                        value="<?= htmlspecialchars($vendeur['longitude'] ?? '') ?>">
+
+                    <button title="Enregistrer" class="btn btn--primary" type="submit">Enregistrer</button>
+                </form>
             </div>
 
-        <div class="form-group-row">
-            <div class="form-row" style="flex: 0 0 150px;"> <label>Civilité</label>
-                <select name="civilite" id="civilite" required>
-                    <option value="">-- Sélectionnez --</option>
-                    <option value="M." <?php echo (safe($vendeur, 'civilite') ?? '') === 'M.' ? 'selected' : ''; ?>>M.</option>
-                    <option value="Mme" <?php echo (safe($vendeur, 'civilite') ?? '') === 'Mme' ? 'selected' : ''; ?>>Mme</option>
-                    <option value="Inconnu" <?php echo (safe($vendeur, 'civilite') ?? '') === 'Inconnu' ? 'selected' : ''; ?>>Inconnu</option>
-                </select>
+            <!-- ===== FORMULAIRE DE MODIFICATION DU MOT DE PASSE ===== -->
+
+            <!-- POPUP DE SUCCÈS -->
+            <div id="popup-success" class="popup-success">
+                Mot de passe modifié avec succès !
             </div>
 
-            <div class="form-row">
-                <label>Téléphone</label>
-                <input type="text" id="telephone" name="telephone" value="<?= safe($vendeur, 'telephone') ?>" required>
-                <span class="error" id="error-telephone"></span>
-            </div>
-        </div>
-
-          <div class="form-row">
-            <label>Dénomination</label>
-            <input type="text" id="pseudo" name="pseudo" value="<?= safe($vendeur, 'pseudo') ?>" required>
-            <span class="error" id="error-pseudo"></span>
-          </div>
-
-          <div class="form-row">
-            <label>Raison sociale</label>
-            <input type="text" id="rsociale" name="rsociale" value="<?= safe($vendeur, 'rsociale') ?>" required>
-            <span class="error" id="error-rsociale"></span>
-          </div>
-
-        <div class="form-group-row">
-            <div class="form-row">
-                <label>Email</label>
-                <input type="email" id="email" name="email" value="<?= safe($vendeur, 'email') ?>" required>
-                <span class="error" id="error-email"></span>
+            <!-- POPUP DE SUCCÈS -->
+            <div id="popup-error" class="popup-error">
+                <span id="popup-error-text"></span>
             </div>
 
-            <div class="form-row form-row--small">
-                <label>SIREN</label>
-                <input type="text" id="siren" name="siren" value="<?= safe($vendeur, 'siren') ?>" required>
-                <span class="error" id="error-siren"></span>
+            <div class="profil-card mt-4">
+
+                <h2 class="profil-card__title">Modifier mon mot de passe</h2>
+
+                <form id="form-password" method="POST" class="edit-form">
+
+                    <div class="form-row password-field">
+                        <label for="old_password">Ancien mot de passe</label>
+                        <input type="password" id="old_password" name="old_password" required>
+                        <span class="toggle-pwd" onclick="togglePassword('old_password', this)">
+                            <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
+                        </span>
+                    </div>
+
+                    <div class="form-row password-field">
+                        <label for="new_password">Nouveau mot de passe</label>
+                        <input type="password" id="new_password" name="new_password" required>
+                        <span class="toggle-pwd" onclick="togglePassword('new_password', this)">
+                            <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
+                        </span>
+                    </div>
+
+                    <div class="form-row password-field">
+                        <label for="confirm_password">Confirmer le mot de passe</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                        <span class="toggle-pwd" onclick="togglePassword('confirm_password', this)">
+                            <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
+                        </span>
+                    </div>
+
+
+
+                    <button title="Modifier mon mot de passe" class="btn btn--primary" type="submit"
+                        name="change_password">Modifier mon mot de passe</button>
+
+                </form>
             </div>
-        </div>
-
-          <div class="form-group-row">
-            <div class="form-row form-row--small">
-                <label>Numéro de rue</label>
-                <input type="text" id="numero" name="numero" value="<?= safe($vendeur, 'numero') ?>" required>
-                <span class="error" id="error-numero"></span>
-            </div>
-
-            <div class="form-row">
-                <label>Adresse</label>
-                <input type="text" id="adresse" name="adresse" value="<?= safe($vendeur, 'adresse') ?>" required>
-                <span class="error" id="error-adresse"></span>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <label>Complément d'adresse</label>
-            <input type="text" id="complement" name="complement" value="<?= safe($vendeur, 'complement') ?>">
-            <span class="error" id="error-complement"></span>
-        </div>
-
-        <div class="form-group-row">
-            <div class="form-row">
-                <label>Ville</label>
-                <input type="text" id="ville" name="ville" value="<?= safe($vendeur, 'ville') ?>" required>
-                <span class="error" id="error-ville"></span>
-            </div>
-
-            <div class="form-row form-row--small">
-                <label>Code postal</label>
-                <input type="text" id="codep" name="codep" value="<?= safe($vendeur, 'codep') ?>" required>
-                <span class="error" id="error-codep"></span>
-            </div>
-        </div>
-
-          <button title="Enregistrer" class="btn btn--primary" type="submit">Enregistrer</button>
-        </form>
-      </div>
-
-      <!-- ===== FORMULAIRE DE MODIFICATION DU MOT DE PASSE ===== -->
-
-      <!-- POPUP DE SUCCÈS -->
-    <div id="popup-success" class="popup-success">
-    Mot de passe modifié avec succès !
+        </main>
     </div>
-    
-    <!-- POPUP DE SUCCÈS -->
-    <div id="popup-error" class="popup-error">
-        <span id="popup-error-text"></span>
-    </div>
-
-    <div class="profil-card mt-4">
-
-    <h2 class="profil-card__title">Modifier mon mot de passe</h2>
-
-    <form id="form-password" method="POST" class="edit-form">
-
-        <div class="form-row password-field">
-            <label for="old_password">Ancien mot de passe</label>
-            <input type="password" id="old_password" name="old_password" required>
-            <span class="toggle-pwd" onclick="togglePassword('old_password', this)">
-                <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
-            </span>
-        </div>
-
-        <div class="form-row password-field">
-            <label for="new_password">Nouveau mot de passe</label>
-            <input type="password" id="new_password" name="new_password" required>
-            <span class="toggle-pwd" onclick="togglePassword('new_password', this)">
-                <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
-            </span>
-        </div>
-
-        <div class="form-row password-field">
-            <label for="confirm_password">Confirmer le mot de passe</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
-            <span class="toggle-pwd" onclick="togglePassword('confirm_password', this)">
-                <img src="../../../img/svg/oeil.svg" alt="Voir/Masquer" />
-            </span>
-        </div>
-
-
-
-        <button title="Modifier mon mot de passe" class="btn btn--primary" type="submit" name="change_password">Modifier mon mot de passe</button>
-
-    </form>
-    </div>
-    </main>
-  </div>
-  <script>
+    <script>
     // REGEX
     const regex = {
         nom: /^[a-zA-ZÀ-ÿ' -]{2,50}$/,
@@ -638,8 +707,7 @@ function safe($array, $key, $default = "") {
             field.classList.remove("invalid");
             field.classList.add("valid");
             error.textContent = "";
-        } 
-        else {
+        } else {
             field.classList.remove("valid");
             field.classList.add("invalid");
             error.textContent = "Valeur invalide pour " + id;
@@ -672,10 +740,10 @@ function safe($array, $key, $default = "") {
     });
 
     // REGEX pour mot de passe sécurisé : 1 maj, 1 min, 1 chiffre, 8+ caractères
-    const regexPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/; 
+    const regexPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     // Validation du nouveau mot de passe
-    document.getElementById("new_password").addEventListener("input", function () {
+    document.getElementById("new_password").addEventListener("input", function() {
         const field = this;
         const error = document.getElementById("error-new_password");
 
@@ -692,7 +760,7 @@ function safe($array, $key, $default = "") {
     });
 
     // Validation de la confirmation
-    document.getElementById("confirm_password").addEventListener("input", function () {
+    document.getElementById("confirm_password").addEventListener("input", function() {
         const newPwd = document.getElementById("new_password").value;
         const field = this;
         const error = document.getElementById("error-confirm_password");
@@ -783,29 +851,142 @@ function safe($array, $key, $default = "") {
     }
 
     function showCustomPopup(message, type = 'success') {
-    const popupId = type === 'success' ? 'custom-popup-success' : 'custom-popup-error';
-    const popup = document.getElementById(popupId);
-    
-    if (popup) {
-        popup.innerText = message;
-        popup.classList.add('show');
+        const popupId = type === 'success' ? 'custom-popup-success' : 'custom-popup-error';
+        const popup = document.getElementById(popupId);
 
-        setTimeout(() => {
-            popup.classList.remove('show');
+        if (popup) {
+            popup.innerText = message;
+            popup.classList.add('show');
+
+            setTimeout(() => {
+                popup.classList.remove('show');
             }, 3000);
         }
     }
 
     <?php if ($notification): ?>
-        document.addEventListener('DOMContentLoaded', function() {
-            showCustomPopup("<?= addslashes($notification['message']) ?>", "<?= $notification['type'] ?>");
-            
-            // On nettoie l'URL pour éviter que la popup revienne au rafraîchissement (F5)
-            window.history.replaceState({}, document.title, window.location.pathname);
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        showCustomPopup("<?= addslashes($notification['message']) ?>", "<?= $notification['type'] ?>");
+
+        // On nettoie l'URL pour éviter que la popup revienne au rafraîchissement (F5)
+        window.history.replaceState({}, document.title, window.location.pathname);
+    });
     <?php endif; ?>
-  </script>
+    </script>
     <div id="custom-popup-success" class="popup-success"></div>
     <div id="custom-popup-error" class="popup-error"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    // ============================================================
+    // GPS – Géocodage Nominatim (OpenStreetMap) + carte Leaflet
+    // ============================================================
+    let gpsMap = null;
+    let gpsMarker = null;
+
+    const initLat = <?= !empty($vendeur['latitude'])  ? (float)$vendeur['latitude']  : 'null' ?>;
+    const initLon = <?= !empty($vendeur['longitude']) ? (float)$vendeur['longitude'] : 'null' ?>;
+
+    function updateCoordinates(lat, lon) {
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lon;
+        document.getElementById('latitude-display').value = parseFloat(lat).toFixed(6);
+        document.getElementById('longitude-display').value = parseFloat(lon).toFixed(6);
+    }
+
+    function initGPSMap(lat, lon) {
+        if (gpsMap !== null) {
+            gpsMap.remove();
+            gpsMap = null;
+            gpsMarker = null;
+        }
+        // Petit délai pour laisser le DOM rendre le bloc visible
+        setTimeout(function() {
+            gpsMap = L.map('map').setView([lat, lon], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(gpsMap);
+
+            gpsMarker = L.marker([lat, lon], {
+                    draggable: true
+                })
+                .addTo(gpsMap)
+                .bindPopup('<b>Votre adresse</b><br>Faites glisser pour ajuster.')
+                .openPopup();
+
+            gpsMarker.on('dragend', function() {
+                const pos = gpsMarker.getLatLng();
+                updateCoordinates(pos.lat, pos.lng);
+            });
+
+            gpsMap.on('click', function(e) {
+                gpsMarker.setLatLng(e.latlng);
+                updateCoordinates(e.latlng.lat, e.latlng.lng);
+            });
+        }, 100);
+    }
+
+    // Afficher la carte automatiquement si coordonnées déjà enregistrées
+    document.addEventListener('DOMContentLoaded', function() {
+        if (initLat !== null && initLon !== null) {
+            document.getElementById('gps-result').style.display = 'block';
+            updateCoordinates(initLat, initLon);
+            initGPSMap(initLat, initLon);
+        }
+    });
+
+    document.getElementById('btn-geocode').addEventListener('click', async function() {
+        const numero = (document.getElementById('numero').value || '').trim();
+        const adresse = (document.getElementById('adresse').value || '').trim();
+        const ville = (document.getElementById('ville').value || '').trim();
+        const codep = (document.getElementById('codep').value || '').trim();
+
+        if (!adresse || !ville) {
+            alert(
+                'Veuillez renseigner au moins l\'adresse et la ville avant de valider les coordonnées GPS.');
+            return;
+        }
+
+        const queryStr = [numero, adresse, codep, ville, 'France']
+            .filter(Boolean).join(', ');
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&q=' +
+            encodeURIComponent(queryStr);
+
+        this.disabled = true;
+        this.textContent = 'Recherche en cours…';
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Réponse réseau invalide');
+            const data = await response.json();
+
+            if (!data.length) {
+                alert('Adresse introuvable. Vérifiez les champs adresse, ville et code postal.');
+                return;
+            }
+
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+
+            document.getElementById('gps-result').style.display = 'block';
+            updateCoordinates(lat, lon);
+            initGPSMap(lat, lon);
+
+            document.getElementById('gps-result').scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+
+        } catch (err) {
+            alert('Erreur lors de la géolocalisation. Vérifiez votre connexion.');
+            console.error(err);
+        } finally {
+            this.disabled = false;
+            this.textContent = '📍 Valider les coordonnées GPS';
+        }
+    });
+    </script>
 </body>
+
 </html>
