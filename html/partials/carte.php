@@ -376,7 +376,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
                 var markerUtilisateur = L.marker([lat, lon], {
                     icon: iconUtilisateur
                 });
-                markerUtilisateur.bindPopup('<b>Vous etes ici</b>');
+                markerUtilisateur.bindPopup('<b>Vous étes ici</b>').addTo(map);
             }, function(error) {
                 console.error('Erreur de géolocalisation:', error);
                 alert('Impossible de récupérer votre position. Vérifiez les permissions de géolocalisation.');
