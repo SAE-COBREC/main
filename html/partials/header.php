@@ -60,6 +60,9 @@ if (isset($_SESSION['idClient'])) {
 
 
         <div class="icons-container">
+            <a href="#" class="carte" id="toggle-map-btn" title="Afficher/Masquer la carte">
+                <img src="/img/png/carte-et-localisation.png" alt="Carte" class="fas fa-shopping-cart icon">
+            </a>
             <a href="/pages/panier/index.php" class="icon-link" id="cart-icon-container">
                 <img src="/img/svg/panier.svg" alt="Panier" class="fas fa-shopping-cart icon"
                     style="filter: invert(1) saturate(0.9);">
@@ -70,9 +73,6 @@ if (isset($_SESSION['idClient'])) {
                 <?php if (isset($_SESSION['idClient'])): ?>
                 <span class="status-dot"></span>
                 <?php endif; ?>
-            </a>
-            <a href="#" class="icon-link" id="toggle-map-btn" title="Afficher/Masquer la carte">
-                <img src="/img/png/carte-et-localisation.png" alt="Carte" class="fas fa-shopping-cart icon">
             </a>
         </div>
     </div>
