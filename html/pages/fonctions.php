@@ -615,15 +615,15 @@ function supprimerAdresse($connexionBaseDeDonnees, $idAdresse, $idCompte)
 }
 
 //fonction pour ajouter une nouvelle adresse
-function ajouterNouvelleAdresse($connexionBaseDeDonnees, $idCompte, $numero, $adresse, $ville, $codePostal, $complement = '') {
+function ajouterNouvelleAdresse($connexionBaseDeDonnees, $idCompte, $numero, $adresse, $ville, $codePostal, $complement = '', $longitude = null, $latitude = null) {
     try {
         $requeteSQL = "
-            INSERT INTO cobrec1._adresse (id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_complement)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO cobrec1._adresse (id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_complement, longitude, latitude)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id_adresse
         ";
         $requetePreparee = $connexionBaseDeDonnees->prepare($requeteSQL);
-        $requetePreparee->execute([$idCompte, $numero, $adresse, $ville, $codePostal, $complement]);
+        $requetePreparee->execute([$idCompte, $numero, $adresse, $ville, $codePostal, $complement, $longitude, $latitude]);
         $idAdresse = (int) $requetePreparee->fetchColumn();
         return ['success' => true, 'message' => "Adresse ajoutée avec succès.", 'id_adresse' => $idAdresse];
     } catch (Exception $erreurException) {
