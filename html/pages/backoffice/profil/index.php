@@ -581,9 +581,12 @@ function safe($array, $key, $default = "") {
                     </div>
 
                     <!-- ===== SECTION GPS ===== -->
-                    <div class="form-row">
+                    <div class="form-row" style="gap: 10px; display: flex; flex-wrap: wrap;">
                         <button type="button" id="btn-geocode" class="btn btn--secondary">
                             Valider les coordonnées GPS
+                        </button>
+                        <button type="button" id="btn-geolocate" class="btn btn--secondary">
+                            Me géolocaliser
                         </button>
                     </div>
 
@@ -947,6 +950,45 @@ function safe($array, $key, $default = "") {
             updateCoordinates(initLat, initLon);
             initGPSMap(initLat, initLon);
         }
+    });
+
+    document.getElementById('btn-geolocate').addEventListener('click', function() {
+        const btn = this;
+        if (!navigator.geolocation) {
+            alert('La géolocalisation n\'est pas supportée par ce navigateur.');
+            return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Localisation en cours…';
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                document.getElementById('gps-result').style.display = 'block';
+                updateCoordinates(lat, lon);
+                initGPSMap(lat, lon);
+                document.getElementById('gps-result').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+                btn.disabled = false;
+                btn.textContent = '🎯 Me géolocaliser';
+            },
+            function(error) {
+                const messages = {
+                    1: 'Permission refusée. Autorisez la géolocalisation dans votre navigateur.',
+                    2: 'Position introuvable. Vérifiez votre connexion ou réseau.',
+                    3: 'Délai dépassé. Réessayez.'
+                };
+                alert(messages[error.code] || 'Erreur de géolocalisation.');
+                btn.disabled = false;
+                btn.textContent = '🎯 Me géolocaliser';
+            }, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
     });
 
     document.getElementById('btn-geocode').addEventListener('click', async function() {
