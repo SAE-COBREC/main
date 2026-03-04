@@ -5,6 +5,29 @@ require_once __DIR__ . '/../pages/fonctions.php';
 $connexionBaseDeDonnees = $pdo;
 $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
+// Endpoint AJAX : sauvegarde des coordonnées géocodées dans la BDD
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_coords') {
+    header('Content-Type: application/json; charset=utf-8');
+    $idAdresse = isset($_POST['id_adresse']) ? (int) $_POST['id_adresse'] : 0;
+    $lat       = isset($_POST['lat'])        ? (float) $_POST['lat']        : null;
+    $lon       = isset($_POST['lon'])        ? (float) $_POST['lon']        : null;
+
+    if ($idAdresse > 0 && $lat !== null && $lon !== null) {
+        try {
+            $stmt = $connexionBaseDeDonnees->prepare(
+                "UPDATE cobrec1._adresse SET latitude = :lat, longitude = :lon WHERE id_adresse = :id"
+            );
+            $stmt->execute([':lat' => $lat, ':lon' => $lon, ':id' => $idAdresse]);
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Paramètres invalides']);
+    }
+    exit;
+}
+
 $listesVendeurs = $_SESSION['listesVendeurs'] ?? [];
 
 $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurParliste($connexionBaseDeDonnees, $listesVendeurs));
@@ -73,65 +96,97 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
 
     var adressesVendeurs = <?php echo json_encode($adresseDesVendeurs); ?>;
 
+    function placerMarker(lat, lon, nom, adresse) {
+        var newMarker = L.marker([lat, lon], {
+            icon: iconVendeur
+        });
+
+        var popupContent = '<div class="vendor-popup">' +
+            '<h3>' + nom.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
+            '<p class="address-label">Adresse :</p>' +
+            '<p>' + adresse.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
+            '<button class="btn-voir-produits" data-vendeur="' + nom.replace(/"/g, '&quot;') +
+            '">Voir les produits</button>' +
+            '</div>';
+
+        newMarker.bindPopup(popupContent);
+
+        newMarker.on('popupopen', function() {
+            var btn = document.querySelector('.leaflet-popup-content .btn-voir-produits');
+            if (btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var nomVendeur = this.getAttribute('data-vendeur');
+                    var searchVendeurInput = document.getElementById('searchVendeur');
+                    if (searchVendeurInput) {
+                        searchVendeurInput.value = nomVendeur;
+                        var filterForm = document.getElementById('filterForm');
+                        if (filterForm) {
+                            filterForm.submit();
+                        }
+                    }
+                });
+            }
+        });
+
+        markers.addLayer(newMarker);
+    }
+
+    function sauvegarderCoords(idAdresse, lat, lon) {
+        var formData = new FormData();
+        formData.append('action', 'save_coords');
+        formData.append('id_adresse', idAdresse);
+        formData.append('lat', lat);
+        formData.append('lon', lon);
+        fetch(window.location.pathname, {
+                method: 'POST',
+                body: formData
+            })
+            .catch(function(err) {
+                console.warn('Impossible de sauvegarder les coordonnées:', err);
+            });
+    }
+
     function ajouterMarkerVendeur(vendeur) {
         var adresse = vendeur.adresse || vendeur.p_adresse || vendeur.v_adresse || '';
         var nom = vendeur.nom || vendeur.denomination || vendeur.v_denomination || 'Vendeur';
+        var idAdresse = vendeur.id_adresse || null;
 
         if (!adresse || adresse.trim() === '') {
             return;
         }
 
+        // Coordonnées déjà géocodées et stockées en BDD
+        if (vendeur.latitude !== null && vendeur.latitude !== undefined &&
+            vendeur.longitude !== null && vendeur.longitude !== undefined) {
+            placerMarker(vendeur.latitude, vendeur.longitude, nom, adresse);
+            return;
+        }
+
+        // Sinon : géocodage Nominatim puis sauvegarde en BDD
         var adresseEncodee = encodeURIComponent(adresse);
         var urlNominatim = 'https://nominatim.openstreetmap.org/search?q=' + adresseEncodee + '&format=json&limit=1';
 
         fetch(urlNominatim)
-            .then(response => response.json())
-            .then(data => {
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
                 if (data && data.length > 0) {
-                    var lat = data[0].lat;
-                    var lon = data[0].lon;
-                    var newMarker = L.marker([lat, lon], {
-                        icon: iconVendeur
-                    });
-
-                    // Créer le contenu HTML de la popup
-                    var popupContent = '<div class="vendor-popup">' +
-                        '<h3>' + nom.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
-                        '<p class="address-label">Adresse :</p>' +
-                        '<p>' + adresse.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
-                        '<button class="btn-voir-produits" data-vendeur="' + nom.replace(/"/g, '&quot;') +
-                        '">Voir les produits</button>' +
-                        '</div>';
-
-                    newMarker.bindPopup(popupContent);
-
-                    // Ajouter l'event listener après l'ouverture de la popup
-                    newMarker.on('popupopen', function() {
-                        var btn = document.querySelector('.leaflet-popup-content .btn-voir-produits');
-                        if (btn) {
-                            btn.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                var nomVendeur = this.getAttribute('data-vendeur');
-                                // Chercher le champ vendeur dans le formulaire parent
-                                var searchVendeurInput = document.getElementById('searchVendeur');
-                                if (searchVendeurInput) {
-                                    searchVendeurInput.value = nomVendeur;
-                                    // Soumettre le formulaire de filtrage
-                                    var filterForm = document.getElementById('filterForm');
-                                    if (filterForm) {
-                                        filterForm.submit();
-                                    }
-                                }
-                            });
-                        }
-                    });
-
-                    markers.addLayer(newMarker);
+                    var lat = parseFloat(data[0].lat);
+                    var lon = parseFloat(data[0].lon);
+                    placerMarker(lat, lon, nom, adresse);
+                    // Sauvegarder en BDD pour éviter de recalculer
+                    if (idAdresse) {
+                        sauvegarderCoords(idAdresse, lat, lon);
+                    }
                 } else {
                     console.warn('Aucun résultat de géocodage pour:', adresse);
                 }
             })
-            .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
+            .catch(function(error) {
+                console.error('Erreur de géocodage pour ' + adresse + ':', error);
+            });
     }
 
     if (Array.isArray(adressesVendeurs)) {
@@ -196,10 +251,14 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     ];
 
     pointsBretagne.forEach(function(point) {
-        var marker = L.marker([point.lat, point.lon], {
-            icon: iconVendeur
+        var marker = L.marker([point.lat, point.lon]);
+
+        marker.bindTooltip('<b>' + point.nom + '</b>', {
+            permanent: true,
+            direction: 'top',
+            offset: [-15, -10]
         });
-        marker.bindPopup('<b>' + point.nom + '</b>');
+
         markers.addLayer(marker);
     });
     </script>
