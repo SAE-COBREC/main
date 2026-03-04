@@ -1039,7 +1039,7 @@ function safe($array, $key, $default = "") {
             console.error(err);
         } finally {
             this.disabled = false;
-            this.textContent = '📍 Valider les coordonnées GPS';
+            this.textContent = 'Valider les coordonnées GPS';
         }
     });
     </script>
