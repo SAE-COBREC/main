@@ -1878,3 +1878,24 @@ function getAdresseVendeur($pdo, $listeIdVendeurs)
         return [];
     }
 }
+
+
+//récup les infos général pour les statistiques
+function recupInfoPourStatsGeneral($pdo, $idVendeur){
+    $query = "
+    SELECT c.id_produit,
+        c.quantite,
+        p.p_nom,
+        p.p_prix,
+        p.p_nb_ventes,
+        c.id_panier,
+        pc.timestamp_commande AS date
+    FROM cobrec1._panier_commande pc
+    LEFT JOIN cobrec1._contient c ON pc.id_panier = c.id_panier
+    LEFT JOIN cobrec1._produit p ON c.id_produit = p.id_produit
+    WHERE p.id_vendeur = :id_vendeur";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['id_vendeur' => $idVendeur]);
+    $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $commandes;
+}
