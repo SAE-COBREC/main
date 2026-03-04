@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     //récupère l'identifiant de l'adresse à mettre à jour
     $idAdresse = isset($_POST['id_adresse']) ? (int) $_POST['id_adresse'] : 0;
     //récupère la latitude géocodée
-    $lat       = isset($_POST['lat'])        ? (float) $_POST['lat']        : null;
+    $lat = isset($_POST['lat']) ? (float) $_POST['lat'] : null;
     //récupère la longitude géocodée
-    $lon       = isset($_POST['lon'])        ? (float) $_POST['lon']        : null;
+    $lon = isset($_POST['lon']) ? (float) $_POST['lon'] : null;
 
     //vérifie que les paramètres reçus sont valides
     if ($idAdresse > 0 && $lat !== null && $lon !== null) {
@@ -113,10 +113,10 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
                 attribution: '&copy; ESRI World Imagery'
             })
     };
-    //ajoute la couche OSM par défaut à la carte
-    baselayers.OSM.addTo(map);
+    //ajoute la couche ESRI par défaut à la carte
+    baselayers.ESRI.addTo(map);
 
-    //ajoute une barre d'échelle en bas de la carte (sans unités impériales)
+    //ajoute une barre d'échelle en bas de la carte
     L.control.scale({
         imperial: false
     }).addTo(map);
