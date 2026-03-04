@@ -242,6 +242,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -466,12 +467,45 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <?php if (empty($listeCommandesRecentes)): ?>
                 <p>Aucune commande effectuée</p>
                 <?php else: ?>
+                <?php
+                    // Calcul des données pour les graphiques
+                    $depensesParMois = array_fill(0, 12, 0);
+                    $commandesParStatut = [];
+                    foreach ($listeCommandesRecentes as $cmd) {
+                        $mois = (int)date('n', strtotime($cmd['timestamp_commande'])) - 1;
+                        $depensesParMois[$mois] += calcul_f_total_ttc($connexionBaseDeDonnees, $cmd['id_panier']);
+                        $statut = $cmd['statut'];
+                        $commandesParStatut[$statut] = ($commandesParStatut[$statut] ?? 0) + 1;
+                    }
+                ?>
                 <article>
                     <header>
                         <div>
                             <span>Nombre de commandes : <?php echo count($listeCommandesRecentes); ?></span>
                         </div>
                     </header>
+                    <main>
+                        <div style="display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start;">
+                            <div
+                                style="flex: 2; min-width: 280px; display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-left: 0;">
+                                <p
+                                    style="margin: 0 0 10px; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                    Dépenses mensuelles (€)</p>
+                                <div style="position: relative; height: 220px;">
+                                    <canvas id="profilGraphiqueDepenses"></canvas>
+                                </div>
+                            </div>
+                            <div
+                                style="flex: 1; min-width: 200px; max-width: 280px; display: flex; flex-direction: column; align-items: stretch; gap: 0;">
+                                <p
+                                    style="margin: 0 0 10px; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                    Commandes par statut</p>
+                                <div style="position: relative; height: 220px;">
+                                    <canvas id="profilGraphiqueStatuts"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
                 </article>
                 <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
                 <article>
@@ -746,20 +780,29 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         </div>
     </div>
 
-    <div id="modalSuppressionMdp" style="display:none; position:fixed; inset:0; background:rgba(9, 12, 19, 0.5); z-index:10001; align-items:center; justify-content:center;">
-        <div style="width:min(420px, 92vw); background:#fff; border-radius:12px; border:1px solid #eef1f6; box-shadow:0 12px 32px rgba(9, 30, 66, .18); overflow:hidden;">
+    <div id="modalSuppressionMdp"
+        style="display:none; position:fixed; inset:0; background:rgba(9, 12, 19, 0.5); z-index:10001; align-items:center; justify-content:center;">
+        <div
+            style="width:min(420px, 92vw); background:#fff; border-radius:12px; border:1px solid #eef1f6; box-shadow:0 12px 32px rgba(9, 30, 66, .18); overflow:hidden;">
             <div style="display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid #eef1f6;">
                 <h2 style="margin:0; font-size:16px; color:#b00020;">Confirmez avec votre mot de passe</h2>
-                <button type="button" onclick="fermerModalSuppressionMotDePasse()" style="margin-left:auto; background:transparent; border:none; font-size:20px; cursor:pointer; color:#8a90a2;">×</button>
+                <button type="button" onclick="fermerModalSuppressionMotDePasse()"
+                    style="margin-left:auto; background:transparent; border:none; font-size:20px; cursor:pointer; color:#8a90a2;">×</button>
             </div>
             <div style="padding:16px;">
                 <p style="margin-top:0;">Pour supprimer définitivement votre compte, saisissez votre mot de passe.</p>
-                <label for="delete-password-input" style="display:block; margin-bottom:8px; font-weight:600;">Mot de passe</label>
-                <input type="password" id="delete-password-input" autocomplete="current-password" style="width:100%; box-sizing:border-box; border:1px solid #d8deea; border-radius:8px; padding:10px 12px;">
+                <label for="delete-password-input" style="display:block; margin-bottom:8px; font-weight:600;">Mot de
+                    passe</label>
+                <input type="password" id="delete-password-input" autocomplete="current-password"
+                    style="width:100%; box-sizing:border-box; border:1px solid #d8deea; border-radius:8px; padding:10px 12px;">
             </div>
-            <div style="display:flex; justify-content:flex-end; gap:10px; padding:12px 16px; border-top:1px solid #eef1f6;">
-                <button type="button" onclick="fermerModalSuppressionMotDePasse()" style="appearance:none; border:1px solid #e2e6f0; border-radius:10px; padding:8px 12px; background:#fff; color:#2b2f3a; cursor:pointer; font-weight:600;">Annuler</button>
-                <button type="button" onclick="confirmerSuppressionAvecMotDePasse()" style="appearance:none; border:1px solid #e74c3c; border-radius:10px; padding:8px 12px; background:#e74c3c; color:#fff; cursor:pointer; font-weight:600;">Supprimer définitivement</button>
+            <div
+                style="display:flex; justify-content:flex-end; gap:10px; padding:12px 16px; border-top:1px solid #eef1f6;">
+                <button type="button" onclick="fermerModalSuppressionMotDePasse()"
+                    style="appearance:none; border:1px solid #e2e6f0; border-radius:10px; padding:8px 12px; background:#fff; color:#2b2f3a; cursor:pointer; font-weight:600;">Annuler</button>
+                <button type="button" onclick="confirmerSuppressionAvecMotDePasse()"
+                    style="appearance:none; border:1px solid #e74c3c; border-radius:10px; padding:8px 12px; background:#e74c3c; color:#fff; cursor:pointer; font-weight:600;">Supprimer
+                    définitivement</button>
             </div>
         </div>
     </div>
@@ -1153,6 +1196,143 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             confirmerSuppressionAvecMotDePasse();
         }
     });
+
+    // Graphiques des commandes
+    (function() {
+        const canvasDepenses = document.getElementById('profilGraphiqueDepenses');
+        const canvasStatuts = document.getElementById('profilGraphiqueStatuts');
+        if (!canvasDepenses || !canvasStatuts) return;
+
+        const depensesParMois = <?php echo json_encode(array_values($depensesParMois ?? [])); ?>;
+        const statutsLabels = <?php echo json_encode(array_keys($commandesParStatut ?? [])); ?>;
+        const statutsData = <?php echo json_encode(array_values($commandesParStatut ?? [])); ?>;
+
+        // Palette DA du site (depuis _variable.scss)
+        const DA = {
+            bleu: '#7171A3', // $primary-color-bleu
+            bleuClair: '#e4e4f5', // $secondary-color-promotion
+            rouge: '#D4183D', // $secondary-color-rouge
+            rougeClair: '#FEE9E8', // $secondary-color-rouge-erreur
+            vert: '#28A745', // $secondary-color-vert-succes-fond
+            vertClair: '#D4EDDA', // $secondary-color-vert-fond
+            jaune: '#856404', // $secondary-color-jaune-avertissement
+            jauneClair: '#FFF3CD', // $secondary-color-jaune-fond
+            teal: '#0C5460', // $secondary-color-bleu-info
+            tealClair: '#D1ECF1', // $secondary-color-bleu-info-fond
+            bronze: '#CD7F32', // $primary-color-bronze
+            gris: '#c0c0c0', // $secondary-color-gris-fonce
+        };
+
+        // Couleurs pleines associées aux statuts, dans l'ordre probable
+        const paletteStatuts = [
+            DA.jaune, // en préparation
+            DA.teal, // en transit
+            DA.vert, // livré
+            DA.rouge, // annulée
+            DA.bleu, // autre
+            DA.bronze, // autre
+            DA.gris // autre
+        ];
+
+        new Chart(canvasDepenses.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov',
+                    'Déc'
+                ],
+                datasets: [{
+                    label: 'Dépenses (€)',
+                    data: depensesParMois,
+                    backgroundColor: DA.bleuClair,
+                    borderColor: DA.bleu,
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ' ' + ctx.parsed.y.toFixed(2) + ' €'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#555',
+                            font: {
+                                family: 'Quicksand',
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#EFEFEF'
+                        },
+                        ticks: {
+                            color: '#555',
+                            font: {
+                                family: 'Quicksand',
+                                size: 11
+                            },
+                            callback: v => v + ' €'
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(canvasStatuts.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: statutsLabels,
+                datasets: [{
+                    label: 'Commandes',
+                    data: statutsData,
+                    backgroundColor: DA.jauneClair,
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#333',
+                            font: {
+                                family: 'Quicksand',
+                                size: 11,
+                                weight: '600'
+                            },
+                            padding: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ' ' + ctx.label + ' : ' + ctx.parsed + ' commande(s)'
+                        }
+                    }
+                }
+            }
+        });
+    })();
     </script>
     <script src="/js/notifications.js"></script>
 </body>
