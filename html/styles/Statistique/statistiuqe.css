@@ -22,8 +22,10 @@ body {
 
 .main {
   background: #FFF7F1;
-  padding: 40px;
+  padding: 32px 40px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 .main .header {
   margin-bottom: 30px;

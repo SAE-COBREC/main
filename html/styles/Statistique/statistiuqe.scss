@@ -21,8 +21,10 @@ body {
 
 .main {
   background: $secondary-color-rose-claire;
-  padding: 40px;
+  padding: 32px 40px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 
   .header {
     margin-bottom: 30px;
