@@ -129,7 +129,9 @@ CREATE TABLE cobrec1._adresse (
     a_ville varchar(100) NOT NULL,
     a_code_postal varchar(10) NOT NULL,
     a_pays varchar(255) DEFAULT 'France' NOT NULL,
-    a_complement varchar(255)
+    a_complement varchar(255),
+    longitude numeric(11, 8) DEFAULT 48.733333,
+    latitude numeric(11, 8) DEFAULT -3.366667
 );
 
 ALTER TABLE ONLY cobrec1._adresse
@@ -1383,7 +1385,9 @@ INSERT INTO
         a_adresse,
         a_ville,
         a_code_postal,
-        a_complement
+        a_complement,
+        longitude,
+        latitude
     )
 VALUES (
         4,
@@ -4293,16 +4297,14 @@ VALUES (
 TRUNCATE cobrec1._paiement,
 cobrec1._facture,
 cobrec1._contient,
-cobrec1._panier_commande
-RESTART IDENTITY CASCADE;
+cobrec1._panier_commande RESTART IDENTITY CASCADE;
 
 -- NETTOYAGE COMPLET (Indispensable pour éviter les erreurs de clé dupliquée)
 -- Le RESTART IDENTITY remet les compteurs SERIAL à 1
 TRUNCATE cobrec1._paiement,
 cobrec1._facture,
 cobrec1._contient,
-cobrec1._panier_commande
-RESTART IDENTITY CASCADE;
+cobrec1._panier_commande RESTART IDENTITY CASCADE;
 
 -- 19. INSERTION DES 60 PANIERS (Sans l'ID car il est en SERIAL)
 INSERT INTO
@@ -7866,9 +7868,18 @@ GROUP BY
     id_panier;
 
 -- GÉNÉRATION DES PAIEMENTS
-INSERT INTO cobrec1._paiement (id_facture, mode_paiement, timestamp_paiement, numero_carte, mois_annee_expiration, cryptogramme_carte)
+INSERT INTO
+    cobrec1._paiement (
+        id_facture,
+        mode_paiement,
+        timestamp_paiement,
+        numero_carte,
+        mois_annee_expiration,
+        cryptogramme_carte
+    )
 SELECT f.id_facture, 'CB', pc.timestamp_commande + INTERVAL '3 minutes', '4970' || LPAD(f.id_facture::text, 12, '0'), '12/28', '123'
-FROM cobrec1._facture f JOIN cobrec1._panier_commande pc ON f.id_panier = pc.id_panier;
+FROM cobrec1._facture f
+    JOIN cobrec1._panier_commande pc ON f.id_panier = pc.id_panier;
 -- Reset
 UPDATE cobrec1._produit SET p_nb_ventes = 0;
 
@@ -7942,8 +7953,7 @@ LIMIT (
 -- Insère les avis dans _avis et stocke les lignes insérées dans une table temporaire pour réutilisation
 DROP TABLE IF EXISTS temp_new_avis;
 
-CREATE TEMP
-TABLE temp_new_avis (
+CREATE TEMP TABLE temp_new_avis (
     id_avis int,
     id_produit int,
     id_client int
