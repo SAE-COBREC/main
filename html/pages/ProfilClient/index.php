@@ -467,45 +467,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <?php if (empty($listeCommandesRecentes)): ?>
                 <p>Aucune commande effectuée</p>
                 <?php else: ?>
-                <?php
-                    // Calcul des données pour les graphiques
-                    $depensesParMois = array_fill(0, 12, 0);
-                    $commandesParStatut = [];
-                    foreach ($listeCommandesRecentes as $cmd) {
-                        $mois = (int)date('n', strtotime($cmd['timestamp_commande'])) - 1;
-                        $depensesParMois[$mois] += calcul_f_total_ttc($connexionBaseDeDonnees, $cmd['id_panier']);
-                        $statut = $cmd['statut'];
-                        $commandesParStatut[$statut] = ($commandesParStatut[$statut] ?? 0) + 1;
-                    }
-                ?>
+
                 <article>
                     <header>
                         <div>
                             <span>Nombre de commandes : <?php echo count($listeCommandesRecentes); ?></span>
                         </div>
                     </header>
-                    <main>
-                        <div style="display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start;">
-                            <div
-                                style="flex: 2; min-width: 280px; display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-left: 0;">
-                                <p
-                                    style="margin: 0 0 10px; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                                    Dépenses mensuelles (€)</p>
-                                <div style="position: relative; height: 220px;">
-                                    <canvas id="profilGraphiqueDepenses"></canvas>
-                                </div>
-                            </div>
-                            <div
-                                style="flex: 1; min-width: 200px; max-width: 280px; display: flex; flex-direction: column; align-items: stretch; gap: 0;">
-                                <p
-                                    style="margin: 0 0 10px; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                                    Commandes par statut</p>
-                                <div style="position: relative; height: 220px;">
-                                    <canvas id="profilGraphiqueStatuts"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </main>
                 </article>
                 <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
                 <article>
