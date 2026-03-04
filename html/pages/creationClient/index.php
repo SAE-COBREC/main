@@ -253,6 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $error_message = 'Ce pseudonyme est déjà utilisé.';
         }
       }
+    }
     
     // Redirection SEULEMENT en cas de succès (pas d'erreur)
     if (!$hasError && isset($_POST['action']) === false && isset($_SESSION['idClient'])) {
@@ -530,6 +531,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
       </div>
 
+    </div>
   </form>
 
   <!-- Modal CGV -->
