@@ -197,9 +197,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $clientId = (int)$client['id_client'];
           }
         $_SESSION['idClient'] = $clientId; 
+        // assuming $longitude and $latitude variables may be set earlier (or null)
         if (!empty($complement)){
-          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_complement, a_ville, a_code_postal, a_pays)
-                  VALUES (:id_compte, :numero, :adresse, :complement, :ville, :code_postal, :pays)';
+          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_complement, a_ville, a_code_postal, a_pays, longitude, latitude)
+                  VALUES (:id_compte, :numero, :adresse, :complement, :ville, :code_postal, :pays, :longitude, :latitude)';
           $stmtAdrss = $pdo->prepare($sqlAdrss);
           $stmtAdrss->execute([
             'id_compte' => $id_compte,
@@ -208,11 +209,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'complement' => $complement,
             'ville'    => $commune,
             'code_postal'    => $codeP,
-            'pays'    => $pays
+            'pays'    => $pays,
+            'longitude' => $longitude ?? null,
+            'latitude' => $latitude ?? null
           ]);
         }else{
-          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays)
-                  VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays)';
+          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays, longitude, latitude)
+                  VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays, :longitude, :latitude)';
           $stmtAdrss = $pdo->prepare($sqlAdrss);
           $stmtAdrss->execute([
             'id_compte' => $id_compte,
@@ -220,7 +223,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'adresse' => $rue,
             'ville'    => $commune,
             'code_postal'    => $codeP,
-            'pays'    => $pays
+            'pays'    => $pays,
+            'longitude' => $longitude ?? null,
+            'latitude' => $latitude ?? null
           ]);
         }
       }
