@@ -119,6 +119,9 @@
   box-sizing: border-box;
 }
 
+.carte {
+  display: none;}
+
 .search-form {
   margin-right: 8px;
 }
