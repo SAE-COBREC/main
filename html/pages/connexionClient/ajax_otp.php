@@ -4,7 +4,8 @@
     $pdo->exec("SET search_path TO cobrec1");
     require_once(__DIR__."/../../vendor/autoload.php");
     use OTPHP\TOTP;
-    try {//recherche nb de Promotions appartenant au vendeur
+    use OTPHP\Factory;
+    try {//recherche du secret_A2F dans la BDD
         $sql = '
         SELECT secret_A2F FROM cobrec1._compte
         WHERE id_compte = :idCompte;
@@ -14,14 +15,17 @@
             'idCompte' => $_SESSION['idCompte']
         ];
         $stmt->execute($params);
+        print_r($_POST);
         print_r("Secret A2F :\n");
-        if(empty(($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f'])){
+        $secret = ($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f']; //cherche dans BDD
+        if(empty($secret)){
             print_r("empty");
         }else{
-            $secret = ($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f']; //cherche dans BDD
-            $_SESSION['A2F']['secret'] = $secret;
+            print_r("OK");
             $otp = TOTP::createFromSecret($secret);
+            //$otp = Factory::loadFromProvisioningUri($secret);
             $logFile = "ajax.txt";
+            //file_put_contents("log_ajax.txt", 'code OPT :' . $otp->now() . ' code rentré :' . $_POST['code'] . ' secret de BDD :' . $secret . ' secret de OPT généré avec secret de BDD :' . $otp->getSecret());
             if ($otp->now() == $_POST['code']){
                 file_put_contents($logFile, "true");
             }else{

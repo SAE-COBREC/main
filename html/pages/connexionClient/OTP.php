@@ -1,9 +1,19 @@
 <?php
 session_start();
-print_r($_SESSION['A2F']);
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
 require_once(__DIR__."/../../vendor/autoload.php");
+require_once(__DIR__."/../../vendor/QRcodes/vendor/autoload.php");
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\ValidationException;
+
 use OTPHP\TOTP;
 
 // A random secret will be generated from this.
@@ -16,9 +26,28 @@ $grCodeUri = $otp->getQrCodeUri(
     'https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M',
     '[DATA]'
 );
-echo "<img src='{$grCodeUri}'>";
+//echo "<img src='{$grCodeUri}'>";
+$writer = new PngWriter();
 
-try {//recherche nb de Promotions appartenant au vendeur
+// Create QR code
+$qrCode = new QrCode(
+    data: $otp->getProvisioningUri(),
+    encoding: new Encoding('UTF-8'),
+    errorCorrectionLevel: ErrorCorrectionLevel::Low,
+    size: 300,
+    margin: 10,
+    roundBlockSizeMode: RoundBlockSizeMode::Margin,
+    foregroundColor: new Color(0, 0, 0),
+    backgroundColor: new Color(255, 255, 255)
+);
+
+$result = $writer->write($qrCode, null, null);
+
+// Validate the result
+$writer->validateResult($result, $otp->getProvisioningUri());
+echo "<img src='{$result->getDataUri()}'>";
+
+try {//enregistrement du secret_A2F dans la BDD
     $sql = '
     UPDATE cobrec1._compte
     SET secret_A2F = :secret
@@ -27,13 +56,9 @@ try {//recherche nb de Promotions appartenant au vendeur
     $stmt = $pdo->prepare($sql);
     $params = [
         'idCompte' => $_SESSION['idCompte'],
-        'secret' => $otp->getSecret()
+        'secret' => /*$otp->getProvisioningUri()*/$otp->getSecret()
     ];
     $stmt->execute($params);
-    print_r("Secret A2F :\n");
-    if(empty(($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f'])){
-        print_r("empty");
-    }
 } catch (Exception $e) {}
 ?>
 <form id="a2form">
@@ -47,33 +72,38 @@ try {//recherche nb de Promotions appartenant au vendeur
         const formData = new FormData(event.target);
         const code = formData.get('code');
         document.getElementById('output').innerText = `code: ${code}`;
+
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "./ajax_otp.php", true);
+        // xhttp.send("1234");
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        // xhttp.onreadystatechange = () => {
+        // // Call a function when the state changes.
+        // if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200) {
+        //     // Request finished. Do processing here.
+        // }
+        // };
+        xhttp.send("code="+code);
+
+
+        const xhttp2 = new XMLHttpRequest();
+        xhttp2.open("GET", "./ajax.txt", true);
+        xhttp2.send();
+        xhttp2.onreadystatechange = () => {
+        if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+            const contentLength = xhttp2.getResponseHeader("Content-Length");
+            if (contentLength == 4) {
+                xhttp2.abort();
+                alert("Authentification à double facteur activée avec succès.");
+                //document.location.href = "/index.php"; 
+            }else{
+                alert("Echec." + contentLength);
+            }
+        }
+        };
     });
 
 
-    const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "./ajax_otp.php", true);
-    // xhttp.send("1234");
-    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhttp.onreadystatechange = () => {
-    // Call a function when the state changes.
-    if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200) {
-        // Request finished. Do processing here.
-    }
-    };
-    xhttp.send("code=1234");
-
-    xhttp.open("GET", "./ajax.txt", true);
-    xhttp.send();
-    xhttp.onreadystatechange = () => {
-    if (xhttp.readyState === xhttp.HEADERS_RECEIVED) {
-        const contentLength = xhttp.getResponseHeader("Content-Length");
-        if (contentLength === 4) {
-            xhttp.abort();
-            alert("Authentification à double facteur activée avec succès.");
-            //document.location.href = "/index.php"; 
-        }else{
-            alert("Echec.");
-        }
-    }
-    };
+    
+    
 </script>
