@@ -974,7 +974,8 @@ main section:nth-of-type(2) article > footer > form {
 
 
 #modalModificationAdresse,
-#modalAjoutAdresse {
+#modalAjoutAdresse,
+#modalA2F {
   display: none;
   position: fixed;
   top: 0;
@@ -987,8 +988,10 @@ main section:nth-of-type(2) article > footer > form {
 }
 
 #modalModificationAdresse > div,
-#modalAjoutAdresse > div {
+#modalAjoutAdresse > div,
+#modalA2F > div {
   position: relative;
+  display:block;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -1001,7 +1004,8 @@ main section:nth-of-type(2) article > footer > form {
 }
 
 #modalModificationAdresse h2,
-#modalAjoutAdresse h2 {
+#modalAjoutAdresse h2,
+#modalA2F h2 {
   color: $primary-color-bleu;
   margin-bottom: 2rem;
   font-size: 1.5em;
@@ -1010,29 +1014,37 @@ main section:nth-of-type(2) article > footer > form {
   text-align: center;
 }
 
+#modalA2F form{
+    margin-bottom: 0.5em;
+}
+
 #formulaireModificationAdresse,
-#formulaireAjoutAdresse {
+#formulaireAjoutAdresse,
+#modalA2F form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 #formulaireModificationAdresse label,
-#formulaireAjoutAdresse label {
+#formulaireAjoutAdresse label,
+#modalA2F form label {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
 }
 
 #formulaireModificationAdresse label > span,
-#formulaireAjoutAdresse label > span {
+#formulaireAjoutAdresse label > span,
+#modalA2F form label > span {
   color: #333;
   font-weight: 600;
   font-size: 1em;
 }
 
 #formulaireModificationAdresse input[type="text"],
-#formulaireAjoutAdresse input[type="text"] {
+#formulaireAjoutAdresse input[type="text"],
+#modalA2F form input[type="text"] {
   padding: 12px 16px;
   border: 2px solid $secondary-color-gris-clair;
   border-radius: 8px;
@@ -1042,14 +1054,16 @@ main section:nth-of-type(2) article > footer > form {
 }
 
 #formulaireModificationAdresse input[type="text"]:focus,
-#formulaireAjoutAdresse input[type="text"]:focus {
+#formulaireAjoutAdresse input[type="text"]:focus,
+#modalA2F form input[type="text"]:focus {
   outline: none;
   border-color: $primary-color-bleu;
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 
 #formulaireModificationAdresse button,
-#formulaireAjoutAdresse button {
+#formulaireAjoutAdresse button,
+#modalA2F form button {
   padding: 12px 20px;
   border-radius: 8px;
   font-size: 1em;
@@ -1060,7 +1074,8 @@ main section:nth-of-type(2) article > footer > form {
 }
 
 #formulaireModificationAdresse button[type="submit"],
-#formulaireAjoutAdresse button[type="submit"] {
+#formulaireAjoutAdresse button[type="submit"],
+#modalA2F form button[type="submit"] {
   background: $primary-color-bleu;
   color: $primary-color-blanc;
   border: none;
@@ -1068,21 +1083,24 @@ main section:nth-of-type(2) article > footer > form {
 }
 
 #formulaireModificationAdresse button[type="submit"]:hover,
-#formulaireAjoutAdresse button[type="submit"]:hover {
+#formulaireAjoutAdresse button[type="submit"]:hover,
+#modalA2F form button[type="submit"]:hover{
   background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
 
 #formulaireModificationAdresse button[type="button"],
-#formulaireAjoutAdresse button[type="button"] {
+#formulaireAjoutAdresse button[type="button"],
+#modalA2F form button[type="button"]  {
   background: $primary-color-blanc;
   color: $primary-color-bleu;
   border: 2px solid $primary-color-bleu;
 }
 
 #formulaireModificationAdresse button[type="button"]:hover,
-#formulaireAjoutAdresse button[type="button"]:hover {
+#formulaireAjoutAdresse button[type="button"]:hover,
+#modalA2F form button[type="button"]:hover {
   background: $primary-color-bleu;
   color: $primary-color-blanc;
   transform: translateY(-2px);
@@ -1092,38 +1110,44 @@ main section:nth-of-type(2) article > footer > form {
 /* Responsive pour les modaux */
 @media (max-width: 768px) {
   #modalModificationAdresse > div,
-  #modalAjoutAdresse > div {
+  #modalAjoutAdresse > div,
+  #modalA2F > div {
     padding: 2em;
     width: 95%;
   }
   
   #modalModificationAdresse h2,
-  #modalAjoutAdresse h2 {
+  #modalAjoutAdresse h2,
+  #modalA2F h2 {
     font-size: 1.3em;
     margin-bottom: 1.5rem;
   }
   
   #formulaireModificationAdresse,
-  #formulaireAjoutAdresse {
+  #formulaireAjoutAdresse,
+  #modalA2F form {
     gap: 1.2rem;
   }
 }
 
 @media (max-width: 428px) {
   #modalModificationAdresse > div,
-  #modalAjoutAdresse > div {
+  #modalAjoutAdresse > div,
+  #modalA2F > div {
     padding: 1.5em;
     border-radius: 8px;
   }
   
   #modalModificationAdresse h2,
-  #modalAjoutAdresse h2 {
+  #modalAjoutAdresse h2,
+  #modalA2F h2 {
     font-size: 1.2em;
     margin-bottom: 1.2rem;
   }
   
   #formulaireModificationAdresse button,
-  #formulaireAjoutAdresse button {
+  #formulaireAjoutAdresse button,
+  #modalA2F form button {
     font-size: 0.95em;
     padding: 10px 16px;
   }

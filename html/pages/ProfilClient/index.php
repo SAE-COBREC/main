@@ -643,25 +643,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         </span>
                     </header>
                     <main>
-                        <!-- Formulaire de changement de mot de passe -->
-                        <!-- <form method="POST">
-                            <div>
-                                <label>
-                                    <span>Mot de passe actuel</span>
-                                    <input type="password" name="actuel_password" required>
-                                </label>
-                            </div>
-                            </div>
-                            <button type="submit" name="change_password"
-                                onclick="return confirm('Confirmer le changement de mot de passe ?')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                    <polyline points="7 3 7 8 15 8"></polyline>
-                                </svg>
-                                Changer le mot de passe
-                            </button>
-                        </form> -->
+                        <button type="button" onclick="ouvrirModalA2F()">
+                            Activer la vérification à double facteurs
+                        </button>
                     </main>
                 </article>
             </section>
@@ -682,6 +666,18 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
         </div>
     </main>
+
+    <div id="modalA2F">
+        <div>
+            <h2>Authentification à double facteurs</h2>
+            <?php
+                include_once '../connexionClient/OTP.php';
+            ?>
+            <form>
+                <button type="button" onclick="fermerModalA2F()">Annuler</button>
+            </form>
+        </div>
+    </div>
 
     <!-- modif une adresse -->
     <div id="modalModificationAdresse">
@@ -865,6 +861,12 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     function fermerModalModificationAdresse() {
         //cache le modal de modification
         document.getElementById('modalModificationAdresse').style.display = 'none';
+    }
+
+    //fonction pour fermer le modal de la double authentification (A2F)
+    function fermerModalA2F() {
+        //cache le modal A2F
+        document.getElementById('modalModificationA2F').style.display = 'none';
     }
 
 
@@ -1182,6 +1184,10 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
         hiddenField.value = password;
         form.submit();
+    }
+
+    function ouvrirModalA2F() {
+        document.getElementById('modalA2F').style.display = 'block';
     }
 
     document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {
