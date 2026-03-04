@@ -1300,10 +1300,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 datasets: [{
                     label: 'Commandes',
                     data: statutsData,
-                    backgroundColor: DA.jauneClair,
-                    borderColor: '#FFFFFF',
-                    borderWidth: 2,
-                    hoverOffset: 6
+                    backgroundColor: DA.jauneClair
                 }]
             },
             options: {
