@@ -55,7 +55,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <script>
-    var map = L.map('map').setView([48.1700, -2.7500], 8);
+    var map = L.map('map').setView([48.2500, -2.7500], 8);
 
     var baselayers = {
         OSM: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -247,6 +247,11 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
             nom: "Morlaix",
             lat: 48.5779,
             lon: -3.8280
+        },
+        {
+            nom: "Lannion",
+            lat: 48.7500,
+            lon: -3.4500
         }
     ];
 
