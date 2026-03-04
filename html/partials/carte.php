@@ -20,19 +20,8 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
     <!-- Cluster -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="/styles/Carte/style.css">
 
-    <style>
-    .marker-cluster {
-        background-color: #7171A3;
-    }
-
-    .marker-cluster div {
-        background-color: #7171A3;
-        color: white;
-        font-weight: bold;
-        border-radius: 50%;
-    }
-    </style>
 </head>
 
 <body>
@@ -145,13 +134,13 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
             .catch(error => console.error('Erreur de géocodage pour ' + adresse + ':', error));
     }
 
-    // if (Array.isArray(adressesVendeurs)) {
-    //     adressesVendeurs.forEach(function(vendeur) {
-    //         if (vendeur && typeof vendeur === 'object') {
-    //             ajouterMarkerVendeur(vendeur);
-    //         }
-    //     });
-    // }
+    if (Array.isArray(adressesVendeurs)) {
+        adressesVendeurs.forEach(function(vendeur) {
+            if (vendeur && typeof vendeur === 'object') {
+                ajouterMarkerVendeur(vendeur);
+            }
+        });
+    }
 
     // 10 points fixes en Bretagne
     var pointsBretagne = [{
