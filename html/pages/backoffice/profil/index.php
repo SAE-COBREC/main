@@ -583,7 +583,7 @@ function safe($array, $key, $default = "") {
                     <!-- ===== SECTION GPS ===== -->
                     <div class="form-row">
                         <button type="button" id="btn-geocode" class="btn btn--secondary">
-                            📍 Valider les coordonnées GPS
+                            Valider les coordonnées GPS
                         </button>
                     </div>
 
@@ -591,13 +591,15 @@ function safe($array, $key, $default = "") {
                         <div class="form-group-row">
                             <div class="form-row form-row--small">
                                 <label>Latitude</label>
-                                <input type="text" id="latitude-display" readonly
-                                    style="background:#f5f5f5;cursor:default;">
+                                <input type="number" step="any" id="latitude" name="latitude"
+                                    value="<?= htmlspecialchars($vendeur['latitude'] ?? '') ?>"
+                                    placeholder="ex : 47.218371">
                             </div>
                             <div class="form-row form-row--small">
                                 <label>Longitude</label>
-                                <input type="text" id="longitude-display" readonly
-                                    style="background:#f5f5f5;cursor:default;">
+                                <input type="number" step="any" id="longitude" name="longitude"
+                                    value="<?= htmlspecialchars($vendeur['longitude'] ?? '') ?>"
+                                    placeholder="ex : -1.553621">
                             </div>
                         </div>
                         <div id="map"
@@ -606,11 +608,6 @@ function safe($array, $key, $default = "") {
                             Vous pouvez faire glisser le marqueur ou cliquer sur la carte pour ajuster la position.
                         </p>
                     </div>
-
-                    <input type="hidden" id="latitude" name="latitude"
-                        value="<?= htmlspecialchars($vendeur['latitude']  ?? '') ?>">
-                    <input type="hidden" id="longitude" name="longitude"
-                        value="<?= htmlspecialchars($vendeur['longitude'] ?? '') ?>">
 
                     <button title="Enregistrer" class="btn btn--primary" type="submit">Enregistrer</button>
                 </form>
@@ -888,10 +885,8 @@ function safe($array, $key, $default = "") {
     const initLon = <?= !empty($vendeur['longitude']) ? (float)$vendeur['longitude'] : 'null' ?>;
 
     function updateCoordinates(lat, lon) {
-        document.getElementById('latitude').value = lat;
-        document.getElementById('longitude').value = lon;
-        document.getElementById('latitude-display').value = parseFloat(lat).toFixed(6);
-        document.getElementById('longitude-display').value = parseFloat(lon).toFixed(6);
+        document.getElementById('latitude').value = parseFloat(lat).toFixed(6);
+        document.getElementById('longitude').value = parseFloat(lon).toFixed(6);
     }
 
     function initGPSMap(lat, lon) {
@@ -927,6 +922,24 @@ function safe($array, $key, $default = "") {
         }, 100);
     }
 
+    // Synchronisation carte ↔ saisie manuelle
+    ['latitude', 'longitude'].forEach(function(fieldId) {
+        document.getElementById(fieldId).addEventListener('input', function() {
+            const lat = parseFloat(document.getElementById('latitude').value);
+            const lon = parseFloat(document.getElementById('longitude').value);
+            if (isNaN(lat) || isNaN(lon)) return;
+            if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return;
+            if (gpsMap && gpsMarker) {
+                const pos = L.latLng(lat, lon);
+                gpsMarker.setLatLng(pos);
+                gpsMap.setView(pos, gpsMap.getZoom());
+            } else {
+                document.getElementById('gps-result').style.display = 'block';
+                initGPSMap(lat, lon);
+            }
+        });
+    });
+
     // Afficher la carte automatiquement si coordonnées déjà enregistrées
     document.addEventListener('DOMContentLoaded', function() {
         if (initLat !== null && initLon !== null) {
@@ -944,7 +957,8 @@ function safe($array, $key, $default = "") {
 
         if (!adresse || !ville) {
             alert(
-                'Veuillez renseigner au moins l\'adresse et la ville avant de valider les coordonnées GPS.');
+                'Veuillez renseigner au moins l\'adresse et la ville avant de valider les coordonnées GPS.'
+            );
             return;
         }
 
