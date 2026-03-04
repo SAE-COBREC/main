@@ -51,7 +51,7 @@ try {
     <meta charset="utf-8" />
     <title>Alizon - Commandes Vendeur</title>
     <link rel="stylesheet" href="/styles/CommandeVendeur/commande.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/chart.js"></script>
 </head>
 <body>
     <div class="app">
