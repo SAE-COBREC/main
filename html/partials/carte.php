@@ -358,7 +358,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
         markers.addLayer(marker);
     });
 
-        function ajouterPositionUtilisateur() {
+    function ajouterPositionUtilisateur() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var lat = position.coords.latitude;
@@ -373,7 +373,9 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
                     shadowSize: [41, 41]
                 });
 
-                var markerUtilisateur = L.marker([lat, lon], { icon: iconUtilisateur });
+                var markerUtilisateur = L.marker([lat, lon], {
+                    icon: iconUtilisateur
+                });
                 markerUtilisateur.bindPopup('<b>Vous etes ici</b>');
             }, function(error) {
                 console.error('Erreur de géolocalisation:', error);
