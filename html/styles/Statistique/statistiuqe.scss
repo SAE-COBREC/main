@@ -1,6 +1,5 @@
 @use "../variable" as *;
 
-// Reset de base et police
 * {
   box-sizing: border-box;
   margin: 0;
@@ -8,21 +7,21 @@
 }
 
 body {
-  font-family: $font-family-primaire;
+  font-family: $font-family-secondaire;
   background: $secondary-color-rose-claire;
 }
 
 .app {
   display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: 100vh;
-  background: $primary-color-blanc;
+  grid-template-columns: 240px 1fr; 
+  height: 1024px;
+  width: 100%;
 }
 
 .main {
   background: $secondary-color-rose-claire;
   padding: 32px 40px;
-  overflow-y: auto;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 

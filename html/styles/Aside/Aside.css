@@ -11,6 +11,9 @@
   width: 240px;
   max-width: 240px;
   font-family: "Quicksand", sans-serif;
+  position: sticky;
+  top: 0;
+  height: 1024px;
 }
 
 .logo {

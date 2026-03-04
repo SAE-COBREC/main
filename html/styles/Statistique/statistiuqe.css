@@ -9,21 +9,21 @@
 }
 
 body {
-  font-family: "Baloo", sans-serif;
+  font-family: "Quicksand", sans-serif;
   background: #FFF7F1;
 }
 
 .app {
   display: grid;
   grid-template-columns: 240px 1fr;
-  min-height: 100vh;
-  background: #FFFFFF;
+  height: 1024px;
+  width: 100%;
 }
 
 .main {
   background: #FFF7F1;
   padding: 32px 40px;
-  overflow-y: auto;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
