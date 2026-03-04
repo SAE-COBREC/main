@@ -972,7 +972,7 @@ function safe($array, $key, $default = "") {
                     block: 'nearest'
                 });
                 btn.disabled = false;
-                btn.textContent = '🎯 Me géolocaliser';
+                btn.textContent = 'Me géolocaliser';
             },
             function(error) {
                 const messages = {
@@ -982,7 +982,7 @@ function safe($array, $key, $default = "") {
                 };
                 alert(messages[error.code] || 'Erreur de géolocalisation.');
                 btn.disabled = false;
-                btn.textContent = '🎯 Me géolocaliser';
+                btn.textContent = 'Me géolocaliser';
             }, {
                 enableHighAccuracy: true,
                 timeout: 10000,
