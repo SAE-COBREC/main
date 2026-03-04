@@ -26,11 +26,18 @@ try {
 
     //on crée un tableau pour les années ou il y a des commandes pour le selecte avec le filtre
     $anneeAvecVente = array();
+
+    //on crée un tableau pour les catégories ou il y a des commandes pour le selecte avec le filtre
+    $categories = array();
+
     foreach ($commandes as $articleCommande){                          //pour chaque article de toutes les commandes
         if (!empty($articleCommande['date'])) {                        //si la date n'est pas vide
             $date = new DateTime($articleCommande['date']);            //cree un objet date avec la date courante
-            if (!in_array($date->format('Y'), $anneeAvecVente))        //regarde si l'année est déjà dans le tableau
-                array_push($anneeAvecVente, $date->format('Y')); 
+            if (!in_array($date->format('Y'), $anneeAvecVente))        //regarde si l'année n'est pas déjà dans le tableau
+                array_push($anneeAvecVente, $date->format('Y'));       //on l'ajoute au tableau
+        }
+        if (!in_array($articleCommande['nom_categorie'], $categories))  { //regarde si la catégorie n'est pas déjà dans le tableau
+            array_push($categories, $articleCommande['nom_categorie']);   //on l'ajoute au tableau
         }
     }
 } catch (PDOException $e) {
@@ -54,7 +61,7 @@ try {
             <header class="header">
                 <h1>Statistique</h1>
                     <label>Mode d'affichage</label>
-                        <select name="modeAffichage" id="modeAffichage">
+                        <select id="modeAffichage">
                             <option value="annee">Année</option>
                             <option value="periode">Période</option>
                         </select>
@@ -75,18 +82,26 @@ try {
                         <input type="date" id="dateFin"></input>
                     </div>
 
-                    <label>Volume / montant</label>
-                    <select name="type" id="type">
+                    <label>Montant / volume</label>
+                    <select id="selectType">
                         <option value="montant">Montant en €</option>
                         <option value="nbCommande">nombre de commandes</option>
                         <option value="nbArticle">nombre d'articles commandés</option>
+                    </select>
+
+                    <label>Catégorie</label>
+                    <select id="categorie">
+                        <option value="toutes">Toutes</option>
+                        <?php foreach ($categories as $categorie): ?>
+                        <option value="<?php echo $categorie ?>"><?php echo $categorie?></option>
+                        <?php endforeach; ?>
                     </select>
 
                 <div>
                     <canvas id="graphiqueVentes"></canvas>
                 </div>
 
-                <div>
+                <div style="display: block;" id="divGraphiqueQuoiVendu">
                     <canvas id="graphiqueQuoiVendu"></canvas>
                 </div>
 
@@ -111,6 +126,15 @@ try {
             chargerLesStats();
         });
 
+        selectType.addEventListener('change', function(){
+            if (this.value === "nbCommande"){
+                divGraphiqueQuoiVendu.style.display = 'none';
+            }else{
+                divGraphiqueQuoiVendu.style.display = 'block';
+            }
+            chargerLesStats();
+        });
+
         const graph1 = new Chart(canva1, {
             type: 'bar',
             data: {
@@ -118,8 +142,8 @@ try {
                 datasets: [{
                     label: 'gains en €',
                     data: [],
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(230, 169, 110, 1)',
+                    borderColor: 'rgba(236, 142, 55, 0.9)',
                     borderWidth: 1
                 }]
             },
@@ -133,27 +157,34 @@ try {
         });
 
         const graph2 = new Chart(canva2, {
-            type: 'doughnut',
+            type: 'bar',
             data:{
                 labels: [],
                 datasets: [{
                     label: "nombres d'articles vendus",
                     data: [],
-                    backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)'
-                    ],
+                    backgroundColor: 'rgba(230, 169, 110, 1)',
+                    borderColor: 'rgba(236, 142, 55, 0.9)',
                     hoverOffset: 4
                 }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grace: '10%' 
+                    }
+                }
             }
         });
 
 
         function chargerLesStats() {
             const modeAffichage = document.getElementById('modeAffichage').value; //mode affiche corresponde a année ou période
-            const type = document.getElementById('type').value;                   //le type est si on veut en volume ou en nb de commande ou prix
-            let url = `donneToutesStats.php?type=${type}&modeAffichage=${modeAffichage}`;
+            const type = document.getElementById('selectType').value;             //le type est si on veut en volume ou en nb de commande ou prix
+            const categorie = document.getElementById('categorie').value;         //la catégorie choisi
+
+            let url = `donneToutesStats.php?type=${type}&modeAffichage=${modeAffichage}&categorie=${categorie}`;
 
             if (modeAffichage === "annee"){                           //si le mode est annnee
                 const annee = document.getElementById("annee").value; //on récup l'année
@@ -171,7 +202,7 @@ try {
                 .then(donnees => {
                     graph1.data.datasets[0].data = donnees.graph1;
                     graph1.update();
-
+            
                     graph2.data.labels = donnees.graph2.labels;
                     graph2.data.datasets[0].data = donnees.graph2.data;
                     graph2.update();
@@ -181,9 +212,10 @@ try {
 
         //on écoute les changements
         document.getElementById('annee').addEventListener('change', chargerLesStats);
-        document.getElementById('type').addEventListener('change', chargerLesStats);
+        document.getElementById('selectType').addEventListener('change', chargerLesStats);
         document.getElementById('dateDebut').addEventListener('change', chargerLesStats);
         document.getElementById('dateFin').addEventListener('change', chargerLesStats);
+        document.getElementById('categorie').addEventListener('change', chargerLesStats);
 
         //on lance une première fois au chargement
         window.onload = chargerLesStats;

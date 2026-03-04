@@ -27,6 +27,7 @@ try {
 
     $modeChoisi = $_GET['modeAffichage'];
     $type = $_GET['type'] ?? 'montant';
+    $categoriesChoisi = $_GET['categorie'];
 
     if ($modeChoisi !== "annee"){
         $debutPeriode = new DateTime($_GET['debut']);
@@ -36,7 +37,8 @@ try {
     foreach ($commandes as $articleCommande){                          //pour chaque article de toutes les commandes
         if (!empty($articleCommande['date'])) {                        //si la date n'est pas vide
             $date = new DateTime($articleCommande['date']);            //on récup la date d'achat
-            $estValide = false;                                        
+            $estValide = false;   
+            $categorievalide = false;                                     
             $mois = $date->format('n'); //on récupère le numéro du mois pour push dans le bonne indice du tableau (janvier indice 1, février indice 2...)
 
             if ($modeChoisi == "annee"){                    //si le mode est annee
@@ -45,29 +47,42 @@ try {
                     $estValide = true;                      //on passe le booleen à true
                 }
             } else {                                        //sinon
-                if ($debutPeriode <= $date && $finPeriode >= $date) {
+                if ($debutPeriode <= $date && $finPeriode >= $date) { //si la date est comprise entre
                     $estValide = true;
                 }
             }
-            //------------------------------------DEMANDE SI ON DOIT METTRE LA TVA ET LES FRAIS DE PORTS DANS LES STATS ------------------------------------
             if ($modeChoisi == "annee"){
                 $anneeChoisi = $_GET['annee'] ?? date('Y'); 
                 if ($date->format('Y') == $anneeChoisi){ //si la date correspond à l'année choisi
-                    switch ($type){
+                    
+                }
+            }
+            
+            if ($categoriesChoisi == "toutes"){
+                $categorievalide = true;
+            }
+            else if ($categoriesChoisi == $articleCommande['nom_categorie']){
+                $categorievalide = true;
+            } else {
+                $categorievalide = false;
+            }
+
+            if ($estValide && $categorievalide){
+                switch ($type){
 
                     //=============
                     //MONTANT
                     //=============
                         case "montant":
                             $totalArticleCommande = $articleCommande['p_prix'] * $articleCommande['quantite']; //on calcul le prix total des articles en fonction de la quantité
-                            $donneesParMois[$mois] += $totalArticleCommande;     
+                            $donneesParMois[$mois] += $totalArticleCommande;    
                             if (!in_array($articleCommande['p_nom'], $estDejaLabel)){
                                 array_push($estDejaLabel, $articleCommande['p_nom']);
-                                array_push($compteParLabel, $articleCommande['quantite']);
+                                array_push($compteParLabel, $articleCommande['quantite'] * $articleCommande['p_prix']);
                             } else {
                                 $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
-                                $compteParLabel[$indiceProduit] += $articleCommande['quantite'];
-                            }
+                                $compteParLabel[$indiceProduit] += $articleCommande['quantite'] * $articleCommande['p_prix'];
+                            } 
                             break;
                         
                     //================
@@ -81,7 +96,7 @@ try {
                             } else {
                                 $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
                                 $compteParLabel[$indiceProduit] += $articleCommande['quantite'];
-                            }
+                            } 
                             break;
 
                     //==================
@@ -92,48 +107,10 @@ try {
                                 array_push($panierTraites, $articleCommande['id_panier']);
                                 $donneesParMois[$mois] += 1;
                             }
-                            if (!in_array($articleCommande['p_nom'], $estDejaLabel)){
-                                array_push($estDejaLabel, $articleCommande['p_nom']);
-                                array_push($compteParLabel, $articleCommande['quantite']);
-                            } else {
-                                $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
-                                $compteParLabel[$indiceProduit] += $articleCommande['quantite'];
-                            }
                             break;
-                    }
-
                 }
-            } else {
-                
-                if ($debutPeriode <= $date && $finPeriode >= $date){
-                    switch ($type){
-                        case "montant":
-                            $totalArticleCommande = $articleCommande['p_prix'] * $articleCommande['quantite']; //on calcul le prix total des articles en fonction de la quantité
-                            $donneesParMois[$mois] += $totalArticleCommande;       
-                            break;
-
-                        case "nbArticle":
-                            $donneesParMois[$mois] += $articleCommande['quantite'];
-                            break;
-
-                        case "nbCommande":
-                            if (!in_array($articleCommande['id_panier'], $panierTraites)){
-                                array_push($panierTraites, $articleCommande['id_panier']);
-                                $donneesParMois[$mois] += 1;
-                            }
-                            break;
-                    }
-                    if (!in_array($articleCommande['p_nom'], $estDejaLabel)){
-                        array_push($estDejaLabel, $articleCommande['p_nom']);
-                        array_push($compteParLabel, $articleCommande['quantite']);
-                    } else {
-                        $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
-                        $compteParLabel[$indiceProduit] += $articleCommande['quantite'];
-                    }
-                }
-            }
+            }     
         }
-        
     }
     $reponse = [
         "graph1" => array_values($donneesParMois), //on converti le tableau pour qu'il soit au bon format pour le graphique

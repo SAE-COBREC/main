@@ -1889,13 +1889,17 @@ function recupInfoPourStatsGeneral($pdo, $idVendeur){
         p.p_prix,
         p.p_nb_ventes,
         c.id_panier,
+        cp.nom_categorie,
         pc.timestamp_commande AS date
     FROM cobrec1._panier_commande pc
     LEFT JOIN cobrec1._contient c ON pc.id_panier = c.id_panier
     LEFT JOIN cobrec1._produit p ON c.id_produit = p.id_produit
+    LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+    LEFT JOIN cobrec1._categorie_produit cp ON cp.id_categorie = fpd.id_categorie
     WHERE p.id_vendeur = :id_vendeur";
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_vendeur' => $idVendeur]);
     $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $commandes;
 }
+
