@@ -357,6 +357,34 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, getIdVendeurPar
         //ajoute le marqueur de ville au groupe de marqueurs
         markers.addLayer(marker);
     });
+
+        function ajouterPositionUtilisateur() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+
+                var iconUtilisateur = L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                });
+
+                var markerUtilisateur = L.marker([lat, lon], { icon: iconUtilisateur });
+                markerUtilisateur.bindPopup('<b>Vous etes ici</b>');
+            }, function(error) {
+                console.error('Erreur de géolocalisation:', error);
+                alert('Impossible de récupérer votre position. Vérifiez les permissions de géolocalisation.');
+            });
+        } else {
+            alert('La géolocalisation n\'est pas supportée par ce navigateur.');
+        }
+    }
+
+    ajouterPositionUtilisateur();
     </script>
 </body>
 
