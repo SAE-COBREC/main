@@ -55,7 +55,7 @@ try {
 <head>
     <meta charset="utf-8" />
     <title>Alizon - Commandes Vendeur</title>
-    <link rel="stylesheet" href="/styles/CommandeVendeur/statistique.css" />
+    <link rel="stylesheet" href="/styles/Statistique/statistique.css" />
     <script src="/js/chart.js"></script>
 </head>
 <body>
@@ -65,6 +65,7 @@ try {
             <header class="header">
                 <h1>Statistique</h1>
             </header>
+            <section class="liste-commandes">
             <label>Mode d'affichage</label>
                 <select id="modeAffichage">
                     <option value="annee">Année</option>
@@ -94,6 +95,7 @@ try {
                     <option value="nbCommande">nombre de commandes</option>
                     <option value="nbArticle">nombre d'articles commandés</option>
                 </select>
+                </div>
                 <div id="divCategorie">
                 <label>Catégorie</label>
                 <select id="categorie">
@@ -104,13 +106,14 @@ try {
                 </select>
                 </div>
             </div>
-        <div>
-            <canvas id="graphiqueVentes"></canvas>
-        </div>
+            <div>
+                <canvas id="graphiqueVentes"></canvas>
+            </div>
 
-        <div style="display: block;" id="divGraphiqueQuoiVendu">
-            <canvas id="graphiqueQuoiVendu"></canvas>
-        </div>
+            <div style="display: block;" id="divGraphiqueQuoiVendu">
+                <canvas id="graphiqueQuoiVendu"></canvas>
+            </div> 
+            </section>
         </main>
     </div>
     <script>
