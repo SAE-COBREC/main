@@ -61,7 +61,7 @@ http_response_code(404);
             </p>
 
             <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:8px;">
-                <a href="index.html"
+                <a href="/index.php"
                     style="display:inline-flex;align-items:center;gap:10px;padding:10px 16px;background:#c0c0c0;color:#030212;border-radius:8px;text-decoration:none;box-shadow:0 6px 18px rgba(25,118,210,0.15);transition:transform .12s ease,box-shadow .12s ease;">
                     <img src="img/svg/fleche-gauche.svg" alt="" aria-hidden="true" width="18" height="18"
                         style="filter:invert(1) saturate(0.9);">

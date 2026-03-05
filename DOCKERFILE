@@ -1,6 +1,10 @@
 # Utilise une image de base officielle PHP avec Apache
 FROM php:8.2-apache
 
+# Configure explicit custom 404 page at Apache level.
+RUN printf "ErrorDocument 404 /404.php\n" > /etc/apache2/conf-available/custom-errors.conf \
+	&& a2enconf custom-errors
+
 # Copie les fichiers de votre projet (dossiers 'html' et 'Php')
 # vers le dossier web du serveur dans le conteneur
 COPY html/ /var/www/html/

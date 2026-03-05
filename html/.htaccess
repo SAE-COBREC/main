@@ -1,0 +1,2 @@
+# Fallback for Apache setups using .htaccess
+ErrorDocument 404 /404.php
