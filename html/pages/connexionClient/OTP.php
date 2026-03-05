@@ -1,5 +1,4 @@
 <?php
-session_start();
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
 require_once(__DIR__."/../../vendor/autoload.php");
