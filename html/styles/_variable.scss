@@ -25,14 +25,14 @@ $secondary-color-etoile: #ffc107;
 $secondary-color-erreur: #721c24;
 $secondary-color-bordure: #FFFFFF;
 
-$secondary-color-bleu-clair: #F0F4F8; 
-$secondary-color-vert-succes: #155724; 
+$secondary-color-bleu-clair: #F0F4F8;
+$secondary-color-vert-succes: #155724;
 $secondary-color-vert-succes-fond: #28A745;
-$secondary-color-vert-fond: #D4EDDA; 
-$secondary-color-jaune-avertissement: #856404; 
+$secondary-color-vert-fond: #D4EDDA;
+$secondary-color-jaune-avertissement: #856404;
 $secondary-color-jaune-fond: #FFF3CD;
 $secondary-color-bleu-info: #0C5460;
-$secondary-color-bleu-info-fond: #D1ECF1; 
+$secondary-color-bleu-info-fond: #D1ECF1;
 $secondary-color-promotion: #e4e4f5;
 
 // Font Families
@@ -50,6 +50,6 @@ $breakpoint-tablette: 1024px;
 // Medias
 $mobile: "screen and (max-width: 508px)";
 
-*{
+* {
     margin: 0;
 }
