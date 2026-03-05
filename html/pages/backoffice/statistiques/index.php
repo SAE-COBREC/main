@@ -106,13 +106,15 @@ try {
                 </select>
                 </div>
             </div>
-            <div>
-                <canvas id="graphiqueVentes"></canvas>
-            </div>
+                <section class="tousGraphiques">
+                    <div>
+                        <canvas id="graphiqueVentes"></canvas>
+                    </div>
 
-            <div style="display: block;" id="divGraphiqueQuoiVendu">
-                <canvas id="graphiqueQuoiVendu"></canvas>
-            </div> 
+                    <div style="display: block;" id="divGraphiqueQuoiVendu">
+                        <canvas id="graphiqueQuoiVendu"></canvas>
+                    </div>
+                </section> 
             </section>
         </main>
     </div>
