@@ -301,19 +301,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <p class="subtitle">Identifiants</p>
 
       <div>
-        <label for="nom">Nom</label>
+        <label for="nom">Nom<span style="color: red;">*</span></label>
         <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required
                value="<?php echo isset($nom) ? htmlspecialchars($nom, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
-        <label for="prenom">Prénom</label>
+        <label for="prenom">Prénom<span style="color: red;">*</span></label>
         <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required
                value="<?php echo isset($prenom) ? htmlspecialchars($prenom, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
-        <label for="pseudo">Pseudonyme</label>
+        <label for="pseudo">Pseudonyme<span style="color: red;">*</span></label>
         <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required
                value="<?php echo isset($pseudo) ? htmlspecialchars($pseudo, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
@@ -350,26 +350,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       <div>
-        <label for="email">Email</label>
+        <label for="email">Email<span style="color: red;">*</span></label>
         <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide."
                value="<?php echo isset($email) ? htmlspecialchars($email, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
-        <label for="telephone">Numéro de téléphone</label>
+        <label for="telephone">Numéro de téléphone<span style="color: red;">*</span></label>
         <input type="text" id="telephone" name="telephone" inputmode="numeric" pattern="(0|\\+33|0033)[1-9][0-9]{8}"
           maxlength="10" placeholder="ex: 0615482649" required title="Le numéro de télephone doit contenir 10 chiffres" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
           value="<?php echo isset($telephone) ? htmlspecialchars($telephone, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
-        <label for="naissance">Date de naissance</label>
+        <label for="naissance">Date de naissance<span style="color: red;">*</span></label>
         <input type="date" id="naissance" name="naissance" placeholder="JJ/MM/AAAA" required
                value="<?php echo isset($naissance) ? htmlspecialchars($naissance, ENT_QUOTES, 'UTF-8') : ''; ?>">
       </div>
 
       <div>
-          <label>Civilité</label>
+          <label>Civilité<span style="color: red;">*</span></label>
           <div class="radio-group">
             <label><input type="radio" name="civilite" value="M." required <?php if(isset($civilite) && $civilite === 'M.') echo 'checked'; ?>> Homme</label>
             <label><input type="radio" name="civilite" value="Mme" <?php if(isset($civilite) && $civilite === 'Mme') echo 'checked'; ?>> Femme</label>
@@ -415,13 +415,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="inline-flex address-row">
         <div class="culumn-flex">
-          <label for="num">Numéro</label>
+          <label for="num">Numéro<span style="color: red;">*</span></label>
           <input type="number" id="num" name="num" min="0" max="9999999" placeholder="ex: 1"
                  value="<?php echo isset($num) ? htmlspecialchars($num, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
 
         <div class="culumn-flex">
-          <label for="rue">Rue</label>
+          <label for="rue">Rue<span style="color: red;">*</span></label>
           <input type="text" id="rue" name="rue" placeholder="ex: rue Hant koz" required
                  value="<?php echo isset($rue) ? htmlspecialchars($rue, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
@@ -436,20 +436,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="inline-flex address-row">
         <div class="culumn-flex">
-          <label for="codeP">Code Postal</label>
+          <label for="codeP">Code Postal<span style="color: red;">*</span></label>
           <input type="text" id="codeP" name="codeP" inputmode="numeric" pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$" maxlength="5" placeholder="ex: 22300"
                  value="<?php echo isset($codeP) ? htmlspecialchars($codeP, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
 
         <div class="culumn-flex">
-          <label for="commune">Commune</label>
+          <label for="commune">Commune<span style="color: red;">*</span></label>
           <input type="text" id="commune" name="commune" placeholder="ex: Lannion" required
                  value="<?php echo isset($commune) ? htmlspecialchars($commune, ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
       </div>
       
       <div>
-        <label for="pays">Pays</label>
+        <label for="pays">Pays<span style="color: red;">*</span></label>
         <input type="text" id="pays" name="pays" 
            placeholder="ex: France" required 
            value="<?php echo isset($pays) ? htmlspecialchars($pays, ENT_QUOTES, 'UTF-8') : ''; ?>">
@@ -494,12 +494,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       <hr>
       <div>
-        <label for="mdp">Mot de passe </label>
+        <label for="mdp">Mot de passe<span style="color: red;">*</span> </label>
         <input type="password" id="mdp" name="mdp" placeholder="8-16 caractère,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
       </div>
 
       <div>
-        <label for="Cmdp">Confirmer le mot de passe</label>
+        <label for="Cmdp">Confirmer le mot de passe<span style="color: red;">*</span></label>
         <input type="password" id="Cmdp" name="Cmdp" placeholder="8-16 caractère,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" required>
       </div>
 
