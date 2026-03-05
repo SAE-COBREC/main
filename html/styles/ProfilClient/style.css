@@ -427,7 +427,8 @@ main section:nth-of-type(4) article form > div {
   display: flex;
   flex-direction: column;
 }
-main section:nth-of-type(4) article form > button {
+main section:nth-of-type(4) article button:not(:last-of-type), main section:nth-of-type(4) article .btnMdpClassique {
+  display: block;
   width: 100%;
   display: flex;
   align-items: center;
@@ -444,15 +445,19 @@ main section:nth-of-type(4) article form > button {
   transition: all 0.3s ease;
   margin-top: 0.5em;
 }
-main section:nth-of-type(4) article form > button:hover {
+main section:nth-of-type(4) article button:not(:last-of-type):hover, main section:nth-of-type(4) article .btnMdpClassique:hover {
   background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
-main section:nth-of-type(4) article form > button > svg {
+main section:nth-of-type(4) article button:not(:last-of-type) > svg, main section:nth-of-type(4) article .btnMdpClassique > svg {
   width: 20px;
   height: 20px;
   stroke-width: 2;
+}
+main section:nth-of-type(4) article button:last-of-type {
+  display: none;
+  width: 100%;
 }
 main section:nth-of-type(4) article label {
   display: flex;
@@ -875,6 +880,12 @@ main section:nth-of-type(2) article > footer > form button:hover {
   max-width: 500px;
   width: 90%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+#modalA2F small {
+  background-color: #EFEFEF;
+  overflow: auto;
+  padding-bottom: 1em;
 }
 
 #modalModificationAdresse h2,

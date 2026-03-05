@@ -501,34 +501,40 @@ main {
                     display: flex;
                     flex-direction: column;
                 }
+            }
 
-                > button {
-                    width: 100%;
-                    @include flex-center;
-                    gap: 0.5em;
-                    padding: 14px 24px;
-                    background: $primary-color-bleu;
-                    color: $primary-color-blanc;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 1.1em;
-                    font-weight: 600;
-                    cursor: pointer;
-                    @include transition();
-                    margin-top: 0.5em;
+            button:not(:last-of-type), .btnMdpClassique {
+                display: block;
+                width: 100%;
+                @include flex-center;
+                gap: 0.5em;
+                padding: 14px 24px;
+                background: $primary-color-bleu;
+                color: $primary-color-blanc;
+                border: none;
+                border-radius: 8px;
+                font-size: 1.1em;
+                font-weight: 600;
+                cursor: pointer;
+                @include transition();
+                margin-top: 0.5em;
 
-                    &:hover {
-                        background: darken($primary-color-bleu, 10%);
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
-                    }
-
-                    > svg {
-                        width: 20px;
-                        height: 20px;
-                        stroke-width: 2;
-                    }
+                &:hover {
+                    background: darken($primary-color-bleu, 10%);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                 }
+
+                > svg {
+                    width: 20px;
+                    height: 20px;
+                    stroke-width: 2;
+                }
+            }
+
+            button:last-of-type{
+                display: none;
+                width: 100%;
             }
 
             label {
@@ -1001,6 +1007,12 @@ main section:nth-of-type(2) article > footer > form {
   max-width: 500px;
   width: 90%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+#modalA2F small{
+    background-color: $secondary-color-gris-clair;
+    overflow: auto;
+    padding-bottom:1em;
 }
 
 #modalModificationAdresse h2,

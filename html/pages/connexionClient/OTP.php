@@ -70,33 +70,39 @@ try {//enregistrement du secret_A2F dans la BDD
     <button type="submit">Valider</button>
 </form>
 <script>
-    // document.getElementById('a2form').addEventListener('submit', function(event) {
-    //     event.preventDefault();
-    //     const formData = new FormData(event.target);
-    //     const code = formData.get('code');
+    document.getElementById('a2form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const code = formData.get('code');
 
-    //     const xhttp = new XMLHttpRequest();
-    //     xhttp.open("POST", "./ajax_otp.php", true);
-    //     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    //     xhttp.send("code="+code);
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("code="+code);
 
 
-    //     const xhttp2 = new XMLHttpRequest();
-    //     xhttp2.open("GET", "./ajax.txt", true);
-    //     xhttp2.send();
-    //     xhttp2.onreadystatechange = () => {
-    //     if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
-    //         const contentLength = xhttp2.getResponseHeader("Content-Length");
-    //         if (contentLength == 4) {
-    //             xhttp2.abort();
-    //             alert("Authentification à double facteur activée avec succès.");
-    //             //document.location.href = "/index.php"; 
-    //         }else{
-    //             alert("Echec." + contentLength);
-    //         }
-    //     }
-    //     };
-    // });
+        const xhttp2 = new XMLHttpRequest();
+        xhttp2.open("GET", "../../pages/connexionClient/ajax.txt", true);
+        xhttp2.send();
+        xhttp2.onreadystatechange = () => {
+        if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+            const contentLength = xhttp2.getResponseHeader("Content-Length");
+            if (contentLength == 4) {
+                xhttp2.abort();
+                alert("Authentification à double facteur activée avec succès.");
+                //document.location.href = "/index.php"; 
+                document.getElementById('modalA2F').style.display = 'none';
+
+                const xhttp3 = new XMLHttpRequest();
+                xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
+                xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhttp3.send("statutOTP=active");
+            }else{
+                alert("Echec." + contentLength);
+            }
+        }
+        };
+    });
 
 
     

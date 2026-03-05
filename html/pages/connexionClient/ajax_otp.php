@@ -24,8 +24,8 @@
             print_r("OK");
             $otp = TOTP::createFromSecret($secret);
             //$otp = Factory::loadFromProvisioningUri($secret);
-            $logFile = "ajax.txt";
-            //file_put_contents("log_ajax.txt", 'code OPT :' . $otp->now() . ' code rentré :' . $_POST['code'] . ' secret de BDD :' . $secret . ' secret de OPT généré avec secret de BDD :' . $otp->getSecret());
+            $logFile = "../../pages/connexionClient/ajax.txt";
+            //file_put_contents("../../pages/connexionClient/log_ajax.txt", 'code OPT :' . $otp->now() . ' code rentré :' . $_POST['code'] . ' secret de BDD :' . $secret . ' secret de OPT généré avec secret de BDD :' . $otp->getSecret());
             if ($otp->now() == $_POST['code']){
                 file_put_contents($logFile, "true");
             }else{

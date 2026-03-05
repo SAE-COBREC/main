@@ -198,6 +198,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $messageErreur = $resultatAjoutAdresse['message'];
         }
     }
+
+    //traitement POST pour désactivation de l'A2F
+    if (isset($_POST['desactiverA2F'])) {
+        unset($_SESSION['OTP']);
+    }
 }
 
 //chargement des données pour l'affichage de la page
@@ -601,7 +606,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <header>
                         <div>
                             <span>Mot de passe</span>
-                            <strong>Vérification à double facteurs</strong>
+                            <strong>Authentification à double facteurs</strong>
                         </div>
                         <span data-type="securite">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -611,9 +616,22 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         </span>
                     </header>
                     <main>
-                        <button type="button" onclick="ouvrirModalA2F()">
-                            Activer la vérification à double facteurs
-                        </button>
+                            <button type="button" class="btnMdpClassique" onclick="ouvrirModalA2F()"
+                            style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:none';} else { echo 'display:block';} ?>">
+                                Activer l'authentification à double facteurs
+                            </button>
+                            <!-- TO DO -->
+                            <?php 
+                                print_r($_SESSION['OTP']); 
+                                print_r($_POST);
+                            ?>
+                            <form method="POST">
+                                <button type="submit" name="desactiverA2F"
+                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')" 
+                                style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
+                                    Désactiver l'authentification à double facteurs
+                                </button>
+                            </form>
                     </main>
                 </article>
             </section>
@@ -897,7 +915,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     //fonction pour fermer le modal de la double authentification (A2F)
     function fermerModalA2F() {
         //cache le modal A2F
-        document.getElementById('modalModificationA2F').style.display = 'none';
+        document.getElementById('modalA2F').style.display = 'none';
     }
 
 
