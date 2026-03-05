@@ -390,7 +390,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
         div.innerHTML =
             '<h4>Légende</h4>' +
             '<div class="legende-item">' +
-            '<img src="/img/png/badge-bretagne.png" style="width:20px;height:20px;margin-right:6px;">' +
+            '<img src="/img/png/394452.png" style="width:20px;height:20px;margin-right:6px;">' +
             '<span>Vendeur</span>' +
             '</div>' +
             '<div class="legende-item">' +
