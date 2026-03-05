@@ -616,22 +616,22 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         </span>
                     </header>
                     <main>
-                            <button type="button" class="btnMdpClassique" onclick="ouvrirModalA2F()"
+                        <button type="button" class="btnMdpClassique" onclick="ouvrirModalA2F()"
                             style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:none';} else { echo 'display:block';} ?>">
-                                Activer l'authentification à double facteurs
-                            </button>
-                            <!-- TO DO -->
-                            <?php 
+                            Activer l'authentification à double facteurs
+                        </button>
+                        <!-- TO DO -->
+                        <?php 
                                 print_r($_SESSION['OTP']); 
                                 print_r($_POST);
                             ?>
-                            <form method="POST">
-                                <button type="submit" name="desactiverA2F"
-                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')" 
+                        <form method="POST">
+                            <button type="submit" name="desactiverA2F"
+                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')"
                                 style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
-                                    Désactiver l'authentification à double facteurs
-                                </button>
-                            </form>
+                                Désactiver l'authentification à double facteurs
+                            </button>
+                        </form>
                     </main>
                 </article>
             </section>
@@ -1251,140 +1251,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             confirmerSuppressionAvecMotDePasse();
         }
     });
-
-    // Graphiques des commandes
-    (function() {
-        const canvasDepenses = document.getElementById('profilGraphiqueDepenses');
-        const canvasStatuts = document.getElementById('profilGraphiqueStatuts');
-        if (!canvasDepenses || !canvasStatuts) return;
-
-        const depensesParMois = <?php echo json_encode(array_values($depensesParMois ?? [])); ?>;
-        const statutsLabels = <?php echo json_encode(array_keys($commandesParStatut ?? [])); ?>;
-        const statutsData = <?php echo json_encode(array_values($commandesParStatut ?? [])); ?>;
-
-        // Palette DA du site (depuis _variable.scss)
-        const DA = {
-            bleu: '#7171A3', // $primary-color-bleu
-            bleuClair: '#e4e4f5', // $secondary-color-promotion
-            rouge: '#D4183D', // $secondary-color-rouge
-            rougeClair: '#FEE9E8', // $secondary-color-rouge-erreur
-            vert: '#28A745', // $secondary-color-vert-succes-fond
-            vertClair: '#D4EDDA', // $secondary-color-vert-fond
-            jaune: '#856404', // $secondary-color-jaune-avertissement
-            jauneClair: '#FFF3CD', // $secondary-color-jaune-fond
-            teal: '#0C5460', // $secondary-color-bleu-info
-            tealClair: '#D1ECF1', // $secondary-color-bleu-info-fond
-            bronze: '#CD7F32', // $primary-color-bronze
-            gris: '#c0c0c0', // $secondary-color-gris-fonce
-        };
-
-        // Couleurs pleines associées aux statuts, dans l'ordre probable
-        const paletteStatuts = [
-            DA.jaune, // en préparation
-            DA.teal, // en transit
-            DA.vert, // livré
-            DA.rouge, // annulée
-            DA.bleu, // autre
-            DA.bronze, // autre
-            DA.gris // autre
-        ];
-
-        new Chart(canvasDepenses.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août',
-                    'Septembre', 'Octobre', 'Novembre', 'Décembre'
-                ],
-                datasets: [{
-                    label: 'Dépenses (€)',
-                    data: depensesParMois,
-                    backgroundColor: DA.bleuClair,
-                    borderColor: DA.bleu,
-                    borderWidth: 2,
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => ' ' + ctx.parsed.y.toFixed(2) + ' €'
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#555',
-                            font: {
-                                family: 'Quicksand',
-                                size: 11
-                            }
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#EFEFEF'
-                        },
-                        ticks: {
-                            color: '#555',
-                            font: {
-                                family: 'Quicksand',
-                                size: 11
-                            },
-                            callback: v => v + ' €'
-                        }
-                    }
-                }
-            }
-        });
-
-        new Chart(canvasStatuts.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: statutsLabels,
-                datasets: [{
-                    label: 'Commandes',
-                    data: statutsData,
-                    backgroundColor: DA.jauneClair
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#333',
-                            font: {
-                                family: 'Quicksand',
-                                size: 11,
-                                weight: '600'
-                            },
-                            padding: 12,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => ' ' + ctx.label + ' : ' + ctx.parsed + ' commande(s)'
-                        }
-                    }
-                }
-            }
-        });
-    })();
     </script>
     <script src="/js/notifications.js"></script>
 </body>
