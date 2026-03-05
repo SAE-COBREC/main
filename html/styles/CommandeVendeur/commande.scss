@@ -9,25 +9,25 @@
 
 body, html {
   font-family: $font-family-primaire;
-  background: $secondary-color-rose-claire;
+  background: $secondary-color-light-pink;
 }
 
 .app {
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
-  background: $primary-color-blanc;
+  background: $primary-color-white;
 }
 
 .main {
-  background: $secondary-color-rose-claire;
+  background: $secondary-color-light-pink;
   padding: 40px;
   overflow-y: auto;
 
   .header {
     margin-bottom: 30px;
     h1 {
-      color: $primary-color-noir;
+      color: $primary-color-black;
       font-size: 2rem;
     }
   }
@@ -39,22 +39,22 @@ body, html {
   gap: 20px;
 
   .facture-card {
-    background: $primary-color-blanc;
+    background: $primary-color-white;
     border-radius: $border-radius-primary;
-    box-shadow: 0 1px 2px $primary-color-noir;
+    box-shadow: 0 1px 2px $primary-color-black;
     overflow: hidden;
-    border: 1px solid rgba($primary-color-noir, 0.1);
+    border: 1px solid rgba($primary-color-black, 0.1);
 
     .facture-header {
-        background: rgba($primary-color-noir, 0.02);
+        background: rgba($primary-color-black, 0.02);
         padding: 15px 20px;
         display: flex;
         justify-content: space-between; // Aligne les textes à gauche et le bouton à droite
         align-items: center;
-        border-bottom: 1px solid rgba($primary-color-noir, 0.05);
+        border-bottom: 1px solid rgba($primary-color-black, 0.05);
 
         h3 { 
-            color: $primary-color-noir;
+            color: $primary-color-black;
             font-size: 1.7em;
             margin: 0;
         }
@@ -74,8 +74,8 @@ body, html {
             display: flex;
             align-items: center;
             gap: 10px;
-            background-color: $primary-color-bronze;
-            color: $primary-color-blanc;
+            background-color: $primary-color-copper;
+            color: $primary-color-white;
             border: none;
             padding: 8px 16px;
             border-radius: $border-radius-primary;
@@ -110,7 +110,7 @@ body, html {
         display: flex;
         padding: 8px 0;
         font-size: 1.2em;
-        border-bottom: 1px dashed $primary-color-noir;
+        border-bottom: 1px dashed $primary-color-black;
         
         &:last-child { 
             border-bottom: none; 
@@ -134,7 +134,7 @@ body, html {
 .empty-state {
   text-align: center;
   padding: 50px;
-  background: $primary-color-blanc;
+  background: $primary-color-white;
   border-radius: $border-radius-primary;
   color: #888;
 }

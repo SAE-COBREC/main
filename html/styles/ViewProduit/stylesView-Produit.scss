@@ -3,8 +3,8 @@
 body {
     font-family: vars.$font-family-secondaire;
     margin: 0;
-    background: vars.$secondary-color-bleu-clair;
-    color: vars.$primary-color-noir;
+    background: vars.$secondary-color-light-blue;
+    color: vars.$primary-color-black;
 }
 
 .page-breadcrumb {
@@ -17,10 +17,10 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: vars.$primary-color-noir;
+    color: vars.$primary-color-black;
     text-decoration: none;
-    background: vars.$primary-color-blanc;
-    border: 1px solid vars.$secondary-color-gris-clair;
+    background: vars.$primary-color-white;
+    border: 1px solid vars.$secondary-color-light-grey;
     padding: 8px 12px;
     border-radius: 999px;
 }
@@ -35,7 +35,7 @@ body {
     max-width: 1150px;
     margin: 36px auto;
     padding: 24px;
-    background: vars.$primary-color-blanc;
+    background: vars.$primary-color-white;
     border-radius: 10px;
     box-shadow: 0 6px 20px rgba(20, 20, 40, 0.06);
 }
@@ -60,7 +60,7 @@ body {
             height: 64px;
             object-fit: cover;
             border-radius: 8px;
-            border: 2px solid vars.$primary-color-blanc;
+            border: 2px solid vars.$primary-color-white;
             box-shadow: 0 4px 10px rgba(30, 30, 60, 0.06);
             cursor: pointer;
             transition: filter .15s ease, border-color .15s ease, transform .06s ease;
@@ -71,7 +71,7 @@ body {
         }
 
         img.is-active {
-            border-color: vars.$primary-color-bleu;
+            border-color: vars.$primary-color-blue;
             filter: brightness(1.06);
         }
 
@@ -81,7 +81,7 @@ body {
     }
 
     .main-image {
-        background: linear-gradient(180deg, vars.$primary-color-blanc, vars.$secondary-color-bleu-clair);
+        background: linear-gradient(180deg, vars.$primary-color-white, vars.$secondary-color-light-blue);
         padding: 12px;
         border-radius: 10px;
         display: flex;
@@ -135,7 +135,7 @@ body {
         }
 
         .rating {
-            color: vars.$secondary-color-gris-fonce;
+            color: vars.$secondary-color-dark-grey;
             font-size: 14px;
             margin-bottom: 10px;
 
@@ -144,7 +144,7 @@ body {
                 gap: 6px;
                 align-items: center;
                 margin-right: 8px;
-                color: vars.$secondary-color-jaune;
+                color: vars.$secondary-color-yellow;
             }
 
             .star {
@@ -159,11 +159,11 @@ body {
         .price {
             font-size: 22px;
             font-weight: 700;
-            color: vars.$primary-color-noir;
+            color: vars.$primary-color-black;
             margin-bottom: 10px;
 
             .old {
-                color: vars.$secondary-color-gris-fonce;
+                color: vars.$secondary-color-dark-grey;
                 text-decoration: line-through;
                 font-weight: 500;
                 font-size: 14px;
@@ -189,14 +189,14 @@ body {
                 gap: 0;
                 padding: 6px 12px;
                 border-radius: 999px;
-                background: vars.$secondary-color-bleu-clair;
-                border: 1px solid vars.$secondary-color-gris-clair;
+                background: vars.$secondary-color-light-blue;
+                border: 1px solid vars.$secondary-color-light-grey;
                 height: 44px;
 
                 button.ghost {
                     background: transparent;
                     border: 0;
-                    color: vars.$primary-color-noir;
+                    color: vars.$primary-color-black;
                     flex: 1 1 auto;
                     min-width: 48px;
                     height: 100%;
@@ -231,7 +231,7 @@ body {
                     text-align: center;
                     font-weight: 700;
                     font-size: 18px;
-                    color: vars.$primary-color-noir;
+                    color: vars.$primary-color-black;
                     padding: 0;
                     margin: 0;
                     line-height: 1;
@@ -241,12 +241,12 @@ body {
         }
 
         .meta {
-            background: vars.$secondary-color-bleu-clair;
+            background: vars.$secondary-color-light-blue;
             padding: 12px;
             border-radius: 8px;
             margin-top: 14px;
             font-size: 14px;
-            color: vars.$primary-color-noir;
+            color: vars.$primary-color-black;
         }
     }
 }
@@ -264,8 +264,8 @@ input[type="number"] {
 }
 
 .btn {
-    background: vars.$primary-color-bleu;
-    color: vars.$primary-color-blanc;
+    background: vars.$primary-color-blue;
+    color: vars.$primary-color-white;
     padding: 10px 16px;
     border-radius: 10px;
     border: 0;
@@ -273,9 +273,9 @@ input[type="number"] {
 }
 
 .ghost {
-    background: vars.$primary-color-blanc;
-    border: 1px solid vars.$secondary-color-gris-clair;
-    color: vars.$primary-color-noir;
+    background: vars.$primary-color-white;
+    border: 1px solid vars.$secondary-color-light-grey;
+    color: vars.$primary-color-black;
     padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
@@ -292,7 +292,7 @@ input[type="number"] {
 .features {
     ul {
         padding-left: 18px;
-        color: vars.$primary-color-noir;
+        color: vars.$primary-color-black;
     }
 }
 
@@ -304,7 +304,7 @@ input[type="number"] {
 
 .reviews {
     .review {
-        background: vars.$primary-color-blanc;
+        background: vars.$primary-color-white;
         padding: 16px;
         border-radius: 10px;
         margin-bottom: 12px;
@@ -341,7 +341,7 @@ input[type="number"] {
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        color: vars.$primary-color-bleu;
+        color: vars.$primary-color-blue;
     }
 
     .review-author {
@@ -349,7 +349,7 @@ input[type="number"] {
     }
 
     .review-subtitle {
-        color: vars.$secondary-color-gris-fonce;
+        color: vars.$secondary-color-dark-grey;
         font-size: 13px;
     }
 
@@ -418,7 +418,7 @@ input[type="number"] {
     }
 
     .star-input button:focus-visible {
-        outline: 2px solid vars.$primary-color-bleu;
+        outline: 2px solid vars.$primary-color-blue;
         border-radius: 4px;
     }
 
@@ -444,9 +444,9 @@ input[type="number"] {
         box-sizing: border-box;
         padding: 10px 12px;
         border-radius: 10px;
-        border: 1px solid vars.$secondary-color-gris-clair;
-        background: vars.$primary-color-blanc;
-        color: vars.$primary-color-noir;
+        border: 1px solid vars.$secondary-color-light-grey;
+        background: vars.$primary-color-white;
+        color: vars.$primary-color-black;
         font-family: inherit;
         font-size: 14px;
         line-height: 1.4;
@@ -455,7 +455,7 @@ input[type="number"] {
         &:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(76, 92, 255, .12);
-            border-color: vars.$primary-color-bleu;
+            border-color: vars.$primary-color-blue;
         }
     }
 
@@ -472,7 +472,7 @@ input[type="number"] {
     }
 
     .review-hint {
-        color: vars.$secondary-color-gris-fonce;
+        color: vars.$secondary-color-dark-grey;
         margin-right: auto;
     }
 
@@ -485,7 +485,7 @@ input[type="number"] {
 
     .btn-vote[aria-pressed="true"] {
         background: rgba(76, 92, 255, .06);
-        border-color: vars.$primary-color-bleu;
+        border-color: vars.$primary-color-blue;
     }
 
     .review-votes {
@@ -501,7 +501,7 @@ input[type="number"] {
         }
 
         .review-date {
-            color: vars.$secondary-color-gris-fonce;
+            color: vars.$secondary-color-dark-grey;
             font-size: 13px;
             margin-left: auto;
         }
@@ -512,8 +512,8 @@ input[type="number"] {
             align-items: center;
 
             .btn-edit-review {
-                color: vars.$primary-color-bleu;
-                border-color: vars.$primary-color-bleu;
+                color: vars.$primary-color-blue;
+                border-color: vars.$primary-color-blue;
             }
 
             .btn-delete-review {
@@ -713,7 +713,7 @@ input[type="number"] {
                 }
 
                 &.btn-edit-review {
-                    color: vars.$primary-color-bleu;
+                    color: vars.$primary-color-blue;
                 }
 
                 &.btn-delete-review {
@@ -818,7 +818,7 @@ input[type="number"] {
 }
 
 .disabled {
-    background: vars.$secondary-color-gris-clair !important;
+    background: vars.$secondary-color-light-grey !important;
     cursor: not-allowed !important;
     pointer-events: none !important;
 }
@@ -846,7 +846,7 @@ input[type="number"] {
 .modal-dialog {
     width: 100%;
     max-width: 500px;
-    background: vars.$primary-color-blanc;
+    background: vars.$primary-color-white;
     border-radius: 16px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     padding: 32px;
@@ -862,7 +862,7 @@ input[type="number"] {
         margin: 0 0 20px 0;
         font-size: 22px;
         font-weight: 700;
-        color: vars.$primary-color-noir;
+        color: vars.$primary-color-black;
         text-align: center;
     }
 
@@ -908,21 +908,21 @@ input[type="number"] {
 
             &.btn-secondary {
                 background: #f0f2f5;
-                color: vars.$secondary-color-gris-fonce;
+                color: vars.$secondary-color-dark-grey;
 
                 &:hover {
                     background: #e4e6eb;
-                    color: vars.$primary-color-noir;
+                    color: vars.$primary-color-black;
                 }
             }
 
             &.btn-primary {
-                background: vars.$primary-color-bleu;
-                color: vars.$primary-color-blanc;
+                background: vars.$primary-color-blue;
+                color: vars.$primary-color-white;
                 box-shadow: 0 4px 12px rgba(76, 92, 255, 0.25);
 
                 &:hover {
-                    background: darken(vars.$primary-color-bleu, 5%);
+                    background: darken(vars.$primary-color-blue, 5%);
                     transform: translateY(-1px);
                     box-shadow: 0 6px 16px rgba(76, 92, 255, 0.3);
                 }

@@ -3,7 +3,7 @@
 
 // Sidebar
 .sidebar {
-  background: linear-gradient(180deg, $secondary-color-marron 0%, $primary-color-bronze 100%);
+  background: linear-gradient(180deg, $secondary-color-brown 0%, $primary-color-copper 100%);
   padding:28px 20px;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 16px;
-  color: $primary-color-blanc;
+  color: $primary-color-white;
   font-size: 28px;
   font-weight: bold;
   font-family: $font-family-secondaire;
@@ -32,12 +32,12 @@
   &__icon {
     width: 50px;
     height: 50px;
-    background: $primary-color-blanc;
+    background: $primary-color-white;
     border-radius: $border-radius-primary;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $primary-color-bronze;
+    color: $primary-color-copper;
   }
 }
 
@@ -55,7 +55,7 @@
     gap: 10px;
     padding: 12px 8px;
     border-radius: $border-radius-primary;
-    color: rgba($primary-color-blanc, 0.7);
+    color: rgba($primary-color-white, 0.7);
     text-decoration: none;
     font-size: 22px;
     transition: all 0.2s;
@@ -66,13 +66,13 @@
       }
 
     &:hover {
-      background: rgba($primary-color-blanc, 0.1);
-      color: $primary-color-blanc;
+      background: rgba($primary-color-white, 0.1);
+      color: $primary-color-white;
     }
 
     &--active {
-      background: rgba($primary-color-blanc, 0.15);
-      color: $primary-color-blanc;
+      background: rgba($primary-color-white, 0.15);
+      color: $primary-color-white;
     }
   }
 }
@@ -81,8 +81,8 @@
 .preview-btn {
   margin-top: auto;
   background: transparent;
-  border: 1px solid rgba($primary-color-blanc, 0.3);
-  color: $primary-color-blanc;
+  border: 1px solid rgba($primary-color-white, 0.3);
+  color: $primary-color-white;
   padding: 10px 12px;
   border-radius: $border-radius-primary;
   font-size: 22px;
@@ -91,7 +91,7 @@
   font-family: $font-family-secondaire;
 
   &:hover {
-    background: rgba($primary-color-blanc, 0.1);
-    color: $primary-color-blanc;
+    background: rgba($primary-color-white, 0.1);
+    color: $primary-color-white;
   }
 }

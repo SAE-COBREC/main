@@ -4,12 +4,12 @@ body{
     aside{
         position: absolute;
         left: 80%;
-        background-color: $secondary-color-bleu-info-fond;
+        background-color: $secondary-color-blue-info-background;
         width: 20%;
-        border: 3px solid $primary-color-bleu;
+        border: 3px solid $primary-color-blue;
         border-radius: 5%;
         hr{
-            color: $primary-color-bleu;
+            color: $primary-color-blue;
             margin: 2%;
         }
         table{
@@ -30,7 +30,7 @@ body{
     }
     article:nth-of-type(2){
         table{
-            border: 3px $secondary-color-gris-fonce;
+            border: 3px $secondary-color-dark-grey;
         }
         table:first-of-type{
             width: 75%;
@@ -51,7 +51,7 @@ body{
                     text-align: center;
                 }*/
                 tr:nth-child(2n){
-                    background-color: $secondary-color-gris-clair;
+                    background-color: $secondary-color-light-grey;
                 }
             }
         }
@@ -104,7 +104,7 @@ footer{
             table:first-of-type{
                 width:250mm;
                 tr:nth-child(2n){
-                    background-color: $secondary-color-gris-fonce;
+                    background-color: $secondary-color-dark-grey;
                 }
                 tbody{
                     td:nth-of-type(-n+3){

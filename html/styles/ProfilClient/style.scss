@@ -17,24 +17,24 @@
 }
 
 @mixin button-primary {
-    border: 1px solid $primary-color-bleu;
-    color: $primary-color-bleu;
+    border: 1px solid $primary-color-blue;
+    color: $primary-color-blue;
     border-radius: 20px;
-    background: $primary-color-blanc;
+    background: $primary-color-white;
     cursor: pointer;
     font-size: 1.3em;
     padding: 10px 20px;
     @include transition();
 
     &:hover {
-        background: $primary-color-bleu;
-        color: $primary-color-blanc;
+        background: $primary-color-blue;
+        color: $primary-color-white;
     }
 }
 
 @mixin input-base {
     padding: 12px;
-    border: 1px solid $secondary-color-gris-clair;
+    border: 1px solid $secondary-color-light-grey;
     border-radius: 8px;
     font-size: 1em;
     font-family: $font-family-secondaire;
@@ -42,13 +42,13 @@
 
     &:focus {
         outline: none;
-        border-color: $primary-color-bleu;
+        border-color: $primary-color-blue;
     }
 }
 
 @mixin article-card {
-    background: $primary-color-blanc;
-    border: 1px solid $secondary-color-gris-clair;
+    background: $primary-color-white;
+    border: 1px solid $secondary-color-light-grey;
     border-radius: 12px;
     padding: 0;
     margin-bottom: 1.5em;
@@ -57,15 +57,15 @@
 
     &:hover {
         box-shadow: 0 4px 12px rgba(113, 113, 163, 0.15);
-        border-color: $primary-color-bleu;
+        border-color: $primary-color-blue;
     }
 }
 
 @mixin article-header {
     @include flex-between;
     padding: 1.5em;
-    background: $secondary-color-bleu-clair;
-    border-bottom: 1px solid $secondary-color-gris-clair;
+    background: $secondary-color-light-blue;
+    border-bottom: 1px solid $secondary-color-light-grey;
 
     > div {
         display: flex;
@@ -94,14 +94,14 @@
     justify-content: center;
     width: 48px;
     height: 48px;
-    background: $primary-color-blanc;
+    background: $primary-color-white;
     border-radius: 50%;
 
     > svg {
         width: 24px;
         height: 24px;
         stroke-width: 2;
-        color: $primary-color-bleu;
+        color: $primary-color-blue;
     }
 }
 
@@ -113,7 +113,7 @@
 
 body {
     font-family: $font-family-secondaire;
-    background: $secondary-color-gris-clair;
+    background: $secondary-color-light-grey;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
@@ -124,7 +124,7 @@ main {
     padding: 2em;
 
     section {
-        background: $primary-color-blanc;
+        background: $primary-color-white;
         border-radius: 12px;
         padding: 2em;
         margin-bottom: 2em;
@@ -133,16 +133,16 @@ main {
 
     h1 {
         margin: 2rem 0;
-        color: $primary-color-bleu;
+        color: $primary-color-blue;
         font-size: 2em;
         text-align: center;
     }
 
     h2 {
-        color: $primary-color-bleu;
+        color: $primary-color-blue;
         margin-bottom: 1.5rem;
         font-size: 1.5em;
-        border-bottom: 2px solid $secondary-color-gris-clair;
+        border-bottom: 2px solid $secondary-color-light-grey;
         padding-bottom: 0.5rem;
     }
 
@@ -183,24 +183,24 @@ main {
                 text-transform: capitalize;
 
                 &[data-statut="en-préparation"] {
-                    background: $secondary-color-jaune-fond;
-                    color: $secondary-color-jaune-avertissement;
+                    background: $secondary-color-yellow-background;
+                    color: $secondary-color-yellow-warning;
                 }
 
                 &[data-statut="en-transit"] {
-                    background: $secondary-color-bleu-info-fond;
-                    color: $secondary-color-bleu-info;
+                    background: $secondary-color-blue-info-background;
+                    color: $secondary-color-blue-info;
                 }
 
                 &[data-statut="livré"] {
-                    background: $secondary-color-vert-fond;
-                    color: $secondary-color-vert-succes;
+                    background: $secondary-color-green-background;
+                    color: $secondary-color-green-success;
                 }
 
                 &[data-statut="annulee"],
                 &[data-statut="annulée"] {
-                    background: $secondary-color-rouge-erreur;
-                    color: $secondary-color-erreur;
+                    background: $secondary-color-red-error;
+                    color: $secondary-color-error;
                 }
             }
         }
@@ -230,20 +230,20 @@ main {
             width: 20px;
             height: 20px;
             stroke-width: 2;
-            color: $primary-color-bleu;
+            color: $primary-color-blue;
             flex-shrink: 0;
         }
 
         em {
             font-size: 1.4em;
             font-weight: 700;
-            color: $primary-color-bleu;
+            color: $primary-color-blue;
             font-style: normal;
         }
 
         > footer {
             padding: 1.5em;
-            border-top: 1px solid $secondary-color-gris-clair;
+            border-top: 1px solid $secondary-color-light-grey;
             background: #FAFAFA;
 
             display: flex;         
@@ -257,10 +257,10 @@ main {
 
             > button, a > button {
                 width: 100%;
-                border: 2px solid $primary-color-bleu;
-                color: $primary-color-bleu;
+                border: 2px solid $primary-color-blue;
+                color: $primary-color-blue;
                 border-radius: 8px;
-                background: $primary-color-blanc;
+                background: $primary-color-white;
                 cursor: pointer;
                 font-size: 1.1em;
                 font-weight: 600;
@@ -270,8 +270,8 @@ main {
                 gap: 0.5em;
 
                 &:hover {
-                    background: $primary-color-bleu;
-                    color: $primary-color-blanc;
+                    background: $primary-color-blue;
+                    color: $primary-color-white;
                     transform: translateY(-2px);
                     box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
                 }
@@ -318,8 +318,8 @@ main {
                     @include flex-center;
                     gap: 0.5em;
                     padding: 14px 24px;
-                    background: $primary-color-bleu;
-                    color: $primary-color-blanc;
+                    background: $primary-color-blue;
+                    color: $primary-color-white;
                     border: none;
                     border-radius: 8px;
                     font-size: 1.1em;
@@ -329,7 +329,7 @@ main {
                     margin-top: 0.5em;
 
                     &:hover {
-                        background: darken($primary-color-bleu, 10%);
+                        background: darken($primary-color-blue, 10%);
                         transform: translateY(-2px);
                         box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                     }
@@ -358,7 +358,7 @@ main {
             input[type="email"],
             input[type="tel"] {
                 padding: 12px 16px;
-                border: 2px solid $secondary-color-gris-clair;
+                border: 2px solid $secondary-color-light-grey;
                 border-radius: 8px;
                 font-size: 1em;
                 font-family: $font-family-secondaire;
@@ -366,7 +366,7 @@ main {
 
                 &:focus {
                     outline: none;
-                    border-color: $primary-color-bleu;
+                    border-color: $primary-color-blue;
                     box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
                 }
             }
@@ -386,8 +386,8 @@ main {
 
             > button {
                 padding: 10px 20px;
-                background: $primary-color-bleu;
-                color: $primary-color-blanc;
+                background: $primary-color-blue;
+                color: $primary-color-white;
                 border: none;
                 border-radius: 8px;
                 font-size: 1em;
@@ -396,7 +396,7 @@ main {
                 @include transition();
 
                 &:hover {
-                    background: darken($primary-color-bleu, 10%);
+                    background: darken($primary-color-blue, 10%);
                     transform: translateY(-2px);
                     box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
                 }
@@ -458,13 +458,13 @@ main {
                     @include transition();
 
                     &:first-child {
-                        border: 2px solid $primary-color-bleu;
-                        color: $primary-color-bleu;
-                        background: $primary-color-blanc;
+                        border: 2px solid $primary-color-blue;
+                        color: $primary-color-blue;
+                        background: $primary-color-white;
 
                         &:hover {
-                            background: $primary-color-bleu;
-                            color: $primary-color-blanc;
+                            background: $primary-color-blue;
+                            color: $primary-color-white;
                             transform: translateY(-2px);
                             box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
                         }
@@ -509,8 +509,8 @@ main {
                 @include flex-center;
                 gap: 0.5em;
                 padding: 14px 24px;
-                background: $primary-color-bleu;
-                color: $primary-color-blanc;
+                background: $primary-color-blue;
+                color: $primary-color-white;
                 border: none;
                 border-radius: 8px;
                 font-size: 1.1em;
@@ -520,7 +520,7 @@ main {
                 margin-top: 0.5em;
 
                 &:hover {
-                    background: darken($primary-color-bleu, 10%);
+                    background: darken($primary-color-blue, 10%);
                     transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                 }
@@ -551,7 +551,7 @@ main {
 
             input[type="password"] {
                 padding: 12px 16px;
-                border: 2px solid $secondary-color-gris-clair;
+                border: 2px solid $secondary-color-light-grey;
                 border-radius: 8px;
                 font-size: 1em;
                 font-family: $font-family-secondaire;
@@ -559,7 +559,7 @@ main {
 
                 &:focus {
                     outline: none;
-                    border-color: $primary-color-bleu;
+                    border-color: $primary-color-blue;
                     box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
                 }
             }
@@ -569,8 +569,8 @@ main {
 
 .site-header {
     grid-column: 1 / -1;
-    background-color: $primary-color-blanc;
-    color: $primary-color-noir;
+    background-color: $primary-color-white;
+    color: $primary-color-black;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
     position: sticky; 
     top: 0;            
@@ -578,7 +578,7 @@ main {
     width: 100%;
     box-sizing: border-box;
     height: 72px;
-    border-bottom: 1px solid $secondary-color-gris-clair;
+    border-bottom: 1px solid $secondary-color-light-grey;
     margin-bottom: 10px;
 }
 
@@ -608,7 +608,7 @@ main {
 .brand-name {
     font-family: $font-family-secondaire;
     font-size: 20px;
-    color: $primary-color-bleu;
+    color: $primary-color-blue;
     font-weight: 700;
 }
 
@@ -624,8 +624,8 @@ main {
     border-radius: $border-radius-primary;
     padding: 0.7em 1em;
     max-width: 500px;
-    background-color: $secondary-color-gris-clair;
-    color: $primary-color-bleu;
+    background-color: $secondary-color-light-grey;
+    color: $primary-color-blue;
 }
 
 .search-form {
@@ -646,7 +646,7 @@ main {
         &::-moz-placeholder,
         &:-ms-input-placeholder,
         &::placeholder {
-            color: $primary-color-bleu;
+            color: $primary-color-blue;
         }
     }
 }
@@ -660,7 +660,7 @@ main {
     background: transparent;
     border: none;
     font-size: 18px;
-    color: $primary-color-bleu;
+    color: $primary-color-blue;
     margin-right: 10px;
     cursor: pointer;
 }
@@ -671,7 +671,7 @@ main {
     outline: none;
     background: transparent;
     font-size: 14px;
-    color: $primary-color-noir;
+    color: $primary-color-black;
 }
 
 .icons-container {
@@ -693,7 +693,7 @@ main {
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    color: $primary-color-noir;
+    color: $primary-color-black;
     text-decoration: none;
     font-size: 18px;
 }
@@ -797,7 +797,7 @@ main {
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid $primary-color-bleu;
+    border: 3px solid $primary-color-blue;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -805,11 +805,11 @@ main {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: $secondary-color-gris-clair;
+    background: $secondary-color-light-grey;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid $primary-color-bleu;
+    border: 3px solid $primary-color-blue;
 }
 
 .profile-image-placeholder svg {
@@ -834,26 +834,26 @@ main {
 .form-separator {
     margin: 1.5rem 0;
     border: none;
-    border-top: 1px solid $secondary-color-gris-clair;
+    border-top: 1px solid $secondary-color-light-grey;
 }
 
 /* Messages de succès et d'erreur */
 .error-message {
-    color: $secondary-color-erreur;
+    color: $secondary-color-error;
     padding: 10px;
-    background: $secondary-color-rouge-erreur;
+    background: $secondary-color-red-error;
     margin-bottom: 20px;
     border-radius: 8px;
-    border: 1px solid lighten($secondary-color-erreur, 40%);
+    border: 1px solid lighten($secondary-color-error, 40%);
 }
 
 .success-message {
-    color: $secondary-color-vert-succes;
+    color: $secondary-color-green-success;
     padding: 10px;
-    background: $secondary-color-vert-fond;
+    background: $secondary-color-green-background;
     margin-bottom: 20px;
     border-radius: 8px;
-    border: 1px solid lighten($secondary-color-vert-succes, 50%);
+    border: 1px solid lighten($secondary-color-green-success, 50%);
 }
 
 /* Formulaire de déconnexion */
@@ -868,8 +868,8 @@ main {
 
     button {
         background: transparent;
-        border: 2px solid $secondary-color-rouge;
-        color: $secondary-color-rouge;
+        border: 2px solid $secondary-color-red;
+        color: $secondary-color-red;
         border-radius: 8px;
         padding: 10px 20px;
         font-size: 1em;
@@ -878,8 +878,8 @@ main {
         @include transition();
 
         &:hover {
-            background: $secondary-color-rouge;
-            color: $primary-color-blanc;
+            background: $secondary-color-red;
+            color: $primary-color-white;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
         }
@@ -905,23 +905,23 @@ main {
 }
 
 #drop-zone {
-    border: 2px dashed $secondary-color-gris-fonce;
+    border: 2px dashed $secondary-color-dark-grey;
     padding: 30px;
     text-align: center;
     margin: 15px 0;
     border-radius: 8px;
     cursor: pointer;
     @include transition();
-    background-color: lighten($secondary-color-gris-clair, 2%);
+    background-color: lighten($secondary-color-light-grey, 2%);
 
     &:hover {
-        border-color: $primary-color-bleu;
-        background-color: lighten($secondary-color-bleu-clair, 2%);
+        border-color: $primary-color-blue;
+        background-color: lighten($secondary-color-light-blue, 2%);
     }
 
     &.drag-over {
-        background-color: lighten($secondary-color-bleu-clair, 1%);
-        border-color: $primary-color-bleu;
+        background-color: lighten($secondary-color-light-blue, 1%);
+        border-color: $primary-color-blue;
         transform: scale(1.02);
     }
 
@@ -951,27 +951,27 @@ main {
     display: none;
 
     &.success {
-        background-color: $secondary-color-vert-fond;
-        color: $secondary-color-vert-succes;
+        background-color: $secondary-color-green-background;
+        color: $secondary-color-green-success;
         display: block;
     }
 
     &.error {
-        background-color: $secondary-color-rouge-erreur;
-        color: $secondary-color-erreur;
+        background-color: $secondary-color-red-error;
+        color: $secondary-color-error;
         display: block;
     }
 }
 
 main section:nth-of-type(2) article > footer > form {
     button {
-        border: 2px solid $secondary-color-rouge;
-        color: $secondary-color-rouge;
-        background: $primary-color-blanc;
+        border: 2px solid $secondary-color-red;
+        color: $secondary-color-red;
+        background: $primary-color-white;
 
         &:hover {
-            background: $secondary-color-rouge;
-            color: $primary-color-blanc;
+            background: $secondary-color-red;
+            color: $primary-color-white;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
         }
@@ -1001,7 +1001,7 @@ main section:nth-of-type(2) article > footer > form {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: $primary-color-blanc;
+  background: $primary-color-white;
   padding: 3em;
   border-radius: 12px;
   max-width: 500px;
@@ -1010,7 +1010,7 @@ main section:nth-of-type(2) article > footer > form {
 }
 
 #modalA2F small{
-    background-color: $secondary-color-gris-clair;
+    background-color: $secondary-color-light-grey;
     overflow: auto;
     padding-bottom:1em;
 }
@@ -1018,10 +1018,10 @@ main section:nth-of-type(2) article > footer > form {
 #modalModificationAdresse h2,
 #modalAjoutAdresse h2,
 #modalA2F h2 {
-  color: $primary-color-bleu;
+  color: $primary-color-blue;
   margin-bottom: 2rem;
   font-size: 1.5em;
-  border-bottom: 2px solid $secondary-color-gris-clair;
+  border-bottom: 2px solid $secondary-color-light-grey;
   padding-bottom: 1rem;
   text-align: center;
 }
@@ -1058,7 +1058,7 @@ main section:nth-of-type(2) article > footer > form {
 #formulaireAjoutAdresse input[type="text"],
 #modalA2F form input[type="text"] {
   padding: 12px 16px;
-  border: 2px solid $secondary-color-gris-clair;
+  border: 2px solid $secondary-color-light-grey;
   border-radius: 8px;
   font-size: 1em;
   font-family: "Quicksand", sans-serif;
@@ -1069,7 +1069,7 @@ main section:nth-of-type(2) article > footer > form {
 #formulaireAjoutAdresse input[type="text"]:focus,
 #modalA2F form input[type="text"]:focus {
   outline: none;
-  border-color: $primary-color-bleu;
+  border-color: $primary-color-blue;
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 
@@ -1088,8 +1088,8 @@ main section:nth-of-type(2) article > footer > form {
 #formulaireModificationAdresse button[type="submit"],
 #formulaireAjoutAdresse button[type="submit"],
 #modalA2F form button[type="submit"] {
-  background: $primary-color-bleu;
-  color: $primary-color-blanc;
+  background: $primary-color-blue;
+  color: $primary-color-white;
   border: none;
   margin-top: 0.5rem;
 }
@@ -1105,16 +1105,16 @@ main section:nth-of-type(2) article > footer > form {
 #formulaireModificationAdresse button[type="button"],
 #formulaireAjoutAdresse button[type="button"],
 #modalA2F form button[type="button"]  {
-  background: $primary-color-blanc;
-  color: $primary-color-bleu;
-  border: 2px solid $primary-color-bleu;
+  background: $primary-color-white;
+  color: $primary-color-blue;
+  border: 2px solid $primary-color-blue;
 }
 
 #formulaireModificationAdresse button[type="button"]:hover,
 #formulaireAjoutAdresse button[type="button"]:hover,
 #modalA2F form button[type="button"]:hover {
-  background: $primary-color-bleu;
-  color: $primary-color-blanc;
+  background: $primary-color-blue;
+  color: $primary-color-white;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
 }
@@ -1175,22 +1175,22 @@ main section:nth-of-type(2) article > footer > form {
 
 main section:nth-of-type(1) article select {
     padding: 12px 16px;
-    border: 2px solid $secondary-color-gris-clair;
+    border: 2px solid $secondary-color-light-grey;
     border-radius: 8px;
     font-size: 1em;
     font-family: 'Quicksand', sans-serif;
     transition: all 0.3s ease;
-    background-color: $primary-color-blanc;
+    background-color: $primary-color-white;
     cursor: pointer;
     width: 100%;
 }
 
 main section:nth-of-type(1) article select:focus {
     outline: none;
-    border-color: $primary-color-bleu;
+    border-color: $primary-color-blue;
     box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 
 main section:nth-of-type(1) article select:hover {
-    border-color: $primary-color-bleu;
+    border-color: $primary-color-blue;
 }

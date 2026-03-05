@@ -10,18 +10,18 @@
 body,
 html {
   font-family: $font-family-primaire;
-  background: $secondary-color-rose-claire;
+  background: $secondary-color-light-pink;
 }
 
 .app {
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
-  background: $primary-color-blanc;
+  background: $primary-color-white;
 }
 
 .main {
-  background: $secondary-color-rose-claire;
+  background: $secondary-color-light-pink;
   padding: 40px;
   overflow-y: auto;
 
@@ -29,22 +29,114 @@ html {
     margin-bottom: 30px;
 
     h1 {
-      color: $primary-color-noir;
+      color: $primary-color-black;
       font-size: 2rem;
     }
   }
 
-  select,
-  input {
-    padding: 8px 16px;
-    font-size: 18px;
-    border-radius: $border-radius-primary;
-    background: #F9F6F3;
-    border: 1px solid $secondary-color-orange-clair;
+.liste-commandes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
-    &:hover {
-      background: $secondary-color-rose-claire;
-      border-color: $primary-color-bronze;
+  .facture-card {
+    background: $primary-color-white;
+    border-radius: $border-radius-primary;
+    box-shadow: 0 1px 2px $primary-color-black;
+    overflow: hidden;
+    border: 1px solid rgba($primary-color-black, 0.1);
+
+    .facture-header {
+      background: rgba($primary-color-black, 0.02);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between; // Aligne les textes à gauche et le bouton à droite
+      align-items: center;
+      border-bottom: 1px solid rgba($primary-color-black, 0.05);
+
+      h3 {
+        color: $primary-color-black;
+        font-size: 1.7em;
+        margin: 0;
+      }
+
+      p {
+        font-size: 1.2em;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      // Style du bouton de téléchargement dans le header
+      .btn-download {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: $primary-color-copper;
+        color: $primary-color-white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: $border-radius-primary;
+        cursor: pointer;
+        font-family: $font-family-primaire;
+        font-size: 1.1em;
+        transition: opacity 0.3s ease;
+
+        svg {
+          width: 18px;
+          height: 18px;
+          stroke-width: 2;
+        }
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    .facture-content {
+      padding: 20px;
+
+      .produits-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+        color: #666;
+      }
+
+      .produit-item {
+        display: flex;
+        padding: 8px 0;
+        font-size: 1.2em;
+        border-bottom: 1px dashed $primary-color-black;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .prod-id {
+          font-size: 1.2em;
+          width: 100px;
+          font-family: monospace;
+          color: #888;
+        }
+
+        .prod-name {
+          font-weight: 500;
+        }
+      }
     }
   }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 50px;
+  background: $primary-color-white;
+  border-radius: $border-radius-primary;
+  color: #888;
+}
 }
