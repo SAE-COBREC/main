@@ -51,7 +51,7 @@ try {
 <head>
     <meta charset="utf-8" />
     <title>Alizon - Commandes Vendeur</title>
-    <link rel="stylesheet" href="/styles/CommandeVendeur/statistique.css" />
+    <link rel="stylesheet" href="/styles/CommandeVendeur/commande.css" />
 </head>
 <body>
     <div class="app">
