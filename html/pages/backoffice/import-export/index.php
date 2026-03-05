@@ -1,0 +1,756 @@
+<?php 
+// Démarrage de la session PHP pour accéder aux variables de session
+session_start(); 
+?>
+
+<?php
+// Inclusion de fichier 
+include '../../../selectBDD.php';
+include __DIR__ . '../../../fonctions.php';
+
+// Récupération de l'ID du vendeur connecté depuis la session
+if(empty($_SESSION['vendeur_id']) === false){
+  $vendeur_id = $_SESSION['vendeur_id'];
+}else{
+?>
+<script>
+alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+</script>
+<?php
+  exit();
+}
+
+// Initialisation des messages
+$message_success = '';
+$message_error = '';
+$import_details = [];
+
+// ============================================
+// TRAITEMENT DE L'IMPORT CSV
+// ============================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'import') {
+    
+    if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
+        $message_error = "Erreur lors de l'envoi du fichier. Veuillez réessayer.";
+    } else {
+        $file = $_FILES['csv_file'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if ($ext !== 'csv') {
+            $message_error = "Format non supporté. Veuillez envoyer un fichier .csv";
+        } else {
+            $handle = fopen($file['tmp_name'], 'r');
+            if ($handle === false) {
+                $message_error = "Impossible de lire le fichier.";
+            } else {
+                // Supprimer le BOM UTF-8 si présent (EF BB BF) pour éviter qu'il se colle au premier en-tête
+                $bom = fread($handle, 3);
+                if ($bom !== "\xEF\xBB\xBF") {
+                    rewind($handle); // Pas de BOM, on revient au début
+                }
+
+                // Lire l'en-tête
+                $header = fgetcsv($handle, 0, ';');
+                if ($header === false) {
+                    $message_error = "Le fichier CSV est vide.";
+                    fclose($handle);
+                } else {
+                    // Normaliser les en-têtes (trim + lowercase + suppression BOM résiduel)
+                    $header = array_map(function($h) {
+                        $h = preg_replace('/^\x{FEFF}/u', '', $h); // Supprime BOM unicode résiduel
+                        return strtolower(trim($h));
+                    }, $header);
+
+                    // Colonnes attendues
+                    $colonnes_requises = ['nom', 'description', 'prix', 'stock'];
+                    $colonnes_optionnelles = ['poids', 'volume', 'frais_de_port', 'statut', 'origine', 'categorie', 'tva'];
+
+                    // Vérifier que les colonnes requises sont présentes
+                    $colonnes_manquantes = array_diff($colonnes_requises, $header);
+                    if (!empty($colonnes_manquantes)) {
+                        $message_error = "Colonnes manquantes dans le CSV : " . implode(', ', $colonnes_manquantes) . ". Colonnes requises : nom, description, prix, stock.";
+                        fclose($handle);
+                    } else {
+                        // Récupérer les catégories et TVA existantes
+                        $stmtCat = $pdo->query("SELECT id_categorie, nom_categorie FROM cobrec1._categorie_produit");
+                        $categories_db = [];
+                        while ($row = $stmtCat->fetch(PDO::FETCH_ASSOC)) {
+                            $categories_db[strtolower(trim($row['nom_categorie']))] = $row['id_categorie'];
+                        }
+
+                        $stmtTva = $pdo->query("SELECT id_tva, libelle_tva, montant_tva FROM cobrec1._tva");
+                        $tvas_db = [];
+                        while ($row = $stmtTva->fetch(PDO::FETCH_ASSOC)) {
+                            $tvas_db[strtolower(trim($row['libelle_tva']))] = $row['id_tva'];
+                        }
+                        // TVA par défaut : la première trouvée
+                        $default_tva_id = !empty($tvas_db) ? reset($tvas_db) : 1;
+
+                        $nb_importes = 0;
+                        $nb_erreurs = 0;
+                        $ligne = 1;
+
+                        $pdo->beginTransaction();
+
+                        try {
+                            while (($data = fgetcsv($handle, 0, ';')) !== false) {
+                                $ligne++;
+                                
+                                // Ignorer les lignes vides
+                                if (count($data) === 1 && empty($data[0])) continue;
+
+                                // Mapper les colonnes
+                                $row = [];
+                                foreach ($header as $i => $col) {
+                                    $row[$col] = isset($data[$i]) ? trim($data[$i]) : '';
+                                }
+
+                                // Validation des champs requis
+                                if (empty($row['nom']) || empty($row['description']) || $row['prix'] === '' || $row['stock'] === '') {
+                                    $import_details[] = "Ligne $ligne : champs requis manquants — ignorée.";
+                                    $nb_erreurs++;
+                                    continue;
+                                }
+
+                                $prix = floatval(str_replace(',', '.', $row['prix']));
+                                $stock = intval($row['stock']);
+
+                                if ($prix < 0) {
+                                    $import_details[] = "Ligne $ligne : prix négatif — ignorée.";
+                                    $nb_erreurs++;
+                                    continue;
+                                }
+                                if ($stock < 0) {
+                                    $import_details[] = "Ligne $ligne : stock négatif — ignoré.";
+                                    $nb_erreurs++;
+                                    continue;
+                                }
+
+                                // SAVEPOINT par ligne pour que l'échec d'un produit ne casse pas tout l'import
+                                $pdo->exec("SAVEPOINT import_row");
+
+                                try {
+                                    // Vérifier si un produit avec le même nom existe déjà pour ce vendeur
+                                    // Utilise TRIM() pour gérer les espaces en début/fin dans la BDD
+                                    $stmtCheck = $pdo->prepare("SELECT id_produit FROM cobrec1._produit WHERE TRIM(p_nom) = TRIM(:nom) AND id_vendeur = :id_vendeur");
+                                    $stmtCheck->execute([':nom' => $row['nom'], ':id_vendeur' => $vendeur_id]);
+                                    $existing = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+                                    if ($existing) {
+                                        // Mise à jour du produit existant (y compris nettoyage du nom)
+                                        $sqlUpdate = "UPDATE cobrec1._produit SET 
+                                            p_nom = :nom,
+                                            p_description = :description,
+                                            p_prix = :prix,
+                                            p_stock = :stock,
+                                            p_poids = :poids,
+                                            p_volume = :volume,
+                                            p_frais_de_port = :frais_de_port,
+                                            p_statut = :statut,
+                                            p_origine = :origine,
+                                            p_modif = CURRENT_TIMESTAMP
+                                        WHERE id_produit = :id_produit";
+
+                                        $stmtUpdate = $pdo->prepare($sqlUpdate);
+                                        $stmtUpdate->execute([
+                                            ':nom' => $row['nom'],
+                                            ':description' => $row['description'],
+                                            ':prix' => $prix,
+                                            ':stock' => $stock,
+                                            ':poids' => isset($row['poids']) && $row['poids'] !== '' ? floatval(str_replace(',', '.', $row['poids'])) : 0,
+                                            ':volume' => isset($row['volume']) && $row['volume'] !== '' ? floatval(str_replace(',', '.', $row['volume'])) : 0,
+                                            ':frais_de_port' => isset($row['frais_de_port']) && $row['frais_de_port'] !== '' ? floatval(str_replace(',', '.', $row['frais_de_port'])) : 0,
+                                            ':statut' => isset($row['statut']) && in_array($row['statut'], ['Ébauche', 'En ligne', 'Hors ligne']) ? $row['statut'] : 'Ébauche',
+                                            ':origine' => isset($row['origine']) && in_array($row['origine'], ['Inconnu', 'Bretagne', 'France', 'UE', 'Hors UE']) ? $row['origine'] : 'Inconnu',
+                                            ':id_produit' => $existing['id_produit']
+                                        ]);
+
+                                        // Mettre à jour la catégorie si renseignée
+                                        if (isset($row['categorie']) && !empty($row['categorie'])) {
+                                            $cat_key = strtolower(trim($row['categorie']));
+                                            if (isset($categories_db[$cat_key])) {
+                                                $pdo->prepare("DELETE FROM cobrec1._fait_partie_de WHERE id_produit = :id_produit")->execute([':id_produit' => $existing['id_produit']]);
+                                                $pdo->prepare("INSERT INTO cobrec1._fait_partie_de (id_produit, id_categorie) VALUES (:id_produit, :id_categorie) ON CONFLICT DO NOTHING")->execute([':id_produit' => $existing['id_produit'], ':id_categorie' => $categories_db[$cat_key]]);
+                                            }
+                                        }
+
+                                        // Mettre à jour la TVA si renseignée
+                                        if (isset($row['tva']) && !empty($row['tva'])) {
+                                            $tva_key = strtolower(trim($row['tva']));
+                                            if (isset($tvas_db[$tva_key])) {
+                                                $pdo->prepare("UPDATE cobrec1._produit SET id_tva = :id_tva WHERE id_produit = :id_produit")->execute([':id_tva' => $tvas_db[$tva_key], ':id_produit' => $existing['id_produit']]);
+                                            }
+                                        }
+
+                                        $pdo->exec("RELEASE SAVEPOINT import_row");
+                                        $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" — mis à jour.";
+                                        $nb_importes++;
+                                    } else {
+                                        // Déterminer la TVA
+                                        $tva_id = $default_tva_id;
+                                        if (isset($row['tva']) && !empty($row['tva'])) {
+                                            $tva_key = strtolower(trim($row['tva']));
+                                            if (isset($tvas_db[$tva_key])) {
+                                                $tva_id = $tvas_db[$tva_key];
+                                            }
+                                        }
+
+                                        // Insertion du nouveau produit
+                                        $sqlInsert = "INSERT INTO cobrec1._produit 
+                                            (id_tva, id_vendeur, p_nom, p_description, p_poids, p_volume, p_frais_de_port, p_prix, p_stock, p_statut, p_origine)
+                                            VALUES (:id_tva, :id_vendeur, :nom, :description, :poids, :volume, :frais_de_port, :prix, :stock, :statut, :origine)
+                                            RETURNING id_produit";
+
+                                        $stmtInsert = $pdo->prepare($sqlInsert);
+                                        $stmtInsert->execute([
+                                            ':id_tva' => $tva_id,
+                                            ':id_vendeur' => $vendeur_id,
+                                            ':nom' => $row['nom'],
+                                            ':description' => $row['description'],
+                                            ':poids' => isset($row['poids']) && $row['poids'] !== '' ? floatval(str_replace(',', '.', $row['poids'])) : 0,
+                                            ':volume' => isset($row['volume']) && $row['volume'] !== '' ? floatval(str_replace(',', '.', $row['volume'])) : 0,
+                                            ':frais_de_port' => isset($row['frais_de_port']) && $row['frais_de_port'] !== '' ? floatval(str_replace(',', '.', $row['frais_de_port'])) : 0,
+                                            ':prix' => $prix,
+                                            ':stock' => $stock,
+                                            ':statut' => isset($row['statut']) && in_array($row['statut'], ['Ébauche', 'En ligne', 'Hors ligne']) ? $row['statut'] : 'Ébauche',
+                                            ':origine' => isset($row['origine']) && in_array($row['origine'], ['Inconnu', 'Bretagne', 'France', 'UE', 'Hors UE']) ? $row['origine'] : 'Inconnu'
+                                        ]);
+
+                                        $new_id = $stmtInsert->fetchColumn();
+
+                                        // Associer la catégorie si renseignée
+                                        if (isset($row['categorie']) && !empty($row['categorie'])) {
+                                            $cat_key = strtolower(trim($row['categorie']));
+                                            if (isset($categories_db[$cat_key])) {
+                                                $stmtCatLink = $pdo->prepare("INSERT INTO cobrec1._fait_partie_de (id_produit, id_categorie) VALUES (:id_produit, :id_categorie) ON CONFLICT DO NOTHING");
+                                                $stmtCatLink->execute([':id_produit' => $new_id, ':id_categorie' => $categories_db[$cat_key]]);
+                                            }
+                                        }
+
+                                        $pdo->exec("RELEASE SAVEPOINT import_row");
+                                        $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" — créé (ID: $new_id).";
+                                        $nb_importes++;
+                                    }
+                                } catch (Exception $rowEx) {
+                                    $pdo->exec("ROLLBACK TO SAVEPOINT import_row");
+                                    $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" — erreur : " . htmlspecialchars($rowEx->getMessage());
+                                    $nb_erreurs++;
+                                }
+                            }
+
+                            $pdo->commit();
+                            $message_success = "$nb_importes produit(s) importé(s) avec succès.";
+                            if ($nb_erreurs > 0) {
+                                $message_success .= " $nb_erreurs ligne(s) ignorée(s).";
+                            }
+
+                        } catch (Exception $e) {
+                            $pdo->rollBack();
+                            $message_error = "Erreur lors de l'import : " . htmlspecialchars($e->getMessage());
+                        }
+
+                        fclose($handle);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ============================================
+// TRAITEMENT DE L'EXPORT CSV (produits)
+// ============================================
+if (isset($_GET['export']) && $_GET['export'] === 'produits') {
+    try {
+        $sqlExport = "
+            SELECT p.id_produit, TRIM(p.p_nom) AS nom, p.p_description AS description, p.p_prix AS prix, 
+                   p.p_stock AS stock, p.p_poids AS poids, p.p_volume AS volume, 
+                   p.p_frais_de_port AS frais_de_port, p.p_statut AS statut, p.p_origine AS origine,
+                   t.libelle_tva AS tva,
+                   STRING_AGG(DISTINCT cp.nom_categorie, ', ') AS categorie
+            FROM cobrec1._produit p
+            LEFT JOIN cobrec1._tva t ON p.id_tva = t.id_tva
+            LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+            LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+            WHERE p.id_vendeur = :id_vendeur AND p.p_statut != 'Supprimé'
+            GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, p.p_poids, 
+                     p.p_volume, p.p_frais_de_port, p.p_statut, p.p_origine, t.libelle_tva
+            ORDER BY p.id_produit ASC";
+
+        $stmt = $pdo->prepare($sqlExport);
+        $stmt->execute([':id_vendeur' => $vendeur_id]);
+        $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Envoi du CSV
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="catalogue_produits_' . date('Y-m-d_His') . '.csv"');
+
+        $output = fopen('php://output', 'w');
+        // BOM UTF-8 pour compatibilité Excel
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        // En-tête — même ordre que le modèle d'import pour pouvoir réimporter directement
+        fputcsv($output, ['nom', 'description', 'prix', 'stock', 'poids', 'volume', 'frais_de_port', 'statut', 'origine', 'categorie', 'tva'], ';');
+
+        foreach ($produits as $produit) {
+            fputcsv($output, [
+                $produit['nom'],
+                $produit['description'],
+                number_format((float)$produit['prix'], 2, '.', ''),
+                $produit['stock'],
+                number_format((float)$produit['poids'], 2, '.', ''),
+                number_format((float)$produit['volume'], 2, '.', ''),
+                number_format((float)$produit['frais_de_port'], 2, '.', ''),
+                $produit['statut'],
+                $produit['origine'],
+                $produit['categorie'],
+                $produit['tva']
+            ], ';');
+        }
+
+        fclose($output);
+        exit();
+
+    } catch (PDOException $e) {
+        $message_error = "Erreur lors de l'export des produits : " . htmlspecialchars($e->getMessage());
+    }
+}
+
+// ============================================
+// TRAITEMENT DE L'EXPORT CSV (commandes)
+// ============================================
+if (isset($_GET['export']) && $_GET['export'] === 'commandes') {
+    try {
+        $sqlExportCmd = "
+            SELECT f.id_facture,
+                   pc.timestamp_commande AS date_commande,
+                   cl.id_client,
+                   cpt.prenom AS prenom_client,
+                   cpt.nom AS nom_client,
+                   p.id_produit,
+                   p.p_nom AS nom_produit,
+                   c.quantite,
+                   c.prix_unitaire,
+                   c.remise_unitaire,
+                   c.frais_de_port,
+                   c.tva,
+                   l.etat_livraison,
+                   l.date_livraison,
+                   f.f_total_ht,
+                   f.f_total_remise,
+                   f.f_total_ttc
+            FROM cobrec1._facture f
+            JOIN cobrec1._panier_commande pc ON f.id_panier = pc.id_panier
+            JOIN cobrec1._client cl ON pc.id_client = cl.id_client
+            JOIN cobrec1._compte cpt ON cl.id_compte = cpt.id_compte
+            JOIN cobrec1._contient c ON pc.id_panier = c.id_panier
+            JOIN cobrec1._produit p ON c.id_produit = p.id_produit
+            LEFT JOIN cobrec1._livraison l ON f.id_facture = l.id_facture
+            WHERE p.id_vendeur = :id_vendeur
+            ORDER BY f.id_facture DESC, p.id_produit ASC";
+
+        $stmt = $pdo->prepare($sqlExportCmd);
+        $stmt->execute([':id_vendeur' => $vendeur_id]);
+        $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Envoi du CSV
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="commandes_' . date('Y-m-d_His') . '.csv"');
+
+        $output = fopen('php://output', 'w');
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        // En-tête 
+        fputcsv($output, [
+            'id_facture', 'date_commande', 'id_client', 'prenom_client', 'nom_client',
+            'id_produit', 'nom_produit', 'quantite', 'prix_unitaire', 'remise_unitaire',
+            'frais_de_port', 'tva', 'etat_livraison', 'date_livraison',
+            'total_ht', 'total_remise', 'total_ttc'
+        ], ';');
+
+        foreach ($commandes as $cmd) {
+            fputcsv($output, [
+                $cmd['id_facture'],
+                $cmd['date_commande'] ? date('d/m/Y H:i', strtotime($cmd['date_commande'])) : '',
+                $cmd['id_client'],
+                $cmd['prenom_client'],
+                $cmd['nom_client'],
+                $cmd['id_produit'],
+                $cmd['nom_produit'],
+                $cmd['quantite'],
+                $cmd['prix_unitaire'],
+                $cmd['remise_unitaire'],
+                $cmd['frais_de_port'],
+                $cmd['tva'],
+                $cmd['etat_livraison'] ?? '',
+                $cmd['date_livraison'] ? date('d/m/Y', strtotime($cmd['date_livraison'])) : '',
+                $cmd['f_total_ht'],
+                $cmd['f_total_remise'],
+                $cmd['f_total_ttc']
+            ], ';');
+        }
+
+        fclose($output);
+        exit();
+
+    } catch (PDOException $e) {
+        $message_error = "Erreur lors de l'export des commandes : " . htmlspecialchars($e->getMessage());
+    }
+}
+
+// ============================================
+// RÉCUPÉRER LES STATS POUR L'AFFICHAGE
+// ============================================
+try {
+    $stmtNbProd = $pdo->prepare("SELECT COUNT(*) FROM cobrec1._produit WHERE id_vendeur = :id_vendeur AND p_statut != 'Supprimé'");
+    $stmtNbProd->execute([':id_vendeur' => $vendeur_id]);
+    $nb_produits = $stmtNbProd->fetchColumn();
+
+    $stmtNbCmd = $pdo->prepare("
+        SELECT COUNT(DISTINCT f.id_facture) 
+        FROM cobrec1._facture f
+        JOIN cobrec1._panier_commande pc ON f.id_panier = pc.id_panier
+        JOIN cobrec1._contient c ON pc.id_panier = c.id_panier
+        JOIN cobrec1._produit p ON c.id_produit = p.id_produit
+        WHERE p.id_vendeur = :id_vendeur
+    ");
+    $stmtNbCmd->execute([':id_vendeur' => $vendeur_id]);
+    $nb_commandes = $stmtNbCmd->fetchColumn();
+
+} catch (PDOException $e) {
+    $nb_produits = 0;
+    $nb_commandes = 0;
+}
+?>
+
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1440, height=1024" />
+    <title>Alizon - Import / Export</title>
+    <link rel="icon" type="image/png" href="../../../img/favicon.svg">
+    <link rel="stylesheet" href="/styles/ImportExport/importExport.css" />
+</head>
+
+<body>
+    <div class="app">
+        <?php include __DIR__ . '/../../../partials/aside.html'; ?>
+
+        <main class="main">
+            <div class="header">
+                <h1 class="header__title">Import / Export en masse</h1>
+            </div>
+
+            <!-- Messages de retour -->
+            <?php if (!empty($message_success)): ?>
+            <div class="alert alert--success">
+                <span class="alert__icon">✓</span>
+                <div class="alert__content">
+                    <p class="alert__text"><?= htmlspecialchars($message_success) ?></p>
+                    <?php if (!empty($import_details)): ?>
+                    <details class="alert__details">
+                        <summary>Voir le détail</summary>
+                        <ul>
+                            <?php foreach ($import_details as $detail): ?>
+                            <li><?= $detail ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </details>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!empty($message_error)): ?>
+            <div class="alert alert--error">
+                <span class="alert__icon">✕</span>
+                <p class="alert__text"><?= htmlspecialchars($message_error) ?></p>
+            </div>
+            <?php endif; ?>
+
+            <div class="cards-grid">
+
+                <!-- ===================== -->
+                <!-- CARTE IMPORT PRODUITS -->
+                <!-- ===================== -->
+                <div class="card card--import">
+                    <div class="card__header">
+                        <div class="card__icon-wrapper card__icon-wrapper--import">
+                            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <h2 class="card__title">Importer des produits</h2>
+                        <p class="card__subtitle">Importez votre catalogue produit via un fichier CSV</p>
+                    </div>
+
+                    <form class="card__body" method="POST" enctype="multipart/form-data" id="import-form">
+                        <input type="hidden" name="action" value="import" />
+
+                        <div class="upload-zone" id="upload-zone">
+                            <svg class="upload-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="12" y1="18" x2="12" y2="12" />
+                                <polyline points="9 15 12 12 15 15" />
+                            </svg>
+                            <p class="upload-zone__text">Glissez votre fichier CSV ici</p>
+                            <p class="upload-zone__or">ou</p>
+                            <label class="btn btn--secondary upload-zone__btn">
+                                Parcourir les fichiers
+                                <input type="file" name="csv_file" accept=".csv" hidden id="csv-input" />
+                            </label>
+                            <p class="upload-zone__filename" id="filename-display"></p>
+                        </div>
+
+                        <div class="card__format-info">
+                            <h4>Format attendu du CSV :</h4>
+                            <p>Séparateur : <strong>point-virgule (;)</strong></p>
+                            <div class="format-table-wrapper">
+                                <table class="format-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Colonne</th>
+                                            <th>Obligatoire</th>
+                                            <th>Exemple</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>nom</td>
+                                            <td class="center">✓</td>
+                                            <td>T-shirt Breton</td>
+                                        </tr>
+                                        <tr>
+                                            <td>description</td>
+                                            <td class="center">✓</td>
+                                            <td>T-shirt en coton bio</td>
+                                        </tr>
+                                        <tr>
+                                            <td>prix</td>
+                                            <td class="center">✓</td>
+                                            <td>29.99</td>
+                                        </tr>
+                                        <tr>
+                                            <td>stock</td>
+                                            <td class="center">✓</td>
+                                            <td>50</td>
+                                        </tr>
+                                        <tr>
+                                            <td>poids</td>
+                                            <td class="center"></td>
+                                            <td>0.3</td>
+                                        </tr>
+                                        <tr>
+                                            <td>volume</td>
+                                            <td class="center"></td>
+                                            <td>0.5</td>
+                                        </tr>
+                                        <tr>
+                                            <td>frais_de_port</td>
+                                            <td class="center"></td>
+                                            <td>4.99</td>
+                                        </tr>
+                                        <tr>
+                                            <td>statut</td>
+                                            <td class="center"></td>
+                                            <td>Ébauche / En ligne / Hors ligne</td>
+                                        </tr>
+                                        <tr>
+                                            <td>origine</td>
+                                            <td class="center"></td>
+                                            <td>Bretagne / France / UE / Hors UE</td>
+                                        </tr>
+                                        <tr>
+                                            <td>categorie</td>
+                                            <td class="center"></td>
+                                            <td>Vêtements</td>
+                                        </tr>
+                                        <tr>
+                                            <td>tva</td>
+                                            <td class="center"></td>
+                                            <td>TVA 20%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="card__note">Si un produit avec le même nom existe déjà, il sera mis à jour.</p>
+                        </div>
+
+                        <button type="submit" class="btn btn--primary btn--full" id="btn-import">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Importer le fichier
+                        </button>
+                    </form>
+
+                    <a href="modele_import.php" class="card__download-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Télécharger le modèle CSV
+                    </a>
+                </div>
+
+                <!-- ======================= -->
+                <!-- CARTE EXPORT PRODUITS   -->
+                <!-- ======================= -->
+                <div class="card card--export">
+                    <div class="card__header">
+                        <div class="card__icon-wrapper card__icon-wrapper--export">
+                            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                        </div>
+                        <h2 class="card__title">Exporter le catalogue</h2>
+                        <p class="card__subtitle">Téléchargez tous vos produits au format CSV</p>
+                    </div>
+
+                    <div class="card__body">
+                        <div class="stat-box">
+                            <div class="stat-box__item">
+                                <span class="stat-box__number"><?= $nb_produits ?></span>
+                                <span class="stat-box__label">produit(s) dans votre catalogue</span>
+                            </div>
+                        </div>
+
+                        <a href="?export=produits" class="btn btn--primary btn--full">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Exporter les produits (.csv)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ======================== -->
+                <!-- CARTE EXPORT COMMANDES   -->
+                <!-- ======================== -->
+                <div class="card card--export">
+                    <div class="card__header">
+                        <div class="card__icon-wrapper card__icon-wrapper--commande">
+                            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
+                                <line x1="8" y1="7" x2="16" y2="7" />
+                                <line x1="8" y1="11" x2="16" y2="11" />
+                                <line x1="8" y1="15" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <h2 class="card__title">Exporter les commandes</h2>
+                        <p class="card__subtitle">Téléchargez l'historique de vos commandes reçues</p>
+                    </div>
+
+                    <div class="card__body">
+                        <div class="stat-box">
+                            <div class="stat-box__item">
+                                <span class="stat-box__number"><?= $nb_commandes ?></span>
+                                <span class="stat-box__label">commande(s) reçue(s)</span>
+                            </div>
+                        </div>
+
+                        <a href="?export=commandes" class="btn btn--primary btn--full">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
+                                <line x1="8" y1="7" x2="16" y2="7" />
+                                <line x1="8" y1="11" x2="16" y2="11" />
+                                <line x1="8" y1="15" x2="12" y2="15" />
+                            </svg>
+                            Exporter les commandes (.csv)
+                        </a>
+                    </div>
+                </div>
+
+            </div><!-- /cards-grid -->
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const uploadZone = document.getElementById('upload-zone');
+        const csvInput = document.getElementById('csv-input');
+        const filenameDisplay = document.getElementById('filename-display');
+        const btnImport = document.getElementById('btn-import');
+
+        // Afficher le nom du fichier sélectionné
+        csvInput.addEventListener('change', () => {
+            if (csvInput.files.length > 0) {
+                filenameDisplay.textContent = csvInput.files[0].name;
+                uploadZone.classList.add('upload-zone--has-file');
+            } else {
+                filenameDisplay.textContent = '';
+                uploadZone.classList.remove('upload-zone--has-file');
+            }
+        });
+
+        // Drag & Drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('upload-zone--drag');
+        });
+
+        uploadZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('upload-zone--drag');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('upload-zone--drag');
+
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                const ext = file.name.split('.').pop().toLowerCase();
+
+                if (ext === 'csv') {
+                    // Créer un nouvel input avec le fichier droppé
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    csvInput.files = dt.files;
+                    filenameDisplay.textContent = file.name;
+                    uploadZone.classList.add('upload-zone--has-file');
+                } else {
+                    alert('Format non supporté. Veuillez déposer un fichier .csv');
+                }
+            }
+        });
+
+        // Confirmation avant import
+        document.getElementById('import-form').addEventListener('submit', (e) => {
+            if (!csvInput.files.length) {
+                e.preventDefault();
+                alert('Veuillez sélectionner un fichier CSV.');
+                return;
+            }
+            if (!confirm(
+                    'Êtes-vous sûr de vouloir importer ce fichier ? Les produits existants avec le même nom seront mis à jour.'
+                )) {
+                e.preventDefault();
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>
