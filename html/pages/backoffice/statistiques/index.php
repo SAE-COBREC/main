@@ -29,6 +29,7 @@ try {
 
     //on crée un tableau pour les catégories ou il y a des commandes pour le selecte avec le filtre
     $categories = array();
+    $produits = array();
 
     foreach ($commandes as $articleCommande){                          //pour chaque article de toutes les commandes
         if (!empty($articleCommande['date'])) {                        //si la date n'est pas vide
@@ -39,7 +40,11 @@ try {
         if (!in_array($articleCommande['nom_categorie'], $categories))  { //regarde si la catégorie n'est pas déjà dans le tableau
             array_push($categories, $articleCommande['nom_categorie']);   //on l'ajoute au tableau
         }
+        if(!in_array($articleCommande['p_nom'], $produits)){
+            array_push($produits, $articleCommande['p_nom']);
+        }
     }
+    sort($produits);
 } catch (PDOException $e) {
     die("Erreur BDD : " . htmlspecialchars($e->getMessage()));
 }
@@ -50,64 +55,62 @@ try {
 <head>
     <meta charset="utf-8" />
     <title>Alizon - Commandes Vendeur</title>
-    <link rel="stylesheet" href="/styles/CommandeVendeur/commande.css" />
+    <link rel="stylesheet" href="/styles/CommandeVendeur/statistique.css" />
     <script src="/js/chart.js"></script>
 </head>
 <body>
     <div class="app">
         <?php include __DIR__ . '/../../../partials/aside.html'; ?>
-        
         <main class="main">
             <header class="header">
                 <h1>Statistique</h1>
-                    <label>Mode d'affichage</label>
-                        <select id="modeAffichage">
-                            <option value="annee">Année</option>
-                            <option value="periode">Période</option>
-                        </select>
-                    <div id="filre">
-                        <div id="groupeParAnnee"> 
-                        <label>Année</label>
-                            <select name="annee" id="annee">
-                                <?php foreach($anneeAvecVente as $annee) :?>
-                                <option value="<?php echo $annee ?>"><?php echo $annee?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div id="groupeParPeriode" style="display: none;">
-                            <label>Début</label>
-                            <input type="date" id="dateDebut"></input>
-                            <label>Fin</label>
-                            <input type="date" id="dateFin"></input>
-                        </div>
-                        
-                        <div id="MontantVolume">
-                        <label>Montant / volume</label>
-                        <select id="selectType">
-                            <option value="montant">Montant en €</option>
-                            <option value="nbCommande">nombre de commandes</option>
-                            <option value="nbArticle">nombre d'articles commandés</option>
-                        </select>
-                        <div id="divCategorie">
-                        <label>Catégorie</label>
-                        <select id="categorie">
-                            <option value="toutes">Toutes</option>
-                            <?php foreach ($categories as $categorie): ?>
-                            <option value="<?php echo $categorie ?>"><?php echo $categorie?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        </div>
-                    </div>
-                <div>
-                    <canvas id="graphiqueVentes"></canvas>
-                </div>
-
-                <div style="display: block;" id="divGraphiqueQuoiVendu">
-                    <canvas id="graphiqueQuoiVendu"></canvas>
-                </div>
-
             </header>
+            <label>Mode d'affichage</label>
+                <select id="modeAffichage">
+                    <option value="annee">Année</option>
+                    <option value="periode">Période</option>
+                </select>
+            <div id="filre">
+                <div id="groupeParAnnee"> 
+                <label>Année</label>
+                    <select name="annee" id="annee">
+                        <?php foreach($anneeAvecVente as $annee) :?>
+                        <option value="<?php echo $annee ?>"><?php echo $annee?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div id="groupeParPeriode" style="display: none;">
+                    <label>Début</label>
+                    <input type="date" id="dateDebut"></input>
+                    <label>Fin</label>
+                    <input type="date" id="dateFin"></input>
+                </div>
+                
+                <div id="MontantVolume">
+                <label>Montant / volume</label>
+                <select id="selectType">
+                    <option value="montant">Montant en €</option>
+                    <option value="nbCommande">nombre de commandes</option>
+                    <option value="nbArticle">nombre d'articles commandés</option>
+                </select>
+                <div id="divCategorie">
+                <label>Catégorie</label>
+                <select id="categorie">
+                    <option value="toutes">Toutes</option>
+                    <?php foreach ($categories as $categorie): ?>
+                    <option value="<?php echo $categorie ?>"><?php echo $categorie?></option>
+                    <?php endforeach; ?>
+                </select>
+                </div>
+            </div>
+        <div>
+            <canvas id="graphiqueVentes"></canvas>
+        </div>
+
+        <div style="display: block;" id="divGraphiqueQuoiVendu">
+            <canvas id="graphiqueQuoiVendu"></canvas>
+        </div>
         </main>
     </div>
     <script>

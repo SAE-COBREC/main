@@ -6,9 +6,11 @@
   padding: 0;
 }
 
-body {
+body, html {
   font-family: $font-family-secondaire;
   background: $secondary-color-rose-claire;
+  margin: 0;
+  padding: 0;
 }
 
 .app {

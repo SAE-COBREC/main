@@ -8,9 +8,11 @@
   padding: 0;
 }
 
-body {
+body, html {
   font-family: "Quicksand", sans-serif;
   background: #FFF7F1;
+  margin: 0;
+  padding: 0;
 }
 
 .app {
@@ -33,4 +35,4 @@ body {
 .main .header h1 {
   color: #030212;
   font-size: 2rem;
-}/*# sourceMappingURL=statistiuqe.css.map */
+}/*# sourceMappingURL=statistique.css.map */

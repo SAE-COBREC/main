@@ -51,12 +51,11 @@ try {
 <head>
     <meta charset="utf-8" />
     <title>Alizon - Commandes Vendeur</title>
-    <link rel="stylesheet" href="/styles/CommandeVendeur/commande.css" />
+    <link rel="stylesheet" href="/styles/CommandeVendeur/statistique.css" />
 </head>
 <body>
     <div class="app">
         <?php include __DIR__ . '/../../../partials/aside.html'; ?>
-        
         <main class="main">
             <header class="header">
                 <h1>Commande Vendeur</h1>
