@@ -5,10 +5,9 @@ FROM php:8.2-apache
 RUN printf "ErrorDocument 404 /404.php\n" > /etc/apache2/conf-available/custom-errors.conf \
 	&& a2enconf custom-errors
 
-# Copie les fichiers de votre projet (dossiers 'html' et 'Php')
+# Copie les fichiers de votre projet
 # vers le dossier web du serveur dans le conteneur
 COPY html/ /var/www/html/
-COPY Php/ /var/www/html/Php/
 
 # (Optionnel) Il y a peut-être d'autres commandes ici,
 # comme l'installation d'extensions PHP (par exemple pour MySQL)
