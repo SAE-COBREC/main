@@ -749,6 +749,41 @@ main section:nth-of-type(4) article input[type=password]:focus {
   margin-top: 1rem;
   text-align: center;
 }
+
+.animation-settings-section article > main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.animation-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 2px solid #EFEFEF;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  background: #FAFAFA;
+}
+
+.animation-toggle-row > span {
+  color: #333;
+  font-weight: 600;
+}
+
+.animation-toggle-row input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+  accent-color: #7171A3;
+  cursor: pointer;
+}
+
+#animation-toggle-status {
+  color: #555;
+  font-size: 0.95em;
+}
+
 .del-form button {
   background: transparent;
   border: 2px solid #D4183D;

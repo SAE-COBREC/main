@@ -618,6 +618,37 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 </article>
             </section>
 
+            <section class="animation-settings-section">
+                <h2>Animations</h2>
+                <article>
+                    <header>
+                        <div>
+                            <span>Affichage</span>
+                            <strong>Animations du site</strong>
+                        </div>
+                        <span data-type="securite">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M12 2v4"></path>
+                                <path d="M12 18v4"></path>
+                                <path d="m4.93 4.93 2.83 2.83"></path>
+                                <path d="m16.24 16.24 2.83 2.83"></path>
+                                <path d="M2 12h4"></path>
+                                <path d="M18 12h4"></path>
+                                <path d="m4.93 19.07 2.83-2.83"></path>
+                                <path d="m16.24 7.76 2.83-2.83"></path>
+                            </svg>
+                        </span>
+                    </header>
+                    <main>
+                        <label class="animation-toggle-row" for="animation-toggle-checkbox">
+                            <span>Activer les animations sur les pages</span>
+                            <input type="checkbox" id="animation-toggle-checkbox" checked>
+                        </label>
+                        <p id="animation-toggle-status">Animations activées</p>
+                    </main>
+                </article>
+            </section>
+
             <!-- Formulaire de déconnexion -->
             <form method="get" class="logout-form">
                 <button type="submit" name="action" value="logout">
@@ -801,7 +832,39 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         //affiche une notification d'erreur
         notify(<?= json_encode($messageErreur) ?>, 'error');
         <?php endif; ?>
+
+        initialiserInterrupteurAnimations();
     });
+
+    function initialiserInterrupteurAnimations() {
+        const caseAnimations = document.getElementById('animation-toggle-checkbox');
+        const texteStatutAnimations = document.getElementById('animation-toggle-status');
+
+        if (!caseAnimations || !texteStatutAnimations || !window.AlizonMotion) {
+            return;
+        }
+
+        function mettreAJourLibelle(estActive) {
+            texteStatutAnimations.textContent = estActive ? 'Animations activées' : 'Animations désactivées';
+        }
+
+        const etatInitial = window.AlizonMotion.isEnabled();
+        caseAnimations.checked = etatInitial;
+        mettreAJourLibelle(etatInitial);
+
+        caseAnimations.addEventListener('change', () => {
+            const estActive = caseAnimations.checked;
+            window.AlizonMotion.setEnabled(estActive);
+            mettreAJourLibelle(estActive);
+        });
+
+        window.addEventListener('alizon:animations-changed', (event) => {
+            const detail = event && event.detail ? event.detail : {};
+            const estActive = detail.enabled !== false;
+            caseAnimations.checked = estActive;
+            mettreAJourLibelle(estActive);
+        });
+    }
 
 
     //fonction pour ouvrir le modal de modification d'adresse

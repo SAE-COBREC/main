@@ -38,6 +38,61 @@ if (isset($_SESSION['idClient'])) {
     }
 }
 ?>
+<script>
+(function () {
+    var STORAGE_KEY = 'alizon_animations_enabled';
+
+    function readAnimationPreference() {
+        try {
+            var savedValue = window.localStorage.getItem(STORAGE_KEY);
+            if (savedValue === null) {
+                return true;
+            }
+            return savedValue === '1';
+        } catch (error) {
+            return true;
+        }
+    }
+
+    function applyAnimationPreference(isEnabled) {
+        document.documentElement.setAttribute('data-animations', isEnabled ? 'on' : 'off');
+    }
+
+    function setAnimationPreference(isEnabled) {
+        var nextValue = !!isEnabled;
+        applyAnimationPreference(nextValue);
+
+        try {
+            window.localStorage.setItem(STORAGE_KEY, nextValue ? '1' : '0');
+        } catch (error) {
+            // Ignore storage errors (private mode, quotas, etc.) and keep runtime state.
+        }
+
+        window.dispatchEvent(new CustomEvent('alizon:animations-changed', {
+            detail: { enabled: nextValue }
+        }));
+    }
+
+    applyAnimationPreference(readAnimationPreference());
+
+    window.AlizonMotion = {
+        isEnabled: function () {
+            return document.documentElement.getAttribute('data-animations') !== 'off';
+        },
+        setEnabled: setAnimationPreference,
+        storageKey: STORAGE_KEY
+    };
+})();
+</script>
+<style>
+html[data-animations="off"] *,
+html[data-animations="off"] *::before,
+html[data-animations="off"] *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+}
+</style>
 <header class="site-header" role="banner">
     <div class="header-inner">
         <div class="logo-container">
