@@ -65,38 +65,40 @@ try {
                             <option value="annee">Année</option>
                             <option value="periode">Période</option>
                         </select>
+                    <div id="filre">
+                        <div id="groupeParAnnee"> 
+                        <label>Année</label>
+                            <select name="annee" id="annee">
+                                <?php foreach($anneeAvecVente as $annee) :?>
+                                <option value="<?php echo $annee ?>"><?php echo $annee?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div id="groupeParAnnee"> 
-                    <label>Année</label>
-                        <select name="annee" id="annee">
-                            <?php foreach($anneeAvecVente as $annee) :?>
-                            <option value="<?php echo $annee ?>"><?php echo $annee?></option>
+                        <div id="groupeParPeriode" style="display: none;">
+                            <label>Début</label>
+                            <input type="date" id="dateDebut"></input>
+                            <label>Fin</label>
+                            <input type="date" id="dateFin"></input>
+                        </div>
+                        
+                        <div id="MontantVolume">
+                        <label>Montant / volume</label>
+                        <select id="selectType">
+                            <option value="montant">Montant en €</option>
+                            <option value="nbCommande">nombre de commandes</option>
+                            <option value="nbArticle">nombre d'articles commandés</option>
+                        </select>
+                        <div id="divCategorie">
+                        <label>Catégorie</label>
+                        <select id="categorie">
+                            <option value="toutes">Toutes</option>
+                            <?php foreach ($categories as $categorie): ?>
+                            <option value="<?php echo $categorie ?>"><?php echo $categorie?></option>
                             <?php endforeach; ?>
                         </select>
+                        </div>
                     </div>
-
-                    <div id="groupeParPeriode" style="display: none;">
-                        <label>Début</label>
-                        <input type="date" id="dateDebut"></input>
-                        <label>Fin</label>
-                        <input type="date" id="dateFin"></input>
-                    </div>
-
-                    <label>Montant / volume</label>
-                    <select id="selectType">
-                        <option value="montant">Montant en €</option>
-                        <option value="nbCommande">nombre de commandes</option>
-                        <option value="nbArticle">nombre d'articles commandés</option>
-                    </select>
-
-                    <label>Catégorie</label>
-                    <select id="categorie">
-                        <option value="toutes">Toutes</option>
-                        <?php foreach ($categories as $categorie): ?>
-                        <option value="<?php echo $categorie ?>"><?php echo $categorie?></option>
-                        <?php endforeach; ?>
-                    </select>
-
                 <div>
                     <canvas id="graphiqueVentes"></canvas>
                 </div>
