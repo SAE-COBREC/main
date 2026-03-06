@@ -11,7 +11,7 @@ fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 fputcsv($output, ['nom', 'description', 'prix', 'stock', 'poids', 'volume', 'frais_de_port', 'statut', 'origine', 'categorie', 'tva'], ';');
 
 // Ligne d'exemple
-fputcsv($output, ['T-shirt Breton', 'T-shirt 100% coton bio fabriqué en Bretagne', '29.99', '50', '0.3', '0.5', '4.99', 'Ébauche', 'Bretagne', 'Vêtements', 'TVA 20%'], ';');
+fputcsv($output, ['T-shirt Breton', 'T-shirt 100% coton bio fabriqué en Bretagne', '29.99', '50', '0.30', '0.50', '4.99', 'Ébauche', 'Bretagne', 'Vêtements', 'TVA normale'], ';');
 
 fclose($output);
 exit();
