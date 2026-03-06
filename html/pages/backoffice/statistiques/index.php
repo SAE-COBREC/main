@@ -58,7 +58,7 @@ try {
 <head>
     <meta charset="utf-8" />
     <title>Alizon - Commandes Vendeur</title>
-    <link rel="stylesheet" href="/styles/CommandeVendeur/commande.css" />
+    <link rel="stylesheet" href="/styles/Statistique/statistique.css" />
     <script src="/js/chart.js"></script>
 </head>
 <body>
@@ -68,14 +68,17 @@ try {
         <main class="main">
             <header class="header">
                 <h1>Statistique</h1>
-                <div id="divModeAffichage">
-                    <label>Mode d'affichage</label>
-                        <select id="modeAffichage">
-                            <option value="annee">Année</option>
-                            <option value="periode">Période</option>
-                        </select>
-                    </div>
+             </header>
+                <section class="graphique-filtre">
                     <div id="filre">
+                        <div id="divModeAffichage">
+                            <label>Mode d'affichage</label>
+                            <select id="modeAffichage">
+                                <option value="annee">Année</option>
+                                <option value="periode">Période</option>
+                            </select>
+                        </div>
+
                         <div id="groupeParAnnee"> 
                         <label>Année</label>
                             <select name="annee" id="annee">
@@ -91,46 +94,46 @@ try {
                             <label>Fin</label>
                             <input type="date" id="dateFin"></input>
                         </div>
-                        
+                            
                         <div id="MontantVolume">
-                        <label>Montant / volume</label>
-                        <select id="selectType">
-                            <option value="montant">Montant en €</option>
-                            <option value="nbCommande">nombre de commandes</option>
-                            <option value="nbArticle">nombre d'articles commandés</option>
-                        </select>
+                            <label>Montant / volume</label>
+                            <select id="selectType">
+                                <option value="montant">Montant en €</option>
+                                <option value="nbCommande">nombre de commandes</option>
+                                <option value="nbArticle">nombre d'articles commandés</option>
+                            </select>
+                        </div>
+
                         <div id="divCategorie">
-                        <label>Catégorie</label>
-                        <select id="categorie">
-                            <option value="toutes">Toutes</option>
-                            <?php foreach ($categories as $categorie): ?>
-                            <option value="<?php echo $categorie ?>"><?php echo $categorie?></option>
-                            <?php endforeach; ?>
-                        </select>
+                            <label>Catégorie</label>
+                            <select id="categorie">
+                                <option value="toutes">Toutes</option>
+                                <?php foreach ($categories as $categorie): ?>
+                                <option value="<?php echo $categorie ?>"><?php echo $categorie?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
-                <div>
-                    <canvas id="graphiqueVentes"></canvas>
-                </div>
+                    <div>
+                        <canvas id="graphiqueVentes"></canvas>
+                    </div>
 
-                <div style="display: block;" id="divGraphiqueQuoiVendu">
-                    <canvas id="graphiqueQuoiVendu"></canvas>
-                </div>
+                    <div style="display: block;" id="divGraphiqueQuoiVendu">
+                        <canvas id="graphiqueQuoiVendu"></canvas>
+                    </div>
 
-                <div id="divSelectArticle">
-                    <label>Article à suivre</label>
-                    <select id="articleEvolution">
-                        <?php foreach ($listeArticles as $art): ?>
-                            <option value="<?php echo htmlspecialchars($art) ?>"><?php echo htmlspecialchars($art) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div style="margin-top: 40px;">
-                    <h3>Évolution de l'article sélectionné</h3>
-                    <canvas id="graphiqueEvolutionArticle"></canvas>
-                </div>
-
-            </header>
+                    <div id="divSelectArticle">
+                        <label>Article à suivre</label>
+                        <select id="articleEvolution">
+                            <?php foreach ($listeArticles as $art): ?>
+                                <option value="<?php echo htmlspecialchars($art) ?>"><?php echo htmlspecialchars($art) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div>
+                            <canvas id="graphiqueEvolutionArticle"></canvas>
+                        </div>
+                    </div>
+                </section>
         </main>
     </div>
     <script>
@@ -146,9 +149,11 @@ try {
             if (this.value === "annee"){
                 groupeParAnnee.style.display = 'block';
                 groupeParPeriode.style.display = 'none';
+                document.getElementById('divSelectArticle').style.display = 'block';
             }else{
                 groupeParAnnee.style.display = 'none';
                 groupeParPeriode.style.display = 'block';
+                document.getElementById('divSelectArticle').style.display = 'none';
             }
             chargerLesStats();
         });
@@ -157,8 +162,10 @@ try {
         selectType.addEventListener('change', function(){
             if (this.value === "nbCommande"){
                 document.getElementById('divGraphiqueQuoiVendu').style.display = 'none';
+                document.getElementById('divSelectArticle').style.display = 'none';
             }else{
                 document.getElementById('divGraphiqueQuoiVendu').style.display = 'block';
+                document.getElementById('divSelectArticle').style.display = 'block';
             }
             chargerLesStats();
         });
@@ -206,7 +213,8 @@ try {
                     fill: true,
                     tension: 0.3
                 }]
-            }
+            },
+            options: { scales: { y: { beginAtZero: true, grace: '10%' } } }
         });
 
 

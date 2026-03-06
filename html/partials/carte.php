@@ -164,7 +164,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
             })
     };
 
-    baselayers["Mode Sombre"].addTo(map);
+    baselayers["ESRI Topo"].addTo(map);
 
     // ============================================
     // LAYERS OVERLAY (vendeurs + villes)

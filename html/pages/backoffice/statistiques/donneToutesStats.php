@@ -10,9 +10,7 @@ try {
     $commandes = recupInfoPourStatsGeneral($pdo, $vendeur_id);
 
 
-    //================================================
-    //PREMIER GRAPHIQUE
-    //================================================
+
     //on créé un tableau de taille 12 rempli de 0
     $donneesParMois = array_fill(1, 12, 0);
 
