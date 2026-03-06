@@ -616,13 +616,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         </span>
                     </header>
                     <main>
-                            <button type="button" id="activerA2F" onclick="ouvrirModalA2F()"
+                        <button type="button" id="activerA2F" onclick="ouvrirModalA2F()"
                             style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:none';} else { echo 'display:block';} ?>">
-                                Activer l'authentification à double facteurs
-                            </button>
-                            <form method="POST">
-                                <button type="submit" name="desactiverA2F"
-                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')" 
+                            Activer l'authentification à double facteurs
+                        </button>
+                        <form method="POST">
+                            <button type="submit" name="desactiverA2F"
+                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')"
                                 style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
                                 Désactiver l'authentification à double facteurs
                             </button>
@@ -1238,6 +1238,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     function ouvrirModalA2F() {
         document.getElementById('modalA2F').style.display = 'block';
     }
+
     function succesA2F() {
         document.getElementById('activerA2F').textContent = "Authentification à double facteurs activée avec succès."
         document.getElementById('activerA2F').disabled = true
