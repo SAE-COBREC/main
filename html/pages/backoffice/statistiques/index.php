@@ -67,12 +67,12 @@ try {
         
         <main class="main">
             <header class="header">
-                <h1>Statistique</h1>
+                <h1>Statistiques</h1>
              </header>
                 <section class="graphique-filtre">
                     <div id="filre">
                         <div id="divModeAffichage">
-                            <label>Mode d'affichage</label>
+                            <label>Mode d'affichage :</label>
                             <select id="modeAffichage">
                                 <option value="annee">Année</option>
                                 <option value="periode">Période</option>
@@ -80,7 +80,7 @@ try {
                         </div>
 
                         <div id="groupeParAnnee"> 
-                        <label>Année</label>
+                        <label>Année :</label>
                             <select name="annee" id="annee">
                                 <?php foreach($anneeAvecVente as $annee) :?>
                                 <option value="<?php echo $annee ?>"><?php echo $annee?></option>
@@ -89,14 +89,14 @@ try {
                         </div>
 
                         <div id="groupeParPeriode" style="display: none;">
-                            <label>Début</label>
+                            <label>Début :</label>
                             <input type="date" id="dateDebut"></input>
-                            <label>Fin</label>
+                            <label>Fin :</label>
                             <input type="date" id="dateFin"></input>
                         </div>
                             
                         <div id="MontantVolume">
-                            <label>Montant / volume</label>
+                            <label>Montant / volume :</label>
                             <select id="selectType">
                                 <option value="montant">Montant en €</option>
                                 <option value="nbCommande">nombre de commandes</option>
@@ -105,7 +105,7 @@ try {
                         </div>
 
                         <div id="divCategorie">
-                            <label>Catégorie</label>
+                            <label>Catégorie :</label>
                             <select id="categorie">
                                 <option value="toutes">Toutes</option>
                                 <?php foreach ($categories as $categorie): ?>
@@ -123,7 +123,7 @@ try {
                     </div>
 
                     <div id="divSelectArticle">
-                        <label>Article à suivre</label>
+                        <label>Article à suivre :</label>
                         <select id="articleEvolution">
                             <?php foreach ($listeArticles as $art): ?>
                                 <option value="<?php echo htmlspecialchars($art) ?>"><?php echo htmlspecialchars($art) ?></option>
@@ -170,6 +170,9 @@ try {
             chargerLesStats();
         });
 
+        //==================
+        //GRAPHIQUE 1
+        //==================
         const graph1 = new Chart(canva1, {
             type: 'bar',
             data: {
@@ -184,7 +187,10 @@ try {
             },
             options: { scales: { y: { beginAtZero: true } } }
         });
-
+        
+        //==================
+        //GRAPHIQUE 2
+        //==================
         const graph2 = new Chart(canva2, {
             type: 'bar',
             data:{
@@ -200,7 +206,9 @@ try {
             options: { scales: { y: { beginAtZero: true, grace: '10%' } } }
         });
 
-        // Initialisation du Graphique 3 (Évolution)
+        //==================
+        //GRAPHIQUE 3
+        //==================
         const graph3 = new Chart(canva3, {
             type: 'bar',
             data: {
@@ -222,22 +230,22 @@ try {
             const modeAffichage = document.getElementById('modeAffichage').value; //mode affiche corresponde a année ou période
             const type = document.getElementById('selectType').value;             //le type est si on veut en volume ou en nb de commande ou prix
             const categorie = document.getElementById('categorie').value;         //la catégorie choisi
-            const article = document.getElementById('articleEvolution').value;
+            const article = document.getElementById('articleEvolution').value;    //l'artcle choisi
 
             // Paramètres communs pour les deux requêtes
             let queryParams = `type=${type}&modeAffichage=${modeAffichage}`;
 
             if (modeAffichage === "annee"){                           //si le mode est annnee
                 const annee = document.getElementById("annee").value; //on récup l'année
-                queryParams += `&annee=${annee}`;                             //on l'ajoute a l'url les données
+                queryParams += `&annee=${annee}`;                     //on l'ajoute a l'url les données
             } else {                                                  //sinon le mode est période
                 const debut = document.getElementById("dateDebut").value; // on récup le début
                 const fin = document.getElementById("dateFin").value;     // on récup la fin
                 if (!debut || !fin) return;                               //on regarde si les 2 ont été saisient
-                queryParams += `&debut=${debut}&fin=${fin}`;                      //on ajoute a l'url les données
+                queryParams += `&debut=${debut}&fin=${fin}`;              //on ajoute a l'url les données
             }
 
-            // 1. Appel pour les graphiques 1 et 2 (Inchangé)
+            //Appel pour les graphiques 1 et 2
             fetch(`donneToutesStats.php?${queryParams}&categorie=${categorie}`)
                 .then(reponse => reponse.json())
                 .then(donnees => {
@@ -250,7 +258,7 @@ try {
                 })
                 .catch(err => console.error("Erreur AJAX Graph 1&2 :", err));
 
-            // 2. Appel spécifique pour le graphique 3
+            //Appel spécifique pour le graphique 3
             fetch(`statsGraph3.php?${queryParams}&article=${encodeURIComponent(article)}`)
                 .then(reponse => reponse.json())
                 .then(donnees => {

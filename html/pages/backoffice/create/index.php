@@ -350,13 +350,13 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
             
             <div>
                 <section>
-                    <h3><?php 
+                    <h2><?php 
                         if($_SESSION["creerArticle"]['_GET'] == null){
                             echo 'Ajouter un produit';
                         }else{
                             echo 'Modifier un produit';
                         }
-                        ?></h3>
+                        ?></h2>
                     <article>
                         <!-- Texte avec label -->
                          <!-- <pre> -->

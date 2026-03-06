@@ -221,7 +221,7 @@ if ($_POST !== []) {
     include __DIR__ . '/../../../partials/aside.html';
     ?>
     <main>
-        <h2><?php 
+        <h1 class="titreSoumisEspaceBas"><?php 
         if (empty($_SESSION["promotion"]['_GET']['id_promotion'])){
             //si id_promotion n'est pas connu alors on paramètre les autres var du _GET afin d'éviter des warnings php
             //TODO plus tard
@@ -236,7 +236,7 @@ if ($_POST !== []) {
             echo 'Modifier la promotion sauvegardée';
         }
         ?>
-        </h2>
+        </h1>
         <form action="index.php<?php 
             if(!empty($_SESSION["promotion"]["_GET"]['produit'])){
                 echo '?modifier=' . $_SESSION["promotion"]["_GET"]['produit'];

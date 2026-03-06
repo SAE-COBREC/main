@@ -58,7 +58,7 @@ try {
         <?php include __DIR__ . '/../../../partials/aside.html'; ?>
         <main class="main">
             <header class="header">
-                <h1>Commande Vendeur</h1>
+                <h1>Commande vendeur</h1>
             </header>
             <section class="liste-commandes">
                 <?php if (empty($commandes)): ?>

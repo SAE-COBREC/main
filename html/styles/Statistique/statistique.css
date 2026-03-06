@@ -23,7 +23,7 @@ html {
 
 .main {
   background: #FFF7F1;
-  padding: 40px;
+  padding: 32px 40px;
   overflow-y: auto;
 }
 .main .header {
@@ -32,6 +32,9 @@ html {
 .main .header h1 {
   color: #030212;
   font-size: 2rem;
+}
+.main label {
+  font-weight: 600;
 }
 .main .graphique-filtre {
   background-color: #FFFFFF;

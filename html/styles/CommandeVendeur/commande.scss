@@ -22,7 +22,7 @@ html {
 
 .main {
   background: $secondary-color-rose-claire;
-  padding: 32px 40px;
+  padding: $vendeur-padding-main;
   overflow-y: auto;
 
   .header {
@@ -74,10 +74,11 @@ html {
         background-color: $primary-color-bronze;
         color: $primary-color-blanc;
         border: none;
-        padding: 8px 16px;
+        padding: $vendeur-padding-button;
         border-radius: $border-radius-primary;
         cursor: pointer;
-        font-family: $font-family-primaire;
+        font-family: $font-family-secondaire;
+        font-weight: 600;
         font-size: 1.1em;
         transition: opacity 0.3s ease;
 

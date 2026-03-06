@@ -199,7 +199,7 @@ if ($_POST !== []) {
     include __DIR__ . '/../../../partials/aside.html';
     ?>
     <main>
-        <h2><?php 
+        <h1 class="titreSoumisEspaceBas"><?php 
         if (empty($_SESSION["remise"]['_GET']['id_reduction'])){
             //si id_reduction n'est pas connu alors on paramètre les autres var du _GET afin d'éviter des warnings php
             //TODO plus tard
@@ -215,7 +215,7 @@ if ($_POST !== []) {
             echo 'Modifier la remise sauvegardée';
         }
         ?>
-        </h2>
+        </h1>
         <form action="index.php<?php 
             if(!empty($_SESSION["remise"]["_GET"]['produit'])){
                 echo '?modifier=' . $_SESSION["remise"]["_GET"]['produit'];

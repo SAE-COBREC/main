@@ -28,7 +28,7 @@ h1 {
 
 .main {
   background: $secondary-color-rose-claire;
-  padding: 32px 40px;
+  padding: $vendeur-padding-main;
   display: flex;
   flex-direction: column;
   height: 1024px;
@@ -342,14 +342,14 @@ h1 {
   &__item {
     text-decoration: none; // Pour les balises <a>
     color: $primary-color-noir;
-    padding: 8px 16px;
+    padding: $vendeur-padding-button;
     font-size: 18px;
     cursor: pointer;
     transition: all 0.3s ease;
 
     a {
       border-radius: $border-radius-primary;
-      background: #F9F6F3;
+      background: $secondary-color-blanc-casse;
       border: 1px solid $secondary-color-orange-clair;
 
       &:hover {
@@ -376,12 +376,12 @@ h1 {
     align-items: center;
     text-decoration: none;
     color: $primary-color-noir;
-    padding: 8px 16px;
+    padding: $vendeur-padding-button;
     font-size: 18px;
     cursor: pointer;
     transition: all 0.3s ease;
     border-radius: $border-radius-primary;
-    background: #F9F6F3;
+    background: $secondary-color-blanc-casse;
     border: 1px solid $secondary-color-orange-clair;
   }
 }

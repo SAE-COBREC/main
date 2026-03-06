@@ -21,7 +21,7 @@ body {
 
 .main {
   background: $secondary-color-rose-claire;
-  padding: 32px 40px;
+  padding: $vendeur-padding-main;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -29,16 +29,16 @@ body {
 
 .page-header {
   display: flex;
-  justify-content: space-between; /* Titre à gauche, bouton à droite */
+  justify-content: space-between;
+  /* Titre à gauche, bouton à droite */
   align-items: center;
-  padding: 10px 20px;
 }
 
 .logout-btn {
   font-size: 20px;
   background-color: $primary-color-bronze;
   color: $primary-color-blanc;
-  padding: 16px 36px;
+  padding: $vendeur-padding-button;
   border-radius: 14px;
   text-decoration: none;
   font-weight: bold;
@@ -57,7 +57,7 @@ body {
   max-width: 1000px;
   width: 100%;
   margin: 20px auto 0 auto;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 
   &__title {
     font-family: $font-family-primaire;
@@ -96,7 +96,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.3s ease-out;
 
   .form-row {
@@ -117,7 +117,7 @@ body {
 
     .form-row--small {
       flex: 0 0 200px !important;
-      width: 200px !important; 
+      width: 200px !important;
     }
   }
 
@@ -127,7 +127,8 @@ body {
     color: $primary-color-noir;
   }
 
-  input, select{
+  input,
+  select {
     padding: 12px 16px;
     border-radius: $border-radius-primary;
     border: 1px solid $secondary-color-orange-clair;
@@ -174,80 +175,85 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .password-field {
-    position: relative;
+  position: relative;
 }
 
 .toggle-pwd {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    user-select: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
 }
 
 .toggle-pwd img {
-    width: 20px; 
-    height: 20px;
-    margin-top: 30px;
-    margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  margin-top: 30px;
+  margin-right: 10px;
 }
 
 
 .error {
-    color: red;
-    font-size: 18px;
-    margin-top: 2px;
-    display: block;
+  color: red;
+  font-size: 18px;
+  margin-top: 2px;
+  display: block;
 }
+
 .valid {
-    border: 2px solid #4CAF50 !important;
+  border: 2px solid #4CAF50 !important;
 }
+
 .invalid {
-    border: 2px solid red !important;
+  border: 2px solid red !important;
 }
 
 .popup-success {
-    position: fixed;
-    top: 20%;
-    left: 45%;
-    background-color: $secondary-color-marron; 
-    color: $primary-color-blanc;
-    padding: 20px 30px;
-    border-radius: 10px;
-    font-size: 20px;
-    box-shadow: 0 4px 20px $primary-color-noir;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    z-index: 9999;
+  position: fixed;
+  top: 20%;
+  left: 45%;
+  background-color: $secondary-color-marron;
+  color: $primary-color-blanc;
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-size: 20px;
+  box-shadow: 0 4px 20px $primary-color-noir;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
 }
+
 .popup-success.show {
-    opacity: 1;
+  opacity: 1;
 }
 
 .popup-error {
-    position: fixed;
-    top: 20%;
-    left: 45%;
-    background-color: $secondary-color-rouge; 
-    color: $primary-color-blanc;
-    padding: 20px 30px;
-    border-radius: 10px;
-    font-size: 20px;
-    box-shadow: 0 4px 20px $primary-color-noir;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    z-index: 9999;
+  position: fixed;
+  top: 20%;
+  left: 45%;
+  background-color: $secondary-color-rouge;
+  color: $primary-color-blanc;
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-size: 20px;
+  box-shadow: 0 4px 20px $primary-color-noir;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
 }
 
 .popup-error.show {
-    opacity: 1;
+  opacity: 1;
 }

@@ -14,7 +14,7 @@
 body {
   font-family: $font-family-secondaire;
   background: $secondary-color-rose-claire;
-  display: flex; 
+  display: flex;
   width: 1440px;
   height: 1024px;
   overflow: hidden;
@@ -26,10 +26,14 @@ aside {
   flex-shrink: 0;
 }
 
+.titreSoumisEspaceBas {
+  margin-bottom: 20px;
+}
+
 // Zone principale
 main {
   flex: 1;
-  padding: 24px 40px; 
+  padding: $vendeur-padding-main;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -41,25 +45,24 @@ main {
     &__title {
       font-family: $font-family-primaire;
       color: $primary-color-noir;
-      font-size: 42px; // Titre de page XL
     }
   }
 
   // --- Configuration du Formulaire ---
   form {
     display: flex;
-    flex-direction: row; 
-    flex-wrap: wrap;     
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start; // Boutons alignés à gauche
-    gap: 16px;           
+    gap: 16px;
 
     // Conteneur des sections
-    > div {
-      width: 100%; 
+    >div {
+      width: 100%;
       display: grid;
       grid-template-columns: 1.5fr 1fr; // Structure 2 colonnes (Info / Logistique)
-      gap: 24px; 
-      margin-bottom: 20px; 
+      gap: 24px;
+      margin-bottom: 20px;
       align-items: start;
     }
 
@@ -68,13 +71,13 @@ main {
       background: $primary-color-blanc;
       border: 1px solid $secondary-color-orange-clair;
       border-radius: $border-radius-primary;
-      padding: 20px; 
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 
       // Titres de sections (H2 et H3) agrandis
-      h2, h3 {
+      h2,
+      h3 {
         font-family: $font-family-primaire;
-        font-size: 32px; 
         margin-bottom: 16px;
         color: $primary-color-noir;
         border-bottom: 3px solid $secondary-color-rose-claire;
@@ -83,14 +86,42 @@ main {
 
       // Groupes de champs (Articles)
       article {
-        margin-bottom: 16px; 
+        margin-bottom: 16px;
+
+        .custom-file-upload {
+          display: block;
+          width: 100%;
+          padding: $vendeur-padding-button;
+          background: $secondary-color-blanc-casse;
+          border: 1px solid $secondary-color-orange-clair;
+          border-radius: $border-radius-primary;
+          cursor: pointer;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+
+          input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0; // On le rend invisible
+            cursor: pointer;
+            font-size: 100px; // S'assure que la zone cliquable est énorme
+          }
+
+          &:hover {
+            background: $secondary-color-rose-claire;
+          }
+        }
 
         label {
           display: block;
-          font-weight: 800; 
-          font-size: 18px;  // Label agrandi
+          font-weight: 800;
+          font-size: 18px; // Label agrandi
           margin-bottom: -2px; // FORCE LE COLLAGE PHYSIQUE
-          padding-left: 4px;   
+          padding-left: 4px;
           position: relative;
           z-index: 2; // Passe par-dessus la bordure de l'input
           color: $primary-color-noir;
@@ -102,12 +133,12 @@ main {
         textarea,
         select {
           width: 100%;
-          padding: 12px 16px; // Champ agrandi
-          border: 1.5px solid $secondary-color-orange-clair; 
+          padding: $vendeur-padding-button; // Champ agrandi
+          border: 1px solid $secondary-color-orange-clair;
           border-radius: $border-radius-primary;
           font-family: inherit;
-          font-size: 16px; 
-          background: #fafafa;
+          font-size: 16px;
+          background: $secondary-color-blanc-casse;
           position: relative;
           z-index: 1;
 
@@ -126,7 +157,7 @@ main {
         small {
           display: block;
           margin-top: 4px;
-          color: $secondary-color-gris-fonce;
+          color: $primary-color-bronze;
           font-size: 13px;
         }
 
@@ -139,68 +170,65 @@ main {
 
     // --- Photos ---
     section:has(#photo\[\]) {
-        article {
-            small:has(img) {
-                display: inline-flex;
-                flex-direction: column;
-                align-items: center;
-                margin: 5px 10px 0 0;
-                background: $secondary-color-rose-claire;
-                padding: 6px;
-                border-radius: $border-radius-primary;
+      article {
+        small:has(img) {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          margin: 5px 10px 0 0;
+          background: $secondary-color-rose-claire;
+          padding: 6px;
+          border-radius: $border-radius-primary;
 
-                img {
-                    border-radius: 4px;
-                    object-fit: cover;
-                    margin-bottom: 6px;
-                    height: 90px;
-                }
+          img {
+            border-radius: 4px;
+            object-fit: cover;
+            margin-bottom: 6px;
+            height: 90px;
+          }
 
-                input[type="submit"][name^="btn_moins"] {
-                    background: $secondary-color-rouge;
-                    color: white;
-                    border: none;
-                    width: 26px;
-                    height: 26px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    font-size: 18px;
-                }
-            }
+          input[type="submit"][name^="btn_moins"] {
+            background: $secondary-color-rouge;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+          }
         }
+      }
     }
 
     // --- BOUTONS D'ACTION (RETOUR TAILLE DÉBUT / INDEX) ---
     input[type="button"],
     input[type="submit"] {
-      padding: 10px 24px; // TAILLE ORIGINALE RESTAURÉE
+      padding: $vendeur-padding-button; // TAILLE ORIGINALE RESTAURÉE
       border-radius: $border-radius-primary;
-      font-weight: 600;
       font-size: 18px; // TAILLE DE POLICE ORIGINALE
       cursor: pointer;
-      border: 2px solid $primary-color-bronze;
-      background: $primary-color-blanc;
-      color: $primary-color-bronze;
+      font-family: $font-family-primaire;
+      border: 1px solid $secondary-color-orange-clair;
+      background: $secondary-color-blanc-casse;
       transition: all 0.2s;
+
 
       &:hover {
         background: $secondary-color-rose-claire;
       }
 
-      &.orange, 
-      &[name="publier"], 
+      &.orange,
+      &[name="publier"],
       &[name="enLigne"],
       &[name="sauvegarder"] {
         background: $primary-color-bronze;
-        color: white;
+        color: $primary-color-blanc;
         border: none;
+        font-weight: 600;
 
-        &:hover { background: rgba($primary-color-bronze, 0.9); }
-      }
-
-      &[value="Annuler"] {
-        border-color: $secondary-color-gris-fonce;
-        color: $secondary-color-gris-fonce;
+        &:hover {
+          background: rgba($primary-color-bronze, 0.9);
+        }
       }
 
       &:disabled {
@@ -212,7 +240,7 @@ main {
 }
 
 // Bordure rouge pour erreurs PHP
-input[style*="border: 3px solid red"], 
+input[style*="border: 3px solid red"],
 section[style*="border: 3px solid red"] {
-    border: 2.5px solid $secondary-color-rouge !important;
+  border: 2.5px solid $secondary-color-rouge !important;
 }

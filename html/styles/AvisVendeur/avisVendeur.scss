@@ -1,22 +1,23 @@
 @use "../variable" as *;
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-html, body {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+html,
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
 .app {
-  display: grid;
-  grid-template-columns: 270px 1fr;
-  height: 1024px;
-  background: $primary-color-blanc;
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    height: 1024px;
+    background: $primary-color-blanc;
 }
 
 .main {
@@ -33,7 +34,7 @@ html, body {
 
         .avis-card {
             background: #fff;
-            border-bottom: 1px solid #eee;
+            border: 1px solid $secondary-color-orange-clair;
             padding: 1.5rem 1rem;
             margin-bottom: 1rem;
             border-radius: 1em;
@@ -104,7 +105,7 @@ html, body {
                 right: 0;
                 top: 100%;
                 background: white;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                 border: 1px solid #eee;
                 border-radius: 8px;
                 width: 180px;
@@ -180,7 +181,8 @@ html, body {
                 border: none;
                 transition: all 0.2s;
 
-                &.btn-save, &.btn-submit {
+                &.btn-save,
+                &.btn-submit {
                     background: #e67e22;
                     color: white;
 
