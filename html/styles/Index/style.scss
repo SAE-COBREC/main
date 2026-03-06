@@ -86,7 +86,7 @@
 //style du body avec grille principale
 body {
   font-family: $font-family-secondaire;
-  background: $secondary-color-light-grey;
+  background: $secondary-color-gris-clair;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
@@ -111,7 +111,7 @@ body {
 
 //style de la barre latérale des filtres
 aside {
-  background: $primary-color-white;
+  background: $primary-color-blanc;
   padding: 1.5rem;
   border-radius: 12px;
   height: fit-content;
@@ -124,16 +124,16 @@ aside {
 
     //label du select
     span {
-      color: $secondary-color-dark-grey;
+      color: $secondary-color-gris-fonce;
     }
 
     //style du select de tri
     select {
       padding: 2px 7px;
-      border: 1px solid $primary-color-blue;
-      color: $primary-color-blue;
+      border: 1px solid $primary-color-bleu;
+      color: $primary-color-bleu;
       border-radius: 20px;
-      background: $primary-color-white;
+      background: $primary-color-blanc;
       cursor: pointer;
       margin-top: 0.9em;
       width: 100%;
@@ -153,7 +153,7 @@ aside {
 
     //bouton "Effacer"
     button {
-      color: $secondary-color-dark-grey;
+      color: $secondary-color-gris-fonce;
       background: none;
       border: none;
       cursor: pointer;
@@ -189,12 +189,12 @@ aside {
       @include flex-between;
       padding: 0.5rem 0;
       cursor: pointer;
-      color: $secondary-color-dark-grey;
+      color: $secondary-color-gris-fonce;
       @include transition(all);
 
       //compteur de produits en bleu
       span {
-        color: $primary-color-blue;
+        color: $primary-color-bleu;
         font-size: 0.9rem;
       }
     }
@@ -206,7 +206,7 @@ aside {
       
       //affichage du prix en bleu
       span {
-        color: $primary-color-blue;
+        color: $primary-color-bleu;
         font-size: 1.3rem;
       }
     }
@@ -222,7 +222,7 @@ aside {
 
       //change la couleur au survol
       &:hover {
-        color: $primary-color-blue;
+        color: $primary-color-bleu;
       }
 
       //style du checkbox
@@ -257,7 +257,7 @@ aside {
       top: 50%;
       transform: translateY(-50%);
       height: 6px;
-      background-color: $primary-color-blue;
+      background-color: $primary-color-bleu;
       border-radius: 3px;
       z-index: 2;
     }
@@ -279,7 +279,7 @@ aside {
         pointer-events: auto; /* Réactive le pointeur sur le thumb */
         width: 20px;
         height: 20px;
-        background: $primary-color-blue;
+        background: $primary-color-bleu;
         border: 2px solid white;
         border-radius: 50%;
         cursor: pointer;
@@ -292,7 +292,7 @@ aside {
         pointer-events: auto;
         width: 20px;
         height: 20px;
-        background: $primary-color-blue;
+        background: $primary-color-bleu;
         border: 2px solid white;
         border-radius: 50%;
         cursor: pointer;
@@ -320,8 +320,8 @@ aside {
       width: 48%;
 
       &:focus-within {
-        border-color: $primary-color-blue;
-        box-shadow: 0 0 0 2px rgba($primary-color-blue, 0.2);
+        border-color: $primary-color-bleu;
+        box-shadow: 0 0 0 2px rgba($primary-color-bleu, 0.2);
       }
 
       input {
@@ -377,7 +377,7 @@ main {
       grid-column: 1 / -1;
       text-align: center;
       padding: 2rem;
-      color: $secondary-color-dark-grey;
+      color: $secondary-color-gris-fonce;
       font-size: 1.1rem;
     }
   }
@@ -393,9 +393,9 @@ main {
   align-items: center;
   margin-bottom: 12px;
   width: fit-content; // Ajouté pour que l'élément ne prenne que sa taille
-  background-color: $secondary-color-light-blue; 
+  background-color: $secondary-color-bleu-clair; 
   border-radius: 20px;
-  border: 1px solid rgba($primary-color-blue, 0.1);
+  border: 1px solid rgba($primary-color-bleu, 0.1);
   gap: 6px;
   padding: 4px 8px;
   
@@ -408,7 +408,7 @@ main {
 
   span {
     font-size: 0.85rem;
-    color: $primary-color-blue;
+    color: $primary-color-bleu;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -443,7 +443,7 @@ article {
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  background: $primary-color-white;
+  background: $primary-color-blanc;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -454,8 +454,8 @@ article {
     position: relative;
     width: 100%;
     height: 200px;
-    //background: linear-gradient(135deg, $secondary-color-light-grey 0%, $secondary-color-dark-grey 100%);
-    background: $primary-color-white;
+    //background: linear-gradient(135deg, $secondary-color-gris-clair 0%, $secondary-color-gris-fonce 100%);
+    background: $primary-color-blanc;
     display: flex;
     justify-content: center;
 
@@ -471,8 +471,8 @@ article {
       position: absolute;
       top: 10px;
       left: 10px;
-      background: $secondary-color-red;
-      color: $primary-color-white;
+      background: $secondary-color-rouge;
+      color: $primary-color-blanc;
       padding: 0.4rem 0.8rem;
       border-radius: 20px;
       font-size: 0.9rem;
@@ -487,8 +487,8 @@ article {
       position: absolute;
       bottom: 0.2em;
       right: 0.2em;
-      background: $primary-color-white;
-      color: $primary-color-white;
+      background: $primary-color-blanc;
+      color: $primary-color-blanc;
       border-radius: 100%;
       padding: 1px;
       font-size: 1rem;
@@ -509,8 +509,8 @@ article {
     //message de rupture de stock
     .rupture-stock {
       @include centre-absolu;
-      background-color: rgba($secondary-color-light-grey, 0.9);
-      color: $primary-color-black;
+      background-color: rgba($secondary-color-gris-clair, 0.9);
+      color: $primary-color-noir;
       padding: 8px 16px;
       border-radius: 8px;
       font-size: 0.9rem;
@@ -547,7 +547,7 @@ article {
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
-      color: $primary-color-black;
+      color: $primary-color-noir;
     }
 
     //section des étoiles et nombre d'avis
@@ -559,12 +559,12 @@ article {
 
       //étoiles de notation
       span:first-child {
-        color: $secondary-color-star;
+        color: $secondary-color-etoile;
       }
 
       //nombre d'avis entre parenthèses
       span:last-child {
-        color: $secondary-color-dark-grey;
+        color: $secondary-color-gris-fonce;
         font-size: 0.85rem;
       }
     }
@@ -580,7 +580,7 @@ article {
       span:last-child {
         font-size: 1.5rem;
         font-weight: bold;
-        color: $primary-color-black;
+        color: $primary-color-noir;
       }
     }
   }
@@ -590,8 +590,8 @@ article {
     margin-top: auto;
     width: 100%;
     padding: 0.75rem;
-    background: $primary-color-black;
-    color: $primary-color-white;
+    background: $primary-color-noir;
+    color: $primary-color-blanc;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -601,14 +601,14 @@ article {
 
     //effet hover sur le bouton
     &:hover:not(:disabled) {
-      background: $primary-color-blue;
+      background: $primary-color-bleu;
     }
 
     //style du bouton désactivé
     &:disabled {
-      background: $secondary-color-dark-grey;
+      background: $secondary-color-gris-fonce;
       cursor: not-allowed;
-      color: $secondary-color-light-grey;
+      color: $secondary-color-gris-clair;
     }
   }
 }
@@ -619,7 +619,7 @@ article {
 
 //bordure spéciale pour les produits en promotion
 .produit-promotion {
-  border: 2px solid $primary-color-blue !important;
+  border: 2px solid $primary-color-bleu !important;
   background-color: $secondary-color-promotion !important;
   position: relative;
   overflow: hidden;
@@ -645,20 +645,20 @@ article {
 
 //style spécial du bouton pour les promotions
 .produit-promotion button:not(:disabled) {
-  background: $primary-color-blue !important;
-  color: $primary-color-white !important;
+  background: $primary-color-bleu !important;
+  color: $primary-color-blanc !important;
   border: 2px solid $secondary-color-promotion !important;
 }
 
 //effet hover du bouton en promotion
 .produit-promotion button:hover:not(:disabled) {
-  background: $primary-color-white !important;
-  color: $primary-color-blue !important;
+  background: $primary-color-blanc !important;
+  color: $primary-color-bleu !important;
 }
 
 //style pour produit en rupture ET en promotion
 .produit-rupture.produit-promotion {
-  border: 2px solid $secondary-color-red !important;
+  border: 2px solid $secondary-color-rouge !important;
   opacity: 0.7;
 }
 
@@ -829,7 +829,7 @@ article {
       padding-left: 1.5em;
       font-size: 1.1em;
       margin-bottom: 1.5rem;
-      color: $primary-color-blue;
+      color: $primary-color-bleu;
     }
     
     //affiche "Masquer les filtres" quand ouvert
@@ -842,7 +842,7 @@ article {
       padding-left: 1.5em;
       font-size: 1.1em;
       margin-bottom: 1.5rem;
-      color: $primary-color-blue;
+      color: $primary-color-bleu;
     }
 
     //agrandit le select de tri sur mobile
@@ -1060,14 +1060,14 @@ article {
 
       .carousel-vendeur {
         font-size: 0.9rem;
-        color: $primary-color-blue;
+        color: $primary-color-bleu;
         margin-bottom: 0.5rem;
       }
 
       .carousel-price {
         font-size: 1.8rem;
         font-weight: bold;
-        color: $primary-color-blue;
+        color: $primary-color-bleu;
       }
 
       .carousel-actions {
@@ -1109,25 +1109,25 @@ article {
       // Bouton "Voir le produit" (Style secondaire / contour)
       .btn-carousel-add {
         background: transparent;
-        color: $primary-color-black;
-        border: 2px solid $primary-color-black;
+        color: $primary-color-noir;
+        border: 2px solid $primary-color-noir;
 
         &:hover {
-          background: $primary-color-black;
+          background: $primary-color-noir;
           color: #fff;
         }
       }
 
       // Bouton "Ajouter au panier" (Style primaire / plein)
       .btn-carousel-cart {
-        background: $primary-color-blue;
+        background: $primary-color-bleu;
         color: #fff;
-        box-shadow: 0 4px 6px rgba($primary-color-blue, 0.3);
+        box-shadow: 0 4px 6px rgba($primary-color-bleu, 0.3);
 
         &:hover {
-          background: darken($primary-color-blue, 10%);
+          background: darken($primary-color-bleu, 10%);
           transform: translateY(-2px);
-          box-shadow: 0 6px 12px rgba($primary-color-blue, 0.4);
+          box-shadow: 0 6px 12px rgba($primary-color-bleu, 0.4);
         }
       }
     }
@@ -1153,7 +1153,7 @@ article {
     transition: background 0.3s;
 
     &:hover {
-      background: $primary-color-blue;
+      background: $primary-color-bleu;
     }
 
     &.prev-btn { left: 10px; }
@@ -1180,7 +1180,7 @@ article {
       transition: background 0.3s;
 
       &.active {
-        background: $primary-color-blue;
+        background: $primary-color-bleu;
         transform: scale(1.2);
       }
     }
