@@ -427,7 +427,7 @@ main section:nth-of-type(4) article form > div {
   display: flex;
   flex-direction: column;
 }
-main section:nth-of-type(4) article button:not(:last-of-type), main section:nth-of-type(4) article .btnMdpClassique {
+main section:nth-of-type(4) article button:not(:last-of-type), main section:nth-of-type(4) article #activerA2F {
   display: block;
   width: 100%;
   display: flex;
@@ -445,12 +445,12 @@ main section:nth-of-type(4) article button:not(:last-of-type), main section:nth-
   transition: all 0.3s ease;
   margin-top: 0.5em;
 }
-main section:nth-of-type(4) article button:not(:last-of-type):hover, main section:nth-of-type(4) article .btnMdpClassique:hover {
+main section:nth-of-type(4) article button:not(:last-of-type):hover, main section:nth-of-type(4) article #activerA2F:hover {
   background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
-main section:nth-of-type(4) article button:not(:last-of-type) > svg, main section:nth-of-type(4) article .btnMdpClassique > svg {
+main section:nth-of-type(4) article button:not(:last-of-type) > svg, main section:nth-of-type(4) article #activerA2F > svg {
   width: 20px;
   height: 20px;
   stroke-width: 2;

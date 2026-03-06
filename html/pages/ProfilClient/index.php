@@ -616,18 +616,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         </span>
                     </header>
                     <main>
-                        <button type="button" class="btnMdpClassique" onclick="ouvrirModalA2F()"
+                            <button type="button" id="activerA2F" onclick="ouvrirModalA2F()"
                             style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:none';} else { echo 'display:block';} ?>">
-                            Activer l'authentification à double facteurs
-                        </button>
-                        <!-- TO DO -->
-                        <?php 
-                                print_r($_SESSION['OTP']); 
-                                print_r($_POST);
-                            ?>
-                        <form method="POST">
-                            <button type="submit" name="desactiverA2F"
-                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')"
+                                Activer l'authentification à double facteurs
+                            </button>
+                            <form method="POST">
+                                <button type="submit" name="desactiverA2F"
+                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')" 
                                 style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
                                 Désactiver l'authentification à double facteurs
                             </button>
@@ -688,7 +683,16 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         <div>
             <h2>Authentification à double facteurs</h2>
             <?php
-                include_once '../connexionClient/OTP.php';
+                if (empty($_SESSION['OTP'])){
+                    include_once '../connexionClient/OTP.php';
+                    ?>
+                    <script>
+                        // document.getElementById('a2form').addEventListener('submit', function(event) {
+                        //     document.location.href = "/pages/connexionClient/index.php"; 
+                        // });
+                    </script>
+                    <?php
+                }
             ?>
             <form>
                 <button type="button" onclick="fermerModalA2F()">Annuler</button>
