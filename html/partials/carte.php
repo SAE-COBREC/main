@@ -215,7 +215,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     // ============================================
 
     var iconVendeur = L.icon({
-        iconUrl: '/img/png/394452.png',
+        iconUrl: '/img/png/badge-bretagne.png',
         iconSize: [33, 33],
         iconAnchor: [16, 33],
         popupAnchor: [0, -30]
