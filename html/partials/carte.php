@@ -61,9 +61,6 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     <!-- Locate control CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
 
-    <!-- Style personnalisé -->
-    <link rel="stylesheet" href="/styles/Carte/style.css">
-
     <style>
     /* ============================================
            LÉGENDE

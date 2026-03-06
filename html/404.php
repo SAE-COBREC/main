@@ -1,83 +1,15 @@
 <?php
-http_response_code(404);
+include 'partials/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
+<main>
+    <div class="container">
+        <h1>Erreur 404 - Page non trouvée</h1>
+        <p>Désolé, la page que vous recherchez n'existe pas.</p>
+        <a href="index.php">Retour à l'accueil</a>
+    </div>
+</main>
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Introuvable - Alizon</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        @font-face {
-            font-family: 'Baloo';
-            src: url('fonts/Baloo-Regular.ttf') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: 'Quicksand';
-            src: url('fonts/Quicksand-Regular.otf') format('opentype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Baloo', 'Quicksand', sans-serif;
-            justify-content: center;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-
-        main {
-            text-align: center;
-        }
-    </style>
-</head>
-
-<body>
-    <main>
-        <div class="not-found"
-            style="display:flex;flex-direction:column;align-items:center;gap:18px;max-width:900px;margin:0 auto;padding:24px;text-align:center;">
-            <img src="img/svg/404.svg" alt="Illustration erreur 404 — page introuvable"
-                style="width:100%;max-width:640px;height:auto;display:block;">
-            <h1 style="font-size:clamp(22px,4vw,42px);color:#222;margin-top:6px;">Oups — page introuvable</h1>
-            <p style="color:#666;font-size:clamp(14px,2.2vw,18px);line-height:1.4;margin:0 0 8px;">
-                Le lien est peut‑être incorrect ou la page a été déplacée.
-            </p>
-
-            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:8px;">
-                <a href="/index.php"
-                    style="display:inline-flex;align-items:center;gap:10px;padding:10px 16px;background:#c0c0c0;color:#030212;border-radius:8px;text-decoration:none;box-shadow:0 6px 18px rgba(25,118,210,0.15);transition:transform .12s ease,box-shadow .12s ease;">
-                    <img src="img/svg/fleche-gauche.svg" alt="" aria-hidden="true" width="18" height="18"
-                        style="filter:invert(1) saturate(0.9);">
-                    Retour à l'accueil
-                </a>
-
-                <a href="javascript:history.back()"
-                    style="display:inline-flex;align-items:center;padding:10px 14px;border-radius:8px;text-decoration:none;color:#030212;border:1px solid rgba(25,118,210,0.12);background:transparent;font-weight:600;">
-                    Revenir
-                </a>
-            </div>
-
-            <p style="color:#999;font-size:13px;margin-top:12px;">Si le problème persiste, contactez l'administrateur du
-                site.</p>
-        </div>
-    </main>
-</body>
-
-</html>
+<?php
+include 'partials/footer.html';
+?>
