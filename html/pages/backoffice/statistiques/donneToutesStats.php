@@ -112,6 +112,7 @@ try {
             }     
         }
     }
+    sort($estDejaLabel);
     $reponse = [
         "graph1" => array_values($donneesParMois), //on converti le tableau pour qu'il soit au bon format pour le graphique
         "graph2" => [
