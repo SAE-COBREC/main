@@ -32,18 +32,38 @@ $import_details = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'import') {
     
     if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
-        $message_error = "Erreur lors de l'envoi du fichier. Veuillez réessayer.";
+        $upload_error_code = isset($_FILES['csv_file']) ? $_FILES['csv_file']['error'] : -1;
+        switch ($upload_error_code) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $message_error = "Le fichier est trop volumineux. La taille maximale autorisée est de " . ini_get('upload_max_filesize') . ". Veuillez réduire la taille de votre fichier CSV et réessayer.";
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $message_error = "Le fichier n'a été que partiellement envoyé. Cela peut être dû à une connexion instable. Veuillez réessayer.";
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $message_error = "Aucun fichier n'a été sélectionné. Veuillez choisir un fichier CSV avant de cliquer sur 'Importer'.";
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+            case UPLOAD_ERR_CANT_WRITE:
+            case UPLOAD_ERR_EXTENSION:
+                $message_error = "Une erreur technique empêche l'envoi du fichier. Veuillez contacter l'administrateur du site.";
+                break;
+            default:
+                $message_error = "Aucun fichier n'a été reçu. Veuillez sélectionner un fichier CSV et réessayer.";
+                break;
+        }
     } else {
         $file = $_FILES['csv_file'];
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
         if ($ext !== 'csv') {
-            $message_error = "Format non supporté. Veuillez envoyer un fichier .csv";
+            $message_error = "Le fichier '" . htmlspecialchars($file['name']) . "' est au format ." . htmlspecialchars($ext) . ", qui n'est pas pris en charge. Seuls les fichiers au format .csv (valeurs séparées par des points-virgules) sont acceptés.";
         } else {
             // Lire tout le contenu du fichier pour un traitement fiable
             $csvContent = file_get_contents($file['tmp_name']);
             if ($csvContent === false || strlen($csvContent) === 0) {
-                $message_error = "Impossible de lire le fichier.";
+                $message_error = "Le fichier '" . htmlspecialchars($file['name']) . "' est vide ou n'a pas pu être lu. Vérifiez que le fichier contient bien des données et réessayez.";
             } else {
 
                 // Supprimer le BOM UTF-8 si présent (bytes bruts)
@@ -66,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 }
 
                 if (empty($lines)) {
-                    $message_error = "Le fichier CSV est vide.";
+                    $message_error = "Le fichier CSV ne contient aucune ligne de données. Assurez-vous que le fichier contient au moins une ligne d'en-tête (nom;description;prix;stock) suivie d'une ou plusieurs lignes de produits.";
                 } else {
                     // Parser la ligne d'en-tête — auto-détection du séparateur
                     $firstLine = $lines[0];
@@ -77,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                     $header = str_getcsv($firstLine, $separator, '"');
                     if (empty($header) || (count($header) === 1 && (trim($header[0] ?? '') === '' || $header[0] === null))) {
-                        $message_error = "Le fichier CSV est vide ou mal formaté.";
+                        $message_error = "La première ligne du fichier CSV ne contient pas d'en-têtes valides. Vérifiez que la première ligne contient les noms de colonnes séparés par des points-virgules (;), par exemple : nom;description;prix;stock";
                         $header = false;
                     }
 
@@ -96,7 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     // Vérifier que les colonnes requises sont présentes
                     $colonnes_manquantes = array_diff($colonnes_requises, $header);
                     if (!empty($colonnes_manquantes)) {
-                        $message_error = "Colonnes manquantes dans le CSV : " . implode(', ', $colonnes_manquantes) . ". Colonnes détectées : " . implode(', ', $header) . ". Séparateur détecté : '" . $separator . "'";
+                        $message_error = "Il manque les colonnes obligatoires suivantes dans votre fichier : " . implode(', ', $colonnes_manquantes) . ".\n"
+                            . "Votre fichier contient les colonnes : " . implode(', ', $header) . ".\n"
+                            . "Vérifiez que la première ligne de votre CSV contient bien les en-têtes : nom;description;prix;stock."
+                            . ($separator === ',' ? "\n⚠️ Attention : votre fichier semble utiliser la virgule (,) comme séparateur au lieu du point-virgule (;). Veuillez modifier le séparateur dans votre fichier." : '');
                     } else {
                         // Récupérer les catégories et TVA existantes
                         $stmtCat = $pdo->query("SELECT id_categorie, nom_categorie FROM cobrec1._categorie_produit");
@@ -135,8 +158,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 }
 
                                 // Validation des champs requis
-                                if (empty($row['nom']) || empty($row['description']) || $row['prix'] === '' || $row['stock'] === '') {
-                                    $import_details[] = "Ligne $ligne : champs requis manquants — ignorée.";
+                                $champs_vides = [];
+                                if (empty($row['nom'])) $champs_vides[] = 'nom';
+                                if (empty($row['description'])) $champs_vides[] = 'description';
+                                if ($row['prix'] === '') $champs_vides[] = 'prix';
+                                if ($row['stock'] === '') $champs_vides[] = 'stock';
+                                if (!empty($champs_vides)) {
+                                    $import_details[] = "Ligne $ligne : les champs obligatoires suivants sont vides ou manquants : " . implode(', ', $champs_vides) . " — ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
@@ -145,12 +173,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 $stock = intval($row['stock']);
 
                                 if ($prix < 0) {
-                                    $import_details[] = "Ligne $ligne : prix négatif — ignorée.";
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le prix est négatif (" . $row['prix'] . "). Le prix doit être un nombre positif ou zéro — ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
                                 if ($stock < 0) {
-                                    $import_details[] = "Ligne $ligne : stock négatif — ignoré.";
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le stock est négatif (" . $row['stock'] . "). Le stock doit être un nombre entier positif ou zéro — ligne ignorée.";
+                                    $nb_erreurs++;
+                                    continue;
+                                }
+                                if (!is_numeric(str_replace(',', '.', $row['prix']))) {
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le prix '" . htmlspecialchars($row['prix']) . "' n'est pas un nombre valide — ligne ignorée.";
+                                    $nb_erreurs++;
+                                    continue;
+                                }
+                                if (!ctype_digit(ltrim($row['stock'], '-'))) {
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le stock '" . htmlspecialchars($row['stock']) . "' n'est pas un nombre entier valide — ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
@@ -262,7 +300,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     }
                                 } catch (Exception $rowEx) {
                                     $pdo->exec("ROLLBACK TO SAVEPOINT import_row");
-                                    $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" — erreur : " . htmlspecialchars($rowEx->getMessage());
+                                    // Log technique pour le développeur
+                                    error_log("Import CSV - Ligne $ligne - Produit: " . ($row['nom'] ?? 'inconnu') . " - Erreur: " . $rowEx->getMessage());
+
+                                    // Générer un message explicite selon le type d'erreur SQL
+                                    $errMsg = $rowEx->getMessage();
+                                    $prodNom = htmlspecialchars($row['nom'] ?? 'inconnu');
+
+                                    if ($rowEx instanceof PDOException && isset($rowEx->errorInfo[0])) {
+                                        $sqlState = $rowEx->errorInfo[0];
+                                    } else {
+                                        $sqlState = '';
+                                    }
+
+                                    // 23505 = violation de contrainte UNIQUE
+                                    if ($sqlState === '23505' || stripos($errMsg, 'unique') !== false || stripos($errMsg, 'duplicate key') !== false) {
+                                        if (stripos($errMsg, 'unique_produit_nom') !== false || stripos($errMsg, 'p_nom') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : un produit portant exactement ce nom existe déjà sur la plateforme (chez un autre vendeur). Veuillez choisir un nom de produit différent — ligne ignorée.";
+                                        } else {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur en doublon empêche l'enregistrement (contrainte d'unicité). Vérifiez que les données ne sont pas déjà présentes — ligne ignorée.";
+                                        }
+                                    }
+                                    // 23514 = violation de contrainte CHECK
+                                    elseif ($sqlState === '23514' || stripos($errMsg, 'check') !== false) {
+                                        if (stripos($errMsg, 'verif_produit_statut') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le statut indiqué n'est pas valide. Valeurs acceptées : Ébauche, En ligne, Hors ligne, Supprimé — ligne ignorée.";
+                                        } elseif (stripos($errMsg, 'verif_produit_origine') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : l'origine indiquée n'est pas valide. Valeurs acceptées : Inconnu, Bretagne, France, UE, Hors UE — ligne ignorée.";
+                                        } elseif (stripos($errMsg, 'verif_produit_prix') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le prix doit être un nombre positif ou zéro — ligne ignorée.";
+                                        } elseif (stripos($errMsg, 'verif_produit_stock') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le stock doit être un nombre entier positif ou zéro — ligne ignorée.";
+                                        } elseif (stripos($errMsg, 'verif_produit_poids') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le poids doit être un nombre positif ou zéro — ligne ignorée.";
+                                        } elseif (stripos($errMsg, 'verif_produit_volume') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le volume doit être un nombre positif ou zéro — ligne ignorée.";
+                                        } elseif (stripos($errMsg, 'verif_produit_frais_de_port') !== false) {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : les frais de port doivent être un nombre positif ou zéro — ligne ignorée.";
+                                        } else {
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur ne respecte pas les contraintes autorisées (statut, origine, prix, stock…). Vérifiez les données — ligne ignorée.";
+                                        }
+                                    }
+                                    // 23503 = violation de clé étrangère
+                                    elseif ($sqlState === '23503' || stripos($errMsg, 'foreign key') !== false) {
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une référence est invalide (catégorie ou TVA inexistante). Vérifiez que la catégorie et la TVA indiquées existent bien — ligne ignorée.";
+                                    }
+                                    // 22001 = chaîne trop longue
+                                    elseif ($sqlState === '22001' || stripos($errMsg, 'value too long') !== false) {
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur est trop longue (le nom ne doit pas dépasser 100 caractères, l'origine 20 caractères). Raccourcissez le texte — ligne ignorée.";
+                                    }
+                                    // 22003 = valeur numérique hors limite
+                                    elseif ($sqlState === '22003' || stripos($errMsg, 'out of range') !== false || stripos($errMsg, 'numeric field overflow') !== false) {
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur numérique est hors des limites autorisées (prix, poids ou volume trop grand). Vérifiez les montants — ligne ignorée.";
+                                    }
+                                    // Erreur non identifiée
+                                    else {
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : impossible d'enregistrer ce produit en base de données. Vérifiez que les valeurs respectent les contraintes (longueur du nom, format du prix, etc.) — ligne ignorée.";
+                                    }
+
                                     $nb_erreurs++;
                                 }
                             }
@@ -275,7 +370,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                         } catch (Exception $e) {
                             $pdo->rollBack();
-                            $message_error = "Erreur lors de l'import : " . htmlspecialchars($e->getMessage());
+                            error_log("Import CSV - Erreur globale: " . $e->getMessage());
+                            $message_error = "Une erreur inattendue est survenue lors de l'import et aucun produit n'a été enregistré. Vérifiez le format de votre fichier CSV et réessayez. Si le problème persiste, contactez l'administrateur du site.";
                         }
                     }
                 } // fin if ($header !== false)
@@ -340,7 +436,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'produits') {
         exit();
 
     } catch (PDOException $e) {
-        $message_error = "Erreur lors de l'export des produits : " . htmlspecialchars($e->getMessage());
+        error_log("Export produits - Erreur: " . $e->getMessage());
+        $message_error = "Impossible d'exporter le catalogue produits. Une erreur est survenue lors de la récupération de vos données. Veuillez réessayer ultérieurement ou contacter l'administrateur si le problème persiste.";
     }
 }
 
@@ -422,7 +519,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'commandes') {
         exit();
 
     } catch (PDOException $e) {
-        $message_error = "Erreur lors de l'export des commandes : " . htmlspecialchars($e->getMessage());
+        error_log("Export commandes - Erreur: " . $e->getMessage());
+        $message_error = "Impossible d'exporter l'historique des commandes. Une erreur est survenue lors de la récupération de vos données. Veuillez réessayer ultérieurement ou contacter l'administrateur si le problème persiste.";
     }
 }
 
@@ -494,7 +592,7 @@ try {
             <?php if (!empty($message_error)): ?>
             <div class="alert alert--error">
                 <span class="alert__icon">✕</span>
-                <p class="alert__text"><?= htmlspecialchars($message_error) ?></p>
+                <p class="alert__text"><?= nl2br(htmlspecialchars($message_error)) ?></p>
             </div>
             <?php endif; ?>
 
