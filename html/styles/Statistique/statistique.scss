@@ -1,6 +1,5 @@
 @use "../variable" as *;
 
-// Reset de base et police
 * {
   box-sizing: border-box;
   margin: 0;
@@ -34,6 +33,13 @@ html {
     }
   }
 
+  .graphique-filtre {
+    background-color: $primary-color-blanc;
+    border-radius: $border-radius-primary;
+    border: 1px solid $secondary-color-orange-clair;
+    padding: 20px 24px;
+  }
+
   select,
   input {
     padding: 8px 16px;
@@ -46,5 +52,21 @@ html {
       background: $secondary-color-rose-claire;
       border-color: $primary-color-bronze;
     }
+  }
+
+  #filre {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+  }
+
+  canvas {
+    border-bottom: 1px solid $secondary-color-orange-clair;
+    padding: 30px 0;
+  }
+
+  #divSelectArticle {
+    padding-top: 20px;
   }
 }

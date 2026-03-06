@@ -33,6 +33,12 @@ html {
   color: #030212;
   font-size: 2rem;
 }
+.main .graphique-filtre {
+  background-color: #FFFFFF;
+  border-radius: 14px;
+  border: 1px solid #E5D5C5;
+  padding: 20px 24px;
+}
 .main select,
 .main input {
   padding: 8px 16px;
@@ -45,4 +51,17 @@ html {
 .main input:hover {
   background: #FFF7F1;
   border-color: #CD7F32;
+}
+.main #filre {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+}
+.main canvas {
+  border-bottom: 1px solid #E5D5C5;
+  padding: 30px 0;
+}
+.main #divSelectArticle {
+  padding-top: 20px;
 }/*# sourceMappingURL=statistique.css.map */
