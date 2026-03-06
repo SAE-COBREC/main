@@ -60,7 +60,6 @@ try {
             <header class="header">
                 <h1>Commande Vendeur</h1>
             </header>
-
             <section class="liste-commandes">
                 <?php if (empty($commandes)): ?>
                     <div class="empty-state">Aucune commande n'a été passée pour vos articles.</div>

@@ -1,164 +1,218 @@
+// =============================================================================
+// creerArticle.scss - Titres & Champs XL + Boutons Taille Standard (Index)
+// =============================================================================
+
 @use "../variable" as *;
 
-$card: #ecd9c6;
+// --- Reset & Mise en page de base ---
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-body{
+body {
+  font-family: $font-family-secondaire;
+  background: $secondary-color-rose-claire;
+  display: flex; 
+  width: 1440px;
+  height: 1024px;
+  overflow: hidden;
+}
+
+// Menu latéral
+aside {
+  width: 270px; // Cohérent avec index
+  flex-shrink: 0;
+}
+
+// Zone principale
+main {
+  flex: 1;
+  padding: 24px 40px; 
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    margin-bottom: 20px;
+    flex-shrink: 0;
+
+    &__title {
+      font-family: $font-family-primaire;
+      color: $primary-color-noir;
+      font-size: 42px; // Titre de page XL
+    }
+  }
+
+  // --- Configuration du Formulaire ---
+  form {
     display: flex;
-    flex-direction: row;
-    margin:0;
-    overflow: auto;
-    background-color: $secondary-color-marron-clair;
-    height: 1024px;
-    width: 1440px;
-    font-family: $font-family-secondaire;
+    flex-direction: row; 
+    flex-wrap: wrap;     
+    justify-content: flex-start; // Boutons alignés à gauche
+    gap: 16px;           
 
-    main{
-        padding:1px 36px;
-        form{
-            > input{
-                position: relative;
-                padding: 8px 16px;
-                border-radius: 8px;
-                font-weight: 700;
-                border: 0;
-                cursor: pointer;
-                background: $primary-color-blanc;
-                border: 1px solid #ecd9c6;
-                color: #030212;
-                margin-bottom: 2em;
-            }
-            input[type=submit] {
-                cursor: pointer;
-            }
-            > .orange{
-                background: $primary-color-bronze;
-                color: #fff;
-                box-shadow: 0 4px 0.1em rgba(205,127,50,0.12);
-            }
-            > *:disabled{
-                background: $secondary-color-gris-fonce;
-            }
+    // Conteneur des sections
+    > div {
+      width: 100%; 
+      display: grid;
+      grid-template-columns: 1.5fr 1fr; // Structure 2 colonnes (Info / Logistique)
+      gap: 24px; 
+      margin-bottom: 20px; 
+      align-items: start;
+    }
+
+    // --- Sections (Cartes blanches) ---
+    section {
+      background: $primary-color-blanc;
+      border: 1px solid $secondary-color-orange-clair;
+      border-radius: $border-radius-primary;
+      padding: 20px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+
+      // Titres de sections (H2 et H3) agrandis
+      h2, h3 {
+        font-family: $font-family-primaire;
+        font-size: 32px; 
+        margin-bottom: 16px;
+        color: $primary-color-noir;
+        border-bottom: 3px solid $secondary-color-rose-claire;
+        padding-bottom: 6px;
+      }
+
+      // Groupes de champs (Articles)
+      article {
+        margin-bottom: 16px; 
+
+        label {
+          display: block;
+          font-weight: 800; 
+          font-size: 18px;  // Label agrandi
+          margin-bottom: -2px; // FORCE LE COLLAGE PHYSIQUE
+          padding-left: 4px;   
+          position: relative;
+          z-index: 2; // Passe par-dessus la bordure de l'input
+          color: $primary-color-noir;
         }
 
-        div {
-            display:grid;
-            // grid-template-columns:2fr 1fr;
-            gap:2em;
-            // height:calc(100% - 70px);
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+          width: 100%;
+          padding: 12px 16px; // Champ agrandi
+          border: 1.5px solid $secondary-color-orange-clair; 
+          border-radius: $border-radius-primary;
+          font-family: inherit;
+          font-size: 16px; 
+          background: #fafafa;
+          position: relative;
+          z-index: 1;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color-bronze;
+            background: $primary-color-blanc;
+          }
         }
 
-        section{
-            grid-column:1;
-            grid-row:1;
-            //width: 630px;
-            background:white;
-            border-radius:0.1em;
-            padding:14px;
-            border:1px solid $card;
-            border-radius: $border-radius-primary;
+        textarea {
+          resize: vertical;
+          min-height: 100px;
+        }
 
-            h3{
-                font-weight: bold;
-            }
-            article{
-                padding: 0.3em;
-                margin-bottom: 0.3em;
+        small {
+          display: block;
+          margin-top: 4px;
+          color: $secondary-color-gris-fonce;
+          font-size: 13px;
+        }
 
-                label{
-                    font-weight: bold;
+        .warn {
+          color: $secondary-color-rouge;
+          font-weight: 700;
+        }
+      }
+    }
+
+    // --- Photos ---
+    section:has(#photo\[\]) {
+        article {
+            small:has(img) {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 5px 10px 0 0;
+                background: $secondary-color-rose-claire;
+                padding: 6px;
+                border-radius: $border-radius-primary;
+
+                img {
+                    border-radius: 4px;
+                    object-fit: cover;
+                    margin-bottom: 6px;
+                    height: 90px;
                 }
-                
-                img{
-                    position: relative;
-                    transition: all 0.5s ease 0.25s;
-                    transform: scale(1,1);
-                    z-index: 0;
-                }
-                img:hover{
-                    transition: all 0.5s ease 0.25s;
-                    transform: scale(2,2);
-                    z-index: 1;
-                }
 
-                > input, textarea, select, option{
-                    border:1px solid $card;
-                    background-color: white;
-                    border-radius: 8px;
-                    font: {
-                        family:inherit;
-                        size: 15px;
-                    }
-                    width:40em;
-                    padding:0.6em;
-                }
-            }
-        }
-        section:nth-of-type(4){
-            background:$secondary-color-rose-claire;
-
-            input{
-                background:$secondary-color-rose-claire;
-            }
-        }
-        .warn{
-            color:red;
-        }
-
-        #photo {
-            border:2px dashed #ecd9c6;
-            border-radius:0.1em;
-            padding:28px;
-            text-align:center;
-            color:#8b7a6a;
-        }
-
-        section:nth-child(2){
-            grid-row:2;
-            //max-height:12em;
-            article{
-                > label:first-of-type{
+                input[type="submit"][name^="btn_moins"] {
+                    background: $secondary-color-rouge;
+                    color: white;
+                    border: none;
+                    width: 26px;
+                    height: 26px;
+                    border-radius: 50%;
                     cursor: pointer;
-                    border:1px solid $card;
-                    background-color: white;
-                    border-radius: 8px;
-                    font: {
-                        family:inherit;
-                        size: 15px;
-                    }
-                    width:40em;
-                    padding:0.6em;
-                }
-                > input:first-of-type{
-                    opacity: 0;
-                    height: 0;
-                }
-                small{
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                    input{
-                        width: 2em;
-                    }
+                    font-size: 18px;
                 }
             }
-        }
-    
-        section:nth-child(3), section:nth-child(4){
-            //width: 360px;
-            //max-height: 15em;
-            grid-column: 2;
-            input, textarea, select, option{
-                width: 20em;
-                padding:0.6em;
-            }
-        }
-
-        section:nth-child(3){
-            grid-row:1;
-        }
-
-        section:nth-child(4){
-            grid-row:2;
         }
     }
+
+    // --- BOUTONS D'ACTION (RETOUR TAILLE DÉBUT / INDEX) ---
+    input[type="button"],
+    input[type="submit"] {
+      padding: 10px 24px; // TAILLE ORIGINALE RESTAURÉE
+      border-radius: $border-radius-primary;
+      font-weight: 600;
+      font-size: 18px; // TAILLE DE POLICE ORIGINALE
+      cursor: pointer;
+      border: 2px solid $primary-color-bronze;
+      background: $primary-color-blanc;
+      color: $primary-color-bronze;
+      transition: all 0.2s;
+
+      &:hover {
+        background: $secondary-color-rose-claire;
+      }
+
+      &.orange, 
+      &[name="publier"], 
+      &[name="enLigne"],
+      &[name="sauvegarder"] {
+        background: $primary-color-bronze;
+        color: white;
+        border: none;
+
+        &:hover { background: rgba($primary-color-bronze, 0.9); }
+      }
+
+      &[value="Annuler"] {
+        border-color: $secondary-color-gris-fonce;
+        color: $secondary-color-gris-fonce;
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        filter: grayscale(1);
+      }
+    }
+  }
+}
+
+// Bordure rouge pour erreurs PHP
+input[style*="border: 3px solid red"], 
+section[style*="border: 3px solid red"] {
+    border: 2.5px solid $secondary-color-rouge !important;
 }

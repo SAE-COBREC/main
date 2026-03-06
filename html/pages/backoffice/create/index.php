@@ -324,22 +324,24 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     include __DIR__ . '/../../../partials/aside.html';
     ?>
     <main>
-        <h2><?php 
-        if (empty($_SESSION["creerArticle"]['_GET']['id_produit'])){
-            //si id_produit n'est pas connu alors on paramètre les autres var du _GET afind 'éviter des warnings php
-            $_SESSION["creerArticle"]['_GET']['p_statut'] = '';
-            $_SESSION["creerArticle"]['_GET']['p_nom'] = '';
-            $_SESSION["creerArticle"]['_GET']['id_produit'] = '';
-        }
-        if(($_SESSION["creerArticle"]['_GET'] == null) || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
-            echo 'Ébauche de produit';
-        }else if(($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne')){
-            echo 'Produit hors ligne';
-        }else{
-            echo 'Produit en ligne';
-        }
-        ?>
-        </h2>
+        <header class="header">
+            <h1><?php 
+            if (empty($_SESSION["creerArticle"]['_GET']['id_produit'])){
+                //si id_produit n'est pas connu alors on paramètre les autres var du _GET afind 'éviter des warnings php
+                $_SESSION["creerArticle"]['_GET']['p_statut'] = '';
+                $_SESSION["creerArticle"]['_GET']['p_nom'] = '';
+                $_SESSION["creerArticle"]['_GET']['id_produit'] = '';
+            }
+            if(($_SESSION["creerArticle"]['_GET'] == null) || ($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Ébauche')){
+                echo 'Ébauche de produit';
+            }else if(($_SESSION["creerArticle"]['_GET']['p_statut'] == 'Hors ligne')){
+                echo 'Produit hors ligne';
+            }else{
+                echo 'Produit en ligne';
+            }
+            ?>
+            </h1>
+        </header>
         <form action="index.php<?php 
             if($_SESSION["creerArticle"]["_GET"] != null){
                 echo '?modifier=' . $_SESSION["creerArticle"]["_GET"]['id_produit'];
