@@ -520,9 +520,6 @@ try {
                     <form class="card__body" method="POST" enctype="multipart/form-data" id="import-form">
                         <input type="hidden" name="action" value="import" />
 
-                        <p class="card__subtitle">Si le fichier contient des produits existants, alors ils seront mis à
-                            jour et le statut sera mis "Hors ligne"</p>
-
                         <div class="upload-zone" id="upload-zone">
                             <svg class="upload-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -611,7 +608,8 @@ try {
                                     </tbody>
                                 </table>
                             </div>
-                            <p class="card__note">Si un produit avec le même nom existe déjà, il sera mis à jour.</p>
+                            <p class="card__note">Si un produit avec le même nom existe déjà, il sera mis à jour et le
+                                statut sera fixé à "Hors ligne".</p>
                         </div>
 
                         <button type="submit" class="btn btn--primary btn--full" id="btn-import">
