@@ -61,54 +61,9 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     <!-- Locate control CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
 
-    <style>
-    /* ============================================
-           LÉGENDE
-        ============================================ */
-    .legende-carte {
-        background: white;
-        padding: 10px 14px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-        font-size: 13px;
-        line-height: 1.6;
-        min-width: 160px;
-    }
+    <!-- Style personnalisé -->
+    <link rel="stylesheet" href="/styles/Carte/style.css">
 
-    .legende-carte h4 {
-        margin: 0 0 8px 0;
-        font-size: 14px;
-        font-weight: bold;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 4px;
-    }
-
-    .legende-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 4px;
-    }
-
-    /* ============================================
-           BOUTONS POPUP VENDEUR
-        ============================================ */
-    .btn-voir-produits {
-        display: block;
-        width: 100%;
-        padding: 6px 10px;
-        background: #28a745;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 13px;
-        margin-bottom: 6px;
-    }
-
-    .btn-voir-produits:hover {
-        background: #218838;
-    }
-    </style>
 </head>
 
 <body>
