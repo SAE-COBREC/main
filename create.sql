@@ -45,6 +45,7 @@ CREATE TABLE cobrec1._compte (
     motif_blocage varchar(255),
     mdp varchar(255) NOT NULL,
     secret_A2F varchar(255),
+    etat_A2F  boolean DEFAULT FALSE,
     prenom varchar(100) NOT NULL,
     nom varchar(100) NOT NULL,
     civilite varchar(255) DEFAULT 'Inconnu' NOT NULL,

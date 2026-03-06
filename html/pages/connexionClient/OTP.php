@@ -96,9 +96,10 @@ try {//enregistrement du secret_A2F dans la BDD
                 xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
                 xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xhttp3.send("statutOTP=active");
-                document.location.href = "/pages/connexionClient/index.php"; 
+                succesA2F();
+                //document.location.href = "/pages/connexionClient/index.php"; 
             }else{
-                alert("Echec." + contentLength);
+                alert("Echec. Veuillez réessayer.");
             }
         }
         };

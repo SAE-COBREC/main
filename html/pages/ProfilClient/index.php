@@ -685,13 +685,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
             <?php
                 if (empty($_SESSION['OTP'])){
                     include_once '../connexionClient/OTP.php';
-                    ?>
-                    <script>
-                        // document.getElementById('a2form').addEventListener('submit', function(event) {
-                        //     document.location.href = "/pages/connexionClient/index.php"; 
-                        // });
-                    </script>
-                    <?php
                 }
             ?>
             <form>
@@ -837,6 +830,9 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         const champCacheLienImage = document.getElementById('lien_image');
         //récupère l'ID du client connecté depuis PHP
         const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
+
+        //réactive le bouton pour activer l'A2F
+        document.getElementById('activerA2F').disabled = false;
 
 
         //configure le système de drag & drop pour l'upload d'image
@@ -1241,6 +1237,10 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     function ouvrirModalA2F() {
         document.getElementById('modalA2F').style.display = 'block';
+    }
+    function succesA2F() {
+        document.getElementById('activerA2F').textContent = "Authentification à double facteurs activée avec succès."
+        document.getElementById('activerA2F').disabled = true
     }
 
     document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {

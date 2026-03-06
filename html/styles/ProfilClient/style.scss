@@ -148,6 +148,9 @@ main {
 
     button {
         @include button-primary;
+        &:disabled{
+            background: $secondary-color-gris-fonce !important;
+        }
     }
 
     form {
@@ -1007,6 +1010,11 @@ main section:nth-of-type(2) article > footer > form {
   max-width: 500px;
   width: 90%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+#modalA2F img{
+    display: flex;
+    align-self: center;
 }
 
 #modalA2F small{

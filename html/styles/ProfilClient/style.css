@@ -55,6 +55,9 @@ main button:hover {
   background: #7171A3;
   color: #FFFFFF;
 }
+main button:disabled {
+  background: #c0c0c0 !important;
+}
 main form {
   display: flex;
   flex-direction: column;
@@ -880,6 +883,11 @@ main section:nth-of-type(2) article > footer > form button:hover {
   max-width: 500px;
   width: 90%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+#modalA2F img {
+  display: flex;
+  align-self: center;
 }
 
 #modalA2F small {
