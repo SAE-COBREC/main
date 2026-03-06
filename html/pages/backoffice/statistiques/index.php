@@ -188,6 +188,22 @@ try {
             }
         });
 
+        const graph3 = new Chart(canva3, {
+            type: 'line',
+            data: {
+                labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+                datasets: [{
+                    label: 'Ventes mensuelles du produit',
+                    data: [],
+                    borderColor: 'rgba(230, 169, 110, 1)',
+                    backgroundColor: 'rgba(236, 142, 55, 0.9)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
 
         function chargerLesStats() {
             const modeAffichage = document.getElementById('modeAffichage').value; //mode affiche corresponde a année ou période
