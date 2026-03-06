@@ -38,7 +38,7 @@ body {
 }
 
 .card {
-  background: $primary-color-white;
+  background: $primary-color-blanc;
   width: 100%;
   max-width: 661px;
   padding: 50px 25px 25px 25px;
@@ -75,7 +75,7 @@ body {
   h1 {
     font-family: $font-family-primaire;
     font-size: 36px;
-    color: $primary-color-black;
+    color: $primary-color-noir;
 
     @media #{$mobile} {
       font-size: 28px;
@@ -84,7 +84,7 @@ body {
 
   .subtitle {
     font-size: 24px;
-    color: $primary-color-black;
+    color: $primary-color-noir;
     margin-bottom: 40px;
 
     @media #{$mobile} {
@@ -94,7 +94,7 @@ body {
 
   label {
     font-size: 24px;
-    color: $primary-color-black;
+    color: $primary-color-noir;
     text-align: left;
     display: block;
     padding-left: 40px;
@@ -109,7 +109,7 @@ body {
   input {
     width: 520px;
     height: 50px;
-    border: 1px solid $primary-color-black;
+    border: 1px solid $primary-color-noir;
     border-radius: $border-radius-primary;
     padding: 0px 12px;
     font-size: 16px;
@@ -124,8 +124,8 @@ body {
 
     &:focus {
       outline: none;
-      border-color: $primary-color-blue;
-      box-shadow: 0 0 4px $primary-color-blue;
+      border-color: $primary-color-bleu;
+      box-shadow: 0 0 4px $primary-color-bleu;
     }
 
     &#codeP {
@@ -148,7 +148,7 @@ body {
   }
 
   .error {
-    background: $primary-color-white;
+    background: $primary-color-blanc;
     border-radius: $border-radius-primary;
     color: #c00;
     padding: 10px;
@@ -170,7 +170,7 @@ body {
   .prev-btn {
     width: 100%;
     background: transparent;
-    color: $secondary-color-red;
+    color: $secondary-color-rouge;
     font-size: 18px;
     padding: 8px 0;
     border-radius: $border-radius-primary;
@@ -183,7 +183,7 @@ body {
 
     .next-text {
       pointer-events: none;
-      color: $primary-color-black;
+      color: $primary-color-noir;
       font-weight: 500;
     }
 
@@ -197,12 +197,12 @@ body {
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: $primary-color-black;
+      color: $primary-color-noir;
       border-radius: 50%;
       transition: background 0.18s ease, transform 0.12s ease;
 
       &:hover {
-        background: rgba($primary-color-black, 0.1);
+        background: rgba($primary-color-noir, 0.1);
         transform: scale(1.06);
       }
     }
@@ -212,14 +212,14 @@ body {
       display: inline-block;
       vertical-align: middle;
       transform: scaleX(-1);
-      color: $primary-color-black;
+      color: $primary-color-noir;
     }
 
     .btn-arrow-left {
       max-width: 50px;
       display: inline-block;
       vertical-align: middle;
-      color: $primary-color-black;
+      color: $primary-color-noir;
     }
   }
 
@@ -262,7 +262,7 @@ body {
 
     .btn-prev {
       flex-direction: column;
-      color: $primary-color-black;
+      color: $primary-color-noir;
 
       .nav-arrow {
         width: 24px;
@@ -273,8 +273,8 @@ body {
 
     .btn-next {
       flex-direction: row;
-      background: $primary-color-black;
-      color: $primary-color-white;
+      background: $primary-color-noir;
+      color: $primary-color-blanc;
       padding: 8px 12px;
     }
 
@@ -317,8 +317,8 @@ body {
 }
 
 .modal-content {
-  background: $primary-color-white;
-  color: $primary-color-black;
+  background: $primary-color-blanc;
+  color: $primary-color-noir;
   padding: 20px 24px;
   border-radius: $border-radius-primary;
   width: 520px;
@@ -328,7 +328,7 @@ body {
   h2 {
     margin: 0 0 12px 0;
     font-size: 20px;
-    color: $primary-color-blue;
+    color: $primary-color-bleu;
   }
 }
 
@@ -357,15 +357,15 @@ body {
 
 .btn-cancel {
   background: transparent;
-  border: 1px solid $primary-color-black;
+  border: 1px solid $primary-color-noir;
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .btn-confirm {
-  background: $primary-color-black;
-  color: $primary-color-white;
+  background: $primary-color-noir;
+  color: $primary-color-blanc;
   border: none;
   padding: 8px 12px;
   border-radius: 8px;
@@ -496,7 +496,7 @@ body {
     font-size: 18px;
     >a{
       &:hover {
-        color: $primary-color-black;
+        color: $primary-color-noir;
       }
     }
   }
@@ -522,7 +522,7 @@ body {
       width: 20px;
       height: 20px;
       margin-right: 6px;
-      accent-color: $primary-color-blue;
+      accent-color: $primary-color-bleu;
     }
   }
 
@@ -552,11 +552,11 @@ body {
   input[type="checkbox"] {
     width: 20px;
     height: 20px;
-    accent-color: $primary-color-blue;
+    accent-color: $primary-color-bleu;
   }
 
   a {
-    color: $primary-color-blue;
+    color: $primary-color-bleu;
     text-decoration: underline;
     cursor: pointer;
 
@@ -592,7 +592,7 @@ body {
       font-size: 16px;
       margin-top: 16px;
       margin-bottom: 8px;
-      color: $primary-color-blue;
+      color: $primary-color-bleu;
     }
 
     p {

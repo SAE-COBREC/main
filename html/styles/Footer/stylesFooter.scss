@@ -12,8 +12,8 @@
 
 footer {
   grid-column: 1 / -1;
-  background: $primary-color-black;
-  color: $primary-color-white;
+  background: $primary-color-noir;
+  color: $primary-color-blanc;
   padding: 3rem 2rem 2rem;
   margin-top: auto;
 
@@ -29,7 +29,7 @@ footer {
     gap: 2rem;
     margin-bottom: 3rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid $primary-color-blue;
+    border-bottom: 1px solid $primary-color-bleu;
 
     > a {
       width: 50px;
@@ -39,7 +39,7 @@ footer {
       cursor: pointer;
       font-size: 1.5rem;
       text-decoration: none;
-      color: $primary-color-white;
+      color: $primary-color-blanc;
       @include transition(all);
 
       &:hover {
@@ -59,7 +59,7 @@ footer {
     h4 {
       margin-bottom: 1rem;
       font-size: 1.1rem;
-      color: $primary-color-white;
+      color: $primary-color-blanc;
     }
 
     ul {
@@ -71,12 +71,12 @@ footer {
     }
 
     a {
-      color: $secondary-color-dark-grey;
+      color: $secondary-color-gris-fonce;
       text-decoration: none;
       @include transition(color);
 
       &:hover {
-        color: $primary-color-white;
+        color: $primary-color-blanc;
       }
     }
   }
@@ -85,8 +85,8 @@ footer {
   > div > div:last-child {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid $primary-color-blue;
-    color: $secondary-color-dark-grey;
+    border-top: 1px solid $primary-color-bleu;
+    color: $secondary-color-gris-fonce;
     font-size: 0.85rem;
     display: flex;
     justify-content: center;
@@ -97,15 +97,15 @@ footer {
       @include transition(color);
 
       &:hover {
-        color: $primary-color-white;
+        color: $primary-color-blanc;
       }
       a {
-        color: $secondary-color-dark-grey;
+        color: $secondary-color-gris-fonce;
         text-decoration: none;
         @include transition(color);
 
         &:hover {
-          color: $primary-color-white;
+          color: $primary-color-blanc;
         }
       }
     }

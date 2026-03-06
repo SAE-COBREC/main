@@ -3,8 +3,8 @@
 
 .site-header {
     grid-column: 1 / -1;
-    background-color: $primary-color-white;
-    color: $primary-color-black;
+    background-color: $primary-color-blanc;
+    color: $primary-color-noir;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
     position: sticky; 
     top: 0;            
@@ -12,7 +12,7 @@
     width: 100%;
     box-sizing: border-box;
     height: 72px;
-    border-bottom: 1px solid $secondary-color-light-grey;
+    border-bottom: 1px solid $secondary-color-gris-clair;
 }
 
 .carte {
@@ -44,7 +44,7 @@
 .brand-name {
     font-family: $font-family-secondaire;
     font-size: 20px;
-    color: $primary-color-blue;
+    color: $primary-color-bleu;
     font-weight: 700;
 }
 
@@ -56,8 +56,8 @@
     border-radius: $border-radius-primary;
     padding: 0.7em 1em;
     max-width: 500px;
-    background-color: $secondary-color-light-grey;
-    color: $primary-color-blue;
+    background-color: $secondary-color-gris-clair;
+    color: $primary-color-bleu;
     display: none;
 }
 
@@ -81,7 +81,7 @@
         &::-moz-placeholder,
         &:-ms-input-placeholder,
         &::placeholder {
-            color: $primary-color-blue;
+            color: $primary-color-bleu;
         }
 
     }
@@ -96,7 +96,7 @@
     background: transparent;
     border: none;
     font-size: 18px;
-    color: $primary-color-blue;
+    color: $primary-color-bleu;
     margin-right: 10px;
     cursor: pointer;
 }
@@ -107,7 +107,7 @@
     outline: none;
     background: transparent;
     font-size: 14px;
-    color: $primary-color-black;
+    color: $primary-color-noir;
 }
 
 .icons-container {
@@ -129,7 +129,7 @@
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    color: $primary-color-black;
+    color: $primary-color-noir;
     text-decoration: none;
     font-size: 18px;
     position: relative;
@@ -142,7 +142,7 @@
         height: 10px;
         background-color: #23a559;
         border-radius: 50%;
-        border: 2px solid $primary-color-white;
+        border: 2px solid $primary-color-blanc;
         box-sizing: content-box;
     }
 
@@ -167,7 +167,7 @@
             left: 50%;
             width: 12px;
             height: 12px;
-            background-color: $primary-color-blue;
+            background-color: $primary-color-bleu;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             animation: item-pop-out 0.8s ease-out forwards;

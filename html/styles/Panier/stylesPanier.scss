@@ -46,7 +46,7 @@ button {
 }
 
 .unArticleP {
-  border: 1px solid $primary-color-blue;
+  border: 1px solid $primary-color-bleu;
   width: 960px;
   height: fit-content;
   display: flex;
@@ -111,7 +111,7 @@ button {
     }
 
     p {
-      color: $primary-color-blue;
+      color: $primary-color-bleu;
       font-weight: bold;
 
       @media screen and (max-width: 428px) {
@@ -132,14 +132,14 @@ button {
       width: 30px;
       height: 30px;
       text-align: center;
-      border: 1px solid $secondary-color-dark-grey;
+      border: 1px solid $secondary-color-gris-fonce;
       border-radius: $border-radius-mini;
     }
   }
 }
 
 .recapCommande {
-  background-color: $secondary-color-light-grey;
+  background-color: $secondary-color-gris-clair;
   border-radius: $border-radius-primary;
   width: 404px;
   max-width: 100%;
@@ -170,9 +170,9 @@ button {
   }
 
   button {
-    background-color: $primary-color-black;
+    background-color: $primary-color-noir;
     border-radius: 999px;
-    color: $primary-color-white;
+    color: $primary-color-blanc;
     width: 343px; //bloqué sa largeur a 343
     height: 49px;
     border: none;
@@ -199,10 +199,10 @@ button {
   width: fit-content;
   display: block;
   margin: 0 auto;
-  background-color: $primary-color-black;
+  background-color: $primary-color-noir;
   border-radius: 999px;
   text-decoration: none;
-  color: $primary-color-white;
+  color: $primary-color-blanc;
   text-align: center;
   padding: 1em;
   margin: 1em auto;

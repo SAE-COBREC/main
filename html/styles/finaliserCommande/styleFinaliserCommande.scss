@@ -3,7 +3,7 @@
 html {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, $primary-color-blue 0%, $primary-color-black 100%);
+    background: linear-gradient(135deg, $primary-color-bleu 0%, $primary-color-noir 100%);
     font-family: $font-family-secondaire;
     display: flex;
     justify-content: center;
@@ -31,12 +31,12 @@ h2 {
 
 a {
     text-decoration: none;
-    color: $primary-color-white;
+    color: $primary-color-blanc;
     font-size: 1.4rem;
 }
 
 .infoPaiement {
-    background-color: $primary-color-white;
+    background-color: $primary-color-blanc;
     border-radius: $border-radius-primary;
     width: 460px;
     padding: 30px;
@@ -51,12 +51,12 @@ a {
     }
 
     a {
-        color: $primary-color-black;
+        color: $primary-color-noir;
     }
 
     p {
-        background-color: $secondary-color-red-error;
-        color: $secondary-color-red;
+        background-color: $secondary-color-rouge-erreur;
+        color: $secondary-color-rouge;
         margin-top: 0.5em;
         padding: 0.7em;
         border-radius: $border-radius-primary;
@@ -75,7 +75,7 @@ a {
     /* Input par défaut */
     input[type="text"], input[type="number"] {
         height: 45px;
-        border: 1px $secondary-color-dark-grey solid;
+        border: 1px $secondary-color-gris-fonce solid;
         border-radius: $border-radius-primary;
         width: 100%;
         margin: 0.5em 0 1.5em 0;
@@ -95,7 +95,7 @@ a {
         flex-direction: column;
 
         input[type="checkbox"] {
-            accent-color: $primary-color-blue;
+            accent-color: $primary-color-bleu;
             cursor: pointer;
             height: 1.4em;
             width: 1.4em;
@@ -107,8 +107,8 @@ a {
         width: 100%;
         margin-top: 0.5em;
         padding: 0.6em;
-        background: $primary-color-black;
-        color: $primary-color-white;
+        background: $primary-color-noir;
+        color: $primary-color-blanc;
         border: none;
         border-radius: $border-radius-primary;
         font-size: 1.3rem;
@@ -116,14 +116,14 @@ a {
         text-align: center;
 
         &:hover {
-            background-color: $primary-color-blue;
+            background-color: $primary-color-bleu;
         }
     }
 
     select {
         background-color: white;
         font-size: 1.2em;
-        border: 1px solid $secondary-color-dark-grey ;
+        border: 1px solid $secondary-color-gris-fonce ;
         border-radius: $border-radius-primary;
         height: 45px;
         width: 100%;
@@ -147,8 +147,8 @@ a {
 }
 
 .modal-content {
-  background: $primary-color-white;
-  color: $primary-color-black;
+  background: $primary-color-blanc;
+  color: $primary-color-noir;
   padding: 20px 24px;
   border-radius: $border-radius-primary;
   width: 520px;
@@ -158,7 +158,7 @@ a {
   h2 {
     margin: 0 0 12px 0;
     font-size: 20px;
-    color: $primary-color-blue;
+    color: $primary-color-bleu;
   }
 }
 
@@ -171,15 +171,15 @@ a {
 
 .btn-cancel {
   background: transparent;
-  border: 1px solid $primary-color-black;
+  border: 1px solid $primary-color-noir;
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .btn-confirm {
-  background: $primary-color-black;
-  color: $primary-color-white;
+  background: $primary-color-noir;
+  color: $primary-color-blanc;
   border: none;
   padding: 8px 12px;
   border-radius: 8px;
@@ -203,7 +203,7 @@ a {
       font-size: 16px;
       margin-top: 16px;
       margin-bottom: 8px;
-      color: $primary-color-blue;
+      color: $primary-color-bleu;
     }
 
     p {
@@ -213,5 +213,5 @@ a {
 }
 
 .checkBox div label a {
-    color: $primary-color-blue; 
+    color: $primary-color-bleu; 
 }

@@ -7,7 +7,7 @@ body{
     flex-direction: row;
     margin:0;
     overflow: auto;
-    background-color: $secondary-color-light-brown;
+    background-color: $secondary-color-marron-clair;
     height: 1024px;
     width: 1440px;
     font-family: $font-family-secondaire;
@@ -22,7 +22,7 @@ body{
                 font-weight: 700;
                 border: 0;
                 cursor: pointer;
-                background: $primary-color-white;
+                background: $primary-color-blanc;
                 border: 1px solid #ecd9c6;
                 color: #030212;
                 margin-bottom: 2em;
@@ -31,12 +31,12 @@ body{
                 cursor: pointer;
             }
             > .orange{
-                background: $primary-color-copper;
+                background: $primary-color-bronze;
                 color: #fff;
                 box-shadow: 0 4px 0.1em rgba(205,127,50,0.12);
             }
             > *:disabled{
-                background: $secondary-color-dark-grey;
+                background: $secondary-color-gris-fonce;
             }
         }
 
@@ -94,10 +94,10 @@ body{
             }
         }
         section:nth-of-type(4){
-            background:$secondary-color-light-pink;
+            background:$secondary-color-rose-claire;
 
             input{
-                background:$secondary-color-light-pink;
+                background:$secondary-color-rose-claire;
             }
         }
         .warn{
