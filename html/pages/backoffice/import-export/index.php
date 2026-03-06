@@ -40,25 +40,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if ($ext !== 'csv') {
             $message_error = "Format non supporté. Veuillez envoyer un fichier .csv";
         } else {
-            $handle = fopen($file['tmp_name'], 'r');
-            if ($handle === false) {
+            // Lire tout le contenu du fichier pour un traitement fiable
+            $csvContent = file_get_contents($file['tmp_name']);
+            if ($csvContent === false || strlen($csvContent) === 0) {
                 $message_error = "Impossible de lire le fichier.";
             } else {
-                // Supprimer le BOM UTF-8 si présent (EF BB BF) pour éviter qu'il se colle au premier en-tête
-                $bom = fread($handle, 3);
-                if ($bom !== "\xEF\xBB\xBF") {
-                    rewind($handle); // Pas de BOM, on revient au début
+
+                // Supprimer le BOM UTF-8 si présent (bytes bruts)
+                if (substr($csvContent, 0, 3) === "\xEF\xBB\xBF") {
+                    $csvContent = substr($csvContent, 3);
                 }
 
-                // Lire l'en-tête
-                $header = fgetcsv($handle, 0, ';');
-                if ($header === false) {
+                // Supprimer d'éventuels espaces/sauts de ligne en début de contenu
+                $csvContent = ltrim($csvContent);
+
+                // Séparer les lignes (compatible \r\n, \n, \r)
+                $lines = preg_split('/\r\n|\r|\n/', $csvContent);
+
+                // Supprimer les lignes vides au début et à la fin
+                while (!empty($lines) && trim(end($lines)) === '') {
+                    array_pop($lines);
+                }
+                while (!empty($lines) && trim(reset($lines)) === '') {
+                    array_shift($lines);
+                }
+
+                if (empty($lines)) {
                     $message_error = "Le fichier CSV est vide.";
-                    fclose($handle);
                 } else {
-                    // Normaliser les en-têtes (trim + lowercase + suppression BOM résiduel)
+                    // Parser la ligne d'en-tête — auto-détection du séparateur
+                    $firstLine = $lines[0];
+                    $separator = ';';
+                    if (substr_count($firstLine, ',') > substr_count($firstLine, ';')) {
+                        $separator = ',';
+                    }
+
+                    $header = str_getcsv($firstLine, $separator, '"');
+                    if (empty($header) || (count($header) === 1 && (trim($header[0] ?? '') === '' || $header[0] === null))) {
+                        $message_error = "Le fichier CSV est vide ou mal formaté.";
+                        $header = false;
+                    }
+
+                if ($header !== false) {
+                    // Normaliser les en-têtes (trim + lowercase + suppression caractères invisibles)
                     $header = array_map(function($h) {
-                        $h = preg_replace('/^\x{FEFF}/u', '', $h); // Supprime BOM unicode résiduel
+                        $h = preg_replace('/[\x00-\x1F\x7F\xC2\xA0]/u', '', $h); // supprime caractères de contrôle
+                        $h = preg_replace('/^\x{FEFF}/u', '', $h); // BOM unicode résiduel
                         return strtolower(trim($h));
                     }, $header);
 
@@ -69,8 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     // Vérifier que les colonnes requises sont présentes
                     $colonnes_manquantes = array_diff($colonnes_requises, $header);
                     if (!empty($colonnes_manquantes)) {
-                        $message_error = "Colonnes manquantes dans le CSV : " . implode(', ', $colonnes_manquantes) . ". Colonnes requises : nom, description, prix, stock.";
-                        fclose($handle);
+                        $message_error = "Colonnes manquantes dans le CSV : " . implode(', ', $colonnes_manquantes) . ". Colonnes détectées : " . implode(', ', $header) . ". Séparateur détecté : '" . $separator . "'";
                     } else {
                         // Récupérer les catégories et TVA existantes
                         $stmtCat = $pdo->query("SELECT id_categorie, nom_categorie FROM cobrec1._categorie_produit");
@@ -94,11 +120,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         $pdo->beginTransaction();
 
                         try {
-                            while (($data = fgetcsv($handle, 0, ';')) !== false) {
+                            for ($lineIndex = 1; $lineIndex < count($lines); $lineIndex++) {
                                 $ligne++;
                                 
                                 // Ignorer les lignes vides
-                                if (count($data) === 1 && empty($data[0])) continue;
+                                if (trim($lines[$lineIndex]) === '') continue;
+
+                                $data = str_getcsv($lines[$lineIndex], $separator, '"');
 
                                 // Mapper les colonnes
                                 $row = [];
@@ -161,8 +189,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             ':poids' => isset($row['poids']) && $row['poids'] !== '' ? floatval(str_replace(',', '.', $row['poids'])) : 0,
                                             ':volume' => isset($row['volume']) && $row['volume'] !== '' ? floatval(str_replace(',', '.', $row['volume'])) : 0,
                                             ':frais_de_port' => isset($row['frais_de_port']) && $row['frais_de_port'] !== '' ? floatval(str_replace(',', '.', $row['frais_de_port'])) : 0,
-                                            ':statut' => isset($row['statut']) && in_array($row['statut'], ['Ébauche', 'En ligne', 'Hors ligne']) ? $row['statut'] : 'Ébauche',
-                                            ':origine' => isset($row['origine']) && in_array($row['origine'], ['Inconnu', 'Bretagne', 'France', 'UE', 'Hors UE']) ? $row['origine'] : 'Inconnu',
+                                            ':statut' => (isset($row['statut']) && $row['statut'] !== '') ? $row['statut'] : 'Ébauche',
+                                            ':origine' => (isset($row['origine']) && $row['origine'] !== '') ? $row['origine'] : 'Inconnu',
                                             ':id_produit' => $existing['id_produit']
                                         ]);
 
@@ -213,8 +241,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             ':frais_de_port' => isset($row['frais_de_port']) && $row['frais_de_port'] !== '' ? floatval(str_replace(',', '.', $row['frais_de_port'])) : 0,
                                             ':prix' => $prix,
                                             ':stock' => $stock,
-                                            ':statut' => isset($row['statut']) && in_array($row['statut'], ['Ébauche', 'En ligne', 'Hors ligne']) ? $row['statut'] : 'Ébauche',
-                                            ':origine' => isset($row['origine']) && in_array($row['origine'], ['Inconnu', 'Bretagne', 'France', 'UE', 'Hors UE']) ? $row['origine'] : 'Inconnu'
+                                            ':statut' => (isset($row['statut']) && $row['statut'] !== '') ? $row['statut'] : 'Ébauche',
+                                            ':origine' => (isset($row['origine']) && $row['origine'] !== '') ? $row['origine'] : 'Inconnu'
                                         ]);
 
                                         $new_id = $stmtInsert->fetchColumn();
@@ -249,10 +277,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             $pdo->rollBack();
                             $message_error = "Erreur lors de l'import : " . htmlspecialchars($e->getMessage());
                         }
-
-                        fclose($handle);
                     }
-                }
+                } // fin if ($header !== false)
+                } // fin if (!empty($lines))
             }
         }
     }
