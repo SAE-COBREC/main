@@ -174,6 +174,7 @@ body {
 }
 </style>
 
+
 <body>
     <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
         <div class="card" id="1">
