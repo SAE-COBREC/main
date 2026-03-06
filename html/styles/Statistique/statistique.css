@@ -16,8 +16,8 @@ html {
 
 .app {
   display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: 100vh;
+  grid-template-columns: 270px 1fr;
+  height: 1024px;
   background: #FFFFFF;
 }
 

@@ -17,8 +17,8 @@ body {
 
 .app {
   display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: 1024px;
+  grid-template-columns: 270px 1fr;
+  height: 1024px;
   background: $primary-color-blanc;
 }
 
