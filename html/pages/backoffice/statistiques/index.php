@@ -129,9 +129,9 @@ try {
                                 <option value="<?php echo htmlspecialchars($art) ?>"><?php echo htmlspecialchars($art) ?></option>
                             <?php endforeach; ?>
                         </select>
-                    </div>
-                    <div>
-                        <canvas id="graphiqueEvolutionArticle"></canvas>
+                        <div>
+                            <canvas id="graphiqueEvolutionArticle"></canvas>
+                        </div>
                     </div>
                 </section>
         </main>
@@ -149,9 +149,11 @@ try {
             if (this.value === "annee"){
                 groupeParAnnee.style.display = 'block';
                 groupeParPeriode.style.display = 'none';
+                document.getElementById('divSelectArticle').style.display = 'block';
             }else{
                 groupeParAnnee.style.display = 'none';
                 groupeParPeriode.style.display = 'block';
+                document.getElementById('divSelectArticle').style.display = 'none';
             }
             chargerLesStats();
         });
@@ -160,8 +162,10 @@ try {
         selectType.addEventListener('change', function(){
             if (this.value === "nbCommande"){
                 document.getElementById('divGraphiqueQuoiVendu').style.display = 'none';
+                document.getElementById('divSelectArticle').style.display = 'none';
             }else{
                 document.getElementById('divGraphiqueQuoiVendu').style.display = 'block';
+                document.getElementById('divSelectArticle').style.display = 'block';
             }
             chargerLesStats();
         });
@@ -209,7 +213,8 @@ try {
                     fill: true,
                     tension: 0.3
                 }]
-            }
+            },
+            options: { scales: { y: { beginAtZero: true, grace: '10%' } } }
         });
 
 
