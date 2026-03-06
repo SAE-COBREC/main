@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             ':poids' => isset($row['poids']) && $row['poids'] !== '' ? floatval(str_replace(',', '.', $row['poids'])) : 0,
                                             ':volume' => isset($row['volume']) && $row['volume'] !== '' ? floatval(str_replace(',', '.', $row['volume'])) : 0,
                                             ':frais_de_port' => isset($row['frais_de_port']) && $row['frais_de_port'] !== '' ? floatval(str_replace(',', '.', $row['frais_de_port'])) : 0,
-                                            ':statut' => (isset($row['statut']) && $row['statut'] !== '') ? $row['statut'] : 'Hors ligne',
+                                            ':statut' => 'Hors ligne',
                                             ':origine' => (isset($row['origine']) && $row['origine'] !== '') ? $row['origine'] : 'Inconnu',
                                             ':id_produit' => $existing['id_produit']
                                         ]);
