@@ -14,9 +14,9 @@ html, body {
 
 .app {
   display: grid;
-  grid-template-columns: 240px 1fr; 
-  height: 100vh;
-  width: 100%;
+  grid-template-columns: 270px 1fr;
+  height: 1024px;
+  background: $primary-color-blanc;
 }
 
 .main {
