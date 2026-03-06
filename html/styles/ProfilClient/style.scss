@@ -503,7 +503,7 @@ main {
                 }
             }
 
-            button:not(:last-of-type), .btnMdpClassique {
+            button:not(:last-of-type), #activerA2F {
                 display: block;
                 width: 100%;
                 @include flex-center;

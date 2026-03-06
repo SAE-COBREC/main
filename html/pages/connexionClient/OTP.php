@@ -51,7 +51,6 @@ $writer->validateResult($result, $otp->getProvisioningUri());
 <small><?php echo $otp->getSecret() ?></small>
 </label>
 <?php
-
 try {//enregistrement du secret_A2F dans la BDD
     $sql = '
     UPDATE cobrec1._compte
@@ -89,7 +88,7 @@ try {//enregistrement du secret_A2F dans la BDD
             const contentLength = xhttp2.getResponseHeader("Content-Length");
             if (contentLength == 4) {
                 xhttp2.abort();
-                alert("Authentification à double facteur activée avec succès.");
+                alert("Authentification à double facteur activée avec succès. Vous allez être déconnecté.");
                 //document.location.href = "/index.php"; 
                 document.getElementById('modalA2F').style.display = 'none';
 
@@ -97,6 +96,7 @@ try {//enregistrement du secret_A2F dans la BDD
                 xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
                 xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xhttp3.send("statutOTP=active");
+                document.location.href = "/pages/connexionClient/index.php"; 
             }else{
                 alert("Echec." + contentLength);
             }
