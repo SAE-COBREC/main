@@ -102,15 +102,15 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
 
     <?php include __DIR__ . '/../../partials/header.php'; ?>
 
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
+    <div id="loadingOverlay">
+        <div></div>
     </div>
 
     <main>
-        <div class="stats-page">
+        <div>
 
             <!-- Lien retour -->
-            <a href="/pages/ProfilClient/index.php" class="back-link">
+            <a href="/pages/ProfilClient/index.php">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
@@ -119,15 +119,15 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
             </a>
 
             <!-- Titre -->
-            <div class="stats-header">
+            <div>
                 <h1>Mes statistiques de commandes</h1>
                 <p>Visualisez l'historique et les tendances de vos achats.</p>
             </div>
 
             <!-- ── Filtres ── -->
-            <div class="stats-filters">
+            <div>
 
-                <div class="filter-group">
+                <div>
                     <label for="modeAffichage">Mode</label>
                     <select id="modeAffichage">
                         <option value="annee">Année</option>
@@ -135,7 +135,7 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
                     </select>
                 </div>
 
-                <div class="filter-group" id="groupeAnnee">
+                <div id="groupeAnnee">
                     <label for="selectAnnee">Année</label>
                     <select id="selectAnnee">
                         <?php foreach ($listeAnneesDisponibles as $annee): ?>
@@ -144,15 +144,15 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
                     </select>
                 </div>
 
-                <div class="filter-group" id="groupePeriode" style="display:none;">
+                <div id="groupePeriode" style="display:none;">
                     <label>Période</label>
-                    <div class="periode-inputs">
+                    <div>
                         <input type="date" id="dateDebut" />
                         <input type="date" id="dateFin" />
                     </div>
                 </div>
 
-                <div class="filter-group">
+                <div>
                     <label for="selectType">Afficher par</label>
                     <select id="selectType">
                         <option value="montant">Montant (€)</option>
@@ -161,7 +161,7 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
                     </select>
                 </div>
 
-                <div class="filter-group">
+                <div>
                     <label for="selectCategorie">Catégorie</label>
                     <select id="selectCategorie">
                         <option value="toutes">Toutes</option>
@@ -174,46 +174,46 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
             </div>
 
             <!-- ── KPI Cards ── -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <span class="kpi-label">Total dépensé</span>
-                    <span class="kpi-value" id="kpiDepense">–</span>
-                    <span class="kpi-sub">sur la période sélectionnée</span>
+            <div>
+                <div>
+                    <span>Total dépensé</span>
+                    <span id="kpiDepense">–</span>
+                    <span>sur la période sélectionnée</span>
                 </div>
-                <div class="kpi-card">
-                    <span class="kpi-label">Commandes passées</span>
-                    <span class="kpi-value" id="kpiCommandes">–</span>
-                    <span class="kpi-sub">commandes</span>
+                <div>
+                    <span>Commandes passées</span>
+                    <span id="kpiCommandes">–</span>
+                    <span>commandes</span>
                 </div>
-                <div class="kpi-card">
-                    <span class="kpi-label">Articles achetés</span>
-                    <span class="kpi-value" id="kpiArticles">–</span>
-                    <span class="kpi-sub">unités</span>
+                <div>
+                    <span>Articles achetés</span>
+                    <span id="kpiArticles">–</span>
+                    <span>unités</span>
                 </div>
-                <div class="kpi-card">
-                    <span class="kpi-label">Panier moyen</span>
-                    <span class="kpi-value" id="kpiMoyenne">–</span>
-                    <span class="kpi-sub" id="kpiTopProduit">–</span>
+                <div>
+                    <span>Panier moyen</span>
+                    <span id="kpiMoyenne">–</span>
+                    <span id="kpiTopProduit">–</span>
                 </div>
             </div>
 
             <!-- ── Graphiques ── -->
-            <div class="charts-grid">
+            <div>
 
                 <!-- Graph 1 : évolution mensuelle -->
-                <div class="chart-card chart-full">
+                <div>
                     <h2 id="titreGraph1">Montant mensuel (€)</h2>
                     <canvas id="graphique1"></canvas>
                 </div>
 
                 <!-- Graph 2 : top produits -->
-                <div class="chart-card" id="carteGraph2">
+                <div id="carteGraph2">
                     <h2 id="titreGraph2">Top 10 produits</h2>
                     <canvas id="graphique2"></canvas>
                 </div>
 
                 <!-- Graph 3 : répartition par catégorie -->
-                <div class="chart-card" id="carteGraph3">
+                <div id="carteGraph3">
                     <h2>Répartition par catégorie</h2>
                     <canvas id="graphique3"></canvas>
                 </div>
@@ -411,7 +411,7 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
         }
 
         //affiche l'indicateur de chargement
-        document.getElementById('loadingOverlay').classList.add('visible');
+        document.getElementById('loadingOverlay').dataset.visible = '';
 
         //lance la requête fetch vers le script PHP de données
         fetch(`donneStatsClient.php?${parametresRequete}`)
@@ -472,7 +472,7 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
             .catch(erreur => console.error('Erreur stats client :', erreur))
             .finally(() => {
                 //masque l'indicateur de chargement quoi qu'il arrive
-                document.getElementById('loadingOverlay').classList.remove('visible');
+                document.getElementById('loadingOverlay').removeAttribute('data-visible');
             });
     }
 
