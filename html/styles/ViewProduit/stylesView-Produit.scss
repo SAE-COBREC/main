@@ -282,6 +282,31 @@ body {
                 margin-top: 12px;
             }
         }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            
+        }
+
+        .add {
+            width: 100%;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        .ghost {
+            background: transparent;
+            border: 1px solid vars.$secondary-color-gris-clair;
+            color: vars.$primary-color-noir;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            height: 4em;
+            font-size: 13px;
+        }
     }
 }
 

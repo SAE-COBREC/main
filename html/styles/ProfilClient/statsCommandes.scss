@@ -1,7 +1,3 @@
-/* ----------------------------------------
-   Stats Commandes Client - styles
-   ---------------------------------------- */
-
 @use "../variable" as *;
 
 $bg-page: #F7F7FB;
@@ -22,13 +18,11 @@ body {
     color: $primary-color-noir;
 }
 
-/* ---- Page layout ---- */
 main > div {
     max-width: 1200px;
     margin: 0 auto;
     padding: 32px 20px 60px;
 
-    /* ---- Back link ---- */
     > a {
         display: inline-flex;
         align-items: center;
@@ -48,7 +42,6 @@ main > div {
         }
     }
 
-    /* ---- Header ---- */
     > div:nth-child(2) {
         h1 {
             font-family: $font-family-primaire;
@@ -64,7 +57,6 @@ main > div {
         }
     }
 
-    /* ---- Filters bar ---- */
     > div:nth-child(3) {
         @include card;
         padding: 20px 24px;
@@ -121,7 +113,6 @@ main > div {
         }
     }
 
-    /* ---- KPI Cards ---- */
     > div:nth-child(4) {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -134,7 +125,6 @@ main > div {
             display: flex;
             flex-direction: column;
             gap: 6px;
-            border-left: 4px solid $primary-color-bleu;
             transition: transform 0.2s, box-shadow 0.2s;
 
             &:hover {
@@ -171,7 +161,6 @@ main > div {
         }
     }
 
-    /* ---- Charts grid ---- */
     > div:nth-child(5) {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -196,7 +185,6 @@ main > div {
     }
 }
 
-/* ---- Loading overlay ---- */
 #loadingOverlay {
     position: fixed;
     inset: 0;
@@ -232,7 +220,6 @@ main > div {
     align-items: flex-end;
 }
 
-/* ---- Responsive ---- */
 @media (max-width: 768px) {
     main > div {
         > div:nth-child(5) {
