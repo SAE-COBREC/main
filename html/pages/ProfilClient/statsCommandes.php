@@ -108,7 +108,6 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
 
     <main>
         <div>
-
             <!-- Lien retour -->
             <a href="/pages/ProfilClient/index.php">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
