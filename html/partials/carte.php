@@ -167,7 +167,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     // ============================================
 
     var iconVendeur = L.icon({
-        iconUrl: '/img/png/badge-bretagne.png',
+        iconUrl: '/img/png/carte-et-localisation.png',
         iconSize: [33, 33],
         iconAnchor: [16, 33],
         popupAnchor: [0, -30]
@@ -342,7 +342,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
         div.innerHTML =
             '<h4>Légende</h4>' +
             '<div class="legende-item">' +
-            '<img src="/img/png/badge-bretagne.png" style="width:20px;height:20px;margin-right:6px;">' +
+            '<img src="/img/png/carte-et-localisation.png" style="width:20px;height:20px;margin-right:6px;">' +
             '<span>Vendeur</span>' +
             '</div>' +
             '<div class="legende-item">' +
