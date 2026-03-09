@@ -11,7 +11,7 @@ ensureAvisSchema($pdo);
 // --- LOGIQUE PRINCIPALE ---
 
 // 1. Gestion Session / Panier
-$idClient = isset($_SESSION['idClient']) ? (int)$_SESSION['idClient'] : null;
+$idClient = isset($_SESSION['idClient']) ? (int) $_SESSION['idClient'] : null;
 
 // Récupération infos client courant pour l'affichage (avatar, pseudo)
 $currentUser = null;
@@ -64,7 +64,7 @@ if ($idClient === null) {
 }
 
 // 2. Récupération ID Produit
-$idProduit = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$idProduit = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 // 3. Traitement POST (AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -80,29 +80,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($rawBody) {
             if (stripos($ct, 'application/json') !== false) {
                 $decoded = json_decode($rawBody, true);
-                if (is_array($decoded)) $_POST = $decoded;
+                if (is_array($decoded))
+                    $_POST = $decoded;
             } elseif (stripos($ct, 'application/x-www-form-urlencoded') !== false) {
                 parse_str($rawBody, $parsed);
-                if (is_array($parsed)) $_POST = $parsed;
+                if (is_array($parsed))
+                    $_POST = $parsed;
             }
         }
     }
     if (isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
         header('Content-Type: application/json');
-        
-        $idP = (int)($_POST['idProduit'] ?? 0);
-        $qty = (int)($_POST['quantite'] ?? 1);
+
+        $idP = (int) ($_POST['idProduit'] ?? 0);
+        $qty = (int) ($_POST['quantite'] ?? 1);
 
         if ($idClient === null) {
             echo json_encode(ajouterArticleSession($pdo, $idP, $qty));
         } else {
             $idPanier = $_SESSION['panierEnCours'] ?? null;
-            if (!$idPanier) { echo json_encode(['success' => false, 'message' => 'Erreur panier']); exit; }
+            if (!$idPanier) {
+                echo json_encode(['success' => false, 'message' => 'Erreur panier']);
+                exit;
+            }
             echo json_encode(ajouterArticleBDD($pdo, $idP, $idPanier, $qty));
         }
         exit;
     }
-    
+
     if (isset($_POST['id_produit'])) {
         gererActionsAvis($pdo, $idClient, $idCompte, $idProduit);
     }
@@ -112,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $raw = file_get_contents('php://input');
     $hdrs = function_exists('getallheaders') ? getallheaders() : [];
     // journaliser côté serveur pour debug
-    error_log('POST non traité dans produit/index.php - _POST: ' . json_encode(array_keys($_POST)) . ' CONTENT_TYPE:' . ($_SERVER['CONTENT_TYPE'] ?? '') );
+    error_log('POST non traité dans produit/index.php - _POST: ' . json_encode(array_keys($_POST)) . ' CONTENT_TYPE:' . ($_SERVER['CONTENT_TYPE'] ?? ''));
     echo json_encode([
         'success' => false,
         'message' => 'Aucun handler POST exécuté',
@@ -134,8 +139,9 @@ if (!$produit || $produit['p_statut'] != 'En ligne') {
 }
 
 $tri = isset($_GET['tri']) ? trim($_GET['tri']) : 'date_desc';
-$allowedTri = ['date_desc','date_asc','note_desc','note_asc','popular'];
-if (!in_array($tri, $allowedTri)) $tri = 'date_desc';
+$allowedTri = ['date_desc', 'date_asc', 'note_desc', 'note_asc', 'popular'];
+if (!in_array($tri, $allowedTri))
+    $tri = 'date_desc';
 
 // Token "propriétaire" (si jamais avis anonymes / session navigateur)
 $ownerTokenServer = $_COOKIE['alizon_owner'] ?? '';
@@ -209,13 +215,13 @@ $stmtRep->execute([':pid' => $idProduit]);
 $rowsRep = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
 $reponsesMap = [];
 foreach ($rowsRep as $r) {
-    $reponsesMap[(int)$r['id_avis_parent']] = $r;
+    $reponsesMap[(int) $r['id_avis_parent']] = $r;
 }
 
 // Calculs affichage
 $estEnRupture = ($produit['p_stock'] <= 0);
-$discount = (float)$produit['pourcentage_reduction'];
-$prixDiscount = ($discount > 0) ? $produit['p_prix'] * (1 - $discount/100) : $produit['p_prix'];
+$discount = (float) $produit['pourcentage_reduction'];
+$prixDiscount = ($discount > 0) ? $produit['p_prix'] * (1 - $discount / 100) : $produit['p_prix'];
 $prixFinal = calcPrixTVA($produit['tva'], $prixDiscount);
 
 // Note moyenne (recalculée pour être sûr)
@@ -223,11 +229,14 @@ try {
     $stmt = $pdo->prepare('SELECT ROUND(COALESCE(AVG(a_note),0)::numeric,1) as avg, COUNT(*) as cnt FROM _avis WHERE id_produit = :pid AND a_note IS NOT NULL');
     $stmt->execute([':pid' => $idProduit]);
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
-    $note = (float)$stats['avg'];
-    $nbAvis = (int)$stats['cnt'];
-} catch (Exception $e) { $note = 0.0; $nbAvis = 0; }
+    $note = (float) $stats['avg'];
+    $nbAvis = (int) $stats['cnt'];
+} catch (Exception $e) {
+    $note = 0.0;
+    $nbAvis = 0;
+}
 
-$noteEntiere = (int)floor($note);
+$noteEntiere = (int) floor($note);
 $images = $produit['images'];
 $mainImage = $images[0] ?? '/img/Photo/default.png';
 $hasMultipleImages = count($images) > 1;
@@ -239,13 +248,14 @@ if ($idClient) {
     try {
         $stmt = $pdo->prepare("SELECT 1 FROM _contient c JOIN _panier_commande pc ON c.id_panier = pc.id_panier WHERE pc.id_client = :cid AND c.id_produit = :pid AND pc.timestamp_commande IS NOT NULL LIMIT 1");
         $stmt->execute([':cid' => $idClient, ':pid' => $idProduit]);
-        $clientAachete = (bool)$stmt->fetchColumn();
+        $clientAachete = (bool) $stmt->fetchColumn();
 
         // Vérif si déjà avis
         $stmtCheck = $pdo->prepare("SELECT 1 FROM _avis WHERE id_produit = :pid AND (id_client = :cid OR id_compte = :compte)");
         $stmtCheck->execute([':pid' => $idProduit, ':cid' => $idClient, ':compte' => $idCompte]);
-        $dejaAvis = (bool)$stmtCheck->fetchColumn();
-    } catch (Exception $e) {}
+        $dejaAvis = (bool) $stmtCheck->fetchColumn();
+    } catch (Exception $e) {
+    }
 }
 
 
@@ -273,6 +283,12 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     exit;
 }
 
+$estEnFavoris = false;
+if ($idClient && $idProduit) {
+    $stmtFav = $pdo->prepare("SELECT 1 FROM _favoris WHERE id_client = ? AND id_produit = ?");
+    $stmtFav->execute([$idClient, $idProduit]);
+    $estEnFavoris = (bool) $stmtFav->fetch();
+}
 ?>
 <!doctype html>
 <html lang="fr">
@@ -292,7 +308,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     //inclure l'en-tête du site
     include __DIR__ . '/../../partials/header.php';
     include __DIR__ . '/../../partials/toast.html'
-    ?>
+        ?>
 
     <nav class="page-breadcrumb">
         <a class="btn btn-retour-catalogue back-link" href="/index.php" aria-label="Retour au catalogue">
@@ -309,13 +325,13 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
         <div class="product-row <?= $hasMultipleImages ? '' : 'no-thumbs' ?>">
             <!-- Vignettes -->
             <?php if ($hasMultipleImages): ?>
-            <aside class="thumbs" aria-label="Vignettes du produit">
-                <?php foreach ($images as $idx => $imgUrl): ?>
-                <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>"
-                    alt="Vignette <?= $idx + 1 ?>" loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>"
-                    role="button" tabindex="0" aria-label="Afficher l'image <?= $idx + 1 ?>" />
-                <?php endforeach; ?>
-            </aside>
+                <aside class="thumbs" aria-label="Vignettes du produit">
+                    <?php foreach ($images as $idx => $imgUrl): ?>
+                        <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>"
+                            alt="Vignette <?= $idx + 1 ?>" loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>"
+                            role="button" tabindex="0" aria-label="Afficher l'image <?= $idx + 1 ?>" />
+                    <?php endforeach; ?>
+                </aside>
             <?php endif; ?>
 
             <!-- Image principale -->
@@ -326,16 +342,19 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
 
             <!-- Colonne droite - résumé produit -->
             <aside class="summary">
-                <div class="product-ref">Ref : #<?= (int)$produit['id_produit'] ?></div>
+                <div class="product-ref">Ref : #<?= (int) $produit['id_produit'] ?></div>
                 <div class="title"><?= htmlspecialchars($produit['p_nom']) ?></div>
                 <div class="rating">
                     <span class="stars" id="summaryStars" aria-hidden="true">
-                        <?php for ($i = 1; $i <= 5; $i++): 
-                            if ($note >= $i) $s = 'full';
-                            elseif ($note >= $i - 0.5) $s = 'alf';
-                            else $s = 'empty';
-                        ?>
-                        <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                        <?php for ($i = 1; $i <= 5; $i++):
+                            if ($note >= $i)
+                                $s = 'full';
+                            elseif ($note >= $i - 0.5)
+                                $s = 'alf';
+                            else
+                                $s = 'empty';
+                            ?>
+                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                     </span>
                     <span id="summaryRatingValue" class="summary-rating-value"><?= number_format($note, 1) ?></span>
@@ -344,10 +363,10 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 <div class="price">
                     <?= number_format($prixFinal, 2, ',', ' ') ?> €
                     <?php if ($discount > 0): ?>
-                    <span
-                        class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?>
-                        €</span>
-                    <span class="discount-badge">-<?= round($discount) ?>%</span>
+                        <span
+                            class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?>
+                            €</span>
+                        <span class="discount-badge">-<?= round($discount) ?>%</span>
                     <?php endif; ?>
                 </div>
 
@@ -356,22 +375,29 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                         aria-label="Choisir la quantité">
                         <button type="button" class="ghost" onclick="updateQty(-1)"
                             aria-label="Réduire quantité">−</button>
-                        <input type="number" id="qtyInput" min="1" step="1" max="<?= (int)$produit['p_stock'] ?>"
-                            value="<?= $estEnRupture ? 0 : 1 ?>" aria-label="Quantité"
-                            <?= $estEnRupture ? 'disabled' : '' ?> />
+                        <input type="number" id="qtyInput" min="1" step="1" max="<?= (int) $produit['p_stock'] ?>"
+                            value="<?= $estEnRupture ? 0 : 1 ?>" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
                         <button type="button" class="ghost" onclick="updateQty(1)" aria-label="Augmenter quantité"
                             <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
                     </div>
+                    <button class="ghost btn <?= $estEnFavoris ? 'active' : '' ?>"
+                        onclick="ajoutSuppFavoris(<?= (int) $idProduit ?>)" id="btnFav">
+                        <?php if ($estEnFavoris) {
+                            echo 'Retirer des favoris';
+                        } else {
+                            echo 'Ajouter aux favoris';
+                        } ?></button>
+                </div>
+                <div>
                     <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
                         onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
                 </div>
-
-                <!--<div class="summary-actions">
-                    <button class="ghost">Ajouter aux favoris</button>
+                <!--
+                    
                     <button class="ghost">Partager</button>
-                </div>-->
+                -->
 
                 <div class="meta meta--compact">
                     Stock : <strong><?= $estEnRupture ? 'Rupture' : $produit['p_stock'] . ' disponible(s)' ?></strong>
@@ -381,8 +407,8 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 <div class="section features">
                     <h3>Caractéristiques</h3>
                     <ul>
-                        <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?> <div
-                                class="smaller">(<a
+                        <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?>
+                            <div class="smaller">(<a
                                     href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)
                             </div>
                         </li>
@@ -419,12 +445,15 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                     <span id="reviewsRatingValue" class="reviews-rating-value"><?= number_format($note, 1) ?></span>
                     <div>
                         <div class="stars" id="reviewsStars">
-                            <?php for ($i = 1; $i <= 5; $i++): 
-                            if ($note >= $i) $s = 'full';
-                            elseif ($note >= $i - 0.5) $s = 'alf';
-                            else $s = 'empty';
-                        ?>
-                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                            <?php for ($i = 1; $i <= 5; $i++):
+                                if ($note >= $i)
+                                    $s = 'full';
+                                elseif ($note >= $i - 0.5)
+                                    $s = 'alf';
+                                else
+                                    $s = 'empty';
+                                ?>
+                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                             <?php endfor; ?>
                         </div>
                         <div id="reviewsRatingCount" class="reviews-rating-count">Basé sur <?= $nbAvis ?> avis</div>
@@ -434,74 +463,76 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
 
             <!-- Formulaire avis -->
             <?php if ($idClient && $clientAachete && !$dejaAvis): ?>
-            <div class="review new-review-card" id="newReviewCard">
-                <div class="review-head">
-                    <div class="review-head-left">
-                        <div class="avatar">
-                            <?php if ($currentUserImage): ?>
-                            <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" class="avatar-image">
-                            <?php else: ?>
-                            <?php 
-                                        $initial = 'U';
-                                        if ($currentUser) {
-                                            if (!empty($currentUser['c_pseudo'])) $initial = substr($currentUser['c_pseudo'], 0, 1);
-                                            elseif (!empty($currentUser['prenom'])) $initial = substr($currentUser['prenom'], 0, 1);
-                                        }
+                <div class="review new-review-card" id="newReviewCard">
+                    <div class="review-head">
+                        <div class="review-head-left">
+                            <div class="avatar">
+                                <?php if ($currentUserImage): ?>
+                                    <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" class="avatar-image">
+                                <?php else: ?>
+                                    <?php
+                                    $initial = 'U';
+                                    if ($currentUser) {
+                                        if (!empty($currentUser['c_pseudo']))
+                                            $initial = substr($currentUser['c_pseudo'], 0, 1);
+                                        elseif (!empty($currentUser['prenom']))
+                                            $initial = substr($currentUser['prenom'], 0, 1);
+                                    }
                                     ?>
-                            <div class="avatar-initial"><?= strtoupper($initial) ?></div>
-                            <?php endif; ?>
+                                    <div class="avatar-initial"><?= strtoupper($initial) ?></div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="review-head-texts">
+                                <div class="review-author">Vous</div>
+                                <div class="review-subtitle">Laisser un avis</div>
+                            </div>
                         </div>
-                        <div class="review-head-texts">
-                            <div class="review-author">Vous</div>
-                            <div class="review-subtitle">Laisser un avis</div>
+                        <div class="review-head-right">
+                            <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                                            src="/img/svg/star-empty.svg" alt=""></button>
+                                <?php endfor; ?>
+                            </div>
+                            <input type="hidden" id="inlineNote" name="note" value="0">
                         </div>
                     </div>
-                    <div class="review-head-right">
-                        <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
-                            <?php for($i=1; $i<=5; $i++): ?>
-                            <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
-                            <?php endfor; ?>
+                    <form id="inlineReviewForm" class="review-form">
+                        <input type="text" name="titre" id="inlineTitle" class="review-title-input"
+                            placeholder="Titre de votre avis" maxlength="255" required>
+                        <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
+                            placeholder="Partagez votre avis..." required></textarea>
+                        <div class="review-actions">
+                            <small class="review-hint">Merci de rester courtois.</small>
+                            <button type="button" class="btn" id="inlineSubmit">Publier</button>
                         </div>
-                        <input type="hidden" id="inlineNote" name="note" value="0">
-                    </div>
+                    </form>
                 </div>
-                <form id="inlineReviewForm" class="review-form">
-                    <input type="text" name="titre" id="inlineTitle" class="review-title-input"
-                        placeholder="Titre de votre avis" maxlength="255" required>
-                    <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
-                        placeholder="Partagez votre avis..." required></textarea>
-                    <div class="review-actions">
-                        <small class="review-hint">Merci de rester courtois.</small>
-                        <button type="button" class="btn" id="inlineSubmit">Publier</button>
-                    </div>
-                </form>
-            </div>
             <?php elseif ($idClient && $dejaAvis): ?>
-            <div class="review new-review-card new-review-card-muted">
-                <div class="new-review-card-message">
-                    Vous avez déjà publié un avis sur ce produit.
+                <div class="review new-review-card new-review-card-muted">
+                    <div class="new-review-card-message">
+                        Vous avez déjà publié un avis sur ce produit.
+                    </div>
                 </div>
-            </div>
             <?php else: ?>
-            <div class="review new-review-card new-review-card-muted">
-                <div class="new-review-card-message">
-                    <?= !$idClient ? 'Connectez-vous pour laisser un avis.' : 'Vous devez avoir acheté ce produit pour laisser un avis.' ?>
+                <div class="review new-review-card new-review-card-muted">
+                    <div class="new-review-card-message">
+                        <?= !$idClient ? 'Connectez-vous pour laisser un avis.' : 'Vous devez avoir acheté ce produit pour laisser un avis.' ?>
+                    </div>
                 </div>
-            </div>
             <?php endif; ?>
 
             <!-- Filtrer les avis (dropdown style YouTube) -->
             <?php
-                $baseHref = '/pages/produit/index.php?id=' . urlencode($idProduit);
-                $options = [
-                    'date_desc' => 'Les plus récentes',
-                    'date_asc' => 'Les plus anciennes',
-                    'note_desc' => 'Note décroissante',
-                    'note_asc' => 'Note croissante',
-                    'popular' => 'Pertinence (pouces)'
-                ];
-                $activeLabel = $options[$tri] ?? 'Filtre';
+            $baseHref = '/pages/produit/index.php?id=' . urlencode($idProduit);
+            $options = [
+                'date_desc' => 'Les plus récentes',
+                'date_asc' => 'Les plus anciennes',
+                'note_desc' => 'Note décroissante',
+                'note_asc' => 'Note croissante',
+                'popular' => 'Pertinence (pouces)'
+            ];
+            $activeLabel = $options[$tri] ?? 'Filtre';
             ?>
             <div class="filters-wrap">
                 <button type="button" class="filters-btn" id="reviewsFilterBtn" aria-haspopup="true"
@@ -517,12 +548,12 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                     <?php foreach ($options as $k => $label):
                         $isActive = ($tri === $k);
                         $href = $baseHref . '&tri=' . urlencode($k);
-                    ?>
-                    <a class="filters-item <?= $isActive ? 'is-active' : '' ?>" role="menuitem"
-                        href="<?= htmlspecialchars($href) ?>">
-                        <span><?= htmlspecialchars($label) ?></span>
-                        <?php if ($isActive): ?><small>Actif</small><?php endif; ?>
-                    </a>
+                        ?>
+                        <a class="filters-item <?= $isActive ? 'is-active' : '' ?>" role="menuitem"
+                            href="<?= htmlspecialchars($href) ?>">
+                            <span><?= htmlspecialchars($label) ?></span>
+                            <?php if ($isActive): ?><small>Actif</small><?php endif; ?>
+                        </a>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -542,9 +573,9 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
         <div class="modal-dialog">
             <h3>Modifier votre avis</h3>
             <div class="star-input" id="editStarInput" title="Sélectionnez une note">
-                <?php for($i=1; $i<=5; $i++): ?>
-                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
-                        src="/img/svg/star-empty.svg" alt=""></button>
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                            src="/img/svg/star-empty.svg" alt=""></button>
                 <?php endfor; ?>
             </div>
             <input type="text" id="editReviewTitle" name="titre" class="review-title-input"
@@ -584,16 +615,16 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
 
     <script src="/js/notifications.js"></script>
     <script>
-    window.PRODUCT_ID = <?= (int)$idProduit ?>;
-    window.CURRENT_ID_CLIENT = <?= $idClient ?: 'null' ?>;
-    window.OWNER_TOKEN = <?= json_encode($ownerTokenServer) ?>;
+        window.PRODUCT_ID = <?= (int) $idProduit ?>;
+        window.CURRENT_ID_CLIENT = <?= $idClient ?: 'null' ?>;
+        window.OWNER_TOKEN = <?= json_encode($ownerTokenServer) ?>;
     </script>
     <script src="/js/produit/utils.js"></script>
     <script src="/js/produit/main.js"></script>
     <script src="/js/produit/panier.js"></script>
     <script src="/js/produit/reviews.js"></script>
     <script src="/js/produit/filter.js"></script>
-
+    <script src="/js/produit/favoris.js"></script>
 
     <!-- Tri des avis: liens classiques (fiable, sans AJAX) -->
 </body>

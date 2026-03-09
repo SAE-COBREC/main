@@ -1152,28 +1152,28 @@ main section:nth-of-type(2) article > footer > form {
 }
 
 @media (max-width: 428px) {
-  #modalModificationAdresse > div,
-  #modalAjoutAdresse > div,
-  #modalA2F > div {
-    padding: 1.5em;
-    border-radius: 8px;
-  }
-  
-  #modalModificationAdresse h2,
-  #modalAjoutAdresse h2,
-  #modalA2F h2 {
-    font-size: 1.2em;
-    margin-bottom: 1.2rem;
-  }
-  
-  #formulaireModificationAdresse button,
-  #formulaireAjoutAdresse button,
-  #modalA2F form button {
-    font-size: 0.95em;
-    padding: 10px 16px;
-  }
+    #modalModificationAdresse > div,
+    #modalAjoutAdresse > div,
+    #modalA2F > div {
+        padding: 1.5em;
+        border-radius: 8px;
+    }
 
-  .btn-text-desktop {
+    #modalModificationAdresse h2,
+    #modalAjoutAdresse h2,
+    #modalA2F h2 {
+        font-size: 1.2em;
+        margin-bottom: 1.2rem;
+    }
+
+    #formulaireModificationAdresse button,
+    #formulaireAjoutAdresse button,
+    #modalA2F form button {
+        font-size: 0.95em;
+        padding: 10px 16px;
+    }
+
+    .btn-text-desktop {
         display: none; /* Cache le texte long */
     }
     

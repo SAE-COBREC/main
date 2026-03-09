@@ -214,8 +214,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'latitude' => $latitude ?? null
           ]);
         }else{
-          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays, longitude, latitude)
-                  VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays, :longitude, :latitude)';
+          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays, longitude, latitude, secret_A2F)
+                  VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays, :longitude, :latitude, :secretOTP)';
           $stmtAdrss = $pdo->prepare($sqlAdrss);
           $stmtAdrss->execute([
             'id_compte' => $id_compte,
@@ -225,7 +225,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'code_postal'    => $codeP,
             'pays'    => $pays,
             'longitude' => $longitude ?? null,
-            'latitude' => $latitude ?? null
+            'latitude' => $latitude ?? null,
+            'secretOTP' => $_SESSION['A2F']['secret'] ?? null
           ]);
         }
       }
@@ -302,23 +303,23 @@ body {
             <h1>Créer un compte</h1>
             <p class="subtitle">Identifiants</p>
 
-            <div>
-                <label for="nom">Nom<span style="color: red;">*</span></label>
-                <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required
-                    value="<?php echo isset($nom) ? htmlspecialchars($nom, ENT_QUOTES, 'UTF-8') : ''; ?>">
-            </div>
+          <div>
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required
+                  value="<?php echo isset($nom) ? htmlspecialchars($nom, ENT_QUOTES, 'UTF-8') : ''; ?>">
+          </div>
 
-            <div>
-                <label for="prenom">Prénom<span style="color: red;">*</span></label>
-                <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required
-                    value="<?php echo isset($prenom) ? htmlspecialchars($prenom, ENT_QUOTES, 'UTF-8') : ''; ?>">
-            </div>
+          <div>
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required
+                  value="<?php echo isset($prenom) ? htmlspecialchars($prenom, ENT_QUOTES, 'UTF-8') : ''; ?>">
+          </div>
 
-            <div>
-                <label for="pseudo">Pseudonyme<span style="color: red;">*</span></label>
-                <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required
-                    value="<?php echo isset($pseudo) ? htmlspecialchars($pseudo, ENT_QUOTES, 'UTF-8') : ''; ?>">
-            </div>
+          <div>
+            <label for="pseudo">Pseudonyme</label>
+            <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required
+                  value="<?php echo isset($pseudo) ? htmlspecialchars($pseudo, ENT_QUOTES, 'UTF-8') : ''; ?>">
+          </div>
 
             <div class="debutant">Retour a la page de <a href="../connexionClient/index.php"><strong>Connexion
                         →</strong></a></div>
@@ -490,33 +491,119 @@ body {
         <!-- Card4 -->
 
         <div class="card hidden" id="4">
-            <div class="logo">
-                <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
-            </div>
+          <div class="logo">
+            <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
+          </div>
 
-            <h1>Créer un compte</h1>
-            <p class="subtitle">Mot de passe</p>
+          <h1>Créer un compte</h1>
+          <p class="subtitle">Mot de passe</p>
 
-            <hr>
-            <div>
-                <label><input type="checkbox" id="a2f" name="a2f"> J'active la vérification à double facteurs</label>
-            </div>
-            <hr>
-            <div>
-                <label for="mdp">Mot de passe<span style="color: red;">*</span> </label>
-                <input type="password" id="mdp" name="mdp"
-                    placeholder="8-16 caractère,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value=""
-                    pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
-            </div>
 
-            <div>
-                <label for="Cmdp">Confirmer le mot de passe<span style="color: red;">*</span></label>
-                <input type="password" id="Cmdp" name="Cmdp"
-                    placeholder="8-16 caractère,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value=""
-                    required>
-            </div>
+          <div>
+            <label><input type="checkbox" id="checkboxa2f" name="checkboxa2f" onclick="changer_A2F();"> J'active la vérification à double facteurs</label>
+          </div>
+          <br>
+          <div class="mdpA2f">
+            <?php
+              include_once '../connexionClient/OTP.php';
+              ?>
+              <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
+              <label>
+              <p>Code secret :</p>
+              <small><?php echo $otp->getSecret() ?></small>
+              </label>
+              <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code"/>
+              <button type="submit" id="validationA2F">Valider</button>
+            <script>
+                document.getElementById('validationA2F').addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(document.getElementById('multiForm'),document.getElementById('validationA2F'));
+                    const code = formData.get('code');
 
-            <div>
+                    const xhttp = new XMLHttpRequest();
+                    xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
+                    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xhttp.send("code="+code);
+
+
+                    const xhttp2 = new XMLHttpRequest();
+                    xhttp2.open("GET", "../../pages/connexionClient/ajax.txt", true);
+                    xhttp2.send();
+                    xhttp2.onreadystatechange = () => {
+                    if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+                        const contentLength = xhttp2.getResponseHeader("Content-Length");
+                        if (contentLength == 4) {
+                            xhttp2.abort();
+                            alert("Authentification à double facteur activée avec succès.");
+
+                            const xhttp3 = new XMLHttpRequest();
+                            xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
+                            xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xhttp3.send("statutOTP=active");
+                            const btnFleche = document.querySelector("#finishBtn");
+                            btnFleche.disabled = false;
+                        }else{
+                            const err = document.querySelector('.card#\\34  .error');
+                            if (err) {
+                              err.classList.remove('hidden');
+                              err.innerHTML = '<strong>Erreur</strong> : Le code est incorrect.';
+                            }
+                        }
+                    }
+                    };
+                });
+
+
+                
+                
+            </script>
+          </div>
+          <div class="mdpClassique">
+            <label for="mdp">Mot de passe </label>
+            <input type="password" id="mdp" name="mdp" placeholder="8-16 caractères,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
+          </div>
+
+          <div class="mdpClassique">
+            <label for="Cmdp">Confirmer le mot de passe</label>
+            <input type="password" id="Cmdp" name="Cmdp" placeholder="8-16 caractères,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" required>
+          </div>
+          <script>
+            document.querySelector(".mdpA2f").style.display = "none";
+            function changer_A2F() {
+              const checkboxA2f = document.querySelector("#checkboxa2f");
+              const mdpClassique = document.querySelectorAll(".mdpClassique");
+              const mdpA2f = document.querySelector(".mdpA2f");
+              const btnFleche = document.querySelector("#finishBtn");
+              const mdp = document.querySelector("#mdp");
+              const Cmdp = document.querySelector("#Cmdp");
+              //const cgv = document.querySelector("#cgv");
+              if (checkboxA2f.checked) {
+                mdpClassique.forEach(function (classico) {
+                  classico.style.display = 'none';
+                });
+                mdpA2f.style.display = 'block';
+                btnFleche.disabled = true;
+                // cgv.checked = false;
+                // cgv.disabled = true;
+                mdp.removeAttribute('required');
+                Cmdp.removeAttribute('required');
+              } else {
+                mdpClassique.forEach(function (classico) {
+                  classico.style.display = 'block';
+                });
+                mdpA2f.style.display = 'none';
+                btnFleche.disabled = false;
+                // cgv.disabled = false;
+                mdp.setAttribute('required');
+                Cmdp.setAttribute('required');
+              }
+            }
+            function echecA2F(){
+              return 'Code A2F invalide. Veuillez réessayer.';
+            }
+          </script>
+
+          <div>
                 <label><input type="checkbox" id="cgv" name="cgv" required> J'accepte les <a href="#"
                         onclick="openCGVModal(); return false;">conditions générales d'utilisation</a></label>
             </div>
@@ -895,7 +982,7 @@ body {
         const mdp = mdpEl ? mdpEl.value : '';
         const cmdp = cmdpEl ? cmdpEl.value : '';
 
-        if (mdp !== cmdp) {
+        if ((mdp !== cmdp) && !document.querySelector("#checkboxa2f").checked) {
             showCardByIndex(3);
             const err = document.querySelector('.card#\\34  .error');
             if (err) {

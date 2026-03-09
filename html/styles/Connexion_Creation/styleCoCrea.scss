@@ -45,6 +45,27 @@ body {
   border-radius: $border-radius-primary;
   text-align: center;
 
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: $primary-color-bleu;
+    padding: 0;
+    margin: 0;
+  }
+
+  .mdpA2f{
+    display:block;
+    small{
+      display: block;
+      background-color: $secondary-color-gris-clair;
+      overflow: auto;
+      padding-bottom:1em;
+    }
+    > label{
+      padding-left: 10px;
+    }
+  }
+
   &.hidden {
     display: none !important;
   }
@@ -549,12 +570,6 @@ body {
   gap: 10px;
   padding-left: 0;
 
-  input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: $primary-color-bleu;
-  }
-
   a {
     color: $primary-color-bleu;
     text-decoration: underline;
@@ -581,6 +596,7 @@ body {
     max-height: 80vh;
     width: 700px;
     overflow-y: auto;
+    width:80%;
   }
 
   .cgv-content {
