@@ -893,6 +893,32 @@ function safe($array, $key, $default = "") {
         document.getElementById('longitude').value = parseFloat(lon).toFixed(6);
     }
 
+    async function reverseGeocode(lat, lon) {
+        const url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' +
+            encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lon) + '&addressdetails=1';
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Accept-Language': 'fr'
+                }
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            if (!data.address) return;
+            const a = data.address;
+            const numero = a.house_number || '';
+            const adresse = a.road || a.pedestrian || a.footway || '';
+            const ville = a.city || a.town || a.village || a.hamlet || a.municipality || '';
+            const codep = a.postcode ? a.postcode.split(';')[0].trim() : '';
+            if (numero) document.getElementById('numero').value = numero;
+            if (adresse) document.getElementById('adresse').value = adresse;
+            if (ville) document.getElementById('ville').value = ville;
+            if (codep) document.getElementById('codep').value = codep;
+        } catch (err) {
+            console.error('Erreur reverse geocoding :', err);
+        }
+    }
+
     function initGPSMap(lat, lon) {
         if (gpsMap !== null) {
             gpsMap.remove();
@@ -917,16 +943,19 @@ function safe($array, $key, $default = "") {
             gpsMarker.on('dragend', function() {
                 const pos = gpsMarker.getLatLng();
                 updateCoordinates(pos.lat, pos.lng);
+                reverseGeocode(pos.lat, pos.lng);
             });
 
             gpsMap.on('click', function(e) {
                 gpsMarker.setLatLng(e.latlng);
                 updateCoordinates(e.latlng.lat, e.latlng.lng);
+                reverseGeocode(e.latlng.lat, e.latlng.lng);
             });
         }, 100);
     }
 
-    // Synchronisation carte ↔ saisie manuelle
+    // Synchronisation carte ↔ saisie manuelle + reverse geocoding
+    let reverseDebounce = null;
     ['latitude', 'longitude'].forEach(function(fieldId) {
         document.getElementById(fieldId).addEventListener('input', function() {
             const lat = parseFloat(document.getElementById('latitude').value);
@@ -941,6 +970,11 @@ function safe($array, $key, $default = "") {
                 document.getElementById('gps-result').style.display = 'block';
                 initGPSMap(lat, lon);
             }
+            // Reverse geocoding avec debounce pour éviter trop de requêtes
+            clearTimeout(reverseDebounce);
+            reverseDebounce = setTimeout(function() {
+                reverseGeocode(lat, lon);
+            }, 800);
         });
     });
 
