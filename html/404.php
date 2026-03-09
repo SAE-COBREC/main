@@ -12,21 +12,16 @@
 </head>
 
 <body>
-<?php
-include 'partials/header.php';
-?>
 
-<main>
-    <div class="container">
-        <img src="/img/svg/404.svg" alt="Erreur 404">
-        <h1>Erreur 404 - Page non trouvée</h1>
-        <p>Désolé, la page que vous recherchez n'existe pas.</p>
-        <a href="/index.php">Retour à l'accueil</a>
-    </div>
-</main>
+    <main>
+        <div class="container">
+            <img src="/img/svg/404.svg" alt="Erreur 404">
+            <h1>Erreur 404 - Page non trouvée</h1>
+            <p>Désolé, la page que vous recherchez n'existe pas.</p>
+            <a href="/index.php">Retour à l'accueil</a>
+        </div>
+    </main>
 
-<?php
-include 'partials/footer.html';
-?>
 </body>
+
 </html>
