@@ -237,6 +237,8 @@ if ($prixMinimumFiltre > $prixMaximumFiltre) {
 $noteMinimumFiltre = isset($_POST['note_min']) ? (int) $_POST['note_min'] : 0;
 //vérifie si le filtre "en stock" est activé
 $enStockSeulement = isset($_POST['stock_only']);
+//vérifie si le filtre "favoris" est activé
+$enFavorisSeulement = isset($_POST['favoris_only']);
 
 //regroupe tous les filtres dans un tableau
 $filtres = [
@@ -244,13 +246,14 @@ $filtres = [
     'noteMinimum' => $noteMinimumFiltre,
     'prixMaximum' => $prixMaximumFiltre,
     'prixMinimum' => $prixMinimumFiltre,
-    'enStockSeulement' => $enStockSeulement
+    'enStockSeulement' => $enStockSeulement,
+    'enFavorisSeulement' => $enFavorisSeulement
 ];
 
 //applique les filtres sauf si recherche par nom
 if (empty($rechercheNom)) {
     //filtre la liste de produits selon les critères
-    $listeProduits = filtrerProduits($listeProduits, $filtres);
+    $listeProduits = filtrerProduits($pdo, $listeProduits, $filtres, $idClient);
 }
 
 //trie les produits selon le critère choisi
@@ -445,6 +448,15 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             <?= isset($_POST['stock_only']) ? 'checked' : '' ?>>
                         <span>En stock uniquement</span>
                     </label>
+                    <?php if (isset($idClient)):?>
+                        <label>
+                        <!--case à cocher pour afficher seulement les produits en stock-->
+                            <input type="checkbox" name="favoris_only" id="favorisOnlyCheckbox"
+                                <?= isset($_POST['favoris_only']) ? 'checked' : '' ?>>
+                            <span>Favoris uniquement</span>
+                        </label>
+                    <?php endif;?>
+
                 </section>
 
                 </section>

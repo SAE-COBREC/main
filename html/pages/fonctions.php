@@ -1404,9 +1404,26 @@ function trierProduits($listeProduits, $tri_par)
 }
 
 //fonction pour filtrer les produits selon les critères choisis
-function filtrerProduits($listeProduits, $filtres)
-{
+function filtrerProduits($pdo, $listeProduits, $filtres, $idClient)
+{   
     $produits_filtres = [];
+    if (isset($idClient)){
+        $pdo->exec("SET search_path TO cobrec1");
+        $requeteFav = "
+            SELECT id_produit 
+            FROM _favoris
+            WHERE id_client = :id_client;   
+        ";
+
+        $stmt = $pdo->prepare($requeteFav);
+        
+        $stmt->execute([
+            ':id_client' => $idClient
+        ]);
+        
+        $idsProduits = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     foreach ($listeProduits as $produitCourant) {
         // Calculer le prix final (avec réduction et TVA)
         $prixBase = (float)($produitCourant['p_prix'] ?? 0);
@@ -1428,7 +1445,7 @@ function filtrerProduits($listeProduits, $filtres)
         $prixFinalCents = (int) round($prixFinal * 100);
         $minFilterCents = (int) round($minFilter * 100);
         $maxFilterCents = is_infinite($maxFilter) ? PHP_INT_MAX : (int) round($maxFilter * 100);
-
+        
         if ($prixFinalCents > $maxFilterCents) continue;
         if ($prixFinalCents < $minFilterCents) continue;
         if ($filtres['categorieFiltre'] !== 'all') {
@@ -1436,7 +1453,10 @@ function filtrerProduits($listeProduits, $filtres)
             if (!in_array($filtres['categorieFiltre'], $categoriesProduit))
                 continue;
         }
+        echo in_array($produitCourant['id_produit'], $idsProduits);
         if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0)
+            continue;
+        if ($filtres['enFavorisSeulement'] && !(in_array($produitCourant['id_produit'], $idsProduits)))
             continue;
         if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum'])
             continue;

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //vérifie que l'élément existe sur la page
     if (triSelect) {
         //écoute quand l'utilisateur change le tri
-        triSelect.addEventListener('change', function() {
+        triSelect.addEventListener('change', function () {
             //soumet le formulaire pour recharger la page avec le nouveau tri
             document.getElementById('filterForm').submit();
         });
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //vérifie que l'élément existe sur la page
     if (categorieSelect) {
         //écoute quand l'utilisateur change la catégorie
-        categorieSelect.addEventListener('change', function() {
+        categorieSelect.addEventListener('change', function () {
             //soumet le formulaire pour recharger la page avec la nouvelle catégorie
             document.getElementById('filterForm').submit();
         });
@@ -72,26 +72,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Gestion Range Min
-        rangeMin.addEventListener("input", function() {
+        rangeMin.addEventListener("input", function () {
             setMinValue(rangeMin.value);
             updateTrack();
         });
 
         // Gestion Range Max
-        rangeMax.addEventListener("input", function() {
+        rangeMax.addEventListener("input", function () {
             setMaxValue(rangeMax.value);
             updateTrack();
         });
 
         // Gestion Input Min
-        inputMin.addEventListener("input", function() {
+        inputMin.addEventListener("input", function () {
             const v = inputMin.value === '' ? sliderMinValue : inputMin.value;
             setMinValue(v);
             updateTrack();
         });
 
-         // Gestion Input Max
-         inputMax.addEventListener("input", function() {
+        // Gestion Input Max
+        inputMax.addEventListener("input", function () {
             const v = inputMax.value === '' ? sliderMaxValue : inputMax.value;
             setMaxValue(v);
             updateTrack();
@@ -118,7 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
     //vérifie que l'élément existe
     if (stockOnlyCheckbox) {
         //écoute quand l'utilisateur coche ou décoche la case
-        stockOnlyCheckbox.addEventListener('change', function() {
+        stockOnlyCheckbox.addEventListener('change', function () {
+            //soumet le formulaire pour appliquer le filtre
+            document.getElementById('filterForm').submit();
+        });
+    }
+
+    const favorisOnlyCheckbox = document.getElementById('favorisOnlyCheckbox');
+    //vérifie que l'élément existe
+    if (favorisOnlyCheckbox) {
+        //écoute quand l'utilisateur coche ou décoche la case
+        favorisOnlyCheckbox.addEventListener('change', function () {
             //soumet le formulaire pour appliquer le filtre
             document.getElementById('filterForm').submit();
         });
@@ -134,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             //remet la catégorie sur "tous les produits"
             document.getElementById('categorieSelect').value = 'all';
-            
+
             //reset les valeurs des sliders de prix
             const inputMin = document.getElementById("inputMin");
             const inputMax = document.getElementById("inputMax");
@@ -245,12 +255,12 @@ function ajouterAuPanier(idProduit) {
 
     //envoie la requête AJAX au serveur
     fetch('index.php', {
-            //type de requête POST
-            method: 'POST',
-            //données à envoyer
-            body: formData,
-            noLoader: true
-        })
+        //type de requête POST
+        method: 'POST',
+        //données à envoyer
+        body: formData,
+        noLoader: true
+    })
         //gère la réponse de manière robuste (texte -> tentative JSON)
         .then(async response => {
             const text = await response.text();
@@ -285,8 +295,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //vérifie que l'élément existe
     if (searchInput) {
+<<<<<<< Updated upstream
+=======
+        //variable pour stocker le timer de recherche
+        let timeoutId;
+        //écoute chaque fois que l'utilisateur tape dans la barre
+        searchInput.addEventListener('input', function () {
+            //annule le timer précédent
+            clearTimeout(timeoutId);
+            //crée un nouveau timer de 500ms (0.5 seconde)
+            timeoutId = setTimeout(() => {
+                //soumet le formulaire après 500ms sans nouvelle frappe
+                document.getElementById('filterForm').submit();
+            }, 500);
+        });
+
+>>>>>>> Stashed changes
         //écoute quand l'utilisateur appuie sur une touche
-        searchInput.addEventListener('keypress', function(e) {
+        searchInput.addEventListener('keypress', function (e) {
             //vérifie si c'est la touche Entrée
             if (e.key === 'Enter') {
                 //empêche le comportement par défaut
