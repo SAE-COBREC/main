@@ -14,8 +14,8 @@ if(empty($_SESSION['vendeur_id']) === false){
 }else{
 ?>
 <script>
-alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
-document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+    document.location.href = "/pages/backoffice/connexionVendeur/index.php";
 </script>
 <?php
 }
@@ -27,6 +27,59 @@ $_SESSION['promotion'] = [];
 $fichiers = glob('create/temp_/*');
 foreach ($fichiers as $value) {
   unlink($value);
+}
+
+// Gestion de la suppression 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_product') {
+    header('Content-Type: application/json');
+
+    try {
+        if (!isset($_POST['id_produit']) || empty($_POST['id_produit'])) {
+            throw new Exception('ID produit manquant');
+        }
+
+        $id_produit = $_POST['id_produit'];
+
+        // Vérifier que le produit appartient bien au vendeur et qu'il est en ébauche
+        $sql_check = 'SELECT id_produit FROM cobrec1._produit WHERE id_produit = :id_produit AND id_vendeur = :vendeur_id AND p_statut = :statut';
+        $stmt_check = $pdo->prepare($sql_check);
+        $stmt_check->execute(['id_produit' => $id_produit, 'vendeur_id' => $vendeur_id, 'statut' => 'Ébauche']);
+
+        if ($stmt_check->rowCount() === 0) {
+            throw new Exception('Produit non trouvé, accès non autorisé ou produit pas en ébauche');
+        }
+        // Supprimer de _contient
+        $sql1 = 'DELETE FROM cobrec1._contient WHERE id_produit = :id_produit;';
+        $stmt1 = $pdo->prepare($sql1);
+        $stmt1->execute(['id_produit' => $id_produit]);
+
+        // Supprimer de _fait_partie_de
+        $sql2 = 'DELETE FROM cobrec1._fait_partie_de WHERE id_produit = :id_produit;';
+        $stmt2 = $pdo->prepare($sql2);
+        $stmt2->execute(['id_produit' => $id_produit]);
+
+        // Supprimer de _represente_produit
+        $sql3 = 'DELETE FROM cobrec1._represente_produit WHERE id_produit = :id_produit;';
+        $stmt3 = $pdo->prepare($sql3);
+        $stmt3->execute(['id_produit' => $id_produit]);
+
+        // Supprimer de _reduction
+        $sql4 = 'DELETE FROM cobrec1._reduction WHERE id_produit = :id_produit;';
+        $stmt4 = $pdo->prepare($sql4);
+        $stmt4->execute(['id_produit' => $id_produit]);
+
+        // Supprimer le produit lui-même
+        $sql5 = 'DELETE FROM cobrec1._produit WHERE id_produit = :id_produit;';
+        $stmt5 = $pdo->prepare($sql5);
+        $stmt5->execute(['id_produit' => $id_produit]);
+
+        echo json_encode(['success' => true, 'message' => 'Produit supprimé avec succès']);
+        exit;
+
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit;
+    }
 }
 
 try {
@@ -124,285 +177,333 @@ try {
 
 <!doctype html>
 <html lang="fr">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=1440, height=1024" />
-    <title>Alizon - Page Accueil Vendeur</title>
-    <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-    <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1440, height=1024" />
+  <title>Alizon - Page Accueil Vendeur</title>
+  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
+  <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
 </head>
-
 <body>
-    <div class="app">
-        <?php include __DIR__ . '/../../partials/aside.html'; ?>
+  <div class="app">
+    <?php include __DIR__ . '/../../partials/aside.html'; ?>
+    
+    <main class="main">
+      <div class="header">
+        <h1 class="header__title">Page accueil vendeur</h1>
 
-        <main class="main">
-            <div class="header">
-                <h1 class="header__title">Page accueil vendeur</h1>
+        <div class="search-bar">
+          <div class="search-bar__input">
+            <span class="search-bar__icon"><img src="../../img/svg/loupe.svg" alt="loupe"></span>
+            <input type="search" id="search_bar" placeholder="Rechercher..." value="<?= htmlspecialchars($rechercheNom) ?>" />
+          </div>
+        </div>
+      </div>
 
-                <div class="search-bar">
-                    <div class="search-bar__input">
-                        <span class="search-bar__icon"><img src="../../img/svg/loupe.svg" alt="loupe"></span>
-                        <input type="search" id="search_bar" placeholder="Rechercher..."
-                            value="<?= htmlspecialchars($rechercheNom) ?>" />
-                    </div>
-                </div>
+      <div class="content-section">
+        <div class="content-section__header">
+          <h2 class="content-section__title">Articles en lignes</h2>
+
+          <div class="tabs">
+            <div class="tabs__item <?= $tout_est_selectionne ? 'tabs__item--active' : '' ?>" id="tab-all">
+              Tous les statuts
             </div>
-
-            <div class="content-section">
-                <div class="content-section__header">
-                    <h2 class="content-section__title">Articles en lignes</h2>
-
-                    <div class="tabs">
-                        <div class="tabs__item <?= $tout_est_selectionne ? 'tabs__item--active' : '' ?>" id="tab-all">
-                            Tous les statuts
-                        </div>
-                        <?php foreach ($tous_les_statuts as $label): ?>
-                        <?php $est_actif = in_array($label, $filtres_actifs); ?>
-                        <div class="tabs__item <?= $est_actif ? 'tabs__item--active' : '' ?> tab-status"
-                            data-label="<?= $label ?>">
-                            <?= $label ?>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="tri">
-                        <div class="tri__item"><span class="tri__label">Trier par prix :</span>
-                            <a href="<?= genererUrlTri('prix_asc') ?>"
-                                class="tri__item <?= ($tri === 'prix_asc') ? 'tri__item--active' : '' ?>">
-                                Croissant
-                            </a>
-                            <a href="<?= genererUrlTri('prix_desc') ?>"
-                                class="tri__item <?= ($tri === 'prix_desc') ? 'tri__item--active' : '' ?>">
-                                Décroissant
-                            </a>
-                            <?php if($tri !== 'id_asc'): ?>
-                            <a href="<?= genererUrlTri('id_asc') ?>" class="tri__item"
-                                style="color: #666; font-size: 0.8em;">Réinitialiser</a>
-                            <?php endif; ?>
-                        </div>
-                        <span class="filtre__label">Trier par catégorie :</span>
-                        <select name="categorie" id="categorie" class="filtre__item">
-                            <option value="all" <?= $categorieSelection === 'all' ? 'selected' : '' ?>>
-                                Tous les produits (<?= $total_article ?>)
-                            </option>
-                            <!--boucle sur toutes les catégories-->
-                            <?php foreach($afficheCategorie as $cate):?>
-                            <!--affiche chaque catégorie sauf "all"-->
-                            <?php if ($cate['category'] !== 'all'): ?>
-                            <option value="<?= htmlspecialchars($cate['category']) ?>"
-                                <?= $categorieSelection === $cate['category'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($cate['category']) ?> (<?= $cate['count'] ?>)
-                            </option>
-                            <?php endif; ?>
-                            <?php endforeach;?>
-                        </select>
-                    </div>
+            <?php foreach ($tous_les_statuts as $label): ?>
+              <?php $est_actif = in_array($label, $filtres_actifs); ?>
+                <div class="tabs__item <?= $est_actif ? 'tabs__item--active' : '' ?> tab-status" 
+                    data-label="<?= $label ?>">
+                    <?= $label ?>
                 </div>
-
-                <div class="table-wrapper">
-                    <table class="products-table">
-                        <thead>
-                            <tr>
-                                <th class="products-table__head-cell col-check"></th>
-                                <th class="products-table__head-cell col-produit">Produit</th>
-                                <th class="products-table__head-cell col-statut">Statut</th>
-                                <th class="products-table__head-cell col-stock">Stock</th>
-                                <th class="products-table__head-cell col-cate">Catégorie</th>
-                                <th class="products-table__head-cell col-promo">Promotion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if(!empty($articles)): ?>
-                            <?php foreach ($articles as $article): ?>
-                            <tr class="products-table__row" data-id="<?php echo $article['id_produit']; ?>">
-                                <td class="products-table__cell col-check">
-                                    <div class="checkbox"></div>
-                                </td>
-                                <td class="products-table__cell col-produit">
-                                    <div class="product">
-                                        <div class="product__image">
-                                            <img src="<?= str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])); ?>"
-                                                width="60" height="60">
-                                        </div>
-                                        <div class="product__info">
-                                            <h4 class="product__name">
-                                                <?php echo htmlspecialchars($article['nom_article']); ?></h4>
-                                            <?php if(!empty($article['pourcentage']) && ((strtotime($article["debut_reduc"]) <= time()) && (time() <= strtotime($article["fin_reduc"])))): ?>
-                                            <div class="product__prix">
-                                                <p class="product__model__ancien">
-                                                    <?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
-                                                <p class="product__model">
-                                                    <?php echo number_format($article['p_prix']* (1 - $article['pourcentage']/100), 2, ',', ' '); ?>
-                                                    €</p>
-                                            </div>
-                                            <?php else: ?>
-                                            <p class="product__model">
-                                                <?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="products-table__cell col-statut">
-                                    <?php if ($article['p_statut'] == 'En ligne'): ?>
-                                    <?php if ($article['p_stock'] <= 0): ?>
-                                    <span class="badge badge--out">Épuisé</span>
-                                    <?php else: ?>
-                                    <span class="badge badge--live">En ligne</span>
-                                    <?php endif; ?>
-                                    <?php elseif ($article['p_statut'] == 'Hors ligne'): ?>
-                                    <span class="badge badge--hors">Hors ligne</span>
-                                    <?php elseif ($article['p_statut'] == 'Ébauche'): ?>
-                                    <span class="badge badge--eb">Ébauche</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="products-table__cell col-stock">
-                                    <?php echo htmlspecialchars($article['p_stock']); ?></td>
-                                <td class="products-table__cell col-cate">
-                                    <?php echo htmlspecialchars($article['categories']); ?></td>
-                                <td class="products-table__cell col-promo">
-                                    <?php if(!empty($article['debut_promo']) && ((strtotime($article["debut_promo"]) <= time()) && (time() <= strtotime($article["fin_promo"])))): ?>
-                                    <p>En Promotion !</p>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+            <?php endforeach; ?>
+        </div>
+          <div class="tri">
+            <div class="tri__item"><span class="tri__label">Trier par prix :</span>
+              <a href="<?= genererUrlTri('prix_asc') ?>" 
+                class="tri__item <?= ($tri === 'prix_asc') ? 'tri__item--active' : '' ?>">
+                Croissant
+              </a>
+              <a href="<?= genererUrlTri('prix_desc') ?>" 
+                class="tri__item <?= ($tri === 'prix_desc') ? 'tri__item--active' : '' ?>">
+                Décroissant
+              </a>
+              <?php if($tri !== 'id_asc'): ?>
+                  <a href="<?= genererUrlTri('id_asc') ?>" class="tri__item" style="color: #666; font-size: 0.8em;">Réinitialiser</a>
+              <?php endif; ?>
             </div>
+            <span class="filtre__label">Trier par catégorie :</span>
+            <select name="categorie" id="categorie" class="filtre__item">
+               <option value="all" <?= $categorieSelection === 'all' ? 'selected' : '' ?>>
+                  Tous les produits (<?= $total_article ?>)
+                </option>
+                <!--boucle sur toutes les catégories-->
+                <?php foreach($afficheCategorie as $cate):?>
+                  <!--affiche chaque catégorie sauf "all"-->
+                  <?php if ($cate['category'] !== 'all'): ?>
+                    <option value="<?= htmlspecialchars($cate['category']) ?>"
+                        <?= $categorieSelection === $cate['category'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($cate['category']) ?> (<?= $cate['count'] ?>)
+                    </option>
+                  <?php endif; ?>
+                <?php endforeach;?>
+            </select>
+          </div>
+        </div>
 
-            <div class="page-actions">
-                <a href="#" id="btn-promotion" class="btn btn--secondary btn--disabled">Appliquer promotion</a>
-                <a href="#" id="btn-remise" class="btn btn--secondary btn--disabled">Appliquer remise</a>
-                <a href="#" id="btn-modifier" class="btn btn--secondary btn--disabled">Modifier le produit</a>
-                <a href="create/index.php" class="btn btn--primary">Ajouter un produit</a>
-            </div>
+        <div class="table-wrapper">
+          <table class="products-table">
+            <thead>
+              <tr>
+                <th class="products-table__head-cell col-check"></th>
+                <th class="products-table__head-cell col-produit">Produit</th>
+                <th class="products-table__head-cell col-statut">Statut</th>
+                <th class="products-table__head-cell col-stock">Stock</th>
+                <th class="products-table__head-cell col-cate">Catégorie</th>
+                <th class="products-table__head-cell col-promo">Promotion</th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php if(!empty($articles)): ?>
+              <?php foreach ($articles as $article): ?>
+                <tr class="products-table__row" data-id="<?php echo $article['id_produit']; ?>" data-statut="<?php echo $article['p_statut']; ?>">
+                  <td class="products-table__cell col-check">
+                    <div class="checkbox"></div>
+                  </td>
+                  <td class="products-table__cell col-produit">
+                    <div class="product">
+                      <div class="product__image">
+                        <img src="<?= str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['image_url'])); ?>" width="60" height="60">
+                      </div>
+                      <div class="product__info">
+                        <h4 class="product__name"><?php echo htmlspecialchars($article['nom_article']); ?></h4>
+                        <?php if(!empty($article['pourcentage']) && ((strtotime($article["debut_reduc"]) <= time()) && (time() <= strtotime($article["fin_reduc"])))): ?>
+                        <div class="product__prix">
+                          <p class="product__model__ancien"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
+                          <p class="product__model"><?php echo number_format($article['p_prix']* (1 - $article['pourcentage']/100), 2, ',', ' '); ?> €</p>
+                        </div>
+                        <?php else: ?>
+                          <p class="product__model"><?php echo number_format($article['p_prix'], 2, ',', ' '); ?> €</p>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="products-table__cell col-statut">
+                    <?php if ($article['p_statut'] == 'En ligne'): ?>
+                      <?php if ($article['p_stock'] <= 0): ?>
+                        <span class="badge badge--out">Épuisé</span>
+                      <?php else: ?>
+                        <span class="badge badge--live">En ligne</span>
+                      <?php endif; ?>
+                    <?php elseif ($article['p_statut'] == 'Hors ligne'): ?>
+                      <span class="badge badge--hors">Hors ligne</span>
+                    <?php elseif ($article['p_statut'] == 'Ébauche'): ?>
+                        <span class="badge badge--eb">Ébauche</span>
+                    <?php endif; ?>
+                  </td>
+                  <td class="products-table__cell col-stock"><?php echo htmlspecialchars($article['p_stock']); ?></td>
+                  <td class="products-table__cell col-cate"><?php echo htmlspecialchars($article['categories']); ?></td>
+                  <td class="products-table__cell col-promo">
+                    <?php if(!empty($article['debut_promo']) && ((strtotime($article["debut_promo"]) <= time()) && (time() <= strtotime($article["fin_promo"])))): ?>
+                      <p>En Promotion !</p>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+          </table>
+        </div>
+      </div>
 
-            <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const rows = document.querySelectorAll('.products-table__row');
-                const btnModifier = document.getElementById('btn-modifier');
-                const btnRemise = document.getElementById('btn-remise');
-                const btnPromotion = document.getElementById('btn-promotion');
+      <div class="page-actions">  
+        <a href="#" id="btn-suppr" class="btn btn--secondary btn--disabled">Supprimer</a>
+        <a href="#" id="btn-promotion" class="btn btn--secondary btn--disabled">Appliquer promotion</a>
+        <a href="#" id="btn-remise" class="btn btn--secondary btn--disabled">Appliquer remise</a>
+        <a href="#" id="btn-modifier" class="btn btn--secondary btn--disabled">Modifier le produit</a>
+        <a href="create/index.php" class="btn btn--primary">Ajouter un produit</a>
+      </div>
 
-                rows.forEach(row => {
-                    row.addEventListener('click', () => {
-                        const isSelected = row.classList.contains('selected');
-                        const productID = row.dataset.id;
-                        const checkbox = row.querySelector('.checkbox');
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const rows = document.querySelectorAll('.products-table__row');
+          const btnModifier = document.getElementById('btn-modifier');
+          const btnRemise = document.getElementById('btn-remise');
+          const btnPromotion = document.getElementById('btn-promotion');
+          const btnSuppr = document.getElementById('btn-suppr');
 
-                        // Désélectionner toutes les lignes
-                        rows.forEach(r => {
-                            r.classList.remove('selected');
-                            r.querySelector('.checkbox').classList.remove(
-                                'checkbox--active');
-                        });
+          rows.forEach(row => {
+            row.addEventListener('click', () => {
+              const isSelected = row.classList.contains('selected');
+              const productID = row.dataset.id;
+              const checkbox = row.querySelector('.checkbox');
 
-                        if (!isSelected) {
-                            // Sélectionner la ligne cliquée
-                            row.classList.add('selected');
-                            checkbox.classList.add('checkbox--active');
+              // Désélectionner toutes les lignes
+              rows.forEach(r => {
+                r.classList.remove('selected');
+                r.querySelector('.checkbox').classList.remove('checkbox--active');
+              });
 
-                            // Activer le bouton Modifier
-                            btnModifier.classList.remove('btn--disabled');
-                            btnModifier.href = "create/index.php?modifier=" + productID;
+              if (!isSelected) {
+                // Sélectionner la ligne cliquée
+                row.classList.add('selected');
+                checkbox.classList.add('checkbox--active');
+                
+                // Activer le bouton Modifier
+                btnModifier.classList.remove('btn--disabled');
+                btnModifier.href = "create/index.php?modifier=" + productID;
 
-                            // Activer le bouton Remise
-                            btnRemise.classList.remove('btn--disabled');
-                            btnRemise.href = "remise/index.php?modifier=" + productID;
+                // Activer le bouton Remise
+                btnRemise.classList.remove('btn--disabled');
+                btnRemise.href = "remise/index.php?modifier=" + productID;
 
-                            // Activer le bouton Promotion
-                            btnPromotion.classList.remove('btn--disabled');
-                            btnPromotion.href = "promotion/index.php?modifier=" + productID;
-                        } else {
-                            // Désactiver le bouton Modifier
-                            btnModifier.classList.add('btn--disabled');
-                            btnModifier.href = "#";
+                // Activer le bouton Promotion
+                btnPromotion.classList.remove('btn--disabled');
+                btnPromotion.href = "promotion/index.php?modifier=" + productID;
 
-                            // Désactiver le bouton Remise
-                            btnRemise.classList.add('btn--disabled');
-                            btnRemise.href = "#" + productID;
+                // Activer le bouton Supprimer
+                if (row.dataset.statut === 'Ébauche') {
+                  btnSuppr.classList.remove('btn--disabled');
+                } else {
+                  btnSuppr.classList.add('btn--disabled');
+                }
+              } else {
+                // Désactiver le bouton Modifier
+                btnModifier.classList.add('btn--disabled');
+                btnModifier.href = "#";
 
-                            // Désactiver le bouton Promotion
-                            btnPromotion.classList.add('btn--disabled');
-                            btnPromotion.href = "#" + productID;
-                        }
-                    });
-                });
-                const tabAll = document.getElementById('tab-all');
-                const tabsStatuts = document.querySelectorAll('.tab-status');
+                // Désactiver le bouton Remise
+                btnRemise.classList.add('btn--disabled');
+                btnRemise.href = "#" + productID;
 
-                tabAll.addEventListener('click', () => {
-                    const isCurrentlyActive = tabAll.classList.contains('tabs__item--active');
-                    let url = "";
+                // Désactiver le bouton Promotion
+                btnPromotion.classList.add('btn--disabled');
+                btnPromotion.href = "#" + productID;
 
-                    if (!isCurrentlyActive) {
-                        const tous = Array.from(tabsStatuts).map(t => t.getAttribute('data-label'));
-                        url = "?st=" + tous.join(',');
-                    } else {
-                        url = "?st=aucun";
-                    }
-                    window.location.href = url;
-                });
-
-                tabsStatuts.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        tab.classList.toggle('tabs__item--active');
-
-                        const actifs = Array.from(document.querySelectorAll(
-                            '.tab-status.tabs__item--active')).map(t => t.getAttribute(
-                            'data-label'));
-
-                        if (actifs.length > 0) {
-                            window.location.href = "?st=" + actifs.join(',');
-                        } else {
-                            window.location.href = "?st=aucun";
-                        }
-                    });
-                });
-
-                const selectCate = document.getElementById('categorie');
-                selectCate.addEventListener('change', () => {
-                    const val = selectCate.value;
-                    const url = new URL(window.location.href);
-
-                    if (val === 'all') {
-                        url.searchParams.delete('cat');
-                    } else {
-                        url.searchParams.set('cat', val);
-                    }
-
-                    window.location.href = url.href;
-                });
-
-                const searchInput = document.getElementById('search_bar');
-                searchInput.addEventListener('keypress', (e) => {
-                    if (searchInput.value !== "") {
-                        searchInput.focus();
-                        const val = searchInput.value;
-                        searchInput.value = '';
-                        searchInput.value = val;
-                    }
-                    if (e.key === 'Enter') {
-                        const val = searchInput.value.trim();
-                        const url = new URL(window.location.href);
-
-                        if (val !== "") {
-                            url.searchParams.set('search', val);
-                        } else {
-                            url.searchParams.delete('search');
-                        }
-
-                        // On recharge la page avec le nouveau paramètre de recherche
-                        window.location.href = url.href;
-                    }
-                });
+                // Désactiver le bouton Supprimer
+                btnSuppr.classList.add('btn--disabled');
+              }
             });
-            </script>
-        </main>
-    </div>
-</body>
+          });
 
+          // Gestionnaire pour le bouton supprimer
+          btnSuppr.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            if (btnSuppr.classList.contains('btn--disabled')) {
+              return;
+            }
+
+            const selectedRow = document.querySelector('.products-table__row.selected');
+            if (!selectedRow) {
+              return;
+            }
+
+            const productID = selectedRow.dataset.id;
+            const productName = selectedRow.querySelector('.product__name').textContent;
+
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${productName}" ? Cette action est irréversible.`)) {
+              return;
+            }
+
+            try {
+              const response = await fetch('index.php', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=delete_product&id_produit=${productID}`
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                // Supprimer la ligne du tableau
+                selectedRow.remove();
+
+                // Désactiver tous les boutons
+                btnModifier.classList.add('btn--disabled');
+                btnRemise.classList.add('btn--disabled');
+                btnPromotion.classList.add('btn--disabled');
+                btnSuppr.classList.add('btn--disabled');
+
+                // Afficher un message de succès
+                alert('Produit supprimé avec succès');
+              } else {
+                alert('Erreur lors de la suppression: ' + result.message);
+              }
+            } catch (error) {
+              alert('Erreur de connexion: ' + error.message);
+            }
+          });
+
+          const tabAll = document.getElementById('tab-all');
+          const tabsStatuts = document.querySelectorAll('.tab-status');
+
+          tabAll.addEventListener('click', () => {
+            const isCurrentlyActive = tabAll.classList.contains('tabs__item--active');
+            let url = "";
+
+            if(!isCurrentlyActive){
+              const tous = Array.from(tabsStatuts).map(t => t.getAttribute('data-label'));
+              url = "?st=" + tous.join(',');
+            }else{
+              url = "?st=aucun";
+            }
+            window.location.href = url;
+          });
+
+          tabsStatuts.forEach(tab => {
+            tab.addEventListener('click', () => {
+              tab.classList.toggle('tabs__item--active');
+            
+              const actifs = Array.from(document.querySelectorAll('.tab-status.tabs__item--active')).map(t => t.getAttribute('data-label'));
+
+              if(actifs.length > 0){
+                window.location.href = "?st=" + actifs.join(',');
+              }else{
+                window.location.href = "?st=aucun";
+              }
+            });
+          });
+
+          const selectCate = document.getElementById('categorie');
+          selectCate.addEventListener('change', () => {
+              const val = selectCate.value;
+              const url = new URL(window.location.href);
+              
+              if (val === 'all') {
+                  url.searchParams.delete('cat');
+              } else {
+                  url.searchParams.set('cat', val);
+              }
+              
+              window.location.href = url.href;
+          });
+
+          const searchInput = document.getElementById('search_bar');
+          searchInput.addEventListener('keypress', (e) => {
+            if (searchInput.value !== "") {
+              searchInput.focus();
+              const val = searchInput.value;
+              searchInput.value = '';
+              searchInput.value = val;
+            }
+            if (e.key === 'Enter') {
+                const val = searchInput.value.trim();
+                const url = new URL(window.location.href);
+                
+                if (val !== "") {
+                    url.searchParams.set('search', val);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                
+                // On recharge la page avec le nouveau paramètre de recherche
+                window.location.href = url.href;
+            }
+          });
+        });
+      </script>
+    </main>
+  </div>
+</body>
 </html>
