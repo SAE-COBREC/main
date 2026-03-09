@@ -109,7 +109,7 @@ alert("La valeur de la remise renseigné dans l'URL n'est pas valide. Vous allez
 <script>
 alert(
     "La valeur de la remise renseigné dans l'URL ne correspond à aucune remise et à aucun produit. Vous allez être redirigé vers votre catalogue."
-    );
+);
 document.location.href = "/pages/backoffice/index.php";
 </script>
 
@@ -133,7 +133,7 @@ document.location.href = "/pages/backoffice/index.php";
 <script>
 alert(
     "La remise que vous essayez de modifier concerne un produit qui ne vous appartient pas. Vous allez être redirigé vers votre catalogue."
-    );
+);
 document.location.href = "/pages/backoffice/index.php";
 </script>
 
@@ -291,8 +291,8 @@ if ($_POST !== []) {
                         <input
                             style="<?php if(/*(time() + 15 * 60 >= strtotime($_POST["debut"])) ||*/ ((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null))) {echo 'border: 3px solid red';} ?>"
                             type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
-                            value="<?php echo !empty($_POST["debut"]) ? $_POST["debut"] : date('Y-m-d') . 'T06:00'; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00"
-                            required />
+                            value="<?php echo !empty($_POST["debut"]) ? $_POST["debut"] : date('Y-m-d') . 'T06:00'; ?>"
+                            min="2025-01-01T00:00" max="2100-01-01T00:00" required />
                         <?php
                                 if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
                                     ?>
@@ -323,8 +323,8 @@ if ($_POST !== []) {
                         <input
                             style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>"
                             type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
-                            value="<?php echo !empty($_POST["fin"]) ? $_POST["fin"] : date('Y-m-d', strtotime('+10 days')) . 'T23:59'; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00"
-                            required />
+                            value="<?php echo !empty($_POST["fin"]) ? $_POST["fin"] : date('Y-m-d', strtotime('+10 days')) . 'T23:59'; ?>"
+                            min="2025-01-01T00:00" max="2100-01-01T00:00" required />
                         <br />
                     </article>
                 </section>
@@ -400,7 +400,7 @@ if ($_POST !== []) {
         function svgModif() { //si clic sur svgModif et pas de warnings
             if (confirm(
                     "Vos modifications ont bien été sauvegardées. Souhaitez-vous continuer à modifier la remise ?."
-                    )) {} else {
+                )) {} else {
                 document.location.href = "/pages/backoffice/index.php";
             }
         }
