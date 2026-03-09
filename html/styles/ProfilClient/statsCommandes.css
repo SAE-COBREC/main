@@ -1,6 +1,3 @@
-/* ----------------------------------------
-   Stats Commandes Client - styles
-   ---------------------------------------- */
 * {
   margin: 0;
 }
@@ -16,12 +13,10 @@ body {
   color: #030212;
 }
 
-/* ---- Page layout ---- */
 main > div {
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 20px 60px;
-  /* ---- Back link ---- */
 }
 main > div > a {
   display: inline-flex;
@@ -41,9 +36,6 @@ main > div > a svg {
   width: 18px;
   height: 18px;
 }
-main > div {
-  /* ---- Header ---- */
-}
 main > div > div:nth-child(2) h1 {
   font-family: "Baloo", sans-serif;
   font-size: 2rem;
@@ -54,9 +46,6 @@ main > div > div:nth-child(2) p {
   margin: 0 0 32px;
   color: #7171A3;
   font-size: 0.95rem;
-}
-main > div {
-  /* ---- Filters bar ---- */
 }
 main > div > div:nth-child(3) {
   background: #FFFFFF;
@@ -113,9 +102,6 @@ main > div > div:nth-child(3) input[type=date] {
 main > div > div:nth-child(3) input[type=date]:focus {
   border-color: #7171A3;
 }
-main > div {
-  /* ---- KPI Cards ---- */
-}
 main > div > div:nth-child(4) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -130,7 +116,6 @@ main > div > div:nth-child(4) > div {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border-left: 4px solid #7171A3;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 main > div > div:nth-child(4) > div:hover {
@@ -164,9 +149,6 @@ main > div > div:nth-child(4) > div > span:nth-child(3) {
   font-size: 0.8rem;
   color: #c0c0c0;
 }
-main > div {
-  /* ---- Charts grid ---- */
-}
 main > div > div:nth-child(5) {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -192,7 +174,6 @@ main > div > div:nth-child(5) > div canvas {
   max-height: 300px;
 }
 
-/* ---- Loading overlay ---- */
 #loadingOverlay {
   position: fixed;
   inset: 0;
@@ -229,7 +210,6 @@ main > div > div:nth-child(5) > div canvas {
   align-items: flex-end;
 }
 
-/* ---- Responsive ---- */
 @media (max-width: 768px) {
   main > div > div:nth-child(5) {
     grid-template-columns: 1fr;
