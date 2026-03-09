@@ -474,11 +474,20 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                 <?php else: ?>
 
                 <article>
+
                     <header>
                         <div>
                             <span>Nombre de commandes : <?php echo count($listeCommandesRecentes); ?></span>
-                            <a href="/pages/ProfilClient/statsCommandes.php">Mes statistiques</a>
+                        </div>
                     </header>
+                    <footer>
+
+                        <a href="/pages/ProfilClient/statsCommandes.php">
+                            <button type="button">
+                                <span class="btn-text-desktop">Mes statistiques de commandes</span>
+                            </button>
+                        </a>
+                    </footer>
                 </article>
                 <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
                 <article>
