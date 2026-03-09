@@ -255,6 +255,27 @@ body {
 .product-row .summary .meta.meta--compact {
   margin-top: 12px;
 }
+.product-row .summary .btn {
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.product-row .summary .add {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+.product-row .summary .ghost {
+  background: transparent;
+  border: 1px solid #EFEFEF;
+  color: #030212;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 4em;
+  font-size: 13px;
+}
 
 input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button {
   -webkit-appearance: none;

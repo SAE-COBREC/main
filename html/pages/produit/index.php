@@ -380,7 +380,7 @@ if ($idClient && $idProduit) {
                         <button type="button" class="ghost" onclick="updateQty(1)" aria-label="Augmenter quantité"
                             <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
                     </div>
-                    <button class="ghost btn <?= $estEnFavoris ? 'active' : '' ?>"
+                    <button class="btn ghost <?= $estEnFavoris ? 'active' : '' ?>"
                         onclick="ajoutSuppFavoris(<?= (int) $idProduit ?>)" id="btnFav">
                         <?php if ($estEnFavoris) {
                             echo 'Retirer des favoris';
@@ -389,7 +389,7 @@ if ($idClient && $idProduit) {
                         } ?></button>
                 </div>
                 <div>
-                    <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
+                    <button class="btn add <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
                         onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
