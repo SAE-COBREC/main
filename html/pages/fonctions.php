@@ -1852,12 +1852,22 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
             error_log('SUPPRESSION: Insérer email supprimé - ' . ($res ? 'OK' : 'KO'));
         }
 
-        // 9. Supprimer définitivement le compte d'origine (le client est supprimé en cascade)
+        // 9. Supprimer explicitement le client d'origine (avant le compte)
+        $requeteSuppressionClient = "DELETE FROM cobrec1._client WHERE id_client = ?";
+        $requetePrepareeSuppressionClient = $connexionBaseDeDonnees->prepare($requeteSuppressionClient);
+        $resClient = $requetePrepareeSuppressionClient->execute([$identifiantClient]);
+        $nbSupprClient = $requetePrepareeSuppressionClient->rowCount();
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE CLIENT] res=" . ($resClient ? 'OK' : 'KO') . " rowCount=" . $nbSupprClient . "\n", FILE_APPEND);
+        if (!$resClient || $nbSupprClient !== 1) {
+            throw new Exception("Le client n'a pas pu être supprimé (rowCount=" . $nbSupprClient . ").");
+        }
+
+        // 10. Supprimer définitivement le compte d'origine (après le client)
         $requeteSuppressionCompte = "DELETE FROM cobrec1._compte WHERE id_compte = ?";
         $requetePrepareeSuppressionCompte = $connexionBaseDeDonnees->prepare($requeteSuppressionCompte);
         $res = $requetePrepareeSuppressionCompte->execute([$identifiantCompte]);
         $nbSupprCompte = $requetePrepareeSuppressionCompte->rowCount();
-        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ORIGINAL ACCOUNT] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $nbSupprCompte . "\n", FILE_APPEND);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ACCOUNT] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $nbSupprCompte . "\n", FILE_APPEND);
         if (!$res || $nbSupprCompte !== 1) {
             throw new Exception("Le compte n'a pas pu être supprimé (rowCount=" . $nbSupprCompte . ").");
         }

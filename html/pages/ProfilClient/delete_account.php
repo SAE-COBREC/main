@@ -64,18 +64,18 @@ if ($motDePasseHash === false || !password_verify($motDePasseSaisi, $motDePasseH
 // Appeler la fonction de suppression du compte
 $resultatSuppression = supprimerCompteClient($connexionBaseDeDonnees, $identifiantClientConnecte, $identifiantCompteClient);
 
-// Supprimer le cookie alizon_owner pour empêcher l'édition des avis anonymisés
-if (isset($_COOKIE['alizon_owner'])) {
-    setcookie('alizon_owner', '', time() - 3600, '/');
-    unset($_COOKIE['alizon_owner']);
-}
-
-// Détruire la session
-session_unset();
-session_destroy();
-
 // Rediriger vers la page d'accueil avec un message dans l'URL
 if ($resultatSuppression['success']) {
+    // Supprimer le cookie alizon_owner pour empêcher l'édition des avis anonymisés
+    if (isset($_COOKIE['alizon_owner'])) {
+        setcookie('alizon_owner', '', time() - 3600, '/');
+        unset($_COOKIE['alizon_owner']);
+    }
+
+    // Détruire la session uniquement si la suppression a réellement réussi
+    session_unset();
+    session_destroy();
+
     $url = '/index.php?compte_supprime=true';
 } else {
     $url = '/pages/ProfilClient/index.php?erreur=' . urlencode($resultatSuppression['message']);
