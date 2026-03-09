@@ -23,11 +23,12 @@
                 ];
                 $stmt->execute($params);
                 if (count($stmt->fetchAll(PDO::FETCH_ASSOC)) >= 2){?>
-                <script>
-                    alert("Vous avez créé plus de deux promotions. Vous ne pouvez donc plus créer de promotion. Vous pouvez toutefois toujours modifier ou supprimer des promotions.");
-                    document.location.href = "/pages/backoffice/index.php"; 
-                </script>
-                <?php
+<script>
+alert(
+    "Vous avez créé plus de deux promotions. Vous ne pouvez donc plus créer de promotion. Vous pouvez toutefois toujours modifier ou supprimer des promotions.");
+document.location.href = "/pages/backoffice/index.php";
+</script>
+<?php
                 exit(0);
             }
             } catch (Exception $e) {}
@@ -100,12 +101,13 @@
                         print_r($e);
                     ?>
 
-                    <script>
-                        alert("La valeur de la promotion renseigné dans l'URL n'est pas valide. Vous allez être redirigé vers votre catalogue.");
-                        //document.location.href = "/pages/backoffice/index.php"; 
-                    </script>
+<script>
+alert(
+"La valeur de la promotion renseigné dans l'URL n'est pas valide. Vous allez être redirigé vers votre catalogue.");
+//document.location.href = "/pages/backoffice/index.php"; 
+</script>
 
-                    <?php
+<?php
                     }
 
                     try {//Récupération des infos de la reduc
@@ -131,12 +133,13 @@
 
                         ?>
 
-                    <script>
-                        alert("La valeur de la promotion renseigné dans l'URL ne correspond à aucune promotion et à aucun produit. Vous allez être redirigé vers votre catalogue.");
-                        document.location.href = "/pages/backoffice/index.php"; 
-                    </script>
+<script>
+alert(
+    "La valeur de la promotion renseigné dans l'URL ne correspond à aucune promotion et à aucun produit. Vous allez être redirigé vers votre catalogue.");
+document.location.href = "/pages/backoffice/index.php";
+</script>
 
-                    <?php
+<?php
                     }else if ($_SESSION["promotion"]['_GET']['id_vendeur'] != $_SESSION['vendeur_id']){
                         // print_r($_SESSION["promotion"]['_GET']['id_vendeur']);
                         // print_r($_SESSION['vendeur_id']);
@@ -153,12 +156,13 @@
                         $_SESSION["promotion"]['_GET'] = null;
                         ?>
 
-                    <script>
-                        alert("La promotion que vous essayez de modifier concerne un produit qui ne vous appartient pas. Vous allez être redirigé vers votre catalogue.");
-                        document.location.href = "/pages/backoffice/index.php"; 
-                    </script>
+<script>
+alert(
+    "La promotion que vous essayez de modifier concerne un produit qui ne vous appartient pas. Vous allez être redirigé vers votre catalogue.");
+document.location.href = "/pages/backoffice/index.php";
+</script>
 
-                    <?php
+<?php
                     }else{//tout est bon
                         //peuplement de _post et de promotion
                         //print_r("peuplement\n");
@@ -215,6 +219,7 @@ if ($_POST !== []) {
 
 }
 ?></pre>
+
 <body>
     <?php
     //inclusion du bandeau à gauche de la page
@@ -242,15 +247,15 @@ if ($_POST !== []) {
                 echo '?modifier=' . $_SESSION["promotion"]["_GET"]['produit'];
             }
         ?>" method="post" enctype="multipart/form-data">
-            
+
             <div>
                 <section>
-                <article>
+                    <article>
                         <!-- Liste déroulante -->
                         <label for="produit">Produit</label>
                         <br>
                         <select id="produit" name="produit" required>
-                        <option value=''></option>
+                            <option value=''></option>
                             <?php
                                 if (empty($produit)){
                                     try {//Permets d'obtenir toutes les catégories de produits listées dans la BDD
@@ -283,9 +288,9 @@ if ($_POST !== []) {
 
                                 foreach ($produit as $value) {
                             ?>
-                            <option 
-                            value="<?php echo $value['id_produit']?>" <?php if ($_POST["produit"] == $value['id_produit']){echo 'selected';} ?>>
-                            <?php echo $value['p_nom']  . ' (' . $value['p_statut'] . ' ; ' . $value['p_stock'] . ' en stock)' ?>
+                            <option value="<?php echo $value['id_produit']?>"
+                                <?php if ($_POST["produit"] == $value['id_produit']){echo 'selected';} ?>>
+                                <?php echo $value['p_nom']  . ' (' . $value['p_statut'] . ' ; ' . $value['p_stock'] . ' en stock)' ?>
                             </option>
                             <?php } ?>
                         </select>
@@ -295,26 +300,30 @@ if ($_POST !== []) {
                     <article>
                         <label for="debut">Date de début de promotion</label>
                         <br>
-                        <input style="<?php if(/*(time() + 15 * 60 >= strtotime($_POST["debut"])) ||*/ ((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null))) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
-                            value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" required/>
-                            <?php
+                        <input
+                            style="<?php if(/*(time() + 15 * 60 >= strtotime($_POST["debut"])) ||*/ ((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null))) {echo 'border: 3px solid red';} ?>"
+                            type="datetime-local" id="debut" name="debut" placeholer="20/10/2025"
+                            value="<?php echo $_POST["debut"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00"
+                            required />
+                        <?php
                                 if(($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))){
                                     ?>
-                                    <br>
-                                    <small class="warn"><?php
+                        <br>
+                        <small class="warn"><?php
                                         echo 'Le premieur horodatage est postérieur (ou égal) au second';
                                         $_SESSION["promotion"]["warn"]++;
                                     ?></small>
-                                    <?php
+                        <?php
                                 }
                                 //if(time() + 15 * 60 >= strtotime($_POST["debut"])){
                                     ?>
-                                    <!-- <br>
+                        <!-- <br>
                                     <small class="warn"> --><?php
                                         // echo 'Le premieur horodatage est bloqué dans le passé';
                                         // $_SESSION["promotion"]["warn"]++;
-                                    ?><!-- </small> -->
-                                    <?php
+                                    ?>
+                        <!-- </small> -->
+                        <?php
                                 //}
                         ?>
                         <br />
@@ -323,78 +332,93 @@ if ($_POST !== []) {
                     <article>
                         <label for="fin">Date de fin de promotion</label>
                         <br>
-                        <input style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>" type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
-                            value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00" required/>
+                        <input
+                            style="<?php if((($_POST["debut"] >= $_POST["fin"]) && (($_POST["debut"] != '') && ($_POST["fin"] != ''))) && ($_POST["btn_maj"] == null)) {echo 'border: 3px solid red';} ?>"
+                            type="datetime-local" id="fin" name="fin" placeholer="20/10/2025"
+                            value="<?php echo $_POST["fin"]; ?>" min="2025-01-01T00:00" max="2100-01-01T00:00"
+                            required />
                         <br />
                     </article>
                 </section>
 
 
             </div>
-            <input type="button" value="Annuler" title="Permets d'annuler la création de l'article et de revenir au catalogue."/>
+            <input type="button" value="Annuler"
+                title="Permets d'annuler la création de l'article et de revenir au catalogue." />
             <?php
             if(empty($_SESSION["promotion"]['_GET']['produit']) == false){//si la page est en mode US modification
                 ?>
-                <input type="submit" class="orange" name="svgModif" title="Sauvegarde les changements sans changer la visibilité de l'article." value="Sauvegarder les modifications" accesskey="s"/>
-                <input type="button" name="suppr" title="Supprimer la promotion." value="Supprimer la promotion" accesskey="d"/>
-                <script>
-                        const btnSupprimer = document.querySelector("input[value='Supprimer la promotion']");
-                        btnSupprimer.addEventListener('click', () => {//si clic sur Supprimer
-                            if (confirm("Êtes-vous certain de vouloir supprimer cette promotion ?")) {
-                                document.location.href="/pages/backoffice/supprPromotion/index.php"; 
-                            }
-                        });
-                    </script>
-                <?php
+            <input type="submit" class="orange" name="svgModif"
+                title="Sauvegarde les changements sans changer la visibilité de l'article."
+                value="Sauvegarder les modifications" accesskey="s" />
+            <input type="button" name="suppr" title="Supprimer la promotion." value="Supprimer la promotion"
+                accesskey="d" />
+            <script>
+            const btnSupprimer = document.querySelector("input[value='Supprimer la promotion']");
+            btnSupprimer.addEventListener('click', () => { //si clic sur Supprimer
+                if (confirm("Êtes-vous certain de vouloir supprimer cette promotion ?")) {
+                    document.location.href = "/pages/backoffice/supprPromotion/index.php";
+                }
+            });
+            </script>
+            <?php
                 if (empty($_SESSION["promotion"]['_GET']['id_promotion'])){
                     ?>
-                    <script>
-                        btnSupprimer.disabled = true; //grisage du bouton
-                    </script>
-                    <?php
+            <script>
+            btnSupprimer.disabled = true; //grisage du bouton
+            </script>
+            <?php
                 }else{
                     ?>
-                    <script>
-                        btnSupprimer.disabled = false; //dégrisage du bouton
-                    </script>
-                    <?php
+            <script>
+            btnSupprimer.disabled = false; //dégrisage du bouton
+            </script>
+            <?php
                 }
             }else{
                 ?>
-            <input class="orange" type="submit" name="publier" title="Un article publié est inscrit dans la base de données et est visible par les clients." value="Publier la promotion dans le catalogue client" />
+            <input class="orange" type="submit" name="publier"
+                title="Un article publié est inscrit dans la base de données et est visible par les clients."
+                value="Publier la promotion dans le catalogue client" />
             <?php } ?>
-            </form>
-            <script>
-            const btnAnnuler = document.querySelector("input[value='Annuler']");
-            btnAnnuler.addEventListener('click', () => {//si clic sur Annuler
-                if (confirm("Êtes-vous certain de vouloir annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu.")) {
-                    document.location.href="/pages/backoffice/index.php"; 
-                }
-            });
-
-            function sauvegarder(){//si clic sur sauvegarder et pas de warnings
-                alert("Votre promotion a bien été sauvegardé.");
-                document.location.href = "/pages/backoffice/index.php"; 
+        </form>
+        <script>
+        const btnAnnuler = document.querySelector("input[value='Annuler']");
+        btnAnnuler.addEventListener('click', () => { //si clic sur Annuler
+            if (confirm(
+                    "Êtes-vous certain de vouloir annuler ? Ce que vous n'avez pas sauvegardé/publié sera perdu."
+                    )) {
+                document.location.href = "/pages/backoffice/index.php";
             }
+        });
 
-            function publier(){//si clic sur publier et pas de warnings
-                alert("Votre promotion a bien été appliquée.");
-                document.location.href = "/pages/backoffice/index.php"; 
-            }
+        function sauvegarder() { //si clic sur sauvegarder et pas de warnings
+            alert("Votre promotion a bien été sauvegardé.");
+            document.location.href = "/pages/backoffice/index.php";
+        }
 
-            function avertirEcrasement(){//si clic sur publier, pas de warnings et écrasement produit
-                if (confirm("Votre promotion a écrasée la promotion précédente appliquée sur ce produit. Souhaitez-vous contineur à modifier la promotion ?")) {
-                }else{document.location.href="/pages/backoffice/index.php"; 
-                }
-            }
+        function publier() { //si clic sur publier et pas de warnings
+            alert("Votre promotion a bien été appliquée.");
+            document.location.href = "/pages/backoffice/index.php";
+        }
 
-            function svgModif(){//si clic sur svgModif et pas de warnings
-                if (confirm("Vos modifications ont bien été sauvegardées. Souhaitez-vous continuer à modifier la promotion ?.")) {
-                }else{document.location.href="/pages/backoffice/index.php"; 
-                }
+        function avertirEcrasement() { //si clic sur publier, pas de warnings et écrasement produit
+            if (confirm(
+                    "Votre promotion a écrasée la promotion précédente appliquée sur ce produit. Souhaitez-vous contineur à modifier la promotion ?"
+                    )) {} else {
+                document.location.href = "/pages/backoffice/index.php";
             }
+        }
+
+        function svgModif() { //si clic sur svgModif et pas de warnings
+            if (confirm(
+                    "Vos modifications ont bien été sauvegardées. Souhaitez-vous continuer à modifier la promotion ?."
+                    )) {} else {
+                document.location.href = "/pages/backoffice/index.php";
+            }
+        }
         </script>
-            <pre>
+        <pre>
                 <?php 
                     if (empty($_POST["produit"])){
                         $_POST["produit"] = '';
@@ -542,17 +566,17 @@ if ($_POST !== []) {
             $dbh = null ;
     ?>
             </pre>
-        </main>
-    </body>
+    </main>
+</body>
+
 </html>
 
 <?php
         //}else{//si l'utilisateur est un client
 ?>
 <script>
-    //alert("Vous êtes connecté avec un compte client. Vous allez être redirigé vers la page d'accueil des clients.");
-    //document.location.href = "/index.php"; 
-    
+//alert("Vous êtes connecté avec un compte client. Vous allez être redirigé vers la page d'accueil des clients.");
+//document.location.href = "/index.php"; 
 </script>
 <?php
         //}
@@ -561,8 +585,8 @@ if ($_POST !== []) {
 ?>
 
 <script>
-    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
-    document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+document.location.href = "/pages/backoffice/connexionVendeur/index.php";
 </script>
 <?php
     }
