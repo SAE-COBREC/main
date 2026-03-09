@@ -1,10 +1,5 @@
-// =============================================================================
-// creerArticle.scss - Titres & Champs XL + Boutons Taille Standard (Index)
-// =============================================================================
-
 @use "../variable" as *;
 
-// --- Reset & Mise en page de base ---
 * {
   box-sizing: border-box;
   margin: 0;
@@ -20,9 +15,8 @@ body {
   overflow: hidden;
 }
 
-// Menu latéral
 aside {
-  width: 270px; // Cohérent avec index
+  width: 270px;
   flex-shrink: 0;
 }
 
@@ -30,7 +24,6 @@ aside {
   margin-bottom: 20px;
 }
 
-// Zone principale
 main {
   flex: 1;
   padding: $vendeur-padding-main;
@@ -48,25 +41,22 @@ main {
     }
   }
 
-  // --- Configuration du Formulaire ---
   form {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start; // Boutons alignés à gauche
+    justify-content: flex-start; 
     gap: 16px;
 
-    // Conteneur des sections
     >div {
       width: 100%;
       display: grid;
-      grid-template-columns: 1.5fr 1fr; // Structure 2 colonnes (Info / Logistique)
+      grid-template-columns: 1.5fr 1fr;
       gap: 24px;
       margin-bottom: 20px;
       align-items: start;
     }
 
-    // --- Sections (Cartes blanches) ---
     section {
       background: $primary-color-blanc;
       border: 1px solid $secondary-color-orange-clair;
@@ -74,7 +64,6 @@ main {
       padding: 20px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 
-      // Titres de sections (H2 et H3) agrandis
       h2,
       h3 {
         font-family: $font-family-primaire;
@@ -84,7 +73,6 @@ main {
         padding-bottom: 6px;
       }
 
-      // Groupes de champs (Articles)
       article {
         margin-bottom: 16px;
 
@@ -106,9 +94,9 @@ main {
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0; // On le rend invisible
+            opacity: 0;
             cursor: pointer;
-            font-size: 100px; // S'assure que la zone cliquable est énorme
+            font-size: 100px;
           }
 
           &:hover {
@@ -119,11 +107,11 @@ main {
         label {
           display: block;
           font-weight: 800;
-          font-size: 18px; // Label agrandi
-          margin-bottom: -2px; // FORCE LE COLLAGE PHYSIQUE
+          font-size: 18px;
+          margin-bottom: -2px;
           padding-left: 4px;
           position: relative;
-          z-index: 2; // Passe par-dessus la bordure de l'input
+          z-index: 2;
           color: $primary-color-noir;
         }
 
@@ -133,7 +121,7 @@ main {
         textarea,
         select {
           width: 100%;
-          padding: $vendeur-padding-button; // Champ agrandi
+          padding: $vendeur-padding-button;
           border: 1px solid $secondary-color-orange-clair;
           border-radius: $border-radius-primary;
           font-family: inherit;
@@ -168,7 +156,6 @@ main {
       }
     }
 
-    // --- Photos ---
     section:has(#photo\[\]) {
       article {
         small:has(img) {
@@ -200,12 +187,11 @@ main {
       }
     }
 
-    // --- BOUTONS D'ACTION (RETOUR TAILLE DÉBUT / INDEX) ---
     input[type="button"],
     input[type="submit"] {
-      padding: $vendeur-padding-button; // TAILLE ORIGINALE RESTAURÉE
+      padding: $vendeur-padding-button;
       border-radius: $border-radius-primary;
-      font-size: 18px; // TAILLE DE POLICE ORIGINALE
+      font-size: 18px;
       cursor: pointer;
       font-family: $font-family-primaire;
       border: 1px solid $secondary-color-orange-clair;
@@ -239,7 +225,6 @@ main {
   }
 }
 
-// Bordure rouge pour erreurs PHP
 input[style*="border: 3px solid red"],
 section[style*="border: 3px solid red"] {
   border: 2.5px solid $secondary-color-rouge !important;
