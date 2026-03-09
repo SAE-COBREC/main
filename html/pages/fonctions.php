@@ -1,5 +1,10 @@
 <?php
 
+// Fonction vide (maintenue pour compatibilité avec code existant)
+function ensureAvisSchema($pdo)
+{
+    // Pas d'action - la table _avis existe déjà avec sa structure finale
+}
 
 //fonction pour charger tous les produits depuis la base de données
 function chargerProduitsBDD($pdo)
