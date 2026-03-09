@@ -40,7 +40,7 @@ if (isset($_SESSION['idClient'])) {
 ?>
 <!DOCTYPE html>
 <script>
-(function () {
+(function() {
     var STORAGE_KEY = 'alizon_animations_enabled';
 
     function readAnimationPreference() {
@@ -70,14 +70,16 @@ if (isset($_SESSION['idClient'])) {
         }
 
         window.dispatchEvent(new CustomEvent('alizon:animations-changed', {
-            detail: { enabled: nextValue }
+            detail: {
+                enabled: nextValue
+            }
         }));
     }
 
     applyAnimationPreference(readAnimationPreference());
 
     window.AlizonMotion = {
-        isEnabled: function () {
+        isEnabled: function() {
             return document.documentElement.getAttribute('data-animations') !== 'off';
         },
         setEnabled: setAnimationPreference,
