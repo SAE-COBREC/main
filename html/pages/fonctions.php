@@ -1902,4 +1902,3 @@ function recupInfoPourStatsGeneral($pdo, $idVendeur){
     $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $commandes;
 }
-
