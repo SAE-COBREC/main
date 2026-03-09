@@ -583,7 +583,7 @@ body {
                     if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';
                     if (!/[a-z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre minuscule.';
                     if (!/[^A-Za-z0-9]/.test(val))
-                return 'Le mot de passe doit contenir au moins un caractère spécial.';
+                        return 'Le mot de passe doit contenir au moins un caractère spécial.';
                     if (el.validity.patternMismatch) return 'Le mot de passe ne respecte pas le format requis.';
                 }
 
@@ -597,7 +597,8 @@ body {
                 }
             }
         } catch (e) {
-            /* ignore */ }
+            /* ignore */
+        }
         return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
     }
 
@@ -786,7 +787,7 @@ body {
                     if (errorEl) {
                         errorEl.classList.remove('hidden');
                         errorEl.innerHTML =
-                        '<strong>Erreur</strong> : Ce numéro de téléphone est déjà utilisé.';
+                            '<strong>Erreur</strong> : Ce numéro de téléphone est déjà utilisé.';
                     }
                     return;
                 }
@@ -884,7 +885,8 @@ body {
                             if (typeof showNextCard === 'function') showNextCard();
                         }
                     } catch (e) {
-                        /* ignore */ }
+                        /* ignore */
+                    }
                 });
             });
         }
