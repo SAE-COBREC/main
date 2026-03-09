@@ -89,7 +89,7 @@ body {
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        aspect-ratio: 16/9;
+        aspect-ratio: 3/4;
         min-height: 240px;
         position: relative;
 
@@ -772,11 +772,14 @@ input[type="number"] {
     }
 
     .thumbs {
-        flex-direction: row;
+        flex-direction: column;
         gap: 8px;
-        overflow-x: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         padding-bottom: 6px;
         margin-top: 8px;
+        max-height: 260px;
+        align-items: flex-start;
 
         img {
             width: 56px;
