@@ -485,6 +485,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <button type="button">
                                 <span class="btn-text-desktop">Mes statistiques de commandes</span>
 
+                                <span class="btn-text-mobile">Statistiques</span>
+
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>
