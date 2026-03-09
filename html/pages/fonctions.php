@@ -1670,25 +1670,21 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
 
         // 1. Réutiliser le compte/client fantôme global s'il existe, sinon le créer
         $emailFantomeGlobal = 'compte.anonyme@anonymous.local';
-        $requeteRechercheFantome = "
-            SELECT c.id_compte, cl.id_client
-            FROM cobrec1._compte c
-            JOIN cobrec1._client cl ON cl.id_compte = c.id_compte
-            WHERE c.email = ?
-            LIMIT 1
-        ";
+        $requeteRechercheFantome = "SELECT id_compte FROM cobrec1._compte WHERE email = ? LIMIT 1";
         $requetePrepareeRechercheFantome = $connexionBaseDeDonnees->prepare($requeteRechercheFantome);
         $requetePrepareeRechercheFantome->execute([$emailFantomeGlobal]);
-        $fantomeExistant = $requetePrepareeRechercheFantome->fetch(PDO::FETCH_ASSOC);
+        $idCompteFantome = $requetePrepareeRechercheFantome->fetchColumn();
 
-        // Si un compte fantôme existe déjà alors on le réutilise sans en recréé un.
-        if ($fantomeExistant) { 
-            $idCompteFantome = (int) $fantomeExistant['id_compte'];
-            $idClientFantome = (int) $fantomeExistant['id_client'];
-            file_put_contents($logFile, date('Y-m-d H:i:s') . " [GHOST REUSED] idCompte=" . $idCompteFantome . " idClient=" . $idClientFantome . "\n", FILE_APPEND);
-        } else {
+        if ($idCompteFantome === false) {
             $motDePasseFantome = password_hash(bin2hex(random_bytes(24)), PASSWORD_DEFAULT);
-            $telephoneFantome = '0900000000';
+
+            // Générer un téléphone unique pour éviter un rollback sur contrainte UNIQUE.
+            do {
+                $telephoneFantome = '0' . random_int(1, 9) . str_pad((string) random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
+                $requeteVerifTelephone = $connexionBaseDeDonnees->prepare('SELECT 1 FROM cobrec1._compte WHERE num_telephone = ? LIMIT 1');
+                $requeteVerifTelephone->execute([$telephoneFantome]);
+                $telephoneExiste = $requeteVerifTelephone->fetchColumn() !== false;
+            } while ($telephoneExiste);
 
             $requeteCreationCompteFantome = "
                 INSERT INTO cobrec1._compte (email, num_telephone, mdp, prenom, nom, civilite)
@@ -1698,18 +1694,29 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
             $requetePrepareeCreationCompteFantome = $connexionBaseDeDonnees->prepare($requeteCreationCompteFantome);
             $requetePrepareeCreationCompteFantome->execute([$emailFantomeGlobal, $telephoneFantome, $motDePasseFantome]);
             $idCompteFantome = (int) $requetePrepareeCreationCompteFantome->fetchColumn();
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [GHOST ACCOUNT CREATED] idCompte=" . $idCompteFantome . "\n", FILE_APPEND);
+        }
 
-            $pseudoFantome = 'Anonyme_Systeme';
+        // Vérifier/réparer la ligne client fantôme liée au compte fantôme.
+        $requeteRechercheClientFantome = $connexionBaseDeDonnees->prepare('SELECT id_client FROM cobrec1._client WHERE id_compte = ? LIMIT 1');
+        $requeteRechercheClientFantome->execute([(int) $idCompteFantome]);
+        $idClientFantome = $requeteRechercheClientFantome->fetchColumn();
+
+        if ($idClientFantome === false) {
+            $pseudoFantome = 'Anonyme_Systeme_' . (int) $idCompteFantome;
             $requeteCreationClientFantome = "
                 INSERT INTO cobrec1._client (id_compte, c_pseudo, c_cloture, c_datenaissance)
                 VALUES (?, ?, TRUE, '1900-01-01')
                 RETURNING id_client
             ";
             $requetePrepareeCreationClientFantome = $connexionBaseDeDonnees->prepare($requeteCreationClientFantome);
-            $requetePrepareeCreationClientFantome->execute([$idCompteFantome, $pseudoFantome]);
+            $requetePrepareeCreationClientFantome->execute([(int) $idCompteFantome, $pseudoFantome]);
             $idClientFantome = (int) $requetePrepareeCreationClientFantome->fetchColumn();
-
-            file_put_contents($logFile, date('Y-m-d H:i:s') . " [GHOST CREATED] idCompte=" . $idCompteFantome . " idClient=" . $idClientFantome . "\n", FILE_APPEND);
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [GHOST CLIENT CREATED] idCompte=" . (int) $idCompteFantome . " idClient=" . $idClientFantome . "\n", FILE_APPEND);
+        } else {
+            $idClientFantome = (int) $idClientFantome;
+            $idCompteFantome = (int) $idCompteFantome;
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [GHOST REUSED] idCompte=" . $idCompteFantome . " idClient=" . $idClientFantome . "\n", FILE_APPEND);
         }
 
         // 2. Réattribuer les avis de l'utilisateur vers le client fantôme
@@ -1849,7 +1856,11 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
         $requeteSuppressionCompte = "DELETE FROM cobrec1._compte WHERE id_compte = ?";
         $requetePrepareeSuppressionCompte = $connexionBaseDeDonnees->prepare($requeteSuppressionCompte);
         $res = $requetePrepareeSuppressionCompte->execute([$identifiantCompte]);
-        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ORIGINAL ACCOUNT] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeSuppressionCompte->rowCount() . "\n", FILE_APPEND);
+        $nbSupprCompte = $requetePrepareeSuppressionCompte->rowCount();
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ORIGINAL ACCOUNT] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $nbSupprCompte . "\n", FILE_APPEND);
+        if (!$res || $nbSupprCompte !== 1) {
+            throw new Exception("Le compte n'a pas pu être supprimé (rowCount=" . $nbSupprCompte . ").");
+        }
 
         // Valider la transaction
         $connexionBaseDeDonnees->commit();
