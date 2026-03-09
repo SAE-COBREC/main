@@ -285,19 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //vérifie que l'élément existe
     if (searchInput) {
-        //variable pour stocker le timer de recherche
-        let timeoutId;
-        //écoute chaque fois que l'utilisateur tape dans la barre
-        searchInput.addEventListener('input', function() {
-            //annule le timer précédent
-            clearTimeout(timeoutId);
-            //crée un nouveau timer de 500ms (0.5 seconde)
-            timeoutId = setTimeout(() => {
-                //soumet le formulaire après 500ms sans nouvelle frappe
-                document.getElementById('filterForm').submit();
-            }, 500);
-        });
-
         //écoute quand l'utilisateur appuie sur une touche
         searchInput.addEventListener('keypress', function(e) {
             //vérifie si c'est la touche Entrée
