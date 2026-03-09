@@ -276,6 +276,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
 ?>
 <!doctype html>
 <html lang="fr">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -285,6 +286,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
 </head>
+
 <body>
     <?php
     //inclure l'en-tête du site
@@ -294,7 +296,11 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
 
     <nav class="page-breadcrumb">
         <a class="btn btn-retour-catalogue back-link" href="/index.php" aria-label="Retour au catalogue">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
             <span>Retour au catalogue</span>
         </a>
     </nav>
@@ -305,15 +311,17 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
             <?php if ($hasMultipleImages): ?>
             <aside class="thumbs" aria-label="Vignettes du produit">
                 <?php foreach ($images as $idx => $imgUrl): ?>
-                    <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>" alt="Vignette <?= $idx + 1 ?>"
-                         loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>" role="button" tabindex="0" aria-label="Afficher l'image <?= $idx + 1 ?>" />
+                <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>"
+                    alt="Vignette <?= $idx + 1 ?>" loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>"
+                    role="button" tabindex="0" aria-label="Afficher l'image <?= $idx + 1 ?>" />
                 <?php endforeach; ?>
             </aside>
             <?php endif; ?>
 
             <!-- Image principale -->
             <section class="main-image">
-                <img id="productMainImage" src="<?= htmlspecialchars($mainImage) ?>" alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
+                <img id="productMainImage" src="<?= htmlspecialchars($mainImage) ?>"
+                    alt="<?= htmlspecialchars($produit['p_nom']) ?>" />
             </section>
 
             <!-- Colonne droite - résumé produit -->
@@ -327,7 +335,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                             elseif ($note >= $i - 0.5) $s = 'alf';
                             else $s = 'empty';
                         ?>
-                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                        <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                     </span>
                     <span id="summaryRatingValue" class="summary-rating-value"><?= number_format($note, 1) ?></span>
@@ -336,18 +344,26 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 <div class="price">
                     <?= number_format($prixFinal, 2, ',', ' ') ?> €
                     <?php if ($discount > 0): ?>
-                        <span class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?> €</span>
-                        <span class="discount-badge">-<?= round($discount) ?>%</span>
+                    <span
+                        class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?>
+                        €</span>
+                    <span class="discount-badge">-<?= round($discount) ?>%</span>
                     <?php endif; ?>
                 </div>
 
                 <div class="qty">
-                    <div class="qty-control <?= $estEnRupture ? 'disabled' : '' ?>" role="group" aria-label="Choisir la quantité">
-                        <button type="button" class="ghost" onclick="updateQty(-1)" aria-label="Réduire quantité">−</button>
-                        <input type="number" id="qtyInput" min="1" step="1" max="<?= (int)$produit['p_stock'] ?>" value="<?= $estEnRupture ? 0 : 1 ?>" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
-                        <button type="button" class="ghost" onclick="updateQty(1)" aria-label="Augmenter quantité" <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
+                    <div class="qty-control <?= $estEnRupture ? 'disabled' : '' ?>" role="group"
+                        aria-label="Choisir la quantité">
+                        <button type="button" class="ghost" onclick="updateQty(-1)"
+                            aria-label="Réduire quantité">−</button>
+                        <input type="number" id="qtyInput" min="1" step="1" max="<?= (int)$produit['p_stock'] ?>"
+                            value="<?= $estEnRupture ? 0 : 1 ?>" aria-label="Quantité"
+                            <?= $estEnRupture ? 'disabled' : '' ?> />
+                        <button type="button" class="ghost" onclick="updateQty(1)" aria-label="Augmenter quantité"
+                            <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
                     </div>
-                    <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?> onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
+                    <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
+                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
                 </div>
@@ -365,14 +381,19 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 <div class="section features">
                     <h3>Caractéristiques</h3>
                     <ul>
-                        <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?> <div class="smaller">(<a href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)</div></li>
+                        <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?> <div
+                                class="smaller">(<a
+                                    href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)
+                            </div>
+                        </li>
                         <li>Origine : <?= htmlspecialchars($produit['p_origine'] ?? 'Non spécifiée') ?></li>
                     </ul>
                 </div>
 
                 <div class="section contact">
                     <strong>Contact</strong>
-                    <div class="contact-service-line">Service client • <a href="mailto:contact@alizon.com">contact@alizon.com</a></div>
+                    <div class="contact-service-line">Service client • <a
+                            href="mailto:contact@alizon.com">contact@alizon.com</a></div>
                 </div>
             </aside>
         </div>
@@ -404,7 +425,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                             else $s = 'empty';
                         ?>
                             <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
-                        <?php endfor; ?>
+                            <?php endfor; ?>
                         </div>
                         <div id="reviewsRatingCount" class="reviews-rating-count">Basé sur <?= $nbAvis ?> avis</div>
                     </div>
@@ -413,58 +434,61 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
 
             <!-- Formulaire avis -->
             <?php if ($idClient && $clientAachete && !$dejaAvis): ?>
-                <div class="review new-review-card" id="newReviewCard">
-                    <div class="review-head">
-                        <div class="review-head-left">
-                            <div class="avatar">
-                                <?php if ($currentUserImage): ?>
-                                    <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" class="avatar-image">
-                                <?php else: ?>
-                                    <?php 
+            <div class="review new-review-card" id="newReviewCard">
+                <div class="review-head">
+                    <div class="review-head-left">
+                        <div class="avatar">
+                            <?php if ($currentUserImage): ?>
+                            <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" class="avatar-image">
+                            <?php else: ?>
+                            <?php 
                                         $initial = 'U';
                                         if ($currentUser) {
                                             if (!empty($currentUser['c_pseudo'])) $initial = substr($currentUser['c_pseudo'], 0, 1);
                                             elseif (!empty($currentUser['prenom'])) $initial = substr($currentUser['prenom'], 0, 1);
                                         }
                                     ?>
-                                    <div class="avatar-initial"><?= strtoupper($initial) ?></div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="review-head-texts">
-                                <div class="review-author">Vous</div>
-                                <div class="review-subtitle">Laisser un avis</div>
-                            </div>
+                            <div class="avatar-initial"><?= strtoupper($initial) ?></div>
+                            <?php endif; ?>
                         </div>
-                        <div class="review-head-right">
-                            <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
-                                <?php for($i=1; $i<=5; $i++): ?>
-                                    <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
-                                <?php endfor; ?>
-                            </div>
-                            <input type="hidden" id="inlineNote" name="note" value="0">
+                        <div class="review-head-texts">
+                            <div class="review-author">Vous</div>
+                            <div class="review-subtitle">Laisser un avis</div>
                         </div>
                     </div>
-                    <form id="inlineReviewForm" class="review-form">
-                        <input type="text" name="titre" id="inlineTitle" class="review-title-input" placeholder="Titre de votre avis" maxlength="255" required>
-                        <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea" placeholder="Partagez votre avis..." required></textarea>
-                        <div class="review-actions">
-                            <small class="review-hint">Merci de rester courtois.</small>
-                            <button type="button" class="btn" id="inlineSubmit">Publier</button>
+                    <div class="review-head-right">
+                        <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
+                            <?php for($i=1; $i<=5; $i++): ?>
+                            <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
+                            <?php endfor; ?>
                         </div>
-                    </form>
+                        <input type="hidden" id="inlineNote" name="note" value="0">
+                    </div>
                 </div>
+                <form id="inlineReviewForm" class="review-form">
+                    <input type="text" name="titre" id="inlineTitle" class="review-title-input"
+                        placeholder="Titre de votre avis" maxlength="255" required>
+                    <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
+                        placeholder="Partagez votre avis..." required></textarea>
+                    <div class="review-actions">
+                        <small class="review-hint">Merci de rester courtois.</small>
+                        <button type="button" class="btn" id="inlineSubmit">Publier</button>
+                    </div>
+                </form>
+            </div>
             <?php elseif ($idClient && $dejaAvis): ?>
-                <div class="review new-review-card new-review-card-muted">
-                    <div class="new-review-card-message">
-                        Vous avez déjà publié un avis sur ce produit.
-                    </div>
+            <div class="review new-review-card new-review-card-muted">
+                <div class="new-review-card-message">
+                    Vous avez déjà publié un avis sur ce produit.
                 </div>
+            </div>
             <?php else: ?>
-                <div class="review new-review-card new-review-card-muted">
-                    <div class="new-review-card-message">
-                        <?= !$idClient ? 'Connectez-vous pour laisser un avis.' : 'Vous devez avoir acheté ce produit pour laisser un avis.' ?>
-                    </div>
+            <div class="review new-review-card new-review-card-muted">
+                <div class="new-review-card-message">
+                    <?= !$idClient ? 'Connectez-vous pour laisser un avis.' : 'Vous devez avoir acheté ce produit pour laisser un avis.' ?>
                 </div>
+            </div>
             <?php endif; ?>
 
             <!-- Filtrer les avis (dropdown style YouTube) -->
@@ -480,20 +504,25 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 $activeLabel = $options[$tri] ?? 'Filtre';
             ?>
             <div class="filters-wrap">
-                <button type="button" class="filters-btn" id="reviewsFilterBtn" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="filters-btn" id="reviewsFilterBtn" aria-haspopup="true"
+                    aria-expanded="false">
                     <span class="label">Filtrer</span>
                     <span class="value">• <?= htmlspecialchars($activeLabel) ?></span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
                 </button>
                 <div class="filters-menu" id="reviewsFilterMenu" role="menu" aria-label="Filtres des avis">
                     <?php foreach ($options as $k => $label):
                         $isActive = ($tri === $k);
                         $href = $baseHref . '&tri=' . urlencode($k);
                     ?>
-                        <a class="filters-item <?= $isActive ? 'is-active' : '' ?>" role="menuitem" href="<?= htmlspecialchars($href) ?>">
-                            <span><?= htmlspecialchars($label) ?></span>
-                            <?php if ($isActive): ?><small>Actif</small><?php endif; ?>
-                        </a>
+                    <a class="filters-item <?= $isActive ? 'is-active' : '' ?>" role="menuitem"
+                        href="<?= htmlspecialchars($href) ?>">
+                        <span><?= htmlspecialchars($label) ?></span>
+                        <?php if ($isActive): ?><small>Actif</small><?php endif; ?>
+                    </a>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -514,12 +543,15 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
             <h3>Modifier votre avis</h3>
             <div class="star-input" id="editStarInput" title="Sélectionnez une note">
                 <?php for($i=1; $i<=5; $i++): ?>
-                    <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img src="/img/svg/star-empty.svg" alt=""></button>
+                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                        src="/img/svg/star-empty.svg" alt=""></button>
                 <?php endfor; ?>
             </div>
-            <input type="text" id="editReviewTitle" name="titre" class="review-title-input" placeholder="Titre de votre avis" maxlength="255" required>
+            <input type="text" id="editReviewTitle" name="titre" class="review-title-input"
+                placeholder="Titre de votre avis" maxlength="255" required>
             <input type="hidden" id="editNote" name="note" value="0">
-            <textarea id="editReviewText" class="review-textarea" rows="5" placeholder="Votre avis..." required></textarea>
+            <textarea id="editReviewText" class="review-textarea" rows="5" placeholder="Votre avis..."
+                required></textarea>
             <div class="modal-actions">
                 <button class="btn-secondary" id="cancelEditReview">Annuler</button>
                 <button class="btn-primary" id="confirmEditReview">Enregistrer</button>
@@ -540,7 +572,8 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 <option value="Autre">Autre</option>
             </select>
             <label class="modal-form-label">Commentaire (optionnel)</label>
-            <textarea id="reportCommentaire" rows="4" class="modal-form-textarea" placeholder="Décrivez si besoin..."></textarea>
+            <textarea id="reportCommentaire" rows="4" class="modal-form-textarea"
+                placeholder="Décrivez si besoin..."></textarea>
             <div class="modal-actions modal-actions--compact">
                 <button class="btn-secondary" id="cancelReport">Annuler</button>
                 <button class="btn-primary" id="confirmReport">Envoyer</button>
@@ -548,12 +581,12 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
         </div>
     </div>
 
-    
+
     <script src="/js/notifications.js"></script>
     <script>
-        window.PRODUCT_ID = <?= (int)$idProduit ?>;
-        window.CURRENT_ID_CLIENT = <?= $idClient ?: 'null' ?>;
-        window.OWNER_TOKEN = <?= json_encode($ownerTokenServer) ?>;
+    window.PRODUCT_ID = <?= (int)$idProduit ?>;
+    window.CURRENT_ID_CLIENT = <?= $idClient ?: 'null' ?>;
+    window.OWNER_TOKEN = <?= json_encode($ownerTokenServer) ?>;
     </script>
     <script src="/js/produit/utils.js"></script>
     <script src="/js/produit/main.js"></script>
@@ -564,4 +597,5 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
 
     <!-- Tri des avis: liens classiques (fiable, sans AJAX) -->
 </body>
+
 </html>

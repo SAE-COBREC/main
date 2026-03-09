@@ -43,7 +43,8 @@
                     echo number_format(($value["quantite"] * $value["prix_unitaire"]) , 2, ',', ' ') . ' €'; 
                     $totalHT += $value["quantite"] * $value["prix_unitaire"];
             ?></td>
-            <td><?php if ($value["remise_unitaire"] != 0) echo number_format($value["remise_unitaire"] , 2, ',', ' ') . ' %'; ?></td>
+            <td><?php if ($value["remise_unitaire"] != 0) echo number_format($value["remise_unitaire"] , 2, ',', ' ') . ' %'; ?>
+            </td>
             <td><?php  echo number_format($value["tva"] , 2, ',', ' ') . ' %'; ?></td>
             <td><?php  
                 echo number_format(round(((($value["quantite"] * $value["prix_unitaire"]) - (($value['remise_unitaire'] / 100) * $value["prix_unitaire"]  * $value["quantite"])) * (1 + $value["tva"]/100)),2) , 2, ',', ' ') . ' €'; 
@@ -56,30 +57,30 @@
         <?php
             }
         ?>
-        </tbody>
-    </table>
-    <br>
-    <table>
-        <tr>
-            <td colspan="7">Montant brut HT</td>
-            <td><?php echo number_format($totalHT , 2, ',', ' ') . ' €' ?></td>
-        </tr>
-        <?php if($netCom != $totalHT){ ?>
-        <tr>
-            <td colspan="7">Total remises  </td>
-            <td><?php echo number_format($totalRemises , 2, ',', ' ') . ' €' ?></td>
-        </tr>
-        <tr>
-            <td colspan="7">Net commercial  </td>
-            <td><?php echo number_format($netCom , 2, ',', ' ') . ' €' ?></td>
-        </tr>
-        <?php } ?>
-        <tr>
-            <td colspan="7">Total TVA</td>
-            <td><strong><?php echo number_format($totalTVA, 2, ',', ' ') . ' €' ?></strong></td>
-        </tr>
-        <tr>
-            <td colspan="7">Net à payer TTC</td>
-            <td><strong><?php echo number_format($totalTTC, 2, ',', ' ') . ' €' ?></strong></td>
-        </tr>
+    </tbody>
+</table>
+<br>
+<table>
+    <tr>
+        <td colspan="7">Montant brut HT</td>
+        <td><?php echo number_format($totalHT , 2, ',', ' ') . ' €' ?></td>
+    </tr>
+    <?php if($netCom != $totalHT){ ?>
+    <tr>
+        <td colspan="7">Total remises </td>
+        <td><?php echo number_format($totalRemises , 2, ',', ' ') . ' €' ?></td>
+    </tr>
+    <tr>
+        <td colspan="7">Net commercial </td>
+        <td><?php echo number_format($netCom , 2, ',', ' ') . ' €' ?></td>
+    </tr>
+    <?php } ?>
+    <tr>
+        <td colspan="7">Total TVA</td>
+        <td><strong><?php echo number_format($totalTVA, 2, ',', ' ') . ' €' ?></strong></td>
+    </tr>
+    <tr>
+        <td colspan="7">Net à payer TTC</td>
+        <td><strong><?php echo number_format($totalTTC, 2, ',', ' ') . ' €' ?></strong></td>
+    </tr>
 </table>
