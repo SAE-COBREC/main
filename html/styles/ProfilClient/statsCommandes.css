@@ -24,7 +24,7 @@ main > div > a {
   gap: 6px;
   color: #7171A3;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 24px;
   transition: color 0.2s;
@@ -46,6 +46,20 @@ main > div > div:nth-child(2) p {
   margin: 0 0 32px;
   color: #7171A3;
   font-size: 0.95rem;
+}
+main > div > div:nth-child(2) {
+  background-color: #FFFFFF;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 20px 24px;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+  margin-bottom: 32px;
+}
+main > div > div:nth-child(2) p {
+  margin: 0;
+  padding-top: 0.1em;
 }
 main > div > div:nth-child(3) {
   background: #FFFFFF;
