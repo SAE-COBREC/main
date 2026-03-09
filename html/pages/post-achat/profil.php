@@ -69,10 +69,10 @@
 
     //header("Location: /pages/post-achat/impression.php");
     ?>
-    <script>
-    document.location.href="/pages/post-achat/impression.php";
-    </script>
-    <?php
+<script>
+document.location.href = "/pages/post-achat/impression.php";
+</script>
+<?php
     exit(0);
 
 ?>
