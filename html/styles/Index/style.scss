@@ -849,7 +849,7 @@ article {
     //agrandit le select de tri sur mobile
     form > div:first-child select {
       padding: 15px;
-      font-size: 1.5em;
+      font-size: 100%;
       width: 100%;
       text-align: center;
     }
@@ -857,7 +857,7 @@ article {
     //agrandit le select de catégories
     form > section select {
       padding: 15px;
-      font-size: 1.5em;
+      font-size: 100%;
     }
 
     //cache le formulaire quand l'accordéon est fermé
