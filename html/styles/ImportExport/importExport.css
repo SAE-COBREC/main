@@ -12,15 +12,24 @@ body {
   font-family: "Quicksand", sans-serif;
   background: #FFF7F1;
   width: 1440px;
-  min-height: 1024px;
-  overflow-y: auto;
+  height: 1024px;
+  overflow: hidden;
 }
 
 .app {
   display: grid;
   grid-template-columns: 270px 1fr;
+  width: 1440px;
   height: 1024px;
   background: #FFFFFF;
+}
+
+aside {
+  width: 270px;
+  height: 1024px;
+  overflow: hidden;
+  background: #FFFFFF;
+  border-right: 1px solid #E5D5C5;
 }
 
 .main {
@@ -29,7 +38,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  min-height: 1024px;
+  height: 1024px;
+  overflow-y: auto;
 }
 
 .header {
@@ -99,6 +109,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+  padding-bottom: 40px;
 }
 
 .card {
@@ -246,17 +257,14 @@ body {
   color: #155724;
 }
 
-.format-table-wrapper {
-  overflow-x: auto;
-}
-
 .format-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
   margin-top: 8px;
 }
-.format-table th, .format-table td {
+.format-table th,
+.format-table td {
   padding: 6px 10px;
   text-align: left;
   border-bottom: 1px solid #E5D5C5;
@@ -294,10 +302,10 @@ body {
 
 .btn {
   border: 0;
-  padding: 12px 24px;
+  padding: 10px 24px;
   border-radius: 14px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
@@ -312,7 +320,7 @@ body {
   color: #FFFFFF;
 }
 .btn--primary:hover {
-  background: rgba(230, 169, 110, 0.9);
+  background: rgba(205, 127, 50, 0.9);
 }
 .btn--secondary {
   background: #FFFFFF;

@@ -1,4 +1,3 @@
-// Variables
 @use "../variable" as *;
 
 * {
@@ -11,15 +10,24 @@ body {
   font-family: $font-family-secondaire;
   background: $secondary-color-rose-claire;
   width: 1440px;
-  min-height: 1024px;
-  overflow-y: auto;
+  height: 1024px;
+  overflow: hidden;
 }
 
 .app {
   display: grid;
   grid-template-columns: 270px 1fr;
+  width: 1440px;
   height: 1024px;
   background: $primary-color-blanc;
+}
+
+aside {
+  width: 270px;
+  height: 1024px;
+  overflow: hidden;
+  background: $primary-color-blanc;
+  border-right: 1px solid $secondary-color-orange-clair;
 }
 
 .main {
@@ -28,13 +36,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  min-height: 1024px;
+  height: 1024px;
+  overflow-y: auto;
 }
 
-// Header
 .header {
   flex-shrink: 0;
-
   &__title {
     font-size: 28px;
     font-weight: 700;
@@ -43,7 +50,6 @@ body {
   }
 }
 
-// Alertes / Messages
 .alert {
   display: flex;
   align-items: flex-start;
@@ -51,38 +57,31 @@ body {
   padding: 16px 20px;
   border-radius: $border-radius-primary;
   font-size: 16px;
-
   &--success {
     background: $secondary-color-vert-fond;
     color: $secondary-color-vert-succes;
     border: 1px solid $secondary-color-vert-succes-fond;
   }
-
   &--error {
     background: $secondary-color-rouge-erreur;
     color: $secondary-color-erreur;
     border: 1px solid $secondary-color-rouge;
   }
-
   &__icon {
     font-size: 20px;
     font-weight: 700;
     flex-shrink: 0;
     margin-top: 1px;
   }
-
   &__content {
     flex: 1;
   }
-
   &__text {
     font-weight: 600;
     margin-bottom: 4px;
   }
-
   &__details {
     margin-top: 8px;
-
     summary {
       cursor: pointer;
       font-weight: 600;
@@ -92,13 +91,11 @@ body {
         text-decoration: underline;
       }
     }
-
     ul {
       margin-top: 8px;
       padding-left: 20px;
       font-size: 14px;
       list-style: disc;
-
       li {
         margin-bottom: 4px;
       }
@@ -106,14 +103,13 @@ body {
   }
 }
 
-// Grille de cartes
 .cards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+  padding-bottom: 40px;
 }
 
-// Carte générique
 .card {
   background: $primary-color-blanc;
   border-radius: $border-radius-primary;
@@ -121,17 +117,14 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-
   &--import {
     grid-column: 1 / 2;
-    grid-row: 1 / 3; // L'import prend 2 rangées
+    grid-row: 1 / 3;
   }
-
   &__header {
     padding: 24px 24px 16px;
     border-bottom: 1px solid $secondary-color-orange-clair;
   }
-
   &__icon-wrapper {
     width: 48px;
     height: 48px;
@@ -140,28 +133,23 @@ body {
     align-items: center;
     justify-content: center;
     margin-bottom: 12px;
-
     &--import {
       background: rgba($primary-color-bronze, 0.12);
       color: $primary-color-bronze;
     }
-
     &--export {
       background: rgba($secondary-color-vert-succes-fond, 0.15);
       color: $secondary-color-vert-succes-fond;
     }
-
     &--commande {
       background: rgba($primary-color-bleu, 0.12);
       color: $primary-color-bleu;
     }
   }
-
   &__icon {
     width: 24px;
     height: 24px;
   }
-
   &__title {
     font-size: 22px;
     font-weight: 700;
@@ -169,12 +157,10 @@ body {
     margin-bottom: 4px;
     font-family: $font-family-primaire;
   }
-
   &__subtitle {
     font-size: 15px;
     color: #666;
   }
-
   &__body {
     padding: 24px;
     flex: 1;
@@ -182,26 +168,22 @@ body {
     flex-direction: column;
     gap: 20px;
   }
-
   &__format-info {
     background: $secondary-color-rose-claire;
     border-radius: $border-radius-primary;
     padding: 16px;
     font-size: 14px;
-
     h4 {
       font-size: 15px;
       font-weight: 700;
       color: $primary-color-noir;
       margin-bottom: 8px;
     }
-
     p {
       margin-bottom: 8px;
       color: #555;
     }
   }
-
   &__note {
     margin-top: 8px;
     padding: 8px 12px;
@@ -211,7 +193,6 @@ body {
     font-size: 13px;
     font-weight: 600;
   }
-
   &__download-link {
     display: flex;
     align-items: center;
@@ -224,14 +205,12 @@ body {
     font-size: 15px;
     border-top: 1px solid $secondary-color-orange-clair;
     transition: background 0.3s;
-
     &:hover {
       background: $secondary-color-rose-claire;
     }
   }
 }
 
-// Zone d'upload
 .upload-zone {
   border: 2px dashed $secondary-color-orange-clair;
   border-radius: $border-radius-primary;
@@ -239,43 +218,36 @@ body {
   text-align: center;
   transition: all 0.3s;
   cursor: pointer;
-
   &:hover,
   &--drag {
     border-color: $primary-color-bronze;
     background: rgba($primary-color-bronze, 0.04);
   }
-
   &--has-file {
     border-color: $secondary-color-vert-succes-fond;
     background: rgba($secondary-color-vert-succes-fond, 0.04);
   }
-
   &__icon {
     width: 48px;
     height: 48px;
     color: $primary-color-bronze;
     margin-bottom: 12px;
   }
-
   &__text {
     font-size: 16px;
     font-weight: 600;
     color: $primary-color-noir;
     margin-bottom: 4px;
   }
-
   &__or {
     font-size: 14px;
     color: #999;
     margin-bottom: 12px;
   }
-
   &__btn {
     cursor: pointer;
     font-size: 14px;
   }
-
   &__filename {
     margin-top: 12px;
     font-size: 14px;
@@ -284,39 +256,30 @@ body {
   }
 }
 
-// Tableau format CSV
-.format-table-wrapper {
-  overflow-x: auto;
-}
-
 .format-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
   margin-top: 8px;
-
-  th, td {
+  th,
+  td {
     padding: 6px 10px;
     text-align: left;
     border-bottom: 1px solid $secondary-color-orange-clair;
   }
-
   th {
     font-weight: 700;
     color: $primary-color-noir;
     background: $primary-color-blanc;
   }
-
   td {
     color: #444;
   }
-
   .center {
     text-align: center;
   }
 }
 
-// Stats box
 .stat-box {
   &__item {
     display: flex;
@@ -326,27 +289,24 @@ body {
     background: $secondary-color-rose-claire;
     border-radius: $border-radius-primary;
   }
-
   &__number {
     font-size: 36px;
     font-weight: 700;
     color: $primary-color-bronze;
     font-family: $font-family-primaire;
   }
-
   &__label {
     font-size: 16px;
     color: #666;
   }
 }
 
-// Boutons
 .btn {
   border: 0;
-  padding: 12px 24px;
+  padding: 10px 24px;
   border-radius: $border-radius-primary;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
@@ -355,15 +315,13 @@ body {
   gap: 8px;
   transition: all 0.3s;
   font-family: $font-family-secondaire;
-
   &--primary {
     background: $primary-color-bronze;
     color: $primary-color-blanc;
     &:hover {
-      background: rgba($secondary-color-bronze-clair, 0.9);
+      background: rgba($primary-color-bronze, 0.9);
     }
   }
-
   &--secondary {
     background: $primary-color-blanc;
     color: $primary-color-bronze;
@@ -372,7 +330,6 @@ body {
       background: $secondary-color-rose-claire;
     }
   }
-
   &--full {
     width: 100%;
   }
