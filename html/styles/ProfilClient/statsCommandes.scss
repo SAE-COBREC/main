@@ -29,7 +29,7 @@ main > div {
         gap: 6px;
         color: $primary-color-bleu;
         text-decoration: none;
-        font-size: 0.9rem;
+        font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 24px;
         transition: color 0.2s;
@@ -54,6 +54,22 @@ main > div {
             margin: 0 0 32px;
             color: $primary-color-bleu;
             font-size: 0.95rem;
+        }
+    }
+
+    > div:nth-child(2) {
+        background-color: $primary-color-blanc;
+        border-radius: 14px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 20px 24px;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-end;
+        margin-bottom: 32px;
+
+        p{
+            margin: 0;
+            padding-top: 0.1em;
         }
     }
 
