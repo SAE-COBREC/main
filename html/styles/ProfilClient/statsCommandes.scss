@@ -1,0 +1,255 @@
+/* ----------------------------------------
+   Stats Commandes Client - styles
+   ---------------------------------------- */
+
+@use "../variable" as *;
+
+$bg-page: #F7F7FB;
+$shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+@mixin card {
+    background: $primary-color-blanc;
+    border-radius: $border-radius-primary;
+    box-shadow: $shadow-card;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: $font-family-secondaire;
+    background: $bg-page;
+    color: $primary-color-noir;
+}
+
+/* ---- Page layout ---- */
+main > div {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+
+    /* ---- Back link ---- */
+    > a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: $primary-color-bleu;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 24px;
+        transition: color 0.2s;
+
+        &:hover { color: $primary-color-bleu; }
+
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    /* ---- Header ---- */
+    > div:nth-child(2) {
+        h1 {
+            font-family: $font-family-primaire;
+            font-size: 2rem;
+            margin: 0 0 4px;
+            color: $primary-color-noir;
+        }
+
+        p {
+            margin: 0 0 32px;
+            color: $primary-color-bleu;
+            font-size: 0.95rem;
+        }
+    }
+
+    /* ---- Filters bar ---- */
+    > div:nth-child(3) {
+        @include card;
+        padding: 20px 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-end;
+        margin-bottom: 32px;
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            > label {
+                font-size: 0.78rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: $primary-color-bleu;
+            }
+
+            > select {
+                height: 40px;
+                padding: 0 12px;
+                border: 1.5px solid $primary-color-bleu;
+                border-radius: 8px;
+                font-family: inherit;
+                font-size: 0.9rem;
+                background: #{$primary-color-bleu}15;
+                color: $primary-color-noir;
+                cursor: pointer;
+                transition: border-color 0.2s;
+                outline: none;
+
+                &:focus { border-color: $primary-color-bleu; }
+            }
+        }
+
+        input[type="date"] {
+            height: 40px;
+            padding: 0 12px;
+            border: 1.5px solid $primary-color-bleu;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: #{$primary-color-bleu}15;
+            color: $primary-color-noir;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            outline: none;
+
+            &:focus { border-color: $primary-color-bleu; }
+        }
+    }
+
+    /* ---- KPI Cards ---- */
+    > div:nth-child(4) {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 18px;
+        margin-bottom: 32px;
+
+        > div {
+            @include card;
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-left: 4px solid $primary-color-bleu;
+            transition: transform 0.2s, box-shadow 0.2s;
+
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+            }
+
+            &:nth-child(2) { border-left-color: $primary-color-bleu; }
+            &:nth-child(3) { border-left-color: $secondary-color-vert-succes-fond; }
+            &:nth-child(4) { border-left-color: $secondary-color-bronze-clair; }
+
+            > span {
+                &:nth-child(1) {
+                    font-size: 0.8rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: $primary-color-bleu;
+                }
+
+                &:nth-child(2) {
+                    font-family: $font-family-primaire;
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                    color: $primary-color-noir;
+                    line-height: 1;
+                }
+
+                &:nth-child(3) {
+                    font-size: 0.8rem;
+                    color: $secondary-color-gris-fonce;
+                }
+            }
+        }
+    }
+
+    /* ---- Charts grid ---- */
+    > div:nth-child(5) {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+
+        > div {
+            @include card;
+            padding: 24px;
+
+            &:first-child { grid-column: 1 / -1; }
+
+            h2 {
+                font-family: $font-family-primaire;
+                font-size: 1.1rem;
+                margin: 0 0 18px;
+                color: $primary-color-noir;
+            }
+
+            canvas { max-height: 300px; }
+        }
+    }
+}
+
+/* ---- Loading overlay ---- */
+#loadingOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+
+    &[data-visible] {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    > div {
+        width: 44px;
+        height: 44px;
+        border: 4px solid $secondary-color-orange-clair;
+        border-top-color: $primary-color-bleu;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+    }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#groupePeriode > div {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    main > div {
+        > div:nth-child(5) {
+            grid-template-columns: 1fr;
+
+            > div:first-child { grid-column: auto; }
+        }
+
+        > div:nth-child(3) {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        > div:nth-child(4) { grid-template-columns: 1fr 1fr; }
+    }
+}
+
+@media (max-width: 480px) {
+    main > div > div:nth-child(4) { grid-template-columns: 1fr; }
+}
