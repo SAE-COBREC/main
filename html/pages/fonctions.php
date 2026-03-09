@@ -1,15 +1,6 @@
 <?php
 
 
-function ensureAvisSchema($pdo)
-{
-    try {
-        $pdo->exec("ALTER TABLE cobrec1._avis ADD COLUMN IF NOT EXISTS id_compte integer");
-        $pdo->exec("ALTER TABLE ONLY cobrec1._avis ADD CONSTRAINT IF NOT EXISTS fk_avis_compte FOREIGN KEY (id_compte) REFERENCES cobrec1._compte (id_compte) ON DELETE SET NULL");
-    } catch (Exception $e) {
-    }
-}
-
 //fonction pour charger tous les produits depuis la base de données
 function chargerProduitsBDD($pdo)
 {
@@ -1722,11 +1713,11 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
         // 2. Réattribuer les avis de l'utilisateur vers le client fantôme
         $requeteAnonymerAvis = "
                 UPDATE cobrec1._avis
-                SET id_client = ?, id_compte = ?, a_owner_token = MD5(RANDOM()::text || NOW()::text)
-                WHERE id_client = ? OR id_compte = ?
+                SET id_client = ?, a_owner_token = MD5(RANDOM()::text || NOW()::text)
+                WHERE id_client = ?
         ";
         $requetePrepareeAvis = $connexionBaseDeDonnees->prepare($requeteAnonymerAvis);
-        $res = $requetePrepareeAvis->execute([$idClientFantome, $idCompteFantome, $identifiantClient, $identifiantCompte]);
+        $res = $requetePrepareeAvis->execute([$idClientFantome, $identifiantClient]);
         file_put_contents($logFile, date('Y-m-d H:i:s') . " [MOVE AVIS TO GHOST] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeAvis->rowCount() . "\n", FILE_APPEND);
 
         // 3. Conserver les paniers payés (facture + paiement) en les réattribuant au client fantôme
