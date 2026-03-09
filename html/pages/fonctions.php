@@ -1668,39 +1668,113 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
         error_log('SUPPRESSION: Transaction démarrée');
         file_put_contents($logFile, date('Y-m-d H:i:s') . " [BEGIN TRANSACTION]\n", FILE_APPEND);
 
-        // 1. Anonymiser les avis du client (mettre id_client et id_compte à NULL et régénérer le token)
-        // en ajoutant id_compte nous garantissons qu'un compte recréé avec le même identifiant
-        // (si la réutilisation d'email était autorisée) ne pourra pas récupérer l'ancien avis.
+        // 1. Réutiliser le compte/client fantôme global s'il existe, sinon le créer
+        $emailFantomeGlobal = 'compte.anonyme@anonymous.local';
+        $requeteRechercheFantome = "
+            SELECT c.id_compte, cl.id_client
+            FROM cobrec1._compte c
+            JOIN cobrec1._client cl ON cl.id_compte = c.id_compte
+            WHERE c.email = ?
+            LIMIT 1
+        ";
+        $requetePrepareeRechercheFantome = $connexionBaseDeDonnees->prepare($requeteRechercheFantome);
+        $requetePrepareeRechercheFantome->execute([$emailFantomeGlobal]);
+        $fantomeExistant = $requetePrepareeRechercheFantome->fetch(PDO::FETCH_ASSOC);
+
+        // Si un compte fantôme existe déjà alors on le réutilise sans en recréé un.
+        if ($fantomeExistant) { 
+            $idCompteFantome = (int) $fantomeExistant['id_compte'];
+            $idClientFantome = (int) $fantomeExistant['id_client'];
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [GHOST REUSED] idCompte=" . $idCompteFantome . " idClient=" . $idClientFantome . "\n", FILE_APPEND);
+        } else {
+            $motDePasseFantome = password_hash(bin2hex(random_bytes(24)), PASSWORD_DEFAULT);
+            $telephoneFantome = '0900000000';
+
+            $requeteCreationCompteFantome = "
+                INSERT INTO cobrec1._compte (email, num_telephone, mdp, prenom, nom, civilite)
+                VALUES (?, ?, ?, 'Anonyme', 'Anonyme', 'Inconnu')
+                RETURNING id_compte
+            ";
+            $requetePrepareeCreationCompteFantome = $connexionBaseDeDonnees->prepare($requeteCreationCompteFantome);
+            $requetePrepareeCreationCompteFantome->execute([$emailFantomeGlobal, $telephoneFantome, $motDePasseFantome]);
+            $idCompteFantome = (int) $requetePrepareeCreationCompteFantome->fetchColumn();
+
+            $pseudoFantome = 'Anonyme_Systeme';
+            $requeteCreationClientFantome = "
+                INSERT INTO cobrec1._client (id_compte, c_pseudo, c_cloture, c_datenaissance)
+                VALUES (?, ?, TRUE, '1900-01-01')
+                RETURNING id_client
+            ";
+            $requetePrepareeCreationClientFantome = $connexionBaseDeDonnees->prepare($requeteCreationClientFantome);
+            $requetePrepareeCreationClientFantome->execute([$idCompteFantome, $pseudoFantome]);
+            $idClientFantome = (int) $requetePrepareeCreationClientFantome->fetchColumn();
+
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " [GHOST CREATED] idCompte=" . $idCompteFantome . " idClient=" . $idClientFantome . "\n", FILE_APPEND);
+        }
+
+        // 2. Réattribuer les avis de l'utilisateur vers le client fantôme
         $requeteAnonymerAvis = "
-            UPDATE cobrec1._avis 
-            SET id_client = NULL, id_compte = NULL, a_owner_token = MD5(RANDOM()::text || NOW()::text)
-            WHERE id_client = ?
+                UPDATE cobrec1._avis
+                SET id_client = ?, id_compte = ?, a_owner_token = MD5(RANDOM()::text || NOW()::text)
+                WHERE id_client = ? OR id_compte = ?
         ";
         $requetePrepareeAvis = $connexionBaseDeDonnees->prepare($requeteAnonymerAvis);
-        $res = $requetePrepareeAvis->execute([$identifiantClient]);
-        file_put_contents($logFile, date('Y-m-d H:i:s') . " [ANONYMIZE AVIS] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeAvis->rowCount() . " - Token régénéré\n", FILE_APPEND);
-        error_log('SUPPRESSION: Anonymiser avis - ' . ($res ? 'OK' : 'KO') . ' (' . $requetePrepareeAvis->rowCount() . ' avis)');
+        $res = $requetePrepareeAvis->execute([$idClientFantome, $idCompteFantome, $identifiantClient, $identifiantCompte]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [MOVE AVIS TO GHOST] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeAvis->rowCount() . "\n", FILE_APPEND);
 
-        // 2. Supprimer les votes de l'utilisateur sur les avis (cascade par FK)
-        // Les votes vont être supprimés via ON DELETE CASCADE quand on supprime le client
-        
-        // 3A. Créer un panier anonyme ou anonymiser les paniers avant suppression
-        // On va supprimer directement les paniers - cela supprimera les factures, paiements, livraisons, commentaires en cascade
-        
-        // 3B. Supprimer les données bancaires (paiements) - mais peuvent être supprimés via cascade des factures
-        // Qui vont être supprimées via cascade des paniers
-        
-        // 4. Supprimer les paniers clients (cela supprime aussi les factures, livraisons, commentaires en cascade)
-        $requeteSuppressionPaniers = "
-            DELETE FROM cobrec1._panier_commande 
-            WHERE id_client = ?
+        // 3. Conserver les paniers payés (facture + paiement) en les réattribuant au client fantôme
+        $requeteReattribuerPaniersPayes = "
+                UPDATE cobrec1._panier_commande pc
+                SET id_client = ?
+                WHERE pc.id_client = ?
+                    AND EXISTS (
+                        SELECT 1
+                        FROM cobrec1._facture f
+                        JOIN cobrec1._paiement p ON p.id_facture = f.id_facture
+                        WHERE f.id_panier = pc.id_panier
+                    )
         ";
-        $requetePrepareeSuppressionPaniers = $connexionBaseDeDonnees->prepare($requeteSuppressionPaniers);
-        $res = $requetePrepareeSuppressionPaniers->execute([$identifiantClient]);
-        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE PANIERS] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeSuppressionPaniers->rowCount() . "\n", FILE_APPEND);
-        error_log('SUPPRESSION: Supprimer paniers - ' . ($res ? 'OK' : 'KO') . ' (' . $requetePrepareeSuppressionPaniers->rowCount() . ' paniers)');
+        $requetePrepareePaniersPayes = $connexionBaseDeDonnees->prepare($requeteReattribuerPaniersPayes);
+        $res = $requetePrepareePaniersPayes->execute([$idClientFantome, $identifiantClient]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [KEEP PAID CARTS] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareePaniersPayes->rowCount() . "\n", FILE_APPEND);
 
-        // 5. Supprimer les adresses du compte
+        // 4. Réattribuer les adresses utilisées dans les factures conservées au compte fantôme
+        $requeteReattribuerAdressesFacturees = "
+                UPDATE cobrec1._adresse a
+                SET id_compte = ?,
+                        a_numero = '0',
+                        a_adresse = 'Adresse anonymisee',
+                        a_ville = 'Anonyme',
+                        a_code_postal = '00000',
+                        a_pays = 'France',
+                        a_complement = NULL
+                WHERE a.id_compte = ?
+                    AND EXISTS (
+                        SELECT 1
+                        FROM cobrec1._facture f
+                        WHERE f.id_adresse = a.id_adresse
+                    )
+        ";
+        $requetePrepareeAdressesFacturees = $connexionBaseDeDonnees->prepare($requeteReattribuerAdressesFacturees);
+        $res = $requetePrepareeAdressesFacturees->execute([$idCompteFantome, $identifiantCompte]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [KEEP BILLED ADDRESSES] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeAdressesFacturees->rowCount() . "\n", FILE_APPEND);
+
+        // 5. Supprimer les paniers non payés du client (les données liées tombent en cascade)
+        $requeteSuppressionPaniersNonPayes = "
+                DELETE FROM cobrec1._panier_commande pc
+                WHERE pc.id_client = ?
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM cobrec1._facture f
+                        JOIN cobrec1._paiement p ON p.id_facture = f.id_facture
+                        WHERE f.id_panier = pc.id_panier
+                    )
+        ";
+        $requetePrepareeSuppressionPaniers = $connexionBaseDeDonnees->prepare($requeteSuppressionPaniersNonPayes);
+        $res = $requetePrepareeSuppressionPaniers->execute([$identifiantClient]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE UNPAID CARTS] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeSuppressionPaniers->rowCount() . "\n", FILE_APPEND);
+
+        // 6. Supprimer les adresses restantes du compte
         $requeteSuppressionAdresses = "
             DELETE FROM cobrec1._adresse 
             WHERE id_compte = ?
@@ -1710,7 +1784,7 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
         file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ADRESSES] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeSuppressionAdresses->rowCount() . "\n", FILE_APPEND);
         error_log('SUPPRESSION: Supprimer adresses - ' . ($res ? 'OK' : 'KO') . ' (' . $requetePrepareeSuppressionAdresses->rowCount() . ' adresses)');
 
-        // 6. Supprimer la photo de profil du compte
+        // 7. Supprimer la photo de profil du compte
         $requeteRecuperationImageCompte = "
             SELECT id_image 
             FROM cobrec1._represente_compte 
@@ -1758,33 +1832,7 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
             }
         }
 
-        // 7. Anonymiser le pseudo du client
-        // Utiliser un timestamp et hash pour garantir l'unicité
-        $pseudoAnonymeClient = "Anonyme_" . substr(md5($identifiantClient . time()), 0, 8);
-        $requeteAnonymerPseudo = "
-            UPDATE cobrec1._client 
-            SET c_pseudo = ? 
-            WHERE id_client = ?
-        ";
-        $requetePrepareeAnonymerPseudo = $connexionBaseDeDonnees->prepare($requeteAnonymerPseudo);
-        $res = $requetePrepareeAnonymerPseudo->execute([$pseudoAnonymeClient, $identifiantClient]);
-        file_put_contents($logFile, date('Y-m-d H:i:s') . " [UPDATE PSEUDO] res=" . ($res ? 'OK' : 'KO') . " newPseudo=" . $pseudoAnonymeClient . " rowCount=" . $requetePrepareeAnonymerPseudo->rowCount() . "\n", FILE_APPEND);
-        error_log('SUPPRESSION: Anonymiser pseudo - ' . ($res ? 'OK' : 'KO') . ' (pseudo=' . $pseudoAnonymeClient . ')');
-
-        // 8. Anonymiser le compte (nom et prénom)
-        $emailAnonym = "anonyme_" . $identifiantCompte . "@anonymous.local";
-        $telephoneAnonym = "0100000000"; // Respecte la regex: ^(0|\+33|0033)[1-9][0-9]{8}$
-        $requeteAnonymerCompte = "
-            UPDATE cobrec1._compte 
-            SET prenom = 'Anonyme', nom = '', email = ?, num_telephone = ?
-            WHERE id_compte = ?
-        ";
-        $requetePrepareeAnonymerCompte = $connexionBaseDeDonnees->prepare($requeteAnonymerCompte);
-        $res = $requetePrepareeAnonymerCompte->execute([$emailAnonym, $telephoneAnonym, $identifiantCompte]);
-        file_put_contents($logFile, date('Y-m-d H:i:s') . " [UPDATE COMPTE ANONYM] res=" . ($res ? 'OK' : 'KO') . " email=" . $emailAnonym . " phone=" . $telephoneAnonym . " rowCount=" . $requetePrepareeAnonymerCompte->rowCount() . "\n", FILE_APPEND);
-        error_log('SUPPRESSION: Anonymiser compte - ' . ($res ? 'OK' : 'KO'));
-
-        // 9. Insérer l'email original dans la table des emails supprimés
+        // 8. Insérer l'email original dans la table des emails supprimés
         if (!empty($emailOriginal)) {
             $requeteInserEnmailDelete = "
                 INSERT INTO cobrec1._emails_deleted (email, id_compte_deleted) 
@@ -1797,12 +1845,18 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
             error_log('SUPPRESSION: Insérer email supprimé - ' . ($res ? 'OK' : 'KO'));
         }
 
+        // 9. Supprimer définitivement le compte d'origine (le client est supprimé en cascade)
+        $requeteSuppressionCompte = "DELETE FROM cobrec1._compte WHERE id_compte = ?";
+        $requetePrepareeSuppressionCompte = $connexionBaseDeDonnees->prepare($requeteSuppressionCompte);
+        $res = $requetePrepareeSuppressionCompte->execute([$identifiantCompte]);
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " [DELETE ORIGINAL ACCOUNT] res=" . ($res ? 'OK' : 'KO') . " rowCount=" . $requetePrepareeSuppressionCompte->rowCount() . "\n", FILE_APPEND);
+
         // Valider la transaction
         $connexionBaseDeDonnees->commit();
         error_log('SUPPRESSION: Transaction validée - suppression complète réussie');
         file_put_contents($logFile, date('Y-m-d H:i:s') . " [COMMIT SUCCESS]\n", FILE_APPEND);
 
-        return ['success' => true, 'message' => "Votre compte a été supprimé avec succès. Toutes vos données personnelles ont été supprimées."];
+        return ['success' => true, 'message' => "Votre compte a été supprimé avec succès. Vos avis et paniers payés ont été conservés de manière anonyme."];
 
     } catch (Exception $erreurException) {
         // Annuler la transaction en cas d'erreur
