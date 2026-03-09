@@ -131,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         //insertion dans la bdd des données de compte
-        $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite,nom,prenom)
-                VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom)';
+        $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite,nom,prenom,secret_A2F)
+                VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP)';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
           'email' => $email,
@@ -140,7 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           'mdp' => $mdp,
           'civilite' => $civilite,
           'nom' => $nom,
-          'prenom' => $prenom
+          'prenom' => $prenom,
+          'secretOTP' => $_SESSION['A2F']['secret'] ?? null
         ]);
 
         // Récupérer l'id du compte créé
@@ -186,8 +187,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'latitude' => $latitude ?? null
           ]);
         }else{
-          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays, longitude, latitude, secret_A2F)
-                  VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays, :longitude, :latitude, :secretOTP)';
+          $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_ville, a_code_postal, a_pays, longitude, latitude)
+                  VALUES (:id_compte, :numero, :adresse, :ville, :code_postal, :pays, :longitude, :latitude)';
           $stmtAdrss = $pdo->prepare($sqlAdrss);
           $stmtAdrss->execute([
             'id_compte' => $id_compte,
@@ -197,8 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'code_postal'    => $codeP,
             'pays'    => $pays,
             'longitude' => $longitude ?? null,
-            'latitude' => $latitude ?? null,
-            'secretOTP' => $_SESSION['A2F']['secret'] ?? null
+            'latitude' => $latitude ?? null
           ]);
         }
       }
@@ -326,14 +326,14 @@ body {
 
 
             <div>
-                <label for="email">Email<span style="color: red;">*</span></label>
+                <label for="email">Email</label>
                 <input type="email" id="email" name="email" placeholder="exemple@domaine.extension" maxlength="254"
                     pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required title="Veuillez saisir une adresse e-mail valide."
                     value="<?php echo isset($email) ? htmlspecialchars($email, ENT_QUOTES, 'UTF-8') : ''; ?>">
             </div>
 
             <div>
-                <label for="telephone">Numéro de téléphone<span style="color: red;">*</span></label>
+                <label for="telephone">Numéro de téléphone</label>
                 <input type="text" id="telephone" name="telephone" inputmode="numeric"
                     pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10" placeholder="ex: 0615482649" required
                     title="Le numéro de télephone doit contenir 10 chiffres"
@@ -342,13 +342,13 @@ body {
             </div>
 
             <div>
-                <label for="naissance">Date de naissance<span style="color: red;">*</span></label>
+                <label for="naissance">Date de naissance</label>
                 <input type="date" id="naissance" name="naissance" placeholder="JJ/MM/AAAA" required
                     value="<?php echo isset($naissance) ? htmlspecialchars($naissance, ENT_QUOTES, 'UTF-8') : ''; ?>">
             </div>
 
             <div>
-                <label>Civilité<span style="color: red;">*</span></label>
+                <label>Civilité</label>
                 <div class="radio-group">
                     <label><input type="radio" name="civilite" value="M." required
                             <?php if(isset($civilite) && $civilite === 'M.') echo 'checked'; ?>> Homme</label>
@@ -397,13 +397,13 @@ body {
 
             <div class="inline-flex address-row">
                 <div class="culumn-flex">
-                    <label for="num">Numéro<span style="color: red;">*</span></label>
+                    <label for="num">Numéro</label>
                     <input type="number" id="num" name="num" min="0" max="9999999" placeholder="ex: 1"
                         value="<?php echo isset($num) ? htmlspecialchars($num, ENT_QUOTES, 'UTF-8') : ''; ?>">
                 </div>
 
                 <div class="culumn-flex">
-                    <label for="rue">Rue<span style="color: red;">*</span></label>
+                    <label for="rue">Rue</label>
                     <input type="text" id="rue" name="rue" placeholder="ex: rue Hant koz" required
                         value="<?php echo isset($rue) ? htmlspecialchars($rue, ENT_QUOTES, 'UTF-8') : ''; ?>">
                 </div>
@@ -417,7 +417,7 @@ body {
 
             <div class="inline-flex address-row">
                 <div class="culumn-flex">
-                    <label for="codeP">Code Postal<span style="color: red;">*</span></label>
+                    <label for="codeP">Code Postal</label>
                     <input type="text" id="codeP" name="codeP" inputmode="numeric"
                         pattern="^((0[1-9])|([1-8][0-9])|(9[0-7])|(2A)|(2B))[0-9]{3}$" maxlength="5"
                         placeholder="ex: 22300"
@@ -425,14 +425,14 @@ body {
                 </div>
 
                 <div class="culumn-flex">
-                    <label for="commune">Commune<span style="color: red;">*</span></label>
+                    <label for="commune">Commune</label>
                     <input type="text" id="commune" name="commune" placeholder="ex: Lannion" required
                         value="<?php echo isset($commune) ? htmlspecialchars($commune, ENT_QUOTES, 'UTF-8') : ''; ?>">
                 </div>
             </div>
 
             <div>
-                <label for="pays">Pays<span style="color: red;">*</span></label>
+                <label for="pays">Pays</label>
                 <input type="text" id="pays" name="pays" placeholder="ex: France" required
                     value="<?php echo isset($pays) ? htmlspecialchars($pays, ENT_QUOTES, 'UTF-8') : ''; ?>">
             </div>
