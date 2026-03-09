@@ -16,19 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $message = '';
         if ($count > 0) {
             $message = 'Email déjà utilisé';
-        } else {
-            // Vérifier si l'email a déjà été utilisé et supprimé
-            try {
-                $stmtDeleted = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._emails_deleted WHERE email = :email');
-                $stmtDeleted->execute(['email' => $email]);
-                $deletedCount = $stmtDeleted->fetchColumn();
-                
-                if ($deletedCount > 0) {
-                    $message = 'Email utilisé pour un compte supprimé - impossible à réutiliser';
-                }
-            } catch (Exception $e) {
-                // La table n'existe pas encore, ignorer
-            }
         }
         
         echo json_encode(['exists' => ($count > 0 || !empty($message)), 'message' => $message]);
@@ -112,21 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $error_message = '';
   if (!$hasError && isset($_POST['action']) === false) {
     try {
-      // Vérifier si l'email a été supprimé précédemment
-      try {
-        $stmtCheckDeleted = $pdo->prepare('SELECT COUNT(*) FROM cobrec1._emails_deleted WHERE email = :email');
-        $stmtCheckDeleted->execute(['email' => $email]);
-        $deletedCount = $stmtCheckDeleted->fetchColumn();
-        
-        if ($deletedCount > 0) {
-          $hasError = true;
-          $error_card = 2;
-          $error_message = "Cet email a été utilisé pour un compte supprimé. Vous ne pouvez pas réutiliser cet email.";
-        }
-      } catch (Exception $e) {
-        // Table n'existe pas encore, ignorer
-      }
-      
       if (!$hasError) {
         // serveur : vérifier les unicités une dernière fois avant insertion
         // email

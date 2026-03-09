@@ -886,7 +886,7 @@ function chargerAvisBDD($pdo, $idProduit, $idClient = null, $idCompte = null) {
                 a.a_pouce_bleu,
                 a.a_pouce_rouge,
                 a.id_client,
-                a.id_compte,
+                co.id_compte,
                 a.a_owner_token,
                 TO_CHAR(a.a_timestamp_creation,'YYYY-MM-DD HH24:MI') AS a_timestamp_fmt,
                 co.prenom,
@@ -1622,20 +1622,20 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
     $logFile = '/tmp/delete_account_debug.log';
     
     try {
-        // Créer la table _emails_deleted si elle n'existe pas
-        try {
-            $connexionBaseDeDonnees->exec("
-                CREATE TABLE IF NOT EXISTS cobrec1._emails_deleted (
-                    id_deleted SERIAL PRIMARY KEY,
-                    email VARCHAR(255) UNIQUE NOT NULL,
-                    id_compte_deleted INTEGER NOT NULL,
-                    date_suppression TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            ");
-            file_put_contents($logFile, date('Y-m-d H:i:s') . " [TABLE EMAILS_DELETED] Créée ou existante\n", FILE_APPEND);
-        } catch (Exception $e) {
-            file_put_contents($logFile, date('Y-m-d H:i:s') . " [TABLE EMAILS_DELETED] Erreur création - " . $e->getMessage() . "\n", FILE_APPEND);
-        }
+        // La table _emails_deleted n'est plus créée pour permettre la réutilisation des emails
+        // try {
+        //     $connexionBaseDeDonnees->exec("
+        //         CREATE TABLE IF NOT EXISTS cobrec1._emails_deleted (
+        //             id_deleted SERIAL PRIMARY KEY,
+        //             email VARCHAR(255) UNIQUE NOT NULL,
+        //             id_compte_deleted INTEGER NOT NULL,
+        //             date_suppression TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        //         )
+        //     ");
+        //     file_put_contents($logFile, date('Y-m-d H:i:s') . " [TABLE EMAILS_DELETED] Créée ou existante\n", FILE_APPEND);
+        // } catch (Exception $e) {
+        //     file_put_contents($logFile, date('Y-m-d H:i:s') . " [TABLE EMAILS_DELETED] Erreur création - " . $e->getMessage() . "\n", FILE_APPEND);
+        // }
         
         error_log('SUPPRESSION: Début du processus - idClient=' . $identifiantClient . ' idCompte=' . $identifiantCompte);
         file_put_contents($logFile, date('Y-m-d H:i:s') . " [SUPPRESSION START] idClient=" . $identifiantClient . " idCompte=" . $identifiantCompte . "\n", FILE_APPEND);
@@ -1835,18 +1835,18 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
             }
         }
 
-        // 8. Insérer l'email original dans la table des emails supprimés
-        if (!empty($emailOriginal)) {
-            $requeteInserEnmailDelete = "
-                INSERT INTO cobrec1._emails_deleted (email, id_compte_deleted) 
-                VALUES (?, ?)
-                ON CONFLICT (email) DO NOTHING
-            ";
-            $requetePrepareeInsertEmail = $connexionBaseDeDonnees->prepare($requeteInserEnmailDelete);
-            $res = $requetePrepareeInsertEmail->execute([$emailOriginal, $identifiantCompte]);
-            file_put_contents($logFile, date('Y-m-d H:i:s') . " [INSERT EMAIL DELETED] res=" . ($res ? 'OK' : 'KO') . " email=" . $emailOriginal . "\n", FILE_APPEND);
-            error_log('SUPPRESSION: Insérer email supprimé - ' . ($res ? 'OK' : 'KO'));
-        }
+        // 8. L'email n'est plus enregistré dans _emails_deleted pour permettre la réutilisation
+        // if (!empty($emailOriginal)) {
+        //     $requeteInserEnmailDelete = "
+        //         INSERT INTO cobrec1._emails_deleted (email, id_compte_deleted) 
+        //         VALUES (?, ?)
+        //         ON CONFLICT (email) DO NOTHING
+        //     ";
+        //     $requetePrepareeInsertEmail = $connexionBaseDeDonnees->prepare($requeteInserEnmailDelete);
+        //     $res = $requetePrepareeInsertEmail->execute([$emailOriginal, $identifiantCompte]);
+        //     file_put_contents($logFile, date('Y-m-d H:i:s') . " [INSERT EMAIL DELETED] res=" . ($res ? 'OK' : 'KO') . " email=" . $emailOriginal . "\n", FILE_APPEND);
+        //     error_log('SUPPRESSION: Insérer email supprimé - ' . ($res ? 'OK' : 'KO'));
+        // }
 
         // 9. Supprimer explicitement le client d'origine (avant le compte)
         $requeteSuppressionClient = "DELETE FROM cobrec1._client WHERE id_client = ?";

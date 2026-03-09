@@ -187,7 +187,7 @@ $sqlAvis = "
         co.prenom,
         co.nom,
         cl.c_pseudo,
-        a.id_compte,
+        co.id_compte,
         i.i_lien as client_image,
         " . ($idClient ? "(SELECT CASE WHEN vote_type = 'like' THEN 'plus' WHEN vote_type = 'dislike' THEN 'minus' END FROM cobrec1._vote_avis va WHERE va.id_avis = a.id_avis AND va.id_client = :cid LIMIT 1) as user_vote, (SELECT CASE WHEN EXISTS(SELECT 1 FROM cobrec1._signale_avis sa JOIN cobrec1._envoie_signalement es ON es.id_signalement = sa.id_signalement JOIN cobrec1._client c ON es.id_compte = c.id_compte WHERE sa.id_avis = a.id_avis AND c.id_client = :cid) THEN true ELSE false END) as user_reported" : "NULL as user_vote, NULL as user_reported") . "
     FROM cobrec1._avis a
