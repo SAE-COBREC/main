@@ -34,6 +34,18 @@ body {
   border: none !important;
   border-radius: 0 !important;
 }
+.main .content-section.content-section--flat {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+.main .content-section .avis-empty-state {
+  text-align: center;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
 .main .content-section .avis-card {
   background: #fff;
   border: 1px solid #E5D5C5;
@@ -54,6 +66,18 @@ body {
   text-decoration: none;
   font-weight: bold;
 }
+.main .content-section .product-name-strong {
+  font-weight: bold;
+}
+.main .content-section .product-rating-inline {
+  font-weight: normal;
+  font-size: 0.9em;
+  color: #666;
+  margin-left: 5px;
+}
+.main .content-section .product-rating-inline--spaced {
+  margin-left: 8px;
+}
 .main .content-section .product-name a:hover {
   text-decoration: underline;
 }
@@ -65,6 +89,40 @@ body {
 .main .content-section .avis-content p {
   overflow-wrap: break-word;
   word-wrap: break-word;
+}
+.main .content-section .avis-title {
+  display: block;
+  margin-bottom: 5px;
+}
+.main .content-section .avis-text {
+  margin: 0;
+  line-height: 1.5;
+  color: #444;
+}
+.main .content-section .response-text {
+  margin: 0;
+}
+.main .content-section .avis-header-actions {
+  display: flex;
+  align-items: center;
+}
+.main .content-section .avis-reponse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.main .content-section .avis-reponse-date {
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #e67e22;
+}
+.main .content-section .avis-reponse-actions {
+  display: flex;
+  gap: 5px;
+}
+.main .content-section .inline-form {
+  display: inline;
 }
 .main .content-section .avis-reponse {
   background: #fdfae0;
@@ -83,11 +141,54 @@ body {
   min-height: 100px;
   margin-bottom: 0.2rem;
 }
+.main .content-section .is-hidden {
+  display: none;
+}
+.main .content-section .reponse-form--edit {
+  margin-top: 10px;
+  background: #fdfae0;
+  padding: 15px;
+  border-left: 4px solid #f39c12;
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+}
+.main .content-section .reponse-form--new {
+  margin-top: 15px;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+.main .content-section .reponse-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.main .content-section .reponse-form-label--edit {
+  color: #d35400;
+}
+.main .content-section .reponse-form .reponse-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-height: 100px;
+  font-family: inherit;
+  resize: vertical;
+}
+.main .content-section .reponse-form .reponse-textarea--edit {
+  border-color: #fab1a0;
+  font-size: 0.95em;
+}
 .main .content-section .char-counter {
   font-size: 0.8em;
   color: #7f8c8d;
   text-align: right;
   margin-bottom: 0.5rem;
+  margin-top: 4px;
+}
+.main .content-section .char-counter--warning {
+  color: #e67e22;
 }
 .main .content-section .report-container {
   position: relative;
@@ -110,7 +211,9 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 0 5px;
+  font-size: 1.2em;
+  font-weight: bold;
   opacity: 0.5;
   transition: opacity 0.2s;
   display: flex;
@@ -118,6 +221,15 @@ body {
 }
 .main .content-section .report-container .btn-report-trigger:hover {
   opacity: 1;
+}
+.main .content-section .report-container .report-dropdown-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
 }
 .main .content-section .stars {
   color: #f1c40f;
@@ -149,6 +261,15 @@ body {
 }
 .main .content-section .btn-submit:hover {
   background-color: #d35400;
+}
+.main .content-section .btn-submit-reply {
+  background: #fff;
+  color: #e67e22;
+  border: 1px solid #e67e22;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
 }
 .main .content-section .edit-actions {
   display: flex;
@@ -255,6 +376,9 @@ body {
   gap: 12px;
   margin-top: 24px;
 }
+.modal-dialog .modal-actions.modal-actions--compact {
+  margin-top: 12px;
+}
 .modal-dialog .modal-actions button {
   padding: 10px 20px;
   border-radius: 8px;
@@ -269,4 +393,18 @@ body {
 .modal-dialog .modal-actions button.btn-primary {
   background: #E67E22;
   color: #FFFFFF;
+}
+.modal-dialog .modal-form-label {
+  display: block;
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+.modal-dialog .modal-form-select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.modal-dialog .modal-form-textarea {
+  width: 100%;
+  padding: 8px;
 }/*# sourceMappingURL=avisVendeur.css.map */

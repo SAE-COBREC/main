@@ -4,6 +4,7 @@
 
 //importe les variables depuis le fichier variable
 @use "../variable" as *;
+@use "sass:color";
 
 //mixin pour centrer avec flexbox
 @mixin flex-center {
@@ -1125,7 +1126,7 @@ article {
         box-shadow: 0 4px 6px rgba($primary-color-bleu, 0.3);
 
         &:hover {
-          background: darken($primary-color-bleu, 10%);
+          background: color.adjust($primary-color-bleu, $lightness: -10%);
           transform: translateY(-2px);
           box-shadow: 0 6px 12px rgba($primary-color-bleu, 0.4);
         }

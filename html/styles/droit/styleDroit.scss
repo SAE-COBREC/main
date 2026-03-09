@@ -1,4 +1,4 @@
-@import "../_variable.scss";
+@use "../variable" as *;
 body {
     font-family: Arial, sans-serif;
     background: $secondary-color-bleu-clair;

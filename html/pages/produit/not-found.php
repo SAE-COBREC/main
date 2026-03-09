@@ -42,6 +42,11 @@ http_response_code(404);
             flex-wrap: wrap;
         }
 
+        .not-found-illustration {
+            opacity: .9;
+            margin-bottom: 10px;
+        }
+
         .btn,
         .ghost {
             cursor: pointer;
@@ -59,7 +64,7 @@ http_response_code(404);
 
     <main class="container">
         <div class="not-found">
-            <img src="/img/svg/empty-box.svg" alt="Introuvable" width="80" style="opacity:.9; margin-bottom:10px"
+            <img src="/img/svg/empty-box.svg" alt="Introuvable" width="80" class="not-found-illustration"
                 onerror="this.style.display='none'">
             <h1>Produit introuvable</h1>
             <p>
