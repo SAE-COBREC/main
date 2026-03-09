@@ -1,4 +1,5 @@
 @use "../variable" as vars;
+@use "sass:color";
 
 body {
     font-family: vars.$font-family-secondaire;
@@ -1058,7 +1059,7 @@ input[type="number"] {
                 box-shadow: 0 4px 12px rgba(76, 92, 255, 0.25);
 
                 &:hover {
-                    background: darken(vars.$primary-color-bleu, 5%);
+                    background: color.adjust(vars.$primary-color-bleu, $lightness: -5%);
                     transform: translateY(-1px);
                     box-shadow: 0 6px 16px rgba(76, 92, 255, 0.3);
                 }

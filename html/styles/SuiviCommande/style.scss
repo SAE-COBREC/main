@@ -4,6 +4,7 @@
 
 //importe les variables depuis le fichier variable
 @use "../variable" as *;
+@use "sass:color";
 
 // Mixin pour centrer avec flexbox
 @mixin flex-center {
@@ -314,7 +315,7 @@ main {
 
     // Surcharge spécifique pour la couleur de fond au hover si besoin
     &:hover {
-      background: darken($primary-color-bleu, 10%); // Calcul automatique de la couleur sombre
+      background: color.adjust($primary-color-bleu, $lightness: -10%); // Calcul automatique de la couleur sombre
     }
 
     svg {
