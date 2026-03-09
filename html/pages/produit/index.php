@@ -273,6 +273,12 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     exit;
 }
 
+$estEnFavoris = false;
+if ($idClient && $idProduit) {
+    $stmtFav = $pdo->prepare("SELECT 1 FROM _favoris WHERE id_client = ? AND id_produit = ?");
+    $stmtFav->execute([$idClient, $idProduit]);
+    $estEnFavoris = (bool)$stmtFav->fetch();
+}
 ?>
 <!doctype html>
 <html lang="fr">
@@ -362,16 +368,27 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                         <button type="button" class="ghost" onclick="updateQty(1)" aria-label="Augmenter quantité"
                             <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
                     </div>
+<<<<<<< Updated upstream
                     <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
                         onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
+=======
+                        <button class="ghost btn <?= $estEnFavoris ? 'active' : '' ?>" onclick="ajoutSuppFavoris(<?= (int)$idProduit ?>)" id="btnFav">
+                            <?php if ($estEnFavoris){
+                                        echo 'Retirer des favoris';
+                                  } else {
+                                        echo 'Ajouter aux favoris';
+                                  } ?></button>
+                </div>
+                <div>
+                    <button class="btn <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?> onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
+>>>>>>> Stashed changes
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
                 </div>
-
-                <!--<div class="summary-actions">
-                    <button class="ghost">Ajouter aux favoris</button>
+                <!--
+                    
                     <button class="ghost">Partager</button>
-                </div>-->
+                -->
 
                 <div class="meta meta--compact">
                     Stock : <strong><?= $estEnRupture ? 'Rupture' : $produit['p_stock'] . ' disponible(s)' ?></strong>
@@ -593,7 +610,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     <script src="/js/produit/panier.js"></script>
     <script src="/js/produit/reviews.js"></script>
     <script src="/js/produit/filter.js"></script>
-
+    <script src="/js/produit/favoris.js"></script>
 
     <!-- Tri des avis: liens classiques (fiable, sans AJAX) -->
 </body>

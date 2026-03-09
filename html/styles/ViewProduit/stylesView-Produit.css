@@ -467,7 +467,8 @@ input[type=number] {
   /* Modal overlay / dialog animations (used by edit/report modals) */
 }
 .reviews .modal-overlay {
-  display: none; /* shown via JS */
+  display: none;
+  /* shown via JS */
   position: fixed;
   inset: 0;
   align-items: center;
@@ -947,7 +948,8 @@ input[type=number] {
 .modal-dialog .modal-actions button.btn-primary:active {
   transform: translateY(0);
 }
-.modal-dialog .review-title-input, .modal-dialog .review-textarea {
+.modal-dialog .review-title-input,
+.modal-dialog .review-textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
