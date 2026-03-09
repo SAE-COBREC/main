@@ -44,27 +44,28 @@ $result = $writer->write($qrCode, null, null);
 // Validate the result
 $writer->validateResult($result, $otp->getProvisioningUri());
 ?>
-<form id="a2form">
-<img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
-<label>
-<p>Code secret :</p>
-<small><?php echo $otp->getSecret() ?></small>
-</label>
 <?php
-try {//enregistrement du secret_A2F dans la BDD
-    $sql = '
-    UPDATE cobrec1._compte
-    SET secret_A2F = :secret
-    WHERE id_compte = :idCompte;
-    ';
-    $stmt = $pdo->prepare($sql);
-    $params = [
-        'idCompte' => $_SESSION['idCompte'],
-        'secret' => /*$otp->getProvisioningUri()*/$otp->getSecret()
-    ];
-    $stmt->execute($params);
-} catch (Exception $e) {}
+// try {//enregistrement du secret_A2F dans la BDD
+//     $sql = '
+//     UPDATE cobrec1._compte
+//     SET secret_A2F = :secret
+//     WHERE id_compte = :idCompte;
+//     ';
+//     $stmt = $pdo->prepare($sql);
+//     $params = [
+//         'idCompte' => $_SESSION['idCompte'],
+//         'secret' => $otp->getSecret()
+//     ];
+//     $stmt->execute($params);
+// } catch (Exception $e) {}
+$_SESSION['A2F']['secret'] = $otp->getSecret();
 ?>
+<!-- <form id="a2form">
+    <img src='<?php //echo $result->getDataUri() ?>' width="250em" height="250em">
+    <label>
+    <p>Code secret :</p>
+    <small><?php //echo $otp->getSecret() ?></small>
+    </label>
     <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code"/>
     <button type="submit">Valider</button>
 </form>
@@ -88,7 +89,7 @@ try {//enregistrement du secret_A2F dans la BDD
             const contentLength = xhttp2.getResponseHeader("Content-Length");
             if (contentLength == 4) {
                 xhttp2.abort();
-                alert("Authentification à double facteur activée avec succès. Vous allez être déconnecté.");
+                alert("Authentification à double facteur activée avec succès.");
                 //document.location.href = "/index.php"; 
                 document.getElementById('modalA2F').style.display = 'none';
 
@@ -108,4 +109,4 @@ try {//enregistrement du secret_A2F dans la BDD
 
     
     
-</script>
+</script> -->
