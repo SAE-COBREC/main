@@ -1,5 +1,6 @@
 *.css.map
 html/config1.php
+.vscode/*
 
 # Html
 html/index.php
