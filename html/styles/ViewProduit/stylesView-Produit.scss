@@ -139,6 +139,15 @@ body {
             font-size: 14px;
             margin-bottom: 10px;
 
+            .summary-rating-value {
+                color: var(--muted);
+                font-weight: 600;
+            }
+
+            .summary-rating-count {
+                color: var(--muted);
+            }
+
             .stars {
                 display: inline-flex;
                 gap: 6px;
@@ -161,6 +170,15 @@ body {
             font-weight: 700;
             color: vars.$primary-color-noir;
             margin-bottom: 10px;
+
+            .discount-badge {
+                background: #D4183D;
+                color: #fff;
+                padding: 6px 10px;
+                border-radius: 24px;
+                font-size: 13px;
+                margin-left: 1em;
+            }
 
             .old {
                 color: vars.$secondary-color-gris-fonce;
@@ -247,6 +265,10 @@ body {
             margin-top: 14px;
             font-size: 14px;
             color: vars.$primary-color-noir;
+
+            &.meta--compact {
+                margin-top: 12px;
+            }
         }
     }
 }
@@ -289,6 +311,34 @@ input[type="number"] {
     }
 }
 
+.contact {
+    font-size: 13px;
+    color: var(--muted);
+
+    .contact-service-line {
+        margin-top: 6px;
+    }
+}
+
+.description-tags {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 14px 0;
+}
+
+.description-tag {
+    background: #f3f5ff;
+    color: var(--accent);
+    padding: 6px 10px;
+    border-radius: 24px;
+    font-size: 13px;
+}
+
+.description-text {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
 .features {
     ul {
         padding-left: 18px;
@@ -318,6 +368,17 @@ input[type="number"] {
         margin-bottom: 12px;
     }
 
+    .new-review-card-muted {
+        background: #f3f4f7;
+        opacity: .85;
+
+        .new-review-card-message {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #555;
+        }
+    }
+
     .review-head {
         display: flex;
         align-items: center;
@@ -342,6 +403,56 @@ input[type="number"] {
         justify-content: center;
         font-weight: 700;
         color: vars.$primary-color-bleu;
+
+        .avatar-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .avatar-initial {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #eef1ff, #ffffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--accent);
+        }
+    }
+
+    .reviews-summary {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .reviews-summary-label {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .reviews-summary-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .reviews-rating-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    .reviews-rating-count {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 4px;
     }
 
     .review-author {
@@ -409,6 +520,27 @@ input[type="number"] {
     .modal-overlay.modal-open .modal-dialog {
         transform: translateY(0) scale(1);
         opacity: 1;
+    }
+
+    .modal-form-label {
+        display: block;
+        margin: 8px 0 4px;
+        font-weight: 600;
+    }
+
+    .modal-form-select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    .modal-form-textarea {
+        width: 100%;
+        padding: 8px;
+    }
+
+    .modal-actions--compact {
+        margin-top: 12px;
     }
     .star-input button {
         padding: 0;
@@ -522,6 +654,10 @@ input[type="number"] {
             }
         }
     }
+}
+
+.filters-wrap {
+    margin: 10px 0 16px;
 }
 
 @keyframes thumb-flash {

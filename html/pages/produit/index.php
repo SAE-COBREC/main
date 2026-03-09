@@ -330,14 +330,14 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                             <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                     </span>
-                    <span id="summaryRatingValue" style="color:var(--muted);font-weight:600"><?= number_format($note, 1) ?></span>
-                    <span id="summaryRatingCount" style="color:var(--muted)">(<?= $nbAvis ?>)</span>
+                    <span id="summaryRatingValue" class="summary-rating-value"><?= number_format($note, 1) ?></span>
+                    <span id="summaryRatingCount" class="summary-rating-count">(<?= $nbAvis ?>)</span>
                 </div>
                 <div class="price">
                     <?= number_format($prixFinal, 2, ',', ' ') ?> €
                     <?php if ($discount > 0): ?>
                         <span class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?> €</span>
-                        <span style="background:#D4183D;color:#fff;padding:6px 10px;border-radius:24px;font-size:13px; margin-left: 1em;">-<?= round($discount) ?>%</span>
+                        <span class="discount-badge">-<?= round($discount) ?>%</span>
                     <?php endif; ?>
                 </div>
 
@@ -357,7 +357,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                     <button class="ghost">Partager</button>
                 </div>-->
 
-                <div class="meta" style="margin-top:12px">
+                <div class="meta meta--compact">
                     Stock : <strong><?= $estEnRupture ? 'Rupture' : $produit['p_stock'] . ' disponible(s)' ?></strong>
                 </div>
                 <div class="meta">Livraison prévue : <strong>3-5 jours ouvrés</strong></div>
@@ -370,9 +370,9 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                     </ul>
                 </div>
 
-                <div class="section contact" style="font-size:13px;color:var(--muted)">
+                <div class="section contact">
                     <strong>Contact</strong>
-                    <div style="margin-top:6px">Service client • <a href="mailto:contact@alizon.com">contact@alizon.com</a></div>
+                    <div class="contact-service-line">Service client • <a href="mailto:contact@alizon.com">contact@alizon.com</a></div>
                 </div>
             </aside>
         </div>
@@ -380,22 +380,22 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
         <!-- Description et avis -->
         <section class="section">
             <h3>Description</h3>
-            <div style="display:flex;gap:8px;margin:8px 0 14px 0">
-                <span style="background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:24px;font-size:13px">
+            <div class="description-tags">
+                <span class="description-tag">
                     <?= htmlspecialchars(explode(', ', $produit['categories'])[0] ?? 'Général') ?>
                 </span>
             </div>
-            <p style="color:var(--muted);line-height:1.6">
+            <p class="description-text">
                 <?= htmlspecialchars($produit['p_description'] ?? 'Description non disponible.') ?>
             </p>
         </section>
 
         <section class="section reviews">
             <h3>Avis clients</h3>
-            <div style="margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:8px">
-                <div style="font-size:14px;color:var(--muted);margin-bottom:8px">Note moyenne</div>
-                <div style="display:flex;align-items:center;gap:10px">
-                    <span id="reviewsRatingValue" style="font-size:32px;font-weight:700;color:var(--accent)"><?= number_format($note, 1) ?></span>
+            <div class="reviews-summary">
+                <div class="reviews-summary-label">Note moyenne</div>
+                <div class="reviews-summary-row">
+                    <span id="reviewsRatingValue" class="reviews-rating-value"><?= number_format($note, 1) ?></span>
                     <div>
                         <div class="stars" id="reviewsStars">
                             <?php for ($i = 1; $i <= 5; $i++): 
@@ -406,7 +406,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                             <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                         </div>
-                        <div id="reviewsRatingCount" style="font-size:13px;color:var(--muted);margin-top:4px">Basé sur <?= $nbAvis ?> avis</div>
+                        <div id="reviewsRatingCount" class="reviews-rating-count">Basé sur <?= $nbAvis ?> avis</div>
                     </div>
                 </div>
             </div>
@@ -418,7 +418,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                         <div class="review-head-left">
                             <div class="avatar">
                                 <?php if ($currentUserImage): ?>
-                                    <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                                    <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" class="avatar-image">
                                 <?php else: ?>
                                     <?php 
                                         $initial = 'U';
@@ -427,7 +427,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                                             elseif (!empty($currentUser['prenom'])) $initial = substr($currentUser['prenom'], 0, 1);
                                         }
                                     ?>
-                                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#eef1ff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)"><?= strtoupper($initial) ?></div>
+                                    <div class="avatar-initial"><?= strtoupper($initial) ?></div>
                                 <?php endif; ?>
                             </div>
                             <div class="review-head-texts">
@@ -454,14 +454,14 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                     </form>
                 </div>
             <?php elseif ($idClient && $dejaAvis): ?>
-                <div class="review new-review-card" style="background:#f3f4f7;opacity:.85">
-                    <div style="padding:12px 16px;font-size:14px;color:#555">
+                <div class="review new-review-card new-review-card-muted">
+                    <div class="new-review-card-message">
                         Vous avez déjà publié un avis sur ce produit.
                     </div>
                 </div>
             <?php else: ?>
-                <div class="review new-review-card" style="background:#f3f4f7;opacity:.85">
-                    <div style="padding:12px 16px;font-size:14px;color:#555">
+                <div class="review new-review-card new-review-card-muted">
+                    <div class="new-review-card-message">
                         <?= !$idClient ? 'Connectez-vous pour laisser un avis.' : 'Vous devez avoir acheté ce produit pour laisser un avis.' ?>
                     </div>
                 </div>
@@ -479,7 +479,7 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
                 ];
                 $activeLabel = $options[$tri] ?? 'Filtre';
             ?>
-            <div class="filters-wrap" style="margin:10px 0 16px;">
+            <div class="filters-wrap">
                 <button type="button" class="filters-btn" id="reviewsFilterBtn" aria-haspopup="true" aria-expanded="false">
                     <span class="label">Filtrer</span>
                     <span class="value">• <?= htmlspecialchars($activeLabel) ?></span>
@@ -528,20 +528,20 @@ if (isset($_GET['partial']) && $_GET['partial'] === 'reviews') {
     </div>
 
     <!-- Modal Signalement Avis -->
-    <div id="reportModal" class="modal-overlay" style="display:none;">
+    <div id="reportModal" class="modal-overlay">
         <div class="modal-dialog">
             <h3>Signaler cet avis</h3>
             <input type="hidden" id="reportAvisId" value="0">
-            <label style="display:block;margin:8px 0 4px;font-weight:600">Motif</label>
-            <select id="reportMotif" style="width:100%;padding:8px;margin-bottom:8px">
+            <label class="modal-form-label">Motif</label>
+            <select id="reportMotif" class="modal-form-select">
                 <option value="Contenu haineux">Contenu haineux</option>
                 <option value="Spam / Publicité">Spam / Publicité</option>
                 <option value="Inapproprié">Inapproprié</option>
                 <option value="Autre">Autre</option>
             </select>
-            <label style="display:block;margin:8px 0 4px;font-weight:600">Commentaire (optionnel)</label>
-            <textarea id="reportCommentaire" rows="4" style="width:100%;padding:8px" placeholder="Décrivez si besoin..."></textarea>
-            <div class="modal-actions" style="margin-top:12px">
+            <label class="modal-form-label">Commentaire (optionnel)</label>
+            <textarea id="reportCommentaire" rows="4" class="modal-form-textarea" placeholder="Décrivez si besoin..."></textarea>
+            <div class="modal-actions modal-actions--compact">
                 <button class="btn-secondary" id="cancelReport">Annuler</button>
                 <button class="btn-primary" id="confirmReport">Envoyer</button>
             </div>
