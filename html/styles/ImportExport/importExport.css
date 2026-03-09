@@ -150,8 +150,8 @@ aside {
   color: #7171A3;
 }
 .card__icon {
-  width: 24px;
-  height: 24px;
+  width: 0%;
+  height: 0px;
 }
 .card__title {
   font-size: 22px;
@@ -286,8 +286,6 @@ aside {
   align-items: baseline;
   gap: 10px;
   padding: 16px 20px;
-  background: #FFF7F1;
-  border-radius: 14px;
 }
 .stat-box__number {
   font-size: 36px;

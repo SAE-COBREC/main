@@ -603,14 +603,6 @@ try {
                 <!-- ===================== -->
                 <div class="card card--import">
                     <div class="card__header">
-                        <div class="card__icon-wrapper card__icon-wrapper--import">
-                            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                        </div>
                         <h2 class="card__title">Importer des produits</h2>
                         <p class="card__subtitle">Importez votre catalogue produit via un fichier CSV</p>
                     </div>
@@ -619,13 +611,6 @@ try {
                         <input type="hidden" name="action" value="import" />
 
                         <div class="upload-zone" id="upload-zone">
-                            <svg class="upload-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                <polyline points="14 2 14 8 20 8" />
-                                <line x1="12" y1="18" x2="12" y2="12" />
-                                <polyline points="9 15 12 12 15 15" />
-                            </svg>
                             <p class="upload-zone__text">Glissez votre fichier CSV ici</p>
                             <p class="upload-zone__or">ou</p>
                             <label class="btn btn--secondary upload-zone__btn">
@@ -711,23 +696,11 @@ try {
                         </div>
 
                         <button type="submit" class="btn btn--primary btn--full" id="btn-import">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
                             Importer le fichier
                         </button>
                     </form>
 
                     <a href="modele_import.php" class="card__download-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                        </svg>
                         Télécharger le modèle CSV
                     </a>
                 </div>
@@ -737,14 +710,6 @@ try {
                 <!-- ======================= -->
                 <div class="card card--export">
                     <div class="card__header">
-                        <div class="card__icon-wrapper card__icon-wrapper--export">
-                            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                        </div>
                         <h2 class="card__title">Exporter le catalogue</h2>
                         <p class="card__subtitle">Téléchargez tous vos produits au format CSV</p>
                     </div>
@@ -758,12 +723,6 @@ try {
                         </div>
 
                         <a href="?export=produits" class="btn btn--primary btn--full">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
                             Exporter les produits (.csv)
                         </a>
                     </div>
@@ -774,15 +733,6 @@ try {
                 <!-- ======================== -->
                 <div class="card card--export">
                     <div class="card__header">
-                        <div class="card__icon-wrapper card__icon-wrapper--commande">
-                            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
-                                <line x1="8" y1="7" x2="16" y2="7" />
-                                <line x1="8" y1="11" x2="16" y2="11" />
-                                <line x1="8" y1="15" x2="12" y2="15" />
-                            </svg>
-                        </div>
                         <h2 class="card__title">Exporter les commandes</h2>
                         <p class="card__subtitle">Téléchargez l'historique de vos commandes reçues</p>
                     </div>
@@ -796,13 +746,7 @@ try {
                         </div>
 
                         <a href="?export=commandes" class="btn btn--primary btn--full">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                                <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
-                                <line x1="8" y1="7" x2="16" y2="7" />
-                                <line x1="8" y1="11" x2="16" y2="11" />
-                                <line x1="8" y1="15" x2="12" y2="15" />
-                            </svg>
+
                             Exporter les commandes (.csv)
                         </a>
                     </div>
