@@ -38,6 +38,7 @@ if (isset($_SESSION['idClient'])) {
     }
 }
 ?>
+<!DOCTYPE html>
 <script>
 (function () {
     var STORAGE_KEY = 'alizon_animations_enabled';
