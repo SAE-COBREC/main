@@ -131,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         //insertion dans la bdd des données de compte
-        $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite,nom,prenom,secret_A2F)
-                VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP)';
+        $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom, secret_OTP, etat_OTP)
+                VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP, true)';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
           'email' => $email,
@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           'civilite' => $civilite,
           'nom' => $nom,
           'prenom' => $prenom,
-          'secretOTP' => $_SESSION['A2F']['secret'] ?? null
+          'secretOTP' => $_SESSION['OTP']['secret'] ?? null
         ]);
 
         // Récupérer l'id du compte créé
@@ -472,10 +472,10 @@ body {
 
 
           <div>
-            <label><input type="checkbox" id="checkboxa2f" name="checkboxa2f" onclick="changer_A2F();"> J'active la vérification à double facteurs</label>
+            <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();"> Basculer sur le One Time Password (OTP)</label>
           </div>
           <br>
-          <div class="mdpA2f">
+          <div class="mdpOtp">
             <?php
               include_once '../connexionClient/OTP.php';
               ?>
@@ -485,11 +485,11 @@ body {
               <small><?php echo $otp->getSecret() ?></small>
               </label>
               <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code"/>
-              <button type="submit" id="validationA2F">Valider</button>
+              <button type="submit" id="validationOTP">Valider</button>
             <script>
-                document.getElementById('validationA2F').addEventListener('click', function(event) {
+                document.getElementById('validationOTP').addEventListener('click', function(event) {
                     event.preventDefault();
-                    const formData = new FormData(document.getElementById('multiForm'),document.getElementById('validationA2F'));
+                    const formData = new FormData(document.getElementById('multiForm'),document.getElementById('validationOTP'));
                     const code = formData.get('code');
 
                     const xhttp = new XMLHttpRequest();
@@ -508,10 +508,10 @@ body {
                             xhttp2.abort();
                             alert("Authentification à double facteur activée avec succès.");
 
-                            const xhttp3 = new XMLHttpRequest();
-                            xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
-                            xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                            xhttp3.send("statutOTP=active");
+                            // const xhttp3 = new XMLHttpRequest();
+                            // xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
+                            // xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            // xhttp3.send("statutOTP=active");
                             const btnFleche = document.querySelector("#finishBtn");
                             btnFleche.disabled = false;
                         }else{
@@ -540,20 +540,20 @@ body {
             <input type="password" id="Cmdp" name="Cmdp" placeholder="8-16 caractères,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" required>
           </div>
           <script>
-            document.querySelector(".mdpA2f").style.display = "none";
-            function changer_A2F() {
-              const checkboxA2f = document.querySelector("#checkboxa2f");
+            document.querySelector(".mdpOtp").style.display = "none";
+            function changer_OTP() {
+              const checkboxOtp = document.querySelector("#checkboxotp");
               const mdpClassique = document.querySelectorAll(".mdpClassique");
-              const mdpA2f = document.querySelector(".mdpA2f");
+              const mdpOtp = document.querySelector(".mdpOtp");
               const btnFleche = document.querySelector("#finishBtn");
               const mdp = document.querySelector("#mdp");
               const Cmdp = document.querySelector("#Cmdp");
               //const cgv = document.querySelector("#cgv");
-              if (checkboxA2f.checked) {
+              if (checkboxOtp.checked) {
                 mdpClassique.forEach(function (classico) {
                   classico.style.display = 'none';
                 });
-                mdpA2f.style.display = 'block';
+                mdpOtp.style.display = 'block';
                 btnFleche.disabled = true;
                 // cgv.checked = false;
                 // cgv.disabled = true;
@@ -563,15 +563,15 @@ body {
                 mdpClassique.forEach(function (classico) {
                   classico.style.display = 'block';
                 });
-                mdpA2f.style.display = 'none';
+                mdpOtp.style.display = 'none';
                 btnFleche.disabled = false;
                 // cgv.disabled = false;
                 mdp.setAttribute('required');
                 Cmdp.setAttribute('required');
               }
             }
-            function echecA2F(){
-              return 'Code A2F invalide. Veuillez réessayer.';
+            function echecOTP(){
+              return 'Code OTP invalide. Veuillez réessayer.';
             }
           </script>
 
@@ -954,7 +954,7 @@ body {
         const mdp = mdpEl ? mdpEl.value : '';
         const cmdp = cmdpEl ? cmdpEl.value : '';
 
-        if ((mdp !== cmdp) && !document.querySelector("#checkboxa2f").checked) {
+        if ((mdp !== cmdp) && !document.querySelector("#checkboxotp").checked) {
             showCardByIndex(3);
             const err = document.querySelector('.card#\\34  .error');
             if (err) {

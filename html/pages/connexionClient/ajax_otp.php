@@ -5,9 +5,9 @@
     require_once(__DIR__."/../../vendor/autoload.php");
     use OTPHP\TOTP;
     use OTPHP\Factory;
-    try {//recherche du secret_A2F dans la BDD
+    try {//recherche du secret_OTP dans la BDD
         // $sql = '
-        // SELECT secret_A2F FROM cobrec1._compte
+        // SELECT secret_OTP FROM cobrec1._compte
         // WHERE id_compte = :idCompte;
         // ';
         // $stmt = $pdo->prepare($sql);
@@ -16,23 +16,23 @@
         // ];
         // $stmt->execute($params);
         // print_r($_POST);
-        // print_r("Secret A2F :\n");
-        // $secret = ($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_a2f']; //cherche dans BDD
-        if(empty($_SESSION['A2F']['secret'])){
+        // print_r("Secret OTP :\n");
+        // $secret = ($stmt->fetchAll(PDO::FETCH_ASSOC))[0]['secret_otp']; //cherche dans BDD
+        if(empty($_SESSION['OTP']['secret'])){
             print_r("empty");
         }else{
             print_r("OK");
-            $otp = TOTP::createFromSecret($_SESSION['A2F']['secret']);
+            $otp = TOTP::createFromSecret($_SESSION['OTP']['secret']);
             $logFile = "../../pages/connexionClient/ajax.txt";
             $codeOpt = $otp->now();
             file_put_contents("../../pages/connexionClient/log_ajax.txt", 'code OPT :' . $codeOpt . ' code rentré :' . $_POST['code'] . ' secret de BDD :' . $secret . ' secret de OPT généré avec secret de BDD :' . $otp->getSecret());
             if ($codeOpt == $_POST['code']){
                 file_put_contents($logFile, "true");
                 if (!empty($_SESSION['idCompte'])){
-                    try {//enregistrement du secret_A2F dans la BDD
+                    try {//enregistrement du secret_OTP dans la BDD
                         $sql = '
                         UPDATE cobrec1._compte
-                        SET secret_A2F = :secret
+                        SET secret_OTP = :secret
                         WHERE id_compte = :idCompte;
                         ';
                         $stmt = $pdo->prepare($sql);
