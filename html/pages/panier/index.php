@@ -37,21 +37,6 @@
 
         
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
-        
-        $requeteFavoris = "
-            SELECT p_nom, id_produit, 
-            JOIN _produit ON _produit.id_produit = _contient.id_produit
-        ";
-
-        $stmt = $pdo->prepare($requetePanier);
-        
-        $stmt->execute([
-            ':id_client' => $id_client,
-            ':id_panier' => $_SESSION['panierEnCours']
-        ]);
-
-        
-        $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
     } else {
         $panierTemp = $_SESSION['panierTemp'];  // stock le panier temporaire
         $articles = $panierTemp; /*ULTRA IMPORTANT POUR LE JAVA NE PAS ENLEVER cette ligne sert à savoir si il y a des c
@@ -252,7 +237,7 @@
         <?php endif;?>
     </section>
     <section class="lesFavoris">
-
+            
     </section>
 
 
