@@ -440,9 +440,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function safe($array, $key, $default = "") {
     return htmlspecialchars(isset($array[$key]) ? $array[$key] : $default);
 }
+
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
+
 <!doctype html>
-<html lang="fr">
+<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="utf-8">
@@ -666,14 +670,14 @@ function safe($array, $key, $default = "") {
                         name="change_password">Modifier mon mot de passe</button>
 
                 </form>
-                <div class="daltonien-switcher">
-                    <label for="colorblind-mode">Mode daltonien :</label>
-                    <select id="colorblind-mode" class="filtre__item">
-                        <option value="default">Désactivé</option>
-                        <option value="dalto-red-green">Rouge/Vert (Protan/Deutan)</option>
-                        <option value="dalto-blue-yellow">Bleu/Jaune (Tritan)</option>
-                    </select>
-                </div>
+            </div>
+            <div class="daltonien-switcher">
+                <label for="colorblind-mode">Mode daltonien :</label>
+                <select id="colorblind-mode" class="filtre__item">
+                    <option value="default" <?= $current_theme === 'default' ? 'selected' : '' ?>>Désactivé</option>
+                    <option value="dalto-red-green" <?= $current_theme === 'dalto-red-green' ? 'selected' : '' ?>>Rouge/Vert (Protan/Deutan)</option>
+                    <option value="dalto-blue-yellow" <?= $current_theme === 'dalto-blue-yellow' ? 'selected' : '' ?>>Bleu/Jaune (Tritan)</option>
+                </select>
             </div>
         </main>
     </div>

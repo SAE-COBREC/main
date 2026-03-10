@@ -179,10 +179,13 @@ try {
 } catch (PDOException $e) {
     die("Erreur : " . htmlspecialchars($e->getMessage()));
 }
+
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
 
 <!doctype html>
-<html lang="fr">
+<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1440, height=1024" />
