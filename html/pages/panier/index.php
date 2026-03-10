@@ -37,6 +37,7 @@
 
         
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
+
     } else {
         $panierTemp = $_SESSION['panierTemp'];  // stock le panier temporaire
         $articles = $panierTemp; /*ULTRA IMPORTANT POUR LE JAVA NE PAS ENLEVER cette ligne sert à savoir si il y a des c
