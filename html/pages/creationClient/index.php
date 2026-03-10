@@ -275,23 +275,23 @@ body {
             <h1>Créer un compte</h1>
             <p class="subtitle">Identifiants</p>
 
-          <div>
-            <label for="nom">Nom</label>
-            <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required
-                  value="<?php echo isset($nom) ? htmlspecialchars($nom, ENT_QUOTES, 'UTF-8') : ''; ?>">
-          </div>
+            <div>
+                <label for="nom">Nom</label>
+                <input type="text" id="nom" name="nom" placeholder="Votre nom" maxlength="99" required
+                    value="<?php echo isset($nom) ? htmlspecialchars($nom, ENT_QUOTES, 'UTF-8') : ''; ?>">
+            </div>
 
-          <div>
-            <label for="prenom">Prénom</label>
-            <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required
-                  value="<?php echo isset($prenom) ? htmlspecialchars($prenom, ENT_QUOTES, 'UTF-8') : ''; ?>">
-          </div>
+            <div>
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" maxlength="99" required
+                    value="<?php echo isset($prenom) ? htmlspecialchars($prenom, ENT_QUOTES, 'UTF-8') : ''; ?>">
+            </div>
 
-          <div>
-            <label for="pseudo">Pseudonyme</label>
-            <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required
-                  value="<?php echo isset($pseudo) ? htmlspecialchars($pseudo, ENT_QUOTES, 'UTF-8') : ''; ?>">
-          </div>
+            <div>
+                <label for="pseudo">Pseudonyme</label>
+                <input type="text" id="pseudo" name="pseudo" placeholder="Votre pseudonyme" maxlength="99" required
+                    value="<?php echo isset($pseudo) ? htmlspecialchars($pseudo, ENT_QUOTES, 'UTF-8') : ''; ?>">
+            </div>
 
             <div class="debutant">Retour a la page de <a href="../connexionClient/index.php"><strong>Connexion
                         →</strong></a></div>
@@ -463,119 +463,123 @@ body {
         <!-- Card4 -->
 
         <div class="card hidden" id="4">
-          <div class="logo">
-            <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
-          </div>
+            <div class="logo">
+                <img src="../../img/svg/logo-text.svg" alt="Logo Alizon">
+            </div>
 
-          <h1>Créer un compte</h1>
-          <p class="subtitle">Mot de passe</p>
+            <h1>Créer un compte</h1>
+            <p class="subtitle">Mot de passe</p>
 
 
-          <div>
-            <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();"> Basculer sur le One Time Password (OTP)</label>
-          </div>
-          <br>
-          <div class="mdpOtp">
-            <?php
-              include_once '../connexionClient/OTP.php';
+            <div>
+                <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();"> Basculer sur
+                    le One Time Password (OTP)</label>
+            </div>
+            <br>
+            <div class="mdpOtp">
+                <?php
+                    //include_once '../connexionClient/OTP.php';
               ?>
-              <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
-              <label>
-              <p>Code secret :</p>
-              <small><?php echo $otp->getSecret() ?></small>
-              </label>
-              <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code"/>
-              <button type="submit" id="validationOTP">Valider</button>
-            <script>
+                <!-- <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em"> -->
+                <label>
+                    <p>Code secret :</p>
+                    <!-- <small><?php echo $otp->getSecret() ?></small> -->
+                </label>
+                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
+                <button type="submit" id="validationOTP">Valider</button>
+                <script>
                 document.getElementById('validationOTP').addEventListener('click', function(event) {
                     event.preventDefault();
-                    const formData = new FormData(document.getElementById('multiForm'),document.getElementById('validationOTP'));
+                    const formData = new FormData(document.getElementById('multiForm'), document.getElementById(
+                        'validationOTP'));
                     const code = formData.get('code');
 
                     const xhttp = new XMLHttpRequest();
                     xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
                     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    xhttp.send("code="+code);
+                    xhttp.send("code=" + code);
 
 
                     const xhttp2 = new XMLHttpRequest();
                     xhttp2.open("GET", "../../pages/connexionClient/ajax.txt", true);
                     xhttp2.send();
                     xhttp2.onreadystatechange = () => {
-                    if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
-                        const contentLength = xhttp2.getResponseHeader("Content-Length");
-                        if (contentLength == 4) {
-                            xhttp2.abort();
-                            alert("Authentification à double facteur activée avec succès.");
+                        if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+                            const contentLength = xhttp2.getResponseHeader("Content-Length");
+                            if (contentLength == 4) {
+                                xhttp2.abort();
+                                alert("Authentification à double facteur activée avec succès.");
 
-                            // const xhttp3 = new XMLHttpRequest();
-                            // xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
-                            // xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                            // xhttp3.send("statutOTP=active");
-                            const btnFleche = document.querySelector("#finishBtn");
-                            btnFleche.disabled = false;
-                        }else{
-                            const err = document.querySelector('.card#\\34  .error');
-                            if (err) {
-                              err.classList.remove('hidden');
-                              err.innerHTML = '<strong>Erreur</strong> : Le code est incorrect.';
+                                // const xhttp3 = new XMLHttpRequest();
+                                // xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
+                                // xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                                // xhttp3.send("statutOTP=active");
+                                const btnFleche = document.querySelector("#finishBtn");
+                                btnFleche.disabled = false;
+                            } else {
+                                const err = document.querySelector('.card#\\34  .error');
+                                if (err) {
+                                    err.classList.remove('hidden');
+                                    err.innerHTML = '<strong>Erreur</strong> : Le code est incorrect.';
+                                }
                             }
                         }
-                    }
                     };
                 });
+                </script>
+            </div>
+            <div class="mdpClassique">
+                <label for="mdp">Mot de passe </label>
+                <input type="password" id="mdp" name="mdp"
+                    placeholder="8-16 caractères,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value=""
+                    pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
+            </div>
 
-
-                
-                
-            </script>
-          </div>
-          <div class="mdpClassique">
-            <label for="mdp">Mot de passe </label>
-            <input type="password" id="mdp" name="mdp" placeholder="8-16 caractères,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
-          </div>
-
-          <div class="mdpClassique">
-            <label for="Cmdp">Confirmer le mot de passe</label>
-            <input type="password" id="Cmdp" name="Cmdp" placeholder="8-16 caractères,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value="" required>
-          </div>
-          <script>
+            <div class="mdpClassique">
+                <label for="Cmdp">Confirmer le mot de passe</label>
+                <input type="password" id="Cmdp" name="Cmdp"
+                    placeholder="8-16 caractères,1 majuscule,1 minuscule,1 chiffre,1 caractère spécial" value=""
+                    required>
+            </div>
+            <script>
             document.querySelector(".mdpOtp").style.display = "none";
-            function changer_OTP() {
-              const checkboxOtp = document.querySelector("#checkboxotp");
-              const mdpClassique = document.querySelectorAll(".mdpClassique");
-              const mdpOtp = document.querySelector(".mdpOtp");
-              const btnFleche = document.querySelector("#finishBtn");
-              const mdp = document.querySelector("#mdp");
-              const Cmdp = document.querySelector("#Cmdp");
-              //const cgv = document.querySelector("#cgv");
-              if (checkboxOtp.checked) {
-                mdpClassique.forEach(function (classico) {
-                  classico.style.display = 'none';
-                });
-                mdpOtp.style.display = 'block';
-                btnFleche.disabled = true;
-                // cgv.checked = false;
-                // cgv.disabled = true;
-                mdp.removeAttribute('required');
-                Cmdp.removeAttribute('required');
-              } else {
-                mdpClassique.forEach(function (classico) {
-                  classico.style.display = 'block';
-                });
-                mdpOtp.style.display = 'none';
-                btnFleche.disabled = false;
-                // cgv.disabled = false;
-                mdp.setAttribute('required','');
-                Cmdp.setAttribute('required','');
-              }
-            }
-            function echecOTP(){
-              return 'Code OTP invalide. Veuillez réessayer.';
-            }
-          </script>
 
-          <div>
+            function changer_OTP() {
+                const checkboxOtp = document.querySelector("#checkboxotp");
+                const mdpClassique = document.querySelectorAll(".mdpClassique");
+                const mdpOtp = document.querySelector(".mdpOtp");
+                const btnFleche = document.querySelector("#finishBtn");
+                const mdp = document.querySelector("#mdp");
+                const Cmdp = document.querySelector("#Cmdp");
+                //const cgv = document.querySelector("#cgv");
+                if (checkboxOtp.checked) {
+                    mdpClassique.forEach(function(classico) {
+                        classico.style.display = 'none';
+                    });
+                    mdpOtp.style.display = 'block';
+                    btnFleche.disabled = true;
+                    // cgv.checked = false;
+                    // cgv.disabled = true;
+                    mdp.removeAttribute('required');
+                    Cmdp.removeAttribute('required');
+                } else {
+                    mdpClassique.forEach(function(classico) {
+                        classico.style.display = 'block';
+                    });
+                    mdpOtp.style.display = 'none';
+                    btnFleche.disabled = false;
+                    // cgv.disabled = false;
+                    mdp.setAttribute('required', '');
+                    Cmdp.setAttribute('required', '');
+                }
+            }
+
+            function echecOTP() {
+                return 'Code OTP invalide. Veuillez réessayer.';
+            }
+            </script>
+
+            <div>
                 <label><input type="checkbox" id="cgv" name="cgv" required> J'accepte les <a href="#"
                         onclick="openCGVModal(); return false;">conditions générales d'utilisation</a></label>
             </div>
@@ -748,7 +752,7 @@ body {
                     if (!/[A-Z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre majuscule.';
                     if (!/[a-z]/.test(val)) return 'Le mot de passe doit contenir au moins une lettre minuscule.';
                     if (!/[^A-Za-z0-9]/.test(val))
-                return 'Le mot de passe doit contenir au moins un caractère spécial.';
+                        return 'Le mot de passe doit contenir au moins un caractère spécial.';
                     if (el.validity.patternMismatch) return 'Le mot de passe ne respecte pas le format requis.';
                 }
                 //verif des REGEX
@@ -760,7 +764,8 @@ body {
                 }
             }
         } catch (e) {
-            /* ignore */ }
+            /* ignore */
+        }
         return el && el.validationMessage ? el.validationMessage : 'Veuillez remplir ce champ correctement.';
     }
 
@@ -1017,7 +1022,8 @@ body {
                             if (typeof showNextCard === 'function') showNextCard();
                         }
                     } catch (e) {
-                        /* ignore */ }
+                        /* ignore */
+                    }
                 });
             });
 
@@ -1042,7 +1048,8 @@ body {
                         if (typeof showNextCard === 'function') showNextCard();
                     }
                 } catch (e) {
-                    /* ignore */ }
+                    /* ignore */
+                }
             });
         }
     });
