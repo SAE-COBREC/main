@@ -449,12 +449,12 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         <span>En stock uniquement</span>
                     </label>
                     <?php if (isset($idClient)):?>
-                        <label>
+                    <label>
                         <!--case à cocher pour afficher seulement les produits en stock-->
-                            <input type="checkbox" name="favoris_only" id="favorisOnlyCheckbox"
-                                <?= isset($_POST['favoris_only']) ? 'checked' : '' ?>>
-                            <span>Favoris uniquement</span>
-                        </label>
+                        <input type="checkbox" name="favoris_only" id="favorisOnlyCheckbox"
+                            <?= isset($_POST['favoris_only']) ? 'checked' : '' ?>>
+                        <span>Favoris uniquement</span>
+                    </label>
                     <?php endif;?>
 
                 </section>
@@ -526,7 +526,10 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                     <div class="carousel-actions">
                                         <div class="carousel-vendeur-block">
                                             <p class="carousel-vendeur">Vendu par :</p>
-                                            <div class="vendeur-info">
+                                            <div class="vendeur-info"
+                                                title="Voir les produits de <?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>"
+                                                onclick="event.stopPropagation(); filterByVendeur('<?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>')"
+                                                style="cursor:pointer;">
                                                 <img src="/img/svg/market.svg" alt="Vendeur">
                                                 <span><?= htmlspecialchars($nomVendeurC) ?></span>
                                             </div>
@@ -662,7 +665,9 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
                         <div class="product-bottom">
-                            <div class="vendeur-info">
+                            <div class="vendeur-info" title="Voir les produits de <?= htmlspecialchars($nomVendeur) ?>"
+                                onclick="event.stopPropagation(); filterByVendeur('<?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>')"
+                                style="cursor:pointer;">
                                 <img src="/img/svg/market.svg" alt="Vendeur">
                                 <span><?= htmlspecialchars($nomVendeur) ?></span>
                             </div>
@@ -693,6 +698,17 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
     <script src="/js/notifications.js"></script>
     <!--charge le script principal de la page-->
     <script src="/js/Index/script.js"></script>
+
+    <script>
+    function filterByVendeur(nom) {
+        var input = document.getElementById('searchVendeur');
+        var form = document.getElementById('filterForm');
+        if (input && form) {
+            input.value = nom;
+            form.submit();
+        }
+    }
+    </script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
