@@ -666,6 +666,14 @@ function safe($array, $key, $default = "") {
                         name="change_password">Modifier mon mot de passe</button>
 
                 </form>
+                <div class="daltonien-switcher">
+                    <label for="colorblind-mode">Mode daltonien :</label>
+                    <select id="colorblind-mode" class="filtre__item">
+                        <option value="default">Désactivé</option>
+                        <option value="dalto-red-green">Rouge/Vert (Protan/Deutan)</option>
+                        <option value="dalto-blue-yellow">Bleu/Jaune (Tritan)</option>
+                    </select>
+                </div>
             </div>
         </main>
     </div>

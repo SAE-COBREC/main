@@ -78,7 +78,6 @@
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   font-size: 22px;
-  transition: all 0.2s;
   font-weight: bold;
 }
 .nav__item img {
