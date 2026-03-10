@@ -203,6 +203,7 @@ CREATE TABLE cobrec1._produit (
     p_description text NOT NULL,
     p_poids numeric(11, 2) DEFAULT 0.0,
     p_volume numeric(11, 2) DEFAULT 0.0,
+    p_seuil integer DEFAULT 0,
     p_frais_de_port numeric(11, 2) DEFAULT 0.0,
     p_prix numeric(11, 2) NOT NULL,
     p_note numeric(2, 1) DEFAULT NULL,
@@ -217,6 +218,7 @@ CREATE TABLE cobrec1._produit (
     CONSTRAINT verif_produit_frais_de_port CHECK (p_frais_de_port >= 0.00),
     CONSTRAINT verif_produit_volume CHECK (p_volume >= 0.00),
     CONSTRAINT verif_produit_poids CHECK (p_poids >= 0.00),
+    CONSTRAINT verif_produit_seuil CHECK (p_seuil >= 0),
     CONSTRAINT verif_produit_prix CHECK (p_prix >= 0),
     CONSTRAINT verif_produit_note CHECK (
         p_note >= 0
