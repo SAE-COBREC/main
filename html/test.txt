@@ -1,0 +1,161 @@
+entré dans la fonctionrentré dans la condtion idClient
+avant la boucle par produit
+produit :Mini-beurriers aromatisés Le Gall
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Crous’ty Caramel de la Maison Brieuc
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Makis de Galettes Apéro Breizh
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Breizh Cola Saveur Cerise
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Robe d été
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Kouign-Amann Artisanal
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Sac à dos urbain
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Far Breton aux Pruneaux
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Andouille de Guémené Véritable
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Cidre de Cornouaille AOP
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Rillettes de Saint-Jacques à la Bretonne
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Sardines Millésimées de Douarnenez
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Tartare d Algues Iodé
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Huîtres Creuses de Cancale
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Palets Bretons Pur Beurre
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Pull Marin de Saint-Malo
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Galettes de blé noir de Vannes
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Écharpe Rayée Fait main
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Ciré Navy de Concarneau
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bracelet Ancre de Concarneau
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Sac Voile de Concarneau
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Écharpe Rayée Authentique
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bonnet Miki Authentique
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bol Breton Traditionnel
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Pull Marin de Brest
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Affiche Vintage de Dinard
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Vareuse Artisanal
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Pull Marin
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Kabig Bio
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Phare Miniature Fait main
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bracelet Ancre Durable
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Caramels de Roscoff
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Ciré Navy Artisanal
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Vareuse de Pont-Aven
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Pendentif Hermine de Roscoff
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Ciré Navy de Brest
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bolée à Cidre Local
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Vareuse de Dinard
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Lampe Tempête Traditionnel
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Coussin Triskell Premium
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Coussin Triskell 
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Coussin Triskell Artisanal
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bolée à Cidre de Saint-Malo
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Caramels Durable
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bonnet Miki Premium
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Caramels de Carnac
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Ciré Jaune de Vannes
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Lampe Tempête Authentique
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bonnet Miki de Concarneau
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Marinière Authentique
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Bracelet Ancre Artisanal
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Pull Marin de Carnac
+avant les conditions
+avant la condition enFavorisSeulement
+produit :Coussin Triskell Fait main
+avant les conditions
+avant la condition enFavorisSeulement
