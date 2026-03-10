@@ -183,6 +183,7 @@ try {
   <title>Alizon - Page Accueil Vendeur</title>
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
   <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
+  <script src="js/accessibility.js"></script>
 </head>
 <body>
   <div class="app">
@@ -191,6 +192,14 @@ try {
     <main class="main">
       <div class="header">
         <h1 class="header__title">Page accueil vendeur</h1>
+        <div class="daltonien-switcher">
+          <label for="colorblind-mode">Mode daltonien :</label>
+          <select id="colorblind-mode" class="filtre__item">
+            <option value="default">Désactivé</option>
+            <option value="dalto-red-green">Rouge/Vert (Protan/Deutan)</option>
+            <option value="dalto-blue-yellow">Bleu/Jaune (Tritan)</option>
+          </select>
+        </div>
 
         <div class="search-bar">
           <div class="search-bar__input">

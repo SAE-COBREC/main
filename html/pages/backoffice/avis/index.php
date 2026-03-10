@@ -236,6 +236,7 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
   <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
   <link rel="stylesheet" href="/styles/AvisVendeur/avisVendeur.css" />
+  <script src="../accessibility.js"></script>
   <style>
     /* ⚠️ Visuel : cartes hors-stock légèrement grisées */
     .avis-card.out-of-stock { background:#fafafa; color:#666; }
