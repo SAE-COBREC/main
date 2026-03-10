@@ -27,16 +27,22 @@ h3 {
   }
 }
 
+// Liste des articles — sans scroll, hauteur naturelle
+.conteneurArticles {
+  flex: 1;
+  min-width: 0;
+}
+
 .articlesPrixP {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
   box-sizing: border-box;
   margin: 0 auto;
-  padding: 1em;
+  padding: 1.5em 1em;
 }
 
 
@@ -47,11 +53,13 @@ button {
 
 .unArticleP {
   border: 1px solid $primary-color-bleu;
-  width: 960px;
+  width: 100%;
+  min-width: 515px;
   height: fit-content;
   display: flex;
-  padding: 12px 10px;
-  margin-bottom: 20px;
+  padding: 16px 14px;
+  margin-bottom: 16px;
+  margin-right: 10em;
 
   @media screen and (max-width: 428px) {
     width: 374px;
@@ -73,8 +81,8 @@ button {
   }
 
   img {
-    width: 100%;
-    height: 100%;
+    width: 75%;
+    height: 75%;
     object-fit: cover;
     object-position: center;
 
@@ -96,7 +104,7 @@ button {
     align-items: center;
     justify-content: space-between;
     max-height: 33px;
-    margin-top: auto;
+    margin-top: 2em;
 
     img {
       border-radius: 0px;
@@ -141,43 +149,102 @@ button {
 .recapCommande {
   background-color: $secondary-color-gris-clair;
   border-radius: $border-radius-primary;
-  width: 404px;
+  width: 420px;
   max-width: 100%;
-  padding: 20px;
+  padding: 28px 24px;
   position: sticky;
-  top: 10px;
+  top: 5em;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0;
   margin: 0 auto;
 
   @media screen and (max-width: 768px) {
     position: static;
     width: 100%;
-    max-width: 404px;
+    max-width: 420px;
   }
 
-  .recapTete,
-  .recapTotal {
+  h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.15em;
+  }
+
+  #listeProduits {
+    max-height: 208px; // ~8 lignes de produit
+    overflow-y: auto;
+    margin-bottom: 4px;
+    padding-right: 4px;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #e3e3e3;
+      border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: $secondary-color-gris-fonce;
+      border-radius: 3px;
+    }
+
+    .recapProduitLigne {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 3px 0;
+      font-size: 0.92em;
+      color: #444;
+      gap: 8px;
+
+      .recapProduitNom {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .recapProduitQte {
+        flex-shrink: 0;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .recapSeparateur {
+    border: none;
+    border-top: 1px solid $secondary-color-gris-fonce;
+    margin: 14px 0;
     width: 100%;
   }
 
-  .recapTotal {
+  .recapLigne {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 6px 0;
+    font-size: 1em;
+  }
+
+  .recapLigneTotale {
+    padding: 10px 0 14px;
+
+    strong {
+      font-size: 1.15em;
+    }
   }
 
   button {
     background-color: $primary-color-noir;
     border-radius: 999px;
     color: $primary-color-blanc;
-    width: 343px; //bloqué sa largeur a 343
-    height: 49px;
+    width: 100%;
+    height: 52px;
     border: none;
     margin-top: 10px;
-    font-size: 1.5em;
+    font-size: 1.2em;
+    cursor: pointer;
   }
 }
 

@@ -71,7 +71,7 @@
         <?php if (isset($_SESSION['idClient']) && count($articles) > 0):?>
 
         <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
-        <div>
+        <div class="conteneurArticles">
 
             <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
 
@@ -128,24 +128,34 @@
 
         <!-- BLOCK DU RECAP DE LA COMMANDE -->
         <aside class="recapCommande">
-            <div class="recapTete">
-                <h3 id="totalArticles"></h3>
-                <!--est remplit avec le js-->
-                <div id="listeProduits"></div>
-                <!--est remplit avec le js-->
+            <h3 id="totalArticles"></h3>
+            <div id="listeProduits"></div>
+
+            <hr class="recapSeparateur">
+
+            <div class="recapLigne">
+                <span>Sous-total HT :</span>
+                <span id="sousTotal">0,00 €</span>
             </div>
-            <div class="recapTotal">
-                <h3>Prix TTC :</h3>
-                <!--est remplit avec le js-->
-                <h3 class="prixTotal" id="prixTotal"></h3>
+            <div class="recapLigne">
+                <span>TVA :</span>
+                <span id="totalTVA">0,00 €</span>
             </div>
+
+            <hr class="recapSeparateur">
+
+            <div class="recapLigne recapLigneTotale">
+                <strong>Montant total TTC :</strong>
+                <strong id="prixTotal">0,00 €</strong>
+            </div>
+
             <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
                 <button class="finaliserCommande">Finaliser commande</button>
             </form>
 
             <!--FORMULAIRE POUR VIDER LE PANIER-->
             <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
-                <button type="submit" id="viderPanier" class>Vider le panier</button>
+                <button type="submit" id="viderPanier">Vider le panier</button>
             </form>
         </aside>
 
@@ -153,7 +163,7 @@
         <!--attention qand le client n'est pas connecté reduction_pourcentage devient a pourcentage_reduction-->
         <?php elseif (isset($panierTemp) && count($panierTemp) > 0): ?>
 
-        <div>
+        <div class="conteneurArticles">
             <?php foreach ($panierTemp as $idProduit => $article): ?>
             <article class="unArticleP"
                 data-prix="<?php echo ($article['p_prix'] - (($article['pourcentage_reduction'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
@@ -208,24 +218,34 @@
 
         <!-- BLOCK DU RECAP DE LA COMMANDE -->
         <aside class="recapCommande">
-            <div class="recapTete">
-                <h3 id="totalArticles"></h3>
-                <!--es tremplit avec le js-->
-                <div id="listeProduits"></div>
-                <!--es tremplit avec le js-->
+            <h3 id="totalArticles"></h3>
+            <div id="listeProduits"></div>
+
+            <hr class="recapSeparateur">
+
+            <div class="recapLigne">
+                <span>Sous-total HT :</span>
+                <span id="sousTotal">0,00 €</span>
             </div>
-            <div class="recapTotal">
-                <h3>Prix TTC :</h3>
-                <!--es tremplit avec le js-->
-                <h3 class="prixTotal" id="prixTotal"></h3>
+            <div class="recapLigne">
+                <span>TVA :</span>
+                <span id="totalTVA">0,00 €</span>
             </div>
+
+            <hr class="recapSeparateur">
+
+            <div class="recapLigne recapLigneTotale">
+                <strong>Montant total TTC :</strong>
+                <strong id="prixTotal">0,00 €</strong>
+            </div>
+
             <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
                 <button class="finaliserCommande">Finaliser commande</button>
             </form>
 
             <!--FORMULAIRE POUR VIDER LE PANIER-->
             <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
-                <button type="submit" id="viderPanier" class>Vider le panier</button>
+                <button type="submit" id="viderPanier">Vider le panier</button>
             </form>
         </aside>
 
@@ -291,38 +311,35 @@ function saveQuantite(id_produit, quantite) {
 
 //fonction pour mettre a jour le recap de la commande
 function updateRecap() {
-    const articles = document.querySelectorAll('.unArticleP'); //recupere tous les articles et les mets dans une liste
-    let PrixTotal = 0;
+    const articles = document.querySelectorAll('.unArticleP');
+    let totalTTC = 0;
+    let totalHT = 0;
     let nbArticles = 0;
-    let produitEnHTML = ''; //initialisation du texte qui sera dans le recap de la commande (les titres d'articles)
+    let produitEnHTML = '';
 
-    articles.forEach(article => { //pour chaque articles de la liste des articles
-        const prix = parseFloat(article.dataset.prix); //récupère le prix et le mettre en float
-        console.log(prix);
-        const quantiteEntre = article.querySelector('.quantite_input_entre'); //récupère l'input
-        const quantite = parseInt(quantiteEntre.value); //converti en int et récupère la valeur dans l'input
-        const titre = article.querySelector('.articleTitreP')
-            .textContent; //récupère le titre pour pouvoir l'affiché dans le récap de la commande
-        const tva = parseFloat(article.dataset.tva); //récupère la tva
-
+    articles.forEach(article => {
+        const prixTTC = parseFloat(article.dataset.prix);
+        const tva = parseFloat(article.dataset.tva);
+        const prixHT = prixTTC / (1 + tva / 100);
+        const quantiteEntre = article.querySelector('.quantite_input_entre');
+        const quantite = parseInt(quantiteEntre.value);
+        const titre = article.querySelector('.articleTitreP').textContent;
 
         if (quantite > 0) {
-            PrixTotal += prix * quantite //calcul le prix avec la quantité dans le panier pour le récap
-            console.log(PrixTotal);
-            nbArticles += quantite; //pour le nombre de produit total
-            produitEnHTML +=
-                `<p>${titre} <span>x${quantite}</span>, tva : <span>${tva}</span> %</p>`; //pour ajouter dans le récap
+            totalTTC += prixTTC * quantite;
+            totalHT += prixHT * quantite;
+            nbArticles += quantite;
+            produitEnHTML += `<p class="recapProduitLigne"><span class="recapProduitNom">${titre}</span><span class="recapProduitQte">x${quantite}</span></p>`;
         }
     });
 
-    //remplit le prix total et arrondit à 2 après la virgule
-    document.getElementById('prixTotal').textContent = PrixTotal.toFixed(2) + ' €';
+    const totalTVA = totalTTC - totalHT;
 
-    //remplit le nombre d'articles total, et gère le petit s si il y a plusieurs articles
+    document.getElementById('prixTotal').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('sousTotal').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('totalTVA').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
     document.getElementById('totalArticles').textContent =
         `Récapitulatif (${nbArticles} produit${nbArticles > 1 ? 's' : ''}) :`;
-
-    //remplit la liste des produits dans le récap
     document.getElementById('listeProduits').innerHTML = produitEnHTML;
 }
 

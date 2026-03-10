@@ -50,16 +50,21 @@ h3 {
   }
 }
 
+.conteneurArticles {
+  flex: 1;
+  min-width: 0;
+}
+
 .articlesPrixP {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
   box-sizing: border-box;
   margin: 0 auto;
-  padding: 1em;
+  padding: 1.5em 1em;
 }
 
 button {
@@ -69,12 +74,14 @@ button {
 
 .unArticleP {
   border: 1px solid var(--primary-bleu);
-  width: 960px;
+  width: 100%;
+  min-width: 515px;
   height: -moz-fit-content;
   height: fit-content;
   display: flex;
-  padding: 12px 10px;
-  margin-bottom: 20px;
+  padding: 16px 14px;
+  margin-bottom: 16px;
+  margin-right: 10em;
 }
 @media screen and (max-width: 428px) {
   .unArticleP {
@@ -97,8 +104,8 @@ button {
   }
 }
 .unArticleP img {
-  width: 100%;
-  height: 100%;
+  width: 75%;
+  height: 75%;
   -o-object-fit: cover;
      object-fit: cover;
   -o-object-position: center;
@@ -121,7 +128,7 @@ button {
   align-items: center;
   justify-content: space-between;
   max-height: 33px;
-  margin-top: auto;
+  margin-top: 2em;
 }
 .unArticleP .basArticleP img {
   border-radius: 0px;
@@ -159,42 +166,93 @@ button {
 .recapCommande {
   background-color: #EFEFEF;
   border-radius: 14px;
-  width: 404px;
+  width: 420px;
   max-width: 100%;
-  padding: 20px;
+  padding: 28px 24px;
   position: sticky;
-  top: 10px;
+  top: 5em;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0;
   margin: 0 auto;
 }
 @media screen and (max-width: 768px) {
   .recapCommande {
     position: static;
     width: 100%;
-    max-width: 404px;
+    max-width: 420px;
   }
 }
-.recapCommande .recapTete,
-.recapCommande .recapTotal {
+.recapCommande h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.15em;
+}
+.recapCommande #listeProduits {
+  max-height: 208px;
+  overflow-y: auto;
+  margin-bottom: 4px;
+  padding-right: 4px;
+}
+.recapCommande #listeProduits::-webkit-scrollbar {
+  width: 5px;
+}
+.recapCommande #listeProduits::-webkit-scrollbar-track {
+  background: #e3e3e3;
+  border-radius: 3px;
+}
+.recapCommande #listeProduits::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 3px;
+}
+.recapCommande #listeProduits .recapProduitLigne {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 3px 0;
+  font-size: 0.92em;
+  color: #444;
+  gap: 8px;
+}
+.recapCommande #listeProduits .recapProduitLigne .recapProduitNom {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recapCommande #listeProduits .recapProduitLigne .recapProduitQte {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.recapCommande .recapSeparateur {
+  border: none;
+  border-top: 1px solid #c0c0c0;
+  margin: 14px 0;
   width: 100%;
 }
-.recapCommande .recapTotal {
+.recapCommande .recapLigne {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 6px 0;
+  font-size: 1em;
+}
+.recapCommande .recapLigneTotale {
+  padding: 10px 0 14px;
+}
+.recapCommande .recapLigneTotale strong {
+  font-size: 1.15em;
 }
 .recapCommande button {
   background-color: #030212;
   border-radius: 999px;
   color: #FFFFFF;
-  width: 343px;
-  height: 49px;
+  width: 100%;
+  height: 52px;
   border: none;
   margin-top: 10px;
-  font-size: 1.5em;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
 #panierVide {
