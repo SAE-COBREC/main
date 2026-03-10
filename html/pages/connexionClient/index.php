@@ -1,5 +1,10 @@
 <?php 
 session_start();
+require_once(__DIR__."/../../vendor/autoload.php");
+use OTPHP\TOTP;
+use OTPHP\Factory;
+
+
 //connexion a la bdd 
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
@@ -74,7 +79,7 @@ $pdo->exec("SET search_path TO cobrec1");
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
-  $otp_saisi = $_POST['otp'] ?? '';
+  $otp_saisi = $_POST['code_OTP'] ?? '';
 
   $hasError = false;
   $error_card = null;
@@ -100,14 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       //verification que le mdp corespondant a ce mail existe
-      if (empty($row['secret_OTP'])){
+      if (empty($row['secret_otp'])){
         $otp = '';
       }else{
-        $otp = TOTP::createFromSecret($row['secret_OTP']);
+        $otp = TOTP::createFromSecret($row['secret_otp']);
         $otp = $otp->now();
       }
-
-      if (($row['etat_OTP'] == 'true' && $otp == $otp_saisi) || ($row['etat_OTP'] != 'true' && password_verify($mdp, $row['mdp']))){
+        //file_put_contents('log.txt','otp=' . $otp . ' otp_saisie=' . $otp_saisi . ' mdp=' . password_verify($mdp, $row['mdp']) . 'etat=' . $row['etat_otp']);
+      if (($row['etat_otp'] == 'true' && $otp == $otp_saisi) || ($row['etat_otp'] != 'true' && password_verify($mdp, $row['mdp']))){
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
@@ -120,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$clientId) {
           $hasError = true;
           $error_card = 1;
-          $error_message = ' mail, pseudo ou mot de passe incorrecte.';
+          $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
         } else {
           //ajout des identifiant a la session
 
