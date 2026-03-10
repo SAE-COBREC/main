@@ -71,16 +71,6 @@ $pdo->exec("SET search_path TO cobrec1");
 </head>
 
 <?php
-try {
-    //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_OTP, etat_OTP FROM _compte WHERE email = :login");
-    $stmt->execute([':login' => $login]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    $hasError = true;
-    $error_card = 1;
-    $error_message = 'Erreur lors de la vérification des identifiants.';
-  }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
@@ -91,6 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $error_message = '';
   
   try{
+    //récuperation des données de compte
+    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_OTP, etat_OTP FROM cobrec1._compte WHERE email = :login");
+    $stmt->execute([':login' => $login]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
     //verification que l'aresse mail existe dans la bdd
     if (!$row) {
       $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
@@ -196,6 +190,7 @@ body {
             </div>
 
             <div>
+                <?php print_r($row); ?>
                 <?php if ($row['etat_OTP'] == 'false'){ ?>
                 <label for="mdp">Mot de passe</label>
                 <input type="password" id="mdp" name="mdp" placeholder="***********" required>
