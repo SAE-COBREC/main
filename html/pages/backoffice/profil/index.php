@@ -451,7 +451,7 @@ function safe($array, $key, $default = "") {
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ProfilVendeur/profil.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="js/accessibility.js"></script>
+    <script src="../../../js/accessibility.js"></script>
 </head>
 
 <body>

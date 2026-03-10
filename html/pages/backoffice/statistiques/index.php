@@ -61,7 +61,7 @@ try {
     <title>Alizon - Commandes Vendeur</title>
     <link rel="stylesheet" href="/styles/Statistique/statistique.css" />
     <script src="/js/chart.js"></script>
-    <script src="js/accessibility.js"></script>
+    <script src="../../../js/accessibility.js"></script>
 </head>
 
 <body>

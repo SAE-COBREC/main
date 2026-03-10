@@ -52,7 +52,7 @@ try {
     <meta charset="utf-8" />
     <title>Alizon - Commandes Vendeur</title>
     <link rel="stylesheet" href="/styles/CommandeVendeur/commande.css" />
-    <script src="js/accessibility.js"></script>
+    <script src="../../../js/accessibility.js"></script>
 </head>
 <body>
     <div class="app">

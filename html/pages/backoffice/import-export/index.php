@@ -558,7 +558,7 @@ try {
     <title>Alizon - Import / Export</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ImportExport/importExport.css" />
-    <script src="js/accessibility.js"></script>
+    <script src="../../../js/accessibility.js"></script>
 </head>
 
 <body>

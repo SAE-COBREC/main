@@ -1,26 +1,31 @@
-// Fonction qui applique le thème sauvegardé dès le chargement
-function applySavedTheme() {
-    const savedMode = localStorage.getItem('theme-dalto') || 'default';
-    document.documentElement.setAttribute('data-theme', savedMode);
-    
-    // Si le sélecteur existe sur la page actuelle, on met sa valeur à jour
-    const selectDalto = document.getElementById('colorblind-mode');
-    if (selectDalto) {
-        selectDalto.value = savedMode;
-    }
-}
-
-// On l'exécute immédiatement
-applySavedTheme();
-
-// On ajoute l'écouteur pour le changement (si le bouton est présent sur la page)
 document.addEventListener('DOMContentLoaded', () => {
-    const selectDalto = document.getElementById('colorblind-mode');
-    if (selectDalto) {
-        selectDalto.addEventListener('change', (e) => {
-            const selectedMode = e.target.value;
-            document.documentElement.setAttribute('data-theme', selectedMode);
-            localStorage.setItem('theme-dalto', selectedMode);
+    const themeSelector = document.getElementById('colorblind-mode');
+    const htmlElement = document.documentElement; // Cible la balise <html>
+
+    // 1. Récupérer le thème sauvegardé (si existant)
+    const savedTheme = localStorage.getItem('site-theme') || 'default';
+    
+    // Fonction pour appliquer le thème
+    const applyTheme = (theme) => {
+        if (theme === 'default') {
+            htmlElement.removeAttribute('data-theme');
+        } else {
+            htmlElement.setAttribute('data-theme', theme);
+        }
+    };
+
+    // 2. Appliquer le thème immédiatement au chargement
+    applyTheme(savedTheme);
+
+    // 3. Si le sélecteur existe sur la page actuelle (ex: page profil)
+    if (themeSelector) {
+        themeSelector.value = savedTheme; // Synchronise le menu avec le stockage
+
+        themeSelector.addEventListener('change', () => {
+            const selectedTheme = themeSelector.value;
+            applyTheme(selectedTheme);
+            // Sauvegarder le choix pour les autres pages
+            localStorage.setItem('site-theme', selectedTheme);
         });
     }
 });

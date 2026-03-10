@@ -189,7 +189,7 @@ try {
   <title>Alizon - Page Accueil Vendeur</title>
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
   <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
-  <script src="js/accessibility.js"></script>
+  <script src="../../js/accessibility.js"></script>
 </head>
 <body>
   <div class="app">
