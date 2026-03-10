@@ -17,3 +17,5 @@ Espace de certification	Page listant vos labels (Bio, Made in France, Eco-conçu
 Mur de preuves sociales	Un flux en temps réel des derniers achats effectués (ex: "Jean de Lyon vient d'acheter ce produit").
 
 Cartes cadeaux dématérialisées	Acheter un code envoyé par mail (idéal pour les cadeaux de dernière minute).
+
+Page vendeur quand on clique sur les "boutons" avec le nom du vendeur
