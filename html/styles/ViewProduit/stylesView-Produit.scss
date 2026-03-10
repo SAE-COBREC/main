@@ -91,6 +91,8 @@ body {
         overflow: hidden;
         aspect-ratio: 3/4;
         min-height: 240px;
+        width: 100%;
+        max-height: 480px;
         position: relative;
 
         img {
@@ -764,6 +766,11 @@ input[type="number"] {
 
     .product-row .thumbs {
         order: 2;
+        display: block;
+        flex-direction: column;
+        margin: auto;
+        align-items: center;
+        justify-content: center;
     }
 
     .product-row .summary {
@@ -779,7 +786,7 @@ input[type="number"] {
         padding-bottom: 6px;
         margin-top: 8px;
         max-height: 260px;
-        align-items: flex-start;
+        align-items: center;
 
         img {
             width: 56px;
@@ -1114,7 +1121,7 @@ input[type="number"] {
                 box-shadow: 0 4px 12px rgba(76, 92, 255, 0.25);
 
                 &:hover {
-                    background: color.adjust(vars.$primary-color-bleu, $lightness: -5%);
+                    background: rgba(76, 92, 255, 0.9);
                     transform: translateY(-1px);
                     box-shadow: 0 6px 16px rgba(76, 92, 255, 0.3);
                 }

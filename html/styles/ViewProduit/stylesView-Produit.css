@@ -93,7 +93,7 @@ body {
   transform: scale(0.98);
 }
 .product-row .thumbs img.is-active {
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
   filter: brightness(1.06);
 }
 .product-row .thumbs img.flash {
@@ -109,6 +109,8 @@ body {
   overflow: hidden;
   aspect-ratio: 3/4;
   min-height: 240px;
+  width: 100%;
+  max-height: 480px;
   position: relative;
 }
 .product-row .main-image img {
@@ -174,7 +176,7 @@ body {
   gap: 6px;
   align-items: center;
   margin-right: 8px;
-  color: #DDCA00;
+  color: var(--semantic-jaune);
 }
 .product-row .summary .rating .star {
   width: 18px;
@@ -310,7 +312,7 @@ input[type=number] {
 }
 
 .btn {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   padding: 10px 16px;
   border-radius: 10px;
@@ -414,7 +416,7 @@ input[type=number] {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 .reviews .avatar .avatar-image {
   width: 40px;
@@ -558,7 +560,7 @@ input[type=number] {
   line-height: 0;
 }
 .reviews .star-input button:focus-visible {
-  outline: 2px solid #7171A3;
+  outline: 2px solid var(--primary-bleu);
   border-radius: 4px;
 }
 .reviews .star-input img {
@@ -592,7 +594,7 @@ input[type=number] {
 .reviews .review-textarea:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(76, 92, 255, 0.12);
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
 }
 .reviews .review-textarea {
   resize: vertical;
@@ -616,7 +618,7 @@ input[type=number] {
 }
 .reviews .btn-vote[aria-pressed=true] {
   background: rgba(76, 92, 255, 0.06);
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
 }
 .reviews .review-votes {
   display: flex;
@@ -640,8 +642,8 @@ input[type=number] {
   align-items: center;
 }
 .reviews .review-votes .review-actions .btn-edit-review {
-  color: #7171A3;
-  border-color: #7171A3;
+  color: var(--primary-bleu);
+  border-color: var(--primary-bleu);
 }
 .reviews .review-votes .review-actions .btn-delete-review {
   color: #b00020;
@@ -694,6 +696,11 @@ input[type=number] {
   }
   .product-row .thumbs {
     order: 2;
+    display: block;
+    flex-direction: column;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
   }
   .product-row .summary {
     order: 3;
@@ -707,7 +714,7 @@ input[type=number] {
     padding-bottom: 6px;
     margin-top: 8px;
     max-height: 260px;
-    align-items: flex-start;
+    align-items: center;
   }
   .thumbs img {
     width: 56px;
@@ -816,7 +823,7 @@ input[type=number] {
     background: #f5f5f5;
   }
   .reviews .review-votes .mobile-menu-dropdown button.btn-edit-review {
-    color: #7171A3;
+    color: var(--primary-bleu);
   }
   .reviews .review-votes .mobile-menu-dropdown button.btn-delete-review {
     color: #b00020;
@@ -982,12 +989,12 @@ input[type=number] {
   color: #030212;
 }
 .modal-dialog .modal-actions button.btn-primary {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(76, 92, 255, 0.25);
 }
 .modal-dialog .modal-actions button.btn-primary:hover {
-  background: rgb(98.4871794872, 98.4871794872, 152.0128205128);
+  background: rgba(76, 92, 255, 0.9);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(76, 92, 255, 0.3);
 }
