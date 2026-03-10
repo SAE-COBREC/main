@@ -86,6 +86,7 @@ try {
     $rechercheNom = $_GET['search'] ?? '';
     $tri = $_GET['tri'] ?? 'id_asc';
     $categorieSelection = $_GET['cat'] ?? 'all';
+    $lowStockActive = isset($_GET['low_stock']);
 
     $sqlToutesCats = "
         SELECT cp.nom_categorie, COUNT(DISTINCT p.id_produit) as nb
@@ -114,6 +115,7 @@ try {
     $paramsQuery = [':id_vendeur' => $vendeur_id];
     $clauseSearch = "";
     $clauseCategorie = "";
+    $clauseLowStock = "";
 
     if (!empty($rechercheNom)) {
         $clauseSearch = " AND p.p_nom ILIKE :search";
@@ -129,12 +131,16 @@ try {
         $paramsQuery[':cat_nom'] = $categorieSelection;
     }
 
+    if ($lowStockActive) {
+        $clauseLowStock = " AND p.p_stock < p.p_seuil";
+    }
+
     $order_sql = ($tri === 'prix_asc') ? "p_prix ASC" : (($tri === 'prix_desc') ? "p_prix DESC" : "id_produit ASC");
 
     $query = "
     SELECT * FROM (
       SELECT DISTINCT on (p.id_produit)
-        p.id_produit, p.p_nom AS nom_article, p.p_description, p.p_stock, p.p_prix, p.p_statut,
+        p.id_produit, p.p_nom AS nom_article, p.p_description, p.p_stock, p.p_seuil, p.p_prix, p.p_statut,
         i.i_lien AS image_url, r.reduction_pourcentage AS pourcentage,
         r.reduction_debut AS debut_reduc, r.reduction_fin AS fin_reduc,
         promo.promotion_debut AS debut_promo, promo.promotion_fin AS fin_promo,
@@ -146,8 +152,8 @@ try {
     LEFT JOIN cobrec1._categorie_produit c ON fpd.id_categorie = c.id_categorie
     LEFT JOIN cobrec1._represente_produit rp ON p.id_produit = rp.id_produit
     LEFT JOIN cobrec1._image i ON rp.id_image = i.id_image
-    WHERE p.id_vendeur = :id_vendeur $clauseSearch $clauseCategorie
-    GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_prix, pourcentage, debut_reduc, fin_reduc, debut_promo, fin_promo, i.i_lien
+    WHERE p.id_vendeur = :id_vendeur $clauseSearch $clauseCategorie $clauseLowStock
+    GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_stock, p.p_seuil, p.p_prix, p.p_statut, pourcentage, debut_reduc, fin_reduc, debut_promo, fin_promo, i.i_lien
     ) AS subquery
     ORDER BY $order_sql";
 
@@ -224,6 +230,9 @@ try {
                     <?= $label ?>
                 </div>
             <?php endforeach; ?>
+            <div class="tabs__item <?= $lowStockActive ? 'tabs__item--active' : '' ?>" id="tab-low-stock">
+              Produit en manque de stock
+            </div>
         </div>
           <div class="tri">
             <div class="tri__item"><span class="tri__label">Trier par prix :</span>
@@ -472,6 +481,19 @@ try {
                 window.location.href = "?st=aucun";
               }
             });
+          });
+
+          const tabLowStock = document.getElementById('tab-low-stock');
+          tabLowStock.addEventListener('click', () => {
+            const url = new URL(window.location.href);
+            
+            if (tabLowStock.classList.contains('tabs__item--active')) {
+              url.searchParams.delete('low_stock');
+            } else {
+              url.searchParams.set('low_stock', '1');
+            }
+            
+            window.location.href = url.href;
           });
 
           const selectCate = document.getElementById('categorie');
