@@ -566,8 +566,8 @@ body {
                 mdpOtp.style.display = 'none';
                 btnFleche.disabled = false;
                 // cgv.disabled = false;
-                mdp.setAttribute('required');
-                Cmdp.setAttribute('required');
+                mdp.setAttribute('required','');
+                Cmdp.setAttribute('required','');
               }
             }
             function echecOTP(){

@@ -82,12 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
   try{
     //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_OTP, etat_OTP FROM cobrec1._compte WHERE email = :login");
+    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_OTP, etat_OTP FROM _compte WHERE email = :login");
     $stmt->execute([':login' => $login]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     //verification que l'aresse mail existe dans la bdd
     if (!$row) {
-      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
+      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp, c.secret_OTP, c.etat_OTP FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
       $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -106,16 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $otp = TOTP::createFromSecret($row['secret_OTP']);
         $otp = $otp->now();
       }
-      
-      if ($row['etat_OTP'] == 'true' && $otp != $otp_saisi){
-        $hasError = true;
-        $error_card = 1;
-        $error_message = 'Adresse mail, pseudo ou code OTP incorrecte.';
-      }else if (!password_verify($mdp, $row['mdp']) && !checkboxOtp.checked) {
-        $hasError = true;
-        $error_card = 1;
-        $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
-      }else {
+
+      if (($row['etat_OTP'] == 'true' && $otp == $otp_saisi) || ($row['etat_OTP'] != 'true' && password_verify($mdp, $row['mdp']))){
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
@@ -139,6 +131,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
+      }else{
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
       }
     }
   //message en cas de probleme de verif dans le code
@@ -188,7 +184,12 @@ body {
 
             <h1>Connexion</h1>
             <div>
-                <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();"> Basculer sur le One Time Password (OTP)</label>
+                <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();" <?php 
+                if (!empty($_SESSION['OTP']['etatCheckbox'])){
+                    echo 'checked';
+                }
+                ?>
+                > Basculer sur le One Time Password (OTP)</label>
             </div>
 
             <div>
@@ -208,6 +209,7 @@ body {
             <script>
                 const mdpOtp = document.querySelector(".mdpClassique + div");
                 mdpOtp.style.display = "none";
+                changer_OTP();
                 function changer_OTP() {
                     const checkboxOtp = document.querySelector("#checkboxotp");
                     const champOtp = document.querySelector(".mdpClassique + div > input");
@@ -218,15 +220,15 @@ body {
                         mdpClassique.style.display = "none";
                         forgot.style.display = "none";
                         mdpOtp.style.display = "block";
-                        champOtp.attributes.required = 'required';
-                        mdp.attributes.required = '';
+                        champOtp.setAttribute('required','');
+                        mdp.removeAttribute('required');
                         
                     }else{
                         mdpClassique.style.display = "block";
                         forgot.style.display = "block";
                         mdpOtp.style.display = "none";
-                        champOtp.attributes.required = '';
-                        mdp.attributes.required = 'required';
+                        champOtp.removeAttribute('required');
+                        mdp.setAttribute('required','');
                     }
 
                 }
@@ -260,6 +262,18 @@ body {
 
     <script>
     window.finishRegistration = function() {
+        
+        const xhttp3 = new XMLHttpRequest();
+        xhttp3.open("POST", "otp_co_checkbox.php", true);
+        xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        if (document.querySelector("#checkboxotp").checked){
+            xhttp3.send("etat_OTP=true");
+        }else{
+            xhttp3.send("etat_OTP=false");
+        }
+
+
+        
         console.log('[register] finishRegistration called');
         var form = document.getElementById('multiForm');
         if (!form) return; // Ne fini le formulaire que si il existe
