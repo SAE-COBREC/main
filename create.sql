@@ -44,8 +44,7 @@ CREATE TABLE cobrec1._compte (
     timestamp_blocage timestamp,
     motif_blocage varchar(255),
     mdp varchar(255) NOT NULL,
-    secret_OTP varchar(255),
-    etat_OTP boolean DEFAULT FALSE,
+    etat_A2F boolean DEFAULT FALSE,
     prenom varchar(100) NOT NULL,
     nom varchar(100) NOT NULL,
     civilite varchar(255) DEFAULT 'Inconnu' NOT NULL,
@@ -130,9 +129,7 @@ CREATE TABLE cobrec1._adresse (
     a_ville varchar(100) NOT NULL,
     a_code_postal varchar(10) NOT NULL,
     a_pays varchar(255) DEFAULT 'France' NOT NULL,
-    a_complement varchar(255),
-    longitude numeric(11, 8) DEFAULT NULL,
-    latitude numeric(11, 8) DEFAULT NULL
+    a_complement varchar(255)
 );
 
 ALTER TABLE ONLY cobrec1._adresse
@@ -340,6 +337,21 @@ ADD CONSTRAINT pk_panier_commande PRIMARY KEY (id_panier);
 ALTER TABLE ONLY cobrec1._panier_commande
 ADD CONSTRAINT fk_panier_commande_client FOREIGN KEY (id_client) REFERENCES cobrec1._client (id_client) ON DELETE CASCADE;
 
+CREATE TABLE cobrec1._favoris (
+    id_favoris SERIAL NOT NULL,
+    id_client integer NOT NULL,
+    id_produit integer NOT NULL
+);
+
+ALTER TABLE ONLY cobrec1._favoris
+ADD CONSTRAINT pk_favoris PRIMARY KEY (id_favoris);
+
+ALTER TABLE ONLY cobrec1._favoris
+ADD CONSTRAINT fk_favoris_client FOREIGN KEY (id_client) REFERENCES cobrec1._client (id_client) ON DELETE CASCADE;
+
+ALTER TABLE ONLY cobrec1._favoris
+ADD CONSTRAINT fk_produit_client FOREIGN KEY (id_produit) REFERENCES cobrec1._produit (id_produit) ON DELETE CASCADE;
+
 -- TABLE FACTURE
 CREATE TABLE cobrec1._facture (
     id_facture SERIAL NOT NULL,
@@ -385,7 +397,7 @@ ADD CONSTRAINT unique_paiement_facture UNIQUE (id_facture);
 ALTER TABLE ONLY cobrec1._paiement
 ADD CONSTRAINT fk_paiement_facture FOREIGN KEY (id_facture) REFERENCES cobrec1._facture (id_facture) ON DELETE CASCADE;
 
--- TABLE
+-- TABLE LIVRAISON
 CREATE TABLE cobrec1._livraison (
     id_livraison SERIAL NOT NULL,
     id_facture integer NOT NULL,
@@ -953,6 +965,7 @@ INSERT INTO
         email,
         num_telephone,
         mdp,
+        etat_A2F,
         nb_fois_signale,
         nb_signalements_avis,
         nb_cpts_signales,
@@ -964,6 +977,7 @@ VALUES (
         'admin@cobrec.fr',
         '0601020304',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        TRUE,
         0,
         0,
         0,
@@ -975,6 +989,7 @@ VALUES (
         'vendeur1@example.com',
         '0612345678',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
         0,
         0,
         0,
@@ -986,6 +1001,7 @@ VALUES (
         'vendeur2@shop.fr',
         '0623456789',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
         1,
         0,
         0,
@@ -997,6 +1013,7 @@ VALUES (
         'client1@gmail.com',
         '0634567890',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
         0,
         1,
         0,
@@ -1008,6 +1025,7 @@ VALUES (
         'client2@yahoo.fr',
         '0645678901',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        TRUE,
         0,
         0,
         1,
@@ -1019,6 +1037,7 @@ VALUES (
         'client3@outlook.com',
         '0656789012',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
         0,
         0,
         0,
@@ -1030,6 +1049,7 @@ VALUES (
         'client4@free.fr',
         '0667890123',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
         0,
         0,
         0,
@@ -1041,6 +1061,7 @@ VALUES (
         'client5@orange.fr',
         '0678901234',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
         0,
         0,
         0,
@@ -1052,6 +1073,7 @@ VALUES (
         'client6@wanadoo.fr',
         '0689012345',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        TRUE,
         0,
         0,
         0,
@@ -1063,138 +1085,7 @@ VALUES (
         'vendeur3@boutique.fr',
         '0690123456',
         '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Kermadec',
-        'Loïc',
-        'vendeur4@example.com',
-        '0612348765',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Le Gall',
-        'Solenn',
-        'vendeur5@example.com',
-        '0745981230',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Tanguy',
-        'Erwan',
-        'vendeur6@example.com',
-        '0688776655',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Guivarch',
-        'Maëlle',
-        'vendeur7@example.com',
-        '0710203040',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Prigent',
-        'Yannick',
-        'vendeur8@example.com',
-        '0654321098',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Le Goff',
-        'Gwenaëlle',
-        'vendeur9@example.com',
-        '0601010101',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Le Roux',
-        'Corentin',
-        'vendeur10@example.com',
-        '0789451236',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Jaffré',
-        'Nolwenn',
-        'vendeur11@example.com',
-        '0611223344',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Riou',
-        'Malo',
-        'vendeur12@example.com',
-        '0702030405',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Morvan',
-        'Rozenn',
-        'vendeur13@example.com',
-        '0699887766',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Coatrieux',
-        'Gaël',
-        'vendeur14@example.com',
-        '0633445566',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
-        0,
-        0,
-        0,
-        0
-    ),
-    (
-        'Pennec',
-        'Enora',
-        'vendeur15@example.com',
-        '0722334455',
-        '$2y$10$PBn4Ku/PsP8epY7TLI1iS./gbw53STiEgT9Af3h/Ni5MMLMUU/JbS',
+        FALSE,
         0,
         0,
         0,
@@ -1233,90 +1124,6 @@ VALUES (
         'SportPro EURL',
         'SportPro',
         2
-    ),
-    (
-        11,
-        '123456787',
-        'Breizh Électronique EURL',
-        'BreizhElec',
-        5
-    ),
-    (
-        12,
-        '787654321',
-        'Atelier du Beurre SAS',
-        'AtelierBeurre',
-        5
-    ),
-    (
-        13,
-        '556789123',
-        'Vêtements Ouest SARL',
-        'WestClothing',
-        5
-    ),
-    (
-        14,
-        '321654987',
-        'Pêcheur & Fils SASU',
-        'MaréeBretonne',
-        5
-    ),
-    (
-        15,
-        '159263487',
-        'Délices de Quimper SARL',
-        'QuimperDélices',
-        5
-    ),
-    (
-        16,
-        '753951852',
-        'Artisanat Armor SAS',
-        'ArmorArt',
-        5
-    ),
-    (
-        17,
-        '852963741',
-        'Biscuiterie de la Mer SARL',
-        'MerBiscuits',
-        5
-    ),
-    (
-        18,
-        '963852741',
-        'Textiles Vannetais EURL',
-        'VannesTextile',
-        5
-    ),
-    (
-        19,
-        '147258369',
-        'Saveurs Argoat SAS',
-        'ArgoatSaveurs',
-        5
-    ),
-    (
-        20,
-        '741852963',
-        'Maison de la Galette SARL',
-        'GaletteMaison',
-        5
-    ),
-    (
-        21,
-        '258369147',
-        'Bijouterie Celtique SARL',
-        'CeltiqueJewels',
-        5
-    ),
-    (
-        22,
-        '369147258',
-        'Cidrerie de la Côte SASU',
-        'CidreCote',
-        5
     );
 
 -- 4. CLIENTS
@@ -1386,19 +1193,15 @@ INSERT INTO
         a_adresse,
         a_ville,
         a_code_postal,
-        a_complement,
-        longitude,
-        latitude
+        a_complement
     )
 VALUES (
         4,
-        7,
-        'rue Édouard Branly',
-        'Lannion',
-        '22300',
-        NULL,
-        NULL,
-        NULL
+        15,
+        'rue de la Paix',
+        'Paris',
+        '75001',
+        'Apt 5'
     ),
     (
         5,
@@ -1406,8 +1209,6 @@ VALUES (
         'avenue des Champs',
         'Lyon',
         '69001',
-        NULL,
-        NULL,
         NULL
     ),
     (
@@ -1416,9 +1217,7 @@ VALUES (
         'boulevard Victor Hugo',
         'Marseille',
         '13001',
-        'Bâtiment B',
-        NULL,
-        NULL
+        'Bâtiment B'
     ),
     (
         7,
@@ -1426,8 +1225,6 @@ VALUES (
         'rue du Commerce',
         'Toulouse',
         '31000',
-        NULL,
-        NULL,
         NULL
     ),
     (
@@ -1436,49 +1233,39 @@ VALUES (
         'place de la République',
         'Nice',
         '06000',
-        '3ème étage',
-        NULL,
-        NULL
+        '3ème étage'
     ),
     (
         9,
         91,
         'rue Principale',
         'Bordeaux',
-        '22260',
-        NULL,
-        NULL,
+        '33000',
         NULL
     ),
     (
         2,
-        1,
-        'Place de la Mairie',
-        'Rennes',
-        '35000',
-        NULL,
-        NULL,
-        NULL
+        12,
+        'avenue du Commerce',
+        'Paris',
+        '75015',
+        'Entrepôt A'
     ),
     (
         3,
-        42,
-        'Rue de Siam',
-        'Brest',
-        '29200',
-        NULL,
-        NULL,
+        55,
+        'rue de la Mode',
+        'Lyon',
+        '69002',
         NULL
     ),
     (
         10,
-        5,
-        'Place du Général de Gaulle',
-        'Vitré',
-        '35500',
-        NULL,
-        NULL,
-        NULL
+        78,
+        'boulevard du Sport',
+        'Marseille',
+        '13008',
+        'Zone industrielle'
     ),
     (
         4,
@@ -1486,129 +1273,7 @@ VALUES (
         'rue du Pillard',
         'Rennes',
         35590,
-        'France',
-        NULL,
-        NULL
-    ),
-    (
-        11,
-        12,
-        'Rue des Fontaines',
-        'Lorient',
-        '56100',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        12,
-        5,
-        'Place Maurice Marchais',
-        'Vannes',
-        '56000',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        13,
-        10,
-        'Rue du Roi Gradlon',
-        'Quimper',
-        '29000',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        14,
-        1,
-        'Esplanade Saint-Vincent',
-        'Saint-Malo',
-        '35400',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        15,
-        14,
-        'Rue des Capucins',
-        'Saint-Brieuc',
-        '22000',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        16,
-        2,
-        'Rue de la Mairie',
-        'Lannion',
-        '22300',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        17,
-        15,
-        'Rue de la Poissonnerie',
-        'Dinan',
-        '22100',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        18,
-        41,
-        'Place des Otages',
-        'Morlaix',
-        '29600',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        19,
-        18,
-        'Grand Rue',
-        'Redon',
-        '35600',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        20,
-        2,
-        'Rue de la Pinterie',
-        'Fougères',
-        '35300',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        21,
-        8,
-        'Rue du Fi',
-        'Pontivy',
-        '56300',
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        22,
-        1,
-        'Rue Duperré',
-        'Concarneau',
-        '29900',
-        NULL,
-        NULL,
-        NULL
+        'France'
     );
 
 -- 6. COULEURS
@@ -1713,7 +1378,7 @@ VALUES (
         0.01,
         5.99,
         4.3,
-        0
+        15
     ),
     (
         1,
@@ -1728,7 +1393,7 @@ VALUES (
         0.03,
         9.99,
         4.0,
-        0
+        8
     ),
     (
         1,
@@ -1743,7 +1408,7 @@ VALUES (
         0.5,
         3.99,
         5.0,
-        0
+        42
     ),
     (
         1,
@@ -1758,7 +1423,7 @@ VALUES (
         0.01,
         4.99,
         NULL,
-        0
+        18
     ),
     (
         1,
@@ -1773,7 +1438,7 @@ VALUES (
         0.08,
         4.99,
         NULL,
-        0
+        12
     ),
     (
         2,
@@ -1788,7 +1453,7 @@ VALUES (
         0.02,
         5.99,
         4.5,
-        0
+        25
     ),
     (
         1,
@@ -1803,7 +1468,7 @@ VALUES (
         0.15,
         6.99,
         NULL,
-        0
+        10
     ),
     (
         1,
@@ -1818,7 +1483,7 @@ VALUES (
         0.01,
         3.99,
         4.7,
-        0
+        20
     ),
     (
         1,
@@ -1833,7 +1498,7 @@ VALUES (
         0.08,
         5.99,
         4.2,
-        0
+        16
     ),
     (
         1,
@@ -1848,11 +1513,11 @@ VALUES (
         0.02,
         7.99,
         3.8,
-        0
+        9
     ),
     (
         1,
-        4,
+        3,
         'Rillettes de Saint-Jacques à la Bretonne',
         'Préparation tartinable fine à base de noix de Saint-Jacques, cuisinées avec du beurre, des échalotes et du vin blanc.',
         8.99,
@@ -1863,7 +1528,7 @@ VALUES (
         0.06,
         4.99,
         4.6,
-        0
+        35
     ),
     (
         1,
@@ -1878,7 +1543,7 @@ VALUES (
         0.01,
         8.99,
         NULL,
-        0
+        5
     ),
     (
         3,
@@ -1893,7 +1558,7 @@ VALUES (
         0.03,
         3.99,
         4.8,
-        0
+        22
     ),
     (
         1,
@@ -1908,7 +1573,7 @@ VALUES (
         0.02,
         5.99,
         4.4,
-        0
+        28
     ),
     (
         1,
@@ -1923,11 +1588,11 @@ VALUES (
         0.04,
         5.99,
         4.1,
-        0
+        11
     ),
     (
         1,
-        4,
+        1,
         'Caramel au Beurre Salé (Salidou) ',
         'Crème onctueuse réalisée avec du sucre caramélisé, du beurre salé breton et une pointe de crème fraîche.',
         4.99,
@@ -1938,7 +1603,7 @@ VALUES (
         0.02,
         14.99,
         4.8,
-        0
+        25
     ),
     (
         1,
@@ -1953,7 +1618,7 @@ VALUES (
         0.03,
         5.99,
         4.4,
-        0
+        18
     ),
     (
         1,
@@ -1968,7 +1633,7 @@ VALUES (
         0.02,
         6.99,
         4.7,
-        0
+        32
     ),
     (
         1,
@@ -1983,7 +1648,7 @@ VALUES (
         0.35,
         19.99,
         4.6,
-        0
+        18
     ),
     (
         1,
@@ -1998,7 +1663,7 @@ VALUES (
         0.06,
         7.99,
         4.9,
-        0
+        65
     ),
     (
         1,
@@ -2013,11 +1678,11 @@ VALUES (
         0.15,
         29.99,
         4.8,
-        0
+        25
     ),
     (
         1,
-        5,
+        1,
         'Lait Ribot de Bretagne',
         'Lait fermenté traditionnel, onctueux et légèrement acide, historiquement servi pour accompagner les galettes de sarrasin',
         2.99,
@@ -2028,7 +1693,7 @@ VALUES (
         0.02,
         12.99,
         4.6,
-        0
+        18
     ),
     (
         1,
@@ -2043,7 +1708,7 @@ VALUES (
         0.01,
         8.99,
         4.4,
-        0
+        65
     ),
     (
         1,
@@ -2058,7 +1723,7 @@ VALUES (
         0.08,
         19.99,
         4.7,
-        0
+        32
     ),
     (
         1,
@@ -2073,7 +1738,7 @@ VALUES (
         0.05,
         6.99,
         4.9,
-        0
+        95
     ),
     (
         2,
@@ -2088,7 +1753,7 @@ VALUES (
         0.45,
         5.78,
         4.4,
-        0
+        12
     ),
     (
         1,
@@ -2103,11 +1768,11 @@ VALUES (
         0.09,
         8.8,
         4.3,
-        0
+        60
     ),
     (
         2,
-        5,
+        3,
         'Galettes de blé noir de Vannes',
         'Produit breton authentique. Fabriqué avec passion à Vannes. Local. Qualité supérieure garantie.',
         4.92,
@@ -2118,7 +1783,7 @@ VALUES (
         0.46,
         5.71,
         4.3,
-        0
+        97
     ),
     (
         1,
@@ -2133,7 +1798,7 @@ VALUES (
         0.32,
         8.28,
         4.4,
-        0
+        58
     ),
     (
         1,
@@ -2148,11 +1813,11 @@ VALUES (
         0.12,
         7.92,
         4.8,
-        0
+        19
     ),
     (
         4,
-        6,
+        2,
         'Ciré Navy de Concarneau',
         'Produit breton authentique. Fabriqué avec passion à Concarneau. Premium. Qualité supérieure garantie.',
         60.35,
@@ -2163,7 +1828,7 @@ VALUES (
         0.14,
         7.22,
         4.6,
-        0
+        72
     ),
     (
         4,
@@ -2178,11 +1843,11 @@ VALUES (
         0.4,
         8.8,
         4.1,
-        0
+        102
     ),
     (
         1,
-        6,
+        3,
         'Marinière Local',
         'Produit breton authentique. Fabriqué avec passion à Quimper. Local. Qualité supérieure garantie.',
         7.43,
@@ -2193,7 +1858,7 @@ VALUES (
         0.23,
         13.58,
         4.9,
-        0
+        72
     ),
     (
         3,
@@ -2208,7 +1873,7 @@ VALUES (
         0.3,
         9.4,
         4.1,
-        0
+        97
     ),
     (
         3,
@@ -2223,7 +1888,7 @@ VALUES (
         0.07,
         10.94,
         4.9,
-        0
+        47
     ),
     (
         1,
@@ -2238,11 +1903,11 @@ VALUES (
         0.26,
         6.09,
         4.2,
-        0
+        91
     ),
     (
         2,
-        7,
+        3,
         'Écharpe Rayée de Saint-Malo',
         'Produit breton authentique. Fabriqué avec passion à Saint-Malo. Fait main. Qualité supérieure garantie.',
         21.13,
@@ -2253,7 +1918,7 @@ VALUES (
         0.43,
         5.64,
         4.2,
-        0
+        129
     ),
     (
         1,
@@ -2268,11 +1933,11 @@ VALUES (
         0.24,
         11.56,
         4.7,
-        0
+        30
     ),
     (
         1,
-        7,
+        3,
         'Écharpe Rayée Authentique',
         'Produit breton authentique. Fabriqué avec passion à Concarneau. Authentique. Qualité supérieure garantie.',
         36.49,
@@ -2283,7 +1948,7 @@ VALUES (
         0.13,
         13.31,
         4.4,
-        0
+        145
     ),
     (
         4,
@@ -2298,7 +1963,7 @@ VALUES (
         0.09,
         5.02,
         4.4,
-        0
+        121
     ),
     (
         1,
@@ -2313,7 +1978,7 @@ VALUES (
         0.16,
         5.45,
         4.5,
-        0
+        140
     ),
     (
         3,
@@ -2328,7 +1993,7 @@ VALUES (
         0.3,
         10.57,
         4.4,
-        0
+        149
     ),
     (
         1,
@@ -2377,7 +2042,7 @@ VALUES (
     ),
     (
         1,
-        8,
+        1,
         'Affiche Vintage de Dinard',
         'Produit breton authentique. Fabriqué avec passion à Dinard. Artisanal. Qualité supérieure garantie.',
         15.74,
@@ -2422,7 +2087,7 @@ VALUES (
     ),
     (
         1,
-        8,
+        3,
         'Kabig Bio',
         'Produit breton authentique. Fabriqué avec passion à Quimper. Bio. Qualité supérieure garantie.',
         170.27,
@@ -2482,7 +2147,7 @@ VALUES (
     ),
     (
         1,
-        9,
+        2,
         'Caramels de Dinard',
         'Produit breton authentique. Fabriqué avec passion à Dinard. Traditionnel. Qualité supérieure garantie.',
         13.67,
@@ -2542,7 +2207,7 @@ VALUES (
     ),
     (
         4,
-        9,
+        3,
         'Bracelet Ancre Durable',
         'Produit breton authentique. Fabriqué avec passion à Roscoff. Durable. Qualité supérieure garantie.',
         5.55,
@@ -2587,7 +2252,7 @@ VALUES (
     ),
     (
         4,
-        10,
+        1,
         'Caramels de Roscoff',
         'Produit breton authentique. Fabriqué avec passion à Roscoff. Authentique. Qualité supérieure garantie.',
         61.58,
@@ -2617,7 +2282,7 @@ VALUES (
     ),
     (
         2,
-        10,
+        1,
         'Ciré Navy Artisanal',
         'Produit breton authentique. Fabriqué avec passion à Pont-Aven. Artisanal. Qualité supérieure garantie.',
         19.84,
@@ -2752,7 +2417,7 @@ VALUES (
     ),
     (
         1,
-        11,
+        2,
         'Vareuse Durable',
         'Produit breton authentique. Fabriqué avec passion à Pont-Aven. Fait main. Qualité supérieure garantie.',
         118.5,
@@ -2827,7 +2492,7 @@ VALUES (
     ),
     (
         1,
-        11,
+        1,
         'Bolée à Cidre Local',
         'Produit breton authentique. Fabriqué avec passion à Roscoff. Local. Qualité supérieure garantie.',
         103.33,
@@ -2872,7 +2537,7 @@ VALUES (
     ),
     (
         1,
-        12,
+        1,
         'Caramels Artisanal',
         'Produit breton authentique. Fabriqué avec passion à Carnac. Artisanal. Qualité supérieure garantie.',
         11.55,
@@ -2902,7 +2567,7 @@ VALUES (
     ),
     (
         2,
-        13,
+        2,
         'Lampe Tempête Traditionnel',
         'Produit breton authentique. Fabriqué avec passion à Quimper. Traditionnel. Qualité supérieure garantie.',
         145.44,
@@ -2962,7 +2627,7 @@ VALUES (
     ),
     (
         1,
-        14,
+        2,
         'Lampe Tempête de Saint-Malo',
         'Produit breton authentique. Fabriqué avec passion à Saint-Malo. Traditionnel. Qualité supérieure garantie.',
         133.75,
@@ -2992,7 +2657,7 @@ VALUES (
     ),
     (
         2,
-        15,
+        1,
         'Bolée à Cidre de Saint-Malo',
         'Produit breton authentique. Fabriqué avec passion à Saint-Malo. Artisanal. Qualité supérieure garantie.',
         20.61,
@@ -3052,7 +2717,7 @@ VALUES (
     ),
     (
         3,
-        15,
+        2,
         'Bonnet Miki Traditionnel',
         'Produit breton authentique. Fabriqué avec passion à Dinard. Traditionnel. Qualité supérieure garantie.',
         18.74,
@@ -3290,8 +2955,8 @@ VALUES (
     ),
     (
         2,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-01-01 00:00:00',
+        '2026-02-07 23:59:00'
     ),
     (
         3,
@@ -3300,8 +2965,8 @@ VALUES (
     ),
     (
         4,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-01-01 00:00:00',
+        '2026-04-15 23:59:00'
     ),
     (
         9,
@@ -3310,8 +2975,8 @@ VALUES (
     ),
     (
         11,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-06-10 00:00:00',
+        '2026-06-20 23:59:00'
     );
 
 -- 9. RÉDUCTIONS (futures)
@@ -3325,8 +2990,8 @@ INSERT INTO
 VALUES (
         1,
         10.00,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-01-05 00:00:00',
+        '2026-09-19 23:59:00'
     ),
     (
         2,
@@ -3337,14 +3002,14 @@ VALUES (
     (
         3,
         20.00,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-01-01 00:00:00',
+        '2026-05-15 23:59:00'
     ),
     (
         4,
         25.00,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-01-20 00:00:00',
+        '2026-02-26 23:59:00'
     ),
     (
         5,
@@ -3355,14 +3020,14 @@ VALUES (
     (
         6,
         60.00,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-01-01 00:00:00',
+        '2026-04-15 23:59:00'
     ),
     (
         7,
         55.00,
-        CURRENT_DATE + TIME '10:00:00',
-        CURRENT_DATE + INTERVAL '30 days'
+        '2026-05-01 00:00:00',
+        '2026-05-07 23:59:00'
     ),
     (
         8,
@@ -3924,36 +3589,6 @@ VALUES (
         '/img/photo/robe_d_ete.jpg',
         'Robe d été',
         'Photo de Robe d été'
-    ),
-    (
-        '/img/photo/Crous’ty_Caramel2.jpg',
-        'Crous’ty Caramel 2',
-        'Photo de Crous’ty Caramel'
-    ),
-    (
-        '/img/photo/Kouign-Amann2.jpg',
-        'Kouign-Amann 2',
-        'Photo de Kouign-Amann 2'
-    ),
-    (
-        '/img/photo/Kouign-Amann3.jpg',
-        'Kouign-Amann 3',
-        'Photo de Kouign-Amann 3'
-    ),
-    (
-        '/img/photo/mini-beurrier2.jpg',
-        'mini-beurrier 2',
-        'Photo de mini beurrier 2'
-    ),
-    (
-        '/img/photo/Huitres-Cancale2.jpg',
-        'Huitres-Cancale2.jpeg',
-        'Image d Huitres-Cancales 2'
-    ),
-    (
-        '/img/photo/palets-bretons2.jpg',
-        'palets-bretons2.jpeg',
-        'Image de palets bretons 2'
     );
 
 -- 13. RELATIONS IMAGES-PRODUITS
@@ -4064,13 +3699,7 @@ VALUES (1, 1),
     (106, 103),
     (107, 104),
     (108, 105),
-    (109, 5),
-    (110, 2),
-    (111, 6),
-    (112, 6),
-    (113, 1),
-    (114, 14),
-    (115, 15);
+    (109, 5);
 
 -- 14. RELATIONS IMAGES-COMPTES
 INSERT INTO
@@ -4338,176 +3967,20 @@ VALUES (
     );
 
 -- 18. PANIERS/COMMANDES
--- Nettoyage et reset des compteurs d'ID
-TRUNCATE cobrec1._paiement,
-cobrec1._facture,
-cobrec1._contient,
-cobrec1._panier_commande RESTART IDENTITY CASCADE;
-
--- NETTOYAGE COMPLET (Indispensable pour éviter les erreurs de clé dupliquée)
--- Le RESTART IDENTITY remet les compteurs SERIAL à 1
-TRUNCATE cobrec1._paiement,
-cobrec1._facture,
-cobrec1._contient,
-cobrec1._panier_commande RESTART IDENTITY CASCADE;
-
--- 19. INSERTION DES 60 PANIERS (Sans l'ID car il est en SERIAL)
 INSERT INTO
-    cobrec1._panier_commande (id_client, timestamp_commande)
-VALUES (2, '2025-01-02 11:05:00'),
-    (3, '2025-01-04 12:10:00'),
-    (4, '2025-01-06 13:15:00'),
-    (5, '2025-01-08 14:20:00'),
-    (6, '2025-01-10 10:25:00'),
-    (1, '2025-01-12 11:30:00'),
-    (2, '2025-01-14 12:35:00'),
-    (3, '2025-01-16 13:40:00'),
-    (4, '2025-01-18 14:45:00'),
-    (5, '2025-01-20 10:50:00'),
-    (6, '2025-02-02 11:05:00'),
-    (1, '2025-02-04 12:10:00'),
-    (2, '2025-02-06 13:15:00'),
-    (3, '2025-02-08 14:20:00'),
-    (4, '2025-02-10 10:25:00'),
-    (5, '2025-02-12 11:30:00'),
-    (6, '2025-02-14 12:35:00'),
-    (1, '2025-02-16 13:40:00'),
-    (2, '2025-02-18 14:45:00'),
-    (3, '2025-02-20 10:50:00'),
-    (4, '2025-03-02 11:05:00'),
-    (5, '2025-03-04 12:10:00'),
-    (6, '2025-03-06 13:15:00'),
-    (1, '2025-03-08 14:20:00'),
-    (2, '2025-03-10 10:25:00'),
-    (3, '2025-03-12 11:30:00'),
-    (4, '2025-03-14 12:35:00'),
-    (5, '2025-03-16 13:40:00'),
-    (6, '2025-03-18 14:45:00'),
-    (1, '2025-03-20 10:50:00'),
-    (2, '2025-04-02 11:05:00'),
-    (3, '2025-04-04 12:10:00'),
-    (4, '2025-04-06 13:15:00'),
-    (5, '2025-04-08 14:20:00'),
-    (6, '2025-04-10 10:25:00'),
-    (1, '2025-04-12 11:30:00'),
-    (2, '2025-04-14 12:35:00'),
-    (3, '2025-04-16 13:40:00'),
-    (4, '2025-04-18 14:45:00'),
-    (5, '2025-04-20 10:50:00'),
-    (6, '2025-05-02 11:05:00'),
-    (1, '2025-05-04 12:10:00'),
-    (2, '2025-05-06 13:15:00'),
-    (3, '2025-05-08 14:20:00'),
-    (4, '2025-05-10 10:25:00'),
-    (5, '2025-05-12 11:30:00'),
-    (6, '2025-05-14 12:35:00'),
-    (1, '2025-05-16 13:40:00'),
-    (2, '2025-05-18 14:45:00'),
-    (3, '2025-05-20 10:50:00'),
-    (4, '2025-06-02 11:05:00'),
-    (5, '2025-06-04 12:10:00'),
-    (6, '2025-06-06 13:15:00'),
-    (1, '2025-06-08 14:20:00'),
-    (2, '2025-06-10 10:25:00'),
-    (3, '2025-06-12 11:30:00'),
-    (4, '2025-06-14 12:35:00'),
-    (5, '2025-06-16 13:40:00'),
-    (6, '2025-06-18 14:45:00'),
-    (1, '2025-06-20 10:50:00'),
-    (2, '2025-07-02 11:05:00'),
-    (3, '2025-07-04 12:10:00'),
-    (4, '2025-07-06 13:15:00'),
-    (5, '2025-07-08 14:20:00'),
-    (6, '2025-07-10 10:25:00'),
-    (1, '2025-07-12 11:30:00'),
-    (2, '2025-07-14 12:35:00'),
-    (3, '2025-07-16 13:40:00'),
-    (4, '2025-07-18 14:45:00'),
-    (5, '2025-07-20 10:50:00'),
-    (6, '2025-08-02 11:05:00'),
-    (1, '2025-08-04 12:10:00'),
-    (2, '2025-08-06 13:15:00'),
-    (3, '2025-08-08 14:20:00'),
-    (4, '2025-08-10 10:25:00'),
-    (5, '2025-08-12 11:30:00'),
-    (6, '2025-08-14 12:35:00'),
-    (1, '2025-08-16 13:40:00'),
-    (2, '2025-08-18 14:45:00'),
-    (3, '2025-08-20 10:50:00'),
-    (4, '2025-09-02 11:05:00'),
-    (5, '2025-09-04 12:10:00'),
-    (6, '2025-09-06 13:15:00'),
-    (1, '2025-09-08 14:20:00'),
-    (2, '2025-09-10 10:25:00'),
-    (3, '2025-09-12 11:30:00'),
-    (4, '2025-09-14 12:35:00'),
-    (5, '2025-09-16 13:40:00'),
-    (6, '2025-09-18 14:45:00'),
-    (1, '2025-09-20 10:50:00'),
-    (2, '2025-10-02 11:05:00'),
-    (3, '2025-10-04 12:10:00'),
-    (4, '2025-10-06 13:15:00'),
-    (5, '2025-10-08 14:20:00'),
-    (6, '2025-10-10 10:25:00'),
-    (1, '2025-10-12 11:30:00'),
-    (2, '2025-10-14 12:35:00'),
-    (3, '2025-10-16 13:40:00'),
-    (4, '2025-10-18 14:45:00'),
-    (5, '2025-10-20 10:50:00'),
-    (6, '2025-11-02 11:05:00'),
-    (1, '2025-11-04 12:10:00'),
-    (2, '2025-11-06 13:15:00'),
-    (3, '2025-11-08 14:20:00'),
-    (4, '2025-11-10 10:25:00'),
-    (5, '2025-11-12 11:30:00'),
-    (6, '2025-11-14 12:35:00'),
-    (1, '2025-11-16 13:40:00'),
-    (2, '2025-11-18 14:45:00'),
-    (3, '2025-11-20 10:50:00'),
-    (4, '2025-12-02 11:05:00'),
-    (5, '2025-12-04 12:10:00'),
-    (6, '2025-12-06 13:15:00'),
-    (1, '2025-12-08 14:20:00'),
-    (2, '2025-12-10 10:25:00'),
-    (3, '2025-12-12 11:30:00'),
-    (4, '2025-12-14 12:35:00'),
-    (5, '2025-12-16 13:40:00'),
-    (6, '2025-12-18 14:45:00'),
-    (1, '2025-12-20 10:50:00'),
-    (2, '2026-01-02 11:05:00'),
-    (3, '2026-01-04 12:10:00'),
-    (4, '2026-01-06 13:15:00'),
-    (5, '2026-01-08 14:20:00'),
-    (6, '2026-01-10 10:25:00'),
-    (1, '2026-01-12 11:30:00'),
-    (2, '2026-01-14 12:35:00'),
-    (3, '2026-01-16 13:40:00'),
-    (4, '2026-01-18 14:45:00'),
-    (5, '2026-01-20 10:50:00'),
-    (6, '2026-02-02 11:05:00'),
-    (1, '2026-02-04 12:10:00'),
-    (2, '2026-02-06 13:15:00'),
-    (3, '2026-02-08 14:20:00'),
-    (4, '2026-02-10 10:25:00'),
-    (5, '2026-02-12 11:30:00'),
-    (6, '2026-02-14 12:35:00'),
-    (1, '2026-02-16 13:40:00'),
-    (2, '2026-02-18 14:45:00'),
-    (3, '2026-02-20 10:50:00'),
-    (4, '2026-03-02 11:05:00'),
-    (5, '2026-03-04 12:10:00'),
-    (6, '2026-03-06 13:15:00'),
-    (1, '2026-03-08 14:20:00'),
-    (2, '2026-03-10 10:25:00'),
-    (3, '2026-03-12 11:30:00'),
-    (4, '2026-03-14 12:35:00'),
-    (5, '2026-03-16 13:40:00'),
-    (6, '2026-03-18 14:45:00'),
-    (1, '2026-03-20 10:50:00');
+    _panier_commande (id_client, timestamp_commande)
+VALUES (1, '2025-11-01 10:30:00'),
+    (2, '2025-11-02 14:45:00'),
+    (3, '2025-11-03 09:15:00'),
+    (1, NULL),
+    (4, '2025-11-04 16:20:00'),
+    (6, '2025-11-05 11:00:00'),
+    (2, NULL),
+    (5, '2025-11-06 13:30:00');
 
--- 20. INSERTION DU CONTENU (60 Paniers)
+-- 19. CONTIENT (produits dans paniers)
 INSERT INTO
-    cobrec1._contient (
+    _contient (
         id_panier,
         id_produit,
         quantite,
@@ -4519,26 +3992,26 @@ INSERT INTO
 VALUES (
         1,
         1,
-        2,
-        3.99,
+        1,
+        599.99,
         0.0,
         5.99,
         20.0
     ),
     (
         1,
-        2,
-        2,
-        8.99,
+        6,
+        1,
+        149.99,
         0.0,
-        9.99,
+        5.99,
         20.0
     ),
     (
-        1,
+        2,
         3,
         2,
-        4.99,
+        24.99,
         0.0,
         3.99,
         20.0
@@ -4546,32 +4019,23 @@ VALUES (
     (
         2,
         4,
-        3,
-        0.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        2,
-        5,
-        3,
-        39.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        3,
-        6,
         1,
-        4.99,
+        49.99,
         0.0,
-        5.99,
-        10.0
+        4.99,
+        20.0
     ),
     (
         3,
+        2,
+        1,
+        899.99,
+        0.0,
+        9.99,
+        20.0
+    ),
+    (
+        4,
         7,
         1,
         69.99,
@@ -4580,3369 +4044,143 @@ VALUES (
         20.0
     ),
     (
-        3,
-        8,
-        1,
-        8.99,
-        0.0,
-        3.99,
-        20.0
-    ),
-    (
-        4,
-        9,
-        2,
-        7.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        4,
-        10,
-        2,
-        3.99,
-        0.0,
-        7.99,
-        20.0
-    ),
-    (
         5,
-        11,
-        3,
-        8.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
         5,
-        12,
-        3,
-        2.99,
-        0.0,
-        8.99,
-        20.0
-    ),
-    (
-        5,
-        13,
-        3,
-        2.99,
-        0.0,
-        3.99,
-        5.5
-    ),
-    (
-        6,
-        14,
         1,
-        12.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        6,
-        15,
-        1,
-        7.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        7,
-        16,
-        2,
-        4.99,
-        0.0,
-        14.99,
-        20.0
-    ),
-    (
-        7,
-        17,
-        2,
-        3.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        7,
-        18,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        8,
-        19,
-        3,
-        14.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        8,
-        20,
-        3,
-        3.99,
-        0.0,
-        7.99,
-        20.0
-    ),
-    (
-        9,
-        21,
-        1,
-        5.99,
-        0.0,
-        29.99,
-        20.0
-    ),
-    (
-        9,
-        22,
-        1,
-        2.99,
-        0.0,
-        12.99,
-        20.0
-    ),
-    (
-        9,
-        23,
-        1,
-        3.99,
-        0.0,
-        8.99,
-        20.0
-    ),
-    (
-        10,
-        24,
-        2,
-        4.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        10,
-        25,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        11,
-        26,
-        3,
-        36.37,
-        0.0,
-        5.78,
-        10.0
-    ),
-    (
-        11,
-        27,
-        3,
-        21.37,
-        0.0,
-        8.8,
-        20.0
-    ),
-    (
-        11,
-        28,
-        3,
-        4.92,
-        0.0,
-        5.71,
-        10.0
-    ),
-    (
-        12,
-        29,
-        1,
-        15.77,
-        0.0,
-        8.28,
-        20.0
-    ),
-    (
-        12,
-        30,
-        1,
-        17.02,
-        0.0,
-        7.92,
-        20.0
-    ),
-    (
-        13,
-        31,
-        2,
-        60.35,
-        0.0,
-        7.22,
-        2.1
-    ),
-    (
-        13,
-        32,
-        2,
-        2.75,
-        0.0,
-        8.8,
-        2.1
-    ),
-    (
-        13,
-        33,
-        2,
-        7.43,
-        0.0,
-        13.58,
-        20.0
-    ),
-    (
-        14,
-        34,
-        3,
-        4.53,
-        0.0,
-        9.4,
-        5.5
-    ),
-    (
-        14,
-        35,
-        3,
-        16.23,
-        0.0,
-        10.94,
-        5.5
-    ),
-    (
-        15,
-        36,
-        1,
-        50.95,
-        0.0,
-        6.09,
-        20.0
-    ),
-    (
-        15,
-        37,
-        1,
-        21.13,
-        0.0,
-        5.64,
-        10.0
-    ),
-    (
-        15,
-        38,
-        1,
-        13.55,
-        0.0,
-        11.56,
-        20.0
-    ),
-    (
-        16,
-        39,
-        2,
-        36.49,
-        0.0,
-        13.31,
-        20.0
-    ),
-    (
-        16,
-        40,
-        2,
-        5.4,
-        0.0,
-        5.02,
-        2.1
-    ),
-    (
-        17,
-        41,
-        3,
-        11.47,
-        0.0,
-        5.45,
-        20.0
-    ),
-    (
-        17,
-        42,
-        3,
-        18.96,
-        0.0,
-        10.57,
-        5.5
-    ),
-    (
-        17,
-        43,
-        3,
-        6.7,
-        0.0,
-        5.08,
-        20.0
-    ),
-    (
-        18,
-        44,
-        1,
-        6.18,
-        0.0,
-        9.89,
-        20.0
-    ),
-    (
-        18,
-        45,
-        1,
-        30.23,
-        0.0,
-        6.9,
-        5.5
-    ),
-    (
-        19,
-        46,
-        2,
-        15.74,
-        0.0,
-        8.98,
-        20.0
-    ),
-    (
-        19,
-        47,
-        2,
-        45.09,
-        0.0,
-        8.28,
-        10.0
-    ),
-    (
-        19,
-        48,
-        2,
-        25.65,
-        0.0,
-        12.3,
-        5.5
-    ),
-    (
-        20,
-        49,
-        3,
-        170.27,
-        0.0,
-        8.15,
-        20.0
-    ),
-    (
-        20,
-        50,
-        3,
-        62.75,
-        0.0,
-        12.59,
-        20.0
-    ),
-    (
-        21,
-        51,
-        1,
-        15.33,
-        0.0,
-        6.04,
-        5.5
-    ),
-    (
-        21,
-        52,
-        1,
-        3.23,
-        0.0,
-        10.97,
-        5.5
-    ),
-    (
-        21,
-        53,
-        1,
-        13.67,
-        0.0,
-        10.54,
-        20.0
-    ),
-    (
-        22,
-        54,
-        2,
-        13.69,
-        0.0,
-        12.16,
-        5.5
-    ),
-    (
-        22,
-        55,
-        2,
-        37.85,
-        0.0,
-        12.65,
-        2.1
-    ),
-    (
-        23,
-        56,
-        3,
-        51.36,
-        0.0,
-        7.24,
-        2.1
-    ),
-    (
-        23,
-        57,
-        3,
-        5.55,
-        0.0,
-        12.56,
-        2.1
-    ),
-    (
-        23,
-        58,
-        3,
-        73.48,
-        0.0,
-        8.45,
-        20.0
-    ),
-    (
-        24,
-        59,
-        1,
-        167.42,
-        0.0,
-        11.26,
-        2.1
-    ),
-    (
-        24,
-        60,
-        1,
-        61.58,
-        0.0,
-        11.11,
-        2.1
-    ),
-    (
-        25,
-        61,
-        2,
-        35.65,
-        0.0,
-        7.95,
-        2.1
-    ),
-    (
-        25,
-        62,
-        2,
-        19.84,
-        0.0,
-        13.62,
-        10.0
-    ),
-    (
-        25,
-        63,
-        2,
-        51.2,
-        0.0,
-        10.45,
-        5.5
-    ),
-    (
-        26,
-        64,
-        3,
-        47.48,
-        0.0,
-        5.92,
-        20.0
-    ),
-    (
-        26,
-        65,
-        3,
-        89.39,
-        0.0,
-        10.72,
-        2.1
-    ),
-    (
-        27,
-        66,
-        1,
-        148.16,
-        0.0,
-        13.41,
-        10.0
-    ),
-    (
-        27,
-        67,
-        1,
-        50.09,
-        0.0,
-        11.31,
-        20.0
-    ),
-    (
-        27,
-        68,
-        1,
-        102.77,
-        0.0,
-        11.23,
-        2.1
-    ),
-    (
-        28,
-        69,
-        2,
-        61.2,
-        0.0,
-        7.84,
-        10.0
-    ),
-    (
-        28,
-        70,
-        2,
-        167.37,
-        0.0,
-        5.13,
-        20.0
-    ),
-    (
-        29,
-        71,
-        3,
-        118.5,
-        0.0,
-        13.69,
-        20.0
-    ),
-    (
-        29,
-        72,
-        3,
-        116.38,
-        0.0,
-        10.02,
-        2.1
-    ),
-    (
-        29,
-        73,
-        3,
-        21.38,
-        0.0,
-        10.63,
-        10.0
-    ),
-    (
-        30,
-        74,
-        1,
-        140.29,
-        0.0,
-        11.36,
-        10.0
-    ),
-    (
-        30,
-        75,
-        1,
-        181.69,
-        0.0,
-        7.77,
-        2.1
-    ),
-    (
-        31,
-        76,
-        2,
-        103.33,
-        0.0,
-        11.61,
-        20.0
-    ),
-    (
-        31,
-        77,
-        2,
-        133.14,
-        0.0,
-        10.71,
-        2.1
-    ),
-    (
-        31,
-        78,
-        2,
-        141.1,
-        0.0,
-        11.84,
-        5.5
-    ),
-    (
-        32,
-        79,
-        3,
-        11.55,
-        0.0,
-        10.6,
-        20.0
-    ),
-    (
-        32,
-        80,
-        3,
-        101.61,
-        0.0,
-        7.15,
-        2.1
-    ),
-    (
-        33,
-        81,
-        1,
-        145.44,
-        0.0,
-        9.34,
-        10.0
-    ),
-    (
-        33,
-        82,
-        1,
-        5.31,
-        0.0,
-        7.4,
-        2.1
-    ),
-    (
-        33,
-        83,
-        1,
-        11.71,
-        0.0,
-        13.83,
-        10.0
-    ),
-    (
-        34,
-        84,
-        2,
-        19.76,
-        0.0,
-        5.33,
-        20.0
-    ),
-    (
-        34,
-        85,
-        2,
-        133.75,
-        0.0,
-        7.39,
-        20.0
-    ),
-    (
-        35,
-        86,
-        3,
-        14.37,
-        0.0,
-        11.72,
-        20.0
-    ),
-    (
-        35,
-        87,
-        3,
-        20.61,
-        0.0,
-        9.78,
-        10.0
-    ),
-    (
-        35,
-        88,
-        3,
-        37.05,
-        0.0,
-        11.0,
-        5.5
-    ),
-    (
-        36,
-        89,
-        1,
-        90.19,
-        0.0,
-        13.99,
-        10.0
-    ),
-    (
-        36,
-        90,
-        1,
-        13.41,
-        0.0,
-        12.0,
-        5.5
-    ),
-    (
-        37,
-        91,
-        2,
-        18.74,
-        0.0,
-        5.3,
-        5.5
-    ),
-    (
-        37,
-        92,
-        2,
-        18.65,
-        0.0,
-        9.34,
-        2.1
-    ),
-    (
-        37,
-        93,
-        2,
-        4.57,
-        0.0,
-        11.06,
-        5.5
-    ),
-    (
-        38,
-        94,
-        3,
-        51.84,
-        0.0,
-        11.31,
-        20.0
-    ),
-    (
-        38,
-        95,
-        3,
-        35.64,
-        0.0,
-        11.27,
-        20.0
-    ),
-    (
-        39,
-        96,
-        1,
-        189.65,
-        0.0,
-        9.9,
-        2.1
-    ),
-    (
-        39,
-        97,
-        1,
-        122.86,
-        0.0,
-        13.9,
-        20.0
-    ),
-    (
-        39,
-        98,
-        1,
-        15.05,
-        0.0,
-        6.3,
-        20.0
-    ),
-    (
-        40,
-        99,
-        2,
-        12.98,
-        0.0,
-        9.73,
-        5.5
-    ),
-    (
-        40,
-        100,
-        2,
-        1.75,
-        0.0,
-        13.68,
-        2.1
-    ),
-    (
-        41,
-        101,
-        3,
-        38.04,
-        0.0,
-        9.94,
-        5.5
-    ),
-    (
-        41,
-        102,
-        3,
-        77.85,
-        0.0,
-        8.74,
-        5.5
-    ),
-    (
-        41,
-        103,
-        3,
-        27.62,
-        0.0,
-        6.17,
-        5.5
-    ),
-    (
-        42,
-        104,
-        1,
-        3.48,
-        0.0,
-        6.39,
-        5.5
-    ),
-    (
-        42,
-        105,
-        1,
-        4.19,
-        0.0,
-        5.24,
-        20.0
-    ),
-    (
-        43,
-        1,
-        2,
-        3.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        43,
-        2,
-        2,
-        8.99,
-        0.0,
-        9.99,
-        20.0
-    ),
-    (
-        43,
-        3,
-        2,
-        4.99,
-        0.0,
-        3.99,
-        20.0
-    ),
-    (
-        44,
-        4,
-        3,
-        0.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        44,
-        5,
-        3,
         39.99,
         0.0,
         4.99,
         20.0
     ),
     (
-        45,
-        6,
-        1,
-        4.99,
-        0.0,
-        5.99,
-        10.0
-    ),
-    (
-        45,
-        7,
-        1,
-        69.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        45,
-        8,
-        1,
-        8.99,
-        0.0,
-        3.99,
-        20.0
-    ),
-    (
-        46,
-        9,
-        2,
-        7.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        46,
-        10,
-        2,
-        3.99,
-        0.0,
-        7.99,
-        20.0
-    ),
-    (
-        47,
-        11,
-        3,
-        8.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        47,
-        12,
-        3,
-        2.99,
-        0.0,
-        8.99,
-        20.0
-    ),
-    (
-        47,
-        13,
-        3,
-        2.99,
-        0.0,
-        3.99,
-        5.5
-    ),
-    (
-        48,
-        14,
-        1,
-        12.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        48,
-        15,
-        1,
-        7.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        49,
-        16,
-        2,
-        4.99,
-        0.0,
-        14.99,
-        20.0
-    ),
-    (
-        49,
-        17,
-        2,
-        3.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        49,
-        18,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        50,
-        19,
-        3,
-        14.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        50,
-        20,
-        3,
-        3.99,
-        0.0,
-        7.99,
-        20.0
-    ),
-    (
-        51,
-        21,
-        1,
-        5.99,
-        0.0,
-        29.99,
-        20.0
-    ),
-    (
-        51,
-        22,
-        1,
-        2.99,
-        0.0,
-        12.99,
-        20.0
-    ),
-    (
-        51,
-        23,
-        1,
-        3.99,
-        0.0,
-        8.99,
-        20.0
-    ),
-    (
-        52,
-        24,
-        2,
-        4.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        52,
-        25,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        53,
-        26,
-        3,
-        36.37,
-        0.0,
-        5.78,
-        10.0
-    ),
-    (
-        53,
-        27,
-        3,
-        21.37,
-        0.0,
-        8.8,
-        20.0
-    ),
-    (
-        53,
-        28,
-        3,
-        4.92,
-        0.0,
-        5.71,
-        10.0
-    ),
-    (
-        54,
-        29,
-        1,
-        15.77,
-        0.0,
-        8.28,
-        20.0
-    ),
-    (
-        54,
-        30,
-        1,
-        17.02,
-        0.0,
-        7.92,
-        20.0
-    ),
-    (
-        55,
-        31,
-        2,
-        60.35,
-        0.0,
-        7.22,
-        2.1
-    ),
-    (
-        55,
-        32,
-        2,
-        2.75,
-        0.0,
-        8.8,
-        2.1
-    ),
-    (
-        55,
-        33,
-        2,
-        7.43,
-        0.0,
-        13.58,
-        20.0
-    ),
-    (
-        56,
-        34,
-        3,
-        4.53,
-        0.0,
-        9.4,
-        5.5
-    ),
-    (
-        56,
-        35,
-        3,
-        16.23,
-        0.0,
-        10.94,
-        5.5
-    ),
-    (
-        57,
-        36,
-        1,
-        50.95,
-        0.0,
-        6.09,
-        20.0
-    ),
-    (
-        57,
-        37,
-        1,
-        21.13,
-        0.0,
-        5.64,
-        10.0
-    ),
-    (
-        57,
-        38,
-        1,
-        13.55,
-        0.0,
-        11.56,
-        20.0
-    ),
-    (
-        58,
-        39,
-        2,
-        36.49,
-        0.0,
-        13.31,
-        20.0
-    ),
-    (
-        58,
-        40,
-        2,
-        5.4,
-        0.0,
-        5.02,
-        2.1
-    ),
-    (
-        59,
-        41,
-        3,
-        11.47,
-        0.0,
-        5.45,
-        20.0
-    ),
-    (
-        59,
-        42,
-        3,
-        18.96,
-        0.0,
-        10.57,
-        5.5
-    ),
-    (
-        59,
-        43,
-        3,
-        6.7,
-        0.0,
-        5.08,
-        20.0
-    ),
-    (
-        60,
-        44,
-        1,
-        6.18,
-        0.0,
-        9.89,
-        20.0
-    ),
-    (
-        60,
-        45,
-        1,
-        30.23,
-        0.0,
-        6.9,
-        5.5
-    ),
-    (
-        61,
-        46,
-        2,
-        15.74,
-        0.0,
-        8.98,
-        20.0
-    ),
-    (
-        61,
-        47,
-        2,
-        45.09,
-        0.0,
-        8.28,
-        10.0
-    ),
-    (
-        61,
-        48,
-        2,
-        25.65,
-        0.0,
-        12.3,
-        5.5
-    ),
-    (
-        62,
-        49,
-        3,
-        170.27,
-        0.0,
-        8.15,
-        20.0
-    ),
-    (
-        62,
-        50,
-        3,
-        62.75,
-        0.0,
-        12.59,
-        20.0
-    ),
-    (
-        63,
-        51,
-        1,
-        15.33,
-        0.0,
-        6.04,
-        5.5
-    ),
-    (
-        63,
-        52,
-        1,
-        3.23,
-        0.0,
-        10.97,
-        5.5
-    ),
-    (
-        63,
-        53,
-        1,
-        13.67,
-        0.0,
-        10.54,
-        20.0
-    ),
-    (
-        64,
-        54,
-        2,
-        13.69,
-        0.0,
-        12.16,
-        5.5
-    ),
-    (
-        64,
-        55,
-        2,
-        37.85,
-        0.0,
-        12.65,
-        2.1
-    ),
-    (
-        65,
-        56,
-        3,
-        51.36,
-        0.0,
-        7.24,
-        2.1
-    ),
-    (
-        65,
-        57,
-        3,
-        5.55,
-        0.0,
-        12.56,
-        2.1
-    ),
-    (
-        65,
-        58,
-        3,
-        73.48,
-        0.0,
-        8.45,
-        20.0
-    ),
-    (
-        66,
-        59,
-        1,
-        167.42,
-        0.0,
-        11.26,
-        2.1
-    ),
-    (
-        66,
-        60,
-        1,
-        61.58,
-        0.0,
-        11.11,
-        2.1
-    ),
-    (
-        67,
-        61,
-        2,
-        35.65,
-        0.0,
-        7.95,
-        2.1
-    ),
-    (
-        67,
-        62,
-        2,
-        19.84,
-        0.0,
-        13.62,
-        10.0
-    ),
-    (
-        67,
-        63,
-        2,
-        51.2,
-        0.0,
-        10.45,
-        5.5
-    ),
-    (
-        68,
-        64,
-        3,
-        47.48,
-        0.0,
-        5.92,
-        20.0
-    ),
-    (
-        68,
-        65,
-        3,
-        89.39,
-        0.0,
-        10.72,
-        2.1
-    ),
-    (
-        69,
-        66,
-        1,
-        148.16,
-        0.0,
-        13.41,
-        10.0
-    ),
-    (
-        69,
-        67,
-        1,
-        50.09,
-        0.0,
-        11.31,
-        20.0
-    ),
-    (
-        69,
-        68,
-        1,
-        102.77,
-        0.0,
-        11.23,
-        2.1
-    ),
-    (
-        70,
-        69,
-        2,
-        61.2,
-        0.0,
-        7.84,
-        10.0
-    ),
-    (
-        70,
-        70,
-        2,
-        167.37,
-        0.0,
-        5.13,
-        20.0
-    ),
-    (
-        71,
-        71,
-        3,
-        118.5,
-        0.0,
-        13.69,
-        20.0
-    ),
-    (
-        71,
-        72,
-        3,
-        116.38,
-        0.0,
-        10.02,
-        2.1
-    ),
-    (
-        71,
-        73,
-        3,
-        21.38,
-        0.0,
-        10.63,
-        10.0
-    ),
-    (
-        72,
-        74,
-        1,
-        140.29,
-        0.0,
-        11.36,
-        10.0
-    ),
-    (
-        72,
-        75,
-        1,
-        181.69,
-        0.0,
-        7.77,
-        2.1
-    ),
-    (
-        73,
-        76,
-        2,
-        103.33,
-        0.0,
-        11.61,
-        20.0
-    ),
-    (
-        73,
-        77,
-        2,
-        133.14,
-        0.0,
-        10.71,
-        2.1
-    ),
-    (
-        73,
-        78,
-        2,
-        141.1,
-        0.0,
-        11.84,
-        5.5
-    ),
-    (
-        74,
-        79,
-        3,
-        11.55,
-        0.0,
-        10.6,
-        20.0
-    ),
-    (
-        74,
-        80,
-        3,
-        101.61,
-        0.0,
-        7.15,
-        2.1
-    ),
-    (
-        75,
-        81,
-        1,
-        145.44,
-        0.0,
-        9.34,
-        10.0
-    ),
-    (
-        75,
-        82,
-        1,
-        5.31,
-        0.0,
-        7.4,
-        2.1
-    ),
-    (
-        75,
-        83,
-        1,
-        11.71,
-        0.0,
-        13.83,
-        10.0
-    ),
-    (
-        76,
-        84,
-        2,
-        19.76,
-        0.0,
-        5.33,
-        20.0
-    ),
-    (
-        76,
-        85,
-        2,
-        133.75,
-        0.0,
-        7.39,
-        20.0
-    ),
-    (
-        77,
-        86,
-        3,
-        14.37,
-        0.0,
-        11.72,
-        20.0
-    ),
-    (
-        77,
-        87,
-        3,
-        20.61,
-        0.0,
-        9.78,
-        10.0
-    ),
-    (
-        77,
-        88,
-        3,
-        37.05,
-        0.0,
-        11.0,
-        5.5
-    ),
-    (
-        78,
-        89,
-        1,
-        90.19,
-        0.0,
-        13.99,
-        10.0
-    ),
-    (
-        78,
-        90,
-        1,
-        13.41,
-        0.0,
-        12.0,
-        5.5
-    ),
-    (
-        79,
-        91,
-        2,
-        18.74,
-        0.0,
-        5.3,
-        5.5
-    ),
-    (
-        79,
-        92,
-        2,
-        18.65,
-        0.0,
-        9.34,
-        2.1
-    ),
-    (
-        79,
-        93,
-        2,
-        4.57,
-        0.0,
-        11.06,
-        5.5
-    ),
-    (
-        80,
-        94,
-        3,
-        51.84,
-        0.0,
-        11.31,
-        20.0
-    ),
-    (
-        80,
-        95,
-        3,
-        35.64,
-        0.0,
-        11.27,
-        20.0
-    ),
-    (
-        81,
-        96,
-        1,
-        189.65,
-        0.0,
-        9.9,
-        2.1
-    ),
-    (
-        81,
-        97,
-        1,
-        122.86,
-        0.0,
-        13.9,
-        20.0
-    ),
-    (
-        81,
-        98,
-        1,
-        15.05,
-        0.0,
-        6.3,
-        20.0
-    ),
-    (
-        82,
-        99,
-        2,
-        12.98,
-        0.0,
-        9.73,
-        5.5
-    ),
-    (
-        82,
-        100,
-        2,
-        1.75,
-        0.0,
-        13.68,
-        2.1
-    ),
-    (
-        83,
-        101,
-        3,
-        38.04,
-        0.0,
-        9.94,
-        5.5
-    ),
-    (
-        83,
-        102,
-        3,
-        77.85,
-        0.0,
-        8.74,
-        5.5
-    ),
-    (
-        83,
-        103,
-        3,
-        27.62,
-        0.0,
-        6.17,
-        5.5
-    ),
-    (
-        84,
-        104,
-        1,
-        3.48,
-        0.0,
-        6.39,
-        5.5
-    ),
-    (
-        84,
-        105,
-        1,
-        4.19,
-        0.0,
-        5.24,
-        20.0
-    ),
-    (
-        85,
-        1,
-        2,
-        3.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        85,
-        2,
-        2,
-        8.99,
-        0.0,
-        9.99,
-        20.0
-    ),
-    (
-        85,
-        3,
-        2,
-        4.99,
-        0.0,
-        3.99,
-        20.0
-    ),
-    (
-        86,
-        4,
-        3,
-        0.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        86,
         5,
-        3,
-        39.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        87,
-        6,
-        1,
-        4.99,
-        0.0,
-        5.99,
-        10.0
-    ),
-    (
-        87,
-        7,
-        1,
-        69.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        87,
         8,
         1,
-        8.99,
+        199.99,
         0.0,
         3.99,
         20.0
     ),
     (
-        88,
-        9,
-        2,
-        7.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        88,
-        10,
-        2,
-        3.99,
-        0.0,
-        7.99,
-        20.0
-    ),
-    (
-        89,
-        11,
-        3,
-        8.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        89,
-        12,
-        3,
-        2.99,
-        0.0,
-        8.99,
-        20.0
-    ),
-    (
-        89,
-        13,
-        3,
-        2.99,
-        0.0,
-        3.99,
-        5.5
-    ),
-    (
-        90,
-        14,
-        1,
-        12.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        90,
-        15,
-        1,
-        7.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        91,
-        16,
-        2,
-        4.99,
-        0.0,
-        14.99,
-        20.0
-    ),
-    (
-        91,
-        17,
-        2,
-        3.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        91,
-        18,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        92,
-        19,
-        3,
-        14.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        92,
-        20,
-        3,
-        3.99,
-        0.0,
-        7.99,
-        20.0
-    ),
-    (
-        93,
-        21,
-        1,
-        5.99,
-        0.0,
-        29.99,
-        20.0
-    ),
-    (
-        93,
-        22,
-        1,
-        2.99,
-        0.0,
-        12.99,
-        20.0
-    ),
-    (
-        93,
-        23,
-        1,
-        3.99,
-        0.0,
-        8.99,
-        20.0
-    ),
-    (
-        94,
-        24,
-        2,
-        4.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        94,
-        25,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        95,
-        26,
-        3,
-        36.37,
-        0.0,
-        5.78,
-        10.0
-    ),
-    (
-        95,
-        27,
-        3,
-        21.37,
-        0.0,
-        8.8,
-        20.0
-    ),
-    (
-        95,
-        28,
-        3,
-        4.92,
-        0.0,
-        5.71,
-        10.0
-    ),
-    (
-        96,
-        29,
-        1,
-        15.77,
-        0.0,
-        8.28,
-        20.0
-    ),
-    (
-        96,
-        30,
-        1,
-        17.02,
-        0.0,
-        7.92,
-        20.0
-    ),
-    (
-        97,
-        31,
-        2,
-        60.35,
-        0.0,
-        7.22,
-        2.1
-    ),
-    (
-        97,
-        32,
-        2,
-        2.75,
-        0.0,
-        8.8,
-        2.1
-    ),
-    (
-        97,
-        33,
-        2,
-        7.43,
-        0.0,
-        13.58,
-        20.0
-    ),
-    (
-        98,
-        34,
-        3,
-        4.53,
-        0.0,
-        9.4,
-        5.5
-    ),
-    (
-        98,
-        35,
-        3,
-        16.23,
-        0.0,
-        10.94,
-        5.5
-    ),
-    (
-        99,
-        36,
-        1,
-        50.95,
-        0.0,
-        6.09,
-        20.0
-    ),
-    (
-        99,
-        37,
-        1,
-        21.13,
-        0.0,
-        5.64,
-        10.0
-    ),
-    (
-        99,
-        38,
-        1,
-        13.55,
-        0.0,
-        11.56,
-        20.0
-    ),
-    (
-        100,
-        39,
-        2,
-        36.49,
-        0.0,
-        13.31,
-        20.0
-    ),
-    (
-        100,
-        40,
-        2,
-        5.4,
-        0.0,
-        5.02,
-        2.1
-    ),
-    (
-        101,
-        41,
-        3,
-        11.47,
-        0.0,
-        5.45,
-        20.0
-    ),
-    (
-        101,
-        42,
-        3,
-        18.96,
-        0.0,
-        10.57,
-        5.5
-    ),
-    (
-        101,
-        43,
-        3,
-        6.7,
-        0.0,
-        5.08,
-        20.0
-    ),
-    (
-        102,
-        44,
-        1,
-        6.18,
-        0.0,
-        9.89,
-        20.0
-    ),
-    (
-        102,
-        45,
-        1,
-        30.23,
-        0.0,
-        6.9,
-        5.5
-    ),
-    (
-        103,
-        46,
-        2,
-        15.74,
-        0.0,
-        8.98,
-        20.0
-    ),
-    (
-        103,
-        47,
-        2,
-        45.09,
-        0.0,
-        8.28,
-        10.0
-    ),
-    (
-        103,
-        48,
-        2,
-        25.65,
-        0.0,
-        12.3,
-        5.5
-    ),
-    (
-        104,
-        49,
-        3,
-        170.27,
-        0.0,
-        8.15,
-        20.0
-    ),
-    (
-        104,
-        50,
-        3,
-        62.75,
-        0.0,
-        12.59,
-        20.0
-    ),
-    (
-        105,
-        51,
-        1,
-        15.33,
-        0.0,
-        6.04,
-        5.5
-    ),
-    (
-        105,
-        52,
-        1,
-        3.23,
-        0.0,
-        10.97,
-        5.5
-    ),
-    (
-        105,
-        53,
-        1,
-        13.67,
-        0.0,
-        10.54,
-        20.0
-    ),
-    (
-        106,
-        54,
-        2,
-        13.69,
-        0.0,
-        12.16,
-        5.5
-    ),
-    (
-        106,
-        55,
-        2,
-        37.85,
-        0.0,
-        12.65,
-        2.1
-    ),
-    (
-        107,
-        56,
-        3,
-        51.36,
-        0.0,
-        7.24,
-        2.1
-    ),
-    (
-        107,
-        57,
-        3,
-        5.55,
-        0.0,
-        12.56,
-        2.1
-    ),
-    (
-        107,
-        58,
-        3,
-        73.48,
-        0.0,
-        8.45,
-        20.0
-    ),
-    (
-        108,
-        59,
-        1,
-        167.42,
-        0.0,
-        11.26,
-        2.1
-    ),
-    (
-        108,
-        60,
-        1,
-        61.58,
-        0.0,
-        11.11,
-        2.1
-    ),
-    (
-        109,
-        61,
-        2,
-        35.65,
-        0.0,
-        7.95,
-        2.1
-    ),
-    (
-        109,
-        62,
-        2,
-        19.84,
-        0.0,
-        13.62,
-        10.0
-    ),
-    (
-        109,
-        63,
-        2,
-        51.2,
-        0.0,
-        10.45,
-        5.5
-    ),
-    (
-        110,
-        64,
-        3,
-        47.48,
-        0.0,
-        5.92,
-        20.0
-    ),
-    (
-        110,
-        65,
-        3,
-        89.39,
-        0.0,
-        10.72,
-        2.1
-    ),
-    (
-        111,
-        66,
-        1,
-        148.16,
-        0.0,
-        13.41,
-        10.0
-    ),
-    (
-        111,
-        67,
-        1,
-        50.09,
-        0.0,
-        11.31,
-        20.0
-    ),
-    (
-        111,
-        68,
-        1,
-        102.77,
-        0.0,
-        11.23,
-        2.1
-    ),
-    (
-        112,
-        69,
-        2,
-        61.2,
-        0.0,
-        7.84,
-        10.0
-    ),
-    (
-        112,
-        70,
-        2,
-        167.37,
-        0.0,
-        5.13,
-        20.0
-    ),
-    (
-        113,
-        71,
-        3,
-        118.5,
-        0.0,
-        13.69,
-        20.0
-    ),
-    (
-        113,
-        72,
-        3,
-        116.38,
-        0.0,
-        10.02,
-        2.1
-    ),
-    (
-        113,
-        73,
-        3,
-        21.38,
-        0.0,
-        10.63,
-        10.0
-    ),
-    (
-        114,
-        74,
-        1,
-        140.29,
-        0.0,
-        11.36,
-        10.0
-    ),
-    (
-        114,
-        75,
-        1,
-        181.69,
-        0.0,
-        7.77,
-        2.1
-    ),
-    (
-        115,
-        76,
-        2,
-        103.33,
-        0.0,
-        11.61,
-        20.0
-    ),
-    (
-        115,
-        77,
-        2,
-        133.14,
-        0.0,
-        10.71,
-        2.1
-    ),
-    (
-        115,
-        78,
-        2,
-        141.1,
-        0.0,
-        11.84,
-        5.5
-    ),
-    (
-        116,
-        79,
-        3,
-        11.55,
-        0.0,
-        10.6,
-        20.0
-    ),
-    (
-        116,
-        80,
-        3,
-        101.61,
-        0.0,
-        7.15,
-        2.1
-    ),
-    (
-        117,
-        81,
-        1,
-        145.44,
-        0.0,
-        9.34,
-        10.0
-    ),
-    (
-        117,
-        82,
-        1,
-        5.31,
-        0.0,
-        7.4,
-        2.1
-    ),
-    (
-        117,
-        83,
-        1,
-        11.71,
-        0.0,
-        13.83,
-        10.0
-    ),
-    (
-        118,
-        84,
-        2,
-        19.76,
-        0.0,
-        5.33,
-        20.0
-    ),
-    (
-        118,
-        85,
-        2,
-        133.75,
-        0.0,
-        7.39,
-        20.0
-    ),
-    (
-        119,
-        86,
-        3,
-        14.37,
-        0.0,
-        11.72,
-        20.0
-    ),
-    (
-        119,
-        87,
-        3,
-        20.61,
-        0.0,
-        9.78,
-        10.0
-    ),
-    (
-        119,
-        88,
-        3,
-        37.05,
-        0.0,
-        11.0,
-        5.5
-    ),
-    (
-        120,
-        89,
-        1,
-        90.19,
-        0.0,
-        13.99,
-        10.0
-    ),
-    (
-        120,
-        90,
-        1,
-        13.41,
-        0.0,
-        12.0,
-        5.5
-    ),
-    (
-        121,
-        91,
-        2,
-        18.74,
-        0.0,
-        5.3,
-        5.5
-    ),
-    (
-        121,
-        92,
-        2,
-        18.65,
-        0.0,
-        9.34,
-        2.1
-    ),
-    (
-        121,
-        93,
-        2,
-        4.57,
-        0.0,
-        11.06,
-        5.5
-    ),
-    (
-        122,
-        94,
-        3,
-        51.84,
-        0.0,
-        11.31,
-        20.0
-    ),
-    (
-        122,
-        95,
-        3,
-        35.64,
-        0.0,
-        11.27,
-        20.0
-    ),
-    (
-        123,
-        96,
-        1,
-        189.65,
-        0.0,
-        9.9,
-        2.1
-    ),
-    (
-        123,
-        97,
-        1,
-        122.86,
-        0.0,
-        13.9,
-        20.0
-    ),
-    (
-        123,
-        98,
-        1,
-        15.05,
-        0.0,
-        6.3,
-        20.0
-    ),
-    (
-        124,
-        99,
-        2,
-        12.98,
-        0.0,
-        9.73,
-        5.5
-    ),
-    (
-        124,
-        100,
-        2,
-        1.75,
-        0.0,
-        13.68,
-        2.1
-    ),
-    (
-        125,
-        101,
-        3,
-        38.04,
-        0.0,
-        9.94,
-        5.5
-    ),
-    (
-        125,
-        102,
-        3,
-        77.85,
-        0.0,
-        8.74,
-        5.5
-    ),
-    (
-        125,
-        103,
-        3,
-        27.62,
-        0.0,
-        6.17,
-        5.5
-    ),
-    (
-        126,
-        104,
-        1,
-        3.48,
-        0.0,
-        6.39,
-        5.5
-    ),
-    (
-        126,
-        105,
-        1,
-        4.19,
-        0.0,
-        5.24,
-        20.0
-    ),
-    (
-        127,
-        1,
-        2,
-        3.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        127,
-        2,
-        2,
-        8.99,
-        0.0,
-        9.99,
-        20.0
-    ),
-    (
-        127,
-        3,
-        2,
-        4.99,
-        0.0,
-        3.99,
-        20.0
-    ),
-    (
-        128,
-        4,
-        3,
-        0.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        128,
-        5,
-        3,
-        39.99,
-        0.0,
-        4.99,
-        20.0
-    ),
-    (
-        129,
         6,
-        1,
-        4.99,
-        0.0,
-        5.99,
-        10.0
-    ),
-    (
-        129,
-        7,
-        1,
-        69.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        129,
-        8,
-        1,
-        8.99,
-        0.0,
-        3.99,
-        20.0
-    ),
-    (
-        130,
         9,
         2,
-        7.99,
+        89.99,
         0.0,
         5.99,
         20.0
     ),
     (
-        130,
+        7,
         10,
-        2,
-        3.99,
+        1,
+        299.99,
         0.0,
         7.99,
         20.0
     ),
     (
-        131,
+        8,
         11,
-        3,
-        8.99,
+        1,
+        29.99,
         0.0,
         4.99,
         20.0
     ),
     (
-        131,
-        12,
-        3,
-        2.99,
+        8,
+        13,
+        1,
+        24.99,
         0.0,
-        8.99,
+        3.99,
         20.0
     ),
     (
-        131,
-        13,
-        3,
-        2.99,
-        0.0,
-        3.99,
-        5.5
-    ),
-    (
-        132,
+        8,
         14,
         1,
-        12.99,
+        34.99,
         0.0,
         5.99,
         20.0
-    ),
-    (
-        132,
-        15,
-        1,
-        7.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        133,
-        16,
-        2,
-        4.99,
-        0.0,
-        14.99,
-        20.0
-    ),
-    (
-        133,
-        17,
-        2,
-        3.99,
-        0.0,
-        5.99,
-        20.0
-    ),
-    (
-        133,
-        18,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        134,
-        19,
-        3,
-        14.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        134,
-        20,
-        3,
-        3.99,
-        0.0,
-        7.99,
-        20.0
-    ),
-    (
-        135,
-        21,
-        1,
-        5.99,
-        0.0,
-        29.99,
-        20.0
-    ),
-    (
-        135,
-        22,
-        1,
-        2.99,
-        0.0,
-        12.99,
-        20.0
-    ),
-    (
-        135,
-        23,
-        1,
-        3.99,
-        0.0,
-        8.99,
-        20.0
-    ),
-    (
-        136,
-        24,
-        2,
-        4.99,
-        0.0,
-        19.99,
-        20.0
-    ),
-    (
-        136,
-        25,
-        2,
-        4.99,
-        0.0,
-        6.99,
-        20.0
-    ),
-    (
-        137,
-        26,
-        3,
-        36.37,
-        0.0,
-        5.78,
-        10.0
-    ),
-    (
-        137,
-        27,
-        3,
-        21.37,
-        0.0,
-        8.8,
-        20.0
-    ),
-    (
-        137,
-        28,
-        3,
-        4.92,
-        0.0,
-        5.71,
-        10.0
-    ),
-    (
-        138,
-        29,
-        1,
-        15.77,
-        0.0,
-        8.28,
-        20.0
-    ),
-    (
-        138,
-        30,
-        1,
-        17.02,
-        0.0,
-        7.92,
-        20.0
-    ),
-    (
-        139,
-        31,
-        2,
-        60.35,
-        0.0,
-        7.22,
-        2.1
-    ),
-    (
-        139,
-        32,
-        2,
-        2.75,
-        0.0,
-        8.8,
-        2.1
-    ),
-    (
-        139,
-        33,
-        2,
-        7.43,
-        0.0,
-        13.58,
-        20.0
-    ),
-    (
-        140,
-        34,
-        3,
-        4.53,
-        0.0,
-        9.4,
-        5.5
-    ),
-    (
-        140,
-        35,
-        3,
-        16.23,
-        0.0,
-        10.94,
-        5.5
-    ),
-    (
-        141,
-        36,
-        1,
-        50.95,
-        0.0,
-        6.09,
-        20.0
-    ),
-    (
-        141,
-        37,
-        1,
-        21.13,
-        0.0,
-        5.64,
-        10.0
-    ),
-    (
-        141,
-        38,
-        1,
-        13.55,
-        0.0,
-        11.56,
-        20.0
-    ),
-    (
-        142,
-        39,
-        2,
-        36.49,
-        0.0,
-        13.31,
-        20.0
-    ),
-    (
-        142,
-        40,
-        2,
-        5.4,
-        0.0,
-        5.02,
-        2.1
-    ),
-    (
-        143,
-        41,
-        3,
-        11.47,
-        0.0,
-        5.45,
-        20.0
-    ),
-    (
-        143,
-        42,
-        3,
-        18.96,
-        0.0,
-        10.57,
-        5.5
-    ),
-    (
-        143,
-        43,
-        3,
-        6.7,
-        0.0,
-        5.08,
-        20.0
-    ),
-    (
-        144,
-        44,
-        1,
-        6.18,
-        0.0,
-        9.89,
-        20.0
-    ),
-    (
-        144,
-        45,
-        1,
-        30.23,
-        0.0,
-        6.9,
-        5.5
-    ),
-    (
-        145,
-        46,
-        2,
-        15.74,
-        0.0,
-        8.98,
-        20.0
-    ),
-    (
-        145,
-        47,
-        2,
-        45.09,
-        0.0,
-        8.28,
-        10.0
-    ),
-    (
-        145,
-        48,
-        2,
-        25.65,
-        0.0,
-        12.3,
-        5.5
-    ),
-    (
-        146,
-        49,
-        3,
-        170.27,
-        0.0,
-        8.15,
-        20.0
-    ),
-    (
-        146,
-        50,
-        3,
-        62.75,
-        0.0,
-        12.59,
-        20.0
-    ),
-    (
-        147,
-        51,
-        1,
-        15.33,
-        0.0,
-        6.04,
-        5.5
-    ),
-    (
-        147,
-        52,
-        1,
-        3.23,
-        0.0,
-        10.97,
-        5.5
-    ),
-    (
-        147,
-        53,
-        1,
-        13.67,
-        0.0,
-        10.54,
-        20.0
-    ),
-    (
-        148,
-        54,
-        2,
-        13.69,
-        0.0,
-        12.16,
-        5.5
-    ),
-    (
-        148,
-        55,
-        2,
-        37.85,
-        0.0,
-        12.65,
-        2.1
-    ),
-    (
-        149,
-        56,
-        3,
-        51.36,
-        0.0,
-        7.24,
-        2.1
-    ),
-    (
-        149,
-        57,
-        3,
-        5.55,
-        0.0,
-        12.56,
-        2.1
-    ),
-    (
-        149,
-        58,
-        3,
-        73.48,
-        0.0,
-        8.45,
-        20.0
-    ),
-    (
-        150,
-        59,
-        1,
-        167.42,
-        0.0,
-        11.26,
-        2.1
-    ),
-    (
-        150,
-        60,
-        1,
-        61.58,
-        0.0,
-        11.11,
-        2.1
     );
 
--- 21. GÉNÉRATION DES FACTURES (Calculées sur le contenu réel)
+-- 20. FACTURES
 INSERT INTO
-    cobrec1._facture (
+    _facture (
         id_panier,
         id_adresse,
         f_total_ht,
         f_total_remise,
         f_total_ttc
     )
-SELECT id_panier, 1, SUM(
-        (quantite * prix_unitaire) + frais_de_port - remise_unitaire
-    ), SUM(remise_unitaire), SUM(
-        (
-            (quantite * prix_unitaire) + frais_de_port - remise_unitaire
-        ) * (1 + TVA / 100)
-    )
-FROM cobrec1._contient
-GROUP BY
-    id_panier;
+VALUES (1, 1, 755.98, 0.0, 907.18),
+    (2, 1, 103.96, 0.0, 124.75),
+    (3, 1, 909.98, 0.0, 1091.98),
+    (5, 1, 248.97, 0.0, 298.76),
+    (6, 1, 185.97, 0.0, 223.16),
+    (8, 1, 95.96, 0.0, 115.15);
 
--- GÉNÉRATION DES PAIEMENTS
+-- 21. PAIEMENTS
 INSERT INTO
-    cobrec1._paiement (
+    _paiement (
         id_facture,
         mode_paiement,
-        timestamp_paiement,
         numero_carte,
         mois_annee_expiration,
-        cryptogramme_carte
+        cryptogramme_carte,
+        timestamp_paiement
     )
-SELECT f.id_facture, 'CB', pc.timestamp_commande + INTERVAL '3 minutes', '4970' || LPAD(f.id_facture::text, 12, '0'), '12/28', '123'
-FROM cobrec1._facture f
-    JOIN cobrec1._panier_commande pc ON f.id_panier = pc.id_panier;
--- Reset
-UPDATE cobrec1._produit SET p_nb_ventes = 0;
-
--- Update basé sur les commandes réelles
-UPDATE cobrec1._produit p
-SET
-    p_nb_ventes = sub.total
-FROM (
-        SELECT c.id_produit, SUM(c.quantite) as total
-        FROM cobrec1._contient c
-            JOIN cobrec1._panier_commande pc ON c.id_panier = pc.id_panier
-        WHERE
-            pc.timestamp_commande IS NOT NULL
-        GROUP BY
-            c.id_produit
-    ) AS sub
-WHERE
-    p.id_produit = sub.id_produit;
+VALUES (
+        1,
+        'CB',
+        '1234567890123456',
+        '12/27',
+        '123',
+        '2025-11-01 10:35:00'
+    ),
+    (
+        2,
+        'CB',
+        '6543210987654321',
+        '06/26',
+        '456',
+        '2025-11-02 14:50:00'
+    ),
+    (
+        3,
+        'CB',
+        '1111222233334444',
+        '03/28',
+        '789',
+        '2025-11-03 09:20:00'
+    ),
+    (
+        4,
+        'CB',
+        '9999888877776666',
+        '09/27',
+        '321',
+        '2025-11-04 16:25:00'
+    ),
+    (
+        5,
+        'CB',
+        '5555666677778888',
+        '11/26',
+        '654',
+        '2025-11-05 11:05:00'
+    ),
+    (
+        6,
+        'CB',
+        '4444333322221111',
+        '08/27',
+        '987',
+        '2025-11-06 13:35:00'
+    );
 
 -- 22. LIVRAISONS
 INSERT INTO
@@ -7998,7 +4236,8 @@ LIMIT (
 -- Insère les avis dans _avis et stocke les lignes insérées dans une table temporaire pour réutilisation
 DROP TABLE IF EXISTS temp_new_avis;
 
-CREATE TEMP TABLE temp_new_avis (
+CREATE TEMP
+TABLE temp_new_avis (
     id_avis int,
     id_produit int,
     id_client int
@@ -8213,3 +4452,4 @@ CREATE TABLE _bordereau (
     etat_suivis int NOT NULL,
     mode_livraison TEXT
 );
+

@@ -236,6 +236,9 @@
 
         <?php endif;?>
     </section>
+    <section class="lesFavoris">
+            
+    </section>
 
 
 </body>
