@@ -3,10 +3,32 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 html {
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #7171A3 0%, #030212 100%);
+  background: linear-gradient(135deg, var(--primary-bleu) 0%, #030212 100%);
   font-family: "Quicksand", sans-serif;
   display: flex;
   justify-content: center;
@@ -59,7 +81,7 @@ a {
 }
 .infoPaiement p {
   background-color: #FEE9E8;
-  color: #D4183D;
+  color: var(--semantic-rouge);
   margin-top: 0.5em;
   padding: 0.7em;
   border-radius: 14px;
@@ -93,7 +115,7 @@ a {
   flex-direction: column;
 }
 .infoPaiement .checkBox input[type=checkbox] {
-  accent-color: #7171A3;
+  accent-color: var(--primary-bleu);
   cursor: pointer;
   height: 1.4em;
   width: 1.4em;
@@ -111,7 +133,7 @@ a {
   text-align: center;
 }
 .infoPaiement button:hover {
-  background-color: #7171A3;
+  background-color: var(--primary-bleu);
 }
 .infoPaiement select {
   background-color: white;
@@ -148,7 +170,7 @@ a {
 .modal-content h2 {
   margin: 0 0 12px 0;
   font-size: 20px;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 
 .modal-actions {
@@ -189,12 +211,12 @@ a {
   font-size: 16px;
   margin-top: 16px;
   margin-bottom: 8px;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 #cgvModal .cgv-content p {
   margin-bottom: 12px;
 }
 
 .checkBox div label a {
-  color: #7171A3;
+  color: var(--primary-bleu);
 }/*# sourceMappingURL=styleFinaliserCommande.css.map */

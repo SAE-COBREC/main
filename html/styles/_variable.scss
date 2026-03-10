@@ -1,17 +1,17 @@
 // Primary Colors
 $primary-color-blanc: #FFFFFF;
 $primary-color-noir: #030212;
-$primary-color-bleu: #7171A3;
-$primary-color-bronze: #CD7F32;
+$primary-color-bleu: var(--primary-bleu);
+$primary-color-bronze: var(--primary-bronze);
 
 // Secondary Colors
-$secondary-color-rouge: #D4183D;
+$secondary-color-rouge: var(--semantic-rouge);
 $secondary-color-rouge-erreur: #FEE9E8;
 
 $secondary-color-gris-fonce: #c0c0c0;
 $secondary-color-gris-clair: #EFEFEF;
 
-$secondary-color-jaune: #DDCA00;
+$secondary-color-jaune: var(--semantic-jaune);
 $secondary-color-creme: #F9E7CF;
 $secondary-color-marron: #8B5A2B;
 
@@ -27,12 +27,12 @@ $secondary-color-erreur: #721c24;
 $secondary-color-bordure: #FFFFFF;
 
 $secondary-color-bleu-clair: #F0F4F8;
-$secondary-color-vert-succes: #155724;
-$secondary-color-vert-succes-fond: #28A745;
+$secondary-color-vert-succes: var(--semantic-success);
+$secondary-color-vert-succes-fond: var(--semantic-success-bg);
 $secondary-color-vert-fond: #D4EDDA;
 $secondary-color-jaune-avertissement: #856404;
 $secondary-color-jaune-fond: #FFF3CD;
-$secondary-color-bleu-info: #0C5460;
+$secondary-color-bleu-info: var(--semantic-info);
 $secondary-color-bleu-info-fond: #D1ECF1;
 $secondary-color-promotion: #e4e4f5;
 
@@ -57,4 +57,36 @@ $vendeur-padding-main: 32px 40px;
 
 * {
     margin: 0;
+}
+
+:root {
+    --primary-bleu: #7171A3;
+    --primary-bronze: #CD7F32;
+    
+    --semantic-success: #155724;
+    --semantic-success-bg: #28A745;
+    --semantic-rouge: #D4183D;
+    --semantic-jaune: #DDCA00;
+    --semantic-info: #0C5460;
+}
+
+// --- MODE PROTANOPIE / DEUTÉRANOPIE (Le plus commun : Vert/Rouge) ---
+[data-theme="dalto-red-green"] {
+    --semantic-success: #005AB5; 
+    --semantic-success-bg: #0072B2;
+    
+    // Le rouge devient un orange vermillon très contrasté
+    --semantic-rouge: #D55E00;
+    
+    // Le jaune devient un jaune très clair ou crème pour trancher
+    --semantic-jaune: #F0E442;
+}
+
+// --- MODE TRITANOPIE (Rare : Bleu/Jaune) ---
+[data-theme="dalto-blue-yellow"] {
+    // Le bleu devient un vert bleuté
+    --primary-bleu: #009E73;
+    
+    // Le jaune devient un rose/violet
+    --semantic-jaune: #CC79A7;
 }

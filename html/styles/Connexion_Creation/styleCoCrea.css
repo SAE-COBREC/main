@@ -3,6 +3,28 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 * {
   font-family: "Quicksand", sans-serif;
 }
@@ -50,7 +72,7 @@ body.centered {
 .card input[type=checkbox] {
   width: 20px;
   height: 20px;
-  accent-color: #7171A3;
+  accent-color: var(--primary-bleu);
   padding: 0;
   margin: 0;
 }
@@ -144,8 +166,8 @@ body.centered {
 }
 .card input:focus {
   outline: none;
-  border-color: #7171A3;
-  box-shadow: 0 0 4px #7171A3;
+  border-color: var(--primary-bleu);
+  box-shadow: 0 0 4px var(--primary-bleu);
 }
 .card input#codeP {
   width: 140px;
@@ -183,7 +205,7 @@ body.centered {
 .card .prev-btn {
   width: 100%;
   background: transparent;
-  color: #D4183D;
+  color: var(--semantic-rouge);
   font-size: 18px;
   padding: 8px 0;
   border-radius: 14px;
@@ -327,7 +349,7 @@ body.centered {
 .modal-content h2 {
   margin: 0 0 12px 0;
   font-size: 20px;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 
 .summary-body dl {
@@ -501,7 +523,7 @@ body.centered {
   width: 20px;
   height: 20px;
   margin-right: 6px;
-  accent-color: #7171A3;
+  accent-color: var(--primary-bleu);
 }
 @media screen and (max-width: 508px) {
   .radio-group {
@@ -525,7 +547,7 @@ body.centered {
   padding-left: 0;
 }
 .card label:has(input#cgv) a, .card label:has(input#a2f) a {
-  color: #7171A3;
+  color: var(--primary-bleu);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -554,7 +576,7 @@ body.centered {
   font-size: 16px;
   margin-top: 16px;
   margin-bottom: 8px;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 #cgvModal .cgv-content p {
   margin-bottom: 12px;

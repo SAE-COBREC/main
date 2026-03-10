@@ -2,6 +2,28 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -130,7 +152,7 @@ main form section article input[type=datetime-local]:focus,
 main form section article textarea:focus,
 main form section article select:focus {
   outline: none;
-  border-color: #CD7F32;
+  border-color: var(--primary-bronze);
   background: #FFFFFF;
 }
 main form section article textarea {
@@ -140,11 +162,11 @@ main form section article textarea {
 main form section article small {
   display: block;
   margin-top: 4px;
-  color: #CD7F32;
+  color: var(--primary-bronze);
   font-size: 13px;
 }
 main form section article .warn {
-  color: #D4183D;
+  color: var(--semantic-rouge);
   font-weight: 700;
 }
 main form section:has(#photo\[\]) article small:has(img) {
@@ -164,7 +186,7 @@ main form section:has(#photo\[\]) article small:has(img) img {
   height: 90px;
 }
 main form section:has(#photo\[\]) article small:has(img) input[type=submit][name^=btn_moins] {
-  background: #D4183D;
+  background: var(--semantic-rouge);
   border: none;
   width: 26px;
   height: 26px;
@@ -192,7 +214,7 @@ main form input[type=submit].orange,
 main form input[type=submit][name=publier],
 main form input[type=submit][name=enLigne],
 main form input[type=submit][name=sauvegarder] {
-  background: #CD7F32;
+  background: var(--primary-bronze);
   color: #FFFFFF;
   border: none;
   font-weight: 600;
@@ -202,7 +224,7 @@ main form input[type=submit].orange:hover,
 main form input[type=submit][name=publier]:hover,
 main form input[type=submit][name=enLigne]:hover,
 main form input[type=submit][name=sauvegarder]:hover {
-  background: rgba(205, 127, 50, 0.9);
+  background: rgba(var(--primary-bronze), 0.9);
 }
 main form input[type=button]:disabled,
 main form input[type=submit]:disabled {
@@ -212,5 +234,5 @@ main form input[type=submit]:disabled {
 
 input[style*="border: 3px solid red"],
 section[style*="border: 3px solid red"] {
-  border: 2.5px solid #D4183D !important;
+  border: 2.5px solid var(--semantic-rouge) !important;
 }/*# sourceMappingURL=creerArticle.css.map */

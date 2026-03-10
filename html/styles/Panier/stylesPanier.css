@@ -2,6 +2,28 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 html {
   font-family: "Quicksand", sans-serif;
 }
@@ -46,7 +68,7 @@ button {
 }
 
 .unArticleP {
-  border: 1px solid #7171A3;
+  border: 1px solid var(--primary-bleu);
   width: 960px;
   height: -moz-fit-content;
   height: fit-content;
@@ -112,7 +134,7 @@ button {
   gap: 0.8em;
 }
 .unArticleP .basArticleP p {
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-weight: bold;
 }
 @media screen and (max-width: 428px) {
