@@ -1407,6 +1407,7 @@ function trierProduits($listeProduits, $tri_par)
 function filtrerProduits($pdo, $listeProduits, $filtres, $idClient)
 {   
     $produits_filtres = [];
+    $idsProduits = [];
     if (isset($idClient)){
         $pdo->exec("SET search_path TO cobrec1");
         $requeteFav = "
@@ -1453,7 +1454,6 @@ function filtrerProduits($pdo, $listeProduits, $filtres, $idClient)
             if (!in_array($filtres['categorieFiltre'], $categoriesProduit))
                 continue;
         }
-        echo in_array($produitCourant['id_produit'], $idsProduits);
         if ($filtres['enStockSeulement'] && ($produitCourant['p_stock'] ?? 0) <= 0)
             continue;
         if ($filtres['enFavorisSeulement'] && !(in_array($produitCourant['id_produit'], $idsProduits)))
