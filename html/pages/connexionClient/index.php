@@ -17,12 +17,6 @@ $pdo->exec("SET search_path TO cobrec1");
                 //cas ou aucune valeur n'est entrée
                 if (el.validity.valueMissing) return 'Ce champ est requis.';
 
-                // Vérification d'âge
-                if (el.id === 'naissance') {
-                    if (el.validity.customError) {
-                        return el.validationMessage;
-                    }
-                }
                 //verification du mdp
                 if (el.id === 'mdp') {
                     var val = (el.value || '').trim();
@@ -39,7 +33,6 @@ $pdo->exec("SET search_path TO cobrec1");
                 //verif des REGEX
                 if (el.validity.patternMismatch) {
                     if (el.type === 'email') return 'Veuillez saisir une adresse e-mail valide.';
-                    if (el.id === 'telephone') return 'Le numéro de téléphone n\'a pas le bon format.';
                     if (el.id === 'codeP') return 'Le code postal est incorrecte.';
                     return 'Le format de ce champ est invalide.';
                 }
@@ -78,20 +71,26 @@ $pdo->exec("SET search_path TO cobrec1");
 </head>
 
 <?php
+try {
+    //récuperation des données de compte
+    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_OTP, etat_OTP FROM _compte WHERE email = :login");
+    $stmt->execute([':login' => $login]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $hasError = true;
+    $error_card = 1;
+    $error_message = 'Erreur lors de la vérification des identifiants.';
+  }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
+  $otp_saisi = $_POST['otp'] ?? '';
 
   $hasError = false;
   $error_card = null;
   $error_message = '';
   
-  try {
-
-    //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :login");
-    $stmt->execute([':login' => $login]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+  try{
     //verification que l'aresse mail existe dans la bdd
     if (!$row) {
       $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
@@ -107,10 +106,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       //verification que le mdp corespondant a ce mail existe
-      if (!password_verify($mdp, $row['mdp'])) {
+      if (!password_verify($mdp, $row['mdp']) && ($row['etat_OTP'] == 'false')) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
+      } else if ($row['etat_OTP'] == 'true'){
+        $otp = TOTP::createFromSecret($row['secret_OTP']);
+        if ($otp->now() != $otp_saisi){
+            $hasError = true;
+            $error_card = 1;
+            $error_message = 'Adresse mail, pseudo ou code OTP incorrecte.';
+        }
       } else {
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
@@ -190,11 +196,18 @@ body {
             </div>
 
             <div>
+                <?php if ($row['etat_OTP'] == 'false'){ ?>
                 <label for="mdp">Mot de passe</label>
                 <input type="password" id="mdp" name="mdp" placeholder="***********" required>
+                <?php } else {?>
+                    <label for="otp">Code OTP</label>
+                    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP" required/>
+                <?php } ?>
             </div>
+            <?php if ($row['etat_OTP'] == 'false'){ ?>
             <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?
             </div>
+            <?php } ?>
             <!-- affichage des erreurs de saisi -->
             <div class="error">
                 <?php if (isset($hasError) && $hasError && $error_card == 1): ?>

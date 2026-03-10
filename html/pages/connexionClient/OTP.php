@@ -19,7 +19,13 @@ use OTPHP\TOTP;
 // You should store the secret with the user for verification.
 $otp = TOTP::generate();
 
-$otp = $otp->withLabel('Alizon');
+if (!empty($donneesInformationsClient['c_pseudo'])){
+    $otp = $otp->withLabel('Alizon - ' . $donneesInformationsClient['c_pseudo']);
+}else if (!empty($_POST['pseudo'])){
+    $otp = $otp->withLabel('Alizon - ' . $_POST['pseudo']);
+}else{
+    $otp = $otp->withLabel('Alizon');
+}
 $grCodeUri = $otp->getQrCodeUri(
     'https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M',
     '[DATA]'
