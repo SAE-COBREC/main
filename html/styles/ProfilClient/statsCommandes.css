@@ -2,6 +2,28 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -22,7 +44,7 @@ main > div > a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #7171A3;
+  color: var(--primary-bleu);
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: 600;
@@ -30,7 +52,7 @@ main > div > a {
   transition: color 0.2s;
 }
 main > div > a:hover {
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 main > div > a svg {
   width: 18px;
@@ -44,7 +66,7 @@ main > div > div:nth-child(2) h1 {
 }
 main > div > div:nth-child(2) p {
   margin: 0 0 32px;
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-size: 0.95rem;
 }
 main > div > div:nth-child(2) {
@@ -82,39 +104,39 @@ main > div > div:nth-child(3) > div > label {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 main > div > div:nth-child(3) > div > select {
   height: 40px;
   padding: 0 12px;
-  border: 1.5px solid #7171A3;
+  border: 1.5px solid var(--primary-bleu);
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.9rem;
-  background: #7171A315;
+  background: var(--primary-bleu)15;
   color: #030212;
   cursor: pointer;
   transition: border-color 0.2s;
   outline: none;
 }
 main > div > div:nth-child(3) > div > select:focus {
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
 }
 main > div > div:nth-child(3) input[type=date] {
   height: 40px;
   padding: 0 12px;
-  border: 1.5px solid #7171A3;
+  border: 1.5px solid var(--primary-bleu);
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.9rem;
-  background: #7171A315;
+  background: var(--primary-bleu)15;
   color: #030212;
   cursor: pointer;
   transition: border-color 0.2s;
   outline: none;
 }
 main > div > div:nth-child(3) input[type=date]:focus {
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
 }
 main > div > div:nth-child(4) {
   display: grid;
@@ -137,10 +159,10 @@ main > div > div:nth-child(4) > div:hover {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 main > div > div:nth-child(4) > div:nth-child(2) {
-  border-left-color: #7171A3;
+  border-left-color: var(--primary-bleu);
 }
 main > div > div:nth-child(4) > div:nth-child(3) {
-  border-left-color: #28A745;
+  border-left-color: var(--semantic-success-bg);
 }
 main > div > div:nth-child(4) > div:nth-child(4) {
   border-left-color: #E6A96E;
@@ -150,7 +172,7 @@ main > div > div:nth-child(4) > div > span:nth-child(1) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 main > div > div:nth-child(4) > div > span:nth-child(2) {
   font-family: "Baloo", sans-serif;
@@ -208,7 +230,7 @@ main > div > div:nth-child(5) > div canvas {
   width: 44px;
   height: 44px;
   border: 4px solid #E5D5C5;
-  border-top-color: #7171A3;
+  border-top-color: var(--primary-bleu);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

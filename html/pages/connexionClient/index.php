@@ -17,12 +17,6 @@ $pdo->exec("SET search_path TO cobrec1");
                 //cas ou aucune valeur n'est entrée
                 if (el.validity.valueMissing) return 'Ce champ est requis.';
 
-                // Vérification d'âge
-                if (el.id === 'naissance') {
-                    if (el.validity.customError) {
-                        return el.validationMessage;
-                    }
-                }
                 //verification du mdp
                 if (el.id === 'mdp') {
                     var val = (el.value || '').trim();
@@ -39,7 +33,6 @@ $pdo->exec("SET search_path TO cobrec1");
                 //verif des REGEX
                 if (el.validity.patternMismatch) {
                     if (el.type === 'email') return 'Veuillez saisir une adresse e-mail valide.';
-                    if (el.id === 'telephone') return 'Le numéro de téléphone n\'a pas le bon format.';
                     if (el.id === 'codeP') return 'Le code postal est incorrecte.';
                     return 'Le format de ce champ est invalide.';
                 }
@@ -81,20 +74,20 @@ $pdo->exec("SET search_path TO cobrec1");
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
   $mdp = $_POST['mdp'] ?? '';
+  $otp_saisi = $_POST['otp'] ?? '';
 
   $hasError = false;
   $error_card = null;
   $error_message = '';
   
-  try {
-
+  try{
     //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :login");
+    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_OTP, etat_OTP FROM _compte WHERE email = :login");
     $stmt->execute([':login' => $login]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     //verification que l'aresse mail existe dans la bdd
     if (!$row) {
-      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
+      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp, c.secret_OTP, c.etat_OTP FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
       $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -107,11 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       //verification que le mdp corespondant a ce mail existe
-      if (!password_verify($mdp, $row['mdp'])) {
-        $hasError = true;
-        $error_card = 1;
-        $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
-      } else {
+      if (empty($row['secret_OTP'])){
+        $otp = '';
+      }else{
+        $otp = TOTP::createFromSecret($row['secret_OTP']);
+        $otp = $otp->now();
+      }
+
+      if (($row['etat_OTP'] == 'true' && $otp == $otp_saisi) || ($row['etat_OTP'] != 'true' && password_verify($mdp, $row['mdp']))){
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
@@ -135,6 +131,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
+      }else{
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
       }
     }
   //message en cas de probleme de verif dans le code
@@ -183,18 +183,59 @@ body {
             </div>
 
             <h1>Connexion</h1>
+            <div>
+                <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();" <?php 
+                if (!empty($_SESSION['OTP']['etatCheckbox'])){
+                    echo 'checked';
+                }
+                ?>
+                > Basculer sur le One Time Password (OTP)</label>
+            </div>
 
             <div>
                 <label for="email">Email/Pseudonyme</label>
                 <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
             </div>
 
-            <div>
+            <div class="mdpClassique">
                 <label for="mdp">Mot de passe</label>
                 <input type="password" id="mdp" name="mdp" placeholder="***********" required>
             </div>
-            <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?
+            <div>
+                <label for="otp">Code OTP</label>
+                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP"/>
             </div>
+            <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?</div>
+            <script>
+                const mdpOtp = document.querySelector(".mdpClassique + div");
+                mdpOtp.style.display = "none";
+                changer_OTP();
+                function changer_OTP() {
+                    const checkboxOtp = document.querySelector("#checkboxotp");
+                    const champOtp = document.querySelector(".mdpClassique + div > input");
+                    const mdpClassique = document.querySelector(".mdpClassique");
+                    const mdp = document.querySelector("#mdp");
+                    const forgot = document.querySelector(".forgot");
+                    if (checkboxOtp.checked) {
+                        mdpClassique.style.display = "none";
+                        forgot.style.display = "none";
+                        mdpOtp.style.display = "block";
+                        champOtp.setAttribute('required','');
+                        mdp.removeAttribute('required');
+                        
+                    }else{
+                        mdpClassique.style.display = "block";
+                        forgot.style.display = "block";
+                        mdpOtp.style.display = "none";
+                        champOtp.removeAttribute('required');
+                        mdp.setAttribute('required','');
+                    }
+
+                }
+            </script>
+
+
+
             <!-- affichage des erreurs de saisi -->
             <div class="error">
                 <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
@@ -221,6 +262,18 @@ body {
 
     <script>
     window.finishRegistration = function() {
+        
+        const xhttp3 = new XMLHttpRequest();
+        xhttp3.open("POST", "otp_co_checkbox.php", true);
+        xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        if (document.querySelector("#checkboxotp").checked){
+            xhttp3.send("etat_OTP=true");
+        }else{
+            xhttp3.send("etat_OTP=false");
+        }
+
+
+        
         console.log('[register] finishRegistration called');
         var form = document.getElementById('multiForm');
         if (!form) return; // Ne fini le formulaire que si il existe

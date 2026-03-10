@@ -19,7 +19,13 @@ use OTPHP\TOTP;
 // You should store the secret with the user for verification.
 $otp = TOTP::generate();
 
-$otp = $otp->withLabel('Alizon');
+if (!empty($donneesInformationsClient['c_pseudo'])){
+    $otp = $otp->withLabel('Alizon - ' . $donneesInformationsClient['c_pseudo']);
+}else if (!empty($_POST['pseudo'])){
+    $otp = $otp->withLabel('Alizon - ' . $_POST['pseudo']);
+}else{
+    $otp = $otp->withLabel('Alizon');
+}
 $grCodeUri = $otp->getQrCodeUri(
     'https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M',
     '[DATA]'
@@ -45,10 +51,10 @@ $result = $writer->write($qrCode, null, null);
 $writer->validateResult($result, $otp->getProvisioningUri());
 ?>
 <?php
-// try {//enregistrement du secret_A2F dans la BDD
+// try {//enregistrement du secret_OTP dans la BDD
 //     $sql = '
 //     UPDATE cobrec1._compte
-//     SET secret_A2F = :secret
+//     SET secret_OTP = :secret
 //     WHERE id_compte = :idCompte;
 //     ';
 //     $stmt = $pdo->prepare($sql);
@@ -58,7 +64,7 @@ $writer->validateResult($result, $otp->getProvisioningUri());
 //     ];
 //     $stmt->execute($params);
 // } catch (Exception $e) {}
-$_SESSION['A2F']['secret'] = $otp->getSecret();
+$_SESSION['OTP']['secret'] = $otp->getSecret();
 ?>
 <!-- <form id="a2form">
     <img src='<?php //echo $result->getDataUri() ?>' width="250em" height="250em">
@@ -91,13 +97,13 @@ $_SESSION['A2F']['secret'] = $otp->getSecret();
                 xhttp2.abort();
                 alert("Authentification à double facteur activée avec succès.");
                 //document.location.href = "/index.php"; 
-                document.getElementById('modalA2F').style.display = 'none';
+                document.getElementById('modalOTP').style.display = 'none';
 
                 const xhttp3 = new XMLHttpRequest();
                 xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
                 xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xhttp3.send("statutOTP=active");
-                succesA2F();
+                succesOTP();
                 //document.location.href = "/pages/connexionClient/index.php"; 
             }else{
                 alert("Echec. Veuillez réessayer.");

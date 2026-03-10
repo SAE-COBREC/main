@@ -16,7 +16,7 @@
                     //si premier passage
                     try {//Récupération des infos du produit
                         $sql = '
-                        SELECT id_produit, id_TVA, id_vendeur, p_nom, p_description, p_poids, p_volume, p_prix, p_stock, p_statut, p_origine FROM cobrec1._produit 
+                        SELECT id_produit, id_TVA, id_vendeur, p_nom, p_description, p_poids, p_volume, p_prix, p_stock, p_statut, p_seuil, p_origine FROM cobrec1._produit 
                         WHERE id_produit = :modifier;'
                         ;
                         $stmt = $pdo->prepare($sql);
@@ -141,6 +141,7 @@
                         $_POST["tva"] = $_SESSION["creerArticle"]['_GET']['id_tva'];
                         $_POST["categorie"] = $_SESSION["creerArticle"]['_GET']['id_categorie'];
                         $_POST["origine"] = $_SESSION["creerArticle"]['_GET']['p_origine'];
+                        $_POST["seuil"] = $_SESSION["creerArticle"]['_GET']['p_seuil'];
                         // $_POST["couleur"] =null;
                         $_POST["poids"] = $_SESSION["creerArticle"]['_GET']['p_poids'];
                         $_POST["volume"] = $_SESSION["creerArticle"]['_GET']['p_volume'];
@@ -311,6 +312,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
     $_POST["poids"] =null;
     $_POST["volume"] =null;
     $_POST["origine"] =null;
+    $_POST["seuil"] =null;
     $_POST["categorie"] =null;
     // $_POST["btn_maj"] =null;
     $_POST["stock"] =null;
@@ -629,6 +631,13 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         </select>
                         <br />
                     </article>
+                    <article>
+                        <label for="seuil">Seuil d'alerte</label>
+                        <br>
+                        <input type="number" id="seuil" name="seuil" value="<?php echo $_POST["seuil"]; ?>" step="1"
+                            min="1" max="999999999" placeholder="10" >
+                        <br/>
+                    </article>
 
                     
 
@@ -841,14 +850,19 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
 
 
                             try {//création de l'objet produit dans la base
+                                if ($_POST["seuil"] == null){
+                                    //si seuil d'alerte pas rempli alors seuil d'alerte = 0
+                                    $_POST["seuil"] = 0;
+                                }
                                 $sql = '
-                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,date_arrivee_stock_recent,p_modif)
-                                VALUES (:tva, :vendeur_id, :origine, :titre, :description, :poids, :volume, :prix, :stock, CURRENT_TIMESTAMP,CURRENT_DATE);
+                                INSERT INTO cobrec1._produit(id_TVA,id_vendeur,p_seuil,p_origine,p_nom,p_description,p_poids,p_volume,p_prix,p_stock,date_arrivee_stock_recent,p_modif)
+                                VALUES (:tva, :vendeur_id, :seuil, :origine, :titre, :description, :poids, :volume, :prix, :stock, CURRENT_TIMESTAMP,CURRENT_DATE);
                                 ';
                                 $stmt = $pdo->prepare($sql);
                                 $params = [
                                     'tva' => $_POST['tva'], 
                                     'vendeur_id' => $_SESSION['vendeur_id'],
+                                    'seuil' => $_POST['seuil'],
                                     'origine' => $_POST['origine'],
                                     'titre' => $_POST['titre'],
                                     'description' => $_POST['description'],
@@ -1018,7 +1032,8 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         $sql = '
                         UPDATE cobrec1._produit
                         SET id_tva = :tva, 
-                        p_origine = :origine, 
+                        p_origine = :origine,
+                        p_seuil = :seuil, 
                         p_nom = :titre, 
                         p_description = :description, 
                         p_poids = :poids, 
@@ -1032,6 +1047,7 @@ if ($_POST !== []) {//Si le formulaire a été submit au moins une fois
                         $params = [
                             'tva' => $_POST['tva'],
                             'origine' => $_POST['origine'],
+                            'seuil' => $_POST['seuil'],
                             'titre' => $_POST['titre'],
                             'description' => $_POST['description'],
                             'poids' => $_POST['poids'],

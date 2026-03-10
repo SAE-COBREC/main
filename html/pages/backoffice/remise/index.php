@@ -179,6 +179,7 @@ document.location.href = "/pages/backoffice/index.php";
     <link rel="stylesheet" type="text/css" href="../../../../styles/creerArticle/creerArticle.css" media="screen">
     <title>Ébauche de produit</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
+    <script src="js/saccessibility.js"></script>
 </head>
 <pre>
 <?php

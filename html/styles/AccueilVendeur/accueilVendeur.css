@@ -2,6 +2,28 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -102,7 +124,7 @@ h1 {
   width: 8px;
 }
 .table-wrapper::-webkit-scrollbar-thumb {
-  background: #CD7F32;
+  background: var(--primary-bronze);
   border-radius: 10px;
 }
 
@@ -189,7 +211,7 @@ h1 {
   transition: all 0.3s;
 }
 .btn--primary {
-  background: #CD7F32;
+  background: var(--primary-bronze);
   color: #FFFFFF;
 }
 .btn--primary:hover {
@@ -197,8 +219,8 @@ h1 {
 }
 .btn--secondary {
   background: #FFFFFF;
-  color: #CD7F32;
-  border: 2px solid #CD7F32;
+  color: var(--primary-bronze);
+  border: 2px solid var(--primary-bronze);
 }
 .btn--secondary:hover {
   background: #FFF7F1;
@@ -256,11 +278,11 @@ h1 {
   font-weight: 600;
 }
 .badge--live {
-  background: #CD7F32;
+  background: var(--primary-bronze);
   color: #FFFFFF;
 }
 .badge--out {
-  background: #D4183D;
+  background: var(--semantic-rouge);
   color: #FFFFFF;
 }
 .badge--eb {
@@ -284,8 +306,8 @@ h1 {
   cursor: pointer;
 }
 .tabs__item--active {
-  color: #CD7F32;
-  border-bottom: 3px solid #CD7F32;
+  color: var(--primary-bronze);
+  border-bottom: 3px solid var(--primary-bronze);
 }
 
 .tri {
@@ -313,7 +335,7 @@ h1 {
 }
 .tri__item a:hover {
   background: #FFF7F1;
-  border-color: #CD7F32;
+  border-color: var(--primary-bronze);
 }
 .tri__item--active {
   display: none;

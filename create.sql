@@ -44,8 +44,8 @@ CREATE TABLE cobrec1._compte (
     timestamp_blocage timestamp,
     motif_blocage varchar(255),
     mdp varchar(255) NOT NULL,
-    secret_A2F varchar(255),
-    etat_A2F boolean DEFAULT FALSE,
+    secret_OTP varchar(255),
+    etat_OTP boolean DEFAULT FALSE,
     prenom varchar(100) NOT NULL,
     nom varchar(100) NOT NULL,
     civilite varchar(255) DEFAULT 'Inconnu' NOT NULL,
@@ -255,6 +255,21 @@ ADD CONSTRAINT fk_produit_TVA FOREIGN KEY (id_TVA) REFERENCES cobrec1._TVA (id_T
 
 ALTER TABLE ONLY cobrec1._produit
 ADD CONSTRAINT unique_produit_nom UNIQUE (p_nom);
+
+CREATE TABLE cobrec1._favoris (
+    id_favoris SERIAL NOT NULL,
+    id_client integer NOT NULL,
+    id_produit integer NOT NULL
+);
+
+ALTER TABLE ONLY cobrec1._favoris
+ADD CONSTRAINT pk_favoris PRIMARY KEY (id_favoris);
+
+ALTER TABLE ONLY cobrec1._favoris
+ADD CONSTRAINT fk_favoris_client FOREIGN KEY (id_client) REFERENCES cobrec1._client (id_client) ON DELETE CASCADE;
+
+ALTER TABLE ONLY cobrec1._favoris
+ADD CONSTRAINT fk_produit_client FOREIGN KEY (id_produit) REFERENCES cobrec1._produit (id_produit) ON DELETE CASCADE;
 
 -- TABLE REDUCTION
 CREATE TABLE cobrec1._reduction (

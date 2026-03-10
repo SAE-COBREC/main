@@ -2,16 +2,38 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 body aside {
   position: absolute;
   left: 80%;
   background-color: #D1ECF1;
   width: 20%;
-  border: 3px solid #7171A3;
+  border: 3px solid var(--primary-bleu);
   border-radius: 5%;
 }
 body aside hr {
-  color: #7171A3;
+  color: var(--primary-bleu);
   margin: 2%;
 }
 body aside table thead {

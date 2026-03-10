@@ -1446,7 +1446,9 @@ function filtrerProduits($pdo, $listeProduits, $filtres, $idClient)
         $prixFinalCents = (int) round($prixFinal * 100);
         $minFilterCents = (int) round($minFilter * 100);
         $maxFilterCents = is_infinite($maxFilter) ? PHP_INT_MAX : (int) round($maxFilter * 100);
-        
+        if (!isset($idsProduits)){
+            $idsProduits = array();
+        }
         if ($prixFinalCents > $maxFilterCents) continue;
         if ($prixFinalCents < $minFilterCents) continue;
         if ($filtres['categorieFiltre'] !== 'all') {
@@ -1461,6 +1463,7 @@ function filtrerProduits($pdo, $listeProduits, $filtres, $idClient)
         if (($produitCourant['note_moyenne'] ?? 0) < $filtres['noteMinimum'])
             continue;
         $produits_filtres[] = $produitCourant;
+
     }
     return $produits_filtres;
 }

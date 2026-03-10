@@ -199,8 +199,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    //traitement POST pour désactivation de l'A2F
-    if (isset($_POST['desactiverA2F'])) {
+    //traitement POST pour désactivation de l'OTP
+    if (isset($_POST['desactiverOTP'])) {
         unset($_SESSION['OTP']);
     }
 }
@@ -246,7 +246,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     <link rel="stylesheet" href="/styles/ProfilClient/style.css" />
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-    <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <script src="/js/chart.js"></script>
 </head>
 
@@ -631,12 +630,12 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         </span>
                     </header>
                     <main>
-                        <button type="button" id="activerA2F" onclick="ouvrirModalA2F()"
+                        <button type="button" id="activerOTP" onclick="ouvrirModalOTP()"
                             style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:none';} else { echo 'display:block';} ?>">
                             Activer l'authentification à double facteurs
                         </button>
                         <form method="POST">
-                            <button type="submit" name="desactiverA2F"
+                            <button type="submit" name="desactiverOTP"
                                 onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')"
                                 style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
                                 Désactiver l'authentification à double facteurs
@@ -694,68 +693,66 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         </div>
     </main>
 
-    <div id="modalA2F">
+    <div id="modalOTP">
         <div>
             <h2>Authentification à double facteurs</h2>
             <?php
                 if (empty($_SESSION['OTP'])){
                     include_once '../connexionClient/OTP.php';
                     ?>
-                    <form id="a2form">
-                        <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
-                        <label>
-                        <p>Code secret :</p>
-                        <small><?php echo $otp->getSecret() ?></small>
-                        </label>
-                        <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code"/>
-                        <button type="submit">Valider</button>
-                    </form>
-                    <script>
-                        document.getElementById('a2form').addEventListener('submit', function(event) {
-                            event.preventDefault();
-                            const formData = new FormData(event.target);
-                            const code = formData.get('code');
+            <form id="otporm">
+                <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
+                <label>
+                    <p>Code secret :</p>
+                    <small><?php echo $otp->getSecret() ?></small>
+                </label>
+                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
+                <button type="submit">Valider</button>
+            </form>
+            <script>
+            document.getElementById('otporm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const code = formData.get('code');
 
-                            const xhttp = new XMLHttpRequest();
-                            xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
-                            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                            xhttp.send("code="+code);
-
-
-                            const xhttp2 = new XMLHttpRequest();
-                            xhttp2.open("GET", "../../pages/connexionClient/ajax.txt", true);
-                            xhttp2.send();
-                            xhttp2.onreadystatechange = () => {
-                            if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
-                                const contentLength = xhttp2.getResponseHeader("Content-Length");
-                                if (contentLength == 4) {
-                                    xhttp2.abort();
-                                    alert("Authentification à double facteur activée avec succès. Vous allez être déconnecté.");
-                                    //document.location.href = "/index.php"; 
-                                    document.getElementById('modalA2F').style.display = 'none';
-
-                                    const xhttp3 = new XMLHttpRequest();
-                                    xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
-                                    xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                                    xhttp3.send("statutOTP=active");
-                                    succesA2F();
-                                    //document.location.href = "/pages/connexionClient/index.php"; 
-                                }else{
-                                    alert("Echec. Veuillez réessayer.");
-                                }
-                            }
-                            };
-                        });
+                const xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
+                xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhttp.send("code=" + code);
 
 
-                        
-                        
-                    </script>
-    <?php
+                const xhttp2 = new XMLHttpRequest();
+                xhttp2.open("GET", "../../pages/connexionClient/ajax.txt", true);
+                xhttp2.send();
+                xhttp2.onreadystatechange = () => {
+                    if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+                        const contentLength = xhttp2.getResponseHeader("Content-Length");
+                        if (contentLength == 4) {
+                            xhttp2.abort();
+                            alert(
+                                "Authentification à double facteur activée avec succès. Vous allez être déconnecté."
+                                );
+                            //document.location.href = "/index.php"; 
+                            document.getElementById('modalOTP').style.display = 'none';
+
+                            const xhttp3 = new XMLHttpRequest();
+                            xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
+                            xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xhttp3.send("statutOTP=active");
+                            succesOTP();
+                            //document.location.href = "/pages/connexionClient/index.php"; 
+                        } else {
+                            alert("Echec. Veuillez réessayer.");
+                        }
+                    }
+                };
+            });
+            </script>
+            <?php
                 }
             ?>
             <form>
-                <button type="button" onclick="fermerModalA2F()">Annuler</button>
+                <button type="button" onclick="fermerModalOTP()">Annuler</button>
             </form>
         </div>
     </div>
@@ -886,7 +883,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     <?php
     //inclure le pied de page du site
-    include __DIR__ . '/../../partials/footer.html';
     include __DIR__ . '/../../partials/toast.html';
     ?>
 
@@ -898,8 +894,8 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         //récupère l'ID du client connecté depuis PHP
         const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
 
-        //réactive le bouton pour activer l'A2F
-        document.getElementById('activerA2F').disabled = false;
+        //réactive le bouton pour activer l'OTP
+        document.getElementById('activerOTP').disabled = false;
 
 
         //configure le système de drag & drop pour l'upload d'image
@@ -979,10 +975,10 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         document.getElementById('modalModificationAdresse').style.display = 'none';
     }
 
-    //fonction pour fermer le modal de la double authentification (A2F)
-    function fermerModalA2F() {
-        //cache le modal A2F
-        document.getElementById('modalA2F').style.display = 'none';
+    //fonction pour fermer le modal de la double authentification (OTP)
+    function fermerModalOTP() {
+        //cache le modal OTP
+        document.getElementById('modalOTP').style.display = 'none';
     }
 
 
@@ -1302,13 +1298,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         form.submit();
     }
 
-    function ouvrirModalA2F() {
-        document.getElementById('modalA2F').style.display = 'block';
+    function ouvrirModalOTP() {
+        document.getElementById('modalOTP').style.display = 'block';
     }
 
-    function succesA2F() {
-        document.getElementById('activerA2F').textContent = "Authentification à double facteurs activée avec succès."
-        document.getElementById('activerA2F').disabled = true
+    function succesOTP() {
+        document.getElementById('activerOTP').textContent = "Authentification à double facteurs activée avec succès."
+        document.getElementById('activerOTP').disabled = true
     }
 
     document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {
