@@ -204,6 +204,7 @@ CREATE TABLE cobrec1._produit (
     p_prix numeric(11, 2) NOT NULL,
     p_note numeric(2, 1) DEFAULT NULL,
     p_stock integer DEFAULT 0,
+    p_seuil integer DEFAULT 0,
     p_nb_signalements integer DEFAULT 0,
     date_arrivee_stock_recent timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     date_mise_sur_marche timestamp,
@@ -220,6 +221,7 @@ CREATE TABLE cobrec1._produit (
         AND p_note <= 5
     ),
     CONSTRAINT verif_produit_stock CHECK (p_stock >= 0),
+    CONSTRAINT verif_produit_seuil CHECK (p_seuil >= 0),
     CONSTRAINT verif_produit_nb_signalements CHECK (p_nb_signalements >= 0),
     CONSTRAINT verif_produit_nb_ventes CHECK (p_nb_ventes >= 0),
     CONSTRAINT verif_produit_statut CHECK (
