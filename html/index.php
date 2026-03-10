@@ -527,7 +527,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                         <div class="carousel-vendeur-block">
                                             <p class="carousel-vendeur">Vendu par :</p>
                                             <div class="vendeur-info"
-                                                title="Voir les produits de <?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>"
+                                                title="Voir la page de <?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>"
                                                 onclick="event.stopPropagation(); filterByVendeur('<?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>')"
                                                 style="cursor:pointer;">
                                                 <img src="/img/svg/market.svg" alt="Vendeur">
@@ -665,7 +665,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
                         <div class="product-bottom">
-                            <div class="vendeur-info" title="Voir les produits de <?= htmlspecialchars($nomVendeur) ?>"
+                            <div class="vendeur-info" title="Voir la page de <?= htmlspecialchars($nomVendeur) ?>"
                                 onclick="event.stopPropagation(); filterByVendeur('<?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>')"
                                 style="cursor:pointer;">
                                 <img src="/img/svg/market.svg" alt="Vendeur">
@@ -701,12 +701,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
 
     <script>
     function filterByVendeur(nom) {
-        var input = document.getElementById('searchVendeur');
-        var form = document.getElementById('filterForm');
-        if (input && form) {
-            input.value = nom;
-            form.submit();
-        }
+        window.location.href = '/pages/vendeur/index.php?denomination=' + encodeURIComponent(nom);
     }
     </script>
 

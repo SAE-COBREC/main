@@ -407,7 +407,7 @@ if ($idClient && $idProduit) {
                 <div class="section features">
                     <h3>Caractéristiques</h3>
                     <ul>
-                        <li>Vendu par : <?= htmlspecialchars($produit['vendeur_nom'] ?? 'Alizon') ?>
+                        <li>Vendu par : <a href="/pages/vendeur/index.php?denomination=<?= urlencode($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? '') ?>" style="color:inherit;font-weight:600;"><?= htmlspecialchars($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? 'Alizon') ?></a>
                             <div class="smaller">(<a
                                     href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)
                             </div>

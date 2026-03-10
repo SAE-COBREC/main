@@ -1,0 +1,426 @@
+@charset "UTF-8";
+
+/* ── Variables ────────────────────────────────────────────────────────────── */
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-rouge: #D4183D;
+}
+
+/* ── Reset de base ─────────────────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Quicksand", sans-serif;
+  background: #EFEFEF;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+/* ── Conteneur page ────────────────────────────────────────────────────────── */
+.vendeur-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 3rem;
+}
+
+/* ── Bouton retour ─────────────────────────────────────────────────────────── */
+.btn-retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: #FFFFFF;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: "Quicksand", sans-serif;
+  color: #374151;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-retour:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+.btn-retour img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+/* ── Carte profil vendeur ──────────────────────────────────────────────────── */
+.vendeur-profil-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: #FFFFFF;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.vendeur-profil-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid #e5e7eb;
+}
+
+.vendeur-profil-avatar-placeholder {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #F0F4F8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 3px solid #e5e7eb;
+}
+.vendeur-profil-avatar-placeholder img {
+  width: 54px;
+  height: 54px;
+  opacity: 0.4;
+  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+}
+
+.vendeur-profil-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vendeur-profil-info h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #030212;
+  font-family: "Quicksand", sans-serif;
+}
+
+.vendeur-profil-raison {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Note moyenne */
+.vendeur-profil-note {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #374151;
+  margin-top: 0.6rem;
+}
+.vendeur-profil-note strong {
+  font-weight: 700;
+}
+.vendeur-profil-note span {
+  color: #9ca3af;
+}
+
+/* Localisation */
+.vendeur-profil-location {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #6b7280;
+  font-size: 0.88rem;
+  margin-top: 0.5rem;
+}
+.vendeur-profil-location img {
+  width: 14px;
+  height: 14px;
+  opacity: 0.55;
+}
+
+/* Chips de statistiques */
+.vendeur-profil-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.vendeur-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #F0F4F8;
+  border: 1px solid rgba(113, 113, 163, 0.15);
+  border-radius: 30px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  color: #374151;
+  font-weight: 600;
+}
+.vendeur-stat-chip img {
+  width: 17px;
+  height: 17px;
+  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+}
+
+/* ── Titre section produits ────────────────────────────────────────────────── */
+.vendeur-produits-titre {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: #030212;
+  font-family: "Quicksand", sans-serif;
+}
+.vendeur-produits-titre span {
+  color: #6b7280;
+  font-weight: 400;
+  font-size: 1rem;
+  margin-left: 0.25rem;
+}
+
+/* ── Grille de produits (reprise du style index) ───────────────────────────── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Vendeur-info dans les cartes */
+.vendeur-info {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  width: fit-content;
+  background-color: #F0F4F8;
+  border-radius: 20px;
+  border: 1px solid rgba(113, 113, 163, 0.1);
+  gap: 6px;
+  padding: 4px 8px;
+}
+.vendeur-info img {
+  width: 24px;
+  height: 24px;
+  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+}
+.vendeur-info span {
+  font-size: 0.85rem;
+  color: #7171A3;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.product-bottom .vendeur-info {
+  margin: 0 0 6px 0;
+  width: fit-content;
+  align-self: flex-start;
+}
+.product-bottom button {
+  margin: 0;
+  width: 100%;
+  flex: none;
+}
+
+/* Cartes produit */
+article {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  background: #FFFFFF;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+article:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+article > div:first-child {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: #FFFFFF;
+  display: flex;
+  justify-content: center;
+}
+article > div:first-child img {
+  height: 100%;
+  object-fit: contain;
+  width: 100em;
+}
+article > div:first-child .badge-reduction {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #D4183D;
+  color: #FFFFFF;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  backdrop-filter: blur(4px);
+}
+article > div:first-child .badge-bretagne {
+  position: absolute;
+  bottom: 0.2em;
+  right: 0.2em;
+  background: #FFFFFF;
+  border-radius: 100%;
+  padding: 1px;
+  z-index: 2;
+  width: 55px;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+article > div:first-child .badge-bretagne img {
+  width: 100%;
+  height: 100%;
+}
+article > div:first-child .rupture-stock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(239, 239, 239, 0.9);
+  color: #030212;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  z-index: 2;
+}
+article > div:first-child .image-rupture {
+  filter: grayscale(100%) opacity(0.7);
+}
+article > div:last-child {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+article > div:last-child h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #030212;
+}
+article > div:last-child > div:nth-child(2) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+article > div:last-child > div:nth-child(2) span:first-child {
+  color: #ffc107;
+}
+article > div:last-child > div:nth-child(2) span:last-child {
+  color: #c0c0c0;
+  font-size: 0.85rem;
+}
+article > div:last-child > div:nth-child(3) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+article > div:last-child > div:nth-child(3) span:last-child {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #030212;
+}
+article button {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.75rem;
+  background: #030212;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.2em;
+  font-family: "Quicksand", sans-serif;
+  transition: background 0.2s ease;
+}
+article button:hover:not(:disabled) {
+  background: #7171A3;
+}
+article button:disabled {
+  background: #c0c0c0;
+  cursor: not-allowed;
+  color: #EFEFEF;
+}
+
+.produit-promotion {
+  border: 2px solid #7171A3 !important;
+  background-color: #e4e4f5 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.produit-rupture {
+  opacity: 0.85;
+}
+
+/* ── Aucun produit ─────────────────────────────────────────────────────────── */
+.vendeur-no-products {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #9ca3af;
+  font-size: 1.05rem;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .vendeur-profil-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+  .vendeur-profil-stats {
+    justify-content: center;
+  }
+  .vendeur-profil-location {
+    justify-content: center;
+  }
+  .vendeur-profil-note {
+    justify-content: center;
+  }
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .product-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .product-bottom button {
+    width: 100%;
+  }
+}

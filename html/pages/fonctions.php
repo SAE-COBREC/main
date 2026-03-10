@@ -819,6 +819,7 @@ function chargerProduitBDD($pdo, $idProduit) {
                 COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
                 t.montant_tva as tva,
                 v.raison_sociale AS vendeur_nom,
+                v.denomination AS vendeur_denomination,
                 c.email AS vendeur_email,
                 STRING_AGG(DISTINCT cp.nom_categorie, ', ') AS categories
             FROM cobrec1._produit p
@@ -833,7 +834,7 @@ function chargerProduitBDD($pdo, $idProduit) {
             WHERE p.id_produit = :pid
             GROUP BY p.id_produit, p.p_nom, p.p_prix, p.p_stock, p.p_statut, 
                      p.p_description, p.p_nb_ventes, p.p_note, r.reduction_pourcentage,
-                     t.montant_tva, v.raison_sociale, c.email
+                     t.montant_tva, v.raison_sociale, v.denomination, c.email
             LIMIT 1
         ");
         $stmtProd->execute([':pid' => $idProduit]);
