@@ -100,18 +100,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       //verification que le mdp corespondant a ce mail existe
-      if (!password_verify($mdp, $row['mdp']) && ($row['etat_OTP'] == 'false')) {
+      if (empty($row['secret_OTP'])){
+        $otp = '';
+      }else{
+        $otp = TOTP::createFromSecret($row['secret_OTP']);
+        $otp = $otp->now();
+      }
+      
+      if ($row['etat_OTP'] == 'true' && $otp != $otp_saisi){
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Adresse mail, pseudo ou code OTP incorrecte.';
+      }else if (!password_verify($mdp, $row['mdp']) && !checkboxOtp.checked) {
         $hasError = true;
         $error_card = 1;
         $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
-      } else if ($row['etat_OTP'] == 'true'){
-        $otp = TOTP::createFromSecret($row['secret_OTP']);
-        if ($otp->now() != $otp_saisi){
-            $hasError = true;
-            $error_card = 1;
-            $error_message = 'Adresse mail, pseudo ou code OTP incorrecte.';
-        }
-      } else {
+      }else {
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
@@ -183,26 +187,53 @@ body {
             </div>
 
             <h1>Connexion</h1>
+            <div>
+                <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();"> Basculer sur le One Time Password (OTP)</label>
+            </div>
 
             <div>
                 <label for="email">Email/Pseudonyme</label>
                 <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
             </div>
 
-            <div>
-                <?php print_r($row); ?>
-                <?php if ($row['etat_OTP'] == 'false'){ ?>
+            <div class="mdpClassique">
                 <label for="mdp">Mot de passe</label>
                 <input type="password" id="mdp" name="mdp" placeholder="***********" required>
-                <?php } else {?>
-                    <label for="otp">Code OTP</label>
-                    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP" required/>
-                <?php } ?>
             </div>
-            <?php if ($row['etat_OTP'] == 'false'){ ?>
-            <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?
+            <div>
+                <label for="otp">Code OTP</label>
+                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP"/>
             </div>
-            <?php } ?>
+            <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?</div>
+            <script>
+                const mdpOtp = document.querySelector(".mdpClassique + div");
+                mdpOtp.style.display = "none";
+                function changer_OTP() {
+                    const checkboxOtp = document.querySelector("#checkboxotp");
+                    const champOtp = document.querySelector(".mdpClassique + div > input");
+                    const mdpClassique = document.querySelector(".mdpClassique");
+                    const mdp = document.querySelector("#mdp");
+                    const forgot = document.querySelector(".forgot");
+                    if (checkboxOtp.checked) {
+                        mdpClassique.style.display = "none";
+                        forgot.style.display = "none";
+                        mdpOtp.style.display = "block";
+                        champOtp.attributes.required = 'required';
+                        mdp.attributes.required = '';
+                        
+                    }else{
+                        mdpClassique.style.display = "block";
+                        forgot.style.display = "block";
+                        mdpOtp.style.display = "none";
+                        champOtp.attributes.required = '';
+                        mdp.attributes.required = 'required';
+                    }
+
+                }
+            </script>
+
+
+
             <!-- affichage des erreurs de saisi -->
             <div class="error">
                 <?php if (isset($hasError) && $hasError && $error_card == 1): ?>

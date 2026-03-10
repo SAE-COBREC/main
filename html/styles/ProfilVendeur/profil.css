@@ -3,6 +3,28 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -39,7 +61,7 @@ body {
 
 .logout-btn {
   font-size: 20px;
-  background-color: #CD7F32;
+  background-color: var(--primary-bronze);
   color: #FFFFFF;
   padding: 10px 20px;
   border-radius: 14px;
@@ -66,7 +88,7 @@ body {
   font-family: "Baloo", sans-serif;
   font-size: 24px;
   font-weight: 700;
-  color: #CD7F32;
+  color: var(--primary-bronze);
   margin-bottom: 24px;
   text-align: center;
 }
@@ -82,7 +104,7 @@ body {
   border-radius: 50%;
   -o-object-fit: cover;
      object-fit: cover;
-  border: 3px solid #CD7F32;
+  border: 3px solid var(--primary-bronze);
 }
 
 .edit-form {
@@ -137,8 +159,8 @@ body {
 .edit-form input:focus,
 .edit-form select:focus {
   outline: none;
-  border-color: #CD7F32;
-  box-shadow: 0 0 0 2px rgba(205, 127, 50, 0.2);
+  border-color: var(--primary-bronze);
+  box-shadow: 0 0 0 2px rgba(var(--primary-bronze), 0.2);
 }
 .edit-form button[type=submit] {
   margin-top: 10px;
@@ -155,7 +177,7 @@ body {
   cursor: pointer;
 }
 .btn--primary {
-  background: #CD7F32;
+  background: var(--primary-bronze);
   color: #FFFFFF;
   transition: background-color 0.3s;
 }
@@ -234,7 +256,7 @@ body {
   position: fixed;
   top: 20%;
   left: 45%;
-  background-color: #D4183D;
+  background-color: var(--semantic-rouge);
   color: #FFFFFF;
   padding: 20px 30px;
   border-radius: 10px;

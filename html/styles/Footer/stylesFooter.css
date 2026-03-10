@@ -2,6 +2,28 @@
   margin: 0;
 }
 
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
 footer {
   grid-column: 1/-1;
   background: #030212;
@@ -19,7 +41,7 @@ footer > div > div:first-child {
   gap: 2rem;
   margin-bottom: 3rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #7171A3;
+  border-bottom: 1px solid var(--primary-bleu);
 }
 footer > div > div:first-child > a {
   width: 50px;
@@ -66,7 +88,7 @@ footer nav a:hover {
 footer > div > div:last-child {
   text-align: center;
   padding-top: 2rem;
-  border-top: 1px solid #7171A3;
+  border-top: 1px solid var(--primary-bleu);
   color: #c0c0c0;
   font-size: 0.85rem;
   display: flex;
