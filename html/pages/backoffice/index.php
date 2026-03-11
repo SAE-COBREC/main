@@ -141,7 +141,7 @@ try {
     SELECT * FROM (
       SELECT DISTINCT on (p.id_produit)
         p.id_produit, p.p_nom AS nom_article, p.p_description, p.p_stock, p.p_seuil, p.p_prix, p.p_statut,
-        i.i_lien AS image_url, r.reduction_pourcentage AS pourcentage,
+        i.i_lien AS image_url, r.pourcentage_reduction AS pourcentage,
         r.reduction_debut AS debut_reduc, r.reduction_fin AS fin_reduc,
         promo.promotion_debut AS debut_promo, promo.promotion_fin AS fin_promo,
         STRING_AGG(DISTINCT c.nom_categorie, ', ') AS categories

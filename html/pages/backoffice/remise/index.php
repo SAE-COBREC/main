@@ -18,7 +18,7 @@
                      $_SESSION["remise"]["warn"]++;
                     try {//Récupération des infos de la reduc
                         $sql = '
-                        SELECT id_reduction, id_produit, reduction_pourcentage, reduction_debut, reduction_fin FROM cobrec1._reduction
+                        SELECT id_reduction, id_produit, pourcentage_reduction, reduction_debut, reduction_fin FROM cobrec1._reduction
                         WHERE id_produit = :modifier;'
                         ;
                         $stmt = $pdo->prepare($sql);
@@ -143,8 +143,8 @@ document.location.href = "/pages/backoffice/index.php";
                         //print_r("peuplement\n");
                         $_POST = [];
                         $_POST["produit"] = $_SESSION["remise"]['_GET']['produit'];
-                        if (!empty($_SESSION["remise"]['_GET']['reduction_pourcentage'])){
-                            $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['reduction_pourcentage'];
+                        if (!empty($_SESSION["remise"]['_GET']['pourcentage_reduction'])){
+                            $_POST["pourcentage"] = $_SESSION["remise"]['_GET']['pourcentage_reduction'];
                             $_POST["debut"] = $_SESSION["remise"]['_GET']['reduction_debut'];
                             $_POST["fin"] = $_SESSION["remise"]['_GET']['reduction_fin'];
                         }else{
@@ -211,7 +211,7 @@ if ($_POST !== []) {
             //TODO plus tard
             $_SESSION["remise"]['_GET']['reduction_fin'] = '';
             $_SESSION["remise"]['_GET']['reduction_debut'] = '';
-            $_SESSION["remise"]['_GET']['reduction_pourcentage'] = '';
+            $_SESSION["remise"]['_GET']['pourcentage_reduction'] = '';
             $_SESSION["remise"]['_GET']['id_reduction'] = '';
         }
         if(empty($_GET['modifier']) || empty($_SESSION["remise"]['_GET']['id_reduction'])){
@@ -434,7 +434,7 @@ if ($_POST !== []) {
                             //si la remise n'existe pas (même si l'URL nous fait croire que l'on en modifie une, ce qui en fait n'est pas le cas)
                             try {//création de l'objet reduction
                                 $sql = '
-                                INSERT INTO cobrec1._reduction(id_produit, reduction_pourcentage, reduction_debut, reduction_fin)
+                                INSERT INTO cobrec1._reduction(id_produit, pourcentage_reduction, reduction_debut, reduction_fin)
                                 VALUES (:produit, :pourcentage, :debut, :fin);
                                 ';
                                 $stmt = $pdo->prepare($sql);
@@ -493,7 +493,7 @@ if ($_POST !== []) {
                     try {//modif de l'objet reduction dans la base
                         $sql = '
                         UPDATE cobrec1._reduction 
-                        SET reduction_pourcentage = :pourcentage, 
+                        SET pourcentage_reduction = :pourcentage, 
                         id_produit = :produit,
                         reduction_debut = :debut, 
                         reduction_fin = :fin   
