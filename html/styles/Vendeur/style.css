@@ -50,20 +50,20 @@ body {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  background: #FFFFFF;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 0.45rem 1rem;
   cursor: pointer;
-  font-size: 0.9rem;
   font-family: "Quicksand", sans-serif;
-  color: #374151;
   text-decoration: none;
-  transition: background 0.15s ease;
+  border: 1px solid var(--primary-bleu);
+  color: var(--primary-bleu);
+  border-radius: 20px;
+  background: #FFFFFF;
+  font-size: 1.3em;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
 }
 .btn-retour:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
+  background: var(--primary-bleu);
+  color: #FFFFFF;
 }
 .btn-retour img {
   width: 16px;
