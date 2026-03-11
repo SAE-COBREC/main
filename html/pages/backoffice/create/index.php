@@ -159,12 +159,13 @@
                 $contenuChamp = str_replace('"', '""',$contenuChamp);
                 return $contenuChamp;
             }
+            
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
 
-
-
-<!DOCTYPE html>
-<html lang="fr">
+<!doctype html>
+<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8" />
