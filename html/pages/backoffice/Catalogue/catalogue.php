@@ -18,14 +18,18 @@ if (empty($_SESSION['vendeur_id'])) {
 $vendeur_id = $_SESSION['vendeur_id'];
 
 function getVendeurInfo($pdo, $vendeur_id) {
-    $stmt = $pdo->prepare("SELECT denomination, SIREN, nb_produits_crees FROM cobrec1._vendeur  WHERE id_vendeur = :id");
+    $stmt = $pdo->prepare("SELECT denomination FROM cobrec1._vendeur  WHERE id_vendeur = :id");
     $stmt->execute(['id' => $vendeur_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 $vendeurInfos = getVendeurInfo($pdo, $vendeur_id);
 
-$vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination'] ?? '');
+//charge les informations du vendeur depuis la base de données
+$informationsVendeur = chargerInformationsVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination']);
+
+$vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination']);
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -37,8 +41,71 @@ $vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeur
 
 <body>
     <header>
-        <h1>Catalogue de <?php echo htmlspecialchars($vendeurInfos['denomination'] ?? ''); ?></h1>
-        <p>SIREN : <?php echo htmlspecialchars($vendeurInfos['SIREN'] ?? ''); ?></p>
+        <!--carte de profil du vendeur-->
+        <section>
+
+            <!--affiche l'avatar du vendeur ou un placeholder-->
+            <?php if (!empty($informationsVendeur['image'])): ?>
+            <img src="<?= htmlspecialchars($informationsVendeur['image']) ?>"
+                alt="<?= htmlspecialchars($informationsVendeur['denomination']) ?>">
+            <?php else: ?>
+            <figure>
+                <img src="/img/svg/market.svg" alt="Vendeur">
+            </figure>
+            <?php endif; ?>
+
+            <!--informations textuelles du vendeur-->
+            <div>
+
+                <!--nom de la dénomination du vendeur-->
+                <h1><?= htmlspecialchars($informationsVendeur['denomination']) ?></h1>
+
+                <!--affiche la raison sociale si elle existe-->
+                <?php if (!empty($informationsVendeur['raison_sociale'])): ?>
+                <small><?= htmlspecialchars($informationsVendeur['raison_sociale']) ?></small>
+                <?php endif; ?>
+
+                <!--affiche la note moyenne si elle existe-->
+                <?php if ($noteMoyenneVendeur > 0): ?>
+                <p>
+                    <!--affiche les étoiles de la note moyenne-->
+                    <?= afficherEtoilesVendeur($noteMoyenneVendeur, 18) ?>
+                    <!--affiche la valeur numérique de la note-->
+                    <strong><?= number_format($noteMoyenneVendeur, 1, ',', '') ?>/5</strong>
+                    <!--affiche le nombre d'avis-->
+                    <span style="color:#9ca3af">(<?= $nombreAvisTotal ?> avis)</span>
+                </p>
+                <?php endif; ?>
+
+                <!--affiche la localisation du vendeur si elle existe-->
+                <?php if (!empty($informationsVendeur['ville'])): ?>
+                <address>
+                    <img src="/img/svg/location.svg" alt="" width="14" onerror="this.style.display='none'">
+                    <!--affiche le code postal s'il est disponible-->
+                    <?php if (!empty($informationsVendeur['code_postal'])): ?>
+                    <?= htmlspecialchars($informationsVendeur['code_postal']) ?> –
+                    <?php endif; ?>
+                    <?= htmlspecialchars($informationsVendeur['ville']) ?>
+                </address>
+                <?php endif; ?>
+
+                <!--chips de statistiques rapides-->
+                <footer>
+                    <!--chip affichant le nombre de produits en ligne-->
+                    <span>
+                        <img src="/img/svg/market.svg" alt="">
+                        <?= $nombreProduits ?> produit<?= $nombreProduits > 1 ? 's' : '' ?> en ligne
+                    </span>
+                    <!--affiche le numéro SIREN si disponible-->
+                    <?php if (!empty($informationsVendeur['siren'])): ?>
+                    <span>
+                        SIREN : <?= htmlspecialchars($informationsVendeur['siren']) ?>
+                    </span>
+                    <?php endif; ?>
+                </footer>
+
+            </div>
+        </section>
     </header>
 
     <main>
