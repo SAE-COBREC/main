@@ -1,9 +1,7 @@
 <?php 
 // Démarrage de la session PHP pour accéder aux variables de session
 session_start(); 
-?>
 
-<?php
 // Inclusion de fichier 
 include '../../../selectBDD.php';
 include __DIR__ . '../../../fonctions.php';
@@ -552,7 +550,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 ?>
 
 <!doctype html>
-<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="utf-8" />
