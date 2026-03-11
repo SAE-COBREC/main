@@ -66,9 +66,11 @@ article > div:first-of-type {
   max-width: 450px;
 }
 article > div:first-of-type img {
-  width: 100%;
-  height: auto;
+  width: 450px;
+  height: 300px;
   display: block;
+  -o-object-fit: contain;
+     object-fit: contain;
 }
 article {
   /* Colonne détails */
@@ -132,11 +134,9 @@ article section > div {
   gap: 10px;
 }
 article section > div > span {
-  width: 25px;
+  width: auto;
   height: 25px;
-  border-radius: 50%;
   display: block;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
