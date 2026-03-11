@@ -1116,7 +1116,7 @@ main section:nth-of-type(1) article select:hover {
   cursor: pointer;
   transition: all 0.3s ease;
 }
-.daltonien-switcher .filtre__item:focus {
+.daltonien-switcher .filtre__item:hover {
   outline: none;
   border-color: var(--primary-bleu);
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);

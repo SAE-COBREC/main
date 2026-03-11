@@ -296,6 +296,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <script src="/js/chart.js"></script>
+    <script src="../../js/accessibility.js"></script>
 </head>
 
 <body>
