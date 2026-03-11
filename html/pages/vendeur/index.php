@@ -167,6 +167,51 @@ if ($idClient === null) {
 }
 
 // ============================================
+// TRAITEMENT AJAX : AJOUT AU PANIER
+// ============================================
+
+//vérifie si c'est une requête d'ajout au panier
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
+    //définit le type de réponse en JSON
+    header('Content-Type: application/json');
+
+    //récupère l'ID du produit à ajouter
+    $idProduit = $_POST['idProduit'] ?? null;
+    //récupère la quantité demandée
+    $quantite = (int) ($_POST['quantite'] ?? 1);
+
+    //vérifie que l'ID produit est présent
+    if (!$idProduit) {
+        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
+        exit;
+    }
+
+    //essaie d'ajouter le produit au panier
+    try {
+        //vérifie si le client est connecté
+        if ($idClient === null) {
+            //ajoute le produit au panier temporaire en session
+            $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
+        } else {
+            //vérifie qu'un panier existe
+            if (!$idPanier) {
+                echo json_encode(['success' => false, 'message' => 'Aucun panier en cours']);
+                exit;
+            }
+            //ajoute le produit au panier en base de données
+            $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
+        }
+        //renvoie le résultat en JSON
+        echo json_encode($resultat);
+    } catch (Exception $e) {
+        //capture les erreurs et les renvoie
+        echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
+    }
+    //arrête le script après traitement
+    exit;
+}
+
+// ============================================
 // FONCTIONS D'AFFICHAGE
 // ============================================
 
@@ -421,32 +466,45 @@ function afficherEtoilesVendeur(float $note, int $taille = 16): string
     <script src="/js/notifications.js"></script>
 
     <script>
-    //fonction d'ajout au panier identique aux autres pages
+    //fonction d'ajout au panier — identique à la page d'accueil
     function ajouterAuPanier(idProduit) {
-        //envoie une requête POST vers la page produit pour ajouter l'article
-        fetch('/pages/produit/index.php?id=' + idProduit, {
+        //crée un objet pour envoyer les données au serveur
+        var formData = new FormData();
+        formData.append('action', 'ajouter_panier');
+        formData.append('idProduit', idProduit);
+        formData.append('quantite', 1);
+
+        //envoie la requête AJAX au serveur
+        fetch(window.location.href, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=ajouter_panier&idProduit=' + idProduit + '&quantite=1'
+                body: formData,
+                noLoader: true
             })
-            .then(function(reponse) {
-                //parse la réponse JSON
-                return reponse.json();
-            })
-            .then(function(donnees) {
-                //affiche une notification selon le résultat
-                if (donnees.success) {
-                    if (typeof showToast === 'function') showToast('Produit ajouté au panier !', 'success');
-                } else {
-                    if (typeof showToast === 'function') showToast(donnees.message || 'Erreur lors de l\'ajout.',
-                        'error');
+            //gère la réponse de manière robuste (texte -> tentative JSON)
+            .then(async function(response) {
+                var text = await response.text();
+                try {
+                    var data = JSON.parse(text);
+                    return data;
+                } catch (err) {
+                    //affiche la réponse brute pour débogage si elle n'est pas du JSON valide
+                    console.error('Réponse serveur non JSON:', text);
+                    window.notify ? notify('Erreur serveur: réponse invalide', 'error') : alert(
+                        'Erreur serveur: réponse invalide');
+                    throw new Error('Invalid JSON response');
                 }
             })
-            .catch(function() {
-                //affiche une notification d'erreur réseau
-                if (typeof showToast === 'function') showToast('Erreur réseau.', 'error');
+            //traite la réponse JSON du serveur
+            .then(function(data) {
+                var message = data && data.message ? data.message : 'Réponse inconnue';
+                var type = data && data.success ? 'success' : 'error';
+                window.notify ? notify(message, type) : alert((type === 'success' ? '✓ ' : '✗ ') + message);
+            })
+            .catch(function(error) {
+                console.error('Erreur ajout au panier:', error);
+                if (!error.message || error.message === 'Invalid JSON response') return;
+                window.notify ? notify('Erreur lors de l\'ajout au panier', 'error') : alert(
+                    'Erreur lors de l\'ajout au panier');
             });
     }
     </script>
