@@ -666,7 +666,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         </div>
                         <div class="product-bottom">
                             <div class="vendeur-info" title="Voir la page de <?= htmlspecialchars($nomVendeur) ?>"
-                                onclick="event.stopPropagation(); filterByVendeur('<?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>')"
+                                onclick="event.stopPropagation(); window.location.href='/pages/vendeur/index.php?denomination=<?= urlencode($nomVendeur) ?>';"
                                 style="cursor:pointer;">
                                 <img src="/img/svg/market.svg" alt="Vendeur">
                                 <span><?= htmlspecialchars($nomVendeur) ?></span>
