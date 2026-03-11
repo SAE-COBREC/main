@@ -189,7 +189,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
             icon: iconVendeur
         });
 
-        //popup avec boutons "Voir les produits" et "Itinéraire"
+        //popup avec boutons "Voir les produits"
         var popupContent = '<div class="vendor-popup">' +
             '<h3>' + nom.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
             '<p><b>Adresse :</b><br>' + adresse.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
@@ -205,10 +205,11 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
             if (btnProduits) {
                 btnProduits.onclick = function() {
                     var nomVendeur = this.getAttribute('data-vendeur');
-                    var searchInput = document.getElementById('searchVendeur');
+                    var parentDoc = window.parent.document;
+                    var searchInput = parentDoc.getElementById('searchVendeur');
                     if (searchInput) {
                         searchInput.value = nomVendeur;
-                        var form = document.getElementById('filterForm');
+                        var form = parentDoc.getElementById('filterForm');
                         if (form) form.submit();
                     }
                 };
