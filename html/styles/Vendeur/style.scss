@@ -1,0 +1,574 @@
+// ============================================
+// IMPORTS ET MIXINS
+// ============================================
+
+//importe les variables depuis le fichier variable
+@use "../variable" as *;
+@use "sass:color";
+
+//mixin pour centrer avec flexbox
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+//mixin pour espacer les éléments entre eux
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+//mixin pour ajouter une transition fluide
+@mixin transition($property: all, $duration: 0.2s) {
+  transition: $property $duration ease;
+}
+
+//mixin pour effet de survol avec élévation
+@mixin hover-lift {
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+}
+
+//mixin pour centrer un élément en absolu
+@mixin centre-absolu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// ============================================
+// STYLES GLOBAUX
+// ============================================
+
+//réinitialise les marges et paddings
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+//style du body avec grille principale
+body {
+  font-family: $font-family-secondaire;
+  background: $secondary-color-gris-clair;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+// ============================================
+// CONTENEUR DE PAGE
+// ============================================
+
+//zone centrale limitée en largeur
+.vendeur-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 3rem;
+}
+
+// ============================================
+// BOUTON RETOUR
+// ============================================
+
+//lien de retour vers la page précédente
+.btn-retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: $primary-color-blanc;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: $font-family-secondaire;
+  color: #374151;
+  text-decoration: none;
+  @include transition(background, 0.15s);
+
+  //effet survol du bouton retour
+  &:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+  }
+
+  //icône flèche
+  img {
+    width: 16px;
+    height: 16px;
+    opacity: 0.6;
+  }
+}
+
+// ============================================
+// CARTE PROFIL VENDEUR
+// ============================================
+
+//carte principale avec avatar et infos du vendeur
+.vendeur-profil-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: $primary-color-blanc;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+//avatar circulaire avec photo
+.vendeur-profil-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid #e5e7eb;
+}
+
+//avatar placeholder quand pas de photo
+.vendeur-profil-avatar-placeholder {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: $secondary-color-bleu-clair;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 3px solid #e5e7eb;
+
+  //icône de remplacement
+  img {
+    width: 54px;
+    height: 54px;
+    opacity: 0.4;
+    filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+  }
+}
+
+//zone texte à droite de l'avatar
+.vendeur-profil-info {
+  flex: 1;
+  min-width: 0;
+
+  //nom du vendeur
+  h1 {
+    margin: 0 0 0.25rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: $primary-color-noir;
+    font-family: $font-family-secondaire;
+  }
+}
+
+//raison sociale ou sous-titre du vendeur
+.vendeur-profil-raison {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+//affichage de la note moyenne
+.vendeur-profil-note {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #374151;
+  margin-top: 0.6rem;
+
+  //valeur numérique en gras
+  strong {
+    font-weight: 700;
+  }
+
+  //nombre d'avis grisé
+  span {
+    color: #9ca3af;
+  }
+}
+
+//ligne de localisation du vendeur
+.vendeur-profil-location {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #6b7280;
+  font-size: 0.88rem;
+  margin-top: 0.5rem;
+
+  //icône de localisation
+  img {
+    width: 14px;
+    height: 14px;
+    opacity: 0.55;
+  }
+}
+
+//conteneur des chips de statistiques
+.vendeur-profil-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+//chip individuelle (produits, ventes, etc.)
+.vendeur-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: $secondary-color-bleu-clair;
+  border: 1px solid rgba($primary-color-bleu, 0.15);
+  border-radius: 30px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  color: #374151;
+  font-weight: 600;
+
+  //icône dans la chip
+  img {
+    width: 17px;
+    height: 17px;
+    filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+  }
+}
+
+// ============================================
+// TITRE SECTION PRODUITS
+// ============================================
+
+//titre "Produits de ce vendeur"
+.vendeur-produits-titre {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: $primary-color-noir;
+  font-family: $font-family-secondaire;
+
+  //compteur entre parenthèses
+  span {
+    color: #6b7280;
+    font-weight: 400;
+    font-size: 1rem;
+    margin-left: 0.25rem;
+  }
+}
+
+// ============================================
+// GRILLE DE PRODUITS
+// ============================================
+
+//grille responsive des cartes produits
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+// ============================================
+// CARTES PRODUITS (ARTICLE)
+// ============================================
+
+//infos vendeur dans les cartes
+.vendeur-info {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  width: fit-content;
+  background-color: $secondary-color-bleu-clair;
+  border-radius: 20px;
+  border: 1px solid rgba($primary-color-bleu, 0.1);
+  gap: 6px;
+  padding: 4px 8px;
+
+  //icône du vendeur
+  img {
+    width: 24px;
+    height: 24px;
+    filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+  }
+
+  //nom du vendeur
+  span {
+    font-size: 0.85rem;
+    color: $primary-color-bleu;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+//ligne du bas : vendeur + bouton panier
+.product-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+
+  //vendeur-info dans la zone bouton
+  .vendeur-info {
+    margin: 0 0 6px 0;
+    width: fit-content;
+    align-self: flex-start;
+  }
+
+  //bouton pleine largeur
+  button {
+    margin: 0;
+    width: 100%;
+    flex: none;
+  }
+}
+
+//style d'une carte produit
+article {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  background: $primary-color-blanc;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  @include hover-lift;
+
+  //section de l'image du produit
+  > div:first-child {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background: $primary-color-blanc;
+    display: flex;
+    justify-content: center;
+
+    //image du produit
+    img {
+      height: 100%;
+      object-fit: contain;
+      width: 100em;
+    }
+
+    //badge de réduction
+    .badge-reduction {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: $secondary-color-rouge;
+      color: $primary-color-blanc;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+      backdrop-filter: blur(4px);
+    }
+
+    //badge provenance Bretagne
+    .badge-bretagne {
+      position: absolute;
+      bottom: 0.2em;
+      right: 0.2em;
+      background: $primary-color-blanc;
+      border-radius: 100%;
+      padding: 1px;
+      z-index: 2;
+      width: 55px;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    //message de rupture de stock centré sur l'image
+    .rupture-stock {
+      @include centre-absolu;
+      background-color: rgba($secondary-color-gris-clair, 0.9);
+      color: $primary-color-noir;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+
+    //effet grisé sur image en rupture
+    .image-rupture {
+      filter: grayscale(100%) opacity(0.7);
+    }
+  }
+
+  //section des informations texte du produit
+  > div:last-child {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    //nom du produit
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: $primary-color-noir;
+    }
+
+    //section des étoiles et nombre d'avis
+    > div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+
+      //étoiles de notation
+      span:first-child {
+        color: $secondary-color-etoile;
+      }
+
+      //nombre d'avis entre parenthèses
+      span:last-child {
+        color: $secondary-color-gris-fonce;
+        font-size: 0.85rem;
+      }
+    }
+
+    //section du prix
+    > div:nth-child(3) {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+
+      //prix final
+      span:last-child {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: $primary-color-noir;
+      }
+    }
+  }
+
+  //bouton "Ajouter au panier"
+  button {
+    margin-top: auto;
+    width: 100%;
+    padding: 0.75rem;
+    background: $primary-color-noir;
+    color: $primary-color-blanc;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.2em;
+    font-family: $font-family-secondaire;
+    @include transition(background);
+
+    //effet hover sur le bouton
+    &:hover:not(:disabled) {
+      background: $primary-color-bleu;
+    }
+
+    //style du bouton désactivé
+    &:disabled {
+      background: $secondary-color-gris-fonce;
+      cursor: not-allowed;
+      color: $secondary-color-gris-clair;
+    }
+  }
+}
+
+// ============================================
+// STYLES SPÉCIAUX - PROMOTIONS ET RUPTURE
+// ============================================
+
+//bordure spéciale pour les produits en promotion
+.produit-promotion {
+  border: 2px solid $primary-color-bleu !important;
+  background-color: $secondary-color-promotion !important;
+  position: relative;
+  overflow: hidden;
+}
+
+//légère transparence pour les produits en rupture
+.produit-rupture {
+  opacity: 0.85;
+}
+
+// ============================================
+// AUCUN PRODUIT
+// ============================================
+
+//message affiché quand le vendeur n'a pas de produits
+.vendeur-no-products {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #9ca3af;
+  font-size: 1.05rem;
+}
+
+// ============================================
+// RESPONSIVE - MOBILE
+// ============================================
+
+//styles pour mobile
+@media (max-width: 640px) {
+  //passage en colonne pour la carte profil
+  .vendeur-profil-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+
+  //centrage des chips de stats
+  .vendeur-profil-stats {
+    justify-content: center;
+  }
+
+  //centrage de la localisation
+  .vendeur-profil-location {
+    justify-content: center;
+  }
+
+  //centrage de la note
+  .vendeur-profil-note {
+    justify-content: center;
+  }
+
+  //grille produits adaptée mobile
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  //bouton pleine largeur sur mobile
+  .product-bottom {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
