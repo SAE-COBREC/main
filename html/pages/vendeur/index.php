@@ -46,6 +46,9 @@ $sqlVendeur = "
         a.a_code_postal  AS code_postal,
         a.a_adresse      AS adresse,
         a.a_numero       AS numero,
+        a.id_adresse     AS id_adresse,
+        a.latitude       AS latitude,
+        a.longitude      AS longitude,
         i.i_lien         AS image
     FROM cobrec1._vendeur v
     LEFT JOIN cobrec1._compte            c  ON v.id_compte = c.id_compte
@@ -334,6 +337,102 @@ function afficherEtoilesVendeur(float $note, int $taille = 16): string
 
             </div>
         </section>
+
+        <?php
+        //construit l'adresse complète du vendeur pour le géocodage
+        $adresseComplete = trim(
+            ($informationsVendeur['numero'] ?? '') . ' ' .
+            ($informationsVendeur['adresse'] ?? '') . ' ' .
+            ($informationsVendeur['code_postal'] ?? '') . ' ' .
+            ($informationsVendeur['ville'] ?? '')
+        );
+        ?>
+        <?php if (!empty($adresseComplete)): ?>
+        <div id="map-vendeur" style="width:100%;height:350px;border-radius:12px;overflow:hidden;margin:1.5rem 0;"></div>
+
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+        <!-- Leaflet JS -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+        <script>
+        (function() {
+            var nomVendeur = <?= json_encode($informationsVendeur['denomination']) ?>;
+            var adresse = <?= json_encode($adresseComplete) ?>;
+            var idAdresse = <?= json_encode($informationsVendeur['id_adresse'] ?? null) ?>;
+            var latSaved =
+                <?= json_encode(isset($informationsVendeur['latitude'])  && $informationsVendeur['latitude']  !== null ? (float)$informationsVendeur['latitude']  : null) ?>;
+            var lonSaved =
+                <?= json_encode(isset($informationsVendeur['longitude']) && $informationsVendeur['longitude'] !== null ? (float)$informationsVendeur['longitude'] : null) ?>;
+
+            var iconVendeur = L.icon({
+                iconUrl: '/img/png/carte-et-localisation.png',
+                iconSize: [33, 33],
+                iconAnchor: [16, 33],
+                popupAnchor: [0, -30]
+            });
+
+            function initMap(lat, lon) {
+                var map = L.map('map-vendeur').setView([lat, lon], 14);
+
+                L.tileLayer(
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: '&copy; ESRI'
+                    }).addTo(map);
+
+                L.marker([lat, lon], {
+                        icon: iconVendeur
+                    })
+                    .bindPopup('<b>' + nomVendeur.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</b><br>' + adresse
+                        .replace(/</g, '&lt;').replace(/>/g, '&gt;'))
+                    .addTo(map)
+                    .openPopup();
+            }
+
+            function sauvegarderCoords(lat, lon) {
+                if (!idAdresse) return;
+                var fd = new FormData();
+                fd.append('action', 'save_coords');
+                fd.append('id_adresse', idAdresse);
+                fd.append('lat', lat);
+                fd.append('lon', lon);
+                fetch('<?= htmlspecialchars('/html/partials/carte.php') ?>', {
+                        method: 'POST',
+                        body: fd
+                    })
+                    .catch(function(e) {
+                        console.warn('Sauvegarde coords échouée', e);
+                    });
+            }
+
+            if (latSaved !== null && lonSaved !== null) {
+                initMap(latSaved, lonSaved);
+            } else {
+                fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(adresse) +
+                        '&format=json&limit=1')
+                    .then(function(r) {
+                        return r.json();
+                    })
+                    .then(function(data) {
+                        if (data.length > 0) {
+                            var lat = parseFloat(data[0].lat);
+                            var lon = parseFloat(data[0].lon);
+                            initMap(lat, lon);
+                            sauvegarderCoords(lat, lon);
+                        } else {
+                            document.getElementById('map-vendeur').style.display = 'none';
+                        }
+                    })
+                    .catch(function() {
+                        document.getElementById('map-vendeur').style.display = 'none';
+                    });
+            }
+        })();
+        </script>
+        <?php endif; ?>
 
         <!--titre de la section produits-->
         <h2>
