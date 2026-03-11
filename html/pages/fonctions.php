@@ -784,11 +784,14 @@ function confirmerMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, 
 }
 
 //fonction pour modifier le mot de passe du compte
-function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationNouveauMotDePasse)
-{
-    $retour = confirmerMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel);
-    if ($retour['success'] == 'false'){
-        return $retour;
+function modifierMotDePasseCompte($connexionBaseDeDonnees, $otp, $identifiantCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationNouveauMotDePasse)
+{   
+    //si on n'est pas en OTP
+    if (!$otp){
+        $retour = confirmerMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel);
+        if ($retour['success'] == 'false'){
+            return $retour;
+        }
     }
     try {
         //récupérer le mot de passe actuellement enregistré
@@ -800,7 +803,7 @@ function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $
 
         //validation du format du nouveau mot de passe
         if (!validerFormatMotDePasse($nouveauMotDePasse)) {
-            return ['success' => false, 'message' => "Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère spécial."];
+            return ['success' => false, 'message' => "Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère spécial. " . $nouveauMotDePasse];
         }
 
         //mettre à jour le nouveau mot de passe

@@ -1,6 +1,9 @@
 <?php
 //démarrer la session pour récupérer les informations du client
 session_start();
+require_once(__DIR__."/../../vendor/autoload.php");
+use OTPHP\TOTP;
+use OTPHP\Factory;
 
 //inclure le fichier de configuration pour la connexion à la base de données
 include '../../selectBDD.php';
@@ -100,27 +103,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //changement du mot de passe
     if (isset($_POST['change_password'])) {
-        //if (empty($_SESSION['OTP'])){
+        $nouveauMotDePasseSaisi = $_POST['nouveau_password'] ?? '';
+        $confirmationMotDePasseSaisie = $_POST['confirm_password'] ?? '';
+        if (empty($_SESSION['OTP']['statut'])){
             //récupérer les mots de passe saisis
             $motDePasseActuelSaisi = $_POST['actuel_password'] ?? '';
-            $nouveauMotDePasseSaisi = $_POST['nouveau_password'] ?? '';
-            $confirmationMotDePasseSaisie = $_POST['confirm_password'] ?? '';
+            
 
             //appeler la fonction de modification du mot de passe
             $resultatModificationMotDePasse = modifierMotDePasseCompte(
                 $connexionBaseDeDonnees,
+                false,
                 $identifiantCompteClient,
                 $motDePasseActuelSaisi,
                 $nouveauMotDePasseSaisi,
                 $confirmationMotDePasseSaisie
             );
-        //}
 
-        //rediriger avec un message de succès ou afficher une erreur
-        if ($resultatModificationMotDePasse['success']) {
-            $messageSucces = "Votre mot de passe a été modifié avec succès";
-        } else {
-            $messageErreur = $resultatModificationMotDePasse['message'];
+            //rediriger avec un message de succès ou afficher une erreur
+            if ($resultatModificationMotDePasse['success']) {
+                $messageSucces = "Votre mot de passe a été modifié avec succès";
+            } else{
+                $messageErreur = $resultatModificationMotDePasse['message'];
+            }
+        }else{
+            $otp_saisi = $_POST['code_OTP'] ?? '';
+            try{
+                $stmt = $connexionBaseDeDonnees->prepare("SELECT secret_otp, etat_otp FROM _compte WHERE id_compte = :compte");
+                $stmt->execute([':compte' => $identifiantCompteClient]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $otp = TOTP::createFromSecret($row['secret_otp']);
+                if (($row['etat_otp'] == 'true' && $otp->verify($otp_saisi, null, 20))){
+                    $succes = true;
+                    $stmt = $connexionBaseDeDonnees->prepare("UPDATE _compte SET etat_otp = false WHERE id_compte = :compte");
+                    $stmt->execute([':compte' => $identifiantCompteClient]);
+                    unset($_SESSION['OTP']['statut']);
+
+                    $resultatModificationMotDePasse = modifierMotDePasseCompte(
+                        $connexionBaseDeDonnees,
+                        true,
+                        $identifiantCompteClient,
+                        '',
+                        $nouveauMotDePasseSaisi,
+                        $confirmationMotDePasseSaisie
+                    );
+                }else{
+                    $succes = false;
+                    $messageErreur2 = "Le code OTP est faux";
+                }
+            } catch (Exception $e) {
+                $succes = false;
+                $messageErreur2 = "Erreur lors du changement de mot de passe";
+            }
+
+            //rediriger avec un message de succès ou afficher une erreur
+            if (!empty($resultatModificationMotDePasse)){
+                 if (!$resultatModificationMotDePasse['success']) {
+                    $messageErreur = $resultatModificationMotDePasse['message'];
+                } else if(!$succes){
+                    $messageErreur = $messageErreur2;
+                }else{
+                    $messageSucces = "Votre mot de passe a été modifié avec succès";
+                }
+            }else{
+                $messageErreur = $messageErreur2;
+            }
         }
     }
 
@@ -203,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //traitement POST pour désactivation de l'OTP
     // if (isset($_POST['desactiverOTP'])) {
-    //     unset($_SESSION['OTP']);
+    //     unset($_SESSION['OTP']['statut']);
     // }
 }
 
@@ -582,23 +629,20 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <main>
                         <!-- Formulaire de changement de mot de passe -->
                         <form method="POST">
-                            <?php
-                            print_r($_SESSION['OTP']);
-                            if (empty($_SESSION['OTP'])){?>
-                            <div>
+                            <div style='display: <?php
+                            if (empty($_SESSION['OTP']['statut'])){ echo 'block'; } else{ echo 'none';} ?>'>
                                 <label>
                                     <span>Mot de passe actuel</span>
                                     <input type="password" name="actuel_password" required>
                                 </label>
                             </div>
-                            <?php }else{?>
-                            <div>
+                            <div style='display: <?php
+                            if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
                                 <label>
                                     <span>code OTP</span>
                                     <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP"/>
                                 </label>
                             </div>
-                            <?php } ?>
                             <div>
                                 <label>
                                     <span>Nouveau mot de passe</span>
@@ -647,15 +691,15 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <span class="btn-text-desktop">Activer le One Time Password</span>
                             <span class="btn-text-mobile">Activer l'OTP</span>
                         </button><?php 
-                        if (!empty($_SESSION['OTP'])){?>
-                            <script> document.querySelector("#activerOTP").disabled = true; </script><?php
+                        if (!empty($_SESSION['OTP']['statut'])){?>
+                            <script> document.getElementById("activerOTP").disabled = true; </script><?php
                         }else{?>
-                            <script> document.querySelector("#activerOTP").disabled = false; </script>
+                            <script> document.getElementById("activerOTP").disabled = false; </script>
                         <?php } ?>
                         <!-- <form method="POST">
                             <button type="submit" name="desactiverOTP"
                                 onclick="return confirm('Êtes-vous sûr de vouloir désactiver le One Time Password ?')"
-                                style="<?php //if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
+                                style="<?php //if (!empty($_SESSION['OTP']['statut'])){ echo 'display:block';} ?>">
                                 <span class="btn-text-desktop">Désactiver le One Time Password</span>
 
                                 <span class="btn-text-mobile">Désactiver l'OTP</span>
@@ -717,7 +761,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         <div>
             <h2>One Time Password</h2>
             <?php
-                if (empty($_SESSION['OTP'])){
+                if (empty($_SESSION['OTP']['statut'])){
                     include_once '../connexionClient/OTP.php';
                     ?>
             <form id="otporm">
@@ -760,7 +804,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                             xhttp3.send("statutOTP=active");
                             succesOTP();
-                            //document.location.href = "/pages/connexionClient/index.php"; 
                         } else {
                             alert("Echec. Veuillez réessayer.");
                         }
@@ -913,9 +956,6 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
         const champCacheLienImage = document.getElementById('lien_image');
         //récupère l'ID du client connecté depuis PHP
         const identifiantClientConnecte = <?php echo $identifiantClientConnecte; ?>;
-
-        //réactive le bouton pour activer l'OTP
-        document.getElementById('activerOTP').disabled = false;
 
 
         //configure le système de drag & drop pour l'upload d'image
@@ -1323,8 +1363,10 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     }
 
     function succesOTP() {
-        document.getElementById('activerOTP').textContent = "One Time Password activée avec succès."
-        document.getElementById('activerOTP').disabled = true
+        document.getElementById('activerOTP').textContent = "One Time Password activé avec succès.";
+        document.getElementById('activerOTP').disabled = true;
+        document.querySelector('form:nth-of-type(1) div:nth-of-type(1)').style.display = 'none';
+        document.querySelector('form:nth-of-type(1) div:nth-of-type(2)').style.display = 'block';
     }
 
     document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {

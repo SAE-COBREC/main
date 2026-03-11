@@ -508,12 +508,13 @@ body {
                             const contentLength = xhttp2.getResponseHeader("Content-Length");
                             if (contentLength == 4) {
                                 xhttp2.abort();
-                                alert("Authentification à double facteur activée avec succès.");
+                                alert("One Time Password activé avec succès.");
 
                                 // const xhttp3 = new XMLHttpRequest();
                                 // xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
                                 // xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                                 // xhttp3.send("statutOTP=active");
+                                $_SESSION['OTP']['statut'] = 'active';
                                 const btnFleche = document.querySelector("#finishBtn");
                                 btnFleche.disabled = false;
                             } else {
