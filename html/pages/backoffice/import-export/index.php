@@ -726,6 +726,10 @@ try {
                         <a href="?export=produits" class="btn btn--primary btn--full">
                             Exporter les produits (.csv)
                         </a>
+
+                        <a href="../Catalogue/lesProduits.php" class="btn btn--primary btn--full">
+                            Exporter les produits (.pdf)
+                        </a>
                     </div>
                 </div>
 
