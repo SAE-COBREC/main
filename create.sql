@@ -1226,113 +1226,97 @@ INSERT INTO
         id_compte,
         SIREN,
         raison_sociale,
-        denomination,
-        nb_produits_crees
+        denomination
     )
 VALUES (
         2,
         '123456789',
         'TechStore SARL',
-        'TechStore',
-        5
+        'TechStore'
     ),
     (
         3,
         '987654321',
         'FashionHub SAS',
-        'FashionHub',
-        3
+        'FashionHub'
     ),
     (
         10,
         '456789123',
         'SportPro EURL',
-        'SportPro',
-        2
+        'SportPro'
     ),
     (
         11,
         '123456787',
         'Breizh Électronique EURL',
-        'BreizhElec',
-        5
+        'BreizhElec'
     ),
     (
         12,
         '787654321',
         'Atelier du Beurre SAS',
-        'AtelierBeurre',
-        5
+        'AtelierBeurre'
     ),
     (
         13,
         '556789123',
         'Vêtements Ouest SARL',
-        'WestClothing',
-        5
+        'WestClothing'
     ),
     (
         14,
         '321654987',
         'Pêcheur & Fils SASU',
-        'MaréeBretonne',
-        5
+        'MaréeBretonne'
     ),
     (
         15,
         '159263487',
         'Délices de Quimper SARL',
-        'QuimperDélices',
-        5
+        'QuimperDélices'
     ),
     (
         16,
         '753951852',
         'Artisanat Armor SAS',
-        'ArmorArt',
-        5
+        'ArmorArt'
     ),
     (
         17,
         '852963741',
         'Biscuiterie de la Mer SARL',
-        'MerBiscuits',
-        5
+        'MerBiscuits'
     ),
     (
         18,
         '963852741',
         'Textiles Vannetais EURL',
-        'VannesTextile',
-        5
+        'VannesTextile'
     ),
     (
         19,
         '147258369',
         'Saveurs Argoat SAS',
-        'ArgoatSaveurs',
-        5
+        'ArgoatSaveurs'
     ),
     (
         20,
         '741852963',
         'Maison de la Galette SARL',
-        'GaletteMaison',
-        5
+        'GaletteMaison'
     ),
     (
         21,
         '258369147',
         'Bijouterie Celtique SARL',
-        'CeltiqueJewels',
-        5
+        'CeltiqueJewels'
     ),
     (
         22,
         '369147258',
         'Cidrerie de la Côte SASU',
-        'CidreCote',
-        5
+        'CidreCote'
     );
 
 -- 4. CLIENTS
@@ -8206,13 +8190,6 @@ VALUES (1, 2),
 UPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 1;
 
 UPDATE _produit SET p_nb_signalements = 1 WHERE id_produit = 12;
-
--- Mise à jour du nombre de produits créés par les vendeurs
-UPDATE _vendeur SET nb_produits_crees = 10 WHERE id_vendeur = 1;
-
-UPDATE _vendeur SET nb_produits_crees = 8 WHERE id_vendeur = 2;
-
-UPDATE _vendeur SET nb_produits_crees = 7 WHERE id_vendeur = 3;
 
 -- Mise à jour de la moyenne des notes des produits ajoutés/modifiés/supprimés
 

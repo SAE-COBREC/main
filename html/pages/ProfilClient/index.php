@@ -1,6 +1,7 @@
 <?php
 //démarrer la session pour récupérer les informations du client
 session_start();
+print_r($_SESSION['OTP']);
 require_once(__DIR__."/../../vendor/autoload.php");
 use OTPHP\TOTP;
 use OTPHP\Factory;
@@ -248,11 +249,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $messageErreur = $resultatAjoutAdresse['message'];
         }
     }
-
-    //traitement POST pour désactivation de l'OTP
-    // if (isset($_POST['desactiverOTP'])) {
-    //     unset($_SESSION['OTP']['statut']);
-    // }
 }
 
 //chargement des données pour l'affichage de la page
