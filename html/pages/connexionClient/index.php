@@ -78,6 +78,7 @@ $pdo->exec("SET search_path TO cobrec1");
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
+  $_SESSION['connexionClient']['login'] = $login;
   $mdp = $_POST['mdp'] ?? '';
   $otp_saisi = $_POST['code_OTP'] ?? '';
 
@@ -87,12 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
   try{
     //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_OTP, etat_OTP FROM _compte WHERE email = :login");
+    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_otp, etat_otp FROM _compte WHERE email = :login");
     $stmt->execute([':login' => $login]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     //verification que l'aresse mail existe dans la bdd
     if (!$row) {
-      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp, c.secret_OTP, c.etat_OTP FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
+      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp, c.secret_otp, c.etat_otp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
       $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -106,13 +107,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       //verification que le mdp corespondant a ce mail existe
       if (empty($row['secret_otp'])){
-        $otp = '';
+        $otp_now = '';
       }else{
         $otp = TOTP::createFromSecret($row['secret_otp']);
-        $otp = $otp->now();
+        $otp_now = $otp->verify($otp_saisi, null, 20);
+        //$otp_now = $otp->now();
       }
-        //file_put_contents('log.txt','otp=' . $otp . ' otp_saisie=' . $otp_saisi . ' mdp=' . password_verify($mdp, $row['mdp']) . 'etat=' . $row['etat_otp']);
-      if (($row['etat_otp'] == 'true' && $otp == $otp_saisi) || ($row['etat_otp'] != 'true' && password_verify($mdp, $row['mdp']))){
+        //file_put_contents('log.txt','otp=' . $otp_now . ' otp_saisie=' . $otp_saisi . ' mdp=' . password_verify($mdp, $row['mdp']) . 'etat=' . $row['etat_otp'] . 'verify=' . $otp->verify($otp_saisi, null, 20));
+      if (($row['etat_otp'] == 'true' && $otp_now) || ($row['etat_otp'] != 'true' && password_verify($mdp, $row['mdp']))){
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
@@ -199,7 +201,9 @@ body {
 
             <div>
                 <label for="email">Email/Pseudonyme</label>
-                <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
+                <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" 
+                value="<?php if (!empty($_SESSION['connexionClient']['login'])){ echo $_SESSION['connexionClient']['login']; }?>" 
+                required>
             </div>
 
             <div class="mdpClassique">
