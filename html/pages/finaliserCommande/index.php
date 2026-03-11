@@ -59,7 +59,7 @@ if (isset($_SESSION['idClient'])) {
         //prix de hors taxe du produit
         $prix_ht = $donnees["p_prix"];
         //calcul de la somme a déduire du produit car il est en réduction
-        $reduc_unitaire = $donnees["p_prix"] * ($donnees["reduction_pourcentage"] / 100);
+        $reduc_unitaire = $donnees["p_prix"] * ($donnees["pourcentage_reduction"] / 100);
         //prix de la réduction avec la quantité de produit acheté (pour la facture)
         $reduc_totale = $reduc_unitaire * $qte;
 
