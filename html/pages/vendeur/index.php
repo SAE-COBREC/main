@@ -166,7 +166,7 @@ $adresseComplete = construireAdresseCompleteVendeur($informationsVendeur);
                 <!--affiche la localisation du vendeur si elle existe-->
                 <?php if (!empty($informationsVendeur['ville'])): ?>
                 <address>
-                    <img src="/img/svg/location.svg" alt="" width="14" onerror="this.style.display='none'">
+                    <img src="/img/png/carte-et-localisation.png" alt="" width="14" onerror="this.style.display='none'">
                     <!--affiche le code postal s'il est disponible-->
                     <?php if (!empty($informationsVendeur['code_postal'])): ?>
                     <?= htmlspecialchars($informationsVendeur['code_postal']) ?> –
