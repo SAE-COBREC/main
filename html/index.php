@@ -673,6 +673,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             </div>
 
 
+
                             <form action="/pages/vendeur/index.php" method="GET" onclick="event.stopPropagation();"
                                 style="display:inline; margin:0; padding:0;">
                                 <input type="hidden" name="denomination"
