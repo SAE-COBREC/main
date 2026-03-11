@@ -78,7 +78,7 @@ main {
 // BOUTON RETOUR  →  main > a
 // ============================================
 
-main > a {
+main>a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -110,7 +110,7 @@ main > a {
 // CARTE PROFIL VENDEUR  →  main > section
 // ============================================
 
-main > section {
+main>section {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -123,7 +123,7 @@ main > section {
 }
 
 //avatar circulaire avec photo  →  main > section > img
-main > section > img {
+main>section>img {
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -133,7 +133,7 @@ main > section > img {
 }
 
 //avatar placeholder  →  main > section > figure
-main > section > figure {
+main>section>figure {
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -153,7 +153,7 @@ main > section > figure {
 }
 
 //zone texte à droite de l'avatar  →  main > section > div
-main > section > div {
+main>section>div {
   flex: 1;
   min-width: 0;
 
@@ -167,7 +167,7 @@ main > section > div {
 }
 
 //raison sociale  →  main > section > div > small
-main > section > div > small {
+main>section>div>small {
   display: block;
   color: #6b7280;
   font-size: 0.95rem;
@@ -175,7 +175,7 @@ main > section > div > small {
 }
 
 //note moyenne  →  main > section > div > p
-main > section > div > p {
+main>section>div>p {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -193,7 +193,7 @@ main > section > div > p {
 }
 
 //localisation  →  main > section > div > address
-main > section > div > address {
+main>section>div>address {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -210,7 +210,7 @@ main > section > div > address {
 }
 
 //chips de statistiques  →  main > section > div > footer
-main > section > div > footer {
+main>section>div>footer {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -243,7 +243,7 @@ main > section > div > footer {
 // TITRE SECTION PRODUITS  →  main > h2
 // ============================================
 
-main > h2 {
+main>h2 {
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 1.2rem;
@@ -262,7 +262,7 @@ main > h2 {
 // GRILLE DE PRODUITS  →  main > ul
 // ============================================
 
-main > ul {
+main>ul {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
@@ -279,7 +279,7 @@ main > ul {
 // INFOS VENDEUR DANS CARTE  →  article > div:last-child > div:last-child > div
 // ============================================
 
-article > div:last-child > div:last-child > div {
+article>div:last-child>div:last-child>div {
   display: inline-flex;
   align-items: center;
   margin-bottom: 12px;
@@ -310,14 +310,14 @@ article > div:last-child > div:last-child > div {
 // BAS DE CARTE  →  article > div:last-child > div:last-child
 // ============================================
 
-article > div:last-child > div:last-child {
+article>div:last-child>div:last-child {
   margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
 
-  > div {
+  >div {
     margin: 0 0 6px 0;
     width: fit-content;
     align-self: flex-start;
@@ -346,7 +346,7 @@ article {
   @include hover-lift;
 
   //section image
-  > div:first-child {
+  >div:first-child {
     position: relative;
     width: 100%;
     height: 200px;
@@ -400,7 +400,7 @@ article {
     }
 
     //rupture de stock  →  div
-    > div {
+    >div {
       @include centre-absolu;
       background-color: rgba($secondary-color-gris-clair, 0.9);
       color: $primary-color-noir;
@@ -414,7 +414,7 @@ article {
   }
 
   //section informations texte
-  > div:last-child {
+  >div:last-child {
     padding: 1.25rem;
     flex: 1;
     display: flex;
@@ -428,7 +428,7 @@ article {
     }
 
     //étoiles et nombre d'avis
-    > div:nth-child(2) {
+    >div:nth-child(2) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -445,7 +445,7 @@ article {
     }
 
     //prix
-    > div:nth-child(3) {
+    >div:nth-child(3) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -504,7 +504,7 @@ article[data-rupture] {
 }
 
 //image grisée si rupture  →  article[data-rupture] img
-article[data-rupture] > div:first-child > img {
+article[data-rupture]>div:first-child>img {
   filter: grayscale(100%) opacity(0.7);
 }
 
@@ -512,7 +512,7 @@ article[data-rupture] > div:first-child > img {
 // AUCUN PRODUIT  →  main > p
 // ============================================
 
-main > p {
+main>p {
   text-align: center;
   padding: 4rem 1rem;
   color: #9ca3af;
@@ -524,30 +524,30 @@ main > p {
 // ============================================
 
 @media (max-width: 640px) {
-  main > section {
+  main>section {
     flex-direction: column;
     text-align: center;
     padding: 1.5rem 1rem;
   }
 
-  main > section > div > footer {
+  main>section>div>footer {
     justify-content: center;
   }
 
-  main > section > div > address {
+  main>section>div>address {
     justify-content: center;
   }
 
-  main > section > div > p {
+  main>section>div>p {
     justify-content: center;
   }
 
-  main > ul {
+  main>ul {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
   }
 
-  article > div:last-child > div:last-child {
+  article>div:last-child>div:last-child {
     flex-direction: column;
     align-items: stretch;
 

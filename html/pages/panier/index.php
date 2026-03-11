@@ -1,6 +1,7 @@
 <?php 
     session_start();
     include '../../selectBDD.php';
+    include '../fonctions.php';
 
     if (!isset($_SESSION['panierTemp']) && !isset($_SESSION['idClient'])){
         $_SESSION['panierTemp'] = array();
@@ -44,6 +45,22 @@
                                     hoses dans le panier pour lancer ou non le javascript*/
     }
     $panierVide = true;
+    $donnees = chargerProduitsBDD($pdo);
+    //extrait la liste des produits
+    $listeProduits = $donnees['produits'];    
+    $requeteFav = "
+        SELECT id_produit 
+        FROM _favoris
+        WHERE id_client = :id_client;   
+    ";
+
+    $stmt = $pdo->prepare($requeteFav);
+    
+    $stmt->execute([
+        ':id_client' => $id_client
+    ]);
+    
+    $idsProduits = $stmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -60,11 +77,11 @@
 
 <?php
     include __DIR__ . '/../../partials/header.php';
-    ?>
+?>
 
 <body>
 
-
+    <main>
     <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
     <section class="articlesPrixP">
 
@@ -78,108 +95,213 @@
             }
         ?>
 
-        <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
-        <div class="conteneurArticles">
-
-            <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
-
-            <?php foreach ($panierCourant as $article): ?>
-            <article class="unArticleP"
-                data-prix="<?php echo ($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
-                data-stock="<?php echo intval($article['p_stock'])?>"
-                data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
-                <div class="imageArticleP">
-                    <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
-                        alt="<?php echo htmlspecialchars($article['i_alt']) ?>"
-                        title="<?php echo htmlspecialchars($article['i_title'])?>">
-                </div>
-                <div class="articleDetailP">
-                    <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                    <p><strong>Vendu par :
-                        </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
-                        <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
-                        <?php
-                        if (!empty($article['reduction_pourcentage'])){
-                            if ((strtotime($article["reduction_debut"]) > time()) && (strtotime($article["reduction_fin"]) > time())){
-                                $article['reduction_pourcentage'] = 0;
-                            }
-                        }
-                        if (!empty($article['reduction_pourcentage']) && $article['reduction_pourcentage'] != 0){
-                        ?>
-                        <strong>Remise :
-                        </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
-                        <?php } ?>
-                    </p>
-                    <div class="basArticleP">
-                        <p class="articlePrix">TTC :
-                            <?php echo number_format(($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
-                            €</p>
-                        <div class="quantite">
-
-                            <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
-                            <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php" data-no-loader>
-                                <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>">
-                                <!--stock l'id du produit pour la suppression-->
-                                <!--bouton pour envoyer le formulaire-->
-                                <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg"
-                                        alt="Supprimer" /></button>
-                            </form>
-                            <button class="btn_moins" data-no-loader>-</button>
-                            <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>" data-no-loader>
-                            <button class="btn_plus" data-no-loader>+</button>
-                        </div>
-                    </div>
-                </div>
-            </article>
-            <?php endforeach;?>
-        </div>
         <?php if(!$panierVide) : ?>
-            <!-- BLOCK DU RECAP DE LA COMMANDE -->
-            <aside class="recapCommande">
-                <h3 id="totalArticles"></h3>
-                <div id="listeProduits"></div>
+            <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
+            <div class="conteneurArticles">
 
-                <hr class="recapSeparateur">
+                <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
 
-                <div class="recapLigne">
-                    <span>Sous-total HT :</span>
-                    <span id="sousTotal">0,00 €</span>
-                </div>
-                <div class="recapLigne">
-                    <span>TVA :</span>
-                    <span id="totalTVA">0,00 €</span>
-                </div>
+                <?php foreach ($panierCourant as $article): ?>
+                        <article class="unArticleP"
+                            data-prix="<?php echo ($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
+                            data-stock="<?php echo intval($article['p_stock'])?>"
+                            data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
+                            <div class="imageArticleP">
+                                <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
+                                    alt="<?php echo htmlspecialchars($article['i_alt']) ?>"
+                                    title="<?php echo htmlspecialchars($article['i_title'])?>">
+                            </div>
+                            <div class="articleDetailP">
+                                <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                                <p><strong>Vendu par :
+                                    </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
+                                    <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
+                                    <?php
+                                    if (!empty($article['reduction_pourcentage'])){
+                                        if ((strtotime($article["reduction_debut"]) > time()) && (strtotime($article["reduction_fin"]) > time())){
+                                            $article['reduction_pourcentage'] = 0;
+                                        }
+                                    }
+                                    if (!empty($article['reduction_pourcentage']) && $article['reduction_pourcentage'] != 0){
+                                    ?>
+                                    <strong>Remise :
+                                    </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
+                                    <?php } ?>
+                                </p>
+                                <div class="basArticleP">
+                                    <p class="articlePrix">TTC :
+                                        <?php echo number_format(($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
+                                        €</p>
+                                    <div class="quantite">
 
-                <hr class="recapSeparateur">
+                                        <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
+                                        <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php" data-no-loader>
+                                            <input type="hidden" name="id_produit" value="<?php echo $article['id_produit']; ?>">
+                                            <!--stock l'id du produit pour la suppression-->
+                                            <!--bouton pour envoyer le formulaire-->
+                                            <button type="submit" id="supprimerArticle" class=" "><img src="/img/svg/poubelle.svg"
+                                                    alt="Supprimer" /></button>
+                                        </form>
+                                        <button class="btn_moins" data-no-loader>-</button>
+                                        <input type="text" class="quantite_input_entre" value="<?php echo $article['quantite'];?>" data-no-loader>
+                                        <button class="btn_plus" data-no-loader>+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                <?php endforeach;?>   
+            </div>
+        <?php endif;?>
+            <?php if(!$panierVide) : ?>
+                <!-- BLOCK DU RECAP DE LA COMMANDE -->
+                <aside class="recapCommande">
+                    <h3 id="totalArticles"></h3>
+                    <div id="listeProduits"></div>
 
-                <div class="recapLigne recapLigneTotale">
-                    <strong>Montant total TTC :</strong>
-                    <strong id="prixTotal">0,00 €</strong>
-                </div>
+                    <hr class="recapSeparateur">
 
-                <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
-                    <button class="finaliserCommande">Finaliser commande</button>
-                </form>
+                    <div class="recapLigne">
+                        <span>Sous-total HT :</span>
+                        <span id="sousTotal">0,00 €</span>
+                    </div>
+                    <div class="recapLigne">
+                        <span>TVA :</span>
+                        <span id="totalTVA">0,00 €</span>
+                    </div>
 
-                <!--FORMULAIRE POUR VIDER LE PANIER-->
-                <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
-                    <button type="submit" id="viderPanier">Vider le panier</button>
-                </form>
-            </aside>
+                    <hr class="recapSeparateur">
+
+                    <div class="recapLigne recapLigneTotale">
+                        <strong>Montant total TTC :</strong>
+                        <strong id="prixTotal">0,00 €</strong>
+                    </div>
+
+                    <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
+                        <button class="finaliserCommande">Finaliser commande</button>
+                    </form>
+
+                    <!--FORMULAIRE POUR VIDER LE PANIER-->
+                    <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
+                        <button type="submit" id="viderPanier">Vider le panier</button>
+                    </form>
+                </aside>
         <?php endif ;?>
-        <?php  if ($panierVide) : ?>
-        <div id="panierVide">
-            <img src="/img/svg/panier-empty.svg" alt="Illustration panier vide" />
-            <a href="/" id="retourAchat">Continuer mes achats</a>
-        </div>
 
+        <?php  if ($panierVide) : ?>
+            <div id="panierVide">
+                <img id="panierVide" src="/img/svg/panier-empty.svg" />
+                <a href="/" id="retourAchat">Continuer mes achats</a>
+            </div>
         <?php endif;?>
     </section>
-    <section class="lesFavoris">
-            
-    </section>
 
+    <?php if(isset($id_client)):?>
+        <section class="lesFavoris">
+            <h3>Mes favoris :</h3>
+            <!--BASÉ SUR LE CODE DE LA PAGE /vendeur/index.php demandé à marceau ou gaetan pour cette partie-->
+            <ul>
+                <!--boucle sur tous les produits du vendeur-->
+                <?php foreach ($listeProduits as $produitCourant):
+                    //vérifie si le produit est en rupture de stock
+                    $estEnRupture = $produitCourant['p_stock'] <= 0;
+                    //récupère le pourcentage de réduction
+                    $discount = (float) ($produitCourant['reduction_pourcentage'] ?? 0);
+                    //vérifie s'il y a une réduction
+                    $possedePourcentageRemise = $discount > 0;
+                    //calcule le prix après réduction
+                    $prixDiscount = $possedePourcentageRemise ? $produitCourant['p_prix'] * (1 - $discount / 100) : $produitCourant['p_prix'];
+                    //calcule le prix final TTC
+                    $prixFinal = calcPrixTVA($produitCourant['tva'], $prixDiscount);
+                    //calcule le prix original TTC
+                    $prixOriginalTTC = calcPrixTVA($produitCourant['tva'], $produitCourant['p_prix']);
+                    //arrondit la note moyenne
+                    $noteArrondie = (int) round($produitCourant['note_moyenne'] ?? 0);
+                    //vérifie si le produit est en promotion
+                    $estEnPromotion = !empty($produitCourant['estenpromo']);
+                    //construit l'URL de l'image du produit
+                    $urlImage = str_replace('html/img/photo', '/img/photo', $produitCourant['image_url'] ?? '/img/default-product.jpg');
+                    //récupère l'origine du produit
+                    $origineProduit = recupOrigineProduit($pdo , $produitCourant['id_produit']);
+                ?>
+                <?php if (in_array($produitCourant['id_produit'], $idsProduits)):?>
+                    <!--carte de produit cliquable-->
+                    <li>
+                        <article <?= $estEnRupture ? 'data-rupture' : '' ?> <?= $estEnPromotion ? 'data-promo' : '' ?>
+                            onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
 
+                            <div>
+                                <!--image du produit-->
+                                <img src="<?= htmlspecialchars($urlImage) ?>"
+                                    alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>">
+                                <!--affiche le badge de réduction s'il y en a une-->
+                                <?php if ($possedePourcentageRemise): ?>
+                                <mark>-<?= round($discount) ?>%</mark>
+                                <?php endif; ?>
+                                <!--affiche le badge Bretagne si le produit est d'origine bretonne-->
+                                <?php if ($origineProduit === 'Bretagne'): ?>
+                                <span><img src="/img/png/badge-bretagne.png" alt="Bretagne"></span>
+                                <?php endif; ?>
+                                <!--affiche le message de rupture de stock si nécessaire-->
+                                <?php if ($estEnRupture): ?>
+                                <div>Rupture de stock</div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div>
+                                <!--nom du produit-->
+                                <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
+
+                                <div>
+                                    <span>
+                                        <!--affiche les étoiles de notation-->
+                                        <?php for ($i = 1; $i <= 5; $i++):
+                                        if ($noteArrondie >= $i)           $s = 'full';
+                                        elseif ($noteArrondie >= $i - 0.5) $s = 'alf';
+                                        else                               $s = 'empty';
+                                    ?>
+                                        <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                        <?php endfor; ?>
+                                    </span>
+                                    <!--affiche le nombre d'avis-->
+                                    <span>(<?= $produitCourant['nombre_avis'] ?? 0 ?>)</span>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        <!--affiche le prix barré s'il y a une réduction-->
+                                        <?php if ($possedePourcentageRemise): ?>
+                                        <span style="text-decoration:line-through;color:#999;margin-right:5px;font-size:1.2em;">
+                                            <?= number_format($prixOriginalTTC, 2, ',', ' ') ?>€
+                                        </span>
+                                        <?php endif; ?>
+                                    </span>
+                                    <!--affiche le prix final TTC-->
+                                    <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
+                                </div>
+
+                                <div>
+                                    <!--informations du vendeur (non cliquable sur cette page)-->
+                                    <div style="cursor:default;">
+                                        <img src="/img/svg/market.svg" alt="Vendeur">
+                                        <span><?= htmlspecialchars($informationsVendeur['denomination']) ?></span>
+                                    </div>
+                                    <!--bouton pour ajouter au panier-->
+                                    <button class="btnAjouterPanier" <?= $estEnRupture ? 'disabled' : '' ?>
+                                        onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
+                                        <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </article>
+                    </li>
+                <?php endif; ?>                  
+                <?php endforeach; ?>
+            </ul>
+        </section>
+    <?php endif;?>
+
+    </main>
 </body>
 <?php
     include __DIR__ . '/../../partials/footer.html';
@@ -187,170 +309,188 @@
     include __DIR__ . '/../../partials/modal.html';
     ?>
 <script src="/js/notifications.js"></script>
-
-<!--vérifie qu'il y ait minimun 1 élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
-<?php if (count($articles) > 0):?>
+<?php if (isset($id_client)) : ?>
 <script>
-function verifieStockMax(val, stock) {
-    console.log(val, stock);
-    if (val > stock) {
-        notify(`La quantité que vous avez saisie est supérieure au stock (${stock}).`, 'warning'); //fonction d'Elouan
-        return stock;
-    }
-    return val;
-}
-
-
-//fonction qui sauvegrade la quantité
-function saveQuantite(id_produit, quantite) {
-    //on construit la chaine qui va être envoyer dnas l'url
-    const params = 'id_produit=' + encodeURIComponent(id_produit) +
-        '&quantite=' + encodeURIComponent(quantite);
-
-    //lance une requete HTTP (fetch) vers le fichier ou est effectuer la mise a jour (ici pour nous c'est updateQuantité)
-    fetch('/pages/panier/updateQuantitePanier.php', {
-            method: 'POST', //avec la méthode post
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }, //on dit ce qu'on envoie et sous quelle forme (comme un formulaire HTML) en gros c'est pour que le php remplissent les variables avec $_POST
-            body: params //on donne les vrai donnée du formulaire
-        })
-        .then(response => response.json()) //on récupère la réponse
-        .then(data => { //si la requete revoie une erreur ou non
+    function ajouterAuPanier(idProduit) {
+        fetch(`/pages/panier/ajouterPanier.php?idProduit=${idProduit}`)
+        .then(reponse => reponse.json())
+        .then(data => {
             if (data.success) {
-                console.log("Quantité mise à jour avec succès");
+                notify(data.message, 'success');
+                setTimeout(() => { location.reload(); }, 300);
+            } else if (data.message === 'not_logged_in') {
+                notify("Vous devez être connecté pour ajouter au panier.", 'warning');
             } else {
-                console.error("Erreur lors de la mise à jour");
+                notify(data.message, 'error');
             }
         })
-        .catch(error => console.error('Erreur:', error)); //pour les erreurs autres par exemple fichier php non trouvé
-}
-
-
-//fonction pour mettre a jour le recap de la commande
-function updateRecap() {
-    const articles = document.querySelectorAll('.unArticleP');
-    let totalTTC = 0;
-    let totalHT = 0;
-    let nbArticles = 0;
-    let produitEnHTML = '';
-
-    articles.forEach(article => {
-        const prixTTC = parseFloat(article.dataset.prix);
-        const tva = parseFloat(article.dataset.tva);
-        const prixHT = prixTTC / (1 + tva / 100);
-        const quantiteEntre = article.querySelector('.quantite_input_entre');
-        const quantite = parseInt(quantiteEntre.value);
-        const titre = article.querySelector('.articleTitreP').textContent;
-
-        if (quantite > 0) {
-            totalTTC += prixTTC * quantite;
-            totalHT += prixHT * quantite;
-            nbArticles += quantite;
-            produitEnHTML += `<p class="recapProduitLigne"><span class="recapProduitNom">${titre}</span><span class="recapProduitQte">x${quantite}</span></p>`;
-        }
-    });
-
-    const totalTVA = totalTTC - totalHT;
-
-    document.getElementById('prixTotal').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
-    document.getElementById('sousTotal').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
-    document.getElementById('totalTVA').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
-    document.getElementById('totalArticles').textContent =
-        `Récapitulatif (${nbArticles} produit${nbArticles > 1 ? 's' : ''}) :`;
-    document.getElementById('listeProduits').innerHTML = produitEnHTML;
-}
-
-//gestion des boutons + et - et  supp pour chaque élément dans le panier
-document.querySelectorAll('.unArticleP').forEach(article => {
-    const input = article.querySelector('.quantite_input_entre');
-    const btnPlus = article.querySelector('.btn_plus');
-    const btnMoins = article.querySelector('.btn_moins');
-    const formSupp = article.querySelector('.suppArt');
-    const stockMax = parseInt(article.dataset.stock); //récup la quantité max en stock
-    const idProduit = article.querySelector('input[name="id_produit"]').value;
-
-
-    //bouton +
-    btnPlus.addEventListener('click', () => { //quand le plus est cliqué
-        let value = parseInt(input.value);
-        value += 1;
-        value = verifieStockMax(value, stockMax);
-        input.value = value;
-        updateRecap(); //appel de la fonction updateRecap
-        saveQuantite(idProduit, input.value); //update la quantité avec la fonction 
-    });
-
-    //bouton -
-    btnMoins.addEventListener('click', () => { //same que bouton plus
-        let value = parseInt(input.value);
-        if (value > 1) { //l'utilisateur ne dépasse pas 1 il sera jamais a 0
-            input.value = value - 1;
-            updateRecap();
-            saveQuantite(idProduit, input.value); //update la quantité avec la fonction 
-        }
-    });
-
-    formSupp.addEventListener('submit', (event) => { //si le client annule la suppression dans le panier
-        event.preventDefault(); //empeche la soumission du formulaire
-        showModal({
-            title: 'Suppression',
-            message: "Souhaitez-vous vraiment supprimer l'article du panier ?",
-            okText: 'Supprimer',
-            cancelText: 'Annuler',
-            variant: 'default',
-            onOk: () => {
-                formSupp.submit();
-            }
-        });
-    });
-
-    //gere les cas ou le texte change autrement genre du copier colle
-    input.addEventListener('input', (event) => { //event est l'évenement qui vient de se passer dans l'input
-
-        //supprime tout ce qui n'est pas un chiffre
-        // le g dans le regex sert pour dire que c'est partout dans le input g = général
-        let value = event.target.value.replace(/[^0-9]/g, '');
-
-        //convertit en nombre ou met a 1 si rien si l'entré est vide ou invalide
-        value = parseInt(value) || 1;
-        //vérifie si quantité ne dépasse pas le max du stock
-        value = verifieStockMax(value, stockMax);
-
-        event.target.value = value; //met a jour la valeur de l'input
-        updateRecap(); //appele la fonction update récap
-        saveQuantite(idProduit, value); //update la quantité avec la fonction 
-    });
-
-    //empeche l’utilisateur de taper des caractères interdits comme les lettres directement.
-    input.addEventListener('keypress', (event) => {
-        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event
-            .key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
-            event.preventDefault();
-        }
-    });
-});
-
-//confirmation pour vider le panier
-const formViderPanier = document.getElementById('formViderPanier');
-
-formViderPanier.addEventListener('submit', (event) => {
-    event.preventDefault(); //empeche l'envoi du formulaire
-    showModal({
-        title: 'Vider le panier',
-        message: "Souhaitez-vous vraiment vider votre panier ?",
-        okText: 'Vider',
-        cancelText: 'Annuler',
-        variant: 'default',
-        onOk: () => {
-            formViderPanier.submit();
-        }
-    });
-});
-
-//initialisation du récap sinon il y a rien au début.
-updateRecap();
+        .catch(err => console.error("Erreur ajout panier:", err));
+    }
 </script>
+<?php endif; ?> 
+<!--vérifie qu'il y ait minimun 1 élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
+<?php if (count($panierCourant) > 0) : ?>
+    <script>
+        function verifieStockMax(val, stock) {
+            console.log(val, stock);
+            if (val > stock) {
+                notify(`La quantité que vous avez saisie est supérieure au stock (${stock}).`, 'warning'); //fonction d'Elouan
+                return stock;
+            }
+            return val;
+        }
+
+        //fonction qui sauvegrade la quantité
+        function saveQuantite(id_produit, quantite) {
+            //on construit la chaine qui va être envoyer dnas l'url
+            const params = 'id_produit=' + encodeURIComponent(id_produit) +
+                '&quantite=' + encodeURIComponent(quantite);
+
+            //lance une requete HTTP (fetch) vers le fichier ou est effectuer la mise a jour (ici pour nous c'est updateQuantité)
+            fetch('/pages/panier/updateQuantitePanier.php', {
+                    method: 'POST', //avec la méthode post
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }, //on dit ce qu'on envoie et sous quelle forme (comme un formulaire HTML) en gros c'est pour que le php remplissent les variables avec $_POST
+                    body: params //on donne les vrai donnée du formulaire
+                })
+                .then(response => response.json()) //on récupère la réponse
+                .then(data => { //si la requete revoie une erreur ou non
+                    if (data.success) {
+                        console.log("Quantité mise à jour avec succès");
+                    } else {
+                        console.error("Erreur lors de la mise à jour");
+                    }
+                })
+                .catch(error => console.error('Erreur:', error)); //pour les erreurs autres par exemple fichier php non trouvé
+        }
+
+
+        //fonction pour mettre a jour le recap de la commande
+        function updateRecap() {
+            const articles = document.querySelectorAll('.unArticleP');
+            let totalTTC = 0;
+            let totalHT = 0;
+            let nbArticles = 0;
+            let produitEnHTML = '';
+
+            articles.forEach(article => {
+                const prixTTC = parseFloat(article.dataset.prix);
+                const tva = parseFloat(article.dataset.tva);
+                const prixHT = prixTTC / (1 + tva / 100);
+                const quantiteEntre = article.querySelector('.quantite_input_entre');
+                const quantite = parseInt(quantiteEntre.value);
+                const titre = article.querySelector('.articleTitreP').textContent;
+
+                if (quantite > 0) {
+                    totalTTC += prixTTC * quantite;
+                    totalHT += prixHT * quantite;
+                    nbArticles += quantite;
+                    produitEnHTML += `<p class="recapProduitLigne"><span class="recapProduitNom">${titre}</span><span class="recapProduitQte">x${quantite}</span></p>`;
+                }
+            });
+
+            const totalTVA = totalTTC - totalHT;
+
+            document.getElementById('prixTotal').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('sousTotal').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('totalTVA').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('totalArticles').textContent = `Récapitulatif (${nbArticles} produit${nbArticles > 1 ? 's' : ''}) :`;
+            document.getElementById('listeProduits').innerHTML = produitEnHTML;
+        }
+
+
+        //gestion des boutons + et - et  supp pour chaque élément dans le panier
+        document.querySelectorAll('.unArticleP').forEach(article => {
+            const input = article.querySelector('.quantite_input_entre');
+            const btnPlus = article.querySelector('.btn_plus');
+            const btnMoins = article.querySelector('.btn_moins');
+            const formSupp = article.querySelector('.suppArt');
+            const stockMax = parseInt(article.dataset.stock); //récup la quantité max en stock
+            const idProduit = article.querySelector('input[name="id_produit"]').value;
+
+            //bouton +
+            btnPlus.addEventListener('click', () => { //quand le plus est cliqué
+                let value = parseInt(input.value);
+                value += 1;
+                value = verifieStockMax(value, stockMax);
+                input.value = value;
+                updateRecap(); //appel de la fonction updateRecap
+                saveQuantite(idProduit, input.value); //update la quantité avec la fonction 
+            });
+
+            //bouton -
+            btnMoins.addEventListener('click', () => { //same que bouton plus
+                let value = parseInt(input.value);
+                if (value > 1) { //l'utilisateur ne dépasse pas 1 il sera jamais a 0
+                    input.value = value - 1;
+                    updateRecap();
+                    saveQuantite(idProduit, input.value); //update la quantité avec la fonction 
+                }
+            });
+
+            formSupp.addEventListener('submit', (event) => { //si le client annule la suppression dans le panier
+                event.preventDefault(); //empeche la soumission du formulaire
+                showModal({
+                    title: 'Suppression',
+                    message: "Souhaitez-vous vraiment supprimer l'article du panier ?",
+                    okText: 'Supprimer',
+                    cancelText: 'Annuler',
+                    variant: 'default',
+                    onOk: () => {
+                        formSupp.submit();
+                    }
+                });
+            });
+
+            //gere les cas ou le texte change autrement genre du copier colle
+            input.addEventListener('input', (event) => { //event est l'évenement qui vient de se passer dans l'input
+
+                //supprime tout ce qui n'est pas un chiffre
+                // le g dans le regex sert pour dire que c'est partout dans le input g = général
+                let value = event.target.value.replace(/[^0-9]/g, '');
+
+                //convertit en nombre ou met a 1 si rien si l'entré est vide ou invalide
+                value = parseInt(value) || 1;
+                //vérifie si quantité ne dépasse pas le max du stock
+                value = verifieStockMax(value, stockMax);
+
+                event.target.value = value; //met a jour la valeur de l'input
+                updateRecap(); //appele la fonction update récap
+                saveQuantite(idProduit, value); //update la quantité avec la fonction 
+            });
+
+            //empeche l’utilisateur de taper des caractères interdits comme les lettres directement.
+            input.addEventListener('keypress', (event) => {
+                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event
+                    .key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+                    event.preventDefault();
+                }
+            });
+        });
+
+
+
+        //confirmation pour vider le panier
+        const formViderPanier = document.getElementById('formViderPanier');
+
+        formViderPanier.addEventListener('submit', (event) => {
+            event.preventDefault(); //empeche l'envoi du formulaire
+            showModal({
+                title: 'Vider le panier',
+                message: "Souhaitez-vous vraiment vider votre panier ?",
+                okText: 'Vider',
+                cancelText: 'Annuler',
+                variant: 'default',
+                onOk: () => {
+                    formViderPanier.submit();
+                }
+            });
+        });
+
+        //initialisation du récap sinon il y a rien au début.
+        updateRecap();
+    </script>
 <?php endif;?>
 
 </html>

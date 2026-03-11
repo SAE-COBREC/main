@@ -10,6 +10,11 @@ body {
   background: $secondary-color-bleu-clair;
 }
 
+main {
+  padding: 1em 3em;
+
+}
+
 h1,
 h2,
 h3 {
@@ -24,14 +29,12 @@ button {
 .articlesPrixP {
   width: min(1380px, 100%);
   margin: 0 auto;
-  padding: 1.5rem 1rem 2.25rem;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 390px;
   align-items: start;
   gap: 24px;
-  position: relative; /* pour positionner #panierVide en absolute */
-  min-height: calc(100vh - 140px);
+  position: relative;
 }
 
 .conteneurArticles {
@@ -55,7 +58,7 @@ button {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 12px;
-  
+
 }
 
 .unArticleP img {
@@ -79,7 +82,7 @@ button {
   color: $primary-color-noir;
 }
 
-.unArticleP .articleDetailP > p {
+.unArticleP .articleDetailP>p {
   margin: 0;
   color: $primary-color-noir;
   line-height: 1.45;
@@ -333,6 +336,10 @@ button {
 }
 
 @media screen and (max-width: 1180px) {
+  main {
+    padding: 1em 2em;
+  }
+
   .articlesPrixP {
     grid-template-columns: 1fr;
   }
@@ -354,6 +361,10 @@ button {
 }
 
 @media screen and (max-width: 860px) {
+  main {
+    padding: 1em;
+  }
+
   .unArticleP {
     grid-template-columns: 150px minmax(0, 1fr);
     gap: 12px;
@@ -371,7 +382,6 @@ button {
 
 @media screen and (max-width: 620px) {
   .articlesPrixP {
-    padding: 1rem 0.6rem 1.5rem;
     gap: 14px;
   }
 
@@ -410,5 +420,264 @@ button {
   .recapCommande button {
     height: 46px;
     font-size: 1rem;
+  }
+}
+
+//mixin pour ajouter une transition fluide
+@mixin transition($property: all, $duration: 0.2s) {
+  transition: $property $duration ease;
+}
+
+//mixin pour effet de survol avec élévation
+@mixin hover-lift {
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+}
+
+//mixin pour centrer un élément en absolu
+@mixin centre-absolu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+
+  //li transparent pour que article soit direct dans la grille
+  li {
+    display: contents;
+    list-style-type: none;
+    list-style: none;
+  }
+}
+
+.lesFavoris {
+  max-width: 1380px;
+  margin: auto;
+
+  h3 {
+    padding-bottom: 1em;
+  }
+
+  // ============================================
+  // INFOS VENDEUR DANS CARTE  →  article > div:last-child > div:last-child > div
+  // ============================================
+
+  article>div:last-child>div:last-child>div {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 12px;
+    width: fit-content;
+    background-color: $secondary-color-bleu-clair;
+    border-radius: 20px;
+    border: 1px solid rgba($primary-color-bleu, 0.1);
+    gap: 6px;
+    padding: 4px 8px;
+
+    img {
+      width: 24px;
+      height: 24px;
+      filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+    }
+
+    span {
+      font-size: 0.85rem;
+      color: $primary-color-bleu;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // ============================================
+  // BAS DE CARTE  →  article > div:last-child > div:last-child
+  // ============================================
+
+  article>div:last-child>div:last-child {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+
+    >div {
+      margin: 0 0 6px 0;
+      width: fit-content;
+      align-self: flex-start;
+    }
+
+    button {
+      margin: 0;
+      width: 100%;
+      flex: none;
+    }
+  }
+
+  // ============================================
+  // CARTES PRODUITS  →  article
+  // ============================================
+
+  article {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    background: $primary-color-blanc;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    @include hover-lift;
+
+    //section image
+    >div:first-child {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: $primary-color-blanc;
+      display: flex;
+      justify-content: center;
+
+      //image du produit
+      img {
+        height: 100%;
+        object-fit: contain;
+        width: 100em;
+      }
+
+      //badge réduction  →  mark
+      mark {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: $secondary-color-rouge;
+        color: $primary-color-blanc;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+        backdrop-filter: blur(4px);
+      }
+
+      //badge Bretagne  →  span
+      span {
+        position: absolute;
+        bottom: 0.2em;
+        right: 0.2em;
+        background: $primary-color-blanc;
+        border-radius: 100%;
+        padding: 1px;
+        z-index: 2;
+        width: 55px;
+        aspect-ratio: 1/1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      //rupture de stock  →  div
+      >div {
+        @include centre-absolu;
+        background-color: rgba($secondary-color-gris-clair, 0.9);
+        color: $primary-color-noir;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        z-index: 2;
+      }
+    }
+
+    //section informations texte
+    >div:last-child {
+      padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: $primary-color-noir;
+      }
+
+      //étoiles et nombre d'avis
+      >div:nth-child(2) {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+
+        span:first-child {
+          color: $secondary-color-etoile;
+        }
+
+        span:last-child {
+          color: $secondary-color-gris-fonce;
+          font-size: 0.85rem;
+        }
+      }
+
+      //prix
+      >div:nth-child(3) {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+
+        span:last-child {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: $primary-color-noir;
+        }
+      }
+    }
+
+    //bouton panier
+    button {
+      margin-top: auto;
+      width: 100%;
+      padding: 0.75rem;
+      background: $primary-color-noir;
+      color: $primary-color-blanc;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.2em;
+      font-family: $font-family-secondaire;
+      @include transition(background);
+
+      &:hover:not(:disabled) {
+        background: $primary-color-bleu;
+      }
+
+      &:disabled {
+        background: $secondary-color-gris-fonce;
+        cursor: not-allowed;
+        color: $secondary-color-gris-clair;
+      }
+    }
   }
 }
