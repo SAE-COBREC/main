@@ -2052,10 +2052,7 @@ function chargerInformationsVendeur($pdo, $denomination)
 }
 
 
-/**
- * Calcule la note moyenne et le nombre d'avis pour un vendeur.
- * Retourne ['note' => float, 'nb' => int].
- */
+//Calcule la note moyenne et le nombre d'avis pour un vendeur
 function calculerStatistiquesVendeur($pdo, $idVendeur)
 {
     $sql = "
@@ -2079,7 +2076,7 @@ function calculerStatistiquesVendeur($pdo, $idVendeur)
 }
 
 
-//gère le panier pour la page vendeur :
+//gère le panier pour la page vendeur
 function gererPanierClient($pdo, $idClient)
 {
     if ($idClient === null) {
