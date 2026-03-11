@@ -266,7 +266,7 @@ function afficherEtoilesVendeur(float $note, int $taille = 16): string
 
         <!--lien de retour vers l'accueil-->
         <a href="/" class="btn-retour">
-            <img src="/img/svg/back.svg" alt="" width="16" onerror="this.style.display='none'"> Retour à l'accueil
+            <img src="/img/svg/back.svg" alt="" width="16" onerror="this.style.display='none'">← Retour à l'accueil
         </a>
 
         <!--carte de profil du vendeur-->
