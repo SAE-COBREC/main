@@ -47,9 +47,10 @@ article {
         max-width: 450px;
 
         img {
-            width: 100%;
-            height: auto;
+            width: 450px;
+            height: 300px;
             display: block;
+            object-fit: contain;
         }
     }
 
@@ -116,11 +117,9 @@ article {
             gap: 10px;
 
             > span {
-                width: 25px;
+                width: auto;
                 height: 25px;
-                border-radius: 50%;
-                display: block;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                display: block;   
             }
         }
     }
