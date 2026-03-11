@@ -6,8 +6,8 @@ include '../../../selectBDD.php';
 if (empty($_SESSION['vendeur_id'])) {
 ?>
 <script>
-    alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
-    document.location.href = "/pages/backoffice/connexionVendeur/index.php";
+alert("Vous n'êtes pas connecté. Vous allez être redirigé vers la page de connexion.");
+document.location.href = "/pages/backoffice/connexionVendeur/index.php";
 </script>
 <?php
     exit;
@@ -34,7 +34,7 @@ $telephone = $vendeur && !empty($vendeur['num_telephone']) ? htmlspecialchars($v
 $photo_profil = !empty($vendeur['image']) ? htmlspecialchars($vendeur['image']) : '/img/svg/market.svg';
 ?>
 <!doctype html>
-<html lang="fr" >
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
@@ -43,14 +43,15 @@ $photo_profil = !empty($vendeur['image']) ? htmlspecialchars($vendeur['image']) 
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <link rel="stylesheet" href="../../..//styles/CatalogueVendeur/Catalogue.css">
 </head>
+
 <body>
     <header></header>
     <main>
         <div class="container">
             <h1>Catalogue<p></p> Produit</h1>
-            <img src="<?php echo $photo_profil; ?>" alt="<?php echo $nom_entreprise; ?>" class="logo-catalogue"> 
+            <img src="<?php echo $photo_profil; ?>" alt="<?php echo $nom_entreprise; ?>" class="logo-catalogue">
             <p>Par <?php echo $nom_entreprise; ?></p>
-            </div>
+        </div>
         </div>
     </main>
     <footer>
