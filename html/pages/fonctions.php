@@ -2014,3 +2014,164 @@ function recupInfoPourStatsGeneral($pdo, $idVendeur){
     $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $commandes;
 }
+
+
+//récupère les informations complètes d'un vendeur par sa dénomination.
+function chargerInformationsVendeur($pdo, $denomination)
+{
+    $sql = "
+        SELECT
+            v.id_vendeur,
+            v.denomination,
+            v.raison_sociale,
+            v.siren,
+            c.email,
+            c.num_telephone  AS telephone,
+            a.a_ville        AS ville,
+            a.a_code_postal  AS code_postal,
+            a.a_adresse      AS adresse,
+            a.a_numero       AS numero,
+            a.id_adresse     AS id_adresse,
+            a.latitude       AS latitude,
+            a.longitude      AS longitude,
+            i.i_lien         AS image
+        FROM cobrec1._vendeur v
+        LEFT JOIN cobrec1._compte            c  ON v.id_compte = c.id_compte
+        LEFT JOIN cobrec1._adresse           a  ON v.id_compte = a.id_compte
+        LEFT JOIN cobrec1._represente_compte rc ON v.id_compte = rc.id_compte
+        LEFT JOIN cobrec1._image             i  ON rc.id_image = i.id_image
+        WHERE v.denomination ILIKE :denomination
+        LIMIT 1
+    ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':denomination' => $denomination]);
+    $vendeur = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $vendeur ?: null;
+}
+
+
+/**
+ * Calcule la note moyenne et le nombre d'avis pour un vendeur.
+ * Retourne ['note' => float, 'nb' => int].
+ */
+function calculerStatistiquesVendeur($pdo, $idVendeur)
+{
+    $sql = "
+        SELECT
+            ROUND(COALESCE(AVG(a.a_note), 0)::numeric, 1) AS note,
+            COUNT(a.id_avis)                               AS nb
+        FROM cobrec1._avis a
+        INNER JOIN cobrec1._produit p ON a.id_produit = p.id_produit
+        WHERE p.id_vendeur = :idVendeur
+          AND a.a_note IS NOT NULL
+    ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':idVendeur' => $idVendeur]);
+    $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return [
+        'note' => (float) ($stats['note'] ?? 0),
+        'nb'   => (int)   ($stats['nb']   ?? 0),
+    ];
+}
+
+
+//gère le panier pour la page vendeur :
+function gererPanierClient($pdo, $idClient)
+{
+    if ($idClient === null) {
+        if (!isset($_SESSION['panierTemp'])) {
+            $_SESSION['panierTemp'] = [];
+        }
+        return null;
+    }
+
+    // Client connecté : cherche son panier en cours
+    $sqlPanier = "
+        SELECT id_panier
+        FROM _panier_commande
+        WHERE timestamp_commande IS NULL AND id_client = :idClient
+    ";
+    $stmt = $pdo->prepare($sqlPanier);
+    $stmt->execute([':idClient' => $idClient]);
+    $panier = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($panier) {
+        $idPanier = (int) $panier['id_panier'];
+    } else {
+        $sqlCreer = "
+            INSERT INTO _panier_commande (id_client, timestamp_commande)
+            VALUES (:idClient, NULL)
+            RETURNING id_panier
+        ";
+        $stmtCreer = $pdo->prepare($sqlCreer);
+        $stmtCreer->execute([':idClient' => $idClient]);
+        $idPanier = (int) $stmtCreer->fetchColumn();
+    }
+
+    $_SESSION['panierEnCours'] = $idPanier;
+    transfererPanierTempVersBDD($pdo, $idPanier);
+
+    return $idPanier;
+}
+
+
+//traite une requête AJAX d'ajout au panier (action = 'ajouter_panier')
+function traiterAjaxAjoutPanierVendeur($pdo, $idClient, $idPanier)
+{
+    header('Content-Type: application/json');
+
+    $idProduit = $_POST['idProduit'] ?? null;
+    $quantite  = (int) ($_POST['quantite'] ?? 1);
+
+    if (!$idProduit) {
+        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
+        exit;
+    }
+
+    try {
+        if ($idClient === null) {
+            $resultat = ajouterArticleSession($pdo, $idProduit, $quantite);
+        } else {
+            if (!$idPanier) {
+                echo json_encode(['success' => false, 'message' => 'Aucun panier en cours']);
+                exit;
+            }
+            $resultat = ajouterArticleBDD($pdo, $idProduit, $idPanier, $quantite);
+        }
+        echo json_encode($resultat);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+
+//génère le HTML des étoiles de notation
+function afficherEtoilesVendeur(float $note, int $taille = 16): string
+{
+    $html = '';
+    for ($i = 1; $i <= 5; $i++) {
+        if ($note >= $i)           $type = 'full';
+        elseif ($note >= $i - 0.5) $type = 'alf';
+        else                       $type = 'empty';
+
+        $html .= '<img src="/img/svg/star-' . $type . '.svg" alt="Etoile" width="' . $taille . '">';
+    }
+    return $html;
+}
+
+
+//construit l'adresse complète d'un vendeur à partir de son tableau d'informations
+function construireAdresseCompleteVendeur(array $informationsVendeur): string
+{
+    return trim(
+        ($informationsVendeur['numero']      ?? '') . ' ' .
+        ($informationsVendeur['adresse']     ?? '') . ' ' .
+        ($informationsVendeur['code_postal'] ?? '') . ' ' .
+        ($informationsVendeur['ville']       ?? '')
+    );
+}
