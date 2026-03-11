@@ -722,7 +722,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </section>
 
             <section class="animation-settings-section">
-                <h2>Animations</h2>
+                <h2>Préférences</h2>
                 <article>
                     <header>
                         <div>
