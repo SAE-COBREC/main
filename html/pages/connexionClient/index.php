@@ -125,6 +125,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($row['etat_otp'] == 'true'){
             $_SESSION['OTP']['statut'] = 'active';
+        }else{
+            if (!empty($_SESSION['OTP']['statut'])){
+                unset($_SESSION['OTP']['statut']);
+            }
         }
 
         //verification que le compte est un compte client
