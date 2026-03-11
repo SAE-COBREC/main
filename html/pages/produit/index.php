@@ -220,7 +220,7 @@ foreach ($rowsRep as $r) {
 
 // Calculs affichage
 $estEnRupture = ($produit['p_stock'] <= 0);
-$discount = (float) $produit['pourcentage_reduction'];
+$discount = (float) $produit['reduction_pourcentage'];
 $prixDiscount = ($discount > 0) ? $produit['p_prix'] * (1 - $discount / 100) : $produit['p_prix'];
 $prixFinal = calcPrixTVA($produit['tva'], $prixDiscount);
 

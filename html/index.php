@@ -137,7 +137,7 @@ $promoSansRemise = [];
 
 foreach ($listeProduits as $p) {
     if (!empty($p['estenpromo']) && $p['estenpromo']) {
-        $reduc = (float)$p['pourcentage_reduction'];
+        $reduc = (float)$p['reduction_pourcentage'];
         if ($reduc > 0) {
             $promoAvecRemise[] = $p;
         } else {
@@ -195,7 +195,7 @@ if (!empty($listeProduits)) {
 
     foreach ($listeProduits as $p) {
         //calcul de la réduction
-        $reduction = (float)($p['pourcentage_reduction'] ?? 0);
+        $reduction = (float)($p['reduction_pourcentage'] ?? 0);
         $prixApresReduc = ($reduction > 0) ? $p['p_prix'] * (1 - $reduction / 100) : $p['p_prix'];
 
         //application de la TVA pour obtenir le prix TTC final
@@ -475,7 +475,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                 <div class="carousel-track-container">
                     <ul class="carousel-track">
                         <?php foreach ($produitsCarousel as $index => $prodCarousel): 
-                            $discountC = (float)$prodCarousel['pourcentage_reduction'];
+                            $discountC = (float)$prodCarousel['reduction_pourcentage'];
                             $prixDiscountC = ($discountC > 0) ? $prodCarousel['p_prix'] * (1 - $discountC/100) : $prodCarousel['p_prix'];
                             $prixFinalC = calcPrixTVA($prodCarousel['tva'], $prixDiscountC);
                             $nomVendeurC = recupNomVendeurIdProduit($connexionBaseDeDonnees, $prodCarousel['id_produit']);
@@ -589,7 +589,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         //vérifie si le produit est en rupture de stock
                         $estEnRupture = $produitCourant['p_stock'] <= 0;
                         //récupère le pourcentage de réduction
-                        $discount = (float)$produitCourant['pourcentage_reduction'];
+                        $discount = (float)$produitCourant['reduction_pourcentage'];
                         //vérifie s'il y a une réduction
                         $possedePourcentageRemise = $discount > 0;
                         //calcule le prix après réduction
@@ -620,7 +620,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         </div>
                         <!--affiche le badge de réduction s'il y en a une-->
                         <?php if ($possedePourcentageRemise): ?>
-                        <span class="badge-reduction">-<?= round($produitCourant['pourcentage_reduction']) ?>%</span>
+                        <span class="badge-reduction">-<?= round($produitCourant['reduction_pourcentage']) ?>%</span>
                         <?php endif; ?>
                         <?php if ($origineProduit == "Bretagne"): ?>
                         <span class="badge-bretagne"><img src="/img/png/badge-bretagne.png" alt="Bretagne"></span>
