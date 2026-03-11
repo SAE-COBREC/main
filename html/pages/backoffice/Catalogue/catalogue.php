@@ -28,7 +28,7 @@ $vendeurInfos = getVendeurInfo($pdo, $vendeur_id);
 //charge les informations du vendeur depuis la base de données
 $informationsVendeur = chargerInformationsVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination']);
 
-$vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination']);
+$listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination']);
 
 ?>
 <!DOCTYPE html>
@@ -41,68 +41,61 @@ $vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeur
 
 <body>
     <header>
-        <!--carte de profil du vendeur-->
-        <section>
-
-            <!--affiche l'avatar du vendeur ou un placeholder-->
-            <?php if (!empty($informationsVendeur['image'])): ?>
-            <img src="<?= htmlspecialchars($informationsVendeur['image']) ?>"
-                alt="<?= htmlspecialchars($informationsVendeur['denomination']) ?>">
-            <?php else: ?>
-            <figure>
-                <img src="/img/svg/market.svg" alt="Vendeur">
-            </figure>
-            <?php endif; ?>
-
-            <!--informations textuelles du vendeur-->
-            <div>
-                <!--nom de la dénomination du vendeur-->
-                <h1><?= htmlspecialchars($informationsVendeur['denomination']) ?></h1>
-
-                <!--affiche la raison sociale si elle existe-->
-                <?php if (!empty($informationsVendeur['raison_sociale'])): ?>
-                <small><?= htmlspecialchars($informationsVendeur['raison_sociale']) ?></small>
-                <?php endif; ?>
-
-                <!--affiche la note moyenne si elle existe-->
-                <?php if ($noteMoyenneVendeur > 0): ?>
-                <p>
-                    <!--affiche les étoiles de la note moyenne-->
-                    <?= afficherEtoilesVendeur($noteMoyenneVendeur, 18) ?>
-                    <!--affiche la valeur numérique de la note-->
-                    <strong><?= number_format($noteMoyenneVendeur, 1, ',', '') ?>/5</strong>
-                    <!--affiche le nombre d'avis-->
-                    <span style="color:#9ca3af">(<?= $nombreAvisTotal ?> avis)</span>
-                </p>
-                <?php endif; ?>
-
-                <!--affiche la localisation du vendeur si elle existe-->
-                <?php if (!empty($informationsVendeur['ville'])): ?>
-                <address>
-                    <img src="/img/png/carte-et-localisation.png" alt="" width="14" onerror="this.style.display='none'">
-                    <!--affiche le code postal s'il est disponible-->
-                    <?php if (!empty($informationsVendeur['code_postal'])): ?>
-                    <?= htmlspecialchars($informationsVendeur['code_postal']) ?> –
-                    <?php endif; ?>
-                    <?= htmlspecialchars($informationsVendeur['ville']) ?>
-                </address>
-                <?php endif; ?>
-
-                <footer>
-
-                    <!--affiche le numéro SIREN si disponible-->
-                    <?php if (!empty($informationsVendeur['siren'])): ?>
-                    <span>
-                        SIREN : <?= htmlspecialchars($informationsVendeur['siren']) ?>
-                    </span>
-                    <?php endif; ?>
-                </footer>
-
-            </div>
-        </section>
+        <h1>Catalogue de <?php echo htmlspecialchars($vendeurInfos['denomination'] ?? ''); ?></h1>
     </header>
 
     <main>
+        <!--affiche un message si le vendeur n'a aucun produit-->
+        <?php if (empty($listeProduits)): ?>
+        <p>Ce vendeur n'a aucun produit en ligne pour le moment.</p>
+        <?php else: ?>
+
+        <!--grille des produits du vendeur-->
+        <ul>
+            <!--boucle sur tous les produits du vendeur-->
+            <?php foreach ($listeProduits as $produitCourant):
+                //arrondit la note moyenne
+                $noteArrondie = (int) round($produitCourant['note_moyenne'] ?? 0);
+                //construit l'URL de l'image du produit
+                $urlImage = str_replace('html/img/photo', '/img/photo', $produitCourant['image_url'] ?? '/img/default-product.jpg');
+
+                $description = $produitCourant['p_description'] ?? 'Aucune description disponible.';
+            ?>
+            <li>
+                <article>
+                    <div>
+                        <!--image du produit-->
+                        <img src="<?= htmlspecialchars($urlImage) ?>"
+                            alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>">
+                    </div>
+
+                    <div>
+                        <!--nom du produit-->
+                        <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
+
+                        <div>
+                            <span>
+                                <!--affiche les étoiles de notation-->
+                                <?php for ($i = 1; $i <= 5; $i++):
+                                if ($noteArrondie >= $i)           $s = 'full';
+                                elseif ($noteArrondie >= $i - 0.5) $s = 'alf';
+                                else                               $s = 'empty';
+                            ?>
+                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                <?php endfor; ?>
+                            </span>
+                            <!--affiche le nombre d'avis-->
+                            <span>(<?= $produitCourant['nombre_avis'] ?? 0 ?>)</span>
+                        </div>
+
+                        <p><?= htmlspecialchars($description) ?></p>
+                    </div>
+
+                </article>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
     </main>
 </body>
 
