@@ -1,8 +1,4 @@
 @charset "UTF-8";
-* {
-  margin: 0;
-}
-
 :root {
   --primary-bleu: #7171A3;
   --primary-bronze: #CD7F32;
@@ -11,6 +7,10 @@
   --semantic-rouge: #D4183D;
   --semantic-jaune: #DDCA00;
   --semantic-info: #0C5460;
+}
+
+* {
+  margin: 0;
 }
 
 [data-theme=dalto-red-green] {
@@ -76,16 +76,16 @@ body.centered {
   padding: 0;
   margin: 0;
 }
-.card .mdpA2f {
+.card .mdpOtp {
   display: block;
 }
-.card .mdpA2f small {
+.card .mdpOtp small {
   display: block;
   background-color: #EFEFEF;
   overflow: auto;
   padding-bottom: 1em;
 }
-.card .mdpA2f > label {
+.card .mdpOtp > label {
   padding-left: 10px;
 }
 .card.hidden {
@@ -538,7 +538,7 @@ body.centered {
   }
 }
 
-.card label:has(input#cgv), .card label:has(input#a2f) {
+.card label:has(input#cgv), .card label:has(input#otp) {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -546,17 +546,17 @@ body.centered {
   gap: 10px;
   padding-left: 0;
 }
-.card label:has(input#cgv) a, .card label:has(input#a2f) a {
+.card label:has(input#cgv) a, .card label:has(input#otp) a {
   color: var(--primary-bleu);
   text-decoration: underline;
   cursor: pointer;
 }
-.card label:has(input#cgv) a:hover, .card label:has(input#a2f) a:hover {
+.card label:has(input#cgv) a:hover, .card label:has(input#otp) a:hover {
   text-decoration: none;
 }
 
 @media screen and (max-width: 508px) {
-  .card label:has(input#cgv) input[type=checkbox], .card label:has(input#a2f) input[type=checkbox] {
+  .card label:has(input#cgv) input[type=checkbox], .card label:has(input#otp) input[type=checkbox] {
     width: 16px;
     height: 16px;
   }

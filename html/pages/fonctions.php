@@ -756,8 +756,8 @@ function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantCli
     }
 }
 
-//fonction pour modifier le mot de passe du compte
-function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationNouveauMotDePasse)
+//fonction pour confirmer le mot de passe
+function confirmerMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel)
 {
     try {
         //récupérer le mot de passe actuellement enregistré
@@ -775,6 +775,23 @@ function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $
         if (password_verify($motDePasseActuel, $motDePasseStockeHashe) === false) {
             return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
         }
+    } catch (Exception $erreurException) {
+        return [
+            'success' => false,
+            'message' => "Erreur lors du changement de mot de passe"
+        ];
+    }
+}
+
+//fonction pour modifier le mot de passe du compte
+function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationNouveauMotDePasse)
+{
+    $retour = confirmerMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel);
+    if ($retour['success'] == 'false'){
+        return $retour;
+    }
+    try {
+        //récupérer le mot de passe actuellement enregistré
 
         //vérifier que la confirmation correspond au nouveau mot de passe
         if ($nouveauMotDePasse !== $confirmationNouveauMotDePasse) {

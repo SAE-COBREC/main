@@ -100,19 +100,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //changement du mot de passe
     if (isset($_POST['change_password'])) {
-        //récupérer les mots de passe saisis
-        $motDePasseActuelSaisi = $_POST['actuel_password'] ?? '';
-        $nouveauMotDePasseSaisi = $_POST['nouveau_password'] ?? '';
-        $confirmationMotDePasseSaisie = $_POST['confirm_password'] ?? '';
+        //if (empty($_SESSION['OTP'])){
+            //récupérer les mots de passe saisis
+            $motDePasseActuelSaisi = $_POST['actuel_password'] ?? '';
+            $nouveauMotDePasseSaisi = $_POST['nouveau_password'] ?? '';
+            $confirmationMotDePasseSaisie = $_POST['confirm_password'] ?? '';
 
-        //appeler la fonction de modification du mot de passe
-        $resultatModificationMotDePasse = modifierMotDePasseCompte(
-            $connexionBaseDeDonnees,
-            $identifiantCompteClient,
-            $motDePasseActuelSaisi,
-            $nouveauMotDePasseSaisi,
-            $confirmationMotDePasseSaisie
-        );
+            //appeler la fonction de modification du mot de passe
+            $resultatModificationMotDePasse = modifierMotDePasseCompte(
+                $connexionBaseDeDonnees,
+                $identifiantCompteClient,
+                $motDePasseActuelSaisi,
+                $nouveauMotDePasseSaisi,
+                $confirmationMotDePasseSaisie
+            );
+        //}
 
         //rediriger avec un message de succès ou afficher une erreur
         if ($resultatModificationMotDePasse['success']) {
@@ -200,9 +202,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     //traitement POST pour désactivation de l'OTP
-    if (isset($_POST['desactiverOTP'])) {
-        unset($_SESSION['OTP']);
-    }
+    // if (isset($_POST['desactiverOTP'])) {
+    //     unset($_SESSION['OTP']);
+    // }
 }
 
 //chargement des données pour l'affichage de la page
@@ -580,12 +582,23 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <main>
                         <!-- Formulaire de changement de mot de passe -->
                         <form method="POST">
+                            <?php
+                            print_r($_SESSION['OTP']);
+                            if (empty($_SESSION['OTP'])){?>
                             <div>
                                 <label>
                                     <span>Mot de passe actuel</span>
                                     <input type="password" name="actuel_password" required>
                                 </label>
                             </div>
+                            <?php }else{?>
+                            <div>
+                                <label>
+                                    <span>code OTP</span>
+                                    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP"/>
+                                </label>
+                            </div>
+                            <?php } ?>
                             <div>
                                 <label>
                                     <span>Nouveau mot de passe</span>
@@ -620,7 +633,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                     <header>
                         <div>
                             <span>Mot de passe</span>
-                            <strong>Authentification à double facteurs</strong>
+                            <strong>One Time Password</strong>
                         </div>
                         <span data-type="securite">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -630,17 +643,24 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         </span>
                     </header>
                     <main>
-                        <button type="button" id="activerOTP" onclick="ouvrirModalOTP()"
-                            style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:none';} else { echo 'display:block';} ?>">
-                            Activer l'authentification à double facteurs
-                        </button>
-                        <form method="POST">
+                        <button type="button" id="activerOTP" onclick="ouvrirModalOTP()">
+                            <span class="btn-text-desktop">Activer le One Time Password</span>
+                            <span class="btn-text-mobile">Activer l'OTP</span>
+                        </button><?php 
+                        if (!empty($_SESSION['OTP'])){?>
+                            <script> document.querySelector("#activerOTP").disabled = true; </script><?php
+                        }else{?>
+                            <script> document.querySelector("#activerOTP").disabled = false; </script>
+                        <?php } ?>
+                        <!-- <form method="POST">
                             <button type="submit" name="desactiverOTP"
-                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver l authentification à double facteurs ?')"
-                                style="<?php if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
-                                Désactiver l'authentification à double facteurs
+                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver le One Time Password ?')"
+                                style="<?php //if (!empty($_SESSION['OTP'])){ echo 'display:block';} ?>">
+                                <span class="btn-text-desktop">Désactiver le One Time Password</span>
+
+                                <span class="btn-text-mobile">Désactiver l'OTP</span>
                             </button>
-                        </form>
+                        </form> -->
                     </main>
                 </article>
             </section>
@@ -695,7 +715,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
 
     <div id="modalOTP">
         <div>
-            <h2>Authentification à double facteurs</h2>
+            <h2>One Time Password</h2>
             <?php
                 if (empty($_SESSION['OTP'])){
                     include_once '../connexionClient/OTP.php';
@@ -730,7 +750,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         if (contentLength == 4) {
                             xhttp2.abort();
                             alert(
-                                "Authentification à double facteur activée avec succès. Vous allez être déconnecté."
+                                "One Time Password activée avec succès."
                                 );
                             //document.location.href = "/index.php"; 
                             document.getElementById('modalOTP').style.display = 'none';
@@ -1303,7 +1323,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
     }
 
     function succesOTP() {
-        document.getElementById('activerOTP').textContent = "Authentification à double facteurs activée avec succès."
+        document.getElementById('activerOTP').textContent = "One Time Password activée avec succès."
         document.getElementById('activerOTP').disabled = true
     }
 
