@@ -84,7 +84,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
                 p.p_frais_de_port, 
                 p.p_stock,
                 t.montant_tva as tva,
-                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
+                COALESCE(r.reduction_pourcentage, 0) as reduction_pourcentage
             FROM cobrec1._produit p
             JOIN cobrec1._tva t ON p.id_tva = t.id_tva
             LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
@@ -109,7 +109,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
 
         //calculer le prix avec remise
         $prixUnitaire = $produitCourant['p_prix'];
-        $remiseUnitaire = $produitCourant['pourcentage_reduction'];
+        $remiseUnitaire = $produitCourant['reduction_pourcentage'];
         $fraisDePort = $produitCourant['p_frais_de_port'];
         $tva = $produitCourant['tva'];
         $quantiteEnStock = (int) ($produitCourant['p_stock'] ?? 0);
@@ -188,7 +188,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 p.p_stock,
                 v.denomination,
                 t.montant_tva as tva,
-                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
+                COALESCE(r.reduction_pourcentage, 0) as reduction_pourcentage,
                 COALESCE(i.i_lien, '/img/photo/smartphone_xpro.jpg') as image_url,
                 i.i_alt as image_alt,
                 i.i_title as image_title,
@@ -268,7 +268,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 'i_title' => $produitCourant['image_title'],
                 'quantite' => $aAjouter,
                 'tva' => $produitCourant['tva'],
-                'pourcentage_reduction' => $produitCourant['pourcentage_reduction'],
+                'reduction_pourcentage' => $produitCourant['reduction_pourcentage'],
                 'reduction_debut' => $produitCourant['reduction_debut'],
                 'reduction_fin' => $produitCourant['reduction_fin'],
                 'p_prix' => $prixUnitaire,
@@ -816,9 +816,10 @@ function chargerProduitBDD($pdo, $idProduit) {
                 p.p_origine,
                 COALESCE(p.p_nb_ventes, 0) AS p_nb_ventes,
                 COALESCE(p.p_note, 0) AS p_note,
-                COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
+                COALESCE(r.reduction_pourcentage, 0) AS reduction_pourcentage,
                 t.montant_tva as tva,
                 v.raison_sociale AS vendeur_nom,
+                v.denomination AS vendeur_denomination,
                 c.email AS vendeur_email,
                 STRING_AGG(DISTINCT cp.nom_categorie, ', ') AS categories
             FROM cobrec1._produit p
@@ -833,7 +834,7 @@ function chargerProduitBDD($pdo, $idProduit) {
             WHERE p.id_produit = :pid
             GROUP BY p.id_produit, p.p_nom, p.p_prix, p.p_stock, p.p_statut, 
                      p.p_description, p.p_nb_ventes, p.p_note, r.reduction_pourcentage,
-                     t.montant_tva, v.raison_sociale, c.email
+                     t.montant_tva, v.raison_sociale, v.denomination, c.email
             LIMIT 1
         ");
         $stmtProd->execute([':pid' => $idProduit]);

@@ -160,13 +160,13 @@
         </aside>
 
         <!-- SI LE CLIENT N'EST PAS CONNECTÉ PARCOURS CHAQUE ARTICLES, et affiche son contenu-->
-        <!--attention qand le client n'est pas connecté reduction_pourcentage devient a pourcentage_reduction-->
+        <!--attention qand le client n'est pas connecté reduction_pourcentage devient a reduction_pourcentage-->
         <?php elseif (isset($panierTemp) && count($panierTemp) > 0): ?>
 
         <div class="conteneurArticles">
             <?php foreach ($panierTemp as $idProduit => $article): ?>
             <article class="unArticleP"
-                data-prix="<?php echo ($article['p_prix'] - (($article['pourcentage_reduction'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
+                data-prix="<?php echo ($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
                 data-stock="<?php echo intval($article['p_stock'])?>"
                 data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                 <div class="imageArticleP">
@@ -180,20 +180,20 @@
                         </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
                         <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
                         <?php
-                        if (!empty($article['pourcentage_reduction'])){
+                        if (!empty($article['reduction_pourcentage'])){
                             if ((strtotime($article["reduction_debut"]) > time()) && (strtotime($article["reduction_fin"]) > time())){
-                                $article['pourcentage_reduction'] = 0;
+                                $article['reduction_pourcentage'] = 0;
                             }
                         }
-                        if (!empty($article['pourcentage_reduction']) && $article['pourcentage_reduction'] != 0){
+                        if (!empty($article['reduction_pourcentage']) && $article['reduction_pourcentage'] != 0){
                         ?>
                         <strong>Remise :
-                        </strong><?php echo number_format($article['pourcentage_reduction'], 2, ',', ' '); ?> %
+                        </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
                         <?php } ?>
                     </p>
                     <div class="basArticleP">
                         <p class="articlePrix">TTC :
-                            <?php echo number_format(($article['p_prix'] - (($article['pourcentage_reduction'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
+                                <?php echo number_format(($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
                             €</p>
                         <div class="quantite">
 

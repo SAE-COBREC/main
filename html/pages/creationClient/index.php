@@ -478,12 +478,12 @@ body {
             <br>
             <div class="mdpOtp">
                 <?php
-                    //include_once '../connexionClient/OTP.php';
+                    include_once '../connexionClient/OTP.php';
               ?>
-                <!-- <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em"> -->
+                <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
                 <label>
                     <p>Code secret :</p>
-                    <!-- <small><?php echo $otp->getSecret() ?></small> -->
+                    <small><?php echo $otp->getSecret() ?></small>
                 </label>
                 <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
                 <button type="submit" id="validationOTP">Valider</button>
