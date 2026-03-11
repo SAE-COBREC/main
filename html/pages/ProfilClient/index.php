@@ -128,13 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }else{
             $otp_saisi = $_POST['code_OTP'] ?? '';
+            $succes = true;
             try{
                 $stmt = $connexionBaseDeDonnees->prepare("SELECT secret_otp, etat_otp FROM _compte WHERE id_compte = :compte");
                 $stmt->execute([':compte' => $identifiantCompteClient]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $otp = TOTP::createFromSecret($row['secret_otp']);
                 if (($row['etat_otp'] == 'true' && $otp->verify($otp_saisi, null, 20))){
-                    $succes = true;
                     $stmt = $connexionBaseDeDonnees->prepare("UPDATE _compte SET etat_otp = false WHERE id_compte = :compte");
                     $stmt->execute([':compte' => $identifiantCompteClient]);
                     unset($_SESSION['OTP']['statut']);
@@ -155,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $succes = false;
                 $messageErreur2 = "Erreur lors du changement de mot de passe";
             }
+            print_r('messageErreur2=' . $messageErreur2);
 
             //rediriger avec un message de succès ou afficher une erreur
             if (!empty($resultatModificationMotDePasse)){

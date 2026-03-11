@@ -123,6 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $clientId = (int)$client['id_client'];
         }
 
+        if ($row['etat_otp'] == 'true'){
+            $_SESSION['OTP']['statut'] = 'active';
+        }
+
         //verification que le compte est un compte client
         if (!$clientId) {
           $hasError = true;
@@ -133,7 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           $_SESSION['idClient'] = $clientId;
           $_SESSION['idCompte'] = (int)$row['id_compte'];
-          $_SESSION['OTP']['statut'] = 'active';
           // Redirection sans header() (serveur peut bloquer header)
           $url = '../../index.php';
           echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
