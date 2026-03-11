@@ -66,22 +66,7 @@ else
 fi
 
 # ------------------------------------------------------------
-# 5. Lancement du transporteur
-# ------------------------------------------------------------
-echo ""
-echo ">> Lancement du transporteur..."
-
-TRANSPORTEUR_DIR="$(dirname "$0")/Delivraptor"
-
-if [ -x "$TRANSPORTEUR_DIR/transporteur" ]; then
-    cd "$TRANSPORTEUR_DIR"
-    ./transporteur -c 500
-else
-    echo "[WARN] Exécutable transporteur introuvable dans $TRANSPORTEUR_DIR, lancement ignoré."
-fi
-
-# ------------------------------------------------------------
-# 6. Planification via cron (toutes les 10 minutes)
+# 5. Planification via cron (toutes les 10 minutes)
 # ------------------------------------------------------------
 echo ""
 echo ">> Installation du cron job (toutes les 10 min)..."
