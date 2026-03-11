@@ -333,7 +333,7 @@ main {
                     margin-top: 0.5em;
 
                     &:hover {
-                        background: color.adjust($primary-color-bleu, $lightness: -10%);
+                        filter: brightness(0.9); 
                         transform: translateY(-2px);
                         box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                     }
@@ -400,9 +400,9 @@ main {
                 @include transition();
 
                 &:hover {
-                    background: color.adjust($primary-color-bleu, $lightness: -10%);
+                    filter: brightness(0.9); 
                     transform: translateY(-2px);
-                    box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
+                    box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                 }
             }
         }
@@ -524,7 +524,7 @@ main {
                 margin-top: 0.5em;
 
                 &:hover {
-                    background: color.adjust($primary-color-bleu, $lightness: -10%);
+                    background: brightness(0.9); 
                     transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                 }
@@ -856,7 +856,7 @@ main {
     background: $secondary-color-vert-fond;
     margin-bottom: 20px;
     border-radius: 8px;
-    border: 1px solid color.adjust($secondary-color-vert-succes, $lightness: 50%);
+    border: 1px solid brightness(0.50, $secondary-color-vert-succes);
 }
 
 /* Formulaire de déconnexion */
@@ -1201,4 +1201,40 @@ main section:nth-of-type(1) article select:focus {
 
 main section:nth-of-type(1) article select:hover {
     border-color: $primary-color-bleu;
+}
+
+.daltonien-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    gap: 1rem; 
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid $secondary-color-gris-clair;
+
+    label {
+        color: #333;
+        font-weight: 600;
+        font-size: 1.1em;
+        white-space: nowrap; 
+    }
+
+    .filtre__item {
+        min-width: 200px; 
+        max-width: 300px;
+        padding: 10px 16px;
+        border: 2px solid $secondary-color-gris-clair;
+        border-radius: 8px;
+        font-size: 1em;
+        font-family: $font-family-secondaire;
+        background-color: $primary-color-blanc;
+        cursor: pointer;
+        @include transition(all);
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color-bleu;
+            box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
+        }
+    }
 }

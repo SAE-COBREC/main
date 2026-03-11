@@ -52,20 +52,20 @@ main section {
 }
 main h1 {
   margin: 2rem 0;
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-size: 2em;
   text-align: center;
 }
 main h2 {
-  color: #7171A3;
+  color: var(--primary-bleu);
   margin-bottom: 1.5rem;
   font-size: 1.5em;
   border-bottom: 2px solid #EFEFEF;
   padding-bottom: 0.5rem;
 }
 main button {
-  border: 1px solid #7171A3;
-  color: #7171A3;
+  border: 1px solid var(--primary-bleu);
+  color: var(--primary-bleu);
   border-radius: 20px;
   background: #FFFFFF;
   cursor: pointer;
@@ -74,7 +74,7 @@ main button {
   transition: all 0.3s ease;
 }
 main button:hover {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
 }
 main button:disabled {
@@ -106,7 +106,7 @@ main input[type=email]:focus,
 main input[type=tel]:focus,
 main input[type=password]:focus {
   outline: none;
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
 }
 main section article {
   background: #FFFFFF;
@@ -119,7 +119,7 @@ main section article {
 }
 main section article:hover {
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.15);
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
 }
 main section article > header {
   display: flex;
@@ -159,11 +159,11 @@ main section article > header > span[data-statut=en-préparation] {
 }
 main section article > header > span[data-statut=en-transit] {
   background: #D1ECF1;
-  color: #0C5460;
+  color: var(--semantic-info);
 }
 main section article > header > span[data-statut=livré] {
   background: #D4EDDA;
-  color: #155724;
+  color: var(--semantic-success);
 }
 main section article > header > span[data-statut=annulee], main section article > header > span[data-statut=annulée] {
   background: #FEE9E8;
@@ -192,13 +192,13 @@ main section article svg {
   width: 20px;
   height: 20px;
   stroke-width: 2;
-  color: #7171A3;
+  color: var(--primary-bleu);
   flex-shrink: 0;
 }
 main section article em {
   font-size: 1.4em;
   font-weight: 700;
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-style: normal;
 }
 main section article > footer {
@@ -215,8 +215,8 @@ main section article > footer a:link {
 }
 main section article > footer > button, main section article > footer a > button {
   width: 100%;
-  border: 2px solid #7171A3;
-  color: #7171A3;
+  border: 2px solid var(--primary-bleu);
+  color: var(--primary-bleu);
   border-radius: 8px;
   background: #FFFFFF;
   cursor: pointer;
@@ -230,7 +230,7 @@ main section article > footer > button, main section article > footer a > button
   gap: 0.5em;
 }
 main section article > footer > button:hover, main section article > footer a > button:hover {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
@@ -257,7 +257,7 @@ main section:nth-of-type(1) article > header > span[data-type=profil] > svg {
   width: 24px;
   height: 24px;
   stroke-width: 2;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 main section:nth-of-type(1) article > main {
   padding: 2em;
@@ -278,7 +278,7 @@ main section:nth-of-type(1) article form > button {
   justify-content: center;
   gap: 0.5em;
   padding: 14px 24px;
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -289,7 +289,7 @@ main section:nth-of-type(1) article form > button {
   margin-top: 0.5em;
 }
 main section:nth-of-type(1) article form > button:hover {
-  background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
+  filter: brightness(0.9);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
@@ -322,7 +322,7 @@ main section:nth-of-type(1) article input[type=text]:focus,
 main section:nth-of-type(1) article input[type=email]:focus,
 main section:nth-of-type(1) article input[type=tel]:focus {
   outline: none;
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 main section:nth-of-type(2) > div:first-child {
@@ -338,7 +338,7 @@ main section:nth-of-type(2) > div:first-child > h2 {
 }
 main section:nth-of-type(2) > div:first-child > button {
   padding: 10px 20px;
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -348,9 +348,9 @@ main section:nth-of-type(2) > div:first-child > button {
   transition: all 0.3s ease;
 }
 main section:nth-of-type(2) > div:first-child > button:hover {
-  background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
+  filter: brightness(0.9);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
+  box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
 main section:nth-of-type(2) > p {
   text-align: center;
@@ -372,7 +372,7 @@ main section:nth-of-type(2) article > header > span[data-type=adresse] > svg {
   width: 24px;
   height: 24px;
   stroke-width: 2;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 main section:nth-of-type(2) article > main > div {
   display: flex;
@@ -410,12 +410,12 @@ main section:nth-of-type(2) article > footer > button {
   transition: all 0.3s ease;
 }
 main section:nth-of-type(2) article > footer > button:first-child {
-  border: 2px solid #7171A3;
-  color: #7171A3;
+  border: 2px solid var(--primary-bleu);
+  color: var(--primary-bleu);
   background: #FFFFFF;
 }
 main section:nth-of-type(2) article > footer > button:first-child:hover {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
@@ -438,7 +438,7 @@ main section:nth-of-type(4) article > header > span[data-type=securite] > svg {
   width: 24px;
   height: 24px;
   stroke-width: 2;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 main section:nth-of-type(4) article > main {
   padding: 2em;
@@ -460,7 +460,7 @@ main section:nth-of-type(4) article button {
   justify-content: center;
   gap: 0.5em;
   padding: 14px 24px;
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -470,12 +470,15 @@ main section:nth-of-type(4) article button {
   transition: all 0.3s ease;
   margin-top: 0.5em;
 }
-main section:nth-of-type(4) article button:not(:last-of-type):hover, main section:nth-of-type(4) article #activerA2F:hover {
-  background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
+main section:nth-of-type(4) article button:hover {
+  background: brightness(0.9);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
-main section:nth-of-type(4) article button:not(:last-of-type) > svg, main section:nth-of-type(4) article #activerA2F > svg {
+main section:nth-of-type(4) article button:disabled {
+  background: #c0c0c0 !important;
+}
+main section:nth-of-type(4) article button > svg {
   width: 20px;
   height: 20px;
   stroke-width: 2;
@@ -500,7 +503,7 @@ main section:nth-of-type(4) article input[type=password] {
 }
 main section:nth-of-type(4) article input[type=password]:focus {
   outline: none;
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 
@@ -546,7 +549,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
 .brand-name {
   font-family: "Quicksand", sans-serif;
   font-size: 20px;
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-weight: 700;
 }
 
@@ -563,7 +566,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
   padding: 0.7em 1em;
   max-width: 500px;
   background-color: #EFEFEF;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 
 .search-form {
@@ -580,7 +583,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
   margin-right: 8px;
 }
 .search-form .search-input::-webkit-input-placeholder, .search-form .search-input::-moz-placeholder, .search-form .search-input:-ms-input-placeholder, .search-form .search-input::placeholder {
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 
 .loupe-icon {
@@ -592,7 +595,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
   background: transparent;
   border: none;
   font-size: 18px;
-  color: #7171A3;
+  color: var(--primary-bleu);
   margin-right: 10px;
   cursor: pointer;
 }
@@ -706,7 +709,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
   border-radius: 50%;
   -o-object-fit: cover;
      object-fit: cover;
-  border: 3px solid #7171A3;
+  border: 3px solid var(--primary-bleu);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -718,7 +721,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid #7171A3;
+  border: 3px solid var(--primary-bleu);
 }
 
 .profile-image-placeholder svg {
@@ -757,12 +760,12 @@ main section:nth-of-type(4) article input[type=password]:focus {
 }
 
 .success-message {
-  color: #155724;
+  color: var(--semantic-success);
   padding: 10px;
   background: #D4EDDA;
   margin-bottom: 20px;
   border-radius: 8px;
-  border: 1px solid rgb(136.5833333333, 226.4166666667, 157);
+  border: 1px solid brightness(0.5, var(--semantic-success));
 }
 
 /* Formulaire de déconnexion */
@@ -777,8 +780,8 @@ main section:nth-of-type(4) article input[type=password]:focus {
 }
 .del-form button {
   background: transparent;
-  border: 2px solid #D4183D;
-  color: #D4183D;
+  border: 2px solid var(--semantic-rouge);
+  color: var(--semantic-rouge);
   border-radius: 8px;
   padding: 10px 20px;
   font-size: 1em;
@@ -787,7 +790,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
   transition: all 0.3s ease;
 }
 .del-form button:hover {
-  background: #D4183D;
+  background: var(--semantic-rouge);
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
@@ -819,12 +822,12 @@ main section:nth-of-type(4) article input[type=password]:focus {
   background-color: rgb(244.1, 244.1, 244.1);
 }
 #drop-zone:hover {
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
   background-color: rgb(246.9545454545, 249.1, 251.2454545455);
 }
 #drop-zone.drag-over {
   background-color: rgb(243.4772727273, 246.55, 249.6227272727);
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
   transform: scale(1.02);
 }
 #drop-zone p {
@@ -852,7 +855,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
 }
 .upload-status.success {
   background-color: #D4EDDA;
-  color: #155724;
+  color: var(--semantic-success);
   display: block;
 }
 .upload-status.error {
@@ -862,12 +865,12 @@ main section:nth-of-type(4) article input[type=password]:focus {
 }
 
 main section:nth-of-type(2) article > footer > form button {
-  border: 2px solid #D4183D;
-  color: #D4183D;
+  border: 2px solid var(--semantic-rouge);
+  color: var(--semantic-rouge);
   background: #FFFFFF;
 }
 main section:nth-of-type(2) article > footer > form button:hover {
-  background: #D4183D;
+  background: var(--semantic-rouge);
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
@@ -917,7 +920,7 @@ main section:nth-of-type(2) article > footer > form button:hover {
 #modalModificationAdresse h2,
 #modalAjoutAdresse h2,
 #modalOTP h2 {
-  color: #7171A3;
+  color: var(--primary-bleu);
   margin-bottom: 2rem;
   font-size: 1.5em;
   border-bottom: 2px solid #EFEFEF;
@@ -968,7 +971,7 @@ main section:nth-of-type(2) article > footer > form button:hover {
 #formulaireAjoutAdresse input[type=text]:focus,
 #modalOTP form input[type=text]:focus {
   outline: none;
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 
@@ -987,7 +990,7 @@ main section:nth-of-type(2) article > footer > form button:hover {
 #formulaireModificationAdresse button[type=submit],
 #formulaireAjoutAdresse button[type=submit],
 #modalOTP form button[type=submit] {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   border: none;
   margin-top: 0.5rem;
@@ -1005,14 +1008,14 @@ main section:nth-of-type(2) article > footer > form button:hover {
 #formulaireAjoutAdresse button[type=button],
 #modalOTP form button[type=button] {
   background: #FFFFFF;
-  color: #7171A3;
-  border: 2px solid #7171A3;
+  color: var(--primary-bleu);
+  border: 2px solid var(--primary-bleu);
 }
 
 #formulaireModificationAdresse button[type=button]:hover,
 #formulaireAjoutAdresse button[type=button]:hover,
 #modalOTP form button[type=button]:hover {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
@@ -1078,10 +1081,43 @@ main section:nth-of-type(1) article select {
 
 main section:nth-of-type(1) article select:focus {
   outline: none;
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
   box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }
 
 main section:nth-of-type(1) article select:hover {
-  border-color: #7171A3;
+  border-color: var(--primary-bleu);
+}
+
+.daltonien-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #EFEFEF;
+}
+.daltonien-switcher label {
+  color: #333;
+  font-weight: 600;
+  font-size: 1.1em;
+  white-space: nowrap;
+}
+.daltonien-switcher .filtre__item {
+  min-width: 200px;
+  max-width: 300px;
+  padding: 10px 16px;
+  border: 2px solid #EFEFEF;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: "Quicksand", sans-serif;
+  background-color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.daltonien-switcher .filtre__item:focus {
+  outline: none;
+  border-color: var(--primary-bleu);
+  box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
 }/*# sourceMappingURL=style.css.map */

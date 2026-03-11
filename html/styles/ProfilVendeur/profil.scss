@@ -259,7 +259,7 @@ body {
 }
 
 .daltonien-switcher {
-  margin: 40px auto; // Espacement par rapport à la carte du dessus et centrage
+  margin: 40px auto;
   padding: 20px;
   background: $primary-color-blanc;
   border: 1px solid $secondary-color-orange-clair;
@@ -268,7 +268,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 15px;
-  width: fit-content; // S'adapte à la largeur du contenu
+  width: fit-content;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 
   label {

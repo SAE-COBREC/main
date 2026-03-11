@@ -738,6 +738,14 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         <p id="animation-toggle-status">Animations activées</p>
                     </main>
                 </article>
+                <div class="daltonien-switcher">
+                    <label for="colorblind-mode">Mode daltonien :</label>
+                    <select id="colorblind-mode" class="filtre__item">
+                        <option value="default" <?= $current_theme === 'default' ? 'selected' : '' ?>>Désactivé</option>
+                        <option value="dalto-red-green" <?= $current_theme === 'dalto-red-green' ? 'selected' : '' ?>>Rouge/Vert (Protan/Deutan)</option>
+                        <option value="dalto-blue-yellow" <?= $current_theme === 'dalto-blue-yellow' ? 'selected' : '' ?>>Bleu/Jaune (Tritan)</option>
+                    </select>
+                </div>
             </section>
 
             <!-- Formulaire de déconnexion -->
