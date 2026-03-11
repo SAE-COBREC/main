@@ -169,7 +169,7 @@
         <?php endif ;?>
         <?php  if ($panierVide) : ?>
         <div id="panierVide">
-            <img id="panierVide" src="/img/svg/panier-empty.svg" />
+            <img src="/img/svg/panier-empty.svg" alt="Illustration panier vide" />
             <a href="/" id="retourAchat">Continuer mes achats</a>
         </div>
 

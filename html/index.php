@@ -479,8 +479,9 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                             $prixDiscountC = ($discountC > 0) ? $prodCarousel['p_prix'] * (1 - $discountC/100) : $prodCarousel['p_prix'];
                             $prixFinalC = calcPrixTVA($prodCarousel['tva'], $prixDiscountC);
                             $nomVendeurC = recupNomVendeurIdProduit($connexionBaseDeDonnees, $prodCarousel['id_produit']);
+                            $estEnRuptureC = (int)$prodCarousel['p_stock'] <= 0;
                         ?>
-                        <li class="carousel-slide <?= $index === 0 ? 'active' : '' ?>">
+                        <li class="carousel-slide <?= $index === 0 ? 'active' : '' ?> <?= $estEnRuptureC ? 'out-of-stock' : '' ?>">
                             <div class="carousel-content"
                                 onclick="window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
                                 <div class="carousel-image">
@@ -488,6 +489,9 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                         alt="<?= htmlspecialchars($prodCarousel['p_nom']) ?>">
                                     <?php if ($discountC > 0): ?>
                                     <span class="badge-reduction">-<?= round($discountC) ?>%</span>
+                                    <?php endif; ?>
+                                    <?php if ($estEnRuptureC): ?>
+                                    <div class="badge-hors-stock">En rupture de stock</div>
                                     <?php endif; ?>
                                 </div>
                                 <div class="carousel-info">
@@ -539,11 +543,11 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                                                 onclick="event.stopPropagation(); window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
                                                 Voir le produit
                                             </button>
-                                            <button class="btn-carousel-cart"
-                                                onclick="event.stopPropagation(); ajouterAuPanier(<?= $prodCarousel['id_produit'] ?>)">
+                                            <button class="btn-carousel-cart" <?= $estEnRuptureC ? 'disabled' : '' ?>
+                                                onclick="event.stopPropagation(); <?= !$estEnRuptureC ? 'ajouterAuPanier(' . $prodCarousel['id_produit'] . ')' : 'return false;' ?>">
                                                 <img src="/img/svg/panier.svg" alt="Panier" width="20"
                                                     style="margin-right:8px; filter: brightness(0) invert(1);">
-                                                Ajouter au panier
+                                                <?= $estEnRuptureC ? 'Rupture de stock' : 'Ajouter au panier' ?>
                                             </button>
                                         </div>
                                     </div>

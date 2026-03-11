@@ -1138,6 +1138,60 @@ article {
     }
   }
 
+  // État de rupture de stock du carrousel
+  .carousel-slide.out-of-stock {
+    opacity: 0.6;
+    pointer-events: none;
+
+    .carousel-content {
+      opacity: 0.6;
+    }
+
+    .btn-carousel-cart {
+      background: #ccc;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+
+      &:hover {
+        background: #ccc;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    .badge-hors-stock {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: vars.$secondary-color-gris-clair;
+      color: vars.$secondary-color-gris-fonce;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      z-index: 5;
+      white-space: nowrap;
+    }
+  }
+
+  // Badge rupture de stock sur l'image
+  .carousel-image .badge-hors-stock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: vars.$secondary-color-gris-clair;
+    color: vars.$secondary-color-gris-fonce;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    z-index: 5;
+    white-space: nowrap;
+  }
+
   // Navigation Arrows
   .carousel-btn {
     position: absolute;

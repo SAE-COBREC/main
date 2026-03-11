@@ -906,6 +906,52 @@ article button:disabled {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(113, 113, 163, 0.4);
 }
+.carousel-container .carousel-slide.out-of-stock {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.carousel-container .carousel-slide.out-of-stock .carousel-content {
+  opacity: 0.6;
+}
+.carousel-container .carousel-slide.out-of-stock .btn-carousel-cart {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.carousel-container .carousel-slide.out-of-stock .btn-carousel-cart:hover {
+  background: #ccc;
+  transform: none;
+  box-shadow: none;
+}
+.carousel-container .carousel-slide.out-of-stock .badge-hors-stock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  z-index: 5;
+  white-space: nowrap;
+}
+.carousel-container .carousel-image .badge-hors-stock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  z-index: 5;
+  white-space: nowrap;
+}
 .carousel-container .carousel-btn {
   position: absolute;
   top: 50%;
