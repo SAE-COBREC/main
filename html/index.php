@@ -263,10 +263,13 @@ $listeProduits = trierProduits($listeProduits, $triSelection);
 $tousLesProduits = count($listeProduits);
 //prépare les catégories pour l'affichage
 $categoriesAffichage = preparercategories_affichage($listeCategories);
+
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
+<!doctype html>
+<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -281,15 +284,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <link rel="stylesheet" href="/styles/Index/style.css">
 
-    <style>
-    .marker-cluster-small div {
-        background-color: #7171A3;
-    }
-
-    .leaflet-control-attribution {
-        display: none;
-    }
-    </style>
+    <script src="js/accessibility.js"></script>
 </head>
 
 <body>
