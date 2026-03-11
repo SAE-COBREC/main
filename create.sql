@@ -88,7 +88,6 @@ CREATE TABLE cobrec1._vendeur (
     SIREN CHAR(9) NOT NULL,
     raison_sociale varchar(255) UNIQUE NOT NULL,
     denomination varchar(255) UNIQUE NOT NULL,
-    nb_produits_crees integer DEFAULT 0,
     CONSTRAINT verif_vendeur_siren CHECK (SIREN ~ '^\d{9}$')
 );
 
