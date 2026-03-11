@@ -194,7 +194,7 @@ function renderStarsVendeur(float $note, int $size = 16): string {
     <div class="product-grid">
         <?php foreach ($produitsVendeur as $prod):
             $estEnRupture = $prod['p_stock'] <= 0;
-            $discount     = (float)($prod['pourcentage_reduction'] ?? 0);
+            $discount     = (float)($prod['reduction_pourcentage'] ?? 0);
             $hasDiscount  = $discount > 0;
             $prixDiscount = $hasDiscount ? $prod['p_prix'] * (1 - $discount / 100) : $prod['p_prix'];
             $prixFinal    = calcPrixTVA($prod['tva'], $prixDiscount);

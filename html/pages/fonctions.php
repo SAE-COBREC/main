@@ -22,7 +22,7 @@ function chargerProduitsBDD($pdo)
             p.p_prix,
             p.p_stock,
             p.p_nb_ventes,
-            r.pourcentage_reduction,
+            r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
             (SELECT COUNT(*) FROM cobrec1._avis av2 WHERE av2.id_produit = p.id_produit AND av2.a_note IS NOT NULL) as nombre_avis,
@@ -39,7 +39,7 @@ function chargerProduitsBDD($pdo)
         LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
         WHERE p.p_statut = 'En ligne'
         GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
-                p.p_note, p.p_nb_ventes, p.p_statut, r.pourcentage_reduction, 
+                p.p_note, p.p_nb_ventes, p.p_statut, r.reduction_pourcentage, 
                 pr.id_produit, t.montant_tva
         ORDER BY p.id_produit;
     ";
@@ -84,7 +84,7 @@ function ajouterArticleBDD($pdo, $idProduit, $panier, $quantite = 1)
                 p.p_frais_de_port, 
                 p.p_stock,
                 t.montant_tva as tva,
-                COALESCE(r.pourcentage_reduction, 0) as pourcentage_reduction
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction
             FROM cobrec1._produit p
             JOIN cobrec1._tva t ON p.id_tva = t.id_tva
             LEFT JOIN cobrec1._reduction r ON p.id_produit = r.id_produit
@@ -188,7 +188,7 @@ function ajouterArticleSession($pdo, $idProduit, $quantite = 1)
                 p.p_stock,
                 v.denomination,
                 t.montant_tva as tva,
-                COALESCE(r.pourcentage_reduction, 0) as pourcentage_reduction,
+                COALESCE(r.reduction_pourcentage, 0) as pourcentage_reduction,
                 COALESCE(i.i_lien, '/img/photo/smartphone_xpro.jpg') as image_url,
                 i.i_alt as image_alt,
                 i.i_title as image_title,
@@ -816,7 +816,7 @@ function chargerProduitBDD($pdo, $idProduit) {
                 p.p_origine,
                 COALESCE(p.p_nb_ventes, 0) AS p_nb_ventes,
                 COALESCE(p.p_note, 0) AS p_note,
-                COALESCE(r.pourcentage_reduction, 0) AS pourcentage_reduction,
+                COALESCE(r.reduction_pourcentage, 0) AS pourcentage_reduction,
                 t.montant_tva as tva,
                 v.raison_sociale AS vendeur_nom,
                 v.denomination AS vendeur_denomination,
@@ -833,7 +833,7 @@ function chargerProduitBDD($pdo, $idProduit) {
             LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
             WHERE p.id_produit = :pid
             GROUP BY p.id_produit, p.p_nom, p.p_prix, p.p_stock, p.p_statut, 
-                     p.p_description, p.p_nb_ventes, p.p_note, r.pourcentage_reduction,
+                     p.p_description, p.p_nb_ventes, p.p_note, r.reduction_pourcentage,
                      t.montant_tva, v.raison_sociale, v.denomination, c.email
             LIMIT 1
         ");
@@ -1221,10 +1221,10 @@ function trierProduits($listeProduits, $tri_par)
         case 'prix_croissant':
             usort($listeProduits, function ($a, $b) {
                 // Calculer le prix HT après réduction
-                $discountA = (float)($a['pourcentage_reduction'] ?? 0);
+                $discountA = (float)($a['reduction_pourcentage'] ?? 0);
                 $prixHT_A = $a['p_prix'] * (1 - $discountA/100);
                 
-                $discountB = (float)($b['pourcentage_reduction'] ?? 0);
+                $discountB = (float)($b['reduction_pourcentage'] ?? 0);
                 $prixHT_B = $b['p_prix'] * (1 - $discountB/100);
                 
                 // Ajouter la TVA pour obtenir le prix TTC
@@ -1263,8 +1263,8 @@ function trierProduits($listeProduits, $tri_par)
 
         case 'en_reduction':
             usort($listeProduits, function ($a, $b) {
-                $reductionA = (float)($a['pourcentage_reduction'] ?? 0);
-                $reductionB = (float)($b['pourcentage_reduction'] ?? 0);
+                $reductionA = (float)($a['reduction_pourcentage'] ?? 0);
+                $reductionB = (float)($b['reduction_pourcentage'] ?? 0);
                 
                 $comparison = $reductionB <=> $reductionA;
                 
@@ -1279,10 +1279,10 @@ function trierProduits($listeProduits, $tri_par)
         case 'prix_decroissant':
             usort($listeProduits, function ($a, $b) {
                 // Calculer le prix HT après réduction
-                $discountA = (float)($a['pourcentage_reduction'] ?? 0);
+                $discountA = (float)($a['reduction_pourcentage'] ?? 0);
                 $prixHT_A = $a['p_prix'] * (1 - $discountA/100);
                 
-                $discountB = (float)($b['pourcentage_reduction'] ?? 0);
+                $discountB = (float)($b['reduction_pourcentage'] ?? 0);
                 $prixHT_B = $b['p_prix'] * (1 - $discountB/100);
                 
                 // Ajouter la TVA pour obtenir le prix TTC
@@ -1429,7 +1429,7 @@ function filtrerProduits($pdo, $listeProduits, $filtres, $idClient)
     foreach ($listeProduits as $produitCourant) {
         // Calculer le prix final (avec réduction et TVA)
         $prixBase = (float)($produitCourant['p_prix'] ?? 0);
-        $reduction = (float)($produitCourant['pourcentage_reduction'] ?? 0);
+        $reduction = (float)($produitCourant['reduction_pourcentage'] ?? 0);
         $tva = (float)($produitCourant['tva'] ?? 0);
 
         // Prix HT après réduction
@@ -1478,7 +1478,7 @@ function genererUrlTri($type_tri) {
 function recupInfoPourFactureArticle($pdo, $id_produit){
     //calcul le prix d'un produit apres les remises et la tva ne calcul pas avec la quantite
     $reqFacture = "
-                SELECT p_prix, montant_tva, pourcentage_reduction 
+                SELECT p_prix, montant_tva, reduction_pourcentage 
                 FROM _produit 
                 JOIN _tva ON _produit.id_tva = _tva.id_tva
                 LEFT JOIN _reduction ON _reduction.id_produit = _produit.id_produit 
@@ -1500,7 +1500,7 @@ function ProduitDenominationVendeur($pdo, $denomination) {
             p.p_prix,
             p.p_stock,
             p.p_nb_ventes,
-            r.pourcentage_reduction,
+            r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
             (SELECT COUNT(*) FROM cobrec1._avis av2 WHERE av2.id_produit = p.id_produit AND av2.a_note IS NOT NULL) as nombre_avis,
@@ -1521,7 +1521,7 @@ function ProduitDenominationVendeur($pdo, $denomination) {
         WHERE v.denomination ILIKE :denomination
             AND p.p_statut = 'En ligne'
         GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
-                 p.p_statut, r.pourcentage_reduction, pr.id_produit, t.montant_tva,
+                 p.p_statut, r.reduction_pourcentage, pr.id_produit, t.montant_tva,
                  v.denomination, v.raison_sociale
         ORDER BY p.id_produit
     ";
@@ -1542,7 +1542,7 @@ function chercherProduitsNom($pdo, $nomProduit) {
             p.p_prix,
             p.p_stock,
             p.p_nb_ventes,
-            r.pourcentage_reduction,
+            r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
             (SELECT COUNT(*) 
@@ -1571,7 +1571,7 @@ function chercherProduitsNom($pdo, $nomProduit) {
         WHERE p.p_nom ILIKE :nomProduit
             AND p.p_statut = 'En ligne'
         GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix, p.p_stock, 
-                 p.p_statut, r.pourcentage_reduction, pr.id_produit, t.montant_tva,
+                 p.p_statut, r.reduction_pourcentage, pr.id_produit, t.montant_tva,
                  v.denomination, v.raison_sociale
         ORDER BY p.p_nom ASC
     ";
