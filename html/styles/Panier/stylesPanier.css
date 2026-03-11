@@ -345,6 +345,7 @@ button {
     position: static;
     width: 100%;
     max-width: none;
+    order: -1;
   }
 }
 @media screen and (max-width: 860px) {
@@ -369,8 +370,9 @@ button {
     grid-template-columns: 1fr;
   }
   .unArticleP .imageArticleP {
-    width: 100%;
+    width: 75%;
     aspect-ratio: 1/1;
+    max-width: 290px;
   }
   .unArticleP .basArticleP {
     flex-direction: column;
