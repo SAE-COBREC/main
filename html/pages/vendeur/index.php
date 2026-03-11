@@ -33,37 +33,8 @@ if ($denominationVendeur === '') {
 // CHARGEMENT DES INFORMATIONS DU VENDEUR
 // ============================================
 
-//prépare la requête pour récupérer les informations complètes du vendeur
-$sqlVendeur = "
-    SELECT
-        v.id_vendeur,
-        v.denomination,
-        v.raison_sociale,
-        v.siren,
-        c.email,
-        c.num_telephone  AS telephone,
-        a.a_ville        AS ville,
-        a.a_code_postal  AS code_postal,
-        a.a_adresse      AS adresse,
-        a.a_numero       AS numero,
-        a.id_adresse     AS id_adresse,
-        a.latitude       AS latitude,
-        a.longitude      AS longitude,
-        i.i_lien         AS image
-    FROM cobrec1._vendeur v
-    LEFT JOIN cobrec1._compte            c  ON v.id_compte = c.id_compte
-    LEFT JOIN cobrec1._adresse           a  ON v.id_compte = a.id_compte
-    LEFT JOIN cobrec1._represente_compte rc ON v.id_compte = rc.id_compte
-    LEFT JOIN cobrec1._image             i  ON rc.id_image = i.id_image
-    WHERE v.denomination ILIKE :denomination
-    LIMIT 1
-";
-
-//exécute la requête pour trouver le vendeur
-$stmtVendeur = $connexionBaseDeDonnees->prepare($sqlVendeur);
-$stmtVendeur->execute([':denomination' => $denominationVendeur]);
-//récupère les informations du vendeur
-$informationsVendeur = $stmtVendeur->fetch(PDO::FETCH_ASSOC);
+//charge les informations du vendeur depuis la base de données
+$informationsVendeur = chargerInformationsVendeur($connexionBaseDeDonnees, $denominationVendeur);
 
 //affiche une page 404 si le vendeur est introuvable
 if (!$informationsVendeur) {
@@ -91,26 +62,9 @@ $nombreAvisTotal    = 0;
 
 //calcule les statistiques seulement si le vendeur a des produits
 if ($nombreProduits > 0) {
-    //prépare la requête pour récupérer la note moyenne et le nombre d'avis
-    $sqlStatistiques = "
-        SELECT
-            ROUND(COALESCE(AVG(a.a_note), 0)::numeric, 1) AS note,
-            COUNT(a.id_avis)                               AS nb
-        FROM cobrec1._avis a
-        INNER JOIN cobrec1._produit p ON a.id_produit = p.id_produit
-        WHERE p.id_vendeur = :idVendeur
-          AND a.a_note IS NOT NULL
-    ";
-
-    //exécute la requête de statistiques
-    $stmtStatistiques = $connexionBaseDeDonnees->prepare($sqlStatistiques);
-    $stmtStatistiques->execute([':idVendeur' => $informationsVendeur['id_vendeur']]);
-    //récupère les résultats
-    $statistiques = $stmtStatistiques->fetch(PDO::FETCH_ASSOC);
-
-    //extrait la note moyenne et le nombre d'avis
-    $noteMoyenneVendeur = (float) ($statistiques['note'] ?? 0);
-    $nombreAvisTotal    = (int)   ($statistiques['nb']   ?? 0);
+    $statistiques       = calculerStatistiquesVendeur($connexionBaseDeDonnees, $informationsVendeur['id_vendeur']);
+    $noteMoyenneVendeur = $statistiques['note'];
+    $nombreAvisTotal    = $statistiques['nb'];
 }
 
 // ============================================
@@ -119,55 +73,8 @@ if ($nombreProduits > 0) {
 
 //récupère l'ID du client s'il est connecté
 $idClient = $_SESSION['idClient'] ?? null;
-//initialise l'ID du panier
-$idPanier = null;
-
-//vérifie si le client est connecté ou pas
-if ($idClient === null) {
-    //client non connecté : utilise un panier temporaire
-    if (!isset($_SESSION['panierTemp'])) {
-        //crée un panier temporaire vide
-        $_SESSION['panierTemp'] = [];
-    }
-} else {
-    //client connecté : cherche son panier dans la base
-
-    //prépare la requête pour trouver le panier en cours
-    $sqlPanierClient = "
-        SELECT id_panier
-        FROM _panier_commande
-        WHERE timestamp_commande IS NULL AND id_client = :idClient
-    ";
-
-    //exécute la requête pour trouver le panier
-    $stmtPanier = $connexionBaseDeDonnees->prepare($sqlPanierClient);
-    $stmtPanier->execute([':idClient' => $idClient]);
-    //récupère le résultat
-    $panier = $stmtPanier->fetch(PDO::FETCH_ASSOC);
-
-    //vérifie si un panier existe
-    if ($panier) {
-        //récupère l'ID du panier existant
-        $idPanier = (int) $panier['id_panier'];
-    } else {
-        //aucun panier trouvé : crée un nouveau panier
-        $sqlCreerPanier = "
-            INSERT INTO _panier_commande (id_client, timestamp_commande)
-            VALUES (:idClient, NULL)
-            RETURNING id_panier
-        ";
-
-        //insère le nouveau panier et récupère son ID
-        $stmtCreerPanier = $connexionBaseDeDonnees->prepare($sqlCreerPanier);
-        $stmtCreerPanier->execute([':idClient' => $idClient]);
-        $idPanier = (int) $stmtCreerPanier->fetchColumn();
-    }
-
-    //sauvegarde l'ID du panier dans la session
-    $_SESSION['panierEnCours'] = $idPanier;
-    //transfère les produits du panier temporaire vers la base
-    transfererPanierTempVersBDD($connexionBaseDeDonnees, $idPanier);
-}
+//initialise le panier (crée ou récupère selon l'état de connexion)
+$idPanier = gererPanierClient($connexionBaseDeDonnees, $idClient);
 
 // ============================================
 // TRAITEMENT AJAX : AJOUT AU PANIER
@@ -175,79 +82,15 @@ if ($idClient === null) {
 
 //vérifie si c'est une requête d'ajout au panier
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'ajouter_panier') {
-    //définit le type de réponse en JSON
-    header('Content-Type: application/json');
-
-    //récupère l'ID du produit à ajouter
-    $idProduit = $_POST['idProduit'] ?? null;
-    //récupère la quantité demandée
-    $quantite = (int) ($_POST['quantite'] ?? 1);
-
-    //vérifie que l'ID produit est présent
-    if (!$idProduit) {
-        echo json_encode(['success' => false, 'message' => 'ID produit manquant']);
-        exit;
-    }
-
-    //essaie d'ajouter le produit au panier
-    try {
-        //vérifie si le client est connecté
-        if ($idClient === null) {
-            //ajoute le produit au panier temporaire en session
-            $resultat = ajouterArticleSession($connexionBaseDeDonnees, $idProduit, $quantite);
-        } else {
-            //vérifie qu'un panier existe
-            if (!$idPanier) {
-                echo json_encode(['success' => false, 'message' => 'Aucun panier en cours']);
-                exit;
-            }
-            //ajoute le produit au panier en base de données
-            $resultat = ajouterArticleBDD($connexionBaseDeDonnees, $idProduit, $idPanier, $quantite);
-        }
-        //renvoie le résultat en JSON
-        echo json_encode($resultat);
-    } catch (Exception $e) {
-        //capture les erreurs et les renvoie
-        echo json_encode(['success' => false, 'message' => 'Erreur serveur: ' . $e->getMessage()]);
-    }
-    //arrête le script après traitement
-    exit;
+    traiterAjaxAjoutPanierVendeur($connexionBaseDeDonnees, $idClient, $idPanier);
 }
 
 // ============================================
-// FONCTIONS D'AFFICHAGE
+// DONNÉES D'AFFICHAGE
 // ============================================
-
-//génère le HTML des étoiles de notation pour le vendeur
-function afficherEtoilesVendeur(float $note, int $taille = 16): string
-{
-    //initialise la chaîne HTML
-    $html = '';
-
-    //boucle sur les 5 étoiles
-    for ($i = 1; $i <= 5; $i++) {
-        //détermine le type d'étoile selon la note
-        if ($note >= $i) {
-            $typeEtoile = 'full';
-        } elseif ($note >= $i - 0.5) {
-            $typeEtoile = 'alf';
-        } else {
-            $typeEtoile = 'empty';
-        }
-        //ajoute l'image de l'étoile au HTML
-        $html .= '<img src="/img/svg/star-' . $typeEtoile . '.svg" alt="Etoile" width="' . $taille . '">';
-    }
-
-    return $html;
-}
 
 //construit l'adresse complète du vendeur pour le géocodage
-$adresseComplete = trim(
-    ($informationsVendeur['numero'] ?? '') . ' ' .
-    ($informationsVendeur['adresse'] ?? '') . ' ' .
-    ($informationsVendeur['code_postal'] ?? '') . ' ' .
-    ($informationsVendeur['ville'] ?? '')
-);
+$adresseComplete = construireAdresseCompleteVendeur($informationsVendeur);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
