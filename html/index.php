@@ -269,7 +269,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 ?>
 
 <!doctype html>
-<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -476,7 +477,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             $nomVendeurC = recupNomVendeurIdProduit($connexionBaseDeDonnees, $prodCarousel['id_produit']);
                             $estEnRuptureC = (int)$prodCarousel['p_stock'] <= 0;
                         ?>
-                        <li class="carousel-slide <?= $index === 0 ? 'active' : '' ?> <?= $estEnRuptureC ? 'out-of-stock' : '' ?>">
+                        <li
+                            class="carousel-slide <?= $index === 0 ? 'active' : '' ?> <?= $estEnRuptureC ? 'out-of-stock' : '' ?>">
                             <div class="carousel-content"
                                 onclick="window.location.href='/pages/produit/index.php?id=<?= $prodCarousel['id_produit'] ?>'">
                                 <div class="carousel-image">
@@ -525,13 +527,18 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                     <div class="carousel-actions">
                                         <div class="carousel-vendeur-block">
                                             <p class="carousel-vendeur">Vendu par :</p>
-                                            <div class="vendeur-info"
-                                                title="Voir la page de <?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>"
-                                                onclick="event.stopPropagation(); filterByVendeur('<?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>')"
-                                                style="cursor:pointer;">
-                                                <img src="/img/svg/market.svg" alt="Vendeur">
-                                                <span><?= htmlspecialchars($nomVendeurC) ?></span>
-                                            </div>
+                                            <form action="/pages/vendeur/index.php" method="GET"
+                                                onclick="event.stopPropagation();"
+                                                style="display:inline; margin:0; padding:0;">
+                                                <input type="hidden" name="denomination"
+                                                    value="<?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>">
+                                                <button type="submit" class="vendeur-info"
+                                                    title="Voir la page de <?= htmlspecialchars($nomVendeurC, ENT_QUOTES) ?>"
+                                                    style="cursor:pointer;">
+                                                    <img src="/img/svg/market.svg" alt="Vendeur">
+                                                    <span><?= htmlspecialchars($nomVendeurC) ?></span>
+                                                </button>
+                                            </form>
                                         </div>
                                         <div class="carousel-actions-buttons">
                                             <button class="btn-carousel-add"
@@ -663,12 +670,17 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
                         </div>
                         <div class="product-bottom">
-                            <div class="vendeur-info" title="Voir la page de <?= htmlspecialchars($nomVendeur) ?>"
-                                onclick="event.stopPropagation(); filterByVendeur('<?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>')"
-                                style="cursor:pointer;">
-                                <img src="/img/svg/market.svg" alt="Vendeur">
-                                <span><?= htmlspecialchars($nomVendeur) ?></span>
-                            </div>
+                            <form action="/pages/vendeur/index.php" method="GET" onclick="event.stopPropagation();"
+                                style="display:inline; margin:0; padding:0;">
+                                <input type="hidden" name="denomination"
+                                    value="<?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>">
+                                <button type="submit" class="vendeur-info"
+                                    title="Voir la page de <?= htmlspecialchars($nomVendeur) ?>"
+                                    style="cursor:pointer;">
+                                    <img src="/img/svg/market.svg" alt="Vendeur">
+                                    <span><?= htmlspecialchars($nomVendeur) ?></span>
+                                </button>
+                            </form>
                             <!--bouton pour ajouter au panier-->
                             <button <?= $estEnRupture ? 'disabled' : '' ?>
                                 onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
