@@ -731,7 +731,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                         var iframe = document.createElement('iframe');
                         iframe.src = '/partials/carte.php';
                         iframe.style.width = '100%';
-                        iframe.style.height = '500px';
+                        iframe.style.height = '412px';
                         iframe.style.border = 'none';
                         iframe.title = 'Carte des vendeurs';
                         mainMap.appendChild(iframe);
