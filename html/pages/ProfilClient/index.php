@@ -640,7 +640,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             <div style='display: <?php
                             if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
                                 <label>
-                                    <span>code OTP</span>
+                                    <span>Code OTP</span>
                                     <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP"/>
                                 </label>
                             </div>
@@ -662,8 +662,13 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                                         required>
                                 </label>
                             </div>
-                            <button type="submit" name="change_password"
-                                onclick="return confirm('Confirmer le changement de mot de passe ?')">
+                            <button type="submit" name="change_password" onclick="return confirm('Confirmer le changement de mot de passe ?')"
+                                <?php 
+                                // if (empty($_SESSION['OTP']['statut'])){ 
+                                //     echo 'onclick="return confirm(Confirmer le changement de mot de passe ?)"';
+                                // }else{ 
+                                //     echo 'onclick="return confirm(Désactiver le One Time Password et changer de mot de passe ?)"'; 
+                                // } ?>>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -687,7 +692,11 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                             </svg>
                         </span>
                     </header>
-                    <main>
+                    <main><?php
+                    if (!empty($_SESSION['OTP']['statut'])){?>
+                        <label>
+                            <span>Pour désactiver l'OTP, veuillez changer le mot de passe.</span>
+                        </label><?php } ?>
                         <button type="button" id="activerOTP" onclick="ouvrirModalOTP()">
                             <span class="btn-text-desktop">Activer le One Time Password</span>
                             <span class="btn-text-mobile">Activer l'OTP</span>
@@ -803,7 +812,7 @@ $donneesImagePresente = $requetePrepareeVerificationImage->fetch(PDO::FETCH_ASSO
                         if (contentLength == 4) {
                             xhttp2.abort();
                             alert(
-                                "One Time Password activée avec succès."
+                                "One Time Password activé avec succès."
                                 );
                             //document.location.href = "/index.php"; 
                             document.getElementById('modalOTP').style.display = 'none';
