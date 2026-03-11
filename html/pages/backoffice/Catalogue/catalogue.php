@@ -37,6 +37,7 @@ $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInf
 <head>
     <meta charset="UTF-8">
     <title>Catalogue vendeur - <?php echo htmlspecialchars($vendeurInfos['denomination'] ?? ''); ?></title>
+    <link rel="stylesheet" href="../../../styles/Catalogue/catalogue.css">
 </head>
 
 <body>
@@ -60,6 +61,10 @@ $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInf
                 $urlImage = str_replace('html/img/photo', '/img/photo', $produitCourant['image_url'] ?? '/img/default-product.jpg');
 
                 $description = $produitCourant['p_description'] ?? 'Aucune description disponible.';
+                $prix = $produitCourant['p_prix'] ?? '150.00';
+
+                //récupère l'origine du produit
+                $origineProduit = recupOrigineProduit($connexionBaseDeDonnees, $produitCourant['id_produit']);
             ?>
             <li>
                 <article>
@@ -73,22 +78,28 @@ $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInf
                         <!--nom du produit-->
                         <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
 
+                        <p><?= htmlspecialchars($description) ?></p>
+
                         <div>
                             <span>
-                                <!--affiche les étoiles de notation-->
-                                <?php for ($i = 1; $i <= 5; $i++):
-                                if ($noteArrondie >= $i)           $s = 'full';
-                                elseif ($noteArrondie >= $i - 0.5) $s = 'alf';
-                                else                               $s = 'empty';
-                            ?>
-                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
-                                <?php endfor; ?>
+                                <span>PRIX</span>
+                                <span>€<?= htmlspecialchars($prix) ?></span>
                             </span>
-                            <!--affiche le nombre d'avis-->
-                            <span>(<?= $produitCourant['nombre_avis'] ?? 0 ?>)</span>
                         </div>
 
-                        <p><?= htmlspecialchars($description) ?></p>
+                        <section>
+                            <span>Origine:</span>
+                            <div>
+                                <span> <?= htmlspecialchars($origineProduit) ?></span>
+                            </div>
+                        </section>
+
+                        <section>
+                            <span>Categorie:</span>
+                            <div>
+                                <span> <?= htmlspecialchars($produitCourant['c_nom'] ?? 'Inconnue') ?></span>
+                            </div>
+                        </section>
                     </div>
 
                 </article>

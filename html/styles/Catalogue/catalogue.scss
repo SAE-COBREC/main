@@ -1,0 +1,138 @@
+@import '../_variable.scss';
+
+$catalogue-green: #6d8354;
+$catalogue-text-gray: #777;
+$catalogue-light-gray: #888;
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: $primary-color-blanc;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+
+    h1 {
+        color: $catalogue-green;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+}
+
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+
+    li {
+        margin-bottom: 60px;
+    }
+}
+
+article {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+
+    /* Colonne image */
+    > div:first-of-type {
+        flex: 1;
+        max-width: 450px;
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    }
+
+    /* Colonne détails */
+    > div:last-of-type {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        /* Badge de prix */
+        > div:first-of-type > span {
+            display: inline-flex;
+            align-items: center;
+            background-color: $catalogue-green;
+            color: $primary-color-blanc;
+            padding: 10px 25px;
+            border-radius: 50px;
+            gap: 10px;
+            font-weight: bold;
+
+            /* Label PRICE dans le badge */
+            span:first-child {
+                font-size: 0.7rem;
+                opacity: 0.8;
+            }
+
+            /* Valeur du prix */
+            span:last-child {
+                font-size: 1.2rem;
+            }
+        }
+    }
+
+    h3 {
+        color: $catalogue-green;
+        font-size: 2rem;
+        text-transform: uppercase;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    p {
+        color: $catalogue-text-gray;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Couleurs */
+    section {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        > span {
+            color: $catalogue-light-gray;
+            font-size: 0.9rem;
+        }
+
+        > div {
+            display: flex;
+            gap: 10px;
+
+            > span {
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+                display: block;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    article {
+        flex-direction: column;
+        gap: 20px;
+
+        > div:first-of-type {
+            max-width: 100%;
+        }
+    }
+}
