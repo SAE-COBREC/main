@@ -39,13 +39,13 @@ body {
   min-height: 100vh;
 }
 
-.vendeur-page {
+main {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1.5rem 3rem;
 }
 
-.btn-retour {
+main > a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -61,17 +61,17 @@ body {
   padding: 10px 20px;
   transition: all 0.3s ease;
 }
-.btn-retour:hover {
+main > a:hover {
   background: var(--primary-bleu);
   color: #FFFFFF;
 }
-.btn-retour img {
+main > a img {
   width: 16px;
   height: 16px;
   opacity: 0.6;
 }
 
-.vendeur-profil-card {
+main > section {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -83,7 +83,7 @@ body {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.vendeur-profil-avatar {
+main > section > img {
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -93,7 +93,7 @@ body {
   border: 3px solid #e5e7eb;
 }
 
-.vendeur-profil-avatar-placeholder {
+main > section > figure {
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -104,18 +104,18 @@ body {
   flex-shrink: 0;
   border: 3px solid #e5e7eb;
 }
-.vendeur-profil-avatar-placeholder img {
+main > section > figure img {
   width: 54px;
   height: 54px;
   opacity: 0.4;
   filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
 }
 
-.vendeur-profil-info {
+main > section > div {
   flex: 1;
   min-width: 0;
 }
-.vendeur-profil-info h1 {
+main > section > div h1 {
   margin: 0 0 0.25rem;
   font-size: 1.7rem;
   font-weight: 700;
@@ -123,13 +123,14 @@ body {
   font-family: "Quicksand", sans-serif;
 }
 
-.vendeur-profil-raison {
+main > section > div > small {
+  display: block;
   color: #6b7280;
   font-size: 0.95rem;
   margin-bottom: 0.25rem;
 }
 
-.vendeur-profil-note {
+main > section > div > p {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -137,35 +138,36 @@ body {
   color: #374151;
   margin-top: 0.6rem;
 }
-.vendeur-profil-note strong {
+main > section > div > p strong {
   font-weight: 700;
 }
-.vendeur-profil-note span {
+main > section > div > p span {
   color: #9ca3af;
 }
 
-.vendeur-profil-location {
+main > section > div > address {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   color: #6b7280;
   font-size: 0.88rem;
   margin-top: 0.5rem;
+  font-style: normal;
 }
-.vendeur-profil-location img {
+main > section > div > address img {
   width: 14px;
   height: 14px;
   opacity: 0.55;
 }
 
-.vendeur-profil-stats {
+main > section > div > footer {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1rem;
+  background: transparent;
 }
-
-.vendeur-stat-chip {
+main > section > div > footer span {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -177,33 +179,38 @@ body {
   color: #374151;
   font-weight: 600;
 }
-.vendeur-stat-chip img {
+main > section > div > footer span img {
   width: 17px;
   height: 17px;
   filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
 }
 
-.vendeur-produits-titre {
+main > h2 {
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 1.2rem;
   color: #030212;
   font-family: "Quicksand", sans-serif;
 }
-.vendeur-produits-titre span {
+main > h2 span {
   color: #6b7280;
   font-weight: 400;
   font-size: 1rem;
   margin-left: 0.25rem;
 }
 
-.product-grid {
+main > ul {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+main > ul li {
+  display: contents;
 }
 
-.vendeur-info {
+article > div:last-child > div:last-child > div {
   display: inline-flex;
   align-items: center;
   margin-bottom: 12px;
@@ -215,12 +222,12 @@ body {
   gap: 6px;
   padding: 4px 8px;
 }
-.vendeur-info img {
+article > div:last-child > div:last-child > div img {
   width: 24px;
   height: 24px;
   filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
 }
-.vendeur-info span {
+article > div:last-child > div:last-child > div span {
   font-size: 0.85rem;
   color: var(--primary-bleu);
   font-weight: 600;
@@ -229,20 +236,20 @@ body {
   text-overflow: ellipsis;
 }
 
-.product-bottom {
+article > div:last-child > div:last-child {
   margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
 }
-.product-bottom .vendeur-info {
+article > div:last-child > div:last-child > div {
   margin: 0 0 6px 0;
   width: -moz-fit-content;
   width: fit-content;
   align-self: flex-start;
 }
-.product-bottom button {
+article > div:last-child > div:last-child button {
   margin: 0;
   width: 100%;
   flex: none;
@@ -277,7 +284,7 @@ article > div:first-child img {
      object-fit: contain;
   width: 100em;
 }
-article > div:first-child .badge-reduction {
+article > div:first-child mark {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -292,7 +299,7 @@ article > div:first-child .badge-reduction {
   z-index: 1;
   backdrop-filter: blur(4px);
 }
-article > div:first-child .badge-bretagne {
+article > div:first-child span {
   position: absolute;
   bottom: 0.2em;
   right: 0.2em;
@@ -306,11 +313,11 @@ article > div:first-child .badge-bretagne {
   align-items: center;
   justify-content: center;
 }
-article > div:first-child .badge-bretagne img {
+article > div:first-child span img {
   width: 100%;
   height: 100%;
 }
-article > div:first-child .rupture-stock {
+article > div:first-child > div {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -323,9 +330,6 @@ article > div:first-child .rupture-stock {
   font-weight: bold;
   text-transform: uppercase;
   z-index: 2;
-}
-article > div:first-child .image-rupture {
-  filter: grayscale(100%) opacity(0.7);
 }
 article > div:last-child {
   padding: 1.25rem;
@@ -386,18 +390,22 @@ article button:disabled {
   color: #EFEFEF;
 }
 
-.produit-promotion {
+article[data-promo] {
   border: 2px solid var(--primary-bleu) !important;
   background-color: #e4e4f5 !important;
   position: relative;
   overflow: hidden;
 }
 
-.produit-rupture {
+article[data-rupture] {
   opacity: 0.85;
 }
 
-.vendeur-no-products {
+article[data-rupture] > div:first-child > img {
+  filter: grayscale(100%) opacity(0.7);
+}
+
+main > p {
   text-align: center;
   padding: 4rem 1rem;
   color: #9ca3af;
@@ -405,29 +413,29 @@ article button:disabled {
 }
 
 @media (max-width: 640px) {
-  .vendeur-profil-card {
+  main > section {
     flex-direction: column;
     text-align: center;
     padding: 1.5rem 1rem;
   }
-  .vendeur-profil-stats {
+  main > section > div > footer {
     justify-content: center;
   }
-  .vendeur-profil-location {
+  main > section > div > address {
     justify-content: center;
   }
-  .vendeur-profil-note {
+  main > section > div > p {
     justify-content: center;
   }
-  .product-grid {
+  main > ul {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
   }
-  .product-bottom {
+  article > div:last-child > div:last-child {
     flex-direction: column;
     align-items: stretch;
   }
-  .product-bottom button {
+  article > div:last-child > div:last-child button {
     width: 100%;
   }
 }/*# sourceMappingURL=style.css.map */

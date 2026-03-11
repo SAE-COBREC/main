@@ -65,22 +65,20 @@ body {
 }
 
 // ============================================
-// CONTENEUR DE PAGE
+// CONTENEUR DE PAGE  →  main
 // ============================================
 
-//zone centrale limitée en largeur
-.vendeur-page {
+main {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1.5rem 3rem;
 }
 
 // ============================================
-// BOUTON RETOUR
+// BOUTON RETOUR  →  main > a
 // ============================================
 
-//lien de retour vers la page précédente
-.btn-retour {
+main > a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -95,13 +93,12 @@ body {
   font-size: 1.3em;
   padding: 10px 20px;
   transition: all 0.3s ease;
-  //effet survol du bouton retour
+
   &:hover {
     background: $primary-color-bleu;
     color: $primary-color-blanc;
   }
 
-  //icône flèche
   img {
     width: 16px;
     height: 16px;
@@ -110,11 +107,10 @@ body {
 }
 
 // ============================================
-// CARTE PROFIL VENDEUR
+// CARTE PROFIL VENDEUR  →  main > section
 // ============================================
 
-//carte principale avec avatar et infos du vendeur
-.vendeur-profil-card {
+main > section {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -126,8 +122,8 @@ body {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-//avatar circulaire avec photo
-.vendeur-profil-avatar {
+//avatar circulaire avec photo  →  main > section > img
+main > section > img {
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -136,8 +132,8 @@ body {
   border: 3px solid #e5e7eb;
 }
 
-//avatar placeholder quand pas de photo
-.vendeur-profil-avatar-placeholder {
+//avatar placeholder  →  main > section > figure
+main > section > figure {
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -148,7 +144,6 @@ body {
   flex-shrink: 0;
   border: 3px solid #e5e7eb;
 
-  //icône de remplacement
   img {
     width: 54px;
     height: 54px;
@@ -157,12 +152,11 @@ body {
   }
 }
 
-//zone texte à droite de l'avatar
-.vendeur-profil-info {
+//zone texte à droite de l'avatar  →  main > section > div
+main > section > div {
   flex: 1;
   min-width: 0;
 
-  //nom du vendeur
   h1 {
     margin: 0 0 0.25rem;
     font-size: 1.7rem;
@@ -172,15 +166,16 @@ body {
   }
 }
 
-//raison sociale ou sous-titre du vendeur
-.vendeur-profil-raison {
+//raison sociale  →  main > section > div > small
+main > section > div > small {
+  display: block;
   color: #6b7280;
   font-size: 0.95rem;
   margin-bottom: 0.25rem;
 }
 
-//affichage de la note moyenne
-.vendeur-profil-note {
+//note moyenne  →  main > section > div > p
+main > section > div > p {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -188,27 +183,25 @@ body {
   color: #374151;
   margin-top: 0.6rem;
 
-  //valeur numérique en gras
   strong {
     font-weight: 700;
   }
 
-  //nombre d'avis grisé
   span {
     color: #9ca3af;
   }
 }
 
-//ligne de localisation du vendeur
-.vendeur-profil-location {
+//localisation  →  main > section > div > address
+main > section > div > address {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   color: #6b7280;
   font-size: 0.88rem;
   margin-top: 0.5rem;
+  font-style: normal;
 
-  //icône de localisation
   img {
     width: 14px;
     height: 14px;
@@ -216,48 +209,46 @@ body {
   }
 }
 
-//conteneur des chips de statistiques
-.vendeur-profil-stats {
+//chips de statistiques  →  main > section > div > footer
+main > section > div > footer {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1rem;
-}
+  background: transparent;
 
-//chip individuelle (produits, ventes, etc.)
-.vendeur-stat-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: $secondary-color-bleu-clair;
-  border: 1px solid rgba($primary-color-bleu, 0.15);
-  border-radius: 30px;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.85rem;
-  color: #374151;
-  font-weight: 600;
+  //chip individuelle  →  span
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: $secondary-color-bleu-clair;
+    border: 1px solid rgba($primary-color-bleu, 0.15);
+    border-radius: 30px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+    color: #374151;
+    font-weight: 600;
 
-  //icône dans la chip
-  img {
-    width: 17px;
-    height: 17px;
-    filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+    img {
+      width: 17px;
+      height: 17px;
+      filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+    }
   }
 }
 
 // ============================================
-// TITRE SECTION PRODUITS
+// TITRE SECTION PRODUITS  →  main > h2
 // ============================================
 
-//titre "Produits de ce vendeur"
-.vendeur-produits-titre {
+main > h2 {
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 1.2rem;
   color: $primary-color-noir;
   font-family: $font-family-secondaire;
 
-  //compteur entre parenthèses
   span {
     color: #6b7280;
     font-weight: 400;
@@ -267,22 +258,27 @@ body {
 }
 
 // ============================================
-// GRILLE DE PRODUITS
+// GRILLE DE PRODUITS  →  main > ul
 // ============================================
 
-//grille responsive des cartes produits
-.product-grid {
+main > ul {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+
+  //li transparent pour que article soit direct dans la grille
+  li {
+    display: contents;
+  }
 }
 
 // ============================================
-// CARTES PRODUITS (ARTICLE)
+// INFOS VENDEUR DANS CARTE  →  article > div:last-child > div:last-child > div
 // ============================================
 
-//infos vendeur dans les cartes
-.vendeur-info {
+article > div:last-child > div:last-child > div {
   display: inline-flex;
   align-items: center;
   margin-bottom: 12px;
@@ -293,14 +289,12 @@ body {
   gap: 6px;
   padding: 4px 8px;
 
-  //icône du vendeur
   img {
     width: 24px;
     height: 24px;
     filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
   }
 
-  //nom du vendeur
   span {
     font-size: 0.85rem;
     color: $primary-color-bleu;
@@ -311,22 +305,23 @@ body {
   }
 }
 
-//ligne du bas : vendeur + bouton panier
-.product-bottom {
+// ============================================
+// BAS DE CARTE  →  article > div:last-child > div:last-child
+// ============================================
+
+article > div:last-child > div:last-child {
   margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
 
-  //vendeur-info dans la zone bouton
-  .vendeur-info {
+  > div {
     margin: 0 0 6px 0;
     width: fit-content;
     align-self: flex-start;
   }
 
-  //bouton pleine largeur
   button {
     margin: 0;
     width: 100%;
@@ -334,7 +329,10 @@ body {
   }
 }
 
-//style d'une carte produit
+// ============================================
+// CARTES PRODUITS  →  article
+// ============================================
+
 article {
   display: flex;
   flex-direction: column;
@@ -346,7 +344,7 @@ article {
   cursor: pointer;
   @include hover-lift;
 
-  //section de l'image du produit
+  //section image
   > div:first-child {
     position: relative;
     width: 100%;
@@ -362,8 +360,8 @@ article {
       width: 100em;
     }
 
-    //badge de réduction
-    .badge-reduction {
+    //badge réduction  →  mark
+    mark {
       position: absolute;
       top: 10px;
       left: 10px;
@@ -379,8 +377,8 @@ article {
       backdrop-filter: blur(4px);
     }
 
-    //badge provenance Bretagne
-    .badge-bretagne {
+    //badge Bretagne  →  span
+    span {
       position: absolute;
       bottom: 0.2em;
       right: 0.2em;
@@ -400,8 +398,8 @@ article {
       }
     }
 
-    //message de rupture de stock centré sur l'image
-    .rupture-stock {
+    //rupture de stock  →  div
+    > div {
       @include centre-absolu;
       background-color: rgba($secondary-color-gris-clair, 0.9);
       color: $primary-color-noir;
@@ -412,21 +410,15 @@ article {
       text-transform: uppercase;
       z-index: 2;
     }
-
-    //effet grisé sur image en rupture
-    .image-rupture {
-      filter: grayscale(100%) opacity(0.7);
-    }
   }
 
-  //section des informations texte du produit
+  //section informations texte
   > div:last-child {
     padding: 1.25rem;
     flex: 1;
     display: flex;
     flex-direction: column;
 
-    //nom du produit
     h3 {
       font-size: 1rem;
       font-weight: 600;
@@ -434,33 +426,30 @@ article {
       color: $primary-color-noir;
     }
 
-    //section des étoiles et nombre d'avis
+    //étoiles et nombre d'avis
     > div:nth-child(2) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 0.75rem;
 
-      //étoiles de notation
       span:first-child {
         color: $secondary-color-etoile;
       }
 
-      //nombre d'avis entre parenthèses
       span:last-child {
         color: $secondary-color-gris-fonce;
         font-size: 0.85rem;
       }
     }
 
-    //section du prix
+    //prix
     > div:nth-child(3) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 1rem;
 
-      //prix final
       span:last-child {
         font-size: 1.5rem;
         font-weight: bold;
@@ -469,7 +458,7 @@ article {
     }
   }
 
-  //bouton "Ajouter au panier"
+  //bouton panier
   button {
     margin-top: auto;
     width: 100%;
@@ -484,12 +473,10 @@ article {
     font-family: $font-family-secondaire;
     @include transition(background);
 
-    //effet hover sur le bouton
     &:hover:not(:disabled) {
       background: $primary-color-bleu;
     }
 
-    //style du bouton désactivé
     &:disabled {
       background: $secondary-color-gris-fonce;
       cursor: not-allowed;
@@ -499,28 +486,32 @@ article {
 }
 
 // ============================================
-// STYLES SPÉCIAUX - PROMOTIONS ET RUPTURE
+// ÉTATS DYNAMIQUES  →  data-attributes
 // ============================================
 
-//bordure spéciale pour les produits en promotion
-.produit-promotion {
+//produit en promotion  →  article[data-promo]
+article[data-promo] {
   border: 2px solid $primary-color-bleu !important;
   background-color: $secondary-color-promotion !important;
   position: relative;
   overflow: hidden;
 }
 
-//légère transparence pour les produits en rupture
-.produit-rupture {
+//produit en rupture  →  article[data-rupture]
+article[data-rupture] {
   opacity: 0.85;
 }
 
+//image grisée si rupture  →  article[data-rupture] img
+article[data-rupture] > div:first-child > img {
+  filter: grayscale(100%) opacity(0.7);
+}
+
 // ============================================
-// AUCUN PRODUIT
+// AUCUN PRODUIT  →  main > p
 // ============================================
 
-//message affiché quand le vendeur n'a pas de produits
-.vendeur-no-products {
+main > p {
   text-align: center;
   padding: 4rem 1rem;
   color: #9ca3af;
@@ -531,38 +522,31 @@ article {
 // RESPONSIVE - MOBILE
 // ============================================
 
-//styles pour mobile
 @media (max-width: 640px) {
-  //passage en colonne pour la carte profil
-  .vendeur-profil-card {
+  main > section {
     flex-direction: column;
     text-align: center;
     padding: 1.5rem 1rem;
   }
 
-  //centrage des chips de stats
-  .vendeur-profil-stats {
+  main > section > div > footer {
     justify-content: center;
   }
 
-  //centrage de la localisation
-  .vendeur-profil-location {
+  main > section > div > address {
     justify-content: center;
   }
 
-  //centrage de la note
-  .vendeur-profil-note {
+  main > section > div > p {
     justify-content: center;
   }
 
-  //grille produits adaptée mobile
-  .product-grid {
+  main > ul {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
   }
 
-  //bouton pleine largeur sur mobile
-  .product-bottom {
+  article > div:last-child > div:last-child {
     flex-direction: column;
     align-items: stretch;
 

@@ -262,94 +262,92 @@ function afficherEtoilesVendeur(float $note, int $taille = 16): string
     ?>
 
     <!--conteneur principal de la page vendeur-->
-    <div class="vendeur-page">
+    <main>
 
         <!--lien de retour vers l'accueil-->
-        <a href="/" class="btn-retour">
+        <a href="/">
             ← Retour à l'accueil
         </a>
 
         <!--carte de profil du vendeur-->
-        <div class="vendeur-profil-card">
+        <section>
 
             <!--affiche l'avatar du vendeur ou un placeholder-->
             <?php if (!empty($informationsVendeur['image'])): ?>
-            <img class="vendeur-profil-avatar" src="<?= htmlspecialchars($informationsVendeur['image']) ?>"
+            <img src="<?= htmlspecialchars($informationsVendeur['image']) ?>"
                 alt="<?= htmlspecialchars($informationsVendeur['denomination']) ?>">
             <?php else: ?>
-            <div class="vendeur-profil-avatar-placeholder">
+            <figure>
                 <img src="/img/svg/market.svg" alt="Vendeur">
-            </div>
+            </figure>
             <?php endif; ?>
 
             <!--informations textuelles du vendeur-->
-            <div class="vendeur-profil-info">
+            <div>
 
                 <!--nom de la dénomination du vendeur-->
                 <h1><?= htmlspecialchars($informationsVendeur['denomination']) ?></h1>
 
                 <!--affiche la raison sociale si elle existe-->
                 <?php if (!empty($informationsVendeur['raison_sociale'])): ?>
-                <p class="vendeur-profil-raison"><?= htmlspecialchars($informationsVendeur['raison_sociale']) ?></p>
+                <small><?= htmlspecialchars($informationsVendeur['raison_sociale']) ?></small>
                 <?php endif; ?>
 
                 <!--affiche la note moyenne si elle existe-->
                 <?php if ($noteMoyenneVendeur > 0): ?>
-                <div class="vendeur-profil-note">
+                <p>
                     <!--affiche les étoiles de la note moyenne-->
                     <?= afficherEtoilesVendeur($noteMoyenneVendeur, 18) ?>
                     <!--affiche la valeur numérique de la note-->
                     <strong><?= number_format($noteMoyenneVendeur, 1, ',', '') ?>/5</strong>
                     <!--affiche le nombre d'avis-->
                     <span style="color:#9ca3af">(<?= $nombreAvisTotal ?> avis)</span>
-                </div>
+                </p>
                 <?php endif; ?>
 
                 <!--affiche la localisation du vendeur si elle existe-->
                 <?php if (!empty($informationsVendeur['ville'])): ?>
-                <div class="vendeur-profil-location">
+                <address>
                     <img src="/img/svg/location.svg" alt="" width="14" onerror="this.style.display='none'">
                     <!--affiche le code postal s'il est disponible-->
                     <?php if (!empty($informationsVendeur['code_postal'])): ?>
                     <?= htmlspecialchars($informationsVendeur['code_postal']) ?> –
                     <?php endif; ?>
                     <?= htmlspecialchars($informationsVendeur['ville']) ?>
-                </div>
+                </address>
                 <?php endif; ?>
 
                 <!--chips de statistiques rapides-->
-                <div class="vendeur-profil-stats">
+                <footer>
                     <!--chip affichant le nombre de produits en ligne-->
-                    <div class="vendeur-stat-chip">
+                    <span>
                         <img src="/img/svg/market.svg" alt="">
                         <?= $nombreProduits ?> produit<?= $nombreProduits > 1 ? 's' : '' ?> en ligne
-                    </div>
+                    </span>
                     <!--affiche le numéro SIREN si disponible-->
                     <?php if (!empty($informationsVendeur['siren'])): ?>
-                    <div class="vendeur-stat-chip">
+                    <span>
                         SIREN : <?= htmlspecialchars($informationsVendeur['siren']) ?>
-                    </div>
+                    </span>
                     <?php endif; ?>
-                </div>
+                </footer>
 
             </div>
-        </div>
+        </section>
 
         <!--titre de la section produits-->
-        <p class="vendeur-produits-titre">
+        <h2>
             Produits de <?= htmlspecialchars($informationsVendeur['denomination']) ?>
             <span>(<?= $nombreProduits ?>)</span>
-        </p>
+        </h2>
 
         <!--affiche un message si le vendeur n'a aucun produit-->
         <?php if (empty($listeProduits)): ?>
-        <div class="vendeur-no-products">
-            <p>Ce vendeur n'a aucun produit en ligne pour le moment.</p>
-        </div>
+        <p>Ce vendeur n'a aucun produit en ligne pour le moment.</p>
         <?php else: ?>
 
         <!--grille des produits du vendeur-->
-        <div class="product-grid">
+        <ul>
             <!--boucle sur tous les produits du vendeur-->
             <?php foreach ($listeProduits as $produitCourant):
                 //vérifie si le produit est en rupture de stock
@@ -374,84 +372,82 @@ function afficherEtoilesVendeur(float $note, int $taille = 16): string
                 $origineProduit = recupOrigineProduit($connexionBaseDeDonnees, $produitCourant['id_produit']);
             ?>
             <!--carte de produit cliquable-->
-            <article
-                class="<?= $estEnRupture ? 'produit-rupture' : '' ?> <?= $estEnPromotion ? 'produit-promotion' : '' ?>"
-                onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
+            <li>
+                <article <?= $estEnRupture ? 'data-rupture' : '' ?> <?= $estEnPromotion ? 'data-promo' : '' ?>
+                    onclick="window.location.href='/pages/produit/index.php?id=<?= $produitCourant['id_produit'] ?>'">
 
-                <div>
                     <div>
                         <!--image du produit-->
                         <img src="<?= htmlspecialchars($urlImage) ?>"
-                            alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>"
-                            class="<?= $estEnRupture ? 'image-rupture' : '' ?>">
+                            alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>">
+                        <!--affiche le badge de réduction s'il y en a une-->
+                        <?php if ($possedePourcentageRemise): ?>
+                        <mark>-<?= round($discount) ?>%</mark>
+                        <?php endif; ?>
+                        <!--affiche le badge Bretagne si le produit est d'origine bretonne-->
+                        <?php if ($origineProduit === 'Bretagne'): ?>
+                        <span><img src="/img/png/badge-bretagne.png" alt="Bretagne"></span>
+                        <?php endif; ?>
+                        <!--affiche le message de rupture de stock si nécessaire-->
+                        <?php if ($estEnRupture): ?>
+                        <div>Rupture de stock</div>
+                        <?php endif; ?>
                     </div>
-                    <!--affiche le badge de réduction s'il y en a une-->
-                    <?php if ($possedePourcentageRemise): ?>
-                    <span class="badge-reduction">-<?= round($discount) ?>%</span>
-                    <?php endif; ?>
-                    <!--affiche le badge Bretagne si le produit est d'origine bretonne-->
-                    <?php if ($origineProduit === 'Bretagne'): ?>
-                    <span class="badge-bretagne"><img src="/img/png/badge-bretagne.png" alt="Bretagne"></span>
-                    <?php endif; ?>
-                    <!--affiche le message de rupture de stock si nécessaire-->
-                    <?php if ($estEnRupture): ?>
-                    <div class="rupture-stock">Rupture de stock</div>
-                    <?php endif; ?>
-                </div>
-
-                <div>
-                    <!--nom du produit-->
-                    <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
 
                     <div>
-                        <span>
-                            <!--affiche les étoiles de notation-->
-                            <?php for ($i = 1; $i <= 5; $i++):
+                        <!--nom du produit-->
+                        <h3><?= htmlspecialchars($produitCourant['p_nom']) ?></h3>
+
+                        <div>
+                            <span>
+                                <!--affiche les étoiles de notation-->
+                                <?php for ($i = 1; $i <= 5; $i++):
                                 if ($noteArrondie >= $i)           $s = 'full';
                                 elseif ($noteArrondie >= $i - 0.5) $s = 'alf';
                                 else                               $s = 'empty';
                             ?>
-                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
-                            <?php endfor; ?>
-                        </span>
-                        <!--affiche le nombre d'avis-->
-                        <span>(<?= $produitCourant['nombre_avis'] ?? 0 ?>)</span>
-                    </div>
-
-                    <div>
-                        <span>
-                            <!--affiche le prix barré s'il y a une réduction-->
-                            <?php if ($possedePourcentageRemise): ?>
-                            <span style="text-decoration:line-through;color:#999;margin-right:5px;font-size:1.2em;">
-                                <?= number_format($prixOriginalTTC, 2, ',', ' ') ?>€
+                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                <?php endfor; ?>
                             </span>
-                            <?php endif; ?>
-                        </span>
-                        <!--affiche le prix final TTC-->
-                        <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
-                    </div>
-
-                    <div class="product-bottom">
-                        <!--informations du vendeur (non cliquable sur cette page)-->
-                        <div class="vendeur-info" style="cursor:default;">
-                            <img src="/img/svg/market.svg" alt="Vendeur">
-                            <span><?= htmlspecialchars($informationsVendeur['denomination']) ?></span>
+                            <!--affiche le nombre d'avis-->
+                            <span>(<?= $produitCourant['nombre_avis'] ?? 0 ?>)</span>
                         </div>
-                        <!--bouton pour ajouter au panier-->
-                        <button <?= $estEnRupture ? 'disabled' : '' ?>
-                            onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
-                            <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
-                        </button>
-                    </div>
-                </div>
 
-            </article>
+                        <div>
+                            <span>
+                                <!--affiche le prix barré s'il y a une réduction-->
+                                <?php if ($possedePourcentageRemise): ?>
+                                <span style="text-decoration:line-through;color:#999;margin-right:5px;font-size:1.2em;">
+                                    <?= number_format($prixOriginalTTC, 2, ',', ' ') ?>€
+                                </span>
+                                <?php endif; ?>
+                            </span>
+                            <!--affiche le prix final TTC-->
+                            <span><?= number_format($prixFinal, 2, ',', ' ') ?>€</span>
+                        </div>
+
+                        <div>
+                            <!--informations du vendeur (non cliquable sur cette page)-->
+                            <div style="cursor:default;">
+                                <img src="/img/svg/market.svg" alt="Vendeur">
+                                <span><?= htmlspecialchars($informationsVendeur['denomination']) ?></span>
+                            </div>
+                            <!--bouton pour ajouter au panier-->
+                            <button <?= $estEnRupture ? 'disabled' : '' ?>
+                                onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
+                                <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
+                            </button>
+                        </div>
+                    </div>
+
+                </article>
+            </li>
             <?php endforeach; ?>
-        </div>
+        </ul>
         <?php endif; ?>
 
-    </div>
-    <!--/vendeur-page-->
+    </main>
+    <!--/main-->
 
     <?php
     //inclut le pied de page
