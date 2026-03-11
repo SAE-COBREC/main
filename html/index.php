@@ -563,20 +563,19 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
             </div>
             <?php endif; ?>
 
-            <!-- SECTION CARTE DES VENDEURS -->
-            <div class="carousel-container" id="main-map" style="padding-bottom: 0px; display: none;">
-                <?php
-                // Collecter les vendeurs uniques des produits filtrés
-                $vendeursUniques = [];
-                foreach ($listeProduits as $produit) {
-                    $nomVendeur = recupNomVendeurIdProduit($connexionBaseDeDonnees, $produit['id_produit']);
-                    if (!in_array($nomVendeur, $vendeursUniques)) {
-                        $vendeursUniques[] = $nomVendeur;
-                    }
+            <!-- SECTION CARTE DES VENDEURS (chargée au clic) -->
+            <?php
+            // Collecter les vendeurs uniques des produits filtrés
+            $vendeursUniques = [];
+            foreach ($listeProduits as $produit) {
+                $nomVendeur = recupNomVendeurIdProduit($connexionBaseDeDonnees, $produit['id_produit']);
+                if (!in_array($nomVendeur, $vendeursUniques)) {
+                    $vendeursUniques[] = $nomVendeur;
                 }
-                $_SESSION['listesVendeurs'] = $vendeursUniques;
-                include __DIR__ . '/partials/carte.php';
-                ?>
+            }
+            $_SESSION['listesVendeurs'] = $vendeursUniques;
+            ?>
+            <div class="carousel-container" id="main-map" style="padding-bottom: 0px; display: none;">
             </div>
 
             <div class="product-grid">
@@ -710,6 +709,7 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
         var toggleMapBtn = document.getElementById('toggle-map-btn');
         var mainCarousel = document.getElementById('main-carousel');
         var mainMap = document.getElementById('main-map');
+        var mapLoaded = false;
 
         if (toggleMapBtn) {
             toggleMapBtn.addEventListener('click', function(e) {
@@ -721,11 +721,17 @@ $categoriesAffichage = preparercategories_affichage($listeCategories);
                 if (isMapHidden && mainMap) {
                     mainMap.style.display = 'block';
                     if (mainCarousel) mainCarousel.style.display = 'none';
-                    // Re-calculer la taille de la carte pour éviter les bugs d'affichage de Leaflet
-                    if (typeof map !== 'undefined') {
-                        setTimeout(function() {
-                            map.invalidateSize();
-                        }, 100);
+
+                    // Charger la carte uniquement au premier clic
+                    if (!mapLoaded) {
+                        var iframe = document.createElement('iframe');
+                        iframe.src = '/partials/carte.php';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '500px';
+                        iframe.style.border = 'none';
+                        iframe.title = 'Carte des vendeurs';
+                        mainMap.appendChild(iframe);
+                        mapLoaded = true;
                     }
                 } else if (mainMap) {
                     mainMap.style.display = 'none';

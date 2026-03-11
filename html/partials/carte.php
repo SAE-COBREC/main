@@ -3,6 +3,10 @@
 // CONFIGURATION ET INITIALISATION
 // ============================================
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../selectBDD.php';
 require_once __DIR__ . '/../pages/fonctions.php';
 
@@ -62,7 +66,7 @@ $adresseDesVendeurs = getAdresseVendeur($connexionBaseDeDonnees, $idVendeurs);
     <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
 
     <!-- Style personnalisé -->
-    <link rel="stylesheet" href="/styles/Carte/style.css">
+    <link rel="stylesheet" href="/styles/Carte/styleCarte.css">
 
 </head>
 
