@@ -1,6 +1,5 @@
 @use '../_variable.scss' as *;
 
-
 html {
   font-family: $font-family-secondaire;
 }
@@ -8,6 +7,7 @@ html {
 body {
   margin: 0;
   padding: 0;
+  background: $secondary-color-bleu-clair;
 }
 
 h1,
@@ -16,287 +16,369 @@ h3 {
   font-family: $font-family-primaire;
 }
 
-
-
-.unArticleP img,
-.unArticleP {
-  border-radius: $border-radius-primary;
-
-  @media screen and (max-width: 428px) {
-    border-radius: 8px;
-  }
-}
-
-// Liste des articles — sans scroll, hauteur naturelle
-.conteneurArticles {
-  flex: 1;
-  min-width: 0;
-}
-
-.articlesPrixP {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 24px;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0 auto;
-  padding: 1.5em 1em;
-}
-
-
 button {
   border: none;
   cursor: pointer;
 }
 
+.articlesPrixP {
+  width: min(1380px, 100%);
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.25rem;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  align-items: start;
+  gap: 24px;
+}
+
+.conteneurArticles {
+  min-width: 0;
+}
+
 .unArticleP {
-  border: 1px solid $primary-color-bleu;
-  width: 100%;
-  min-width: 515px;
-  height: fit-content;
-  display: flex;
-  padding: 16px 14px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px;
   margin-bottom: 16px;
+  border: 1px solid $secondary-color-gris-fonce;
+  border-radius: 16px;
+  background: $primary-color-blanc;
+}
 
-  @media screen and (max-width: 428px) {
-    padding: 12px 10px;
-    min-width: 0;
-  }
+.unArticleP .imageArticleP {
+  width: 75%;
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 12px;
+  
+}
 
-  .imageArticleP {
-    width: 280px;
-    height: 190px;
-    overflow: hidden;
+.unArticleP img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
 
-    @media screen and (max-width: 428px) {
-      width: 100px;
-      height: 100px;
-      flex-shrink: 0; // empêche la réduction forcée
-      min-width: 100px;
-      max-width: 100px;
-    }
-  }
+.unArticleP .articleDetailP {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-left: 0;
+}
 
-  img {
-    width: 75%;
-    height: 75%;
-    object-fit: cover;
-    object-position: center;
+.unArticleP .articleTitreP {
+  margin: 2px 0 10px;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: $primary-color-noir;
+}
 
-    @media screen and (max-width: 428px) {
-      flex-shrink: 0;
-      align-items: center;
-    }
-  }
+.unArticleP .articleDetailP > p {
+  margin: 0;
+  color: $primary-color-noir;
+  line-height: 1.45;
+  font-size: 0.97rem;
+}
 
-  .articleDetailP {
-    width: 100%;
-    margin-left: 15px;
-    display: flex;
-    flex-direction: column;
-  }
+.unArticleP .basArticleP {
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 
-  .basArticleP {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-height: 33px;
-    margin-top: 2em;
+.unArticleP .articlePrix {
+  margin: 0;
+  color: $primary-color-bleu;
+  font-weight: 800;
+  font-size: 1.16rem;
+}
 
-    img {
-      border-radius: 0px;
-      width: 70%;
-      height: 70%;
-    }
+.unArticleP .quantite {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 
-    .quantite {
-      display: flex;
-      align-items: center;
-      gap: 0.8em;
-    }
+.unArticleP .quantite button {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: $secondary-color-gris-clair;
+  border: 1px solid $secondary-color-gris-fonce;
+  color: $primary-color-bleu;
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1;
+  transition: all 0.18s ease;
+}
 
-    p {
-      color: $primary-color-bleu;
-      font-weight: bold;
+.unArticleP .quantite button:hover {
+  background: $secondary-color-bleu-clair;
+}
 
-      @media screen and (max-width: 428px) {
-        margin-left: -6em;
-        font-size: 1.15em;
-      }
-    }
+.unArticleP .quantite input {
+  width: 40px;
+  height: 34px;
+  text-align: center;
+  border: 1px solid $secondary-color-gris-fonce;
+  border-radius: 8px;
+  background: $primary-color-blanc;
+  color: $primary-color-noir;
+  font-weight: 700;
+}
 
-    button {
-      //les boutons + et - pour la quantite
-      width: 35px;
-      height: 35px;
-      border-radius: $border-radius-mini;
+#supprimerArticle {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: $secondary-color-rouge-erreur;
+  border: 1px solid $secondary-color-rouge;
+}
 
-    }
-
-    input {
-      width: 30px;
-      height: 30px;
-      text-align: center;
-      border: 1px solid $secondary-color-gris-fonce;
-      border-radius: $border-radius-mini;
-    }
-  }
+#supprimerArticle img {
+  width: 18px;
+  height: 18px;
 }
 
 .recapCommande {
-  background-color: $secondary-color-gris-clair;
-  border-radius: $border-radius-primary;
-  width: 420px;
-  max-width: 100%;
-  padding: 28px 24px;
   position: sticky;
-  top: 5em;
+  top: 5.25rem;
+  border-radius: 18px;
+  background: $primary-color-blanc;
+  border: 1px solid $secondary-color-gris-fonce;
+  padding: 22px 20px;
   box-sizing: border-box;
+}
+
+.recapCommande h3 {
+  margin: 0 0 10px;
+  color: $primary-color-noir;
+  font-size: 1.2rem;
+}
+
+.recapCommande #listeProduits {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+  margin-bottom: 2px;
+}
+
+.recapCommande #listeProduits::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recapCommande #listeProduits::-webkit-scrollbar-track {
+  background: $secondary-color-gris-clair;
+  border-radius: 999px;
+}
+
+.recapCommande #listeProduits::-webkit-scrollbar-thumb {
+  background: $secondary-color-gris-fonce;
+  border-radius: 999px;
+}
+
+.recapCommande .recapProduitLigne {
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin: 0 auto;
-  margin-left: 2em;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+  color: $primary-color-noir;
+  font-size: 0.95rem;
+}
 
-  @media screen and (max-width: 768px) {
-    position: static;
-    width: 100%;
-    max-width: 420px;
-  }
+.recapCommande .recapProduitNom {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.15em;
-  }
+.recapCommande .recapProduitQte {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: $primary-color-bleu;
+}
 
-  #listeProduits {
-    max-height: 208px; // ~8 lignes de produit
-    overflow-y: auto;
-    margin-bottom: 4px;
-    padding-right: 4px;
+.recapCommande .recapSeparateur {
+  border: 0;
+  border-top: 1px solid $secondary-color-gris-fonce;
+  margin: 14px 0;
+}
 
-    &::-webkit-scrollbar {
-      width: 5px;
-    }
-    &::-webkit-scrollbar-track {
-      background: #e3e3e3;
-      border-radius: 3px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: $secondary-color-gris-fonce;
-      border-radius: 3px;
-    }
+.recapCommande .recapLigne {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 1rem;
+  color: $primary-color-noir;
+}
 
-    .recapProduitLigne {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin: 3px 0;
-      font-size: 0.92em;
-      color: #444;
-      gap: 8px;
+.recapCommande .recapLigneTotale {
+  padding-top: 8px;
+  padding-bottom: 10px;
+}
 
-      .recapProduitNom {
-        flex: 1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+.recapCommande .recapLigneTotale strong {
+  font-size: 1.2rem;
+  color: $primary-color-bleu;
+}
 
-      .recapProduitQte {
-        flex-shrink: 0;
-        font-weight: 600;
-      }
-    }
-  }
+.recapCommande button {
+  width: 100%;
+  border-radius: 999px;
+  height: 50px;
+  font-size: 1.06rem;
+  font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
 
-  .recapSeparateur {
-    border: none;
-    border-top: 1px solid $secondary-color-gris-fonce;
-    margin: 14px 0;
-    width: 100%;
-  }
+.recapCommande button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(3, 2, 18, 0.12);
+}
 
-  .recapLigne {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    font-size: 1em;
-  }
+.finaliserCommande {
+  margin-top: 12px;
+  background: $primary-color-noir;
+  color: $primary-color-blanc;
+}
 
-  .recapLigneTotale {
-    padding: 10px 0 14px;
-
-    strong {
-      font-size: 1.15em;
-    }
-  }
-
-  button {
-    background-color: $primary-color-noir;
-    border-radius: 999px;
-    color: $primary-color-blanc;
-    width: 100%;
-    height: 52px;
-    border: none;
-    margin-top: 10px;
-    font-size: 1.2em;
-    cursor: pointer;
-  }
+#viderPanier {
+  margin-top: 10px;
+  background: $secondary-color-gris-clair;
+  color: $primary-color-noir;
+  border: 1px solid $secondary-color-gris-fonce;
 }
 
 #panierVide {
-  width: 25%;
-  display: block;
-  margin: 0 auto 1em auto;
+  width: min(420px, 90%);
+  margin: 2rem auto;
+  text-align: center;
+}
 
-  img {
-    width: 75%;
-  }
-
-  @media screen and (max-width: 428px) {
-    width: 75%;
-  }
+#panierVide img {
+  width: 72%;
 }
 
 #retourAchat {
   width: fit-content;
   display: block;
-  margin: 0 auto;
+  margin: 1.2rem auto 0;
   background-color: $primary-color-noir;
   border-radius: 999px;
   text-decoration: none;
   color: $primary-color-blanc;
   text-align: center;
-  padding: 1em;
-  margin: 1em auto;
-  font-size: 1.5em;
+  padding: 0.8rem 1.4rem;
+  font-size: 1.06rem;
+  font-weight: 700;
+}
 
-  @media screen and (max-width: 428px) {
-    margin: 3em auto;
-  }
+.steps,
+.steps2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 1300px;
+  max-width: 100%;
+  margin: 0 auto;
 }
-.steps, .steps2{
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    width: 1300px;
-    max-width: 100%;
-    margin: 0 auto;
-}
-.steps2{
+
+.steps2 {
   width: 1400px;
   margin-left: 150px;
-  p{
+
+  p {
     width: 312px;
     text-align: center;
   }
 }
 
 #steps {
+  width: 100%;
+  height: auto;
+}
+
+@media screen and (max-width: 1180px) {
+  .articlesPrixP {
+    grid-template-columns: 1fr;
+  }
+
+  .recapCommande {
+    position: static;
     width: 100%;
-    height: auto;
+    max-width: none;
+  }
+}
+
+@media screen and (max-width: 860px) {
+  .unArticleP {
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .unArticleP .imageArticleP {
+    aspect-ratio: 1 / 1;
+  }
+
+  .unArticleP .articleTitreP {
+    font-size: 1.15rem;
+  }
+}
+
+@media screen and (max-width: 620px) {
+  .articlesPrixP {
+    padding: 1rem 0.6rem 1.5rem;
+    gap: 14px;
+  }
+
+  .unArticleP {
+    grid-template-columns: 1fr;
+  }
+
+  .unArticleP .imageArticleP {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+
+  .unArticleP .basArticleP {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .unArticleP .articlePrix {
+    font-size: 1.05rem;
+  }
+
+  .recapCommande {
+    border-radius: 14px;
+    padding: 16px 12px;
+  }
+
+  .recapCommande h3 {
+    font-size: 1.08rem;
+  }
+
+  .recapCommande .recapLigneTotale strong {
+    font-size: 1.1rem;
+  }
+
+  .recapCommande button {
+    height: 46px;
+    font-size: 1rem;
+  }
 }
