@@ -133,6 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           $_SESSION['idClient'] = $clientId;
           $_SESSION['idCompte'] = (int)$row['id_compte'];
+          $_SESSION['OTP']['statut'] = 'active';
           // Redirection sans header() (serveur peut bloquer header)
           $url = '../../index.php';
           echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
