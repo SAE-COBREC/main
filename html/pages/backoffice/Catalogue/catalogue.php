@@ -83,7 +83,7 @@ $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInf
                         <div>
                             <span>
                                 <span>PRIX</span>
-                                <span>€<?= htmlspecialchars($prix) ?></span>
+                                <span><?= htmlspecialchars($prix) ?>€</span>
                             </span>
                         </div>
 
@@ -97,7 +97,7 @@ $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInf
                         <section>
                             <span>Categorie:</span>
                             <div>
-                                <span> <?= htmlspecialchars($produitCourant['c_nom'] ?? 'Inconnue') ?></span>
+                                <span> <?= htmlspecialchars($produitCourant['categories'] ?? 'Inconnue') ?></span>
                             </div>
                         </section>
                     </div>
