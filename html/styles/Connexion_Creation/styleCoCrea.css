@@ -1,4 +1,8 @@
 @charset "UTF-8";
+* {
+  margin: 0;
+}
+
 :root {
   --primary-bleu: #7171A3;
   --primary-bronze: #CD7F32;
@@ -7,10 +11,6 @@
   --semantic-rouge: #D4183D;
   --semantic-jaune: #DDCA00;
   --semantic-info: #0C5460;
-}
-
-* {
-  margin: 0;
 }
 
 [data-theme=dalto-red-green] {
