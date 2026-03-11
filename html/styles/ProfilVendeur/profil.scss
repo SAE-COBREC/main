@@ -257,3 +257,51 @@ body {
 .popup-error.show {
   opacity: 1;
 }
+
+.daltonien-switcher {
+  margin: 40px auto; // Espacement par rapport à la carte du dessus et centrage
+  padding: 20px;
+  background: $primary-color-blanc;
+  border: 1px solid $secondary-color-orange-clair;
+  border-radius: $border-radius-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: fit-content; // S'adapte à la largeur du contenu
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  label {
+    font-size: 18px;
+    font-weight: 600;
+    color: $primary-color-noir;
+    font-family: $font-family-secondaire;
+  }
+
+  .filtre__item {
+    padding: 10px 15px;
+    border-radius: $border-radius-primary;
+    border: 1px solid $secondary-color-orange-clair;
+    background: $primary-color-blanc;
+    font-size: 16px;
+    font-family: $font-family-secondaire;
+    cursor: pointer;
+    color: $primary-color-noir;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color-bronze;
+      box-shadow: 0 0 0 2px rgba($primary-color-bronze, 0.1);
+    }
+
+    &:hover {
+      border-color: $primary-color-bronze;
+    }
+
+    option {
+      background: $primary-color-blanc;
+      color: $primary-color-noir;
+    }
+  }
+}

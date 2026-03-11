@@ -270,4 +270,48 @@ body {
 
 .popup-error.show {
   opacity: 1;
+}
+
+.daltonien-switcher {
+  margin: 40px auto;
+  padding: 20px;
+  background: #FFFFFF;
+  border: 1px solid #E5D5C5;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: -moz-fit-content;
+  width: fit-content;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.daltonien-switcher label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #030212;
+  font-family: "Quicksand", sans-serif;
+}
+.daltonien-switcher .filtre__item {
+  padding: 10px 15px;
+  border-radius: 14px;
+  border: 1px solid #E5D5C5;
+  background: #FFFFFF;
+  font-size: 16px;
+  font-family: "Quicksand", sans-serif;
+  cursor: pointer;
+  color: #030212;
+  transition: all 0.2s ease;
+}
+.daltonien-switcher .filtre__item:focus {
+  outline: none;
+  border-color: var(--primary-bronze);
+  box-shadow: 0 0 0 2px rgba(var(--primary-bronze), 0.1);
+}
+.daltonien-switcher .filtre__item:hover {
+  border-color: var(--primary-bronze);
+}
+.daltonien-switcher .filtre__item option {
+  background: #FFFFFF;
+  color: #030212;
 }/*# sourceMappingURL=profil.css.map */
