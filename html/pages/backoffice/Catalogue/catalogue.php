@@ -56,7 +56,6 @@ $vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeur
 
             <!--informations textuelles du vendeur-->
             <div>
-
                 <!--nom de la dénomination du vendeur-->
                 <h1><?= htmlspecialchars($informationsVendeur['denomination']) ?></h1>
 
@@ -80,7 +79,7 @@ $vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeur
                 <!--affiche la localisation du vendeur si elle existe-->
                 <?php if (!empty($informationsVendeur['ville'])): ?>
                 <address>
-                    <img src="/img/svg/location.svg" alt="" width="14" onerror="this.style.display='none'">
+                    <img src="/img/png/carte-et-localisation.png" alt="" width="14" onerror="this.style.display='none'">
                     <!--affiche le code postal s'il est disponible-->
                     <?php if (!empty($informationsVendeur['code_postal'])): ?>
                     <?= htmlspecialchars($informationsVendeur['code_postal']) ?> –
@@ -89,13 +88,8 @@ $vendeur_produits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeur
                 </address>
                 <?php endif; ?>
 
-                <!--chips de statistiques rapides-->
                 <footer>
-                    <!--chip affichant le nombre de produits en ligne-->
-                    <span>
-                        <img src="/img/svg/market.svg" alt="">
-                        <?= $nombreProduits ?> produit<?= $nombreProduits > 1 ? 's' : '' ?> en ligne
-                    </span>
+
                     <!--affiche le numéro SIREN si disponible-->
                     <?php if (!empty($informationsVendeur['siren'])): ?>
                     <span>
