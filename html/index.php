@@ -671,20 +671,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                 <img src="/img/svg/market.svg" alt="Vendeur">
                                 <span><?= htmlspecialchars($nomVendeur) ?></span>
                             </div>
-
-
-
-                            <form action="/pages/vendeur/index.php" method="GET" onclick="event.stopPropagation();"
-                                style="display:inline; margin:0; padding:0;">
-                                <input type="hidden" name="denomination"
-                                    value="<?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>">
-                                <button type="submit" class="vendeur-info"
-                                    title="Voir la page de <?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>"
-                                    style="cursor:pointer;">
-                                    <img src="/img/svg/market.svg" alt="Vendeur">
-                                    <span><?= htmlspecialchars($nomVendeur) ?></span>
-                                </button>
-                            </form>
                             <!--bouton pour ajouter au panier-->
                             <button <?= $estEnRupture ? 'disabled' : '' ?>
                                 onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
