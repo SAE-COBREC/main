@@ -222,6 +222,8 @@
                     $urlImage = str_replace('html/img/photo', '/img/photo', $produitCourant['image_url'] ?? '/img/default-product.jpg');
                     //récupère l'origine du produit
                     $origineProduit = recupOrigineProduit($pdo , $produitCourant['id_produit']);
+                    //récup le nom du vendeur
+                    $nomVendeur = recupNomVendeurIdProduit($pdo, $produitCourant['id_produit']);
                 ?>
                 <?php if (in_array($produitCourant['id_produit'], $idsProduits)):?>
                     <!--carte de produit cliquable-->
@@ -281,10 +283,17 @@
 
                                 <div>
                                     <!--informations du vendeur (non cliquable sur cette page)-->
-                                    <div style="cursor:default;">
-                                        <img src="/img/svg/market.svg" alt="Vendeur">
-                                        <span><?= htmlspecialchars($informationsVendeur['denomination']) ?></span>
-                                    </div>
+                                    <form action="/pages/vendeur/index.php" method="GET" onclick="event.stopPropagation();"
+                                        style="display:inline; margin:0; padding:0;">
+                                        <input type="hidden" name="denomination"
+                                            value="<?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>">
+                                        <button type="submit" class="vendeur-info"
+                                            title="Voir la page de <?= htmlspecialchars($nomVendeur, ENT_QUOTES) ?>"
+                                            style="cursor:pointer;">
+                                            <img src="/img/svg/market.svg" alt="Vendeur">
+                                            <span><?= htmlspecialchars($nomVendeur) ?></span>
+                                        </button>
+                                    </form>
                                     <!--bouton pour ajouter au panier-->
                                     <button class="btnAjouterPanier" <?= $estEnRupture ? 'disabled' : '' ?>
                                         onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
