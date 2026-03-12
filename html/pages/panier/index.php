@@ -197,7 +197,7 @@
             </div>
         <?php endif;?>
 
-        <?php if(isset($id_client)):?>
+        <?php if(isset($_SESSION['idClient'])):?>
         <section class="lesFavoris">
             <h3>Mes favoris :</h3>
             <!--BASÉ SUR LE CODE DE LA PAGE /vendeur/index.php demandé à marceau ou gaetan pour cette partie-->
@@ -334,7 +334,7 @@
     include __DIR__ . '/../../partials/modal.html';
     ?>
 <script src="/js/notifications.js"></script>
-<?php if (isset($id_client)) : ?>
+<?php if (isset($_SESSION['idClient'])) : ?>
 <script>
 function ajouterAuPanier(idProduit) {
     fetch(`/pages/panier/ajouterPanier.php?idProduit=${idProduit}`)
