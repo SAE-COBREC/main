@@ -36,7 +36,8 @@ body {
 }
 
 main {
-  padding: 1em 3em;
+  padding: 2em 3em;
+  height: fit-content30%;
 }
 
 h1,
@@ -51,7 +52,6 @@ button {
 }
 
 .articlesPrixP {
-  width: min(1380px, 100%);
   margin: 0 auto;
   box-sizing: border-box;
   display: grid;
@@ -59,6 +59,7 @@ button {
   align-items: start;
   gap: 24px;
   position: relative;
+  height: 60vh;
 }
 
 .conteneurArticles {
@@ -295,33 +296,31 @@ button {
 
 #panierVide {
   width: min(420px, 90%);
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   text-align: center;
+  margin: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: auto;
-  gap: 1rem;
+  gap: 1em;
 }
 
-#panierVide img {
+#imgPanierVide,
+#imgFavorisVide {
   width: 72%;
   max-width: 320px;
 }
 
-.panierVideTitre {
-  font-size: 1.6rem;
-  color: #030212;
-  margin: 0;
-  font-weight: 700;
+#favorisVide {
+  text-align: center;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
 }
 
-#retourAchat {
+#retourAchat,
+#retourConnexion {
   width: -moz-fit-content;
   width: fit-content;
   display: block;
@@ -378,7 +377,7 @@ button {
     position: static;
     margin: 2rem auto;
     transform: none;
-    min-height: auto;
+    height: auto;
   }
 }
 @media screen and (max-width: 860px) {
