@@ -2171,3 +2171,66 @@ function getVendeurInfo($pdo, $vendeur_id) {
     $stmt->execute(['id' => $vendeur_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
+//récupère tous les produits d'un vendeur qui ne sont PAS "En ligne"
+function ProduitsHorsCatalogue($pdo, $idVendeur) {
+    $sql = "
+        SELECT DISTINCT ON (p.id_produit)
+            p.id_produit,
+            p.p_nom,
+            p.p_description,
+            p.p_prix,
+            p.p_stock,
+            p.p_statut,
+            p.p_origine,
+            STRING_AGG(DISTINCT cp.nom_categorie, ', ') AS categories,
+            (SELECT COALESCE(i2.i_lien, '/img/photo/smartphone_xpro.jpg')
+             FROM cobrec1._represente_produit rp2
+             LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image
+             WHERE rp2.id_produit = p.id_produit LIMIT 1) AS image_url
+        FROM cobrec1._produit p
+        LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+        LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+        WHERE p.id_vendeur = :idVendeur
+          AND p.p_statut IN ('Ébauche', 'Hors ligne')
+        GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix,
+                 p.p_stock, p.p_statut, p.p_origine
+        ORDER BY p.id_produit
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':idVendeur' => $idVendeur]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+//met en ligne (statut 'En ligne') une liste de produits appartenant au vendeur.
+function mettreProduitsEnLigne($pdo, array $idsProduits, $idVendeur) {
+    if (empty($idsProduits)) return 0;
+
+    $placeholders = implode(',', array_fill(0, count($idsProduits), '?'));
+    $sql = "UPDATE cobrec1._produit
+            SET p_statut = 'En ligne', date_mise_sur_marche = CURRENT_TIMESTAMP
+            WHERE id_produit IN ($placeholders)
+              AND id_vendeur = ?";
+    $params = array_map('intval', $idsProduits);
+    $params[] = (int) $idVendeur;
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->rowCount();
+}
+
+//Retire du catalogue (statut 'Hors ligne') une liste de produits appartenant au vendeur.
+function retirerProduitsDuCatalogue($pdo, array $idsProduits, $idVendeur) {
+    if (empty($idsProduits)) return 0;
+
+    $placeholders = implode(',', array_fill(0, count($idsProduits), '?'));
+    $sql = "UPDATE cobrec1._produit
+            SET p_statut = 'Hors ligne'
+            WHERE id_produit IN ($placeholders)
+              AND id_vendeur = ?
+              AND p_statut = 'En ligne'";
+    $params = array_map('intval', $idsProduits);
+    $params[] = (int) $idVendeur;
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->rowCount();
+}
