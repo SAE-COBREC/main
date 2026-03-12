@@ -61,7 +61,7 @@ $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInf
                 $urlImage = str_replace('html/img/photo', '/img/photo', $produitCourant['image_url'] ?? '/img/default-product.jpg');
 
                 $description = $produitCourant['p_description'] ?? 'Aucune description disponible.';
-                $prix = $produitCourant['p_prix'] ?? '150.00';
+                $prix = $produitCourant['p_prix'] ?? '';
 
                 //récupère l'origine du produit
                 $origineProduit = recupOrigineProduit($connexionBaseDeDonnees, $produitCourant['id_produit']);
