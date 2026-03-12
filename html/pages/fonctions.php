@@ -2165,3 +2165,9 @@ function construireAdresseCompleteVendeur(array $informationsVendeur): string
         ($informationsVendeur['ville']       ?? '')
     );
 }
+
+function getVendeurInfo($pdo, $vendeur_id) {
+    $stmt = $pdo->prepare("SELECT denomination FROM cobrec1._vendeur  WHERE id_vendeur = :id");
+    $stmt->execute(['id' => $vendeur_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}

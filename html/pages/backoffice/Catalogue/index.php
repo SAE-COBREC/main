@@ -16,3 +16,10 @@ if (!isset($_SESSION['idClient'])) {
     echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
+
+$vendeurInfos = getVendeurInfo($pdo, $vendeur_id);
+
+//charge les informations du vendeur depuis la base de données
+$informationsVendeur = chargerInformationsVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination']);
+
+$listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $vendeurInfos['denomination']);

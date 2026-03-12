@@ -17,12 +17,6 @@ if (empty($_SESSION['vendeur_id'])) {
 
 $vendeur_id = $_SESSION['vendeur_id'];
 
-function getVendeurInfo($pdo, $vendeur_id) {
-    $stmt = $pdo->prepare("SELECT denomination FROM cobrec1._vendeur  WHERE id_vendeur = :id");
-    $stmt->execute(['id' => $vendeur_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
 $vendeurInfos = getVendeurInfo($pdo, $vendeur_id);
 
 //charge les informations du vendeur depuis la base de données
