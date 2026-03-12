@@ -728,7 +728,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             Exporter les produits (.csv)
                         </a>
 
-                        <a href="../Catalogue/exportPDF.php" class="btn btn--primary btn--full">
+                        <a href="../Catalogue/" class="btn btn--primary btn--full">
                             Exporter les produits (.pdf)
                         </a>
                     </div>

@@ -10,9 +10,11 @@ $connexionBaseDeDonnees = $pdo;
 //définit le schéma de base de données à utiliser
 $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
-if (empty($_SESSION['vendeur_id'])) {
-    header("Location: /pages/backoffice/connexionVendeur/index.php");
-    exit(0);
+//vérifier si le vendeur est connecté via la session
+if (!isset($_SESSION['vendeur_id'])) {
+    $url = '/pages/backoffice/connexionVendeur/index.php';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+    exit;
 }
 
 $vendeur_id = $_SESSION['vendeur_id'];
