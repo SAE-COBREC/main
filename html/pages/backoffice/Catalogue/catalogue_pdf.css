@@ -1,0 +1,117 @@
+* {
+  margin: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #FFFFFF;
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+}
+header h1 {
+  color: #6d8354;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 22px;
+}
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+ul li {
+  margin-bottom: 40px;
+  page-break-inside: avoid;
+}
+
+article {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.product-image {
+  flex: 0 0 250px;
+  max-width: 250px;
+}
+.product-image img {
+  width: 250px;
+  height: 180px;
+  display: block;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.product-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.product-details h3 {
+  color: #6d8354;
+  font-size: 20px;
+  text-transform: uppercase;
+  margin: 0;
+  font-weight: 400;
+}
+.product-details p {
+  color: #777;
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.price-badge {
+  display: inline-block;
+  background-color: #6d8354;
+  color: #FFFFFF;
+  padding: 6px 18px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 13px;
+}
+.price-badge .label {
+  font-size: 9px;
+  opacity: 0.8;
+  margin-right: 6px;
+}
+
+.info-row {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.info-row .info-label {
+  color: #888;
+  font-size: 11px;
+}
+.info-row .info-value {
+  font-size: 11px;
+  font-weight: bold;
+  color: #555;
+}
+
+.separator {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 10px 0 0 0;
+}
+
+.empty-message {
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+  margin-top: 40px;
+}/*# sourceMappingURL=catalogue_pdf.css.map */

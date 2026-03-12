@@ -1,5 +1,6 @@
 {
     "require": {
-        "spomky-labs/otphp": "^11.4"
+        "spomky-labs/otphp": "^11.4",
+        "dompdf/dompdf": "*"
     }
 }
