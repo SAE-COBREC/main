@@ -1,7 +1,6 @@
 <?php
 //démarrer la session pour récupérer les informations du client
 session_start();
-print_r($_SESSION['OTP']);
 require_once(__DIR__."/../../vendor/autoload.php");
 use OTPHP\TOTP;
 use OTPHP\Factory;
@@ -156,7 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $succes = false;
                 $messageErreur2 = "Erreur lors du changement de mot de passe";
             }
-            print_r('messageErreur2=' . $messageErreur2);
 
             //rediriger avec un message de succès ou afficher une erreur
             if (!empty($resultatModificationMotDePasse)){
@@ -629,7 +627,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <main>
                         <!-- Formulaire de changement de mot de passe -->
                         <form method="POST">
-                            <div style='display: <?php
+                            <div class="mdpUsuel" style='display: <?php
                             if (empty($_SESSION['OTP']['statut'])){ echo 'block'; } else{ echo 'none';} ?>'>
                                 <label>
                                     <span>Mot de passe actuel</span>
@@ -1382,8 +1380,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     function succesOTP() {
         document.getElementById('activerOTP').textContent = "One Time Password activé avec succès.";
         document.getElementById('activerOTP').disabled = true;
-        document.querySelector('form:nth-of-type(1) div:nth-of-type(1)').style.display = 'none';
-        document.querySelector('form:nth-of-type(1) div:nth-of-type(2)').style.display = 'block';
+        document.querySelector('.mdpUsuel').style.display = 'none';
+        document.querySelector('.mdpUsuel + div').style.display = 'block';
     }
 
     document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {
