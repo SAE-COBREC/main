@@ -62,6 +62,7 @@
     
     $idsProduits = $stmt->fetchAll(PDO::FETCH_COLUMN);
     $nbFavoris = 0;
+    $panierCourant = array();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -91,7 +92,7 @@
             } else if (isset($panierTemp) && count($panierTemp) > 0) {
                 $panierVide = false;    
                 $panierCourant = $panierTemp;
-            }
+            } 
         ?>
         <?php if(!$panierVide) : ?>
             <section class="articlesPrixP">
@@ -314,7 +315,7 @@
             <?php endif; ?>
         </section>
         <?php endif;?>
-        <?php if(!isset($id_client)) : ?>
+        <?php if(!isset($_SESSION['idClient'])) : ?>
             <section class="lesFavoris">
                 <h3>Mes Favoris :</h3>
                 <div id="favorisVide">
