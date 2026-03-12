@@ -39,6 +39,19 @@
         
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); //récup les données et les stock dans une liste
 
+        $requeteFav = "
+            SELECT id_produit 
+            FROM _favoris
+            WHERE id_client = :id_client;   
+        ";
+
+        $stmt = $pdo->prepare($requeteFav);
+        
+        $stmt->execute([
+            ':id_client' => $id_client
+        ]);
+        
+        $idsProduits = $stmt->fetchAll(PDO::FETCH_COLUMN);
     } else {
         $panierTemp = $_SESSION['panierTemp'];  // stock le panier temporaire
         $articles = $panierTemp; /*ULTRA IMPORTANT POUR LE JAVA NE PAS ENLEVER cette ligne sert à savoir si il y a des c
@@ -48,19 +61,6 @@
     $donnees = chargerProduitsBDD($pdo);
     //extrait la liste des produits
     $listeProduits = $donnees['produits'];    
-    $requeteFav = "
-        SELECT id_produit 
-        FROM _favoris
-        WHERE id_client = :id_client;   
-    ";
-
-    $stmt = $pdo->prepare($requeteFav);
-    
-    $stmt->execute([
-        ':id_client' => $id_client
-    ]);
-    
-    $idsProduits = $stmt->fetchAll(PDO::FETCH_COLUMN);
     $nbFavoris = 0;
     $panierCourant = array();
 ?>
