@@ -61,6 +61,7 @@
     ]);
     
     $idsProduits = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $nbFavoris = 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -83,9 +84,7 @@
 
     <main>
         <!-- BLOCK AVEC TOUS LES ARTICLES DANS LE PANIER ET LE RECAP DE LA COMMANDE-->
-        <section class="articlesPrixP">
-
-            <?php 
+        <?php 
             if (isset($_SESSION['idClient']) && count($articles) > 0) {
                 $panierVide = false;
                 $panierCourant = $articles;
@@ -94,109 +93,108 @@
                 $panierCourant = $panierTemp;
             }
         ?>
+        <?php if(!$panierVide) : ?>
+            <section class="articlesPrixP">
+                <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
+                <div class="conteneurArticles">
 
-            <?php if(!$panierVide) : ?>
-            <!-- CETTE DIV CONTIENT UNIQUEMENT LES ARTICLES PAS LE RECAP !! -->
-            <div class="conteneurArticles">
+                    <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
 
-                <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
-
-                <?php foreach ($panierCourant as $article): ?>
-                <article class="unArticleP"
-                    data-prix="<?php echo ($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
-                    data-stock="<?php echo intval($article['p_stock'])?>"
-                    data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
-                    <div class="imageArticleP">
-                        <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
-                            alt="<?php echo htmlspecialchars($article['i_alt']) ?>"
-                            title="<?php echo htmlspecialchars($article['i_title'])?>">
-                    </div>
-                    <div class="articleDetailP">
-                        <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
-                        <p><strong>Vendu par :
-                            </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
-                            <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
-                            <?php
-                                    if (!empty($article['reduction_pourcentage'])){
-                                        if ((strtotime($article["reduction_debut"]) > time()) && (strtotime($article["reduction_fin"]) > time())){
-                                            $article['reduction_pourcentage'] = 0;
+                    <?php foreach ($panierCourant as $article): ?>
+                    <article class="unArticleP"
+                        data-prix="<?php echo ($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
+                        data-stock="<?php echo intval($article['p_stock'])?>"
+                        data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
+                        <div class="imageArticleP">
+                            <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
+                                alt="<?php echo htmlspecialchars($article['i_alt']) ?>"
+                                title="<?php echo htmlspecialchars($article['i_title'])?>">
+                        </div>
+                        <div class="articleDetailP">
+                            <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                            <p><strong>Vendu par :
+                                </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
+                                <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
+                                <?php
+                                        if (!empty($article['reduction_pourcentage'])){
+                                            if ((strtotime($article["reduction_debut"]) > time()) && (strtotime($article["reduction_fin"]) > time())){
+                                                $article['reduction_pourcentage'] = 0;
+                                            }
                                         }
-                                    }
-                                    if (!empty($article['reduction_pourcentage']) && $article['reduction_pourcentage'] != 0){
-                                    ?>
-                            <strong>Remise :
-                            </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
-                            <?php } ?>
-                        </p>
-                        <div class="basArticleP">
-                            <p class="articlePrix">TTC :
-                                <?php echo number_format(($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
-                                €</p>
-                            <div class="quantite">
+                                        if (!empty($article['reduction_pourcentage']) && $article['reduction_pourcentage'] != 0){
+                                        ?>
+                                <strong>Remise :
+                                </strong><?php echo number_format($article['reduction_pourcentage'], 2, ',', ' '); ?> %
+                                <?php } ?>
+                            </p>
+                            <div class="basArticleP">
+                                <p class="articlePrix">TTC :
+                                    <?php echo number_format(($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100), 2, ',', ' ')?>
+                                    €</p>
+                                <div class="quantite">
 
-                                <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
-                                <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php"
-                                    data-no-loader>
-                                    <input type="hidden" name="id_produit"
-                                        value="<?php echo $article['id_produit']; ?>">
-                                    <!--stock l'id du produit pour la suppression-->
-                                    <!--bouton pour envoyer le formulaire-->
-                                    <button type="submit" id="supprimerArticle" class=" "><img
-                                            src="/img/svg/poubelle.svg" alt="Supprimer" /></button>
-                                </form>
-                                <button class="btn_moins" data-no-loader>-</button>
-                                <input type="text" class="quantite_input_entre"
-                                    value="<?php echo $article['quantite'];?>" data-no-loader>
-                                <button class="btn_plus" data-no-loader>+</button>
+                                    <!-- FORMULAIRE POUR SUPPRIMER UN ARTICLE DU PANIER-->
+                                    <form class="suppArt" method="POST" action="/pages/panier/supprimerArticle.php"
+                                        data-no-loader>
+                                        <input type="hidden" name="id_produit"
+                                            value="<?php echo $article['id_produit']; ?>">
+                                        <!--stock l'id du produit pour la suppression-->
+                                        <!--bouton pour envoyer le formulaire-->
+                                        <button type="submit" id="supprimerArticle" class=" "><img
+                                                src="/img/svg/poubelle.svg" alt="Supprimer" /></button>
+                                    </form>
+                                    <button class="btn_moins" data-no-loader>-</button>
+                                    <input type="text" class="quantite_input_entre"
+                                        value="<?php echo $article['quantite'];?>" data-no-loader>
+                                    <button class="btn_plus" data-no-loader>+</button>
+                                </div>
                             </div>
                         </div>
+                    </article>
+                    <?php endforeach;?>
+                </div>
+                <!-- BLOCK DU RECAP DE LA COMMANDE -->
+                <aside class="recapCommande">
+                    <h3 id="totalArticles"></h3>
+                    <div id="listeProduits"></div>
+
+                    <hr class="recapSeparateur">
+
+                    <div class="recapLigne">
+                        <span>Sous-total HT :</span>
+                        <span id="sousTotal">0,00 €</span>
                     </div>
-                </article>
-                <?php endforeach;?>
-            </div>
-            <?php endif;?>
-            <?php if(!$panierVide) : ?>
-            <!-- BLOCK DU RECAP DE LA COMMANDE -->
-            <aside class="recapCommande">
-                <h3 id="totalArticles"></h3>
-                <div id="listeProduits"></div>
+                    <div class="recapLigne">
+                        <span>TVA :</span>
+                        <span id="totalTVA">0,00 €</span>
+                    </div>
 
-                <hr class="recapSeparateur">
+                    <hr class="recapSeparateur">
 
-                <div class="recapLigne">
-                    <span>Sous-total HT :</span>
-                    <span id="sousTotal">0,00 €</span>
-                </div>
-                <div class="recapLigne">
-                    <span>TVA :</span>
-                    <span id="totalTVA">0,00 €</span>
-                </div>
+                    <div class="recapLigne recapLigneTotale">
+                        <strong>Montant total TTC :</strong>
+                        <strong id="prixTotal">0,00 €</strong>
+                    </div>
 
-                <hr class="recapSeparateur">
+                    <!--FORMULAIRE POUR ALLER A LA PAGE DE PAIEMENT-->
+                    <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
+                        <button class="finaliserCommande">Finaliser commande</button>
+                    </form>
 
-                <div class="recapLigne recapLigneTotale">
-                    <strong>Montant total TTC :</strong>
-                    <strong id="prixTotal">0,00 €</strong>
-                </div>
+                    <!--FORMULAIRE POUR VIDER LE PANIER-->
+                    <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
+                        <button type="submit" id="viderPanier">Vider le panier</button>
+                    </form>
+                </aside>
+            </section>
+        <?php endif ;?>
 
-                <form id="finaliserCommande" method="POST" action="/pages/finaliserCommande/index.php">
-                    <button class="finaliserCommande">Finaliser commande</button>
-                </form>
-
-                <!--FORMULAIRE POUR VIDER LE PANIER-->
-                <form id="formViderPanier" method="POST" action="/pages/panier/viderPanier.php" data-no-loader>
-                    <button type="submit" id="viderPanier">Vider le panier</button>
-                </form>
-            </aside>
-            <?php endif ;?>
-
-            <?php  if ($panierVide) : ?>
+        <?php  if ($panierVide) : ?>
             <div id="panierVide">
-                <img id="panierVide" src="/img/svg/panier-empty.svg" />
+                <img id="imgPanierVide" src="/img/svg/panier-empty.svg" />
                 <a href="/" id="retourAchat">Continuer mes achats</a>
             </div>
-            <?php endif;?>
-        </section>
+        <?php endif;?>
 
         <?php if(isset($id_client)):?>
         <section class="lesFavoris">
@@ -228,7 +226,10 @@
                     //récup le nom du vendeur
                     $nomVendeur = recupNomVendeurIdProduit($pdo, $produitCourant['id_produit']);
                 ?>
-                <?php if (in_array($produitCourant['id_produit'], $idsProduits)):?>
+                <?php 
+                    if (in_array($produitCourant['id_produit'], $idsProduits)):
+                        $nbFavoris += 1;
+                ?>
                 <!--carte de produit cliquable-->
                 <li>
                     <article <?= $estEnRupture ? 'data-rupture' : '' ?> <?= $estEnPromotion ? 'data-promo' : '' ?>
@@ -306,8 +307,23 @@
                 <?php endif; ?>
                 <?php endforeach; ?>
             </ul>
+            <?php if ($nbFavoris == 0) : ?>
+                <div id="favorisVide">
+                    <img id="imgFavorisVide" src="/img/png/aucunFavoris.png" title="Les Favoris sont vide" alt="Les favoris sont vide"/>
+                </div>
+            <?php endif; ?>
         </section>
         <?php endif;?>
+        <?php if(!isset($id_client)) : ?>
+            <section class="lesFavoris">
+                <h3>Mes Favoris :</h3>
+                <div id="favorisVide">
+                    <img id="imgFavorisVide" src="/img/png/aucunFavoris.png" title="Les Favoris sont vide" alt="Les favoris sont vide"/>
+                    <p>Oups! Il semblerait que vous ne soyez pas connecté. Connectez-vous pour accéder aux favoris</p>
+                    <a href="/pages/connexionClient/index.php" id="retourConnexion">Je me connecte</a>
+                </div>
+            </section>
+        <?php endif; ?>
 
     </main>
 </body>
