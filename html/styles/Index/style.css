@@ -89,8 +89,8 @@ aside form > div:first-child span {
 }
 aside form > div:first-child select {
   padding: 2px 7px;
-  border: 1px solid #7171A3;
-  color: #7171A3;
+  border: 1px solid var(--primary-bleu);
+  color: var(--primary-bleu);
   border-radius: 20px;
   background: #FFFFFF;
   cursor: pointer;
@@ -142,7 +142,7 @@ aside section:not(.no-hover) > div {
   transition: all 0.2s ease;
 }
 aside section:not(.no-hover) > div span {
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-size: 0.9rem;
 }
 aside section.no-hover > div {
@@ -152,7 +152,7 @@ aside section.no-hover > div {
   padding: 0.5rem 0;
 }
 aside section.no-hover > div span {
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-size: 1.3rem;
 }
 aside section label {
@@ -164,7 +164,7 @@ aside section label {
   transition: color 0.2s ease;
 }
 aside section label:hover {
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 aside section label input[type=checkbox] {
   cursor: pointer;
@@ -194,7 +194,7 @@ aside .slider-container .slider-track-active {
   top: 50%;
   transform: translateY(-50%);
   height: 6px;
-  background-color: #7171A3;
+  background-color: var(--primary-bleu);
   border-radius: 3px;
   z-index: 2;
 }
@@ -217,7 +217,7 @@ aside .slider-container input[type=range]::-webkit-slider-thumb {
   pointer-events: auto; /* Réactive le pointeur sur le thumb */
   width: 20px;
   height: 20px;
-  background: #7171A3;
+  background: var(--primary-bleu);
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -230,7 +230,7 @@ aside .slider-container input[type=range]::-moz-range-thumb {
   pointer-events: auto;
   width: 20px;
   height: 20px;
-  background: #7171A3;
+  background: var(--primary-bleu);
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -263,8 +263,8 @@ aside .price-inputs .price-field {
   width: 48%;
 }
 aside .price-inputs .price-field:focus-within {
-  border-color: #7171A3;
-  box-shadow: 0 0 0 2px rgba(113, 113, 163, 0.2);
+  border-color: var(--primary-bleu);
+  box-shadow: 0 0 0 2px rgba(var(--primary-bleu), 0.2);
 }
 aside .price-inputs .price-field input {
   width: 100%;
@@ -317,7 +317,7 @@ main .product-grid > p {
   width: fit-content;
   background-color: #F0F4F8;
   border-radius: 20px;
-  border: 1px solid rgba(113, 113, 163, 0.1);
+  border: 1px solid rgba(var(--primary-bleu), 0.1);
   gap: 6px;
   padding: 4px 8px;
 }
@@ -328,7 +328,7 @@ main .product-grid > p {
 }
 .vendeur-info span {
   font-size: 0.85rem;
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -387,7 +387,7 @@ article > div:first-child .badge-reduction {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: #D4183D;
+  background: var(--semantic-rouge);
   color: #FFFFFF;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
@@ -493,7 +493,7 @@ article button {
   transition: background 0.2s ease;
 }
 article button:hover:not(:disabled) {
-  background: #7171A3;
+  background: var(--primary-bleu);
 }
 article button:disabled {
   background: #c0c0c0;
@@ -502,7 +502,7 @@ article button:disabled {
 }
 
 .produit-promotion {
-  border: 2px solid #7171A3 !important;
+  border: 2px solid var(--primary-bleu) !important;
   background-color: #e4e4f5 !important;
   position: relative;
   overflow: hidden;
@@ -524,18 +524,18 @@ article button:disabled {
 }
 
 .produit-promotion button:not(:disabled) {
-  background: #7171A3 !important;
+  background: var(--primary-bleu) !important;
   color: #FFFFFF !important;
   border: 2px solid #e4e4f5 !important;
 }
 
 .produit-promotion button:hover:not(:disabled) {
   background: #FFFFFF !important;
-  color: #7171A3 !important;
+  color: var(--primary-bleu) !important;
 }
 
 .produit-rupture.produit-promotion {
-  border: 2px solid #D4183D !important;
+  border: 2px solid var(--semantic-rouge) !important;
   opacity: 0.7;
 }
 
@@ -665,7 +665,7 @@ article button:disabled {
     padding-left: 1.5em;
     font-size: 1.1em;
     margin-bottom: 1.5rem;
-    color: #7171A3;
+    color: var(--primary-bleu);
   }
   aside.open::before {
     content: "Masquer les filtres";
@@ -676,7 +676,7 @@ article button:disabled {
     padding-left: 1.5em;
     font-size: 1.1em;
     margin-bottom: 1.5rem;
-    color: #7171A3;
+    color: var(--primary-bleu);
   }
   aside form > div:first-child select {
     padding: 15px;
@@ -847,13 +847,13 @@ article button:disabled {
 }
 .carousel-container .carousel-slide .carousel-info .carousel-vendeur {
   font-size: 0.9rem;
-  color: #7171A3;
+  color: var(--primary-bleu);
   margin-bottom: 0.5rem;
 }
 .carousel-container .carousel-slide .carousel-info .carousel-price {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 .carousel-container .carousel-slide .carousel-info .carousel-actions {
   display: flex;
@@ -897,14 +897,14 @@ article button:disabled {
   color: #fff;
 }
 .carousel-container .carousel-slide .carousel-info .btn-carousel-cart {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #fff;
-  box-shadow: 0 4px 6px rgba(113, 113, 163, 0.3);
+  box-shadow: 0 4px 6px rgba(var(--primary-bleu), 0.3);
 }
 .carousel-container .carousel-slide .carousel-info .btn-carousel-cart:hover {
-  background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
+  filter: brightness(0.9);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(113, 113, 163, 0.4);
+  box-shadow: 0 6px 12px rgba(var(--primary-bleu), 0.4);
 }
 .carousel-container .carousel-slide.out-of-stock {
   opacity: 0.6;
@@ -929,8 +929,8 @@ article button:disabled {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
+  background: #EFEFEF;
+  color: #c0c0c0;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: bold;
@@ -943,8 +943,8 @@ article button:disabled {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
+  background: #EFEFEF;
+  color: #c0c0c0;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: bold;
@@ -971,7 +971,7 @@ article button:disabled {
   transition: background 0.3s;
 }
 .carousel-container .carousel-btn:hover {
-  background: #7171A3;
+  background: var(--primary-bleu);
 }
 .carousel-container .carousel-btn.prev-btn {
   left: 10px;
@@ -998,14 +998,13 @@ article button:disabled {
   transition: background 0.3s;
 }
 .carousel-container .carousel-nav .carousel-dot.active {
-  background: #7171A3;
+  background: var(--primary-bleu);
   transform: scale(1.2);
 }
 
 #map {
   height: 414px;
   width: 100%;
-  border: 1px solid #ccc;
 }
 
 .carte {

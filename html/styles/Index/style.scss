@@ -1130,7 +1130,7 @@ article {
         box-shadow: 0 4px 6px rgba($primary-color-bleu, 0.3);
 
         &:hover {
-          background: color.adjust($primary-color-bleu, $lightness: -10%);
+          filter: brightness(0.9);
           transform: translateY(-2px);
           box-shadow: 0 6px 12px rgba($primary-color-bleu, 0.4);
         }
@@ -1165,8 +1165,8 @@ article {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: vars.$secondary-color-gris-clair;
-      color: vars.$secondary-color-gris-fonce;
+      background: $secondary-color-gris-clair;
+      color: $secondary-color-gris-fonce;
       padding: 12px 24px;
       border-radius: 8px;
       font-weight: bold;
@@ -1182,8 +1182,8 @@ article {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: vars.$secondary-color-gris-clair;
-    color: vars.$secondary-color-gris-fonce;
+    background: $secondary-color-gris-clair;
+    color: $secondary-color-gris-fonce;
     padding: 12px 24px;
     border-radius: 8px;
     font-weight: bold;
