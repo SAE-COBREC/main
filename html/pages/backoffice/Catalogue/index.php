@@ -146,7 +146,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
                                     <!--case à cocher de sélection-->
                                     <td class="products-table__cell col-check">
-                                        <div class="checkbox"></div>
+                                        <div class="checkbox" style="border-radius: 0;"></div>
                                         <input type="checkbox" name="produits_selectionnes[]"
                                             value="<?= (int) $produitCourant['id_produit'] ?>" style="display:none;"
                                             class="hidden-checkbox">
