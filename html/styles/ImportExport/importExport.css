@@ -340,7 +340,7 @@ aside {
   color: #FFFFFF;
 }
 .btn--primary:hover {
-  background: rgba(var(--primary-bronze), 0.9);
+  background: rgba(230, 169, 110, 0.9);
 }
 .btn--secondary {
   background: #FFFFFF;
@@ -348,7 +348,7 @@ aside {
   border: 2px solid var(--primary-bronze);
 }
 .btn--secondary:hover {
-  background: #FFF7F1;
+  background: rgba(230, 169, 110, 0.9);
 }
 .btn--full {
   width: 100%;

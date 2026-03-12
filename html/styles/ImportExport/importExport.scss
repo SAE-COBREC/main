@@ -369,7 +369,7 @@ aside {
     color: $primary-color-blanc;
 
     &:hover {
-      background: rgba($primary-color-bronze, 0.9);
+      background: rgba($secondary-color-bronze-clair, 0.9);
     }
   }
 
@@ -379,7 +379,7 @@ aside {
     border: 2px solid $primary-color-bronze;
 
     &:hover {
-      background: $secondary-color-rose-claire;
+      background: rgba($secondary-color-bronze-clair, 0.9);
     }
   }
 
