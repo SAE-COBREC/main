@@ -118,7 +118,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                 <?php else: ?>
 
                 <!--formulaire du catalogue avec tableau des produits-->
-                <form method="post" id="formCatalogue">
+                <form method="post" id="formCatalogue" action="test.php" target="_blank">
                     <div class="table-wrapper">
                         <table class="products-table">
                             <thead>
@@ -207,7 +207,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
                     <!--bouton d'export PDF en bas du tableau-->
                     <div class="page-actions">
-                        <button type="button" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled
+                        <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled
                             style="margin-right: 20px;">
                             Exporter en PDF
                         </button>
@@ -256,37 +256,13 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
             });
         });
 
-        //gère le clic sur le bouton d'export PDF
-        if (boutonExportPdf) {
-            boutonExportPdf.addEventListener('click', function() {
-                //récupère les identifiants des produits sélectionnés
-                var identifiantsSelectionnes = [];
-                document.querySelectorAll('.products-table__row.selected').forEach(function(ligne) {
-                    identifiantsSelectionnes.push(ligne.dataset.id);
-                });
-
-                //ne fait rien si aucun produit n'est sélectionné
-                if (identifiantsSelectionnes.length === 0) return;
-
-                //crée un formulaire dynamique pour envoyer les IDs à exportPDF.php
-                var formulaire = document.createElement('form');
-                formulaire.method = 'POST';
-                formulaire.action = 'exportPDF.php';
-                formulaire.target = '_blank';
-
-                //ajoute un champ caché pour chaque produit sélectionné
-                identifiantsSelectionnes.forEach(function(id) {
-                    var champCache = document.createElement('input');
-                    champCache.type = 'hidden';
-                    champCache.name = 'produits_selectionnes[]';
-                    champCache.value = id;
-                    formulaire.appendChild(champCache);
-                });
-
-                //soumet le formulaire puis le supprime du DOM
-                document.body.appendChild(formulaire);
-                formulaire.submit();
-                document.body.removeChild(formulaire);
+        var formulaireCatalogue = document.getElementById('formCatalogue');
+        if (formulaireCatalogue) {
+            formulaireCatalogue.addEventListener('submit', function(event) {
+                var lignesSelectionnees = document.querySelectorAll('.products-table__row.selected');
+                if (lignesSelectionnees.length === 0) {
+                    event.preventDefault();
+                }
             });
         }
     });
