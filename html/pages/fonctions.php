@@ -2234,3 +2234,30 @@ function retirerProduitsDuCatalogue($pdo, array $idsProduits, $idVendeur) {
     $stmt->execute($params);
     return $stmt->rowCount();
 }
+
+function getProduitParId($pdo, $idProduit, $vendeurId) {
+    $reqDenomination = "
+        SELECT
+            p.id_produit,
+            p.p_nom,
+            p.p_description,
+            p.p_prix,
+            (SELECT COALESCE(i2.i_lien, '/img/photo/smartphone_xpro.jpg') FROM cobrec1._represente_produit rp2 LEFT JOIN cobrec1._image i2 ON rp2.id_image = i2.id_image WHERE rp2.id_produit = p.id_produit LIMIT 1) as image_url,
+            STRING_AGG(DISTINCT cp.nom_categorie, ', ') as categories
+        FROM cobrec1._produit p
+        LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
+        LEFT JOIN cobrec1._categorie_produit cp ON fpd.id_categorie = cp.id_categorie
+        WHERE p.id_produit = :idProduit
+            AND p.id_vendeur = :vendeurId
+        GROUP BY p.id_produit, p.p_nom, p.p_description, p.p_prix
+    ";
+    
+    $stmt = $pdo->prepare($reqDenomination);
+    $stmt->execute([
+        'idProduit' => $idProduit,
+        'vendeurId' => $vendeurId
+    ]);
+    $donnees = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    return $donnees;
+}
