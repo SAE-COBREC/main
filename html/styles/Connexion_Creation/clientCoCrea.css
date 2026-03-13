@@ -10,6 +10,7 @@
   --semantic-rouge: #D4183D;
   --semantic-jaune: #DDCA00;
   --semantic-info: #0C5460;
+  --secondary-promotion: #e4e4f5;
 }
 
 [data-theme=dalto-red-green] {
@@ -17,27 +18,29 @@
   --semantic-success-bg: #0072B2;
   --semantic-rouge: #D55E00;
   --semantic-jaune: #F0E442;
+  --secondary-promotion: #dbe0ff;
 }
 
 [data-theme=dalto-blue-yellow] {
   --primary-bleu: #009E73;
   --semantic-jaune: #CC79A7;
+  --secondary-promotion: #e2f2e4;
 }
 
 body {
-  background: linear-gradient(to bottom right, #7171A3, #030212);
+  background: linear-gradient(to bottom right, var(--primary-bleu), #030212);
 }
 
 .debutant a {
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 
 .footer > p {
-  color: #7171A3;
+  color: var(--primary-bleu);
 }
 
 .connex-btn > button:hover {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #030212;
 }
 

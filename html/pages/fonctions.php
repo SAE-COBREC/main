@@ -757,35 +757,26 @@ function mettreAJourProfilCompletClient($connexionBaseDeDonnees, $identifiantCli
 }
 
 //fonction pour modifier le mot de passe du compte
-function modifierMotDePasseCompte($connexionBaseDeDonnees, $otp, $identifiantCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationNouveauMotDePasse)
+function modifierMotDePasseCompte($connexionBaseDeDonnees, $identifiantCompte, $motDePasseActuel, $nouveauMotDePasse, $confirmationNouveauMotDePasse)
 {   
-    //si on n'est pas en OTP
-    if (!$otp){
-        //récupérer le mot de passe actuellement enregistré
-        try {
-            //récupérer le mot de passe actuellement enregistré
-            $requeteRecuperationMotDePasse = "SELECT mdp FROM cobrec1._compte WHERE id_compte = ?";
-            $requetePrepareeRecuperation = $connexionBaseDeDonnees->prepare($requeteRecuperationMotDePasse);
-            $requetePrepareeRecuperation->execute([$identifiantCompte]);
-            $motDePasseStockeHashe = $requetePrepareeRecuperation->fetchColumn();
-
-            //vérifier que le compte existe
-            if ($motDePasseStockeHashe === false) {
-                return ['success' => false, 'message' => "Compte introuvable."];
-            }
-
-            //vérifier que le mot de passe actuel correspond
-            if (password_verify($motDePasseActuel, $motDePasseStockeHashe) === false) {
-                return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
-            }
-        } catch (Exception $erreurException) {
-            return [
-                'success' => false,
-                'message' => "Erreur lors du changement de mot de passe"
-            ];
-        }
-    }
+    
     try {
+        //récupérer le mot de passe actuellement enregistré
+        $requeteRecuperationMotDePasse = "SELECT mdp FROM cobrec1._compte WHERE id_compte = ?";
+        $requetePrepareeRecuperation = $connexionBaseDeDonnees->prepare($requeteRecuperationMotDePasse);
+        $requetePrepareeRecuperation->execute([$identifiantCompte]);
+        $motDePasseStockeHashe = $requetePrepareeRecuperation->fetchColumn();
+
+        //vérifier que le compte existe
+        if ($motDePasseStockeHashe === false) {
+            return ['success' => false, 'message' => "Compte introuvable."];
+        }
+
+        //vérifier que le mot de passe actuel correspond
+        if (password_verify($motDePasseActuel, $motDePasseStockeHashe) === false) {
+            return ['success' => false, 'message' => "Mot de passe actuel incorrect."];
+        }
+
         //vérifier que la confirmation correspond au nouveau mot de passe
         if ($nouveauMotDePasse !== $confirmationNouveauMotDePasse) {
             return ['success' => false, 'message' => "Les mots de passe ne correspondent pas."];

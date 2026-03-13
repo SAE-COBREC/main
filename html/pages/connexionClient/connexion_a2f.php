@@ -1,4 +1,10 @@
-<?php session_start(); ?>
+<?php 
+session_start(); 
+require_once(__DIR__."/../../vendor/autoload.php");
+use OTPHP\TOTP;
+use OTPHP\Factory;
+$hasError = false;
+?>
 <?php if (!empty($_SESSION['A2F'])){ ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -9,6 +15,7 @@
     <title>Connexion A2F - Alizon</title>
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="../../styles/Connexion_Creation/styleCoCrea.css">
+    <link rel="stylesheet" href="../../styles/Connexion_Creation/clientCoCrea.css">
 </head>
 <body>
     <main>
@@ -17,41 +24,57 @@
                 <img src="../../img/svg/logo-text.svg" alt="Logo Alizon"
                     onclick="window.location.href='../../index.php'">
             </div>
-
-            <h1>Connexion à double facteurs</h1>
-            <form id="otporm">
-                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
+            <form action="connexion_a2f.php" method="post" enctype="multipart/form-data">
+                <h1>Connexion à double facteurs</h1>
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
                 <div class="connex-btn">
-                    <button type="submit" onclick="finishRegistration()">
+                    <button type="submit">
                         Valider
                     </button>
                 </div>
+                <div class="error">
+                    <?php if ($hasError){ 
+                        print_r("ERREUR OK"); ?>
+                        <strong>Erreur</strong> : Code A2F incorrect.
+                    <?php } ?>
+                </div>
             </form>
-    <?php
-    $otp = TOTP::createFromSecret($_SESSION['OTP']['secret']);
-    if ($otp->verify($_POST['code'], null, 20)){
-        $_SESSION['idClient'] = $_SESSION['A2F']['idClient'];
-        $_SESSION['idCompte'] = $_SESSION['A2F']['idCompte'];
-        unset($_SESSION['A2F']);
-    }else{
-        ?>
-        <div class='error'>
-            <strong>Erreur :</strong>
-            Code OTP incorrect
-        <?php
-    }
-    ?>
-            </div>
-        </main>
-    </body>
+        </div>
+    </main>
+</body>
 </html>
+<script>
+    const inputCarte = document.querySelector("input");
+    inputCarte.addEventListener("input", function() {
+        let valeur = this.value;
+        valeur = valeur.replace(/\D/g, "");
+        valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
+        this.value = valeur;
+    });
+</script>
+    <?php
+    $otp = TOTP::createFromSecret($_SESSION['A2F']['secret_otp']);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        print_r($otp->now());
+        if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){
+            $_SESSION['idClient'] = $_SESSION['A2F']['idClient'];
+            $_SESSION['idCompte'] = $_SESSION['A2F']['idCompte'];
+            $_SESSION['OTP']['secret'] = $_SESSION['A2F']['secret_otp'];
+            unset($_SESSION['A2F']);
+            $_SESSION['OTP']['statut'] = 'active';
+            $url = '../../index.php';
+            echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+        }else{
+            $hasError = true;
+        }
+    }
+    
+    ?>
 <?php
 }else{
-    print_r("redirection");
-    //$url = '../../index.php';
-    //echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
+    $url = '../../index.php';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
 }
 
 
 ?>
-</pre>

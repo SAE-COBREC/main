@@ -79,6 +79,10 @@ body.centered {
   padding: 0;
   margin: 0;
 }
+.card input[name=code] {
+  font-size: 26px;
+  text-align: center;
+}
 .card .mdpOtp {
   display: block;
 }

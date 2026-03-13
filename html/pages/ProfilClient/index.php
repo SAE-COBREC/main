@@ -103,17 +103,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //changement du mot de passe
     if (isset($_POST['change_password'])) {
+        //récupérer les mots de passe saisis
+        $motDePasseActuelSaisi = $_POST['actuel_password'] ?? '';
         $nouveauMotDePasseSaisi = $_POST['nouveau_password'] ?? '';
         $confirmationMotDePasseSaisie = $_POST['confirm_password'] ?? '';
         if (empty($_SESSION['OTP']['statut'])){
-            //récupérer les mots de passe saisis
-            $motDePasseActuelSaisi = $_POST['actuel_password'] ?? '';
+            
             
 
             //appeler la fonction de modification du mot de passe
             $resultatModificationMotDePasse = modifierMotDePasseCompte(
                 $connexionBaseDeDonnees,
-                false,
                 $identifiantCompteClient,
                 $motDePasseActuelSaisi,
                 $nouveauMotDePasseSaisi,
@@ -134,22 +134,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([':compte' => $identifiantCompteClient]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $otp = TOTP::createFromSecret($row['secret_otp']);
-                if (($row['etat_otp'] == 'true' && $otp->verify($otp_saisi, null, 20))){
-                    $stmt = $connexionBaseDeDonnees->prepare("UPDATE _compte SET etat_otp = false WHERE id_compte = :compte");
-                    $stmt->execute([':compte' => $identifiantCompteClient]);
-                    unset($_SESSION['OTP']['statut']);
+                if (($row['etat_otp'] == 'true' && $otp->verify(str_replace(' ', '', $otp_saisi), null, 20))){
 
                     $resultatModificationMotDePasse = modifierMotDePasseCompte(
                         $connexionBaseDeDonnees,
-                        true,
                         $identifiantCompteClient,
-                        '',
+                        $motDePasseActuelSaisi,
                         $nouveauMotDePasseSaisi,
                         $confirmationMotDePasseSaisie
                     );
                 }else{
                     $succes = false;
-                    $messageErreur2 = "Le code OTP est faux";
+                    $messageErreur2 = "Le code A2F est faux";
                 }
             } catch (Exception $e) {
                 $succes = false;
@@ -627,18 +623,10 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <main>
                         <!-- Formulaire de changement de mot de passe -->
                         <form method="POST">
-                            <div class="mdpUsuel" style='display: <?php
-                            if (empty($_SESSION['OTP']['statut'])){ echo 'block'; } else{ echo 'none';} ?>'>
+                            <div>
                                 <label>
                                     <span>Mot de passe actuel</span>
                                     <input type="password" name="actuel_password" required>
-                                </label>
-                            </div>
-                            <div style='display: <?php
-                            if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
-                                <label>
-                                    <span>Code OTP</span>
-                                    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP"/>
                                 </label>
                             </div>
                             <div>
@@ -659,12 +647,19 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                         required>
                                 </label>
                             </div>
+                            <div class="mdpOTP" style='display: <?php
+                            if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
+                                <label>
+                                    <span>Code A2F</span>
+                                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code_OTP"/>
+                                </label>
+                            </div>
                             <button type="submit" name="change_password" onclick="return confirm('Confirmer le changement de mot de passe ?')"
                                 <?php 
                                 // if (empty($_SESSION['OTP']['statut'])){ 
                                 //     echo 'onclick="return confirm(Confirmer le changement de mot de passe ?)"';
                                 // }else{ 
-                                //     echo 'onclick="return confirm(Désactiver le One Time Password et changer de mot de passe ?)"'; 
+                                //     echo 'onclick="return confirm(Désactiver l'authentification à doubles facteurs et changer de mot de passe ?)"'; 
                                 // } ?>>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -680,7 +675,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <header>
                         <div>
                             <span>Mot de passe</span>
-                            <strong>One Time Password</strong>
+                            <strong>Authentification à doubles facteurs</strong>
                         </div>
                         <span data-type="securite">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -689,29 +684,27 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             </svg>
                         </span>
                     </header>
-                    <main><?php
-                    if (!empty($_SESSION['OTP']['statut'])){?>
-                        <label>
-                            <span>Pour désactiver l'OTP, veuillez changer le mot de passe.</span>
-                        </label><?php } ?>
+                    <main>
                         <button type="button" id="activerOTP" onclick="ouvrirModalOTP()">
-                            <span class="btn-text-desktop">Activer le One Time Password</span>
-                            <span class="btn-text-mobile">Activer l'OTP</span>
-                        </button><?php 
+                            <span class="btn-text-desktop">Activer l'authentification à doubles facteurs</span>
+                            <span class="btn-text-mobile">Activer l'A2F</span>
+                        </button>
+                        <button type="button" id="desactiverOTP" onclick="ouvrirModalDesactivationOTP()">
+                            <span class="btn-text-desktop">Désactiver l'authentification à doubles facteurs</span>
+                            <span class="btn-text-mobile">Désactiver l'A2F</span>
+                        </button>
+                        <?php 
                         if (!empty($_SESSION['OTP']['statut'])){?>
-                            <script> document.getElementById("activerOTP").disabled = true; </script><?php
+                            <script> 
+                            document.getElementById("activerOTP").disabled = true; 
+                            document.getElementById("desactiverOTP").disabled = false; 
+                            </script><?php
                         }else{?>
-                            <script> document.getElementById("activerOTP").disabled = false; </script>
+                            <script> 
+                            document.getElementById("activerOTP").disabled = false;
+                            document.getElementById("desactiverOTP").disabled = true;
+                            </script>
                         <?php } ?>
-                        <!-- <form method="POST">
-                            <button type="submit" name="desactiverOTP"
-                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver le One Time Password ?')"
-                                style="<?php //if (!empty($_SESSION['OTP']['statut'])){ echo 'display:block';} ?>">
-                                <span class="btn-text-desktop">Désactiver le One Time Password</span>
-
-                                <span class="btn-text-mobile">Désactiver l'OTP</span>
-                            </button>
-                        </form> -->
                     </main>
                 </article>
             </section>
@@ -774,22 +767,22 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
     <div id="modalOTP">
         <div>
-            <h2>One Time Password</h2>
+            <h2>Authentification à doubles facteurs</h2>
             <?php
-                if (empty($_SESSION['OTP']['statut'])){
+                //if (empty($_SESSION['OTP']['statut'])){
                     include_once '../connexionClient/OTP.php';
                     ?>
-            <form id="otporm">
+            <form id="otpform">
                 <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
                 <label>
                     <p>Code secret :</p>
                     <small><?php echo $otp->getSecret() ?></small>
                 </label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
                 <button type="submit">Valider</button>
             </form>
             <script>
-            document.getElementById('otporm').addEventListener('submit', function(event) {
+            document.getElementById('otpform').addEventListener('submit', function(event) {
                 event.preventDefault();
                 const formData = new FormData(event.target);
                 const code = formData.get('code');
@@ -809,7 +802,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         if (contentLength == 4) {
                             xhttp2.abort();
                             alert(
-                                "One Time Password activé avec succès."
+                                "Authentification à doubles facteurs activée avec succès."
                                 );
                             //document.location.href = "/index.php"; 
                             document.getElementById('modalOTP').style.display = 'none';
@@ -827,10 +820,78 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             });
             </script>
             <?php
-                }
+                //}
             ?>
             <form>
                 <button type="button" onclick="fermerModalOTP()">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalDesactivationOTP">
+        <div>
+            <h2>Désactiver l'authentification à doubles facteurs</h2>
+             <?php
+                //if (!empty($_SESSION['OTP']['statut'])){
+            ?>
+            <form>
+                <label>
+                    <p>Code secret :</p>
+                </label>
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <button type="submit">Valider</button>
+            </form>
+            <script>
+            document.querySelector(".mdpOtp input[placeholder='123 456']").addEventListener("input", function() {
+                let valeur = this.value;
+                valeur = valeur.replace(/\D/g, "");
+                valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
+                this.value = valeur;
+            });
+
+
+            document.querySelector("#modalDesactivationOTP form").addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const code = formData.get('code');
+
+                const xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "../../pages/ProfilClient/verif_code.php", true);
+                xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhttp.send("code=" + code);
+
+
+                const xhttp2 = new XMLHttpRequest();
+                xhttp2.open("GET", "../../pages/ProfilClient/verif_code.txt", true);
+                xhttp2.send();
+                xhttp2.onreadystatechange = () => {
+                    if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+                        const contentLength = xhttp2.getResponseHeader("Content-Length");
+                        if (contentLength == 4) {
+                            xhttp2.abort();
+                            alert(
+                                "Authentification à doubles facteurs désactivée avec succès."
+                                );
+                            //document.location.href = "/index.php"; 
+                            document.getElementById('modalDesactivationOTP').style.display = 'none';
+
+                            const xhttp3 = new XMLHttpRequest();
+                            xhttp3.open("POST", "../../pages/ProfilClient/statut_otp_desact.php", true);
+                            xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xhttp3.send("statutOTP=unactive");
+                            succesDesactOTP();
+                        } else {
+                            alert("Echec. Veuillez réessayer.");
+                        }
+                    }
+                };
+            });
+            </script>
+            <?php
+                //}
+            ?>
+            <form>
+                <button type="button" onclick="fermerModalDesactivationOTP()">Annuler</button>
             </form>
         </div>
     </div>
@@ -1054,6 +1115,12 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     function fermerModalOTP() {
         //cache le modal OTP
         document.getElementById('modalOTP').style.display = 'none';
+    }
+
+     //fonction pour fermer le modal de désactivation de la double authentification (OTP)
+    function fermerModalDesactivationOTP() {
+        //cache le modal OTP
+        document.getElementById('modalDesactivationOTP').style.display = 'none';
     }
 
 
@@ -1377,11 +1444,26 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         document.getElementById('modalOTP').style.display = 'block';
     }
 
+    function ouvrirModalDesactivationOTP() {
+        document.getElementById('modalDesactivationOTP').style.display = 'block';
+    }
+
     function succesOTP() {
-        document.getElementById('activerOTP').textContent = "One Time Password activé avec succès.";
+        document.getElementById('activerOTP').textContent = "Authentification à doubles facteurs activée avec succès.";
         document.getElementById('activerOTP').disabled = true;
-        document.querySelector('.mdpUsuel').style.display = 'none';
-        document.querySelector('.mdpUsuel + div').style.display = 'block';
+        document.querySelector('.mdpOTP').style.display = 'block';
+
+        document.getElementById('desactiverOTP').textContent = "Désactiver l'authentification à doubles facteurs ?";
+        document.getElementById('desactiverOTP').disabled = false;        
+    }
+
+    function succesDesactOTP() {
+        document.getElementById('desactiverOTP').textContent = "Authentification à doubles facteurs désactivée.";
+        document.getElementById('desactiverOTP').disabled = true;
+        document.querySelector('.mdpOTP').style.display = 'none';
+
+        document.getElementById('activerOTP').textContent = "Activer l'authentification à doubles facteurs.";
+        document.getElementById('activerOTP').disabled = false;
     }
 
     document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {

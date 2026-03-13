@@ -52,6 +52,10 @@ body {
     padding: 0;
     margin: 0;
   }
+  input[name="code"]{
+    font-size: 26px;
+    text-align: center;
+}
 
   .mdpOtp{
     display:block;

@@ -483,11 +483,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p>Code secret :</p>
                         <small><?php echo $otp->getSecret() ?></small>
                     </label>
-                    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
+                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
                     <button type="submit" id="validationOTP">Valider</button>
                     <button type="submit" id="fermerOTP" onclick="fermerMdpOtp()">Annuler</button>
                 </div>
                 <script>
+                document.querySelector(".mdpOtp input[type='text']").addEventListener("input", function() {
+                    let valeur = this.value;
+                    valeur = valeur.replace(/\D/g, "");
+                    valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
+                    this.value = valeur;
+                });
                 document.getElementById('validationOTP').addEventListener('click', function(event) {
                     event.preventDefault();
                     const formData = new FormData(document.getElementById('multiForm'), document.getElementById(

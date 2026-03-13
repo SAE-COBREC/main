@@ -25,7 +25,7 @@
             $otp = TOTP::createFromSecret($_SESSION['OTP']['secret']);
             $logFile = "../../pages/connexionClient/ajax.txt";
             //file_put_contents("../../pages/connexionClient/log_ajax.txt", 'code OPT :' . $codeOpt . ' code rentré :' . $_POST['code'] . ' secret de BDD :' . $secret . ' secret de OPT généré avec secret de BDD :' . $otp->getSecret());
-            if ($otp->verify($_POST['code'], null, 20)){
+            if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){
                 file_put_contents($logFile, "true");
                 if (!empty($_SESSION['idCompte'])){
                     try {//enregistrement du secret_OTP dans la BDD
