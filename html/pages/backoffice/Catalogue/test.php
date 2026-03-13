@@ -136,7 +136,7 @@ echo "</pre>";
                         <div>
                             <span>
                                 <span>PRIX</span>
-                                <span><?= htmlspecialchars($prix) ?>€</span>
+                                <span><?= number_format($prix, 2, ',', ' ') ?>€</span>
                             </span>
                         </div>
 
