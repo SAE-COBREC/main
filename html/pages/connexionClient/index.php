@@ -1,10 +1,5 @@
 <?php 
 session_start();
-require_once(__DIR__."/../../vendor/autoload.php");
-use OTPHP\TOTP;
-use OTPHP\Factory;
-
-
 //connexion a la bdd 
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
@@ -22,6 +17,12 @@ $pdo->exec("SET search_path TO cobrec1");
                 //cas ou aucune valeur n'est entrée
                 if (el.validity.valueMissing) return 'Ce champ est requis.';
 
+                // Vérification d'âge
+                if (el.id === 'naissance') {
+                    if (el.validity.customError) {
+                        return el.validationMessage;
+                    }
+                }
                 //verification du mdp
                 if (el.id === 'mdp') {
                     var val = (el.value || '').trim();
@@ -38,6 +39,7 @@ $pdo->exec("SET search_path TO cobrec1");
                 //verif des REGEX
                 if (el.validity.patternMismatch) {
                     if (el.type === 'email') return 'Veuillez saisir une adresse e-mail valide.';
+                    if (el.id === 'telephone') return 'Le numéro de téléphone n\'a pas le bon format.';
                     if (el.id === 'codeP') return 'Le code postal est incorrecte.';
                     return 'Le format de ce champ est invalide.';
                 }
@@ -73,27 +75,27 @@ $pdo->exec("SET search_path TO cobrec1");
     <title>Connexion - Alizon</title>
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="../../styles/Connexion_Creation/styleCoCrea.css">
+    <link rel="stylesheet" href="../../styles/Connexion_Creation/clientCoCrea.css">
 </head>
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $login = trim($_POST['email'] ?? '');
-  $_SESSION['connexionClient']['login'] = $login;
   $mdp = $_POST['mdp'] ?? '';
-  $otp_saisi = $_POST['code_OTP'] ?? '';
 
   $hasError = false;
   $error_card = null;
   $error_message = '';
   
-  try{
+  try {
+
     //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp, secret_otp, etat_otp FROM _compte WHERE email = :login");
+    $stmt = $pdo->prepare("SELECT id_compte, mdp, etat_otp, secret_otp FROM _compte WHERE email = :login");
     $stmt->execute([':login' => $login]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     //verification que l'aresse mail existe dans la bdd
     if (!$row) {
-      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp, c.secret_otp, c.etat_otp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
+      $stmt = $pdo->prepare("SELECT c.id_compte, c.mdp, c.etat_otp, c.secret_otp FROM _compte c JOIN _client cl ON c.id_compte = cl.id_compte WHERE cl.c_pseudo = :login");
       $stmt->execute([':login' => $login]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -106,15 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       //verification que le mdp corespondant a ce mail existe
-      if (empty($row['secret_otp'])){
-        $otp_now = '';
-      }else{
-        $otp = TOTP::createFromSecret($row['secret_otp']);
-        $otp_now = $otp->verify($otp_saisi, null, 20);
-        //$otp_now = $otp->now();
-      }
-        //file_put_contents('log.txt','otp=' . $otp_now . ' otp_saisie=' . $otp_saisi . ' mdp=' . password_verify($mdp, $row['mdp']) . 'etat=' . $row['etat_otp'] . 'verify=' . $otp->verify($otp_saisi, null, 20));
-      if (($row['etat_otp'] == 'true' && $otp_now) || ($row['etat_otp'] != 'true' && password_verify($mdp, $row['mdp']))){
+      if (!password_verify($mdp, $row['mdp'])) {
+        $hasError = true;
+        $error_card = 1;
+        $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
+      } else {
         //récuperation des données client
         $clientStmt = $pdo->prepare("SELECT id_client FROM _client WHERE id_compte = :id");
         $clientStmt->execute([':id' => (int)$row['id_compte']]);
@@ -123,33 +121,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $clientId = (int)$client['id_client'];
         }
 
-        if ($row['etat_otp'] == 'true'){
-            $_SESSION['OTP']['statut'] = 'active';
-        }else{
-            if (!empty($_SESSION['OTP']['statut'])){
-                unset($_SESSION['OTP']['statut']);
-            }
-        }
-
         //verification que le compte est un compte client
         if (!$clientId) {
           $hasError = true;
           $error_card = 1;
-          $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
+          $error_message = ' mail, pseudo ou mot de passe incorrecte.';
         } else {
-          //ajout des identifiant a la session
-
-          $_SESSION['idClient'] = $clientId;
-          $_SESSION['idCompte'] = (int)$row['id_compte'];
           // Redirection sans header() (serveur peut bloquer header)
-          $url = '../../index.php';
+          if ($row['etat_otp'] == 'true'){
+            $_SESSION['A2F']['idClient'] = $clientId;
+            $_SESSION['A2F']['secret_otp'] = $row['secret_otp'];
+            $_SESSION['A2F']['idCompte'] = (int)$row['id_compte'];
+            $url = './connexion_a2f.php';
+          }else{
+            //ajout des identifiant a la session
+            $_SESSION['idClient'] = $clientId;
+            $_SESSION['idCompte'] = (int)$row['id_compte'];
+            if (!empty($_SESSION['A2F'])){
+                unset($_SESSION['A2F']);
+            }
+
+            $url = '../../index.php';
+          }
           echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
-      }else{
-        $hasError = true;
-        $error_card = 1;
-        $error_message = 'Adresse mail, pseudo ou mot de passe incorrecte.';
       }
     }
   //message en cas de probleme de verif dans le code
@@ -161,34 +157,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-
-<style>
-body {
-    background: linear-gradient(to bottom right, #7171A3, #030212);
-}
-
-.debutant {
-    a {
-        color: #7171A3;
-    }
-}
-
-.footer {
-    >p {
-        color: #7171A3;
-    }
-}
-
-.connex-btn {
-    >button {
-        &:hover {
-            background: #7171A3;
-            color: #030212;
-        }
-    }
-}
-</style>
-
 <body>
     <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
         <div class="card" id="1">
@@ -198,61 +166,18 @@ body {
             </div>
 
             <h1>Connexion</h1>
-            <div>
-                <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();" <?php 
-                if (!empty($_SESSION['OTP']['etatCheckbox'])){
-                    echo 'checked';
-                }
-                ?>
-                > Basculer sur le One Time Password (OTP)</label>
-            </div>
 
             <div>
                 <label for="email">Email/Pseudonyme</label>
-                <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" 
-                value="<?php if (!empty($_SESSION['connexionClient']['login'])){ echo $_SESSION['connexionClient']['login']; }?>" 
-                required>
+                <input type="text" id="email" name="email" placeholder="exemple@domaine.extension" required>
             </div>
 
-            <div class="mdpClassique">
+            <div>
                 <label for="mdp">Mot de passe</label>
                 <input type="password" id="mdp" name="mdp" placeholder="***********" required>
             </div>
-            <div>
-                <label for="otp">Code OTP</label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code_OTP"/>
+            <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?
             </div>
-            <div class="forgot" onclick="window.location.href='../MDPoublieClient/index.php'">Mot de passe oublié ?</div>
-            <script>
-                const mdpOtp = document.querySelector(".mdpClassique + div");
-                mdpOtp.style.display = "none";
-                changer_OTP();
-                function changer_OTP() {
-                    const checkboxOtp = document.querySelector("#checkboxotp");
-                    const champOtp = document.querySelector(".mdpClassique + div > input");
-                    const mdpClassique = document.querySelector(".mdpClassique");
-                    const mdp = document.querySelector("#mdp");
-                    const forgot = document.querySelector(".forgot");
-                    if (checkboxOtp.checked) {
-                        mdpClassique.style.display = "none";
-                        forgot.style.display = "none";
-                        mdpOtp.style.display = "block";
-                        champOtp.setAttribute('required','');
-                        mdp.removeAttribute('required');
-                        
-                    }else{
-                        mdpClassique.style.display = "block";
-                        forgot.style.display = "block";
-                        mdpOtp.style.display = "none";
-                        champOtp.removeAttribute('required');
-                        mdp.setAttribute('required','');
-                    }
-
-                }
-            </script>
-
-
-
             <!-- affichage des erreurs de saisi -->
             <div class="error">
                 <?php if (isset($hasError) && $hasError && $error_card == 1): ?>
@@ -279,18 +204,6 @@ body {
 
     <script>
     window.finishRegistration = function() {
-        
-        const xhttp3 = new XMLHttpRequest();
-        xhttp3.open("POST", "otp_co_checkbox.php", true);
-        xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        if (document.querySelector("#checkboxotp").checked){
-            xhttp3.send("etat_OTP=true");
-        }else{
-            xhttp3.send("etat_OTP=false");
-        }
-
-
-        
         console.log('[register] finishRegistration called');
         var form = document.getElementById('multiForm');
         if (!form) return; // Ne fini le formulaire que si il existe

@@ -1,0 +1,44 @@
+@use "sass:list";
+@use "../variable" as *;
+
+body {
+    background: linear-gradient(to bottom right, $primary-color-bleu, $primary-color-noir);
+}
+
+.debutant {
+    a {
+        color: $primary-color-bleu;
+    }
+}
+
+.footer {
+    >p {
+        color: $primary-color-bleu;
+    }
+}
+
+.connex-btn {
+    >button {
+        &:hover {
+            background: $primary-color-bleu;
+            color: $primary-color-noir;
+        }
+    }
+}
+
+.field-error {
+    border-color: #dc143c !important;
+    box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.18);
+    transition: box-shadow 120ms ease-in-out, border-color 120ms ease-in-out;
+}
+
+.card[id="3"] {
+    label {
+        margin-left: 20px;
+    }
+
+    label[for="commune"] {
+        padding-left: 15px;
+        margin-left: 0;
+    }
+}

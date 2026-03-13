@@ -68,6 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <title>Créer un compte - Alizon</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <link rel="stylesheet" href="../../styles/Connexion_Creation/styleCoCrea.css">
+    <link rel="stylesheet" href="../../styles/Connexion_Creation/clientCoCrea.css">
+    <link rel="stylesheet" href="../../styles/Connexion_Creation/creaOTP.css">
 </head>
 
 <?php
@@ -130,19 +132,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           }
         }
 
-        //insertion dans la bdd des données de compte
-        $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom, secret_OTP, etat_OTP)
-                VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP, true)';
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-          'email' => $email,
-          'telephone' => $telephone,
-          'mdp' => $mdp,
-          'civilite' => $civilite,
-          'nom' => $nom,
-          'prenom' => $prenom,
-          'secretOTP' => $_SESSION['OTP']['secret'] ?? null
-        ]);
+        if(empty($_SESSION['OTP']['statut'])){
+            //insertion dans la bdd des données de compte
+            $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom)
+                    VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom)';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+            'email' => $email,
+            'telephone' => $telephone,
+            'mdp' => $mdp,
+            'civilite' => $civilite,
+            'nom' => $nom,
+            'prenom' => $prenom
+            ]);
+        }else{
+            //insertion dans la bdd des données de compte
+            $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom, secret_OTP, etat_OTP)
+                    VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP, true)';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+            'email' => $email,
+            'telephone' => $telephone,
+            'mdp' => $mdp,
+            'civilite' => $civilite,
+            'nom' => $nom,
+            'prenom' => $prenom,
+            'secretOTP' => $_SESSION['OTP']['secret']
+            ]);
+        }
+
+        
 
         // Récupérer l'id du compte créé
         try {
@@ -238,31 +257,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 ?>
-
-<style>
-body {
-    background: linear-gradient(to bottom right, #7171A3, #030212);
-}
-
-.debutant a {
-    color: #7171A3;
-}
-
-.field-error {
-    border-color: #dc143c !important;
-    box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.18);
-    transition: box-shadow 120ms ease-in-out, border-color 120ms ease-in-out;
-}
-
-.card[id="3"] label {
-    margin-left: 20px;
-}
-
-.card[id="3"] label[for="commune"] {
-    padding-left: 15px;
-    margin-left: 0;
-}
-</style>
 
 <body>
     <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
@@ -472,21 +466,27 @@ body {
 
 
             <div>
-                <label><input type="checkbox" id="checkboxotp" name="checkboxotp" onclick="changer_OTP();"> Basculer sur
-                    le One Time Password (OTP)</label>
+                <label id="checkboxotp">
+                    <input type="checkbox" name="checkboxotp" onclick="changer_OTP();"> 
+                    Activer la vérification à double facteurs ?
+                </label>
+                <label> Vérification à double facteurs activée</label>
             </div>
             <br>
             <div class="mdpOtp">
-                <?php
-                    include_once '../connexionClient/OTP.php';
-              ?>
-                <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
-                <label>
-                    <p>Code secret :</p>
-                    <small><?php echo $otp->getSecret() ?></small>
-                </label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
-                <button type="submit" id="validationOTP">Valider</button>
+                <div>
+                    <?php
+                        include_once '../connexionClient/OTP.php';
+                    ?>
+                    <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
+                    <label>
+                        <p>Code secret :</p>
+                        <small><?php echo $otp->getSecret() ?></small>
+                    </label>
+                    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code" />
+                    <button type="submit" id="validationOTP">Valider</button>
+                    <button type="submit" id="fermerOTP" onclick="fermerMdpOtp()">Annuler</button>
+                </div>
                 <script>
                 document.getElementById('validationOTP').addEventListener('click', function(event) {
                     event.preventDefault();
@@ -508,14 +508,18 @@ body {
                             const contentLength = xhttp2.getResponseHeader("Content-Length");
                             if (contentLength == 4) {
                                 xhttp2.abort();
-                                alert("One Time Password activé avec succès.");
+                                alert("Vérification à double facteurs activée avec succès.");
+                                document.querySelector(".mdpOtp").style.display = 'none';
+                                document.querySelector("#checkboxotp").style.display = 'none';
+                                document.querySelector("#checkboxotp + label").style.display = 'block';
+
 
                                 const xhttp3 = new XMLHttpRequest();
                                 xhttp3.open("POST", "../../pages/creationClient/otp_session_crea.php", true);
                                 xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                                 xhttp3.send("statutOTP=active");
-                                const btnFleche = document.querySelector("#finishBtn");
-                                btnFleche.disabled = false;
+                                // const btnFleche = document.querySelector("#finishBtn");
+                                // btnFleche.disabled = false;
                             } else {
                                 const err = document.querySelector('.card#\\34  .error');
                                 if (err) {
@@ -543,34 +547,27 @@ body {
             </div>
             <script>
             document.querySelector(".mdpOtp").style.display = "none";
+            document.querySelector("#checkboxotp + label").style.display = 'none';
+
+            function fermerMdpOtp(){
+                document.querySelector("#checkboxotp input").checked = false;
+                changer_OTP();
+            }
 
             function changer_OTP() {
-                const checkboxOtp = document.querySelector("#checkboxotp");
-                const mdpClassique = document.querySelectorAll(".mdpClassique");
+                const checkboxOtp = document.querySelector("#checkboxotp input");
                 const mdpOtp = document.querySelector(".mdpOtp");
-                const btnFleche = document.querySelector("#finishBtn");
-                const mdp = document.querySelector("#mdp");
-                const Cmdp = document.querySelector("#Cmdp");
+                // const btnFleche = document.querySelector("#finishBtn");
                 //const cgv = document.querySelector("#cgv");
                 if (checkboxOtp.checked) {
-                    mdpClassique.forEach(function(classico) {
-                        classico.style.display = 'none';
-                    });
                     mdpOtp.style.display = 'block';
-                    btnFleche.disabled = true;
+                    // btnFleche.disabled = true;
                     // cgv.checked = false;
                     // cgv.disabled = true;
-                    mdp.removeAttribute('required');
-                    Cmdp.removeAttribute('required');
                 } else {
-                    mdpClassique.forEach(function(classico) {
-                        classico.style.display = 'block';
-                    });
                     mdpOtp.style.display = 'none';
-                    btnFleche.disabled = false;
+                    // btnFleche.disabled = false;
                     // cgv.disabled = false;
-                    mdp.setAttribute('required', '');
-                    Cmdp.setAttribute('required', '');
                 }
             }
 
@@ -959,7 +956,7 @@ body {
         const mdp = mdpEl ? mdpEl.value : '';
         const cmdp = cmdpEl ? cmdpEl.value : '';
 
-        if ((mdp !== cmdp) && !document.querySelector("#checkboxotp").checked) {
+        if (mdp !== cmdp) {
             showCardByIndex(3);
             const err = document.querySelector('.card#\\34  .error');
             if (err) {

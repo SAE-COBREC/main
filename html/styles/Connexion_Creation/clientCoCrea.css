@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+}
+
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+}
+
+body {
+  background: linear-gradient(to bottom right, #7171A3, #030212);
+}
+
+.debutant a {
+  color: #7171A3;
+}
+
+.footer > p {
+  color: #7171A3;
+}
+
+.connex-btn > button:hover {
+  background: #7171A3;
+  color: #030212;
+}
+
+.field-error {
+  border-color: #dc143c !important;
+  box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.18);
+  transition: box-shadow 120ms ease-in-out, border-color 120ms ease-in-out;
+}
+
+.card[id="3"] label {
+  margin-left: 20px;
+}
+.card[id="3"] label[for=commune] {
+  padding-left: 15px;
+  margin-left: 0;
+}/*# sourceMappingURL=clientCoCrea.css.map */
