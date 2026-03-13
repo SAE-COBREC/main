@@ -97,9 +97,18 @@ h1 {
   }
 }
 
+#formCatalogue {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 // Wrapper scrollable
 .table-wrapper {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
