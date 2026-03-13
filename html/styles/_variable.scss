@@ -34,7 +34,7 @@ $secondary-color-jaune-avertissement: #856404;
 $secondary-color-jaune-fond: #FFF3CD;
 $secondary-color-bleu-info: var(--semantic-info);
 $secondary-color-bleu-info-fond: #D1ECF1;
-$secondary-color-promotion: #e4e4f5;
+$secondary-color-promotion: var(--secondary-promotion);
 
 // Font Families
 $font-family-primaire: 'Baloo', sans-serif;
@@ -68,6 +68,7 @@ $vendeur-padding-main: 32px 40px;
     --semantic-rouge: #D4183D;
     --semantic-jaune: #DDCA00;
     --semantic-info: #0C5460;
+    --secondary-promotion: #e4e4f5;
 }
 
 // --- MODE PROTANOPIE / DEUTÉRANOPIE (Le plus commun : Vert/Rouge) ---
@@ -80,6 +81,7 @@ $vendeur-padding-main: 32px 40px;
     
     // Le jaune devient un jaune très clair ou crème pour trancher
     --semantic-jaune: #F0E442;
+    --secondary-promotion: #dbe0ff;
 }
 
 // --- MODE TRITANOPIE (Rare : Bleu/Jaune) ---
@@ -89,4 +91,5 @@ $vendeur-padding-main: 32px 40px;
     
     // Le jaune devient un rose/violet
     --semantic-jaune: #CC79A7;
+    --secondary-promotion: #e2f2e4;
 }

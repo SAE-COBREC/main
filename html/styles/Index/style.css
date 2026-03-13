@@ -11,6 +11,7 @@
   --semantic-rouge: #D4183D;
   --semantic-jaune: #DDCA00;
   --semantic-info: #0C5460;
+  --secondary-promotion: #e4e4f5;
 }
 
 [data-theme=dalto-red-green] {
@@ -18,11 +19,13 @@
   --semantic-success-bg: #0072B2;
   --semantic-rouge: #D55E00;
   --semantic-jaune: #F0E442;
+  --secondary-promotion: #dbe0ff;
 }
 
 [data-theme=dalto-blue-yellow] {
   --primary-bleu: #009E73;
   --semantic-jaune: #CC79A7;
+  --secondary-promotion: #e2f2e4;
 }
 
 @media screen and (max-width: 560px) {
@@ -506,7 +509,7 @@ article button:disabled {
 
 .produit-promotion {
   border: 2px solid var(--primary-bleu) !important;
-  background-color: #e4e4f5 !important;
+  background-color: var(--secondary-promotion) !important;
   position: relative;
   overflow: hidden;
 }
@@ -529,7 +532,7 @@ article button:disabled {
 .produit-promotion button:not(:disabled) {
   background: var(--primary-bleu) !important;
   color: #FFFFFF !important;
-  border: 2px solid #e4e4f5 !important;
+  border: 2px solid var(--secondary-promotion) !important;
 }
 
 .produit-promotion button:hover:not(:disabled) {
@@ -543,7 +546,7 @@ article button:disabled {
 }
 
 .produit-promotion .badge-bretagne {
-  background-color: #e4e4f5 !important;
+  background-color: var(--secondary-promotion) !important;
 }
 
 .star-rating-filter {

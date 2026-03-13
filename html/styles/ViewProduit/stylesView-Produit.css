@@ -10,6 +10,7 @@
   --semantic-rouge: #D4183D;
   --semantic-jaune: #DDCA00;
   --semantic-info: #0C5460;
+  --secondary-promotion: #e4e4f5;
 }
 
 [data-theme=dalto-red-green] {
@@ -17,11 +18,13 @@
   --semantic-success-bg: #0072B2;
   --semantic-rouge: #D55E00;
   --semantic-jaune: #F0E442;
+  --secondary-promotion: #dbe0ff;
 }
 
 [data-theme=dalto-blue-yellow] {
   --primary-bleu: #009E73;
   --semantic-jaune: #CC79A7;
+  --secondary-promotion: #e2f2e4;
 }
 
 body {
