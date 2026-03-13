@@ -495,6 +495,9 @@ article button {
 article button:hover:not(:disabled) {
   background: var(--primary-bleu);
 }
+article button:hover:not(:disabled) img {
+  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+}
 article button:disabled {
   background: #c0c0c0;
   cursor: not-allowed;
