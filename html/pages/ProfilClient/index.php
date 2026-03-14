@@ -842,11 +842,14 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <button type="submit">Valider</button>
             </form>
             <script>
-            document.querySelector(".mdpOtp input[placeholder='123 456']").addEventListener("input", function() {
-                let valeur = this.value;
-                valeur = valeur.replace(/\D/g, "");
-                valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
-                this.value = valeur;
+
+            document.querySelectorAll("input[placeholder='123 456']").forEach(champOTP => {
+                champOTP.addEventListener("input", function() {
+                    let valeur = this.value;
+                    valeur = valeur.replace(/\D/g, "");
+                    valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
+                    this.value = valeur;
+                });
             });
 
 
