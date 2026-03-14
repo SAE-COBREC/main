@@ -1,0 +1,39 @@
+@use "sass:list";
+@use "../variable" as *;
+
+body {
+    background: linear-gradient(to bottom right, #CD7F32, #D4183D);
+}
+.debutant {
+    a {
+      color: #CD7F32;
+    }
+  }
+.footer{
+    > p{
+      color: #CD7F32;
+    }
+  }
+.connex-btn {
+    > button {
+      &:hover {
+        background: #CD7F32;
+        color: black;
+      }
+    }
+  }
+
+.card[id="3"] {
+    label {
+        margin-left: 20px;
+
+        &[for="commune"] {
+            padding-left: 15px;
+            margin-left: 0;
+        }
+
+        @media #{$mobile} {
+            margin-left: 0;
+        }
+    }
+}

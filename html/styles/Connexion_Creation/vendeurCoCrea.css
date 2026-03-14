@@ -1,0 +1,58 @@
+* {
+  margin: 0;
+}
+
+:root {
+  --primary-bleu: #7171A3;
+  --primary-bronze: #CD7F32;
+  --semantic-success: #155724;
+  --semantic-success-bg: #28A745;
+  --semantic-rouge: #D4183D;
+  --semantic-jaune: #DDCA00;
+  --semantic-info: #0C5460;
+  --secondary-promotion: #e4e4f5;
+}
+
+[data-theme=dalto-red-green] {
+  --semantic-success: #005AB5;
+  --semantic-success-bg: #0072B2;
+  --semantic-rouge: #D55E00;
+  --semantic-jaune: #F0E442;
+  --secondary-promotion: #dbe0ff;
+}
+
+[data-theme=dalto-blue-yellow] {
+  --primary-bleu: #009E73;
+  --semantic-jaune: #CC79A7;
+  --secondary-promotion: #e2f2e4;
+}
+
+body {
+  background: linear-gradient(to bottom right, #CD7F32, #D4183D);
+}
+
+.debutant a {
+  color: #CD7F32;
+}
+
+.footer > p {
+  color: #CD7F32;
+}
+
+.connex-btn > button:hover {
+  background: #CD7F32;
+  color: black;
+}
+
+.card[id="3"] label {
+  margin-left: 20px;
+}
+.card[id="3"] label[for=commune] {
+  padding-left: 15px;
+  margin-left: 0;
+}
+@media screen and (max-width: 508px) {
+  .card[id="3"] label {
+    margin-left: 0;
+  }
+}/*# sourceMappingURL=vendeurCoCrea.css.map */

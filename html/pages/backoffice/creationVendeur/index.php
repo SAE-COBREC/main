@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <title>Créer un compte vendeur - Alizon</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <style>
-    /* Local fonts: Baloo 2 and Quicksand */
+    /* Local fonts: Baloo 2 and Quicksand
     @font-face {
         font-family: 'Baloo 2';
         src: url('../../fonts/baloo.regular.ttf') format('truetype');
@@ -113,9 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         font-weight: 400;
         font-style: normal;
         font-display: swap;
-    }
+    } */
     </style>
     <link rel="stylesheet" href="../../../styles/Connexion_Creation/styleCoCrea.css">
+    <link rel="stylesheet" href="../../../styles/Connexion_Creation/vendeurCoCrea.css">
+    <link rel="stylesheet" href="../../../styles/Connexion_Creation/creaOTP.css">
 </head>
 
 <?php
@@ -150,18 +152,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!$hasError && isset($_POST['action']) === false) {
     try {
 
-      // Insertion dans la bdd des données de compte
-      $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, prenom, nom, civilite)
-              VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :prenom, :nom, :civilite)';
-      $stmt = $pdo->prepare($sql);
-      $stmt->execute([
-        'email' => $email,
-        'telephone' => $telephone,
-        'mdp' => $mdp,
-        'nom' => $nom,
-        'prenom' => $prenom,
-        'civilite' => $civilite
-      ]);
+      if(empty($_SESSION['OTPvendeur']['statut'])){
+            //insertion dans la bdd des données de compte
+            $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom)
+                    VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom)';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+            'email' => $email,
+            'telephone' => $telephone,
+            'mdp' => $mdp,
+            'civilite' => $civilite,
+            'nom' => $nom,
+            'prenom' => $prenom
+            ]);
+        }else{
+            //insertion dans la bdd des données de compte
+            $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom, secret_OTP, etat_OTP)
+                    VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP, true)';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+            'email' => $email,
+            'telephone' => $telephone,
+            'mdp' => $mdp,
+            'civilite' => $civilite,
+            'nom' => $nom,
+            'prenom' => $prenom,
+            'secretOTP' => $_SESSION['OTPvendeur']['secret']
+            ]);
+        }
 
       // Récupérer l'id du compte créé
       try {
@@ -263,31 +281,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 ?>
-
-<style>
-body {
-    background: linear-gradient(to bottom right, #CD7F32, #D4183D);
-}
-
-.debutant a {
-    color: #CD7F32;
-}
-
-.card[id="3"] {
-    label {
-        margin-left: 20px;
-
-        &[for="commune"] {
-            padding-left: 15px;
-            margin-left: 0;
-        }
-
-        @media #{$mobile} {
-            margin-left: 0;
-        }
-    }
-}
-</style>
 
 <body>
     <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">
@@ -519,6 +512,78 @@ body {
             <p class="subtitle">Mot de passe</p>
 
             <div>
+                <label id="checkboxotp">
+                    <input type="checkbox" name="checkboxotp" onclick="changer_OTP();"> 
+                    Activer la vérification à double facteurs ?
+                </label>
+                <label> Vérification à double facteurs activée</label>
+            </div>
+            <br>
+            <div class="mdpOtp">
+                <div>
+                    <?php
+                        include_once '../../connexionClient/OTP.php';
+                        $_SESSION['OTPvendeur']['secret'] = $otp->getSecret();
+                    ?>
+                    <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
+                    <label>
+                        <p>Code secret :</p>
+                        <small><?php echo $otp->getSecret() ?></small>
+                    </label>
+                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                    <button type="submit" id="validationOTP">Valider</button>
+                    <button type="submit" id="fermerOTP" onclick="fermerMdpOtp()">Annuler</button>
+                </div>
+                <script>
+                document.querySelector(".mdpOtp input[type='text']").addEventListener("input", function() {
+                    let valeur = this.value;
+                    valeur = valeur.replace(/\D/g, "");
+                    valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
+                    this.value = valeur;
+                });
+                document.getElementById('validationOTP').addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(document.getElementById('multiForm'), document.getElementById(
+                        'validationOTP'));
+                    const code = formData.get('code');
+
+                    const xhttp = new XMLHttpRequest();
+                    xhttp.open("POST", "../../../pages/connexionClient/ajax_otp.php", true);
+                    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xhttp.send("code=" + code);
+
+
+                    const xhttp2 = new XMLHttpRequest();
+                    xhttp2.open("GET", "../../../pages/connexionClient/ajax.txt", true);
+                    xhttp2.send();
+                    xhttp2.onreadystatechange = () => {
+                        if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+                            const contentLength = xhttp2.getResponseHeader("Content-Length");
+                            if (contentLength == 4) {
+                                xhttp2.abort();
+                                alert("Vérification à double facteurs activée avec succès.");
+                                document.querySelector(".mdpOtp").style.display = 'none';
+                                document.querySelector("#checkboxotp").style.display = 'none';
+                                document.querySelector("#checkboxotp + label").style.display = 'block';
+
+
+                                const xhttp3 = new XMLHttpRequest();
+                                xhttp3.open("POST", "../../../pages/backoffice/creationVendeur/otp_session_crea_vendeur.php", true);
+                                xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                                xhttp3.send("statutOTP=active");
+                            } else {
+                                const err = document.querySelector('.card#\\34  .error');
+                                if (err) {
+                                    err.classList.remove('hidden');
+                                    err.innerHTML = '<strong>Erreur</strong> : Le code est incorrect.';
+                                }
+                            }
+                        }
+                    };
+                });
+                </script>
+            </div>
+            <div class="mdpClassique">
                 <label for="mdp">Mot de passe</label>
                 <input type="password" id="mdp" name="mdp" placeholder="***********"
                     pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,16}$" required>
@@ -528,6 +593,30 @@ body {
                 <label for="Cmdp">Confirmer le mot de passe</label>
                 <input type="password" id="Cmdp" name="Cmdp" placeholder="**********" required>
             </div>
+
+            <script>
+            document.querySelector(".mdpOtp").style.display = "none";
+            document.querySelector("#checkboxotp + label").style.display = 'none';
+
+            function fermerMdpOtp(){
+                document.querySelector("#checkboxotp input").checked = false;
+                changer_OTP();
+            }
+
+            function changer_OTP() {
+                const checkboxOtp = document.querySelector("#checkboxotp input");
+                const mdpOtp = document.querySelector(".mdpOtp");
+                if (checkboxOtp.checked) {
+                    mdpOtp.style.display = 'block';
+                } else {
+                    mdpOtp.style.display = 'none';
+                }
+            }
+
+            function echecOTP() {
+                return 'Code OTP invalide. Veuillez réessayer.';
+            }
+            </script>
 
             <div class="error">
                 <?php if (isset($hasError) && $hasError && $error_card == 5): ?>
@@ -766,7 +855,7 @@ body {
         }
 
         // Vérification de l'email et du téléphone à la card 2
-        if (visible === 1) {
+        if (visible === 2) {
             const emailInput = document.getElementById('email');
             const phoneInput = document.getElementById('telephone');
 

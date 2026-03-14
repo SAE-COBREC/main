@@ -771,6 +771,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             <?php
                 //if (empty($_SESSION['OTP']['statut'])){
                     include_once '../connexionClient/OTP.php';
+                    $_SESSION['OTP']['secret'] = $otp->getSecret();
                     ?>
             <form id="otpform">
                 <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">

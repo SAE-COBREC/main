@@ -477,6 +477,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div>
                     <?php
                         include_once '../connexionClient/OTP.php';
+                        $_SESSION['OTP']['secret'] = $otp->getSecret();
                     ?>
                     <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
                     <label>

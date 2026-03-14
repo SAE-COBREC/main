@@ -69,9 +69,8 @@ $_SESSION['creeArticle']=[];
   </script>
   <title>Connexion - Alizon</title>
   <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link
-    rel="stylesheet">
   <link rel="stylesheet" href="../../../styles/Connexion_Creation/styleCoCrea.css">
+  <link rel="stylesheet" href="../../../styles/Connexion_Creation/vendeurCoCrea.css">
 </head>
 
 <?php
@@ -137,29 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 ?>
-<style>
-  body {
-    background: linear-gradient(to bottom right, #CD7F32, #D4183D);
-  }
-  .debutant {
-    a {
-      color: #CD7F32;
-    }
-  }
-  .footer{
-    > p{
-      color: #CD7F32;
-    }
-  }
-  .connex-btn {
-    > button {
-      &:hover {
-        background: #CD7F32;
-        color: black;
-      }
-    }
-  }
-</style>
 
 <body>
     <form action="index.php" method="post" enctype="multipart/form-data" id="multiForm">

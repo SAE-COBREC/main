@@ -1,5 +1,6 @@
 <?php
 include '../../selectBDD.php';
+include '../../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
 require_once(__DIR__."/../../vendor/autoload.php");
 require_once(__DIR__."/../../vendor/QRcodes/vendor/autoload.php");
@@ -50,69 +51,3 @@ $result = $writer->write($qrCode, null, null);
 // Validate the result
 $writer->validateResult($result, $otp->getProvisioningUri());
 ?>
-<?php
-// try {//enregistrement du secret_OTP dans la BDD
-//     $sql = '
-//     UPDATE cobrec1._compte
-//     SET secret_OTP = :secret
-//     WHERE id_compte = :idCompte;
-//     ';
-//     $stmt = $pdo->prepare($sql);
-//     $params = [
-//         'idCompte' => $_SESSION['idCompte'],
-//         'secret' => $otp->getSecret()
-//     ];
-//     $stmt->execute($params);
-// } catch (Exception $e) {}
-$_SESSION['OTP']['secret'] = $otp->getSecret();
-?>
-<!-- <form id="a2form">
-    <img src='<?php //echo $result->getDataUri() ?>' width="250em" height="250em">
-    <label>
-    <p>Code secret :</p>
-    <small><?php //echo $otp->getSecret() ?></small>
-    </label>
-    <input type="text" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456" name="code"/>
-    <button type="submit">Valider</button>
-</form>
-<script>
-    document.getElementById('a2form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const code = formData.get('code');
-
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send("code="+code);
-
-
-        const xhttp2 = new XMLHttpRequest();
-        xhttp2.open("GET", "../../pages/connexionClient/ajax.txt", true);
-        xhttp2.send();
-        xhttp2.onreadystatechange = () => {
-        if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
-            const contentLength = xhttp2.getResponseHeader("Content-Length");
-            if (contentLength == 4) {
-                xhttp2.abort();
-                alert("Authentification à double facteur activée avec succès.");
-                //document.location.href = "/index.php"; 
-                document.getElementById('modalOTP').style.display = 'none';
-
-                const xhttp3 = new XMLHttpRequest();
-                xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
-                xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                xhttp3.send("statutOTP=active");
-                succesOTP();
-                //document.location.href = "/pages/connexionClient/index.php"; 
-            }else{
-                alert("Echec. Veuillez réessayer.");
-            }
-        }
-        };
-    });
-
-
-    
-    
-</script> -->
