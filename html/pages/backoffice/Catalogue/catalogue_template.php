@@ -1,7 +1,8 @@
 <?php
-// Charger le CSS compilé depuis le SCSS
+// Charger le CSS compilé depuis le SCSS pour le style du PDF/catalogue
 $css = file_get_contents(__DIR__ . '/../../../styles/Catalogue/catalogue.css');
 
+// Démarrer la temporisation de sortie pour capturer tout le HTML généré
 ob_start();
 ?>
 <!DOCTYPE html>
@@ -17,9 +18,13 @@ ob_start();
 
 <body>
     <main>
-        <?php if (empty($listeProduits)): ?>
+        <?php 
+        // Vérifier s'il y a des produits à afficher pour ce vendeur
+        if (empty($listeProduits)): 
+        ?>
         <p class="empty-message">Ce vendeur n'a aucun produit en ligne pour le moment.</p>
         <?php else: ?>
+        <!-- En-tête principal de la première page du catalogue -->
         <div class="page-title">CATALOGUE DE <?= mb_strtoupper(htmlspecialchars($nom_entreprise)) ?></div>
         <div class="company-info">
             <p>
@@ -29,9 +34,12 @@ ob_start();
         </div>
         <ul>
             <?php 
+                // Initialisation du compteur pour gérer la pagination (4 produits par page)
                 $compteur = 1;
+
+                // Parcourir chaque produit du vendeur
                 foreach ($listeProduits as $produit): 
-                    // Ajouter un titre de page tous les 4 produits
+                    // Ajouter un saut de page et un nouveau titre tous les 4 produits
                     if ($compteur % 4 === 1 && $compteur > 1): 
                 ?>
         </ul>
@@ -44,11 +52,14 @@ ob_start();
                     $nom = htmlspecialchars($produit['p_nom'] ?? 'Sans nom');
                     $description = htmlspecialchars($produit['p_description'] ?? 'Aucune description disponible.');
                     $prix = htmlspecialchars($produit['p_prix'] ?? '0.00');
-                    $origine = htmlspecialchars(recupOrigineProduit($connexionBaseDeDonnees, $produit['id_produit']) ?? 'Inconnu');
-                    $categories = htmlspecialchars($produit['categories'] ?? 'Inconnue');
-
-                    // Construction du chemin d'image absolu pour DOMPDF
+                    $origine = htmlspecialchars(recupOrigine, requis par les pre-processeurs HTML vers PDF comme DOMPDF
                     $urlImage = $produit['image_url'] ?? '';
+                    // Adapter le chemin de l'image pour accéder au dossier local correctement
+                    $urlImage = str_replace('html/img/photo', '/img/photo', $urlImage);
+                    $imgPath = $basePath . $urlImage;
+                    $imgSrc = '';
+
+                    // Vérifier si l'image existe physiquement et si son extension est valideproduit['image_url'] ?? '';
                     $urlImage = str_replace('html/img/photo', '/img/photo', $urlImage);
                     $imgPath = $basePath . $urlImage;
                     $imgSrc = '';
@@ -89,16 +100,15 @@ ob_start();
                         </td>
                     </tr>
                 </table>
-                <hr class="separator">
-            </li>
-            <?php 
-                    $compteur++;
-                endforeach; 
-                ?>
+                <hr // Incrémenter le compteur pour le prochain produit $compteur++; endforeach; ?>
         </ul>
-        <?php endif; ?>
+        <?php endif; // Fin de la condition et de la liste des produits ?>
     </main>
 </body>
+
+</html>
+<?php
+// Récupérer et stocker le contenu HTML final généré dans la variable, puis vider le tampon cache (ob_)y>
 
 </html>
 <?php
