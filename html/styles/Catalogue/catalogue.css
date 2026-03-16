@@ -17,7 +17,7 @@ header h1 {
   color: #6d8354;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-size: 22px;
+  font-size: 2em;
 }
 
 main {
@@ -27,7 +27,7 @@ main {
 
 .page-title {
   text-align: center;
-  font-size: 18px;
+  font-size: 2em;
   color: #6d8354;
   font-weight: bold;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
