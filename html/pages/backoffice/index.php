@@ -430,7 +430,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
                     if (!confirm(
                             `Êtes-vous sûr de vouloir supprimer le produit "${productName}" ? Cette action est irréversible.`
-                            )) {
+                        )) {
                         return;
                     }
 
