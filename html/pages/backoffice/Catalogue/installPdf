@@ -2,3 +2,14 @@ curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
 
 composer install
+
+
+
+  thrown in /home/etudiant/Bureau/BUT_1E2/COURS/Semestre_3/SAE/SAE 3.04/main/html/vendor/dompdf/dompdf/src/Dompdf.php on line 297
+[Mon Mar 16 09:01:18 2026] [::1]:34396 [500]: POST /pages/backoffice/Catalogue/exportPDF.php - Uncaught Error: Call to undefined function Dompdf\mb_internal_encoding() in /home/etudiant/Bureau/BUT_1E2/COURS/Semestre_3/SAE/SAE 3.04/main/html/vendor/dompdf/dompdf/src/Dompdf.php:297
+Stack trace:
+#0 /home/etudiant/Bureau/BUT_1E2/COURS/Semestre_3/SAE/SAE 3.04/main/html/vendor/dompdf/dompdf/src/Dompdf.php(269): Dompdf\Dompdf->setPhpConfig()
+#1 /home/etudiant/Bureau/BUT_1E2/COURS/Semestre_3/SAE/SAE 3.04/main/html/pages/backoffice/Catalogue/exportPDF.php(60): Dompdf\Dompdf->__construct()
+#2 {main}
+  thrown in /home/etudiant/Bureau/BUT_1E2/COURS/Semestre_3/SAE/SAE 3.04/main/html/vendor/dompdf/dompdf/src/Dompdf.php on line 297
+[Mon Mar 16 09:01:18 2026] [::1]:34396 Closing
