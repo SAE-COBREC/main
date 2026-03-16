@@ -292,9 +292,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                                     //construit l'URL de l'image du produit
                                     $urlImage = htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg');
                                     //récupère l'origine du produit selon son statut
-                                    $origineProduit = $produitCourant['_en_ligne']
-                                        ? recupOrigineProduit($connexionBaseDeDonnees, $produitCourant['id_produit'])
-                                        : ($produitCourant['p_origine'] ?? 'Inconnu');
+                                    $origineProduit = $produitCourant['p_origine'] ?? 'Inconnu';
                                 ?>
 
                                     <!--ligne de produit dans le tableau-->
