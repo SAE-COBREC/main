@@ -1501,6 +1501,7 @@ function ProduitDenominationVendeur($pdo, $denomination) {
             p.p_prix,
             p.p_stock,
             p.p_nb_ventes,
+            p.p_origine,
             r.reduction_pourcentage,
             t.montant_tva as tva,
             pr.id_produit as estEnpromo,
