@@ -363,7 +363,8 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                         <div class="page-actions">
                             <button type="button" class="btn btn--secondary" id="btn-select-all">Tout
                                 sélectionner</button>
-                            <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled>
+                            <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf"
+                                style="margin-right: 20px;" disabled>
                                 Exporter en PDF
                             </button>
                         </div>
