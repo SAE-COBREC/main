@@ -595,12 +595,27 @@ article {
     font-size: 1.2em;
     @include transition(background);
 
+    .icon-panier-dynamic {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-color: $primary-color-blanc;
+      -webkit-mask-image: url('/img/svg/panier.svg');
+      mask-image: url('/img/svg/panier.svg');
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
     //effet hover sur le bouton
     &:hover:not(:disabled) {
       background: $primary-color-bleu;
 
-      img {
-        filter: none;
+      span{
+        background-color: $primary-color-blanc;
       }
     }
 
@@ -664,6 +679,10 @@ article {
 .produit-promotion button:hover:not(:disabled) {
   background: $primary-color-blanc !important;
   color: $primary-color-bleu !important;
+
+  span{
+    background-color: $primary-color-bleu !important;
+  }
 }
 
 //style pour produit en rupture ET en promotion
@@ -1058,10 +1077,10 @@ article {
         position: absolute;
         top: 0;
         left: 0;
-        background: #e74c3c;
+        background: $secondary-color-rouge;
         color: white;
         padding: 5px 10px;
-        border-radius: 12px;
+        border-radius: $border-radius-primary;
         font-weight: bold;
         font-size: 0.9rem;
       }
@@ -1281,4 +1300,8 @@ article {
 }
 .carte {
   display: flex;
+}
+
+.panier-icon {
+    display: none !important;
 }

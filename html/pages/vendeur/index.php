@@ -91,9 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 //construit l'adresse complète du vendeur pour le géocodage
 $adresseComplete = construireAdresseCompleteVendeur($informationsVendeur);
+
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
+
+<!doctype html>
+<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -107,10 +111,13 @@ $adresseComplete = construireAdresseCompleteVendeur($informationsVendeur);
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <link rel="stylesheet" href="/styles/Vendeur/style.css">
+    <link rel="stylesheet" href="/styles/Star/star.css">
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <script src="../../js/accessibility.js"></script>
 </head>
 
 <body>
@@ -121,6 +128,9 @@ $adresseComplete = construireAdresseCompleteVendeur($informationsVendeur);
 
     <!--conteneur principal de la page vendeur-->
     <main>
+
+<!doctype html>
+<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
         <!--lien de retour vers l'accueil-->
         <a href="/">
@@ -262,16 +272,20 @@ $adresseComplete = construireAdresseCompleteVendeur($informationsVendeur);
 
                         <div>
                             <span>
-                                <!--affiche les étoiles de notation-->
-                                <?php for ($i = 1; $i <= 5; $i++):
-                                if ($noteArrondie >= $i)           $s = 'full';
-                                elseif ($noteArrondie >= $i - 0.5) $s = 'alf';
-                                else                               $s = 'empty';
-                            ?>
-                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                <?php 
+                                // On calcule l'état pour chaque étoile de 1 à 5
+                                for ($i = 1; $i <= 5; $i++):
+                                    if ($noteArrondie >= $i) {
+                                        $s = 'full';
+                                    } elseif ($noteArrondie >= $i - 0.5) {
+                                        $s = 'alf';
+                                    } else {
+                                        $s = 'empty';
+                                    }
+                                ?>
+                                    <span class="star-icon medium <?= $s ?>"></span>
                                 <?php endfor; ?>
                             </span>
-                            <!--affiche le nombre d'avis-->
                             <span>(<?= $produitCourant['nombre_avis'] ?? 0 ?>)</span>
                         </div>
 
@@ -297,7 +311,11 @@ $adresseComplete = construireAdresseCompleteVendeur($informationsVendeur);
                             <!--bouton pour ajouter au panier-->
                             <button <?= $estEnRupture ? 'disabled' : '' ?>
                                 onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
-                                <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
+                                <?php if ($estEnRupture): ?>
+                                    Indisponible
+                                <?php else: ?>
+                                    <span class="icon-panier-dynamic"></span> Ajouter au panier
+                                <?php endif; ?>
                             </button>
                         </div>
                     </div>
