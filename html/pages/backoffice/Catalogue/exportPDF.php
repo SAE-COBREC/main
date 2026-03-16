@@ -21,7 +21,7 @@ $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 // Récupération infos vendeur
 function getVendeurInfoPDF($pdo, $vendeur_id) {
-    $stmt = $pdo->prepare("SELECT denomination FROM cobrec1._vendeur WHERE id_vendeur = :id");
+    $stmt = $pdo->prepare("SELECT v.denomination, c.num_telephone, c.email FROM cobrec1._vendeur v JOIN cobrec1._compte c ON v.id_compte = c.id_compte WHERE v.id_vendeur = :id");
     $stmt->execute(['id' => $vendeur_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }

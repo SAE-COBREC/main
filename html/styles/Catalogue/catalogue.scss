@@ -17,7 +17,7 @@ body {
 
 header {
     text-align: center;
-    padding: 20px;
+    padding: 10px 0;
 
     h1 {
         color: $catalogue-green;
@@ -30,6 +30,27 @@ header {
 main {
     max-width: 1000px;
     margin: 0 auto;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 18px;
+    color: $catalogue-green;
+    font-weight: bold;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px 0 30px 0;
+}
+
+.company-info {
+    text-align: center;
+    margin: 0 0 40px 0;
+    font-size: 12px;
+    color: #555;
+    
+    p {
+        margin: 5px 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
 }
 
 ul {
@@ -49,14 +70,19 @@ ul {
 
 .product-image {
     width: 250px;
+    height: 180px;
     vertical-align: top;
     padding-right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     img {
-        width: 250px;
-        height: 180px;
+        max-width: 100%;
+        max-height: 100%;
         display: block;
         object-fit: contain;
+        object-position: center;
     }
 }
 

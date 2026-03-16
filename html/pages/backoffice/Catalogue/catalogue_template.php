@@ -1,6 +1,6 @@
 <?php
 // Charger le CSS compilé depuis le SCSS
-$css = file_get_contents(__DIR__ . '../../../styles/catalogue.css');
+$css = file_get_contents(__DIR__ . '/../../../styles/Catalogue/catalogue.css');
 
 // Démarrage de la construction HTML
 $html = '<!DOCTYPE html>
@@ -11,16 +11,25 @@ $html = '<!DOCTYPE html>
     <style>' . $css . '</style>
 </head>
 <body>
-    <header>
-        <h1>Catalogue de ' . htmlspecialchars($nom_entreprise) . '</h1>
-    </header>
     <main>';
 
 if (empty($listeProduits)) {
     $html .= '<p class="empty-message">Ce vendeur n\'a aucun produit en ligne pour le moment.</p>';
 } else {
-    $html .= '<ul>';
+    $html .= '<div class="page-title">CATALOGUE DE TECHSTORE</div>
+    <div class="company-info">
+        <p><strong>Téléphone:</strong> ' . htmlspecialchars($vendeurInfos['num_telephone'] ?? 'Non spécifié') . ' | <strong>Email:</strong> ' . htmlspecialchars($vendeurInfos['email'] ?? 'Non spécifié') . '</p>
+    </div>
+    <ul>';
+    $compteur = 1;
     foreach ($listeProduits as $produit) {
+        // Ajouter un titre de page tous les 4 produits
+        if ($compteur % 4 === 1 && $compteur > 1) {
+            $html .= '</ul>
+            <div class="page-title" style="page-break-before: always;">CATALOGUE DE TECHSTORE</div>
+            <ul>';
+        }
+        
         $nom = htmlspecialchars($produit['p_nom'] ?? 'Sans nom');
         $description = htmlspecialchars($produit['p_description'] ?? 'Aucune description disponible.');
         $prix = htmlspecialchars($produit['p_prix'] ?? '0.00');
@@ -71,6 +80,7 @@ if (empty($listeProduits)) {
             </table>
             <hr class="separator">
         </li>';
+        $compteur++;
     }
     $html .= '</ul>';
 }
