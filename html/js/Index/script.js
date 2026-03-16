@@ -181,8 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const btns = document.querySelectorAll('.star-btn');
             //parcourt chaque bouton d'étoile
             btns.forEach(b => {
-                //remet l'image d'étoile vide
-                b.querySelector('img').src = '/img/svg/star-empty.svg';
+                const star = b.querySelector('.star-icon');
+                if (star) {
+                    star.classList.remove('full');
+                    star.classList.add('empty');
+                }
             });
             //soumet le formulaire pour afficher tous les produits sans filtres
             document.getElementById('filterForm').submit();
@@ -203,14 +206,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         //fonction pour mettre à jour l'affichage des étoiles
         const updateStars = (val) => {
-            //parcourt chaque bouton d'étoile
             btns.forEach(b => {
-                //récupère la valeur de l'étoile (1 à 5)
                 const v = parseInt(b.dataset.value);
-                //récupère l'image de l'étoile
-                const img = b.querySelector('img');
-                //change l'image selon si l'étoile doit être pleine ou vide
-                img.src = v <= val ? '/img/svg/star-full.svg' : '/img/svg/star-empty.svg';
+                const starIcon = b.querySelector('.star-icon');
+                
+                if (starIcon) {
+                    if (v <= val) {
+                        starIcon.classList.add('full');
+                        starIcon.classList.remove('empty');
+                    } else {
+                        starIcon.classList.add('empty');
+                        starIcon.classList.remove('full');
+                    }
+                }
             });
         };
 

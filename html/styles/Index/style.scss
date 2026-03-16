@@ -643,11 +643,10 @@ article {
   }
 
   button {
-    //effet hover sur le bouton
     &:hover:not(:disabled) {
       background: $primary-color-bleu;
-
-      img {
+      
+      img{
         filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
       }
     }
@@ -715,6 +714,7 @@ article {
     // Tailles
     &.small { width: 16px; height: 16px; }
     &.medium { width: 20px; height: 20px; }
+    &.large { width: 24px; height: 24px; }
 
     // Définition des fichiers images
     &.full { -webkit-mask-image: url('/img/svg/star-full.svg'); mask-image: url('/img/svg/star-full.svg'); }

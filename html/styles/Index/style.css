@@ -593,6 +593,10 @@ article button:disabled {
   width: 20px;
   height: 20px;
 }
+.star-icon.large {
+  width: 24px;
+  height: 24px;
+}
 .star-icon.full {
   -webkit-mask-image: url("/img/svg/star-full.svg");
   mask-image: url("/img/svg/star-full.svg");

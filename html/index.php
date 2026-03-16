@@ -421,16 +421,16 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <!--filtre par note minimum-->
                 <section>
                     <h4>Note minimum</h4>
-                    <!--widget d'étoiles pour sélectionner la note-->
                     <div class="star-rating-filter" id="starFilterWidget">
-                        <!--boucle pour créer 5 étoiles cliquables-->
-                        <?php for($i=1; $i<=5; $i++): ?>
+                        <?php for($i=1; $i<=5; $i++): 
+                            // Détermine si l'étoile doit être pleine ou vide au chargement
+                            $state = ($i <= $noteMinimumFiltre) ? 'full' : 'empty';
+                        ?>
                         <button type="button" class="star-btn" data-value="<?= $i ?>" aria-label="Note <?= $i ?>">
-                            <img src="/img/svg/star-empty.svg" alt="" width="24" height="24">
+                            <span class="star-icon large <?= $state ?>"></span>
                         </button>
                         <?php endfor; ?>
                     </div>
-                    <!--champ caché pour stocker la note sélectionnée-->
                     <input type="hidden" name="note_min" id="inputNoteMin" value="<?= $noteMinimumFiltre ?>">
                 </section>
 
