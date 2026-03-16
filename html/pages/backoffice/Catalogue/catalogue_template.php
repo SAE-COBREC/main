@@ -1,16 +1,6 @@
 <?php
-/**
- * Template HTML du catalogue PDF.
- * 
- * Variables attendues :
- *   $nom_entreprise  — string, nom du vendeur
- *   $listeProduits   — array, liste des produits
- *   $basePath         — string, chemin absolu vers html/
- *   $connexionBaseDeDonnees — PDO
- */
-
 // Charger le CSS compilé depuis le SCSS
-$css = file_get_contents(__DIR__ . '/catalogue_pdf.css');
+$css = file_get_contents(__DIR__ . '../../../styles/catalogue.css');
 
 // Démarrage de la construction HTML
 $html = '<!DOCTYPE html>
