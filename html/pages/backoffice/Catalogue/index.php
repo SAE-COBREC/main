@@ -215,7 +215,11 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                             <table class="products-table">
                                 <thead>
                                     <tr>
-                                        <th class="products-table__head-cell col-check"></th>
+                                        <th class="products-table__head-cell col-check">
+                                            <button type="button" id="btn-clear-filters" class="filtre__item">
+                                                Effacer
+                                            </button>
+                                        </th>
                                         <th class="products-table__head-cell col-produit">
                                             <input type="search" id="filtre-search" name="search"
                                                 placeholder="Rechercher un produit..."
@@ -471,6 +475,13 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                 var el = document.getElementById(id);
                 if (el) el.addEventListener('change', appliquerFiltres);
             });
+
+            var boutonEffacerFiltres = document.getElementById('btn-clear-filters');
+            if (boutonEffacerFiltres) {
+                boutonEffacerFiltres.addEventListener('click', function() {
+                    window.location.href = window.location.pathname;
+                });
+            }
 
             var searchInput = document.getElementById('filtre-search');
             if (searchInput) {
