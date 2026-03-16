@@ -290,6 +290,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <script src="/js/chart.js"></script>
     <script src="../../js/accessibility.js"></script>
+    <script src="/js/profilClient.js"></script>
 </head>
 
 <body>
@@ -300,15 +301,69 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     ?>
 
     <main>
-        <div>
-            <button class="back-button" onclick="window.location.href='/index.php';">
-                ← Retour
+        <h1>Mon Profil</h1>
+
+        <nav class="profile-sidebar">
+            <button class="sidebar-item active" onclick="switchTab('general')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Général</span>
+            </button>
+            <button class="sidebar-item" onclick="switchTab('adresses')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>Adresses</span>
+            </button>
+            <button class="sidebar-item" onclick="switchTab('commandes')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span>Commandes</span>
+            </button>
+            <button class="sidebar-item" onclick="switchTab('securite')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span>Sécurité</span>
+            </button>
+            <button class="sidebar-item" onclick="switchTab('preferences')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <span>Préférences</span>
+            </button>
+            <div style="flex: 1;"></div>
+            <form method="get" class="logout-form">
+                <button type="submit" name="action" value="logout" class="sidebar-item logout" style="color: $secondary-color-rouge;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Déconnexion</span>
+                </button>
+            </form>
+        </nav>
+
+        <div class="profile-content">
+            <button class="back-button" onclick="window.location.href='/index.php';" style="margin-bottom: 2em; display: inline-flex; align-items: center; gap: 0.5em; background: none; border: none; color: #888; cursor: pointer; font-weight: 600;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Retour à l'accueil
             </button>
 
-            <h1>Mon Profil</h1>
-
             <!-- Section : Informations personnelles -->
-            <section>
+            <section id="general" class="active">
                 <h2>Informations personnelles</h2>
 
                 <article>
@@ -444,7 +499,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </section>
 
             <!-- Section : Mes adresses -->
-            <section>
+            <section id="adresses">
                 <div>
                     <h2>Mes adresses</h2>
                     <button type="button" onclick="ouvrirModalAjoutAdresse()">
@@ -508,7 +563,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </section>
 
             <!-- Section : Mes dernières commandes -->
-            <section>
+            <section id="commandes">
                 <h2>Mes dernières commandes</h2>
 
                 <?php if (empty($listeCommandesRecentes)): ?>
@@ -605,7 +660,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </section>
 
             <!-- Section Sécurité -->
-            <section>
+            <section id="securite">
                 <h2>Sécurité</h2>
                 <article>
                     <header>
@@ -709,7 +764,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 </article>
             </section>
 
-            <section class="animation-settings-section">
+            <section id="preferences" class="animation-settings-section">
                 <h2>Préférences</h2>
                 <article>
                     <header>
@@ -748,20 +803,16 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 </div>
             </section>
 
-            <!-- Formulaire de déconnexion -->
-            <form method="get" class="logout-form">
-                <button type="submit" name="action" value="logout">
-                    Déconnexion
-                </button>
-            </form>
-
-            <form method="post" action="delete_account.php" class="del-form" id="delete-account-form">
-                <input type="hidden" name="delete_password" id="delete_password_field" value="">
-                <button type="button" onclick="ouvrirModalSuppressionCompte()">
-                    Supprimer mon compte
-                </button>
-            </form>
-
+            <div class="danger-zone" style="margin-top: 4em; padding-top: 2em; border-top: 1px solid rgba(220, 53, 69, 0.1);">
+                <form method="post" action="delete_account.php" class="del-form" id="delete-account-form" style="text-align: left;">
+                    <h3 style="color: $secondary-color-rouge; margin-bottom: 0.5em;">Zone de danger</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 1.5em;">Une fois supprimé, votre compte et toutes ses données ne pourront plus être récupérés.</p>
+                    <input type="hidden" name="delete_password" id="delete_password_field" value="">
+                    <button type="button" onclick="ouvrirModalSuppressionCompte()" style="border-color: $secondary-color-rouge; color: $secondary-color-rouge; padding: 10px 20px; font-weight: 600;">
+                        Supprimer mon compte
+                    </button>
+                </form>
+            </div>
         </div>
     </main>
 
