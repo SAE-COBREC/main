@@ -189,7 +189,6 @@ main > section > div > footer span {
 main > section > div > footer span img {
   width: 17px;
   height: 17px;
-  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
 }
 
 main > h2 {
@@ -232,7 +231,6 @@ article > div:last-child > div:last-child > div {
 article > div:last-child > div:last-child > div img {
   width: 24px;
   height: 24px;
-  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
 }
 article > div:last-child > div:last-child > div span {
   font-size: 0.85rem;
