@@ -180,6 +180,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
         <!--charge les feuilles de style CSS-->
         <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
+        <link rel="stylesheet" href="/styles/Catalogue/backofficeCatalogue.css" />
 
         <!--charge le script d'accessibilité-->
         <script src="/js/accessibility.js"></script>
@@ -217,14 +218,14 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                                     <tr>
                                         <th class="products-table__head-cell col-check">
                                             <button type="button" id="btn-clear-filters" class="filtre__item">
-                                                Effacer
+                                                <img src="/img/svg/poubelle.svg" alt="Effacer les filtres" width="20"
+                                                    height="20">
                                             </button>
                                         </th>
                                         <th class="products-table__head-cell col-produit">
                                             <input type="search" id="filtre-search" name="search"
                                                 placeholder="Rechercher un produit..."
-                                                value="<?= htmlspecialchars($rechercheNom) ?>" class="filtre__item"
-                                                style="min-width: 240px;" />
+                                                value="<?= htmlspecialchars($rechercheNom) ?>" class="filtre__item" />
                                         </th>
                                         <th class="products-table__head-cell col-statut">
                                             <select id="filtre-statut" name="statut" class="filtre__item">
@@ -282,8 +283,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                                     <!--boucle sur tous les produits du catalogue-->
                                     <?php if (empty($produitsFiltres)): ?>
                                     <tr>
-                                        <td class="products-table__cell" colspan="6"
-                                            style="text-align:center; color:#666;">
+                                        <td class="products-table__cell" colspan="6">
                                             Aucun produit ne correspond aux filtres.
                                         </td>
                                     </tr>
@@ -303,7 +303,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
                                         <!--case à cocher de sélection-->
                                         <td class="products-table__cell col-check">
-                                            <div class="checkbox" style="border-radius: 0;"></div>
+                                            <div class="checkbox"></div>
                                             <input type="checkbox" name="produits_selectionnes[]"
                                                 value="<?= (int) $produitCourant['id_produit'] ?>" style="display:none;"
                                                 class="hidden-checkbox">
@@ -363,8 +363,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                         <div class="page-actions">
                             <button type="button" class="btn btn--secondary" id="btn-select-all">Tout
                                 sélectionner</button>
-                            <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled
-                                style="margin-right: 20px;">
+                            <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled>
                                 Exporter en PDF
                             </button>
                         </div>
