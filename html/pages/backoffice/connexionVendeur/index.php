@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   try {
     //récuperation des données de compte
-    $stmt = $pdo->prepare("SELECT id_compte, mdp FROM _compte WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT id_compte, mdp, etat_otp, secret_otp FROM _compte WHERE email = :email");
     $stmt->execute([':email' => $email]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -118,11 +118,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
         } else {
 
-          //ajout des identifiant a la session
-          $_SESSION['vendeur_id'] = $vendeurId;
-          
-          //redirige sur la page d'acceuil
-          $url = '../index.php';
+          // Redirection sans header() (serveur peut bloquer header)
+          if ($row['etat_otp'] == 'true'){
+            $_SESSION['A2Fvendeur']['vendeur_id'] = $vendeurId;
+            $_SESSION['A2Fvendeur']['secret_otp'] = $row['secret_otp'];
+            $_SESSION['A2Fvendeur']['idCompte'] = (int)$row['id_compte'];
+            $url = './connexion_a2f.php';
+          }else{
+            //ajout des identifiant a la session
+            $_SESSION['vendeur_id'] = $vendeurId;
+            $_SESSION['idCompte'] = (int)$row['id_compte'];
+            if (!empty($_SESSION['A2Fvendeur'])){
+                unset($_SESSION['A2Fvendeur']);
+            }
+
+            $url = '../index.php';
+          }
           echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
         }
