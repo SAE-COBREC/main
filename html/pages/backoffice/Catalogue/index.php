@@ -320,7 +320,8 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                                                     <h4 class="product__name">
                                                         <?= htmlspecialchars($produitCourant['p_nom']) ?></h4>
                                                     <p class="product__model">
-                                                        <?= htmlspecialchars($produitCourant['p_prix']) ?> €</p>
+                                                        <?php echo number_format($produitCourant['p_prix'], 2, ',', ' '); ?>
+                                                        €</p>
                                                 </div>
                                             </div>
                                         </td>
