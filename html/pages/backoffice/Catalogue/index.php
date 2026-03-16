@@ -476,7 +476,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
             if (searchInput) {
                 searchInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
-                        clearTimeout(searchTimer);
+                        e.preventDefault();
                         appliquerFiltres();
                     }
                 });
