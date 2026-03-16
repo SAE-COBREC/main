@@ -15,33 +15,37 @@ body {
     background-color: $white;
 }
 
-header {
+h1 {
+    color: $catalogue-green;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 2em;
     text-align: center;
     padding: 10px 0;
-
-    h1 {
-        color: $catalogue-green;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-size: 22px;
-    }
 }
 
 main {
     max-width: 1000px;
     margin: 0 auto;
+    
+    > p {
+        text-align: center;
+        color: $text-gray;
+        font-size: 14px;
+        margin-top: 40px;
+    }
 }
 
-.page-title {
+h2 {
     text-align: center;
-    font-size: 18px;
+    font-size: 2em;
     color: $catalogue-green;
     font-weight: bold;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     margin: 20px 0 30px 0;
 }
 
-.company-info {
+header {
     text-align: center;
     margin: 0 0 40px 0;
     font-size: 12px;
@@ -62,106 +66,102 @@ ul {
         page-break-inside: avoid;
     }
 }
-.product-row {
+
+table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;
-}
 
-.product-image {
-    width: 250px;
-    height: 180px;
-    vertical-align: top;
-    padding-right: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    td:first-child {
+        width: 250px;
+        height: 180px;
+        vertical-align: top;
+        padding-right: 30px;
+        
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            margin: 0 auto;
+        }
 
-    img {
-        max-width: 100%;
-        max-height: 100%;
-        display: block;
-        object-fit: contain;
-        object-position: center;
+        > div {
+            width: 225px;
+            height: 150px;
+            border: 2px dashed #ccc;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            display: table-cell;
+            vertical-align: middle;
+        }
+    }
+
+    td:last-child {
+        vertical-align: top;
+
+        h3 {
+            color: $catalogue-green;
+            font-size: 20px;
+            text-transform: uppercase;
+            margin: 0 0 10px 0;
+            font-weight: 400;
+        }
+
+        > p {
+            color: $text-gray;
+            font-size: 11px;
+            line-height: 1.6;
+            margin: 0 0 10px 0;
+        }
+
+        > div {
+            margin-bottom: 6px;
+
+            span {
+                display: inline-block;
+                background-color: $catalogue-green;
+                color: $white;
+                padding: 6px 18px;
+                border-radius: 50px;
+                font-weight: bold;
+                font-size: 13px;
+
+                strong {
+                    font-size: 9px;
+                    opacity: 0.8;
+                    margin-right: 6px;
+                    font-weight: normal;
+                }
+            }
+        }
     }
 }
 
-.image-placeholder {
-    width: 225px;
-    height: 150px;
-    border: 2px dashed #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: #666;
-    text-align: center;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-.product-details {
-    vertical-align: top;
-
-    h3 {
-        color: $catalogue-green;
-        font-size: 20px;
-        text-transform: uppercase;
-        margin: 0 0 10px 0;
-        font-weight: 400;
-    }
-
-    p {
-        color: $text-gray;
-        font-size: 11px;
-        line-height: 1.6;
-        margin: 0 0 10px 0;
-    }
-}
-
-.price-badge {
-    display: inline-block;
-    background-color: $catalogue-green;
-    color: $white;
-    padding: 6px 18px;
-    border-radius: 50px;
-    font-weight: bold;
-    font-size: 13px;
-
-    .label {
-        font-size: 9px;
-        opacity: 0.8;
-        margin-right: 6px;
-    }
-}
-
-.info-row {
-    margin-top: 6px;
-
-    .info-label {
+dl {
+    margin: 6px 0 0 0;
+    
+    dt {
         color: $label-gray;
         font-size: 11px;
         display: inline;
         margin-right: 8px;
+        font-weight: normal;
     }
 
-    .info-value {
+    dd {
         font-size: 11px;
         font-weight: bold;
         color: $value-gray;
         display: inline;
+        margin: 0;
     }
 }
 
-.separator {
+hr {
     border: none;
     border-top: 1px solid $separator-gray;
     margin: 10px 0 0 0;
-}
-
-.empty-message {
-    text-align: center;
-    color: $text-gray;
-    font-size: 14px;
-    margin-top: 40px;
 }
