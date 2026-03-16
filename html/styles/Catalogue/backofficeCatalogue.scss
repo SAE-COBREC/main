@@ -2,9 +2,9 @@
 
 #formCatalogue {
   .table-wrapper {
-    border: 1px solid #eadfce;
+    border: 1px solid $catalogue-color-border;
     border-radius: 12px;
-    background: #fff;
+    background: $primary-color-blanc;
   }
 
   .products-table {
@@ -12,25 +12,25 @@
     border-spacing: 0;
 
     thead {
-      background: #fff9f4;
+      background: $catalogue-color-header-bg;
     }
 
     &__head-cell {
       padding: 14px 12px;
       font-size: 15px;
       font-weight: 700;
-      color: #3a2e21;
-      border-bottom: 1px solid #eadfce;
+      color: $catalogue-color-title;
+      border-bottom: 1px solid $catalogue-color-border;
     }
 
     &__cell {
       padding: 12px;
       font-size: 15px;
-      border-bottom: 1px solid #f4ede3;
+      border-bottom: 1px solid $catalogue-color-row-border;
 
       &[colspan="6"] {
         text-align: center;
-        color: #7a6a59;
+        color: $catalogue-color-empty-text;
         padding: 24px 12px;
       }
     }
@@ -43,11 +43,11 @@
       }
 
       &:hover {
-        background: #fff7ef;
+        background: $catalogue-color-row-hover;
       }
 
       &.selected {
-        background: #ffeedf;
+        background: $catalogue-color-row-selected;
       }
     }
 
@@ -66,7 +66,7 @@
     }
 
     .col-desc {
-      color: #5a4b3b;
+      color: $catalogue-color-desc;
     }
   }
 
@@ -106,7 +106,7 @@
         width: 54px;
         height: 54px;
         border-radius: 10px;
-        border: 1px solid #ebdfcf;
+        border: 1px solid $catalogue-color-image-border;
       }
     }
 
@@ -118,7 +118,7 @@
 
     &__model {
       font-size: 14px;
-      color: #6b5c4c;
+      color: $catalogue-color-model;
       font-weight: 600;
     }
   }
@@ -127,7 +127,7 @@
     width: 20px;
     height: 20px;
     border: 2px solid $secondary-color-orange-clair;
-    border-radius: 100%;
+    border-radius: 0;
     margin: 0 auto;
 
     &--active {
