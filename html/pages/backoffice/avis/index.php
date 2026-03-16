@@ -5,7 +5,8 @@ require_once '../../fonctions.php';
 
 // Vérification authentification vendeur
 if (empty($_SESSION['vendeur_id'])) {
-    header('Location: /pages/backoffice/connexionVendeur/index.php');
+    $url = '/pages/backoffice/connexionVendeur/index.php';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 
@@ -229,60 +230,82 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Alizon - Gestion des Avis</title>
-  <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-  <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
-  <link rel="stylesheet" href="/styles/AvisVendeur/avisVendeur.css" />
-  <script src="../../../js/accessibility.js"></script>
-  <style>
-    /* ⚠️ Visuel : cartes hors-stock légèrement grisées */
-    .avis-card.out-of-stock { background:#fafafa; color:#666; }
-    .avis-card.out-of-stock { filter:grayscale(10%); }
-    .avis-card.out-of-stock .product-name a { pointer-events:none; cursor:default; text-decoration:none; color:inherit; }
-    .out-of-stock-badge { font-size:0.9em; color:#e74c3c; margin-left:6px; font-weight:600; }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <?php include __DIR__ . '/../../../partials/aside.html'; ?>
-    
-    <main class="main">
-      <div class="header">
-        <h1 class="header__title">Avis Clients</h1>
-      </div>
 
-      <div class="content-section content-section--flat">
-        <?php if (empty($avisList)): ?>
-            <div class="avis-empty-state">
-                <p>Aucun avis trouvé pour vos produits pour le moment.</p>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alizon - Gestion des Avis</title>
+    <link rel="icon" type="image/png" href="../../../img/favicon.svg">
+    <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
+    <link rel="stylesheet" href="/styles/AvisVendeur/avisVendeur.css" />
+    <script src="../../../js/accessibility.js"></script>
+    <style>
+    /* ⚠️ Visuel : cartes hors-stock légèrement grisées */
+    .avis-card.out-of-stock {
+        background: #fafafa;
+        color: #666;
+    }
+
+    .avis-card.out-of-stock {
+        filter: grayscale(10%);
+    }
+
+    .avis-card.out-of-stock .product-name a {
+        pointer-events: none;
+        cursor: default;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .out-of-stock-badge {
+        font-size: 0.9em;
+        color: #e74c3c;
+        margin-left: 6px;
+        font-weight: 600;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <?php include __DIR__ . '/../../../partials/aside.html'; ?>
+
+        <main class="main">
+            <div class="header">
+                <h1 class="header__title">Avis Clients</h1>
             </div>
-        <?php else: ?>
-            <?php foreach ($avisList as $avis): ?>
+
+            <div class="content-section content-section--flat">
+                <?php if (empty($avisList)): ?>
+                <div class="avis-empty-state">
+                    <p>Aucun avis trouvé pour vos produits pour le moment.</p>
+                </div>
+                <?php else: ?>
+                <?php foreach ($avisList as $avis): ?>
                 <?php $estEnRupture = isset($avis['p_stock']) && $avis['p_stock'] <= 0; ?>
-                <div class="avis-card<?= $estEnRupture ? ' out-of-stock' : '' ?>" data-avis-id="<?= $avis['id_avis'] ?>">
+                <div class="avis-card<?= $estEnRupture ? ' out-of-stock' : '' ?>"
+                    data-avis-id="<?= $avis['id_avis'] ?>">
                     <div class="avis-header">
                         <div>
                             <div class="product-name">
                                 <?php if (!$estEnRupture): ?>
-                                    <a href="/pages/produit/index.php?id=<?= $avis['id_produit'] ?>" target="_blank">
-                                        <?= htmlspecialchars($avis['p_nom']) ?>
-                                        <span class="product-rating-inline">
-                                            (★ <?= $avis['produit_moyenne'] ?>/5 - <?= $avis['produit_nb_avis'] ?> avis)
-                                        </span>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="product-name-strong"><?= htmlspecialchars($avis['p_nom']) ?></span>
-                                    <span class="out-of-stock-badge">Rupture de stock</span>
-                                    <span class="product-rating-inline product-rating-inline--spaced">
+                                <a href="/pages/produit/index.php?id=<?= $avis['id_produit'] ?>" target="_blank">
+                                    <?= htmlspecialchars($avis['p_nom']) ?>
+                                    <span class="product-rating-inline">
                                         (★ <?= $avis['produit_moyenne'] ?>/5 - <?= $avis['produit_nb_avis'] ?> avis)
                                     </span>
+                                </a>
+                                <?php else: ?>
+                                <span class="product-name-strong"><?= htmlspecialchars($avis['p_nom']) ?></span>
+                                <span class="out-of-stock-badge">Rupture de stock</span>
+                                <span class="product-rating-inline product-rating-inline--spaced">
+                                    (★ <?= $avis['produit_moyenne'] ?>/5 - <?= $avis['produit_nb_avis'] ?> avis)
+                                </span>
                                 <?php endif; ?>
                             </div>
                             <div class="avis-meta">
-                                Par <strong><?= htmlspecialchars($avis['c_pseudo'] ?? $avis['prenom'] . ' ' . $avis['nom'] ?? 'Anonyme') ?></strong> 
+                                Par
+                                <strong><?= htmlspecialchars($avis['c_pseudo'] ?? $avis['prenom'] . ' ' . $avis['nom'] ?? 'Anonyme') ?></strong>
                                 le <?= date('d/m/Y à H:i', strtotime($avis['a_timestamp_creation'])) ?>
                             </div>
                         </div>
@@ -301,220 +324,274 @@ $avisList = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </button>
                                 <div class="report-dropdown">
                                     <?php if ($avis['vendor_reported']): ?>
-                                        <button class="btn-unreport-action report-dropdown-btn" title="Annuler le signalement">Annuler le signalement</button>
+                                    <button class="btn-unreport-action report-dropdown-btn"
+                                        title="Annuler le signalement">Annuler le signalement</button>
                                     <?php else: ?>
-                                        <button class="btn-report-action report-dropdown-btn" title="Signaler l'avis">Signaler l'avis</button>
+                                    <button class="btn-report-action report-dropdown-btn"
+                                        title="Signaler l'avis">Signaler l'avis</button>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="avis-content">
-                        <?php if($avis['a_titre']): ?><strong class="avis-title"><?= htmlspecialchars($avis['a_titre']) ?></strong><?php endif; ?>
+                        <?php if($avis['a_titre']): ?><strong
+                            class="avis-title"><?= htmlspecialchars($avis['a_titre']) ?></strong><?php endif; ?>
                         <p class="avis-text"><?= nl2br(htmlspecialchars($avis['a_texte'])) ?></p>
                     </div>
 
                     <div class="avis-reponse-section">
                         <?php if (!empty($avis['reponse_texte'])): ?>
-                            <div class="avis-reponse" id="view-reponse-<?= $avis['id_reponse'] ?>">
-                                <div class="avis-reponse-header">
-                                    <div class="avis-reponse-date">
-                                        Répondu le <?= date('d/m/Y à H:i', strtotime($avis['reponse_date'])) ?>
-                                    </div>
-                                    <div class="avis-reponse-actions">
-                                        <button title="Modifier" onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='block';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='none';" class="btn-action btn-edit">Modifier</button>
-                                        <form method="POST" class="inline-form" onsubmit="return confirm('Supprimer votre réponse ?');">
-                                            <input type="hidden" name="action" value="supprimer">
-                                            <input type="hidden" name="id_reponse" value="<?= $avis['id_reponse'] ?>">
-                                            <butto title="Supprimer" type="submit" class="btn-action btn-delete">Supprimer</button>
-                                        </form>
-                                    </div>
+                        <div class="avis-reponse" id="view-reponse-<?= $avis['id_reponse'] ?>">
+                            <div class="avis-reponse-header">
+                                <div class="avis-reponse-date">
+                                    Répondu le <?= date('d/m/Y à H:i', strtotime($avis['reponse_date'])) ?>
                                 </div>
-                                <p class="response-text"><?= nl2br(htmlspecialchars($avis['reponse_texte'])) ?></p>
+                                <div class="avis-reponse-actions">
+                                    <button title="Modifier"
+                                        onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='block';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='none';"
+                                        class="btn-action btn-edit">Modifier</button>
+                                    <form method="POST" class="inline-form"
+                                        onsubmit="return confirm('Supprimer votre réponse ?');">
+                                        <input type="hidden" name="action" value="supprimer">
+                                        <input type="hidden" name="id_reponse" value="<?= $avis['id_reponse'] ?>">
+                                        <butto title="Supprimer" type="submit" class="btn-action btn-delete">
+                                            Supprimer</button>
+                                    </form>
+                                </div>
                             </div>
+                            <p class="response-text"><?= nl2br(htmlspecialchars($avis['reponse_texte'])) ?></p>
+                        </div>
 
-                            <form id="edit-reponse-<?= $avis['id_reponse'] ?>" title="Modifier la réponse" class="reponse-form reponse-form--edit is-hidden" method="POST">
-                                <input type="hidden" name="action" value="modifier">
-                                <input type="hidden" name="id_reponse" value="<?= $avis['id_reponse'] ?>">
-                                <label class="reponse-form-label reponse-form-label--edit">Modifier votre réponse :</label>
-                                <textarea name="reponse" required maxlength="255" oninput="updateCounter(this)" class="reponse-textarea reponse-textarea--edit"><?= htmlspecialchars($avis['reponse_texte']) ?></textarea>
-                                <div class="char-counter char-counter--warning"><?= strlen($avis['reponse_texte']) ?>/255</div>
-                                <div class="edit-actions">
-                                    <button type="submit" class="btn-submit btn-save" name="submit_edit">Enregistrer les modifications</button>
-                                    <button type="button" title="Annuler" class="btn-cancel" onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='none';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='block';">Annuler</button>
-                                </div>
-                            </form>
+                        <form id="edit-reponse-<?= $avis['id_reponse'] ?>" title="Modifier la réponse"
+                            class="reponse-form reponse-form--edit is-hidden" method="POST">
+                            <input type="hidden" name="action" value="modifier">
+                            <input type="hidden" name="id_reponse" value="<?= $avis['id_reponse'] ?>">
+                            <label class="reponse-form-label reponse-form-label--edit">Modifier votre réponse :</label>
+                            <textarea name="reponse" required maxlength="255" oninput="updateCounter(this)"
+                                class="reponse-textarea reponse-textarea--edit"><?= htmlspecialchars($avis['reponse_texte']) ?></textarea>
+                            <div class="char-counter char-counter--warning"><?= strlen($avis['reponse_texte']) ?>/255
+                            </div>
+                            <div class="edit-actions">
+                                <button type="submit" class="btn-submit btn-save" name="submit_edit">Enregistrer les
+                                    modifications</button>
+                                <button type="button" title="Annuler" class="btn-cancel"
+                                    onclick="document.getElementById('edit-reponse-<?= $avis['id_reponse'] ?>').style.display='none';document.getElementById('view-reponse-<?= $avis['id_reponse'] ?>').style.display='block';">Annuler</button>
+                            </div>
+                        </form>
                         <?php else: ?>
-                            <button title="Répondre à cet avis" onclick="this.nextElementSibling.style.display='block'; this.style.display='none'; this.nextElementSibling.querySelector('textarea').focus();" class="btn-submit btn-submit-reply">Répondre à cet avis</button>
-                            <form id="form-reponse-<?= $avis['id_avis'] ?>" class="reponse-form reponse-form--new is-hidden" method="POST">
-                                <input type="hidden" name="action" value="repondre">
-                                <input type="hidden" name="id_avis" value="<?= $avis['id_avis'] ?>">
-                                <label for="reponse_<?= $avis['id_avis'] ?>" class="reponse-form-label">Votre réponse :</label>
-                                <textarea name="reponse" id="reponse_<?= $avis['id_avis'] ?>" required maxlength="255" oninput="updateCounter(this)" placeholder="Écrivez votre réponse ici..." class="reponse-textarea"></textarea>
-                                <div class="char-counter">0/255</div>
-                                <div class="edit-actions">
-                                    <button title="Publier la réponse" type="submit" class="btn-submit btn-save">Publier la réponse</button>
-                                    <button title="Annuler la réponse" type="button" class="btn-cancel" onclick="this.closest('form').style.display='none';this.closest('form').previousElementSibling.style.display='inline-block';">Annuler</button>
-                                </div>
-                            </form>
+                        <button title="Répondre à cet avis"
+                            onclick="this.nextElementSibling.style.display='block'; this.style.display='none'; this.nextElementSibling.querySelector('textarea').focus();"
+                            class="btn-submit btn-submit-reply">Répondre à cet avis</button>
+                        <form id="form-reponse-<?= $avis['id_avis'] ?>" class="reponse-form reponse-form--new is-hidden"
+                            method="POST">
+                            <input type="hidden" name="action" value="repondre">
+                            <input type="hidden" name="id_avis" value="<?= $avis['id_avis'] ?>">
+                            <label for="reponse_<?= $avis['id_avis'] ?>" class="reponse-form-label">Votre réponse
+                                :</label>
+                            <textarea name="reponse" id="reponse_<?= $avis['id_avis'] ?>" required maxlength="255"
+                                oninput="updateCounter(this)" placeholder="Écrivez votre réponse ici..."
+                                class="reponse-textarea"></textarea>
+                            <div class="char-counter">0/255</div>
+                            <div class="edit-actions">
+                                <button title="Publier la réponse" type="submit" class="btn-submit btn-save">Publier la
+                                    réponse</button>
+                                <button title="Annuler la réponse" type="button" class="btn-cancel"
+                                    onclick="this.closest('form').style.display='none';this.closest('form').previousElementSibling.style.display='inline-block';">Annuler</button>
+                            </div>
+                        </form>
                         <?php endif; ?>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-      </div>
-    </main>
-  </div>
-  
-  <script src="/js/notifications.js"></script>
-  <?php include __DIR__ . '/../../../partials/toast.html'; ?>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </main>
+    </div>
 
-  <!-- Modal Signalement Avis (vendeur) -->
-  <div id="reportModalVendor" class="modal-overlay">
-      <div class="modal-dialog">
-          <h3>Signaler cet avis</h3>
-          <input type="hidden" id="reportAvisIdVendor" value="0">
-          <label class="modal-form-label">Motif</label>
-          <select id="reportMotifVendor" class="modal-form-select">
-              <option value="Contenu haineux">Contenu haineux</option>
-              <option value="Spam / Publicité">Spam / Publicité</option>
-              <option value="Inapproprié">Inapproprié</option>
-              <option value="Autre">Autre</option>
-          </select>
-          <label class="modal-form-label">Commentaire (optionnel)</label>
-          <textarea id="reportCommentaireVendor" rows="4" class="modal-form-textarea" placeholder="Décrivez si besoin..."></textarea>
-          <div class="modal-actions modal-actions--compact">
-              <button title="Annuler" class="btn-secondary" id="cancelReportVendor">Annuler</button>
-              <button title="Envoyer" class="btn-primary" id="confirmReportVendor">Envoyer</button>
-          </div>
-      </div>
-  </div>
+    <script src="/js/notifications.js"></script>
+    <?php include __DIR__ . '/../../../partials/toast.html'; ?>
 
-  <script src="/js/produit/utils.js"></script>
-  <script>
-  function updateCounter(textarea) {
-      const counter = textarea.parentElement.querySelector('.char-counter');
-      if (counter) {
-          counter.textContent = textarea.value.length + '/255';
-      }
-  }
+    <!-- Modal Signalement Avis (vendeur) -->
+    <div id="reportModalVendor" class="modal-overlay">
+        <div class="modal-dialog">
+            <h3>Signaler cet avis</h3>
+            <input type="hidden" id="reportAvisIdVendor" value="0">
+            <label class="modal-form-label">Motif</label>
+            <select id="reportMotifVendor" class="modal-form-select">
+                <option value="Contenu haineux">Contenu haineux</option>
+                <option value="Spam / Publicité">Spam / Publicité</option>
+                <option value="Inapproprié">Inapproprié</option>
+                <option value="Autre">Autre</option>
+            </select>
+            <label class="modal-form-label">Commentaire (optionnel)</label>
+            <textarea id="reportCommentaireVendor" rows="4" class="modal-form-textarea"
+                placeholder="Décrivez si besoin..."></textarea>
+            <div class="modal-actions modal-actions--compact">
+                <button title="Annuler" class="btn-secondary" id="cancelReportVendor">Annuler</button>
+                <button title="Envoyer" class="btn-primary" id="confirmReportVendor">Envoyer</button>
+            </div>
+        </div>
+    </div>
 
-  (function(){
-      const container = document.querySelector('.content-section');
-      if (!container) return;
-      const reportModal = document.getElementById('reportModalVendor');
-      const reportAvisIdInput = document.getElementById('reportAvisIdVendor');
-      const reportMotif = document.getElementById('reportMotifVendor');
-      const reportCommentaire = document.getElementById('reportCommentaireVendor');
-      const cancelReport = document.getElementById('cancelReportVendor');
-      const confirmReport = document.getElementById('confirmReportVendor');
+    <script src="/js/produit/utils.js"></script>
+    <script>
+    function updateCounter(textarea) {
+        const counter = textarea.parentElement.querySelector('.char-counter');
+        if (counter) {
+            counter.textContent = textarea.value.length + '/255';
+        }
+    }
 
-      // Toggle dropdown and handle clicks via delegation
-      container.addEventListener('click', (e) => {
-          const trigger = e.target.closest('.btn-report-trigger');
-          if (trigger) {
-              const card = trigger.closest('.avis-card');
-              const dropdown = card ? card.querySelector('.report-dropdown') : null;
-              document.querySelectorAll('.report-dropdown').forEach(d => { if (d !== dropdown) d.style.display = 'none'; });
-              if (dropdown) dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
-              e.stopPropagation();
-              return;
-          }
+    (function() {
+        const container = document.querySelector('.content-section');
+        if (!container) return;
+        const reportModal = document.getElementById('reportModalVendor');
+        const reportAvisIdInput = document.getElementById('reportAvisIdVendor');
+        const reportMotif = document.getElementById('reportMotifVendor');
+        const reportCommentaire = document.getElementById('reportCommentaireVendor');
+        const cancelReport = document.getElementById('cancelReportVendor');
+        const confirmReport = document.getElementById('confirmReportVendor');
 
-          if (e.target.closest('.btn-unreport-action')) {
-              const card = e.target.closest('.avis-card');
-              const aid = card ? card.getAttribute('data-avis-id') : null;
-              if (!aid) return;
-              const fd = new FormData();
-              fd.append('action','unreport_avis');
-              fd.append('id_avis', aid);
-              window.fetchJson('/pages/produit/actions_avis.php', { method: 'POST', body: fd })
-                  .then(d => {
-                      if (d.success) {
-                          notify(d.message || 'Signalement annulé.', 'success');
-                          const dropdown = card.querySelector('.report-dropdown');
-                          if (dropdown) dropdown.innerHTML = '<button title="Signaler l avis" class="btn-report-action report-dropdown-btn">Signaler l\'avis</button>';
-                      } else {
-                          const msg = d.message || 'Impossible d\'annuler le signalement';
-                          notify(msg, 'error');
-                      }
-                  })
-                  .catch(err => { console.error(err); notify('Erreur réseau', 'error'); })
-                  .finally(() => { document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none'); });
-              return;
-          }
+        // Toggle dropdown and handle clicks via delegation
+        container.addEventListener('click', (e) => {
+            const trigger = e.target.closest('.btn-report-trigger');
+            if (trigger) {
+                const card = trigger.closest('.avis-card');
+                const dropdown = card ? card.querySelector('.report-dropdown') : null;
+                document.querySelectorAll('.report-dropdown').forEach(d => {
+                    if (d !== dropdown) d.style.display = 'none';
+                });
+                if (dropdown) dropdown.style.display = (dropdown.style.display === 'block') ? 'none' :
+                    'block';
+                e.stopPropagation();
+                return;
+            }
 
-          if (e.target.closest('.btn-report-action')) {
-              const card = e.target.closest('.avis-card');
-              const aid = card ? card.getAttribute('data-avis-id') : null;
-              if (!aid) return;
-              if (!reportModal || !reportAvisIdInput || !reportMotif || !reportCommentaire) return;
-              reportAvisIdInput.value = aid;
-              reportMotif.selectedIndex = 0;
-              reportCommentaire.value = '';
-              // show modal
-              reportModal.style.display = 'flex';
-              setTimeout(() => reportModal.classList.add('modal-open'), 10);
-              document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
-              return;
-          }
+            if (e.target.closest('.btn-unreport-action')) {
+                const card = e.target.closest('.avis-card');
+                const aid = card ? card.getAttribute('data-avis-id') : null;
+                if (!aid) return;
+                const fd = new FormData();
+                fd.append('action', 'unreport_avis');
+                fd.append('id_avis', aid);
+                window.fetchJson('/pages/produit/actions_avis.php', {
+                        method: 'POST',
+                        body: fd
+                    })
+                    .then(d => {
+                        if (d.success) {
+                            notify(d.message || 'Signalement annulé.', 'success');
+                            const dropdown = card.querySelector('.report-dropdown');
+                            if (dropdown) dropdown.innerHTML =
+                                '<button title="Signaler l avis" class="btn-report-action report-dropdown-btn">Signaler l\'avis</button>';
+                        } else {
+                            const msg = d.message || 'Impossible d\'annuler le signalement';
+                            notify(msg, 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        notify('Erreur réseau', 'error');
+                    })
+                    .finally(() => {
+                        document.querySelectorAll('.report-dropdown').forEach(d => d.style.display =
+                            'none');
+                    });
+                return;
+            }
 
-          // click outside to close dropdowns
-          if (!e.target.closest('.report-dropdown')) {
-              document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
-          }
-      });
+            if (e.target.closest('.btn-report-action')) {
+                const card = e.target.closest('.avis-card');
+                const aid = card ? card.getAttribute('data-avis-id') : null;
+                if (!aid) return;
+                if (!reportModal || !reportAvisIdInput || !reportMotif || !reportCommentaire) return;
+                reportAvisIdInput.value = aid;
+                reportMotif.selectedIndex = 0;
+                reportCommentaire.value = '';
+                // show modal
+                reportModal.style.display = 'flex';
+                setTimeout(() => reportModal.classList.add('modal-open'), 10);
+                document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
+                return;
+            }
 
-      if (cancelReport) cancelReport.onclick = () => { reportModal.classList.remove('modal-open'); setTimeout(()=>reportModal.style.display='none',300); };
-      if (reportModal) reportModal.onclick = (ev) => { if (ev.target === reportModal) { reportModal.classList.remove('modal-open'); setTimeout(()=>reportModal.style.display='none',300); } };
+            // click outside to close dropdowns
+            if (!e.target.closest('.report-dropdown')) {
+                document.querySelectorAll('.report-dropdown').forEach(d => d.style.display = 'none');
+            }
+        });
 
-      if (confirmReport && !confirmReport.dataset.bound) {
-          confirmReport.dataset.bound = 'true';
-          confirmReport.onclick = () => {
-              if (!reportAvisIdInput || !reportMotif || !reportCommentaire || !reportModal) return;
-              const aid = reportAvisIdInput.value;
-              const motif = reportMotif.value;
-              const comm = reportCommentaire.value.trim();
-              if (!motif) return notify('Sélectionnez un motif', 'warning');
-              confirmReport.disabled = true;
-              const fd = new FormData();
-              fd.append('action', 'report_avis');
-              fd.append('id_avis', aid);
-              fd.append('motif', motif);
-              fd.append('commentaire', comm);
-              window.fetchJson('/pages/produit/actions_avis.php', { method: 'POST', body: fd })
-                  .then(d => {
-                      if (d.success) {
-                          notify(d.message || 'Signalement envoyé', 'success');
-                          // Update dropdown to show 'Annuler'
-                          try {
-                              const rev = document.querySelector('.avis-card[data-avis-id="' + aid + '"]');
-                              if (rev) {
-                                  const dropdown = rev.querySelector('.report-dropdown');
-                                  if (dropdown) dropdown.innerHTML = '<button title="Annuler" class="btn-unreport-action report-dropdown-btn">Annuler le signalement</button>';
-                              }
-                          } catch (e) { /* silent */ }
-                          reportModal.classList.remove('modal-open');
-                          setTimeout(()=>reportModal.style.display='none',300);
-                      } else {
-                          const msg = d.message || 'Impossible d\'envoyer le signalement';
-                          notify(msg, 'error');
-                      }
-                  })
-                  .catch(err => { console.error(err); notify('Erreur réseau', 'error'); })
-                  .finally(() => { confirmReport.disabled = false; });
-          };
-      }
-  })();
-  </script>
+        if (cancelReport) cancelReport.onclick = () => {
+            reportModal.classList.remove('modal-open');
+            setTimeout(() => reportModal.style.display = 'none', 300);
+        };
+        if (reportModal) reportModal.onclick = (ev) => {
+            if (ev.target === reportModal) {
+                reportModal.classList.remove('modal-open');
+                setTimeout(() => reportModal.style.display = 'none', 300);
+            }
+        };
 
-  <?php if ($notification): ?>
-  <script>
-      document.addEventListener('DOMContentLoaded', function() {
-          notify('<?= addslashes($notification['message']) ?>', '<?= $notification['type'] ?>');
-      });
-  </script>
-  <?php endif; ?>
+        if (confirmReport && !confirmReport.dataset.bound) {
+            confirmReport.dataset.bound = 'true';
+            confirmReport.onclick = () => {
+                if (!reportAvisIdInput || !reportMotif || !reportCommentaire || !reportModal) return;
+                const aid = reportAvisIdInput.value;
+                const motif = reportMotif.value;
+                const comm = reportCommentaire.value.trim();
+                if (!motif) return notify('Sélectionnez un motif', 'warning');
+                confirmReport.disabled = true;
+                const fd = new FormData();
+                fd.append('action', 'report_avis');
+                fd.append('id_avis', aid);
+                fd.append('motif', motif);
+                fd.append('commentaire', comm);
+                window.fetchJson('/pages/produit/actions_avis.php', {
+                        method: 'POST',
+                        body: fd
+                    })
+                    .then(d => {
+                        if (d.success) {
+                            notify(d.message || 'Signalement envoyé', 'success');
+                            // Update dropdown to show 'Annuler'
+                            try {
+                                const rev = document.querySelector('.avis-card[data-avis-id="' + aid +
+                                '"]');
+                                if (rev) {
+                                    const dropdown = rev.querySelector('.report-dropdown');
+                                    if (dropdown) dropdown.innerHTML =
+                                        '<button title="Annuler" class="btn-unreport-action report-dropdown-btn">Annuler le signalement</button>';
+                                }
+                            } catch (e) {
+                                /* silent */ }
+                            reportModal.classList.remove('modal-open');
+                            setTimeout(() => reportModal.style.display = 'none', 300);
+                        } else {
+                            const msg = d.message || 'Impossible d\'envoyer le signalement';
+                            notify(msg, 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        notify('Erreur réseau', 'error');
+                    })
+                    .finally(() => {
+                        confirmReport.disabled = false;
+                    });
+            };
+        }
+    })();
+    </script>
+
+    <?php if ($notification): ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        notify('<?= addslashes($notification['message']) ?>', '<?= $notification['type'] ?>');
+    });
+    </script>
+    <?php endif; ?>
 </body>
+
 </html>
