@@ -1,4 +1,4 @@
-<?php
+    <?php
 // ============================================
 // CONFIGURATION ET INITIALISATION
 // ============================================
@@ -118,7 +118,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                 <?php else: ?>
 
                 <!--formulaire du catalogue avec tableau des produits-->
-                <form method="post" id="formCatalogue" action="test.php" target="_blank">
+                <form method="post" id="formCatalogue" action="exportPDF.php" target="_blank">
                     <div class="table-wrapper">
                         <table class="products-table">
                             <thead>

@@ -55,6 +55,8 @@ if (empty($listeProduits)) {
                     <td class="product-image">';
         if (!empty($imgSrc)) {
             $html .= '<img src="' . htmlspecialchars($imgSrc) . '" alt="' . $nom . '">';
+        } else {
+            $html .= '<div class="image-placeholder">' . htmlspecialchars($nom) . '</div>';
         }
         $html .= '</td>
                     <td class="product-details">
