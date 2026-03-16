@@ -1,10 +1,8 @@
-    <?php
+<?php
+session_start();
 // ============================================
 // CONFIGURATION ET INITIALISATION
 // ============================================
-
-//démarre la session utilisateur
-session_start();
 
 //charge le fichier de connexion à la base de données
 require_once __DIR__ . '/../../../selectBDD.php';
@@ -21,7 +19,7 @@ $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 // ============================================
 
 //redirige vers la page de connexion si le vendeur n'est pas connecté
-if (empty($_SESSION['vendeur_id'])) {
+if (empty($_SESSION['vendeur_id']) === true) {
     $url = '/pages/backoffice/connexionVendeur/test.php';
     echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
@@ -167,332 +165,331 @@ usort($produitsFiltres, function ($produitA, $produitB) use ($triCatalogue) {
 //récupère le thème d'accessibilité actuel (daltonisme, etc.)
 $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 ?>
-    <!doctype html>
-    <html lang="fr" <?= ($themeActuel !== 'default') ? 'data-theme="' . htmlspecialchars($themeActuel) . '"' : '' ?>>
+<!doctype html>
+<html lang="fr" <?= ($themeActuel !== 'default') ? 'data-theme="' . htmlspecialchars($themeActuel) . '"' : '' ?>>
 
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=1440, height=1024" />
-        <title>Catalogue – <?= htmlspecialchars($informationsVendeur['denomination'] ?? '') ?></title>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1440, height=1024" />
+    <title>Catalogue – <?= htmlspecialchars($informationsVendeur['denomination'] ?? '') ?></title>
 
-        <!--charge l'icône du site-->
-        <link rel="icon" type="image/png" href="/img/favicon.svg">
+    <!--charge l'icône du site-->
+    <link rel="icon" type="image/png" href="/img/favicon.svg">
 
-        <!--charge les feuilles de style CSS-->
-        <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
-        <link rel="stylesheet" href="/styles/Catalogue/backofficeCatalogue.css" />
+    <!--charge les feuilles de style CSS-->
+    <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
+    <link rel="stylesheet" href="/styles/Catalogue/backofficeCatalogue.css" />
 
-        <!--charge le script d'accessibilité-->
-        <script src="/js/accessibility.js"></script>
-    </head>
+    <!--charge le script d'accessibilité-->
+    <script src="/js/accessibility.js"></script>
+</head>
 
-    <body>
-        <div class="app">
-            <?php
+<body>
+    <div class="app">
+        <?php
         //inclut la barre latérale de navigation
         include __DIR__ . '/../../../partials/aside.html';
         ?>
 
-            <!--conteneur principal de la page catalogue-->
-            <main class="main">
+        <!--conteneur principal de la page catalogue-->
+        <main class="main">
 
-                <!--en-tête de la page avec le titre-->
-                <div class="header">
-                    <h1 class="header__title">Catalogue de
-                        <?= htmlspecialchars($informationsVendeur['denomination'] ?? '') ?></h1>
-                </div>
+            <!--en-tête de la page avec le titre-->
+            <div class="header">
+                <h1 class="header__title">Catalogue de
+                    <?= htmlspecialchars($informationsVendeur['denomination'] ?? '') ?></h1>
+            </div>
 
-                <!--section du contenu principal-->
-                <div class="content-section">
-                    <!--affiche un message si aucun produit n'existe-->
-                    <?php if (empty($tousProduits)): ?>
-                    <p style="padding: 20px; color: #666;">Aucun produit pour le moment.</p>
-                    <?php else: ?>
+            <!--section du contenu principal-->
+            <div class="content-section">
+                <!--affiche un message si aucun produit n'existe-->
+                <?php if (empty($tousProduits)): ?>
+                <p style="padding: 20px; color: #666;">Aucun produit pour le moment.</p>
+                <?php else: ?>
 
-                    <!--formulaire du catalogue avec tableau des produits-->
-                    <form method="post" id="formCatalogue" action="/pages/backoffice/Catalogue/exportPDF.php"
-                        target="_blank">
-                        <div class="table-wrapper">
-                            <table class="products-table">
-                                <thead>
-                                    <tr>
-                                        <th class="products-table__head-cell col-check">
-                                            <button type="button" id="btn-clear-filters" class="filtre__item">
-                                                <img src="/img/svg/poubelle.svg" alt="Effacer les filtres" width="20"
-                                                    height="20">
-                                            </button>
-                                        </th>
-                                        <th class="products-table__head-cell col-produit">
-                                            <input type="search" id="filtre-search" name="search"
-                                                placeholder="Rechercher un produit..."
-                                                value="<?= htmlspecialchars($rechercheNom) ?>" class="filtre__item" />
-                                        </th>
-                                        <th class="products-table__head-cell col-statut">
-                                            <select id="filtre-statut" name="statut" class="filtre__item">
-                                                <option value="all" <?= $filtreStatut === 'all' ? 'selected' : '' ?>>
-                                                    Tous les
-                                                    statuts
-                                                </option>
-                                                <?php foreach ($statutsDisponibles as $statutCourant): ?>
-                                                <option value="<?= htmlspecialchars($statutCourant) ?>"
-                                                    <?= $filtreStatut === $statutCourant ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($statutCourant) ?>
-                                                </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </th>
-                                        <th class="products-table__head-cell col-stock">
-                                            <select id="filtre-tri" name="tri" class="filtre__item">
-                                                <option value="nom_asc"
-                                                    <?= $triCatalogue === 'nom_asc' ? 'selected' : '' ?>>A à Z
-                                                </option>
-                                                <option value="nom_desc"
-                                                    <?= $triCatalogue === 'nom_desc' ? 'selected' : '' ?>>Z à A
-                                                </option>
-                                                <option value="prix_asc"
-                                                    <?= $triCatalogue === 'prix_asc' ? 'selected' : '' ?>>Prix
-                                                    croissant</option>
-                                                <option value="prix_desc"
-                                                    <?= $triCatalogue === 'prix_desc' ? 'selected' : '' ?>>Prix
-                                                    décroissant</option>
-                                                <option value="stock_asc"
-                                                    <?= $triCatalogue === 'stock_asc' ? 'selected' : '' ?>>Stock
-                                                    croissant</option>
-                                                <option value="stock_desc"
-                                                    <?= $triCatalogue === 'stock_desc' ? 'selected' : '' ?>>Stock
-                                                    décroissant</option>
-                                            </select>
-                                        </th>
-                                        <th class="products-table__head-cell col-cate">
-                                            <select id="filtre-cat" name="cat" class="filtre__item">
-                                                <option value="all" <?= $filtreCategorie === 'all' ? 'selected' : '' ?>>
-                                                    Toutes les
-                                                    catégories</option>
-                                                <?php foreach ($categoriesDisponibles as $categorieCourante): ?>
-                                                <option value="<?= htmlspecialchars($categorieCourante) ?>"
-                                                    <?= $filtreCategorie === $categorieCourante ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($categorieCourante) ?>
-                                                </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </th>
-                                        <th class="products-table__head-cell col-desc">Origine</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!--boucle sur tous les produits du catalogue-->
-                                    <?php if (empty($produitsFiltres)): ?>
-                                    <tr>
-                                        <td class="products-table__cell" colspan="6">
-                                            Aucun produit ne correspond aux filtres.
-                                        </td>
-                                    </tr>
-                                    <?php else: ?>
-                                    <?php foreach ($produitsFiltres as $produitCourant):
+                <!--formulaire du catalogue avec tableau des produits-->
+                <form method="post" id="formCatalogue" action="/pages/backoffice/Catalogue/exportPDF.php"
+                    target="_blank">
+                    <div class="table-wrapper">
+                        <table class="products-table">
+                            <thead>
+                                <tr>
+                                    <th class="products-table__head-cell col-check">
+                                        <button type="button" id="btn-clear-filters" class="filtre__item">
+                                            <img src="/img/svg/poubelle.svg" alt="Effacer les filtres" width="20"
+                                                height="20">
+                                        </button>
+                                    </th>
+                                    <th class="products-table__head-cell col-produit">
+                                        <input type="search" id="filtre-search" name="search"
+                                            placeholder="Rechercher un produit..."
+                                            value="<?= htmlspecialchars($rechercheNom) ?>" class="filtre__item" />
+                                    </th>
+                                    <th class="products-table__head-cell col-statut">
+                                        <select id="filtre-statut" name="statut" class="filtre__item">
+                                            <option value="all" <?= $filtreStatut === 'all' ? 'selected' : '' ?>>
+                                                Tous les
+                                                statuts
+                                            </option>
+                                            <?php foreach ($statutsDisponibles as $statutCourant): ?>
+                                            <option value="<?= htmlspecialchars($statutCourant) ?>"
+                                                <?= $filtreStatut === $statutCourant ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($statutCourant) ?>
+                                            </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </th>
+                                    <th class="products-table__head-cell col-stock">
+                                        <select id="filtre-tri" name="tri" class="filtre__item">
+                                            <option value="nom_asc"
+                                                <?= $triCatalogue === 'nom_asc' ? 'selected' : '' ?>>A à Z
+                                            </option>
+                                            <option value="nom_desc"
+                                                <?= $triCatalogue === 'nom_desc' ? 'selected' : '' ?>>Z à A
+                                            </option>
+                                            <option value="prix_asc"
+                                                <?= $triCatalogue === 'prix_asc' ? 'selected' : '' ?>>Prix
+                                                croissant</option>
+                                            <option value="prix_desc"
+                                                <?= $triCatalogue === 'prix_desc' ? 'selected' : '' ?>>Prix
+                                                décroissant</option>
+                                            <option value="stock_asc"
+                                                <?= $triCatalogue === 'stock_asc' ? 'selected' : '' ?>>Stock
+                                                croissant</option>
+                                            <option value="stock_desc"
+                                                <?= $triCatalogue === 'stock_desc' ? 'selected' : '' ?>>Stock
+                                                décroissant</option>
+                                        </select>
+                                    </th>
+                                    <th class="products-table__head-cell col-cate">
+                                        <select id="filtre-cat" name="cat" class="filtre__item">
+                                            <option value="all" <?= $filtreCategorie === 'all' ? 'selected' : '' ?>>
+                                                Toutes les
+                                                catégories</option>
+                                            <?php foreach ($categoriesDisponibles as $categorieCourante): ?>
+                                            <option value="<?= htmlspecialchars($categorieCourante) ?>"
+                                                <?= $filtreCategorie === $categorieCourante ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($categorieCourante) ?>
+                                            </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </th>
+                                    <th class="products-table__head-cell col-desc">Origine</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--boucle sur tous les produits du catalogue-->
+                                <?php if (empty($produitsFiltres)): ?>
+                                <tr>
+                                    <td class="products-table__cell" colspan="6">
+                                        Aucun produit ne correspond aux filtres.
+                                    </td>
+                                </tr>
+                                <?php else: ?>
+                                <?php foreach ($produitsFiltres as $produitCourant):
                                     //construit l'URL de l'image du produit
                                     $urlImage = htmlspecialchars($produitCourant['image_url'] ?? '/img/default-product.jpg');
                                     //récupère l'origine du produit selon son statut
                                     $origineProduit = $produitCourant['p_origine'] ?? 'Inconnu';
                                 ?>
 
-                                    <!--ligne de produit dans le tableau-->
-                                    <tr class="products-table__row"
-                                        data-id="<?= (int) $produitCourant['id_produit'] ?>">
+                                <!--ligne de produit dans le tableau-->
+                                <tr class="products-table__row" data-id="<?= (int) $produitCourant['id_produit'] ?>">
 
-                                        <!--case à cocher de sélection-->
-                                        <td class="products-table__cell col-check">
-                                            <div class="checkbox"></div>
-                                            <input type="checkbox" name="produits_selectionnes[]"
-                                                value="<?= (int) $produitCourant['id_produit'] ?>" style="display:none;"
-                                                class="hidden-checkbox">
-                                        </td>
+                                    <!--case à cocher de sélection-->
+                                    <td class="products-table__cell col-check">
+                                        <div class="checkbox"></div>
+                                        <input type="checkbox" name="produits_selectionnes[]"
+                                            value="<?= (int) $produitCourant['id_produit'] ?>" style="display:none;"
+                                            class="hidden-checkbox">
+                                    </td>
 
-                                        <!--informations du produit (image, nom, prix)-->
-                                        <td class="products-table__cell col-produit">
-                                            <div class="product">
-                                                <div class="product__image">
-                                                    <img src="<?= $urlImage ?>" width="60" height="60"
-                                                        alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>">
-                                                </div>
-                                                <div class="product__info">
-                                                    <h4 class="product__name">
-                                                        <?= htmlspecialchars($produitCourant['p_nom']) ?></h4>
-                                                    <p class="product__model">
-                                                        <?php echo number_format($produitCourant['p_prix'], 2, ',', ' '); ?>
-                                                        €</p>
-                                                </div>
+                                    <!--informations du produit (image, nom, prix)-->
+                                    <td class="products-table__cell col-produit">
+                                        <div class="product">
+                                            <div class="product__image">
+                                                <img src="<?= $urlImage ?>" width="60" height="60"
+                                                    alt="<?= htmlspecialchars($produitCourant['p_nom']) ?>">
                                             </div>
-                                        </td>
+                                            <div class="product__info">
+                                                <h4 class="product__name">
+                                                    <?= htmlspecialchars($produitCourant['p_nom']) ?></h4>
+                                                <p class="product__model">
+                                                    <?php echo number_format($produitCourant['p_prix'], 2, ',', ' '); ?>
+                                                    €</p>
+                                            </div>
+                                        </div>
+                                    </td>
 
-                                        <!--badge de statut du produit-->
-                                        <td class="products-table__cell col-statut">
-                                            <?php if (($produitCourant['_statut_affichage'] ?? '') === 'Épuisé'): ?>
-                                            <span class="badge badge--out">Épuisé</span>
-                                            <?php elseif (($produitCourant['_statut_affichage'] ?? '') === 'En ligne'): ?>
-                                            <span class="badge badge--live">En ligne</span>
-                                            <?php elseif (($produitCourant['_statut_affichage'] ?? '') === 'Ébauche'): ?>
-                                            <span class="badge badge--eb">Ébauche</span>
-                                            <?php else: ?>
-                                            <span class="badge badge--hors">Hors ligne</span>
-                                            <?php endif; ?>
-                                        </td>
+                                    <!--badge de statut du produit-->
+                                    <td class="products-table__cell col-statut">
+                                        <?php if (($produitCourant['_statut_affichage'] ?? '') === 'Épuisé'): ?>
+                                        <span class="badge badge--out">Épuisé</span>
+                                        <?php elseif (($produitCourant['_statut_affichage'] ?? '') === 'En ligne'): ?>
+                                        <span class="badge badge--live">En ligne</span>
+                                        <?php elseif (($produitCourant['_statut_affichage'] ?? '') === 'Ébauche'): ?>
+                                        <span class="badge badge--eb">Ébauche</span>
+                                        <?php else: ?>
+                                        <span class="badge badge--hors">Hors ligne</span>
+                                        <?php endif; ?>
+                                    </td>
 
-                                        <!--stock du produit-->
-                                        <td class="products-table__cell col-stock">
-                                            <?= (int) $produitCourant['p_stock'] ?>
-                                        </td>
+                                    <!--stock du produit-->
+                                    <td class="products-table__cell col-stock">
+                                        <?= (int) $produitCourant['p_stock'] ?>
+                                    </td>
 
-                                        <!--catégorie du produit-->
-                                        <td class="products-table__cell col-cate">
-                                            <?= htmlspecialchars($produitCourant['categories'] ?? 'Aucune') ?>
-                                        </td>
+                                    <!--catégorie du produit-->
+                                    <td class="products-table__cell col-cate">
+                                        <?= htmlspecialchars($produitCourant['categories'] ?? 'Aucune') ?>
+                                    </td>
 
-                                        <!--origine du produit-->
-                                        <td class="products-table__cell col-desc">
-                                            <?= htmlspecialchars($origineProduit ?? 'Inconnu') ?>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <!--origine du produit-->
+                                    <td class="products-table__cell col-desc">
+                                        <?= htmlspecialchars($origineProduit ?? 'Inconnu') ?>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
 
-                        <!--bouton d'export PDF en bas du tableau-->
-                        <div class="page-actions">
-                            <button type="button" class="btn btn--secondary" id="btn-select-all">Tout
-                                sélectionner</button>
-                            <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf"
-                                style="margin-right: 20px;" disabled>
-                                Exporter en PDF
-                            </button>
-                        </div>
-                    </form>
-                    <?php endif; ?>
+                    <!--bouton d'export PDF en bas du tableau-->
+                    <div class="page-actions">
+                        <button type="button" class="btn btn--secondary" id="btn-select-all">Tout
+                            sélectionner</button>
+                        <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf"
+                            style="margin-right: 20px;" disabled>
+                            Exporter en PDF
+                        </button>
+                    </div>
+                </form>
+                <?php endif; ?>
 
-                </div>
-            </main>
-        </div>
+            </div>
+        </main>
+    </div>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            //sélectionne toutes les lignes du tableau
-            var lignes = document.querySelectorAll('.products-table__row');
-            //sélectionne le bouton d'export PDF
-            var boutonExportPdf = document.getElementById('btn-export-pdf');
-            //sélectionne le bouton tout sélectionner
-            var boutonSelectAll = document.getElementById('btn-select-all');
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        //sélectionne toutes les lignes du tableau
+        var lignes = document.querySelectorAll('.products-table__row');
+        //sélectionne le bouton d'export PDF
+        var boutonExportPdf = document.getElementById('btn-export-pdf');
+        //sélectionne le bouton tout sélectionner
+        var boutonSelectAll = document.getElementById('btn-select-all');
 
-            //met à jour l'état du bouton d'export selon la sélection
-            function mettreAJourBoutons() {
-                var lignesSelectionnees = document.querySelectorAll('.products-table__row.selected');
-                if (boutonExportPdf) {
-                    if (lignesSelectionnees.length > 0) {
-                        boutonExportPdf.classList.remove('btn--disabled');
-                        boutonExportPdf.disabled = false;
-                    } else {
-                        boutonExportPdf.classList.add('btn--disabled');
-                        boutonExportPdf.disabled = true;
-                    }
-                }
-                if (boutonSelectAll) {
-                    if (lignesSelectionnees.length === lignes.length) {
-                        boutonSelectAll.textContent = 'Tout désélectionner';
-                    } else {
-                        boutonSelectAll.textContent = 'Tout sélectionner';
-                    }
+        //met à jour l'état du bouton d'export selon la sélection
+        function mettreAJourBoutons() {
+            var lignesSelectionnees = document.querySelectorAll('.products-table__row.selected');
+            if (boutonExportPdf) {
+                if (lignesSelectionnees.length > 0) {
+                    boutonExportPdf.classList.remove('btn--disabled');
+                    boutonExportPdf.disabled = false;
+                } else {
+                    boutonExportPdf.classList.add('btn--disabled');
+                    boutonExportPdf.disabled = true;
                 }
             }
+            if (boutonSelectAll) {
+                if (lignesSelectionnees.length === lignes.length) {
+                    boutonSelectAll.textContent = 'Tout désélectionner';
+                } else {
+                    boutonSelectAll.textContent = 'Tout sélectionner';
+                }
+            }
+        }
 
-            //ajoute un écouteur de clic sur chaque ligne pour la sélection
-            lignes.forEach(function(ligne) {
-                ligne.addEventListener('click', function() {
+        //ajoute un écouteur de clic sur chaque ligne pour la sélection
+        lignes.forEach(function(ligne) {
+            ligne.addEventListener('click', function() {
+                var caseACocherInput = ligne.querySelector('.hidden-checkbox');
+                var caseACocherDiv = ligne.querySelector('.checkbox');
+
+                //bascule la sélection de la ligne
+                ligne.classList.toggle('selected');
+                caseACocherDiv.classList.toggle('checkbox--active');
+                caseACocherInput.checked = !caseACocherInput.checked;
+
+                //met à jour l'état des boutons
+                mettreAJourBoutons();
+            });
+        });
+
+        //ajoute un écouteur de clic sur le bouton tout sélectionner
+        if (boutonSelectAll) {
+            boutonSelectAll.addEventListener('click', function() {
+                var allSelected = document.querySelectorAll('.products-table__row.selected')
+                    .length === lignes.length;
+                lignes.forEach(function(ligne) {
                     var caseACocherInput = ligne.querySelector('.hidden-checkbox');
                     var caseACocherDiv = ligne.querySelector('.checkbox');
-
-                    //bascule la sélection de la ligne
-                    ligne.classList.toggle('selected');
-                    caseACocherDiv.classList.toggle('checkbox--active');
-                    caseACocherInput.checked = !caseACocherInput.checked;
-
-                    //met à jour l'état des boutons
-                    mettreAJourBoutons();
-                });
-            });
-
-            //ajoute un écouteur de clic sur le bouton tout sélectionner
-            if (boutonSelectAll) {
-                boutonSelectAll.addEventListener('click', function() {
-                    var allSelected = document.querySelectorAll('.products-table__row.selected')
-                        .length === lignes.length;
-                    lignes.forEach(function(ligne) {
-                        var caseACocherInput = ligne.querySelector('.hidden-checkbox');
-                        var caseACocherDiv = ligne.querySelector('.checkbox');
-                        if (allSelected) {
-                            // désélectionner tout
-                            ligne.classList.remove('selected');
-                            caseACocherDiv.classList.remove('checkbox--active');
-                            caseACocherInput.checked = false;
-                        } else {
-                            // sélectionner tout
-                            ligne.classList.add('selected');
-                            caseACocherDiv.classList.add('checkbox--active');
-                            caseACocherInput.checked = true;
-                        }
-                    });
-                    mettreAJourBoutons();
-                });
-            }
-
-            var formulaireCatalogue = document.getElementById('formCatalogue');
-            if (formulaireCatalogue) {
-                formulaireCatalogue.addEventListener('submit', function(event) {
-                    var lignesSelectionnees = document.querySelectorAll(
-                        '.products-table__row.selected');
-                    if (lignesSelectionnees.length === 0) {
-                        event.preventDefault();
+                    if (allSelected) {
+                        // désélectionner tout
+                        ligne.classList.remove('selected');
+                        caseACocherDiv.classList.remove('checkbox--active');
+                        caseACocherInput.checked = false;
+                    } else {
+                        // sélectionner tout
+                        ligne.classList.add('selected');
+                        caseACocherDiv.classList.add('checkbox--active');
+                        caseACocherInput.checked = true;
                     }
                 });
-            }
-
-            // ---- synchronisation des filtres ----
-            function appliquerFiltres() {
-                var params = new URLSearchParams();
-                var search = document.getElementById('filtre-search');
-                var statut = document.getElementById('filtre-statut');
-                var tri = document.getElementById('filtre-tri');
-                var cat = document.getElementById('filtre-cat');
-                if (search && search.value.trim() !== '') params.set('search', search.value.trim());
-                if (statut && statut.value !== 'all') params.set('statut', statut.value);
-                if (tri && tri.value !== 'nom_asc') params.set('tri', tri.value);
-                if (cat && cat.value !== 'all') params.set('cat', cat.value);
-                window.location.href = window.location.pathname + (params.toString() ? '?' + params.toString() :
-                    '');
-            }
-
-            ['filtre-statut', 'filtre-tri', 'filtre-cat'].forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) el.addEventListener('change', appliquerFiltres);
+                mettreAJourBoutons();
             });
+        }
 
-            var boutonEffacerFiltres = document.getElementById('btn-clear-filters');
-            if (boutonEffacerFiltres) {
-                boutonEffacerFiltres.addEventListener('click', function() {
-                    window.location.href = window.location.pathname;
-                });
-            }
+        var formulaireCatalogue = document.getElementById('formCatalogue');
+        if (formulaireCatalogue) {
+            formulaireCatalogue.addEventListener('submit', function(event) {
+                var lignesSelectionnees = document.querySelectorAll(
+                    '.products-table__row.selected');
+                if (lignesSelectionnees.length === 0) {
+                    event.preventDefault();
+                }
+            });
+        }
 
-            var searchInput = document.getElementById('filtre-search');
-            if (searchInput) {
-                searchInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        appliquerFiltres();
-                    }
-                });
-            }
+        // ---- synchronisation des filtres ----
+        function appliquerFiltres() {
+            var params = new URLSearchParams();
+            var search = document.getElementById('filtre-search');
+            var statut = document.getElementById('filtre-statut');
+            var tri = document.getElementById('filtre-tri');
+            var cat = document.getElementById('filtre-cat');
+            if (search && search.value.trim() !== '') params.set('search', search.value.trim());
+            if (statut && statut.value !== 'all') params.set('statut', statut.value);
+            if (tri && tri.value !== 'nom_asc') params.set('tri', tri.value);
+            if (cat && cat.value !== 'all') params.set('cat', cat.value);
+            window.location.href = window.location.pathname + (params.toString() ? '?' + params.toString() :
+                '');
+        }
+
+        ['filtre-statut', 'filtre-tri', 'filtre-cat'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('change', appliquerFiltres);
         });
-        </script>
-    </body>
 
-    </html>
+        var boutonEffacerFiltres = document.getElementById('btn-clear-filters');
+        if (boutonEffacerFiltres) {
+            boutonEffacerFiltres.addEventListener('click', function() {
+                window.location.href = window.location.pathname;
+            });
+        }
+
+        var searchInput = document.getElementById('filtre-search');
+        if (searchInput) {
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    appliquerFiltres();
+                }
+            });
+        }
+    });
+    </script>
+</body>
+
+</html>
