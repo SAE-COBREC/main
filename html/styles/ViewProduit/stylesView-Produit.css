@@ -307,6 +307,18 @@ body {
   font-size: 13px;
 }
 
+#btnFav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#btnFav img {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
 input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
