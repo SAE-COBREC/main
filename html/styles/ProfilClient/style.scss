@@ -106,12 +106,6 @@
     }
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: $font-family-secondaire;
     background: $secondary-color-gris-clair;
@@ -119,10 +113,154 @@ body {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
     min-height: 100vh;
+    scroll-behavior: smooth;
 }
 
 main {
     padding: 2em;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+
+    .profile-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2.5rem;
+        align-items: start;
+
+        @media screen and (max-width: 1024px) {
+            grid-template-columns: 220px 1fr;
+            gap: 1.5rem;
+        }
+
+        @media screen and (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .profile-sidebar {
+        position: sticky;
+        top: 10em;
+        background: $primary-color-blanc;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid $secondary-color-gris-clair;
+
+        @media screen and (max-width: 768px) {
+            position: static;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            @media screen and (max-width: 768px) {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                scrollbar-width: none;
+
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .sidebar-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 12px 16px;
+        border: none;
+        background: transparent;
+        color: #666;
+        font-size: 1.1em;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+        text-decoration: none;
+
+        @media screen and (max-width: 768px) {
+            flex-direction: column;
+            padding: 10px;
+            font-size: 0.8em;
+            min-width: 90px;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            transition: transform 0.3s ease;
+        }
+
+        &:hover {
+            background: $secondary-color-bleu-clair;
+            color: $primary-color-bleu;
+        }
+
+        &.active {
+            background: $primary-color-bleu;
+            color: $primary-color-blanc;
+            box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
+
+            svg {
+                transform: scale(1.1);
+            }
+        }
+
+        &.logout {
+            margin-top: 1rem;
+            border-top: 1px solid $secondary-color-gris-clair;
+            border-radius: 0 0 12px 12px;
+            padding-top: 1.5rem;
+            color: $secondary-color-rouge;
+
+            &:hover {
+                background: $secondary-color-rouge-erreur;
+                color: $secondary-color-rouge;
+            }
+
+            @media screen and (max-width: 768px) {
+                margin-top: 0;
+                border-top: none;
+                padding-top: 10px;
+                border-radius: 12px;
+            }
+        }
+    }
+
+    .profile-content {
+        min-width: 0;
+    }
+
+    .profile-section {
+        display: block; // Always visible
+        animation: fadeIn 0.4s ease-out;
+        scroll-margin-top: 100px; // Offset for sticky sidebar/header
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
     section {
         background: $primary-color-blanc;

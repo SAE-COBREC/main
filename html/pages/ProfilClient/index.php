@@ -5,6 +5,29 @@ require_once(__DIR__."/../../vendor/autoload.php");
 use OTPHP\TOTP;
 use OTPHP\Factory;
 
+// Polyfill for mbstring if missing
+if (!function_exists('mb_convert_encoding')) {
+    function mb_convert_encoding($string, $to_encoding, $from_encoding = null) {
+        if (!function_exists('iconv')) return $string;
+        return iconv($from_encoding ?? 'UTF-8', $to_encoding . '//IGNORE', (string)$string);
+    }
+}
+if (!function_exists('mb_internal_encoding')) {
+    function mb_internal_encoding($encoding = null) {
+        return $encoding === null ? 'UTF-8' : true;
+    }
+}
+if (!function_exists('mb_detect_encoding')) {
+    function mb_detect_encoding($str, $encoding_list = null, $strict = false) {
+        return 'UTF-8';
+    }
+}
+if (!function_exists('mb_detect_order')) {
+    function mb_detect_order($encoding_list = null) {
+        return ['UTF-8', 'ISO-8859-1'];
+    }
+}
+
 //inclure le fichier de configuration pour la connexion à la base de données
 include '../../selectBDD.php';
 
@@ -300,472 +323,579 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     include __DIR__ . '/../../partials/header.php';
     ?>
 
-    <main>
-        <div>
-            <button class="back-button" onclick="window.location.href='/index.php';">
-                ← Retour
-            </button>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('.profile-section');
+        const navLinks = document.querySelectorAll('a.sidebar-btn[href]');
 
-            <h1>Mon Profil</h1>
+        // Update active class on scroll
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
 
-            <!-- Section : Informations personnelles -->
-            <section>
-                <h2>Informations personnelles</h2>
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                if (current && href && href.includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
 
-                <article>
-                    <header>
-                        <div>
-                            <span>Profil</span>
-                            <strong>Vos informations</strong>
-                        </div>
-                        <span data-type="profil">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                        </span>
-                    </header>
+        // Smooth scroll for anchors
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const targetId = link.getAttribute('href');
+                if (!targetId) return;
 
-                    <main>
-                        <div class="profile-image-container">
-                            <?php if ($donneesImageProfilCompte !== null && $donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
-                            <img src="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien']); ?>"
-                                alt="<?php echo htmlspecialchars($donneesImageProfilCompte['i_alt'] ?? 'Photo de profil'); ?>"
-                                title="<?php echo htmlspecialchars($donneesImageProfilCompte['i_title'] ?? ''); ?>"
-                                class="profile-image" id="current-profile-image">
-                            <?php else: ?>
-                            <div class="profile-image-placeholder">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
+                e.preventDefault();
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+    </script>
+
+            <main>
+                <div class="profile-layout">
+            <aside class="profile-sidebar">
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="#personal-info" class="sidebar-btn active">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                     <circle cx="12" cy="7" r="4"></circle>
                                 </svg>
-                            </div>
-                            <p class="no-profile-image">Aucune photo de profil</p>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Formulaire de mise à jour du profil -->
-                        <form method="POST" id="profile-form">
-                            <div id="drop-zone">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="48" height="48"
-                                    style="margin-bottom: 10px;">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                                <p><strong>Glissez-déposez votre image ici</strong></p>
-                                <p style="font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner un fichier</p>
-                                <input type="file" id="file-input" accept="image/*" style="display: none;">
-                            </div>
-
-                            <div id="preview-zone"></div>
-                            <div id="upload-status" class="upload-status"></div>
-
-                            <input type="hidden" name="lien_image" id="lien_image"
-                                value="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien'] ?? ''); ?>">
-
-                            <div>
-                                <label>
-                                    <span>Nom</span>
-                                    <input type="text" name="nom" id="nom"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['nom'] ?? ''); ?>"
-                                        required>
-                                </label>
-                            </div>
-
-                            <div>
-                                <label>
-                                    <span>Prénom</span>
-                                    <input type="text" name="prenom" id="prenom"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['prenom'] ?? ''); ?>"
-                                        required>
-                                </label>
-                            </div>
-
-                            <div>
-                                <label>
-                                    <span>Pseudo</span>
-                                    <input type="text" name="pseudo"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['c_pseudo'] ?? ''); ?>"
-                                        required>
-                                </label>
-                            </div>
-
-                            <div>
-                                <label>
-                                    <span>Email</span>
-                                    <input type="email" name="email"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['email'] ?? ''); ?>"
-                                        required>
-                                </label>
-                            </div>
-
-                            <div>
-                                <label>
-                                    <span>Civilité</span>
-                                    <select name="civilite" required>
-                                        <option value="">-- Sélectionnez --</option>
-                                        <option value="M."
-                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'M.' ? 'selected' : ''; ?>>
-                                            M.</option>
-                                        <option value="Mme"
-                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Mme' ? 'selected' : ''; ?>>
-                                            Mme</option>
-                                        <option value="Inconnu"
-                                            <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Inconnu' ? 'selected' : ''; ?>>
-                                            Inconnu</option>
-                                    </select>
-                                </label>
-                            </div>
-
-
-                            <div>
-                                <label>
-                                    <span>Téléphone</span>
-                                    <input type="tel" name="telephone" inputmode="numeric"
-                                        pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10"
-                                        placeholder="ex: 0615482649" required
-                                        title="Le numéro de télephone doit contenir 10 chiffres"
-                                        oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
-                                        value="<?php echo htmlspecialchars($donneesInformationsClient['num_telephone'] ?? ''); ?>">
-                                </label>
-                            </div>
-
-                            <button type="submit" name="update_info">
+                                <span>Informations</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#addresses" class="sidebar-btn">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
-                                Enregistrer les modifications
-                            </button>
-                        </form>
-                    </main>
-                </article>
-            </section>
-
-            <!-- Section : Mes adresses -->
-            <section>
-                <div>
-                    <h2>Mes adresses</h2>
-                    <button type="button" onclick="ouvrirModalAjoutAdresse()">
-                        + Ajouter une adresse
-                    </button>
-                </div>
-
-                <?php if (empty($listeAdressesClient)): ?>
-                <p>Aucune adresse enregistrée</p>
-                <?php else: ?>
-                <?php foreach ($listeAdressesClient as $adresseIndividuelle): ?>
-                <article>
-                    <main>
-                        <div>
-                            <p>
-                                <strong><?php echo htmlspecialchars($adresseIndividuelle['a_numero']) ; ?><?php echo ' ' ;?><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
-                                <?php echo htmlspecialchars($adresseIndividuelle['a_code_postal']); ?>
-                                <?php echo htmlspecialchars($adresseIndividuelle['a_ville']); ?>
-                                <?php if (!empty($adresseIndividuelle['a_complement'])): ?>
-                                <br><em><?php echo htmlspecialchars($adresseIndividuelle['a_complement']); ?></em>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                    </main>
-
-                    <footer>
-                        <button type="button" onclick="ouvrirModalModificationAdresse(
-    <?php echo $adresseIndividuelle['id_adresse']; ?>, 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_numero'] ?? '', ENT_QUOTES); ?>', 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_pays'] ?? 'France', ENT_QUOTES); ?>', 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_code_postal'], ENT_QUOTES); ?>', 
-    '<?php echo htmlspecialchars($adresseIndividuelle['a_complement'], ENT_QUOTES); ?>'
-)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                            Modifier
-                        </button>
-
-                        <form method="post" style="display:inline;"
-                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">
-                            <input type="hidden" name="id_adresse"
-                                value="<?php echo $adresseIndividuelle['id_adresse']; ?>">
-                            <button type="submit" name="delete_address">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path
-                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                    </path>
-                                </svg>
-                                Supprimer
-                            </button>
-                        </form>
-                    </footer>
-                </article>
-                <?php endforeach; ?>
-                <?php endif; ?>
-            </section>
-
-            <!-- Section : Mes dernières commandes -->
-            <section>
-                <h2>Mes dernières commandes</h2>
-
-                <?php if (empty($listeCommandesRecentes)): ?>
-                <p>Aucune commande effectuée</p>
-                <?php else: ?>
-
-                <article>
-
-                    <header>
-                        <div>
-                            <span>Nombre de commandes : <?php echo count($listeCommandesRecentes); ?></span>
-                        </div>
-                    </header>
-                    <footer>
-                        <a href="/pages/ProfilClient/statsCommandes.php">
-                            <button type="button">
-                                <span class="btn-text-desktop">Mes statistiques de commandes</span>
-
-                                <span class="btn-text-mobile">Statistiques</span>
-
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
-                            </button>
-                        </a>
-                    </footer>
-                </article>
-                <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
-                <article>
-                    <header>
-                        <div>
-                            <span>Commande</span>
-                        </div>
-                        <span
-                            data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
-                            <?php echo htmlspecialchars($commandeIndividuelle['statut']); ?>
-                        </span>
-                    </header>
-
-                    <main>
-                        <div>
-                            <div>
+                                <span>Adresses</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#orders" class="sidebar-btn">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                                     <line x1="16" y1="2" x2="16" y2="6"></line>
                                     <line x1="8" y1="2" x2="8" y2="6"></line>
                                     <line x1="3" y1="10" x2="21" y2="10"></line>
                                 </svg>
-                                <span><?php echo date('d/m/Y', strtotime($commandeIndividuelle['timestamp_commande'])); ?></span>
-                            </div>
-                            <div>
-                                <em><?php echo number_format(calcul_f_total_ttc($connexionBaseDeDonnees, $commandeIndividuelle['id_panier']), 2, ',', ' '); ?>
-                                    €</em>
-                            </div>
-                        </div>
-                    </main>
-
-                    <footer>
-                        <a
-                            href="../suiviCommande/index.php?id_commande=<?php echo $commandeIndividuelle['id_panier']; ?>">
-                            <button type="button">
-                                <!-- Texte pour ordinateur -->
-                                <span class="btn-text-desktop">Voir les détails de la commande</span>
-                                <!-- Texte court pour mobile -->
-                                <span class="btn-text-mobile">Détails</span>
-
+                                <span>Commandes</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#security" class="sidebar-btn">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                 </svg>
-                            </button>
-                        </a>
-
-
-                        <a href="../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>"
-                            target="_blank" rel="noopener noreferrer">
-                            <button type="button">
-                                <!-- Texte pour ordinateur -->
-                                <span class="btn-text-desktop">Télécharger la facture</span>
-                                <!-- Texte court pour mobile -->
-                                <span class="btn-text-mobile">Facture</span>
-
+                                <span>Sécurité</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#preferences" class="sidebar-btn">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                    <path d="M12 2v4"></path>
+                                    <path d="M12 18v4"></path>
+                                    <path d="m4.93 4.93 2.83 2.83"></path>
+                                    <path d="m16.24 16.24 2.83 2.83"></path>
+                                    <path d="M2 12h4"></path>
+                                    <path d="M18 12h4"></path>
+                                    <path d="m4.93 19.07 2.83-2.83"></path>
+                                    <path d="m16.24 7.76 2.83-2.83"></path>
                                 </svg>
-                            </button>
-                        </a>
-                    </footer>
-                </article>
-                <?php endforeach; ?>
-                <?php endif; ?>
-            </section>
+                                <span>Préférences</span>
+                            </a>
+                        </li>
+                        <li>
+                            <form method="get" class="logout-form-sidebar">
+                                <button type="submit" name="action" value="logout" class="sidebar-btn logout">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>Déconnexion</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
 
-            <!-- Section Sécurité -->
-            <section>
-                <h2>Sécurité</h2>
-                <article>
-                    <header>
-                        <div>
-                            <span>Mot de passe</span>
-                            <strong>Modifier votre mot de passe</strong>
-                        </div>
-                        <span data-type="securite">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
-                        </span>
-                    </header>
-                    <main>
-                        <!-- Formulaire de changement de mot de passe -->
-                        <form method="POST">
-                            <div>
-                                <label>
-                                    <span>Mot de passe actuel</span>
-                                    <input type="password" name="actuel_password" required>
-                                </label>
-                            </div>
-                            <div>
-                                <label>
-                                    <span>Nouveau mot de passe</span>
-                                    <input type="password" name="nouveau_password"
-                                        pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$"
-                                        title="Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère parmi : . ! @ # $ % ^ & *"
-                                        required>
-                                </label>
-                            </div>
-                            <div>
-                                <label>
-                                    <span>Confirmer le mot de passe</span>
-                                    <input type="password" name="confirm_password"
-                                        pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$"
-                                        title="Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère parmi : . ! @ # $ % ^ & *"
-                                        required>
-                                </label>
-                            </div>
-                            <div class="mdpOTP" style='display: <?php
-                            if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
-                                <label>
-                                    <span>Code A2F</span>
-                                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}"
-                                        placeholder="123 456" name="code_OTP" />
-                                </label>
-                            </div>
-                            <button type="submit" name="change_password"
-                                onclick="return confirm('Confirmer le changement de mot de passe ?')" <?php 
-                                // if (empty($_SESSION['OTP']['statut'])){ 
-                                //     echo 'onclick="return confirm(Confirmer le changement de mot de passe ?)"';
-                                // }else{ 
-                                //     echo 'onclick="return confirm(Désactiver l'authentification à doubles facteurs et changer de mot de passe ?)"'; 
-                                // } ?>>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                    <polyline points="7 3 7 8 15 8"></polyline>
-                                </svg>
-                                Changer le mot de passe
-                            </button>
-                        </form>
-                    </main>
-                </article>
-                <article>
-                    <header>
-                        <div>
-                            <span>Mot de passe</span>
-                            <strong>Authentification à doubles facteurs</strong>
-                        </div>
-                        <span data-type="securite">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
-                        </span>
-                    </header>
-                    <main>
-                        <button type="button" id="activerOTP" onclick="ouvrirModalOTP()">
-                            <span class="btn-text-desktop">Activer l'authentification à doubles facteurs</span>
-                            <span class="btn-text-mobile">Activer l'A2F</span>
-                        </button>
-                        <button type="button" id="desactiverOTP" onclick="ouvrirModalDesactivationOTP()">
-                            <span class="btn-text-desktop">Désactiver l'authentification à doubles facteurs</span>
-                            <span class="btn-text-mobile">Désactiver l'A2F</span>
-                        </button>
-                        <?php 
-                        if (!empty($_SESSION['OTP']['statut'])){?>
-                        <script>
-                        document.getElementById("activerOTP").disabled = true;
-                        document.getElementById("desactiverOTP").disabled = false;
-                        </script><?php
-                        }else{?>
-                        <script>
-                        document.getElementById("activerOTP").disabled = false;
-                        document.getElementById("desactiverOTP").disabled = true;
-                        </script>
-                        <?php } ?>
-                    </main>
-                </article>
-            </section>
-
-            <section class="animation-settings-section">
-                <h2>Préférences</h2>
-                <article>
-                    <header>
-                        <div>
-                            <span>Affichage</span>
-                            <strong>Animations du site</strong>
-                        </div>
-                        <span data-type="securite">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 2v4"></path>
-                                <path d="M12 18v4"></path>
-                                <path d="m4.93 4.93 2.83 2.83"></path>
-                                <path d="m16.24 16.24 2.83 2.83"></path>
-                                <path d="M2 12h4"></path>
-                                <path d="M18 12h4"></path>
-                                <path d="m4.93 19.07 2.83-2.83"></path>
-                                <path d="m16.24 7.76 2.83-2.83"></path>
-                            </svg>
-                        </span>
-                    </header>
-                    <main>
-                        <label class="animation-toggle-row" for="animation-toggle-checkbox">
-                            <span>Activer les animations sur les pages</span>
-                            <input type="checkbox" id="animation-toggle-checkbox" checked>
-                        </label>
-                        <p id="animation-toggle-status">Animations activées</p>
-                    </main>
-                </article>
-                <div class="daltonien-switcher">
-                    <label for="colorblind-mode">Mode daltonien :</label>
-                    <select id="colorblind-mode" class="filtre__item">
-                        <option value="default" <?= $current_theme === 'default' ? 'selected' : '' ?>>Désactivé</option>
-                        <option value="dalto-red-green" <?= $current_theme === 'dalto-red-green' ? 'selected' : '' ?>>
-                            Rouge/Vert (Protan/Deutan)</option>
-                        <option value="dalto-blue-yellow"
-                            <?= $current_theme === 'dalto-blue-yellow' ? 'selected' : '' ?>>Bleu/Jaune (Tritan)</option>
-                    </select>
-                </div>
-            </section>
-
-            <!-- Formulaire de déconnexion -->
-            <form method="get" class="logout-form">
-                <button type="submit" name="action" value="logout">
-                    Déconnexion
+            <div class="profile-content">
+                <button class="back-button" onclick="window.location.href='/index.php';">
+                    ← Retour
                 </button>
-            </form>
 
-            <form method="post" action="delete_account.php" class="del-form" id="delete-account-form">
-                <input type="hidden" name="delete_password" id="delete_password_field" value="">
-                <button type="button" onclick="ouvrirModalSuppressionCompte()">
-                    Supprimer mon compte
-                </button>
-            </form>
+                <h1>Mon Profil</h1>
 
+                <!-- Section : Informations personnelles -->
+                <section id="personal-info" class="profile-section active">
+                    <h2>Informations personnelles</h2>
+
+                    <article>
+                        <header>
+                            <div>
+                                <span>Profil</span>
+                                <strong>Vos informations</strong>
+                            </div>
+                            <span data-type="profil">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </span>
+                        </header>
+
+                        <main>
+                            <div class="profile-image-container">
+                                <?php if ($donneesImageProfilCompte !== null && $donneesImageProfilCompte['i_lien'] !== NULL && $donneesImageProfilCompte['i_lien'] !== ''): ?>
+                                <img src="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien']); ?>"
+                                    alt="<?php echo htmlspecialchars($donneesImageProfilCompte['i_alt'] ?? 'Photo de profil'); ?>"
+                                    title="<?php echo htmlspecialchars($donneesImageProfilCompte['i_title'] ?? ''); ?>"
+                                    class="profile-image" id="current-profile-image">
+                                <?php else: ?>
+                                <div class="profile-image-placeholder">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#7171A3">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <p class="no-profile-image">Aucune photo de profil</p>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Formulaire de mise à jour du profil -->
+                            <form method="POST" id="profile-form">
+                                <div id="drop-zone">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="48" height="48"
+                                        style="margin-bottom: 10px;">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    <p><strong>Glissez-déposez votre image ici</strong></p>
+                                    <p style="font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner un fichier</p>
+                                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                                </div>
+
+                                <div id="preview-zone"></div>
+                                <div id="upload-status" class="upload-status"></div>
+
+                                <input type="hidden" name="lien_image" id="lien_image"
+                                    value="<?php echo htmlspecialchars($donneesImageProfilCompte['i_lien'] ?? ''); ?>">
+
+                                <div>
+                                    <label>
+                                        <span>Nom</span>
+                                        <input type="text" name="nom" id="nom"
+                                            value="<?php echo htmlspecialchars($donneesInformationsClient['nom'] ?? ''); ?>"
+                                            required>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label>
+                                        <span>Prénom</span>
+                                        <input type="text" name="prenom" id="prenom"
+                                            value="<?php echo htmlspecialchars($donneesInformationsClient['prenom'] ?? ''); ?>"
+                                            required>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label>
+                                        <span>Pseudo</span>
+                                        <input type="text" name="pseudo"
+                                            value="<?php echo htmlspecialchars($donneesInformationsClient['c_pseudo'] ?? ''); ?>"
+                                            required>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label>
+                                        <span>Email</span>
+                                        <input type="email" name="email"
+                                            value="<?php echo htmlspecialchars($donneesInformationsClient['email'] ?? ''); ?>"
+                                            required>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label>
+                                        <span>Civilité</span>
+                                        <select name="civilite" required>
+                                            <option value="">-- Sélectionnez --</option>
+                                            <option value="M."
+                                                <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'M.' ? 'selected' : ''; ?>>
+                                                M.</option>
+                                            <option value="Mme"
+                                                <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Mme' ? 'selected' : ''; ?>>
+                                                Mme</option>
+                                            <option value="Inconnu"
+                                                <?php echo ($donneesInformationsClient['civilite'] ?? '') === 'Inconnu' ? 'selected' : ''; ?>>
+                                                Inconnu</option>
+                                        </select>
+                                    </label>
+                                </div>
+
+
+                                <div>
+                                    <label>
+                                        <span>Téléphone</span>
+                                        <input type="tel" name="telephone" inputmode="numeric"
+                                            pattern="(0|\\+33|0033)[1-9][0-9]{8}" maxlength="10"
+                                            placeholder="ex: 0615482649" required
+                                            title="Le numéro de télephone doit contenir 10 chiffres"
+                                            oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+                                            value="<?php echo htmlspecialchars($donneesInformationsClient['num_telephone'] ?? ''); ?>">
+                                    </label>
+                                </div>
+
+                                <button type="submit" name="update_info">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                    </svg>
+                                    Enregistrer les modifications
+                                </button>
+                            </form>
+                        </main>
+                    </article>
+                </section>
+
+                <!-- Section : Mes adresses -->
+                <section id="addresses" class="profile-section">
+                    <h2>Mes adresses</h2>
+
+                    <?php if (empty($listeAdressesClient)): ?>
+                    <p>Aucune adresse enregistrée</p>
+                    <?php else: ?>
+                    <?php foreach ($listeAdressesClient as $adresseIndividuelle): ?>
+                    <article>
+                        <main>
+                            <div>
+                                <p>
+                                    <strong><?php echo htmlspecialchars($adresseIndividuelle['a_numero']) ; ?><?php echo ' ' ;?><?php echo htmlspecialchars($adresseIndividuelle['a_adresse']); ?></strong><br>
+                                    <?php echo htmlspecialchars($adresseIndividuelle['a_code_postal']); ?>
+                                    <?php echo htmlspecialchars($adresseIndividuelle['a_ville']); ?>
+                                    <?php if (!empty($adresseIndividuelle['a_complement'])): ?>
+                                    <br><em><?php echo htmlspecialchars($adresseIndividuelle['a_complement']); ?></em>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                        </main>
+
+                        <footer>
+                            <button type="button" onclick="ouvrirModalModificationAdresse(
+        <?php echo $adresseIndividuelle['id_adresse']; ?>, 
+        '<?php echo htmlspecialchars($adresseIndividuelle['a_numero'] ?? '', ENT_QUOTES); ?>', 
+        '<?php echo htmlspecialchars($adresseIndividuelle['a_adresse'], ENT_QUOTES); ?>', 
+        '<?php echo htmlspecialchars($adresseIndividuelle['a_pays'] ?? 'France', ENT_QUOTES); ?>', 
+        '<?php echo htmlspecialchars($adresseIndividuelle['a_ville'], ENT_QUOTES); ?>', 
+        '<?php echo htmlspecialchars($adresseIndividuelle['a_code_postal'], ENT_QUOTES); ?>', 
+        '<?php echo htmlspecialchars($adresseIndividuelle['a_complement'], ENT_QUOTES); ?>'
+    )">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Modifier
+                            </button>
+
+                            <form method="post" style="display:inline;"
+                                onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">
+                                <input type="hidden" name="id_adresse"
+                                    value="<?php echo $adresseIndividuelle['id_adresse']; ?>">
+                                <button type="submit" name="delete_address">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
+                                    Supprimer
+                                </button>
+                            </form>
+                        </footer>
+                    </article>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </section>
+
+                <!-- Section : Mes dernières commandes -->
+                <section id="orders" class="profile-section">
+                    <h2>Mes dernières commandes</h2>
+
+                    <?php if (empty($listeCommandesRecentes)): ?>
+                    <p>Aucune commande effectuée</p>
+                    <?php else: ?>
+
+                    <article>
+
+                        <header>
+                            <div>
+                                <span>Nombre de commandes : <?php echo count($listeCommandesRecentes); ?></span>
+                            </div>
+                        </header>
+                        <footer>
+                            <a href="/pages/ProfilClient/statsCommandes.php">
+                                <button type="button">
+                                    <span class="btn-text-desktop">Mes statistiques de commandes</span>
+
+                                    <span class="btn-text-mobile">Statistiques</span>
+
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                </button>
+                            </a>
+                        </footer>
+                    </article>
+                    <?php foreach ($listeCommandesRecentes as $commandeIndividuelle): ?>
+                    <article>
+                        <header>
+                            <div>
+                                <span>Commande</span>
+                            </div>
+                            <span
+                                data-statut="<?php echo strtolower(str_replace(' ', '-', $commandeIndividuelle['statut'])); ?>">
+                                <?php echo htmlspecialchars($commandeIndividuelle['statut']); ?>
+                            </span>
+                        </header>
+
+                        <main>
+                            <div>
+                                <div>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <span><?php echo date('d/m/Y', strtotime($commandeIndividuelle['timestamp_commande'])); ?></span>
+                                </div>
+                                <div>
+                                    <em><?php echo number_format(calcul_f_total_ttc($connexionBaseDeDonnees, $commandeIndividuelle['id_panier']), 2, ',', ' '); ?>
+                                        €</em>
+                                </div>
+                            </div>
+                        </main>
+
+                        <footer>
+                            <a
+                                href="../suiviCommande/index.php?id_commande=<?php echo $commandeIndividuelle['id_panier']; ?>">
+                                <button type="button">
+                                    <!-- Texte pour ordinateur -->
+                                    <span class="btn-text-desktop">Voir les détails de la commande</span>
+                                    <!-- Texte court pour mobile -->
+                                    <span class="btn-text-mobile">Détails</span>
+
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                </button>
+                            </a>
+
+
+                            <a href="../post-achat/profil.php?id=<?php echo $commandeIndividuelle['id_panier']; ?>"
+                                target="_blank" rel="noopener noreferrer">
+                                <button type="button">
+                                    <!-- Texte pour ordinateur -->
+                                    <span class="btn-text-desktop">Télécharger la facture</span>
+                                    <!-- Texte court pour mobile -->
+                                    <span class="btn-text-mobile">Facture</span>
+
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                </button>
+                            </a>
+                        </footer>
+                    </article>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </section>
+
+                <!-- Section Sécurité -->
+                <section id="security" class="profile-section">
+                    <h2>Sécurité</h2>
+                    <article>
+                        <header>
+                            <div>
+                                <span>Mot de passe</span>
+                                <strong>Modifier votre mot de passe</strong>
+                            </div>
+                            <span data-type="securite">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </span>
+                        </header>
+                        <main>
+                            <!-- Formulaire de changement de mot de passe -->
+                            <form method="POST">
+                                <div>
+                                    <label>
+                                        <span>Mot de passe actuel</span>
+                                        <input type="password" name="actuel_password" required>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label>
+                                        <span>Nouveau mot de passe</span>
+                                        <input type="password" name="nouveau_password"
+                                            pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$"
+                                            title="Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère parmi : . ! @ # $ % ^ & *"
+                                            required>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label>
+                                        <span>Confirmer le mot de passe</span>
+                                        <input type="password" name="confirm_password"
+                                            pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[A-Za-z0-9.!@#$%^&*]).{8,16}$"
+                                            title="Le mot de passe doit contenir entre 8 et 16 caractères, au moins une majuscule, une minuscule et un caractère parmi : . ! @ # $ % ^ & *"
+                                            required>
+                                    </label>
+                                </div>
+                                <div class="mdpOTP" style='display: <?php
+                                if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
+                                    <label>
+                                        <span>Code A2F</span>
+                                        <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}"
+                                            placeholder="123 456" name="code_OTP" />
+                                    </label>
+                                </div>
+                                <button type="submit" name="change_password"
+                                    onclick="return confirm('Confirmer le changement de mot de passe ?')" <?php 
+                                    // if (empty($_SESSION['OTP']['statut'])){ 
+                                    //     echo 'onclick="return confirm(Confirmer le changement de mot de passe ?)"';
+                                    // }else{ 
+                                    //     echo 'onclick="return confirm(Désactiver l'authentification à doubles facteurs et changer de mot de passe ?)"'; 
+                                    // } ?>>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                    </svg>
+                                    Changer le mot de passe
+                                </button>
+                            </form>
+                        </main>
+                    </article>
+                    <article>
+                        <header>
+                            <div>
+                                <span>Mot de passe</span>
+                                <strong>Authentification à doubles facteurs</strong>
+                            </div>
+                            <span data-type="securite">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </span>
+                        </header>
+                        <main>
+                            <button type="button" id="activerOTP" onclick="ouvrirModalOTP()">
+                                <span class="btn-text-desktop">Activer l'authentification à doubles facteurs</span>
+                                <span class="btn-text-mobile">Activer l'A2F</span>
+                            </button>
+                            <button type="button" id="desactiverOTP" onclick="ouvrirModalDesactivationOTP()">
+                                <span class="btn-text-desktop">Désactiver l'authentification à doubles facteurs</span>
+                                <span class="btn-text-mobile">Désactiver l'A2F</span>
+                            </button>
+                            <?php 
+                            if (!empty($_SESSION['OTP']['statut'])){?>
+                            <script>
+                            document.getElementById("activerOTP").disabled = true;
+                            document.getElementById("desactiverOTP").disabled = false;
+                            </script><?php
+                            }else{?>
+                            <script>
+                            document.getElementById("activerOTP").disabled = false;
+                            document.getElementById("desactiverOTP").disabled = true;
+                            </script>
+                            <?php } ?>
+                        </main>
+                    </article>
+                </section>
+
+                <section id="preferences" class="profile-section">
+                    <h2>Préférences</h2>
+                    <article>
+                        <header>
+                            <div>
+                                <span>Affichage</span>
+                                <strong>Animations du site</strong>
+                            </div>
+                            <span data-type="securite">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M12 2v4"></path>
+                                    <path d="M12 18v4"></path>
+                                    <path d="m4.93 4.93 2.83 2.83"></path>
+                                    <path d="m16.24 16.24 2.83 2.83"></path>
+                                    <path d="M2 12h4"></path>
+                                    <path d="M18 12h4"></path>
+                                    <path d="m4.93 19.07 2.83-2.83"></path>
+                                    <path d="m16.24 7.76 2.83-2.83"></path>
+                                </svg>
+                            </span>
+                        </header>
+                        <main>
+                            <label class="animation-toggle-row" for="animation-toggle-checkbox">
+                                <span>Activer les animations sur les pages</span>
+                                <input type="checkbox" id="animation-toggle-checkbox" checked>
+                            </label>
+                            <p id="animation-toggle-status">Animations activées</p>
+                        </main>
+                    </article>
+                    <div class="daltonien-switcher">
+                        <label for="colorblind-mode">Mode daltonien :</label>
+                        <select id="colorblind-mode" class="filtre__item">
+                            <option value="default" <?= $current_theme === 'default' ? 'selected' : '' ?>>Désactivé</option>
+                            <option value="dalto-red-green" <?= $current_theme === 'dalto-red-green' ? 'selected' : '' ?>>
+                                Rouge/Vert (Protan/Deutan)</option>
+                            <option value="dalto-blue-yellow"
+                                <?= $current_theme === 'dalto-blue-yellow' ? 'selected' : '' ?>>Bleu/Jaune (Tritan)</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Formulaire de suppression de compte -->
+                <form method="post" action="delete_account.php" class="del-form" id="delete-account-form">
+                    <input type="hidden" name="delete_password" id="delete_password_field" value="">
+                    <button type="button" onclick="ouvrirModalSuppressionCompte()">
+                        Supprimer mon compte
+                    </button>
+                </form>
+
+            </div>
         </div>
     </main>
 
@@ -1059,6 +1189,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
         initialiserInterrupteurAnimations();
     });
+
 
     function initialiserInterrupteurAnimations() {
         const caseAnimations = document.getElementById('animation-toggle-checkbox');
@@ -1486,6 +1617,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         }
     });
     </script>
+                </div>
+            </main>
     <script src="/js/notifications.js"></script>
 </body>
 
