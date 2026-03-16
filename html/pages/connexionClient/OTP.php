@@ -1,9 +1,17 @@
 <?php
-include '../../selectBDD.php';
-include '../../../selectBDD.php';
+try{
+    include '../../selectBDD.php';
+    require_once(__DIR__."/../../vendor/autoload.php");
+    require_once(__DIR__."/../../vendor/QRcodes/vendor/autoload.php");
+}catch(Exception $e){
+    try{
+        include '../../../selectBDD.php';
+        require_once(__DIR__."/../../../vendor/autoload.php");
+        require_once(__DIR__."/../../../vendor/QRcodes/vendor/autoload.php");
+    }catch(Exception $e2){}
+}
+
 $pdo->exec("SET search_path TO cobrec1");
-require_once(__DIR__."/../../vendor/autoload.php");
-require_once(__DIR__."/../../vendor/QRcodes/vendor/autoload.php");
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
