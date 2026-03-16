@@ -260,7 +260,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                     </form>
 
                     <!--formulaire du catalogue avec tableau des produits-->
-                    <form method="post" id="formCatalogue" action="exportPDF.php" target="_blank">
+                    <form method="post" id="formCatalogue" action="/pages/backoffice/Catalogue/exportPDF.php" target="_blank">
                         <div class="table-wrapper">
                             <table class="products-table">
                                 <thead>
