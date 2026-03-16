@@ -1,11 +1,9 @@
 <?php
 try{
-    include '../../selectBDD.php';
     require_once(__DIR__."/../../vendor/autoload.php");
     require_once(__DIR__."/../../vendor/QRcodes/vendor/autoload.php");
 }catch(Exception $e){
     try{
-        include '../../../selectBDD.php';
         require_once(__DIR__."/../../../vendor/autoload.php");
         require_once(__DIR__."/../../../vendor/QRcodes/vendor/autoload.php");
     }catch(Exception $e2){}
