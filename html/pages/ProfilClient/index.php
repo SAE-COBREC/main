@@ -795,7 +795,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 const xhttp = new XMLHttpRequest();
                 xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
                 xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                xhttp.send("code=" + code);
+                xhttp.send("code=" + code + '&send=0');
 
 
                 const xhttp2 = new XMLHttpRequest();
@@ -865,7 +865,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 const xhttp = new XMLHttpRequest();
                 xhttp.open("POST", "../../pages/ProfilClient/verif_code.php", true);
                 xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                xhttp.send("code=" + code);
+                xhttp.send("code=" + code + '&send=0');
 
 
                 const xhttp2 = new XMLHttpRequest();
