@@ -207,6 +207,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
                     <!--bouton d'export PDF en bas du tableau-->
                     <div class="page-actions">
+                        <button type="button" class="btn btn--secondary" id="btn-select-all">Tout sélectionner</button>
                         <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled
                             style="margin-right: 20px;">
                             Exporter en PDF
@@ -225,6 +226,8 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
         var lignes = document.querySelectorAll('.products-table__row');
         //sélectionne le bouton d'export PDF
         var boutonExportPdf = document.getElementById('btn-export-pdf');
+        //sélectionne le bouton tout sélectionner
+        var boutonSelectAll = document.getElementById('btn-select-all');
 
         //met à jour l'état du bouton d'export selon la sélection
         function mettreAJourBoutons() {
@@ -236,6 +239,13 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                 } else {
                     boutonExportPdf.classList.add('btn--disabled');
                     boutonExportPdf.disabled = true;
+                }
+            }
+            if (boutonSelectAll) {
+                if (lignesSelectionnees.length === lignes.length) {
+                    boutonSelectAll.textContent = 'Tout désélectionner';
+                } else {
+                    boutonSelectAll.textContent = 'Tout sélectionner';
                 }
             }
         }
@@ -255,6 +265,29 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                 mettreAJourBoutons();
             });
         });
+
+        //ajoute un écouteur de clic sur le bouton tout sélectionner
+        if (boutonSelectAll) {
+            boutonSelectAll.addEventListener('click', function() {
+                var allSelected = document.querySelectorAll('.products-table__row.selected').length === lignes.length;
+                lignes.forEach(function(ligne) {
+                    var caseACocherInput = ligne.querySelector('.hidden-checkbox');
+                    var caseACocherDiv = ligne.querySelector('.checkbox');
+                    if (allSelected) {
+                        // désélectionner tout
+                        ligne.classList.remove('selected');
+                        caseACocherDiv.classList.remove('checkbox--active');
+                        caseACocherInput.checked = false;
+                    } else {
+                        // sélectionner tout
+                        ligne.classList.add('selected');
+                        caseACocherDiv.classList.add('checkbox--active');
+                        caseACocherInput.checked = true;
+                    }
+                });
+                mettreAJourBoutons();
+            });
+        }
 
         var formulaireCatalogue = document.getElementById('formCatalogue');
         if (formulaireCatalogue) {

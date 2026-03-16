@@ -50,31 +50,33 @@ if (empty($listeProduits)) {
         }
 
         $html .= '<li>
-            <article>
-                <div class="product-image">';
+            <table class="product-row">
+                <tr>
+                    <td class="product-image">';
         if (!empty($imgSrc)) {
             $html .= '<img src="' . htmlspecialchars($imgSrc) . '" alt="' . $nom . '">';
         }
-        $html .= '</div>
-                <div class="product-details">
-                    <h3>' . $nom . '</h3>
-                    <p>' . $description . '</p>
-                    <div>
-                        <span class="price-badge">
-                            <span class="label">PRIX</span>
-                            ' . $prix . '€
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Origine:</span>
-                        <span class="info-value">' . $origine . '</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Catégorie:</span>
-                        <span class="info-value">' . $categories . '</span>
-                    </div>
-                </div>
-            </article>
+        $html .= '</td>
+                    <td class="product-details">
+                        <h3>' . $nom . '</h3>
+                        <p>' . $description . '</p>
+                        <div>
+                            <span class="price-badge">
+                                <span class="label">PRIX</span>
+                                ' . $prix . '€
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Origine:</span>
+                            <span class="info-value">' . $origine . '</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Catégorie:</span>
+                            <span class="info-value">' . $categories . '</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
             <hr class="separator">
         </li>';
     }
