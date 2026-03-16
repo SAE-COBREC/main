@@ -1,0 +1,156 @@
+#formCatalogue .table-wrapper {
+  border: 1px solid #eadfce;
+  border-radius: 12px;
+  background: #fff;
+}
+
+#formCatalogue .products-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#formCatalogue .products-table thead {
+  background: #fff9f4;
+}
+
+#formCatalogue .products-table__head-cell {
+  padding: 14px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #3a2e21;
+  border-bottom: 1px solid #eadfce;
+}
+
+#formCatalogue .products-table__cell {
+  padding: 12px;
+  font-size: 15px;
+  border-bottom: 1px solid #f4ede3;
+}
+
+#formCatalogue .products-table__row:last-child .products-table__cell {
+  border-bottom: 0;
+}
+
+#formCatalogue .products-table__cell[colspan="6"] {
+  text-align: center;
+  color: #7a6a59;
+  padding: 24px 12px;
+}
+
+#formCatalogue .products-table__row:hover {
+  background: #fff7ef;
+}
+
+#formCatalogue .products-table__row.selected {
+  background: #ffeedf;
+}
+
+#formCatalogue .products-table .col-check {
+  width: 64px;
+}
+
+#formCatalogue .products-table .col-produit {
+  width: 34%;
+}
+
+#formCatalogue .products-table .col-statut,
+#formCatalogue .products-table .col-stock,
+#formCatalogue .products-table .col-cate {
+  text-align: center;
+}
+
+#formCatalogue .products-table .col-desc {
+  color: #5a4b3b;
+}
+
+#formCatalogue .filtre__item {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #dac8b5;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #2f2418;
+}
+
+#formCatalogue .filtre__item:hover {
+  border-color: var(--primary-bronze);
+  background: #fffaf5;
+}
+
+#formCatalogue .filtre__item:focus {
+  outline: none;
+  border-color: var(--primary-bronze);
+  box-shadow: 0 0 0 3px rgba(205, 127, 50, 0.15);
+}
+
+#btn-clear-filters.filtre__item {
+  justify-content: center;
+  font-weight: 600;
+}
+
+#formCatalogue .product {
+  gap: 10px;
+}
+
+#formCatalogue .product__image img {
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  border: 1px solid #ebdfcf;
+}
+
+#formCatalogue .product__name {
+  margin-bottom: 2px;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+#formCatalogue .product__model {
+  font-size: 14px;
+  color: #6b5c4c;
+  font-weight: 600;
+}
+
+#formCatalogue .checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border-color: #cdb69f;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#formCatalogue .checkbox--active {
+  background-color: var(--primary-bronze);
+  border-color: var(--primary-bronze);
+}
+
+#formCatalogue .badge {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+}
+
+#formCatalogue .page-actions {
+  margin-top: 14px;
+  padding: 0;
+  gap: 10px;
+}
+
+#formCatalogue .btn {
+  min-height: 40px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+#formCatalogue .btn--primary {
+  box-shadow: 0 3px 10px rgba(205, 127, 50, 0.2);
+}
+
+#formCatalogue .btn--disabled {
+  opacity: 0.45;
+}
