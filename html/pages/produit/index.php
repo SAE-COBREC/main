@@ -325,13 +325,13 @@ if ($idClient && $idProduit) {
         <div class="product-row <?= $hasMultipleImages ? '' : 'no-thumbs' ?>">
             <!-- Vignettes -->
             <?php if ($hasMultipleImages): ?>
-                <aside class="thumbs" aria-label="Vignettes du produit">
-                    <?php foreach ($images as $idx => $imgUrl): ?>
-                        <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>"
-                            alt="Vignette <?= $idx + 1 ?>" loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>"
-                            role="button" tabindex="0" aria-label="Afficher l'image <?= $idx + 1 ?>" />
-                    <?php endforeach; ?>
-                </aside>
+            <aside class="thumbs" aria-label="Vignettes du produit">
+                <?php foreach ($images as $idx => $imgUrl): ?>
+                <img class="thumb <?= $idx === 0 ? 'is-active' : '' ?>" src="<?= htmlspecialchars($imgUrl) ?>"
+                    alt="Vignette <?= $idx + 1 ?>" loading="lazy" data-src="<?= htmlspecialchars($imgUrl) ?>"
+                    role="button" tabindex="0" aria-label="Afficher l'image <?= $idx + 1 ?>" />
+                <?php endforeach; ?>
+            </aside>
             <?php endif; ?>
 
             <!-- Image principale -->
@@ -354,7 +354,7 @@ if ($idClient && $idProduit) {
                             else
                                 $s = 'empty';
                             ?>
-                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                        <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                     </span>
                     <span id="summaryRatingValue" class="summary-rating-value"><?= number_format($note, 1) ?></span>
@@ -363,10 +363,10 @@ if ($idClient && $idProduit) {
                 <div class="price">
                     <?= number_format($prixFinal, 2, ',', ' ') ?> €
                     <?php if ($discount > 0): ?>
-                        <span
-                            class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?>
-                            €</span>
-                        <span class="discount-badge">-<?= round($discount) ?>%</span>
+                    <span
+                        class="old"><?= number_format(calcPrixTVA($produit['tva'], $produit['p_prix']), 2, ',', ' ') ?>
+                        €</span>
+                    <span class="discount-badge">-<?= round($discount) ?>%</span>
                     <?php endif; ?>
                 </div>
 
@@ -376,21 +376,23 @@ if ($idClient && $idProduit) {
                         <button type="button" class="ghost" onclick="updateQty(-1)"
                             aria-label="Réduire quantité">−</button>
                         <input type="number" id="qtyInput" min="1" step="1" max="<?= (int) $produit['p_stock'] ?>"
-                            value="<?= $estEnRupture ? 0 : 1 ?>" aria-label="Quantité" <?= $estEnRupture ? 'disabled' : '' ?> />
+                            value="<?= $estEnRupture ? 0 : 1 ?>" aria-label="Quantité"
+                            <?= $estEnRupture ? 'disabled' : '' ?> />
                         <button type="button" class="ghost" onclick="updateQty(1)" aria-label="Augmenter quantité"
                             <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
                     </div>
                     <button class="btn ghost <?= $estEnFavoris ? 'active' : '' ?>"
-                        onclick="ajoutSuppFavoris(<?= (int) $idProduit ?>)" id="btnFav">
-                        <?php if ($estEnFavoris) {
-                            echo 'Retirer des favoris';
-                        } else {
-                            echo 'Ajouter aux favoris';
-                        } ?></button>
+                        onclick="ajoutSuppFavoris(<?= (int) $idProduit ?>)" id="btnFav"
+                        aria-label="<?= $estEnFavoris ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>"
+                        title="<?= $estEnFavoris ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                        <img id="btnFavIcon"
+                            src="<?= $estEnFavoris ? '/img/png/coeur.png' : '/img/png/coeurVide.png' ?>"
+                            alt="<?= $estEnFavoris ? 'Favori actif' : 'Favori inactif' ?>" width="24" height="24">
+                    </button>
                 </div>
                 <div>
-                    <button class="btn add <?= $estEnRupture ? 'disabled' : '' ?>" <?= $estEnRupture ? 'disabled' : '' ?>
-                        onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
+                    <button class="btn add <?= $estEnRupture ? 'disabled' : '' ?>"
+                        <?= $estEnRupture ? 'disabled' : '' ?> onclick="ajouterAuPanier(<?= $produit['id_produit'] ?>)">
                         <?= $estEnRupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
                     </button>
                 </div>
@@ -407,7 +409,9 @@ if ($idClient && $idProduit) {
                 <div class="section features">
                     <h3>Caractéristiques</h3>
                     <ul>
-                        <li>Vendu par : <a href="/pages/vendeur/index.php?denomination=<?= urlencode($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? '') ?>" style="color:inherit;font-weight:600;"><?= htmlspecialchars($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? 'Alizon') ?></a>
+                        <li>Vendu par : <a
+                                href="/pages/vendeur/index.php?denomination=<?= urlencode($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? '') ?>"
+                                style="color:inherit;font-weight:600;"><?= htmlspecialchars($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? 'Alizon') ?></a>
                             <div class="smaller">(<a
                                     href="mailto:<?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?>"><?= htmlspecialchars($produit['vendeur_email'] ?? 'contact@alizon.com') ?></a>)
                             </div>
@@ -453,7 +457,7 @@ if ($idClient && $idProduit) {
                                 else
                                     $s = 'empty';
                                 ?>
-                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                             <?php endfor; ?>
                         </div>
                         <div id="reviewsRatingCount" class="reviews-rating-count">Basé sur <?= $nbAvis ?> avis</div>
@@ -463,14 +467,14 @@ if ($idClient && $idProduit) {
 
             <!-- Formulaire avis -->
             <?php if ($idClient && $clientAachete && !$dejaAvis): ?>
-                <div class="review new-review-card" id="newReviewCard">
-                    <div class="review-head">
-                        <div class="review-head-left">
-                            <div class="avatar">
-                                <?php if ($currentUserImage): ?>
-                                    <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" class="avatar-image">
-                                <?php else: ?>
-                                    <?php
+            <div class="review new-review-card" id="newReviewCard">
+                <div class="review-head">
+                    <div class="review-head-left">
+                        <div class="avatar">
+                            <?php if ($currentUserImage): ?>
+                            <img src="<?= htmlspecialchars($currentUserImage) ?>" alt="Avatar" class="avatar-image">
+                            <?php else: ?>
+                            <?php
                                     $initial = 'U';
                                     if ($currentUser) {
                                         if (!empty($currentUser['c_pseudo']))
@@ -479,47 +483,47 @@ if ($idClient && $idProduit) {
                                             $initial = substr($currentUser['prenom'], 0, 1);
                                     }
                                     ?>
-                                    <div class="avatar-initial"><?= strtoupper($initial) ?></div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="review-head-texts">
-                                <div class="review-author">Vous</div>
-                                <div class="review-subtitle">Laisser un avis</div>
-                            </div>
+                            <div class="avatar-initial"><?= strtoupper($initial) ?></div>
+                            <?php endif; ?>
                         </div>
-                        <div class="review-head-right">
-                            <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
-                                            src="/img/svg/star-empty.svg" alt=""></button>
-                                <?php endfor; ?>
-                            </div>
-                            <input type="hidden" id="inlineNote" name="note" value="0">
+                        <div class="review-head-texts">
+                            <div class="review-author">Vous</div>
+                            <div class="review-subtitle">Laisser un avis</div>
                         </div>
                     </div>
-                    <form id="inlineReviewForm" class="review-form">
-                        <input type="text" name="titre" id="inlineTitle" class="review-title-input"
-                            placeholder="Titre de votre avis" maxlength="255" required>
-                        <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
-                            placeholder="Partagez votre avis..." required></textarea>
-                        <div class="review-actions">
-                            <small class="review-hint">Merci de rester courtois.</small>
-                            <button type="button" class="btn" id="inlineSubmit">Publier</button>
+                    <div class="review-head-right">
+                        <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
+                            <?php endfor; ?>
                         </div>
-                    </form>
+                        <input type="hidden" id="inlineNote" name="note" value="0">
+                    </div>
                 </div>
+                <form id="inlineReviewForm" class="review-form">
+                    <input type="text" name="titre" id="inlineTitle" class="review-title-input"
+                        placeholder="Titre de votre avis" maxlength="255" required>
+                    <textarea name="commentaire" id="inlineComment" rows="3" class="review-textarea"
+                        placeholder="Partagez votre avis..." required></textarea>
+                    <div class="review-actions">
+                        <small class="review-hint">Merci de rester courtois.</small>
+                        <button type="button" class="btn" id="inlineSubmit">Publier</button>
+                    </div>
+                </form>
+            </div>
             <?php elseif ($idClient && $dejaAvis): ?>
-                <div class="review new-review-card new-review-card-muted">
-                    <div class="new-review-card-message">
-                        Vous avez déjà publié un avis sur ce produit.
-                    </div>
+            <div class="review new-review-card new-review-card-muted">
+                <div class="new-review-card-message">
+                    Vous avez déjà publié un avis sur ce produit.
                 </div>
+            </div>
             <?php else: ?>
-                <div class="review new-review-card new-review-card-muted">
-                    <div class="new-review-card-message">
-                        <?= !$idClient ? 'Connectez-vous pour laisser un avis.' : 'Vous devez avoir acheté ce produit pour laisser un avis.' ?>
-                    </div>
+            <div class="review new-review-card new-review-card-muted">
+                <div class="new-review-card-message">
+                    <?= !$idClient ? 'Connectez-vous pour laisser un avis.' : 'Vous devez avoir acheté ce produit pour laisser un avis.' ?>
                 </div>
+            </div>
             <?php endif; ?>
 
             <!-- Filtrer les avis (dropdown style YouTube) -->
@@ -549,11 +553,11 @@ if ($idClient && $idProduit) {
                         $isActive = ($tri === $k);
                         $href = $baseHref . '&tri=' . urlencode($k);
                         ?>
-                        <a class="filters-item <?= $isActive ? 'is-active' : '' ?>" role="menuitem"
-                            href="<?= htmlspecialchars($href) ?>">
-                            <span><?= htmlspecialchars($label) ?></span>
-                            <?php if ($isActive): ?><small>Actif</small><?php endif; ?>
-                        </a>
+                    <a class="filters-item <?= $isActive ? 'is-active' : '' ?>" role="menuitem"
+                        href="<?= htmlspecialchars($href) ?>">
+                        <span><?= htmlspecialchars($label) ?></span>
+                        <?php if ($isActive): ?><small>Actif</small><?php endif; ?>
+                    </a>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -574,8 +578,8 @@ if ($idClient && $idProduit) {
             <h3>Modifier votre avis</h3>
             <div class="star-input" id="editStarInput" title="Sélectionnez une note">
                 <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
-                            src="/img/svg/star-empty.svg" alt=""></button>
+                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                        src="/img/svg/star-empty.svg" alt=""></button>
                 <?php endfor; ?>
             </div>
             <input type="text" id="editReviewTitle" name="titre" class="review-title-input"
@@ -615,9 +619,9 @@ if ($idClient && $idProduit) {
 
     <script src="/js/notifications.js"></script>
     <script>
-        window.PRODUCT_ID = <?= (int) $idProduit ?>;
-        window.CURRENT_ID_CLIENT = <?= $idClient ?: 'null' ?>;
-        window.OWNER_TOKEN = <?= json_encode($ownerTokenServer) ?>;
+    window.PRODUCT_ID = <?= (int) $idProduit ?>;
+    window.CURRENT_ID_CLIENT = <?= $idClient ?: 'null' ?>;
+    window.OWNER_TOKEN = <?= json_encode($ownerTokenServer) ?>;
     </script>
     <script src="/js/produit/utils.js"></script>
     <script src="/js/produit/main.js"></script>
