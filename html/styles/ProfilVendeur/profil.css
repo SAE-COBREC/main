@@ -113,6 +113,10 @@ body {
   border: 3px solid var(--primary-bronze);
 }
 
+#modalDesactivationOTP, #modalOTP {
+  display: none;
+}
+
 .edit-form {
   margin-top: 10px;
   background: #FFF7F1;
@@ -147,34 +151,34 @@ body {
   flex: 0 0 200px !important;
   width: 200px !important;
 }
-.edit-form label {
-  font-size: 18px;
-  font-weight: 600;
-  color: #030212;
-}
-.edit-form input,
-.edit-form select {
-  padding: 12px 16px;
-  border-radius: 14px;
-  border: 1px solid #E5D5C5;
-  background: #FFFFFF;
-  font-size: 20px;
-  font-family: "Quicksand", sans-serif;
-  transition: all 0.2s;
-}
-.edit-form input:focus,
-.edit-form select:focus {
-  outline: none;
-  border-color: var(--primary-bronze);
-  box-shadow: 0 0 0 2px rgba(var(--primary-bronze), 0.2);
-}
 .edit-form button[type=submit] {
   margin-top: 10px;
   width: 50%;
   align-self: center;
 }
 
-.btn {
+#modalOTP img, #modalDesactivationOTP img {
+  display: flex;
+  align-self: center;
+}
+#modalOTP small, #modalDesactivationOTP small {
+  display: block;
+  width: 25%;
+  background-color: #EFEFEF;
+  overflow: auto;
+  padding-bottom: 1em;
+}
+#modalOTP form, #modalDesactivationOTP form {
+  margin-top: 0.5em;
+}
+
+label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #030212;
+}
+
+button {
   border: none;
   padding: 10px 20px;
   border-radius: 14px;
@@ -182,13 +186,34 @@ body {
   font-size: 22px;
   cursor: pointer;
 }
-.btn--primary {
+button .btn--primary {
   background: var(--primary-bronze);
   color: #FFFFFF;
   transition: background-color 0.3s;
 }
-.btn--primary:hover {
+button .btn--primary:hover {
   background: rgba(230, 169, 110, 0.9);
+}
+button:disabled {
+  background: #c0c0c0 !important;
+}
+
+input,
+select {
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid #E5D5C5;
+  background: #FFFFFF;
+  font-size: 20px;
+  font-family: "Quicksand", sans-serif;
+  transition: all 0.2s;
+  width: 100%;
+}
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-bronze);
+  box-shadow: 0 0 0 2px rgba(var(--primary-bronze), 0.2);
 }
 
 @keyframes fadeIn {

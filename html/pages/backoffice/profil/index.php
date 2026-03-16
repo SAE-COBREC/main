@@ -1,5 +1,8 @@
 <?php
 session_start();
+require_once(__DIR__."/../../../vendor/autoload.php");
+use OTPHP\TOTP;
+use OTPHP\Factory;
 include '../../../selectBDD.php'; 
 
 if(empty($_SESSION['vendeur_id']) === false){
@@ -133,6 +136,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($new !== $confirm) {
             header("Location: index.php?password_error=" . urlencode("Les nouveaux mots de passe ne correspondent pas."));
             exit;
+        }
+
+        if (!empty($_SESSION['OTPvendeur']['statut'])){
+            $otp_saisi = $_POST['code_OTP'] ?? '';
+            $stmt = $pdo->prepare("SELECT secret_otp, etat_otp FROM cobrec1._compte WHERE id_compte = :compte");
+            $stmt->execute([':compte' => $vendeur['compte']]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $otp = TOTP::createFromSecret($row['secret_otp']);
+            if (!(($row['etat_otp'] == 'true' && $otp->verify(str_replace(' ', '', $otp_saisi), null, 20)))){
+                header("Location: index.php?password_error=" . urlencode("Le code A2F est faux."));
+                exit;
+            }
         }
 
         // Mise à jour du mot de passe en clair
@@ -454,7 +469,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <title>Profil Vendeur - Alizon</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ProfilVendeur/profil.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /> -->
     <script src="../../../js/accessibility.js"></script>
 </head>
 
@@ -587,7 +602,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     </div>
 
                     <!-- ===== SECTION GPS ===== -->
-                    <div class="form-row" style="gap: 10px; display: flex; flex-wrap: wrap;">
+                    <!-- <div class="form-row" style="gap: 10px; display: flex; flex-wrap: wrap;">
                         <button type="button" id="btn-geocode" class="btn btn--secondary">
                             Valider les coordonnées GPS
                         </button>
@@ -601,13 +616,13 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             <div class="form-row form-row--small">
                                 <label>Latitude</label>
                                 <input type="number" step="any" id="latitude" name="latitude"
-                                    value="<?= htmlspecialchars($vendeur['latitude'] ?? '') ?>"
+                                    value="<?//= htmlspecialchars($vendeur['latitude'] ?? '') ?>"
                                     placeholder="ex : 47.218371">
                             </div>
                             <div class="form-row form-row--small">
                                 <label>Longitude</label>
                                 <input type="number" step="any" id="longitude" name="longitude"
-                                    value="<?= htmlspecialchars($vendeur['longitude'] ?? '') ?>"
+                                    value="<?//= htmlspecialchars($vendeur['longitude'] ?? '') ?>"
                                     placeholder="ex : -1.553621">
                             </div>
                         </div>
@@ -616,7 +631,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         <p style="font-size: 0.83em; color: #666; margin-top: 6px;">
                             Vous pouvez faire glisser le marqueur ou cliquer sur la carte pour ajuster la position.
                         </p>
-                    </div>
+                    </div> -->
 
                     <button title="Enregistrer" class="btn btn--primary" type="submit">Enregistrer</button>
                 </form>
@@ -664,6 +679,12 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         </span>
                     </div>
 
+                    <div class="form-row mdpOTP" style='display: <?php
+                            if (empty($_SESSION['OTPvendeur']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
+                        <label for="code_OTP">Code d'authentification à double facteurs</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code_OTP">
+                    </div>
+
 
 
                     <button title="Modifier mon mot de passe" class="btn btn--primary" type="submit"
@@ -671,6 +692,189 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
                 </form>
             </div>
+
+            <div class="profil-card">
+
+                <h2 class="profil-card__title">Authentification à double facteurs</h2>
+
+                <form id="form-OTP" method="POST" class="edit-form">
+                    <button type="button" id="activerOTP" class="btn btn--primary" onclick="ouvrirModalOTP()">
+                        <span class="btn-text-desktop">Activer l'authentification à doubles facteurs</span>
+                    </button>
+                    <button type="button" id="desactiverOTP" class="btn btn--primary" onclick="ouvrirModalDesactivationOTP()">
+                        <span class="btn-text-desktop">Désactiver l'authentification à doubles facteurs</span>
+                    </button>
+                    <?php 
+                    if (!empty($_SESSION['OTPvendeur']['statut'])){?>
+                        <script> 
+                        document.getElementById("activerOTP").disabled = true; 
+                        document.getElementById("desactiverOTP").disabled = false; 
+                        </script><?php
+                    }else{?>
+                        <script> 
+                        document.getElementById("activerOTP").disabled = false;
+                        document.getElementById("desactiverOTP").disabled = true;
+                        </script>
+                    <?php } ?>
+                </form>
+
+                <div id="modalOTP">
+        <div>
+            <h2 class="profil-card__title">Authentification à doubles facteurs</h2>
+            <?php
+                include_once '../../connexionClient/OTP.php';
+                $_SESSION['OTPvendeur']['secret'] = $otp->getSecret();
+                ?>
+            <form id="otpform">
+                <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
+                <label>Code secret :
+                    <small><?php echo $otp->getSecret() ?></small>
+                </label>
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <button type="submit">Valider</button>
+            </form>
+            <script>
+            document.getElementById('otpform').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const code = formData.get('code');
+
+                const xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "../../../pages/connexionClient/ajax_otp.php", true);
+                xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhttp.send("code=" + code + '&send=1');
+
+
+                const xhttp2 = new XMLHttpRequest();
+                xhttp2.open("GET", "../../../pages/connexionClient/ajax.txt", true);
+                xhttp2.send();
+                xhttp2.onreadystatechange = () => {
+                    if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+                        const contentLength = xhttp2.getResponseHeader("Content-Length");
+                        if (contentLength == 4) {
+                            xhttp2.abort();
+                            alert(
+                                "Authentification à doubles facteurs activée avec succès."
+                                );
+                            //document.location.href = "/index.php"; 
+                            document.getElementById('modalOTP').style.display = 'none';
+
+                            const xhttp3 = new XMLHttpRequest();
+                            xhttp3.open("POST", "../../../pages/connexionClient/statut_otp.php", true);
+                            xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xhttp3.send("statutOTP=active&send=1");
+                            succesOTP();
+                        } else {
+                            alert("Echec. Veuillez réessayer.");
+                        }
+                    }
+                };
+            });
+            </script>
+            <?php
+                //}
+            ?>
+            <form>
+                <button type="button" onclick="fermerModalOTP()">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalDesactivationOTP">
+        <div>
+            <h2 class="profil-card__title">Désactiver l'authentification à doubles facteurs</h2>
+            <form>
+                <label>
+                    <p>Code secret :</p>
+                </label>
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <button type="submit">Valider</button>
+            </form>
+            <script>
+                document.querySelector("#modalDesactivationOTP form").addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    const code = formData.get('code');
+
+                    const xhttp = new XMLHttpRequest();
+                    xhttp.open("POST", "../../../pages/ProfilClient/verif_code.php", true);
+                    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xhttp.send("code=" + code + '&send=1');
+
+
+                    const xhttp2 = new XMLHttpRequest();
+                    xhttp2.open("GET", "../../../pages/ProfilClient/verif_code.txt", true);
+                    xhttp2.send();
+                    xhttp2.onreadystatechange = () => {
+                        if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
+                            const contentLength = xhttp2.getResponseHeader("Content-Length");
+                            if (contentLength == 4) {
+                                xhttp2.abort();
+                                alert(
+                                    "Authentification à doubles facteurs désactivée avec succès."
+                                    );
+                                //document.location.href = "/index.php"; 
+                                document.getElementById('modalDesactivationOTP').style.display = 'none';
+
+                                const xhttp3 = new XMLHttpRequest();
+                                xhttp3.open("POST", "../../../pages/ProfilClient/statut_otp_desact.php", true);
+                                xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                                xhttp3.send("statutOTP=unactive");
+                                succesDesactOTP();
+                            } else {
+                                alert("Echec. Veuillez réessayer.");
+                            }
+                        }
+                    };
+                });
+                </script>
+                <form>
+                    <button type="button" onclick="fermerModalDesactivationOTP()">Annuler</button>
+                </form>
+            </div>
+            </div>
+
+            <script>
+                //fonction pour fermer le modal de la double authentification (OTP)
+                function fermerModalOTP() {
+                    //cache le modal OTP
+                    document.getElementById('modalOTP').style.display = 'none';
+                }
+
+                //fonction pour fermer le modal de désactivation de la double authentification (OTP)
+                function fermerModalDesactivationOTP() {
+                    //cache le modal OTP
+                    document.getElementById('modalDesactivationOTP').style.display = 'none';
+                }
+
+                function ouvrirModalOTP() {
+                    document.getElementById('modalOTP').style.display = 'block';
+                }
+
+                function ouvrirModalDesactivationOTP() {
+                    document.getElementById('modalDesactivationOTP').style.display = 'block';
+                }
+
+                function succesOTP() {
+                    document.getElementById('activerOTP').textContent = "Authentification à doubles facteurs activée avec succès.";
+                    document.getElementById('activerOTP').disabled = true;
+                    document.querySelector('.mdpOTP').style.display = 'block';
+
+                    document.getElementById('desactiverOTP').textContent = "Désactiver l'authentification à doubles facteurs ?";
+                    document.getElementById('desactiverOTP').disabled = false;        
+                }
+
+                function succesDesactOTP() {
+                    document.getElementById('desactiverOTP').textContent = "Authentification à doubles facteurs désactivée.";
+                    document.getElementById('desactiverOTP').disabled = true;
+                    document.querySelector('.mdpOTP').style.display = 'none';
+
+                    document.getElementById('activerOTP').textContent = "Activer l'authentification à doubles facteurs.";
+                    document.getElementById('activerOTP').disabled = false;
+                }
+            </script>
+
+
             <div class="daltonien-switcher">
                 <label for="colorblind-mode">Mode daltonien :</label>
                 <select id="colorblind-mode" class="filtre__item">
@@ -682,6 +886,42 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         </main>
     </div>
     <script>
+
+    document.querySelectorAll("input[placeholder='123 456']").forEach(champOTP => {
+        champOTP.addEventListener("input", function() {
+            let valeur = this.value;
+            valeur = valeur.replace(/\D/g, "");
+            valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
+            this.value = valeur;
+        });
+    });
+
+    function ouvrirModalOTP() {
+        document.getElementById('modalOTP').style.display = 'block';
+    }
+
+    function ouvrirModalDesactivationOTP() {
+        document.getElementById('modalDesactivationOTP').style.display = 'block';
+    }
+
+    function succesOTP() {
+        document.getElementById('activerOTP').textContent = "Authentification à doubles facteurs activée avec succès.";
+        document.getElementById('activerOTP').disabled = true;
+        document.querySelector('.mdpOTP').style.display = 'block';
+
+        document.getElementById('desactiverOTP').textContent = "Désactiver l'authentification à doubles facteurs ?";
+        document.getElementById('desactiverOTP').disabled = false;        
+    }
+
+    function succesDesactOTP() {
+        document.getElementById('desactiverOTP').textContent = "Authentification à doubles facteurs désactivée.";
+        document.getElementById('desactiverOTP').disabled = true;
+        document.querySelector('.mdpOTP').style.display = 'none';
+
+        document.getElementById('activerOTP').textContent = "Activer l'authentification à doubles facteurs.";
+        document.getElementById('activerOTP').disabled = false;
+    }
+
     // REGEX
     const regex = {
         nom: /^[a-zA-ZÀ-ÿ' -]{2,50}$/,
@@ -890,16 +1130,16 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <div id="custom-popup-success" class="popup-success"></div>
     <div id="custom-popup-error" class="popup-error"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
+    <!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> -->
+    <!-- <script>
     // ============================================================
     // GPS – Géocodage Nominatim (OpenStreetMap) + carte Leaflet
     // ============================================================
     let gpsMap = null;
     let gpsMarker = null;
 
-    const initLat = <?= !empty($vendeur['latitude'])  ? (float)$vendeur['latitude']  : 'null' ?>;
-    const initLon = <?= !empty($vendeur['longitude']) ? (float)$vendeur['longitude'] : 'null' ?>;
+    const initLat = <?//= !empty($vendeur['latitude'])  ? (float)$vendeur['latitude']  : 'null' ?>;
+    const initLon = <?//= !empty($vendeur['longitude']) ? (float)$vendeur['longitude'] : 'null' ?>;
 
     function updateCoordinates(lat, lon) {
         document.getElementById('latitude').value = parseFloat(lat).toFixed(6);
@@ -1090,7 +1330,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             this.textContent = 'Valider les coordonnées GPS';
         }
     });
-    </script>
+    </script> -->
 </body>
 
 </html>

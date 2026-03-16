@@ -19,8 +19,12 @@
             }else{
                 file_put_contents($logFile, "false");
             }
-            unset($_POST['code']);
-            unset($_SESSION['OTP']['statut']);
+            if ($_POST['send'] == 0){
+                unset($_SESSION['OTP']['statut']);
+            }else{
+                unset($_SESSION['OTPvendeur']['statut']);
+            }
+            unset($_POST);
         }
     } catch (Exception $e) {}
 ?>

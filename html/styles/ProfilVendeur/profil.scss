@@ -83,6 +83,10 @@ body {
   }
 }
 
+#modalDesactivationOTP, #modalOTP{
+  display: none;
+}
+
 .edit-form {
   margin-top: 10px;
   background: $secondary-color-rose-claire;
@@ -121,29 +125,6 @@ body {
     }
   }
 
-  label {
-    font-size: 18px;
-    font-weight: 600;
-    color: $primary-color-noir;
-  }
-
-  input,
-  select {
-    padding: 12px 16px;
-    border-radius: $border-radius-primary;
-    border: 1px solid $secondary-color-orange-clair;
-    background: $primary-color-blanc;
-    font-size: 20px;
-    font-family: $font-family-secondaire;
-    transition: all 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: $primary-color-bronze;
-      box-shadow: 0 0 0 2px rgba($primary-color-bronze, 0.2);
-    }
-  }
-
   button[type="submit"] {
     margin-top: 10px;
     width: 50%;
@@ -151,7 +132,30 @@ body {
   }
 }
 
-.btn {
+#modalOTP, #modalDesactivationOTP {
+  img{
+      display: flex;
+      align-self: center;
+  }
+  small{
+      display: block;
+      width:25%;
+      background-color: $secondary-color-gris-clair;
+      overflow: auto;
+      padding-bottom:1em;
+  }
+  form{
+      margin-top: 0.5em;
+  }
+}
+
+label {
+  font-size: 18px;
+  font-weight: 600;
+  color: $primary-color-noir;
+}
+
+button {
   border: none;
   padding: 10px 20px;
   border-radius: $border-radius-primary;
@@ -159,7 +163,7 @@ body {
   font-size: 22px;
   cursor: pointer;
 
-  &--primary {
+  .btn--primary {
     background: $primary-color-bronze;
     color: $primary-color-blanc;
     transition: background-color 0.3s;
@@ -168,7 +172,29 @@ body {
       background: rgba($secondary-color-bronze-clair, 0.9);
     }
   }
+
+   &:disabled{
+      background: $secondary-color-gris-fonce !important;
+    }
 }
+
+input,
+  select {
+    padding: 12px 16px;
+    border-radius: $border-radius-primary;
+    border: 1px solid $secondary-color-orange-clair;
+    background: $primary-color-blanc;
+    font-size: 20px;
+    font-family: $font-family-secondaire;
+    transition: all 0.2s;
+    width:100%;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color-bronze;
+      box-shadow: 0 0 0 2px rgba($primary-color-bronze, 0.2);
+    }
+  }
 
 @keyframes fadeIn {
   from {

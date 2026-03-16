@@ -14,7 +14,11 @@ if (!(empty($_POST['statutOTP']))){
             'idCompte' => $_SESSION['idCompte']
         ];
         $stmt->execute($params);
-        unset($_SESSION['OTP']['statut']);
+        if ($_POST['send'] == 0){
+            unset($_SESSION['OTP']['statut']);
+        }else{
+            unset($_SESSION['OTPvendeur']['statut']);
+        }
     } catch (Exception $e) {}
 }
 ?>
