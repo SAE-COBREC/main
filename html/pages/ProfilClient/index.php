@@ -301,6 +301,13 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     ?>
 
     <main>
+        <button class="back-button" onclick="window.location.href='/index.php';" style="margin-bottom: 2em; display: inline-flex; align-items: center; gap: 0.5em; background: none; border: none; color: #888; cursor: pointer; font-weight: 600;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Retour à l'accueil
+            </button>
         <h1>Mon Profil</h1>
 
         <nav class="profile-sidebar">
@@ -354,14 +361,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         </nav>
 
         <div class="profile-content">
-            <button class="back-button" onclick="window.location.href='/index.php';" style="margin-bottom: 2em; display: inline-flex; align-items: center; gap: 0.5em; background: none; border: none; color: #888; cursor: pointer; font-weight: 600;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                Retour à l'accueil
-            </button>
-
             <!-- Section : Informations personnelles -->
             <section id="general" class="active">
                 <h2>Informations personnelles</h2>
