@@ -178,7 +178,7 @@ main > section > div > footer span {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: #F0F4F8;
+  background: var(--secondary-promotion);
   border: 1px solid rgba(var(--primary-bleu), 0.15);
   border-radius: 30px;
   padding: 0.35rem 0.9rem;
