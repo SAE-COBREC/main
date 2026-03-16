@@ -200,7 +200,7 @@
         <?php if(isset($_SESSION['idClient'])):?>
         
         <!----------------------------------------------------------------------------------------------------->
-        <!-------------------                         FAVORIS              ------------------------------------>
+        <!-------------------                         FAVORIS                         ------------------------->
         <!----------------------------------------------------------------------------------------------------->
         <section class="lesFavoris">
             <h3>Mes favoris :</h3>
@@ -302,7 +302,7 @@
                                     </div>
                                     <div class="divBtnFav">
                                         <button class="btnFavIcon"
-                                            onclick="event.stopPropagation(); ajoutSuppFavoris(<?= (int) $produitCourant['id_produit'] ?>)" id="btnFav">
+                                            onclick="event.stopPropagation(); ajoutSuppFavoris(<?= (int) $produitCourant['id_produit'] ?>, this)" id="btnFav">
                                             <img id="imgFavIcon"
                                                 src="/img/png/coeur.png"
                                                 alt="Favori actif" >
@@ -389,26 +389,20 @@ formViderFavoris.addEventListener('submit', (event) => {
     });
 });
 
-function ajoutSuppFavoris(idProduit) {
+function ajoutSuppFavoris(idProduit, elem) {
     const btn = document.getElementById('btnFav'); //on regarde l'état du bouton
 
     fetch(`/pages/produit/action_favoris.php?idProduit=${idProduit}&page="panier"`) //envoie l'id du produit pour ajouter au favoris
         .then(reponse => reponse.json())
         .then(data => {
             if (data.succes) {
-                if (data.action === 'ajoute') { //si la réponse de php est ajouté 
-                    btn.classList.add('active');
-                    btn.setAttribute('aria-label', 'Retirer des favoris');
-                    btn.setAttribute('title', 'Retirer des favoris');
-                    notify("Ajouter aux favoris", 'success');//on notify le client
-                } else {
+                if (data.action === 'retirer') { //si la réponse de php est ajouté 
                     btn.classList.remove('active');
                     btn.setAttribute('aria-label', 'Ajouter aux favoris');
                     btn.setAttribute('title', 'Ajouter aux favoris');
                     notify("Retirer des favoris", 'info');   //on notify le client
-                    setTimeout(() => {
-                    location.reload();
-                }, 300);
+                    const article = elem.closest("article");
+                    article.remove();
                 }
             }
         })
