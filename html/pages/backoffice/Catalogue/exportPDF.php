@@ -30,7 +30,20 @@ $vendeurInfos = getVendeurInfoPDF($pdo, $vendeur_id);
 $nom_entreprise = $vendeurInfos['denomination'] ?? 'Entreprise inconnue';
 
 // Récupération des produits
-$listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $nom_entreprise);
+$listeIdProduit = $_POST['produits_selectionnes'] ?? [];
+$listeProduits = [];
+
+if (!empty($listeIdProduit)) {
+    foreach ($listeIdProduit as $idProduit) {
+        $produit = getProduitParId($connexionBaseDeDonnees, (int)$idProduit, (int)$vendeur_id);
+        if (!empty($produit)) {
+            $listeProduits[] = $produit;
+        }
+    }
+} else {
+    // Si aucun produit sélectionné, prendre tous les produits en ligne
+    $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $nom_entreprise);
+}
 
 // Chemin de base pour les images
 $basePath = realpath(__DIR__ . '/../../../');

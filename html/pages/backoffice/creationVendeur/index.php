@@ -522,13 +522,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mdpOtp">
                 <div>
                     <?php
-                        include_once '../../connexionClient/OTP.php';
+                        include_once '../../../pages/connexionClient/OTP.php';
                         $_SESSION['OTPvendeur']['secret'] = $otp->getSecret();
                     ?>
                     <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
                     <label>
                         <p>Code secret :</p>
-                        <small><?php echo $otp->getSecret() ?></small>
+                        <small><?php echo $_SESSION['OTPvendeur']['secret']; ?></small>
                     </label>
                     <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
                     <button type="submit" id="validationOTP">Valider</button>
@@ -550,7 +550,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     const xhttp = new XMLHttpRequest();
                     xhttp.open("POST", "../../../pages/connexionClient/ajax_otp.php", true);
                     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    xhttp.send("code=" + code);
+                    xhttp.send("code=" + code + '&send=1');
 
 
                     const xhttp2 = new XMLHttpRequest();
