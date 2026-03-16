@@ -25,7 +25,8 @@ $denominationVendeur = trim($_GET['denomination'] ?? '');
 
 //redirige vers l'accueil si aucune dénomination n'est fournie
 if ($denominationVendeur === '') {
-    header('Location: /');
+    $url = '/';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 
@@ -97,7 +98,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 ?>
 
 <!doctype html>
-<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -129,8 +131,9 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <!--conteneur principal de la page vendeur-->
     <main>
 
-<!doctype html>
-<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
+        <!doctype html>
+        <html lang="fr"
+            <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
         <!--lien de retour vers l'accueil-->
         <a href="/">
@@ -283,7 +286,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                         $s = 'empty';
                                     }
                                 ?>
-                                    <span class="star-icon medium <?= $s ?>"></span>
+                                <span class="star-icon medium <?= $s ?>"></span>
                                 <?php endfor; ?>
                             </span>
                             <span>(<?= $produitCourant['nombre_avis'] ?? 0 ?>)</span>
@@ -312,9 +315,9 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             <button <?= $estEnRupture ? 'disabled' : '' ?>
                                 onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
                                 <?php if ($estEnRupture): ?>
-                                    Indisponible
+                                Indisponible
                                 <?php else: ?>
-                                    <span class="icon-panier-dynamic"></span> Ajouter au panier
+                                <span class="icon-panier-dynamic"></span> Ajouter au panier
                                 <?php endif; ?>
                             </button>
                         </div>
