@@ -30,7 +30,9 @@
   --star-color: #009E73;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 

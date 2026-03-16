@@ -9,6 +9,8 @@ $idClient = $_SESSION['idClient'] ?? null; // récup l'id client
 
 $idProduit = $_GET['idProduit'] ?? null; //récup l'id produit
 
+$dernierePage = $_GET['page'] ?? null; //récup la page sur laquelle était le client
+
 if (!$idClient) {                                                      //si il n'y a pas d'id client
     echo json_encode(['succes' => false, 'error' => 'not_logged_in']); //renvoie une erreur not_logged_in
     exit;

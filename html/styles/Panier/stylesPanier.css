@@ -474,7 +474,7 @@ ul li {
 .lesFavoris h3 {
   padding-bottom: 1em;
 }
-.lesFavoris article > div:last-child > div:last-child > div {
+.lesFavoris article > div:last-child > div:last-child > div div {
   display: inline-flex;
   align-items: center;
   margin-bottom: 12px;
@@ -629,7 +629,7 @@ ul li {
   font-weight: bold;
   color: #030212;
 }
-.lesFavoris article button {
+.lesFavoris article button:last-child {
   margin-top: auto;
   width: 100%;
   padding: 0.75rem;
@@ -643,10 +643,10 @@ ul li {
   font-family: "Quicksand", sans-serif;
   transition: background 0.2s ease;
 }
-.lesFavoris article button:hover:not(:disabled) {
+.lesFavoris article button:last-child:hover:not(:disabled) {
   background: var(--primary-bleu);
 }
-.lesFavoris article button:disabled {
+.lesFavoris article button:last-child:disabled {
   background: #c0c0c0;
   cursor: not-allowed;
   color: #EFEFEF;

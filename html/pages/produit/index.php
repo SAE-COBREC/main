@@ -382,12 +382,10 @@ if ($idClient && $idProduit) {
                             <?= $estEnRupture ? 'disabled' : '' ?>>+</button>
                     </div>
                     <button class="btn ghost <?= $estEnFavoris ? 'active' : '' ?>"
-                        onclick="ajoutSuppFavoris(<?= (int) $idProduit ?>)" id="btnFav"
-                        aria-label="<?= $estEnFavoris ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>"
-                        title="<?= $estEnFavoris ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                        onclick="ajoutSuppFavoris(<?= (int) $idProduit ?>)" id="btnFav">
                         <img id="btnFavIcon"
                             src="<?= $estEnFavoris ? '/img/png/coeur.png' : '/img/png/coeurVide.png' ?>"
-                            alt="<?= $estEnFavoris ? 'Favori actif' : 'Favori inactif' ?>" width="24" height="24">
+                            alt="<?= $estEnFavoris ? 'Favori actif' : 'Favori inactif' ?>" >
                     </button>
                 </div>
                 <div>

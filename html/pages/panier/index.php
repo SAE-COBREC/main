@@ -198,6 +198,10 @@
         <?php endif;?>
 
         <?php if(isset($_SESSION['idClient'])):?>
+        
+        <!----------------------------------------------------------------------------------------------------->
+        <!-------------------                         FAVORIS              ------------------------------------>
+        <!----------------------------------------------------------------------------------------------------->
         <section class="lesFavoris">
             <h3>Mes favoris :</h3>
             <!--BASÉ SUR LE CODE DE LA PAGE /vendeur/index.php demandé à marceau ou gaetan pour cette partie-->
@@ -288,12 +292,22 @@
                             </div>
 
                             <div>
-                                <!--informations du vendeur (non cliquable sur cette page)-->
-                                <div class="vendeur-info" title="Voir la page de <?= htmlspecialchars($nomVendeur) ?>"
-                                    onclick="event.stopPropagation(); window.location.href='/pages/vendeur/index.php?denomination=<?= urlencode($nomVendeur) ?>';"
-                                    style="cursor:pointer;">
-                                    <img src="/img/svg/market.svg" alt="Vendeur">
-                                    <span><?= htmlspecialchars($nomVendeur) ?></span>
+                                <div class="vendeurEtFav">
+                                    <!--informations du vendeur (non cliquable sur cette page)-->
+                                    <div class="vendeur-info" title="Voir la page de <?= htmlspecialchars($nomVendeur) ?>"
+                                        onclick="event.stopPropagation(); window.location.href='/pages/vendeur/index.php?denomination=<?= urlencode($nomVendeur) ?>';"
+                                        style="cursor:pointer;">
+                                        <img src="/img/svg/market.svg" alt="Vendeur">
+                                        <span><?= htmlspecialchars($nomVendeur) ?></span>
+                                    </div>
+                                    <div class="divBtnFav">
+                                        <button class="btnFavIcon"
+                                            onclick="event.stopPropagation(); ajoutSuppFavoris(<?= (int) $produitCourant['id_produit'] ?>)" id="btnFav">
+                                            <img id="imgFavIcon"
+                                                src="/img/png/coeur.png"
+                                                alt="Favori actif" >
+                                        </button>
+                                    </div>
                                 </div>
                                 <!--bouton pour ajouter au panier-->
                                 <button class="btnAjouterPanier" <?= $estEnRupture ? 'disabled' : '' ?>
@@ -310,7 +324,7 @@
             </ul>
             <?php if($nbFavoris > 0) : ?>
                 <form id="formViderFavoris" method="POST" action="/pages/panier/viderFavoris.php" data-no-loader>
-                    <button type="submit" id="viderFavoris">Vider les favoris</button>
+                    <button type="submit" id="viderFavoris">Supprimer les favoris</button>
                 </form>
             <?php elseif ($nbFavoris == 0) : ?>
                 <div id="favorisVide">
@@ -374,6 +388,34 @@ formViderFavoris.addEventListener('submit', (event) => {
         }
     });
 });
+
+function ajoutSuppFavoris(idProduit) {
+    const btn = document.getElementById('btnFav'); //on regarde l'état du bouton
+
+    fetch(`/pages/produit/action_favoris.php?idProduit=${idProduit}&page="panier"`) //envoie l'id du produit pour ajouter au favoris
+        .then(reponse => reponse.json())
+        .then(data => {
+            if (data.succes) {
+                if (data.action === 'ajoute') { //si la réponse de php est ajouté 
+                    btn.classList.add('active');
+                    btn.setAttribute('aria-label', 'Retirer des favoris');
+                    btn.setAttribute('title', 'Retirer des favoris');
+                    notify("Ajouter aux favoris", 'success');//on notify le client
+                } else {
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-label', 'Ajouter aux favoris');
+                    btn.setAttribute('title', 'Ajouter aux favoris');
+                    notify("Retirer des favoris", 'info');   //on notify le client
+                    setTimeout(() => {
+                    location.reload();
+                }, 300);
+                }
+            }
+        })
+        .catch(err => console.error("Erreur page favoris:", err));
+}
+
+
 </script>
 <?php endif; ?>
 <!--vérifie qu'il y ait minimun 1 élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->

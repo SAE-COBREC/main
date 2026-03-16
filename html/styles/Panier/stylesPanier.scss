@@ -492,15 +492,18 @@ ul {
   // ============================================
 
   article>div:last-child>div:last-child>div {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 12px;
-    width: fit-content;
-    background-color: $secondary-color-bleu-clair;
-    border-radius: 20px;
-    border: 1px solid rgba($primary-color-bleu, 0.1);
-    gap: 6px;
-    padding: 4px 8px;
+
+    div {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 12px;
+      width: fit-content;
+      background-color: $secondary-color-bleu-clair;
+      border-radius: 20px;
+      border: 1px solid rgba($primary-color-bleu, 0.1);
+      gap: 6px;
+      padding: 4px 8px;
+    }
 
     img {
       width: 24px;
@@ -672,7 +675,7 @@ ul {
     }
 
     //bouton panier
-    button {
+    button:last-child {
       margin-top: auto;
       width: 100%;
       padding: 0.75rem;

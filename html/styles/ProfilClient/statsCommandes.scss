@@ -9,7 +9,11 @@ $shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
     box-shadow: $shadow-card;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
@@ -18,12 +22,12 @@ body {
     color: $primary-color-noir;
 }
 
-main > div {
+main>div {
     max-width: 1200px;
     margin: 0 auto;
     padding: 32px 20px 60px;
 
-    > a {
+    >a {
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -34,7 +38,9 @@ main > div {
         margin-bottom: 24px;
         transition: color 0.2s;
 
-        &:hover { color: $primary-color-bleu; }
+        &:hover {
+            color: $primary-color-bleu;
+        }
 
         svg {
             width: 18px;
@@ -42,7 +48,7 @@ main > div {
         }
     }
 
-    > div:nth-child(2) {
+    >div:nth-child(2) {
         h1 {
             font-family: $font-family-primaire;
             font-size: 2rem;
@@ -57,7 +63,7 @@ main > div {
         }
     }
 
-    > div:nth-child(2) {
+    >div:nth-child(2) {
         background-color: $primary-color-blanc;
         border-radius: 14px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -67,13 +73,13 @@ main > div {
         align-items: flex-end;
         margin-bottom: 32px;
 
-        p{
+        p {
             margin: 0;
             padding-top: 0.1em;
         }
     }
 
-    > div:nth-child(3) {
+    >div:nth-child(3) {
         @include card;
         padding: 20px 24px;
         display: flex;
@@ -82,12 +88,12 @@ main > div {
         align-items: flex-end;
         margin-bottom: 32px;
 
-        > div {
+        >div {
             display: flex;
             flex-direction: column;
             gap: 6px;
 
-            > label {
+            >label {
                 font-size: 0.78rem;
                 font-weight: 700;
                 text-transform: uppercase;
@@ -95,7 +101,7 @@ main > div {
                 color: $primary-color-bleu;
             }
 
-            > select {
+            >select {
                 height: 40px;
                 padding: 0 12px;
                 border: 1.5px solid $primary-color-bleu;
@@ -108,7 +114,9 @@ main > div {
                 transition: border-color 0.2s;
                 outline: none;
 
-                &:focus { border-color: $primary-color-bleu; }
+                &:focus {
+                    border-color: $primary-color-bleu;
+                }
             }
         }
 
@@ -125,17 +133,19 @@ main > div {
             transition: border-color 0.2s;
             outline: none;
 
-            &:focus { border-color: $primary-color-bleu; }
+            &:focus {
+                border-color: $primary-color-bleu;
+            }
         }
     }
 
-    > div:nth-child(4) {
+    >div:nth-child(4) {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
         gap: 18px;
         margin-bottom: 32px;
 
-        > div {
+        >div {
             @include card;
             padding: 22px 24px;
             display: flex;
@@ -148,11 +158,19 @@ main > div {
                 box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
             }
 
-            &:nth-child(2) { border-left-color: $primary-color-bleu; }
-            &:nth-child(3) { border-left-color: $secondary-color-vert-succes-fond; }
-            &:nth-child(4) { border-left-color: $secondary-color-bronze-clair; }
+            &:nth-child(2) {
+                border-left-color: $primary-color-bleu;
+            }
 
-            > span {
+            &:nth-child(3) {
+                border-left-color: $secondary-color-vert-succes-fond;
+            }
+
+            &:nth-child(4) {
+                border-left-color: $secondary-color-bronze-clair;
+            }
+
+            >span {
                 &:nth-child(1) {
                     font-size: 0.8rem;
                     font-weight: 700;
@@ -177,17 +195,19 @@ main > div {
         }
     }
 
-    > div:nth-child(5) {
+    >div:nth-child(5) {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 24px;
         margin-bottom: 24px;
 
-        > div {
+        >div {
             @include card;
             padding: 24px;
 
-            &:first-child { grid-column: 1 / -1; }
+            &:first-child {
+                grid-column: 1 / -1;
+            }
 
             h2 {
                 font-family: $font-family-primaire;
@@ -196,7 +216,9 @@ main > div {
                 color: $primary-color-noir;
             }
 
-            canvas { max-height: 300px; }
+            canvas {
+                max-height: 300px;
+            }
         }
     }
 }
@@ -218,7 +240,7 @@ main > div {
         pointer-events: all;
     }
 
-    > div {
+    >div {
         width: 44px;
         height: 44px;
         border: 4px solid $secondary-color-orange-clair;
@@ -228,31 +250,41 @@ main > div {
     }
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 
-#groupePeriode > div {
+#groupePeriode>div {
     display: flex;
     gap: 12px;
     align-items: flex-end;
 }
 
 @media (max-width: 768px) {
-    main > div {
-        > div:nth-child(5) {
+    main>div {
+        >div:nth-child(5) {
             grid-template-columns: 1fr;
 
-            > div:first-child { grid-column: auto; }
+            >div:first-child {
+                grid-column: auto;
+            }
         }
 
-        > div:nth-child(3) {
+        >div:nth-child(3) {
             flex-direction: column;
             align-items: stretch;
         }
 
-        > div:nth-child(4) { grid-template-columns: 1fr 1fr; }
+        >div:nth-child(4) {
+            grid-template-columns: 1fr 1fr;
+        }
     }
 }
 
 @media (max-width: 480px) {
-    main > div > div:nth-child(4) { grid-template-columns: 1fr; }
+    main>div>div:nth-child(4) {
+        grid-template-columns: 1fr;
+    }
 }

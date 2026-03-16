@@ -290,7 +290,7 @@ body {
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            
+
         }
 
         .add {
@@ -1251,6 +1251,11 @@ input[type="number"] {
     letter-spacing: .02em;
     text-transform: uppercase;
     margin-bottom: 6px;
+}
+
+#btnFavIcon {
+    width: 24px;
+    height: 24px;
 }
 
 @keyframes slideInReview {
