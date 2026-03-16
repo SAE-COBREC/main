@@ -11,6 +11,7 @@
   --semantic-jaune: #DDCA00;
   --semantic-info: #0C5460;
   --secondary-promotion: #e4e4f5;
+  --star-color: #7171A3;
 }
 
 [data-theme=dalto-red-green] {
@@ -19,12 +20,14 @@
   --semantic-rouge: #D55E00;
   --semantic-jaune: #F0E442;
   --secondary-promotion: #dbe0ff;
+  --star-color: #FFAE00;
 }
 
 [data-theme=dalto-blue-yellow] {
   --primary-bleu: #009E73;
   --semantic-jaune: #CC79A7;
   --secondary-promotion: #e2f2e4;
+  --star-color: #009E73;
 }
 
 *, *::before, *::after {

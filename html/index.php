@@ -518,7 +518,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                                 elseif ($noteArrondieC >= $i - 0.5) $s = 'alf';
                                                 else $s = 'empty';
                                             ?>
-                                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="16">
+                                            <span class="star-icon medium <?= $s ?>"></span>
                                             <?php endfor; ?>
                                         </span>
                                         <span>(<?= $prodCarousel['nombre_avis'] ?? 0 ?>)</span>
@@ -644,7 +644,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                             else
                                                 $s = 'empty';
                                             ?>
-                                <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                <span class="star-icon medium <?= $s ?>"></span>
                                 <?php endfor; ?>
                             </span>
                             <!--affiche le nombre d'avis-->

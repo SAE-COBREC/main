@@ -176,10 +176,10 @@ aside {
     //select des catégories
     select {
       padding: 0.2em;
-      border: 1px solid #7171A3;
-      color: #7171A3;
+      border: 1px solid $primary-color-bleu;
+      color: $primary-color-bleu;
       border-radius: 20px;
-      background: #FFFFFF;
+      background: $primary-color-blanc;
       cursor: pointer;
       width: 100%;
       text-align: center;
@@ -404,7 +404,7 @@ main {
   img {
     width: 24px;
     height: 24px;
-    filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%); // approximate color for #7171A3
+    color: $primary-color-bleu;
   }
 
   span {
@@ -694,6 +694,25 @@ article {
 //effet d'agrandissement au survol
 .star-btn:hover {
   transform: scale(1.1);
+}
+
+.star-icon {
+    display: inline-block;
+    background-color: var(--star-color);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    vertical-align: middle;
+
+    // Tailles
+    &.small { width: 16px; height: 16px; }
+    &.medium { width: 20px; height: 20px; }
+
+    // Définition des fichiers images
+    &.full { -webkit-mask-image: url('/img/svg/star-full.svg'); mask-image: url('/img/svg/star-full.svg'); }
+    &.empty { -webkit-mask-image: url('/img/svg/star-empty.svg'); mask-image: url('/img/svg/star-empty.svg'); }
+    &.alf { -webkit-mask-image: url('/img/svg/star-alf.svg'); mask-image: url('/img/svg/star-alf.svg'); }
 }
 
 //champ numérique pour le prix

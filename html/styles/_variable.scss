@@ -69,6 +69,7 @@ $vendeur-padding-main: 32px 40px;
     --semantic-jaune: #DDCA00;
     --semantic-info: #0C5460;
     --secondary-promotion: #e4e4f5;
+    --star-color: #7171A3;
 }
 
 // --- MODE PROTANOPIE / DEUTÉRANOPIE (Le plus commun : Vert/Rouge) ---
@@ -82,6 +83,7 @@ $vendeur-padding-main: 32px 40px;
     // Le jaune devient un jaune très clair ou crème pour trancher
     --semantic-jaune: #F0E442;
     --secondary-promotion: #dbe0ff;
+    --star-color: #FFAE00;
 }
 
 // --- MODE TRITANOPIE (Rare : Bleu/Jaune) ---
@@ -92,4 +94,5 @@ $vendeur-padding-main: 32px 40px;
     // Le jaune devient un rose/violet
     --semantic-jaune: #CC79A7;
     --secondary-promotion: #e2f2e4;
+    --star-color: #009E73;
 }
