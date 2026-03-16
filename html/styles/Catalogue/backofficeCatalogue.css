@@ -31,42 +31,42 @@
 }
 
 #formCatalogue .table-wrapper {
-  border: 1px solid #eadfce;
+  border: 1px solid #EADFCE;
   border-radius: 12px;
-  background: #fff;
+  background: #FFFFFF;
 }
 #formCatalogue .products-table {
   border-collapse: separate;
   border-spacing: 0;
 }
 #formCatalogue .products-table thead {
-  background: #fff9f4;
+  background: #FFF9F4;
 }
 #formCatalogue .products-table__head-cell {
   padding: 14px 12px;
   font-size: 15px;
   font-weight: 700;
-  color: #3a2e21;
-  border-bottom: 1px solid #eadfce;
+  color: #3A2E21;
+  border-bottom: 1px solid #EADFCE;
 }
 #formCatalogue .products-table__cell {
   padding: 12px;
   font-size: 15px;
-  border-bottom: 1px solid #f4ede3;
+  border-bottom: 1px solid #F4EDE3;
 }
 #formCatalogue .products-table__cell[colspan="6"] {
   text-align: center;
-  color: #7a6a59;
+  color: #7A6A59;
   padding: 24px 12px;
 }
 #formCatalogue .products-table__row:last-child .products-table__cell {
   border-bottom: 0;
 }
 #formCatalogue .products-table__row:hover {
-  background: #fff7ef;
+  background: #FFF7EF;
 }
 #formCatalogue .products-table__row.selected {
-  background: #ffeedf;
+  background: #FFEEDF;
 }
 #formCatalogue .products-table .col-check {
   width: 64px;
@@ -80,7 +80,7 @@
   text-align: center;
 }
 #formCatalogue .products-table .col-desc {
-  color: #5a4b3b;
+  color: #5A4B3B;
 }
 #formCatalogue .filtre__item {
   width: 100%;
@@ -112,7 +112,7 @@
   width: 54px;
   height: 54px;
   border-radius: 10px;
-  border: 1px solid #ebdfcf;
+  border: 1px solid #EBDFCF;
 }
 #formCatalogue .product__name {
   margin-bottom: 2px;
@@ -121,14 +121,14 @@
 }
 #formCatalogue .product__model {
   font-size: 14px;
-  color: #6b5c4c;
+  color: #6B5C4C;
   font-weight: 600;
 }
 #formCatalogue .checkbox {
   width: 20px;
   height: 20px;
   border: 2px solid #E5D5C5;
-  border-radius: 100%;
+  border-radius: 0;
   margin: 0 auto;
 }
 #formCatalogue .checkbox--active {
