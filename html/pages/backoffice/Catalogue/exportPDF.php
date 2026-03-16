@@ -8,8 +8,9 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 
 // Vérification de la connexion du vendeur
-if (empty($_SESSION['vendeur_id'])) {
-    header("Location: /pages/backoffice/connexionVendeur/index.php");
+if (!isset($_SESSION['vendeur_id'])) {
+    $url = '/pages/backoffice/connexionVendeur/index.php';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }
 
