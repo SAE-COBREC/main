@@ -502,7 +502,7 @@ article button:hover:not(:disabled) {
   background: var(--primary-bleu);
 }
 article button:hover:not(:disabled) img {
-  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+  filter: none;
 }
 article button:disabled {
   background: #c0c0c0;
@@ -530,6 +530,12 @@ article button:disabled {
 .produit-promotion > * {
   position: relative;
   z-index: 1;
+}
+.produit-promotion button:hover:not(:disabled) {
+  background: var(--primary-bleu);
+}
+.produit-promotion button:hover:not(:disabled) img {
+  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
 }
 
 .produit-promotion button:not(:disabled) {

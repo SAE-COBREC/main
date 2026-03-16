@@ -600,7 +600,7 @@ article {
       background: $primary-color-bleu;
 
       img {
-        filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+        filter: none;
       }
     }
 
@@ -640,6 +640,17 @@ article {
   > * {
     position: relative;
     z-index: 1;
+  }
+
+  button {
+    //effet hover sur le bouton
+    &:hover:not(:disabled) {
+      background: $primary-color-bleu;
+
+      img {
+        filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+      }
+    }
   }
 }
 

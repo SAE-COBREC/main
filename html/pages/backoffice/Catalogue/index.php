@@ -241,9 +241,9 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                         </select>
 
                         <select name="tri" class="filtre__item">
-                            <option value="nom_asc" <?= $triCatalogue === 'nom_asc' ? 'selected' : '' ?>>Nom (A → Z)
+                            <option value="nom_asc" <?= $triCatalogue === 'nom_asc' ? 'selected' : '' ?>>A à Z
                             </option>
-                            <option value="nom_desc" <?= $triCatalogue === 'nom_desc' ? 'selected' : '' ?>>Nom (Z → A)
+                            <option value="nom_desc" <?= $triCatalogue === 'nom_desc' ? 'selected' : '' ?>>Z à A
                             </option>
                             <option value="prix_asc" <?= $triCatalogue === 'prix_asc' ? 'selected' : '' ?>>Prix
                                 croissant</option>
@@ -260,7 +260,8 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                     </form>
 
                     <!--formulaire du catalogue avec tableau des produits-->
-                    <form method="post" id="formCatalogue" action="/pages/backoffice/Catalogue/exportPDF.php" target="_blank">
+                    <form method="post" id="formCatalogue" action="/pages/backoffice/Catalogue/exportPDF.php"
+                        target="_blank">
                         <div class="table-wrapper">
                             <table class="products-table">
                                 <thead>
