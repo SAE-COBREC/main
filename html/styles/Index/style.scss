@@ -1171,7 +1171,6 @@ article {
   // État de rupture de stock du carrousel
   .carousel-slide.out-of-stock {
     opacity: 0.6;
-    pointer-events: none;
 
     .carousel-content {
       opacity: 0.6;

@@ -957,7 +957,6 @@ article button:disabled {
 }
 .carousel-container .carousel-slide.out-of-stock {
   opacity: 0.6;
-  pointer-events: none;
 }
 .carousel-container .carousel-slide.out-of-stock .carousel-content {
   opacity: 0.6;
