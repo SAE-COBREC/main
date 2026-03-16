@@ -367,7 +367,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     });
     </script>
 
-            <main class="profile-layout">
+            <main>
+                <div class="profile-layout">
             <aside class="profile-sidebar">
                 <nav>
                     <ul>
@@ -585,12 +586,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
                 <!-- Section : Mes adresses -->
                 <section id="addresses" class="profile-section">
-                    <div>
-                        <h2>Mes adresses</h2>
-                        <button type="button" onclick="ouvrirModalAjoutAdresse()">
-                            + Ajouter une adresse
-                        </button>
-                    </div>
+                    <h2>Mes adresses</h2>
 
                     <?php if (empty($listeAdressesClient)): ?>
                     <p>Aucune adresse enregistrée</p>
@@ -1621,6 +1617,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         }
     });
     </script>
+                </div>
             </main>
     <script src="/js/notifications.js"></script>
 </body>

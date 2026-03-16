@@ -69,7 +69,7 @@ main .profile-layout {
 }
 main .profile-sidebar {
   position: sticky;
-  top: 100px;
+  top: 10em;
   background: #FFFFFF;
   border-radius: 16px;
   padding: 1.5rem;
@@ -163,6 +163,17 @@ main .sidebar-btn.logout:hover {
     padding-top: 10px;
     border-radius: 12px;
   }
+}
+main .sidebar-btn.add-btn {
+  background: rgba(var(--primary-bleu), 0.1);
+  color: var(--primary-bleu);
+  margin-top: 0.5rem;
+  border: 1px dashed var(--primary-bleu);
+}
+main .sidebar-btn.add-btn:hover {
+  background: var(--primary-bleu);
+  color: #FFFFFF;
+  border-style: solid;
 }
 main .profile-content {
   min-width: 0;
