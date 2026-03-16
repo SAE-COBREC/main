@@ -1,0 +1,199 @@
+@use "../variable" as *;
+
+#formCatalogue {
+  .table-wrapper {
+    border: 1px solid $catalogue-color-border;
+    border-radius: 12px;
+    background: $primary-color-blanc;
+  }
+
+  .products-table {
+    border-collapse: separate;
+    border-spacing: 0;
+
+    thead {
+      background: $catalogue-color-header-bg;
+    }
+
+    &__head-cell {
+      padding: 14px 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: $catalogue-color-title;
+      border-bottom: 1px solid $catalogue-color-border;
+    }
+
+    &__cell {
+      padding: 12px;
+      font-size: 15px;
+      border-bottom: 1px solid $catalogue-color-row-border;
+
+      &[colspan="6"] {
+        text-align: center;
+        color: $catalogue-color-empty-text;
+        padding: 24px 12px;
+      }
+    }
+
+    &__row {
+      &:last-child {
+        .products-table__cell {
+          border-bottom: 0;
+        }
+      }
+
+      &:hover {
+        background: $catalogue-color-row-hover;
+      }
+
+      &.selected {
+        background: $catalogue-color-row-selected;
+      }
+    }
+
+    .col-check {
+      width: 64px;
+    }
+
+    .col-produit {
+      width: 34%;
+    }
+
+    .col-statut,
+    .col-stock,
+    .col-cate {
+      text-align: center;
+    }
+
+    .col-desc {
+      color: $catalogue-color-desc;
+    }
+  }
+
+  .filtre {
+    &__item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: $primary-color-noir;
+      padding: $vendeur-padding-button;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: $border-radius-primary;
+      background: $secondary-color-blanc-casse;
+      border: 1px solid $secondary-color-orange-clair;
+
+      &:hover {
+        background: $secondary-color-rose-claire;
+        border-color: $primary-color-bronze;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color-bronze;
+        box-shadow: 0 0 0 3px rgba($secondary-color-bronze-clair, 0.2);
+      }
+    }
+  }
+
+  .product {
+    gap: 10px;
+
+    &__image {
+      img {
+        width: 54px;
+        height: 54px;
+        border-radius: 10px;
+        border: 1px solid $catalogue-color-image-border;
+      }
+    }
+
+    &__name {
+      margin-bottom: 2px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    &__model {
+      font-size: 14px;
+      color: $catalogue-color-model;
+      font-weight: 600;
+    }
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid $secondary-color-orange-clair;
+    border-radius: 0;
+    margin: 0 auto;
+
+    &--active {
+      background-color: $secondary-color-bronze-clair;
+      border-color: $secondary-color-bronze-clair;
+    }
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: $border-radius-primary;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .page-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 24px 0;
+    flex-shrink: 0;
+  }
+
+  .btn {
+    border: 0;
+    padding: 10px 24px;
+    border-radius: $border-radius-primary;
+    font-weight: 600;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s;
+
+    &--primary {
+      background: $primary-color-bronze;
+      color: $primary-color-blanc;
+
+      &:hover {
+        background: rgba($secondary-color-bronze-clair, 0.9);
+      }
+    }
+
+    &--secondary {
+      background: $primary-color-blanc;
+      color: $primary-color-bronze;
+      border: 2px solid $primary-color-bronze;
+
+      &:hover {
+        background: $secondary-color-rose-claire;
+      }
+    }
+
+    &--disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      filter: grayscale(1);
+    }
+  }
+}
+
+#btn-clear-filters {
+  &.filtre__item {
+    justify-content: center;
+    font-weight: 600;
+  }
+}

@@ -180,6 +180,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
         <!--charge les feuilles de style CSS-->
         <link rel="stylesheet" href="/styles/AccueilVendeur/accueilVendeur.css" />
+        <link rel="stylesheet" href="/styles/Catalogue/backofficeCatalogue.css" />
 
         <!--charge le script d'accessibilité-->
         <script src="/js/accessibility.js"></script>
@@ -203,61 +204,10 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
                 <!--section du contenu principal-->
                 <div class="content-section">
-                    <div class="content-section__header">
-                        <h2 class="content-section__title">Gérer le catalogue</h2>
-                    </div>
-
                     <!--affiche un message si aucun produit n'existe-->
                     <?php if (empty($tousProduits)): ?>
                     <p style="padding: 20px; color: #666;">Aucun produit pour le moment.</p>
                     <?php else: ?>
-
-                    <form method="get"
-                        style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 0;">
-                        <input type="search" name="search" placeholder="Rechercher un produit..."
-                            value="<?= htmlspecialchars($rechercheNom) ?>" class="filtre__item"
-                            style="min-width: 240px;" />
-
-                        <select name="statut" class="filtre__item">
-                            <option value="all" <?= $filtreStatut === 'all' ? 'selected' : '' ?>>Tous les statuts
-                            </option>
-                            <?php foreach ($statutsDisponibles as $statutCourant): ?>
-                            <option value="<?= htmlspecialchars($statutCourant) ?>"
-                                <?= $filtreStatut === $statutCourant ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($statutCourant) ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-
-                        <select name="cat" class="filtre__item">
-                            <option value="all" <?= $filtreCategorie === 'all' ? 'selected' : '' ?>>Toutes les
-                                catégories</option>
-                            <?php foreach ($categoriesDisponibles as $categorieCourante): ?>
-                            <option value="<?= htmlspecialchars($categorieCourante) ?>"
-                                <?= $filtreCategorie === $categorieCourante ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($categorieCourante) ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-
-                        <select name="tri" class="filtre__item">
-                            <option value="nom_asc" <?= $triCatalogue === 'nom_asc' ? 'selected' : '' ?>>A à Z
-                            </option>
-                            <option value="nom_desc" <?= $triCatalogue === 'nom_desc' ? 'selected' : '' ?>>Z à A
-                            </option>
-                            <option value="prix_asc" <?= $triCatalogue === 'prix_asc' ? 'selected' : '' ?>>Prix
-                                croissant</option>
-                            <option value="prix_desc" <?= $triCatalogue === 'prix_desc' ? 'selected' : '' ?>>Prix
-                                décroissant</option>
-                            <option value="stock_asc" <?= $triCatalogue === 'stock_asc' ? 'selected' : '' ?>>Stock
-                                croissant</option>
-                            <option value="stock_desc" <?= $triCatalogue === 'stock_desc' ? 'selected' : '' ?>>Stock
-                                décroissant</option>
-                        </select>
-
-                        <button type="submit" class="btn btn--secondary">Appliquer</button>
-                        <a href="index.php" class="btn btn--secondary">Réinitialiser</a>
-                    </form>
 
                     <!--formulaire du catalogue avec tableau des produits-->
                     <form method="post" id="formCatalogue" action="/pages/backoffice/Catalogue/exportPDF.php"
@@ -266,11 +216,66 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                             <table class="products-table">
                                 <thead>
                                     <tr>
-                                        <th class="products-table__head-cell col-check"></th>
-                                        <th class="products-table__head-cell col-produit">Produit</th>
-                                        <th class="products-table__head-cell col-statut">Statut</th>
-                                        <th class="products-table__head-cell col-stock">Stock</th>
-                                        <th class="products-table__head-cell col-cate">Catégorie</th>
+                                        <th class="products-table__head-cell col-check">
+                                            <button type="button" id="btn-clear-filters" class="filtre__item">
+                                                <img src="/img/svg/poubelle.svg" alt="Effacer les filtres" width="20"
+                                                    height="20">
+                                            </button>
+                                        </th>
+                                        <th class="products-table__head-cell col-produit">
+                                            <input type="search" id="filtre-search" name="search"
+                                                placeholder="Rechercher un produit..."
+                                                value="<?= htmlspecialchars($rechercheNom) ?>" class="filtre__item" />
+                                        </th>
+                                        <th class="products-table__head-cell col-statut">
+                                            <select id="filtre-statut" name="statut" class="filtre__item">
+                                                <option value="all" <?= $filtreStatut === 'all' ? 'selected' : '' ?>>
+                                                    Tous les
+                                                    statuts
+                                                </option>
+                                                <?php foreach ($statutsDisponibles as $statutCourant): ?>
+                                                <option value="<?= htmlspecialchars($statutCourant) ?>"
+                                                    <?= $filtreStatut === $statutCourant ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($statutCourant) ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </th>
+                                        <th class="products-table__head-cell col-stock">
+                                            <select id="filtre-tri" name="tri" class="filtre__item">
+                                                <option value="nom_asc"
+                                                    <?= $triCatalogue === 'nom_asc' ? 'selected' : '' ?>>A à Z
+                                                </option>
+                                                <option value="nom_desc"
+                                                    <?= $triCatalogue === 'nom_desc' ? 'selected' : '' ?>>Z à A
+                                                </option>
+                                                <option value="prix_asc"
+                                                    <?= $triCatalogue === 'prix_asc' ? 'selected' : '' ?>>Prix
+                                                    croissant</option>
+                                                <option value="prix_desc"
+                                                    <?= $triCatalogue === 'prix_desc' ? 'selected' : '' ?>>Prix
+                                                    décroissant</option>
+                                                <option value="stock_asc"
+                                                    <?= $triCatalogue === 'stock_asc' ? 'selected' : '' ?>>Stock
+                                                    croissant</option>
+                                                <option value="stock_desc"
+                                                    <?= $triCatalogue === 'stock_desc' ? 'selected' : '' ?>>Stock
+                                                    décroissant</option>
+                                            </select>
+                                        </th>
+                                        <th class="products-table__head-cell col-cate">
+                                            <select id="filtre-cat" name="cat" class="filtre__item">
+                                                <option value="all" <?= $filtreCategorie === 'all' ? 'selected' : '' ?>>
+                                                    Toutes les
+                                                    catégories</option>
+                                                <?php foreach ($categoriesDisponibles as $categorieCourante): ?>
+                                                <option value="<?= htmlspecialchars($categorieCourante) ?>"
+                                                    <?= $filtreCategorie === $categorieCourante ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($categorieCourante) ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </th>
                                         <th class="products-table__head-cell col-desc">Origine</th>
                                     </tr>
                                 </thead>
@@ -278,8 +283,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                                     <!--boucle sur tous les produits du catalogue-->
                                     <?php if (empty($produitsFiltres)): ?>
                                     <tr>
-                                        <td class="products-table__cell" colspan="6"
-                                            style="text-align:center; color:#666;">
+                                        <td class="products-table__cell" colspan="6">
                                             Aucun produit ne correspond aux filtres.
                                         </td>
                                     </tr>
@@ -299,7 +303,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
                                         <!--case à cocher de sélection-->
                                         <td class="products-table__cell col-check">
-                                            <div class="checkbox" style="border-radius: 0;"></div>
+                                            <div class="checkbox"></div>
                                             <input type="checkbox" name="produits_selectionnes[]"
                                                 value="<?= (int) $produitCourant['id_produit'] ?>" style="display:none;"
                                                 class="hidden-checkbox">
@@ -359,8 +363,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                         <div class="page-actions">
                             <button type="button" class="btn btn--secondary" id="btn-select-all">Tout
                                 sélectionner</button>
-                            <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled
-                                style="margin-right: 20px;">
+                            <button type="submit" class="btn btn--primary btn--disabled" id="btn-export-pdf" disabled>
                                 Exporter en PDF
                             </button>
                         </div>
@@ -448,6 +451,43 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                         '.products-table__row.selected');
                     if (lignesSelectionnees.length === 0) {
                         event.preventDefault();
+                    }
+                });
+            }
+
+            // ---- synchronisation des filtres ----
+            function appliquerFiltres() {
+                var params = new URLSearchParams();
+                var search = document.getElementById('filtre-search');
+                var statut = document.getElementById('filtre-statut');
+                var tri = document.getElementById('filtre-tri');
+                var cat = document.getElementById('filtre-cat');
+                if (search && search.value.trim() !== '') params.set('search', search.value.trim());
+                if (statut && statut.value !== 'all') params.set('statut', statut.value);
+                if (tri && tri.value !== 'nom_asc') params.set('tri', tri.value);
+                if (cat && cat.value !== 'all') params.set('cat', cat.value);
+                window.location.href = window.location.pathname + (params.toString() ? '?' + params.toString() :
+                    '');
+            }
+
+            ['filtre-statut', 'filtre-tri', 'filtre-cat'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.addEventListener('change', appliquerFiltres);
+            });
+
+            var boutonEffacerFiltres = document.getElementById('btn-clear-filters');
+            if (boutonEffacerFiltres) {
+                boutonEffacerFiltres.addEventListener('click', function() {
+                    window.location.href = window.location.pathname;
+                });
+            }
+
+            var searchInput = document.getElementById('filtre-search');
+            if (searchInput) {
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        appliquerFiltres();
                     }
                 });
             }

@@ -55,6 +55,18 @@ $mobile: "screen and (max-width: 508px)";
 $vendeur-padding-button: 10px 20px;
 $vendeur-padding-main: 32px 40px;
 
+// Coté catalogue backoffice
+$catalogue-color-border: #EADFCE;
+$catalogue-color-header-bg: #FFF9F4;
+$catalogue-color-title: #3A2E21;
+$catalogue-color-row-border: #F4EDE3;
+$catalogue-color-empty-text: #7A6A59;
+$catalogue-color-row-hover: #FFF7EF;
+$catalogue-color-row-selected: #FFEEDF;
+$catalogue-color-desc: #5A4B3B;
+$catalogue-color-image-border: #EBDFCF;
+$catalogue-color-model: #6B5C4C;
+
 * {
     margin: 0;
 }
