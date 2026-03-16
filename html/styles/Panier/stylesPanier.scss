@@ -491,9 +491,9 @@ ul {
   // INFOS VENDEUR DANS CARTE  →  article > div:last-child > div:last-child > div
   // ============================================
 
-  article>div:last-child>div:last-child>div {
+  article>div:last-child>div:last-child {
 
-    div {
+    .vendeur-info {
       display: inline-flex;
       align-items: center;
       margin-bottom: 12px;
@@ -505,10 +505,27 @@ ul {
       padding: 4px 8px;
     }
 
+    div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btnFavIcon {
+      background-color: transparent;
+
+      img {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+
     img {
       width: 24px;
       height: 24px;
-      filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+
     }
 
     span {
@@ -531,18 +548,6 @@ ul {
     flex-direction: column;
     gap: 0.5rem;
     align-items: stretch;
-
-    >div {
-      margin: 0 0 6px 0;
-      width: fit-content;
-      align-self: flex-start;
-    }
-
-    button {
-      margin: 0;
-      width: 100%;
-      flex: none;
-    }
   }
 
   // ============================================
@@ -675,7 +680,7 @@ ul {
     }
 
     //bouton panier
-    button:last-child {
+    .btnAjouterPanier {
       margin-top: auto;
       width: 100%;
       padding: 0.75rem;

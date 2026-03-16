@@ -474,7 +474,7 @@ ul li {
 .lesFavoris h3 {
   padding-bottom: 1em;
 }
-.lesFavoris article > div:last-child > div:last-child > div div {
+.lesFavoris article > div:last-child > div:last-child .vendeur-info {
   display: inline-flex;
   align-items: center;
   margin-bottom: 12px;
@@ -486,12 +486,24 @@ ul li {
   gap: 6px;
   padding: 4px 8px;
 }
-.lesFavoris article > div:last-child > div:last-child > div img {
+.lesFavoris article > div:last-child > div:last-child div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.lesFavoris article > div:last-child > div:last-child .btnFavIcon {
+  background-color: transparent;
+}
+.lesFavoris article > div:last-child > div:last-child .btnFavIcon img {
+  width: 32px;
+  height: 32px;
+}
+.lesFavoris article > div:last-child > div:last-child img {
   width: 24px;
   height: 24px;
-  filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
 }
-.lesFavoris article > div:last-child > div:last-child > div span {
+.lesFavoris article > div:last-child > div:last-child span {
   font-size: 0.85rem;
   color: var(--primary-bleu);
   font-weight: 600;
@@ -505,17 +517,6 @@ ul li {
   flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
-}
-.lesFavoris article > div:last-child > div:last-child > div {
-  margin: 0 0 6px 0;
-  width: -moz-fit-content;
-  width: fit-content;
-  align-self: flex-start;
-}
-.lesFavoris article > div:last-child > div:last-child button {
-  margin: 0;
-  width: 100%;
-  flex: none;
 }
 .lesFavoris article {
   display: flex;
@@ -629,7 +630,7 @@ ul li {
   font-weight: bold;
   color: #030212;
 }
-.lesFavoris article button:last-child {
+.lesFavoris article .btnAjouterPanier {
   margin-top: auto;
   width: 100%;
   padding: 0.75rem;
@@ -643,10 +644,10 @@ ul li {
   font-family: "Quicksand", sans-serif;
   transition: background 0.2s ease;
 }
-.lesFavoris article button:last-child:hover:not(:disabled) {
+.lesFavoris article .btnAjouterPanier:hover:not(:disabled) {
   background: var(--primary-bleu);
 }
-.lesFavoris article button:last-child:disabled {
+.lesFavoris article .btnAjouterPanier:disabled {
   background: #c0c0c0;
   cursor: not-allowed;
   color: #EFEFEF;
