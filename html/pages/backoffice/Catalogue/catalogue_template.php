@@ -16,7 +16,7 @@ $html = '<!DOCTYPE html>
 if (empty($listeProduits)) {
     $html .= '<p class="empty-message">Ce vendeur n\'a aucun produit en ligne pour le moment.</p>';
 } else {
-    $html .= '<div class="page-title">CATALOGUE DE TECHSTORE</div>
+    $html .= '<div class="page-title">CATALOGUE DE ' . mb_strtoupper(htmlspecialchars($nom_entreprise)) . '</div>
     <div class="company-info">
         <p><strong>Téléphone:</strong> ' . htmlspecialchars($vendeurInfos['num_telephone'] ?? 'Non spécifié') . ' | <strong>Email:</strong> ' . htmlspecialchars($vendeurInfos['email'] ?? 'Non spécifié') . '</p>
     </div>
@@ -26,7 +26,7 @@ if (empty($listeProduits)) {
         // Ajouter un titre de page tous les 4 produits
         if ($compteur % 4 === 1 && $compteur > 1) {
             $html .= '</ul>
-            <div class="page-title" style="page-break-before: always;">CATALOGUE DE TECHSTORE</div>
+            <div class="page-title" style="page-break-before: always;">CATALOGUE DE ' . mb_strtoupper(htmlspecialchars($nom_entreprise)) . '</div>
             <ul>';
         }
         
