@@ -18,10 +18,10 @@ ob_start();
 <body>
     <main>
         <?php if (empty($listeProduits)): ?>
-        <p class="empty-message">Ce vendeur n'a aucun produit en ligne pour le moment.</p>
+        <p class="message-vide">Ce vendeur n'a aucun produit en ligne pour le moment.</p>
         <?php else: ?>
-        <div class="page-title">CATALOGUE DE <?= mb_strtoupper(htmlspecialchars($nom_entreprise)) ?></div>
-        <div class="company-info">
+        <div class="titre-page">CATALOGUE DE <?= mb_strtoupper(htmlspecialchars($nom_entreprise)) ?></div>
+        <div class="informations-entreprise">
             <p>
                 <strong>Téléphone:</strong> <?= htmlspecialchars($vendeurInfos['num_telephone'] ?? 'Non spécifié') ?> |
                 <strong>Email:</strong> <?= htmlspecialchars($vendeurInfos['email'] ?? 'Non spécifié') ?>
@@ -35,7 +35,7 @@ ob_start();
                     if ($compteur % 3 === 1 && $compteur > 1): 
                 ?>
         </ul>
-        <div class="page-title" style="page-break-before: always;">CATALOGUE DE
+        <div class="titre-page" style="page-break-before: always;">CATALOGUE DE
             <?= mb_strtoupper(htmlspecialchars($nom_entreprise)) ?></div>
         <ul>
             <?php 
@@ -60,36 +60,36 @@ ob_start();
                     }
                 ?>
             <li>
-                <table class="product-row">
+                <table class="ligne-produit">
                     <tr>
-                        <td class="product-image" style="text-align: center; vertical-align: middle;">
+                        <td class="image-produit" style="text-align: center; vertical-align: middle;">
                             <?php if (!empty($imgSrc)): ?>
                             <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= $nom ?>">
                             <?php else: ?>
-                            <div class="image-placeholder"><?= $nom ?></div>
+                            <div class="espace-image"><?= $nom ?></div>
                             <?php endif; ?>
                         </td>
-                        <td class="product-details">
+                        <td class="details-produit">
                             <h3><?= $nom ?></h3>
                             <p><?= $description ?></p>
                             <div>
-                                <span class="price-badge">
-                                    <span class="label">PRIX</span>
+                                <span class="badge-prix">
+                                    <span class="etiquette">PRIX</span>
                                     <?= number_format((float)$prix, 2, ',', ' ') ?>€
                                 </span>
                             </div>
-                            <div class="info-row">
-                                <span class="info-label">Origine:</span>
-                                <span class="info-value"><?= $origine ?></span>
+                            <div class="ligne-info">
+                                <span class="etiquette-info">Origine:</span>
+                                <span class="valeur-info"><?= $origine ?></span>
                             </div>
-                            <div class="info-row">
-                                <span class="info-label">Catégorie:</span>
-                                <span class="info-value"><?= $categories ?></span>
+                            <div class="ligne-info">
+                                <span class="etiquette-info">Catégorie:</span>
+                                <span class="valeur-info"><?= $categories ?></span>
                             </div>
                         </td>
                     </tr>
                 </table>
-                <hr class="separator">
+                <hr class="separateur">
             </li>
             <?php 
                     $compteur++;

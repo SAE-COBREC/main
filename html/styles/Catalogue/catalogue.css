@@ -1,116 +1,96 @@
 * {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 20px;
+  font-family: "Montserrat", sans-serif;
+  color: #333333;
   background-color: #FFFFFF;
-}
-
-header {
-  text-align: center;
-  padding: 10px 0;
-}
-header h1 {
-  color: #6d8354;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 2em;
+  line-height: 1.5;
+  padding: 40px;
 }
 
 main {
   max-width: 1000px;
   margin: 0 auto;
 }
-
-.page-title {
+main .titre-page {
   text-align: center;
-  font-size: 2em;
-  color: #6d8354;
-  font-weight: bold;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  margin: 20px 0 30px 0;
+  font-family: "Playfair Display", serif;
+  font-size: 32pt;
+  color: #1a2e1a;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
 }
-
-.company-info {
+main .informations-entreprise {
   text-align: center;
-  margin: 0 0 40px 0;
-  font-size: 12px;
-  color: #555;
+  margin-bottom: 50px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eeeeee;
 }
-.company-info p {
-  margin: 5px 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+main .informations-entreprise p {
+  font-size: 10pt;
+  color: #777777;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+main .informations-entreprise p strong {
+  color: #1a2e1a;
 }
 
 ul {
   list-style: none;
-  padding: 0;
 }
 ul li {
-  margin-bottom: 40px;
+  margin-bottom: 60px;
   page-break-inside: avoid;
 }
 
-.product-row {
+.ligne-produit {
   width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 10px;
+  padding-bottom: 20px;
+  border-bottom: collapse;
 }
-
-.product-image {
-  width: 250px;
-  height: 180px;
-  vertical-align: top;
-  padding-right: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.ligne-produit .image-produit {
+  width: 35%;
+  padding-right: 40px;
+  vertical-align: middle;
 }
-.product-image img {
+.ligne-produit .image-produit img {
   max-width: 100%;
-  max-height: 100%;
   display: block;
-  -o-object-fit: contain;
-     object-fit: contain;
-  -o-object-position: center;
-     object-position: center;
+  border-radius: 2px;
 }
-
-.image-placeholder {
-  width: 225px;
-  height: 150px;
-  border: 2px dashed #ccc;
+.ligne-produit .image-produit .espace-image {
+  border: 1px dashed #777777;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  color: #666;
-  text-align: center;
-  padding: 10px;
-  box-sizing: border-box;
+  font-size: 9pt;
+  color: #777777;
 }
-
-.product-details {
-  vertical-align: top;
+.ligne-produit .details-produit {
+  vertical-align: middle;
 }
-.product-details h3 {
-  color: #6d8354;
-  font-size: 20px;
-  text-transform: uppercase;
-  margin: 0 0 10px 0;
-  font-weight: 400;
+.ligne-produit .details-produit h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 20pt;
+  color: #1a2e1a;
+  margin-bottom: 12px;
+  border-left: 4px solid #6d8354;
+  padding-left: 15px;
+  line-height: 1.2;
 }
-.product-details p {
-  color: #777;
-  font-size: 11px;
-  line-height: 1.6;
-  margin: 0 0 10px 0;
+.ligne-produit .details-produit p {
+  font-size: 10.5pt;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: justify;
 }
-
-.price-badge {
+.ligne-produit .details-produit .badge-prix {
   display: inline-block;
   background-color: #6d8354;
   color: #FFFFFF;
@@ -119,37 +99,26 @@ ul li {
   font-weight: bold;
   font-size: 13px;
 }
-.price-badge .label {
-  font-size: 9px;
-  opacity: 0.8;
-  margin-right: 6px;
+.ligne-produit .details-produit .badge-prix .etiquette {
+  font-size: 8pt;
+  font-weight: 300;
+  text-transform: uppercase;
+  margin-right: 12px;
+  padding-right: 12px;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
 }
-
-.info-row {
-  margin-top: 6px;
+.ligne-produit .details-produit .ligne-info {
+  margin-top: 5px;
+  font-size: 9pt;
 }
-.info-row .info-label {
-  color: #888;
-  font-size: 11px;
-  display: inline;
-  margin-right: 8px;
+.ligne-produit .details-produit .ligne-info .etiquette-info {
+  color: #777777;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
-.info-row .info-value {
-  font-size: 11px;
-  font-weight: bold;
-  color: #555;
-  display: inline;
-}
-
-.separator {
-  border: none;
-  border-top: 1px solid #e0e0e0;
-  margin: 10px 0 0 0;
-}
-
-.empty-message {
-  text-align: center;
-  color: #777;
-  font-size: 14px;
-  margin-top: 40px;
+.ligne-produit .details-produit .ligne-info .valeur-info {
+  color: #1a2e1a;
+  font-weight: 500;
+  margin-left: 5px;
 }/*# sourceMappingURL=catalogue.css.map */

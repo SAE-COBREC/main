@@ -1,167 +1,156 @@
-// Variables
-$catalogue-green: #6d8354;
-$text-gray: #777;
-$label-gray: #888;
-$value-gray: #555;
-$separator-gray: #e0e0e0;
-$white: #FFFFFF;
+// --- Variables de Design ---
+$primary-color: #1a2e1a;    // Vert forêt très sombre (Luxe)
+$accent-color: #6d8354;     // Vert sauge (Rappel artisanat)
+$text-main: #333333;
+$text-light: #777777;
+$bg-white: #FFFFFF;
+$border-color: #eeeeee;
 
-* { margin: 0; }
+$font-serif: 'Playfair Display', serif;
+$font-sans: 'Montserrat', sans-serif;
+
+// --- Styles Généraux ---
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: $white;
+    font-family: $font-sans;
+    color: $text-main;
+    background-color: $bg-white;
+    line-height: 1.5;
+    padding: 40px;
 }
 
-h1 {
-    color: $catalogue-green;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 2em;
-    text-align: center;
-    padding: 10px 0;
-}
-
+// --- Mise en page du Catalogue ---
 main {
     max-width: 1000px;
     margin: 0 auto;
-    
-    > p {
+
+    .titre-page {
         text-align: center;
-        color: $text-gray;
-        font-size: 14px;
-        margin-top: 40px;
-    }
-}
-
-h2 {
-    text-align: center;
-    font-size: 2em;
-    color: $catalogue-green;
-    font-weight: bold;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px 0 30px 0;
-}
-
-header {
-    text-align: center;
-    margin: 0 0 40px 0;
-    font-size: 12px;
-    color: #555;
-    
-    p {
-        margin: 5px 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-
-    li {
-        margin-bottom: 40px;
-        page-break-inside: avoid;
-    }
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-
-    td:first-child {
-        width: 250px;
-        height: 180px;
-        vertical-align: top;
-        padding-right: 30px;
-        
-        img {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-            margin: 0 auto;
-        }
-
-        > div {
-            width: 225px;
-            height: 150px;
-            border: 2px dashed #ccc;
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            padding: 10px;
-            box-sizing: border-box;
-            display: table-cell;
-            vertical-align: middle;
-        }
+        font-family: $font-serif;
+        font-size: 32pt;
+        color: $primary-color;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
     }
 
-    td:last-child {
-        vertical-align: top;
+    .informations-entreprise {
+        text-align: center;
+        margin-bottom: 50px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid $border-color;
 
-        h3 {
-            color: $catalogue-green;
-            font-size: 20px;
+        p {
+            font-size: 10pt;
+            color: $text-light;
             text-transform: uppercase;
-            margin: 0 0 10px 0;
-            font-weight: 400;
-        }
-
-        > p {
-            color: $text-gray;
-            font-size: 11px;
-            line-height: 1.6;
-            margin: 0 0 10px 0;
-        }
-
-        > div {
-            margin-bottom: 6px;
-
-            span {
-                display: inline-block;
-                background-color: $catalogue-green;
-                color: $white;
-                padding: 6px 18px;
-                border-radius: 50px;
-                font-weight: bold;
-                font-size: 13px;
-
-                strong {
-                    font-size: 9px;
-                    opacity: 0.8;
-                    margin-right: 6px;
-                    font-weight: normal;
-                }
+            letter-spacing: 2px;
+            
+            strong {
+                color: $primary-color;
             }
         }
     }
 }
 
-dl {
-    margin: 6px 0 0 0;
-    
-    dt {
-        color: $label-gray;
-        font-size: 11px;
-        display: inline;
-        margin-right: 8px;
-        font-weight: normal;
-    }
+// --- Liste de Produits ---
+ul {
+    list-style: none;
 
-    dd {
-        font-size: 11px;
-        font-weight: bold;
-        color: $value-gray;
-        display: inline;
-        margin: 0;
+    li {
+        margin-bottom: 60px;
+        page-break-inside: avoid; // Évite de couper un produit entre deux pages
     }
 }
 
-hr {
-    border: none;
-    border-top: 1px solid $separator-gray;
-    margin: 10px 0 0 0;
+.ligne-produit {
+    width: 100%;
+    padding-bottom: 20px;
+    border-bottom: collapse;
+
+    .image-produit {
+        width: 35%;
+        padding-right: 40px;
+        vertical-align: middle;
+
+        img {
+            max-width: 100%;
+            display: block;
+            border-radius: 2px;
+        }
+
+        .espace-image {
+            border: 1px dashed $text-light;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9pt;
+            color: $text-light;
+        }
+    }
+
+    .details-produit {
+        vertical-align: middle;
+
+        h3 {
+            font-family: $font-serif;
+            font-size: 20pt;
+            color: $primary-color;
+            margin-bottom: 12px;
+            border-left: 4px solid $accent-color;
+            padding-left: 15px;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 10.5pt;
+            color: #555;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        // Badge de prix
+        .badge-prix {
+            display: inline-block;
+            background-color: $accent-color;
+            color: $bg-white;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 13px;
+
+            .etiquette {
+                font-size: 8pt;
+                font-weight: 300;
+                text-transform: uppercase;
+                margin-right: 12px;
+                padding-right: 12px;
+                border-right: 1px solid rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        // Informations d'origine/catégorie
+        .ligne-info {
+            margin-top: 5px;
+            font-size: 9pt;
+
+            .etiquette-info {
+                color: $text-light;
+                text-transform: uppercase;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+
+            .valeur-info {
+                color: $primary-color;
+                font-weight: 500;
+                margin-left: 5px;
+            }
+        }
+    }
 }
