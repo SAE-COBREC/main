@@ -72,7 +72,7 @@ main h2 {
 main button {
   border: 1px solid var(--primary-bleu);
   color: var(--primary-bleu);
-  border-radius: 20px;
+  border-radius: 14px;
   background: #FFFFFF;
   cursor: pointer;
   font-size: 1.3em;
@@ -218,7 +218,8 @@ main section article > footer a:link {
   text-decoration: none;
   flex: 1;
 }
-main section article > footer > button, main section article > footer a > button {
+main section article > footer > button,
+main section article > footer a > button {
   width: 100%;
   border: 2px solid var(--primary-bleu);
   color: var(--primary-bleu);
@@ -234,19 +235,22 @@ main section article > footer > button, main section article > footer a > button
   justify-content: center;
   gap: 0.5em;
 }
-main section article > footer > button:hover, main section article > footer a > button:hover {
+main section article > footer > button:hover,
+main section article > footer a > button:hover {
   background: var(--primary-bleu);
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
 }
-main section article > footer > button > svg, main section article > footer a > button > svg {
+main section article > footer > button > svg,
+main section article > footer a > button > svg {
   width: 18px;
   height: 18px;
   stroke-width: 2.5;
   transition: transform 0.3s ease;
 }
-main section article > footer > button:hover > svg, main section article > footer a > button:hover > svg {
+main section article > footer > button:hover > svg,
+main section article > footer a > button:hover > svg {
   transform: translateX(4px);
 }
 main section:nth-of-type(1) article > header > span[data-type=profil] {
@@ -787,7 +791,7 @@ main section:nth-of-type(4) article input[type=password]:focus {
   background: transparent;
   border: 2px solid var(--semantic-rouge);
   color: var(--semantic-rouge);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 10px 20px;
   font-size: 1em;
   font-weight: 600;
@@ -923,16 +927,19 @@ main section:nth-of-type(2) article > footer > form button:hover {
   text-align: center;
 }
 
-#modalOTP img, #modalDesactivationOTP img {
+#modalOTP img,
+#modalDesactivationOTP img {
   display: flex;
   align-self: center;
 }
-#modalOTP small, #modalDesactivationOTP small {
+#modalOTP small,
+#modalDesactivationOTP small {
   background-color: #EFEFEF;
   overflow: auto;
   padding-bottom: 1em;
 }
-#modalOTP form, #modalDesactivationOTP form {
+#modalOTP form,
+#modalDesactivationOTP form {
   margin-bottom: 0.5em;
 }
 
@@ -1072,10 +1079,12 @@ main section:nth-of-type(2) article > footer > form button:hover {
     padding: 10px 16px;
   }
   .btn-text-desktop {
-    display: none; /* Cache le texte long */
+    display: none;
+    /* Cache le texte long */
   }
   .btn-text-mobile {
-    display: inline; /* Affiche le texte court */
+    display: inline;
+    /* Affiche le texte court */
   }
 }
 main section:nth-of-type(1) article select {

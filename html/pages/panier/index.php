@@ -308,7 +308,11 @@
                 <?php endif; ?>
                 <?php endforeach; ?>
             </ul>
-            <?php if ($nbFavoris == 0) : ?>
+            <?php if($nbFavoris > 0) : ?>
+                <form id="formViderFavoris" method="POST" action="/pages/panier/viderFavoris.php" data-no-loader>
+                    <button type="submit" id="viderFavoris">Vider les favoris</button>
+                </form>
+            <?php elseif ($nbFavoris == 0) : ?>
                 <div id="favorisVide">
                     <img id="imgFavorisVide" src="/img/png/aucunFavoris.png" title="Les Favoris sont vide" alt="Les favoris sont vide"/>
                 </div>
@@ -336,6 +340,7 @@
 <script src="/js/notifications.js"></script>
 <?php if (isset($_SESSION['idClient'])) : ?>
 <script>
+//fonction qui permet d'ajouter au panier les articles qui sont dans les favoris
 function ajouterAuPanier(idProduit) {
     fetch(`/pages/panier/ajouterPanier.php?idProduit=${idProduit}`)
         .then(reponse => reponse.json())
@@ -353,6 +358,22 @@ function ajouterAuPanier(idProduit) {
         })
         .catch(err => console.error("Erreur ajout panier:", err));
 }
+
+const formViderFavoris = document.getElementById('formViderFavoris');
+
+formViderFavoris.addEventListener('submit', (event) => {
+    event.preventDefault(); //empeche l'envoi du formulaire
+    showModal({
+        title: 'Vider les favoris',
+        message: "Souhaitez-vous vraiment vider vos favoris ?",
+        okText: 'Vider',
+        cancelText: 'Annuler',
+        variant: 'default',
+        onOk: () => {
+            formViderFavoris.submit();
+        }
+    });
+});
 </script>
 <?php endif; ?>
 <!--vérifie qu'il y ait minimun 1 élément dans le panier pour envoyer le javascript ça permet d'éviter les erreurs de truc non trouvé-->
@@ -500,7 +521,7 @@ document.querySelectorAll('.unArticleP').forEach(article => {
 
 
 
-//confirmation pour vider le panier
+//confirmation pour vider les favoris
 const formViderPanier = document.getElementById('formViderPanier');
 
 formViderPanier.addEventListener('submit', (event) => {

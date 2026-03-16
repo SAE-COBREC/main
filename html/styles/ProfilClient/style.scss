@@ -20,7 +20,7 @@
 @mixin button-primary {
     border: 1px solid $primary-color-bleu;
     color: $primary-color-bleu;
-    border-radius: 20px;
+    border-radius: $border-radius-primary;
     background: $primary-color-blanc;
     cursor: pointer;
     font-size: 1.3em;
@@ -68,12 +68,12 @@
     background: $secondary-color-bleu-clair;
     border-bottom: 1px solid $secondary-color-gris-clair;
 
-    > div {
+    >div {
         display: flex;
         flex-direction: column;
         gap: 0.3em;
 
-        > span {
+        >span {
             font-size: 0.85em;
             color: #888;
             text-transform: uppercase;
@@ -81,7 +81,7 @@
             font-weight: 600;
         }
 
-        > strong {
+        >strong {
             font-size: 1.3em;
             color: #333;
             font-weight: 700;
@@ -98,7 +98,7 @@
     background: $primary-color-blanc;
     border-radius: 50%;
 
-    > svg {
+    >svg {
         width: 24px;
         height: 24px;
         stroke-width: 2;
@@ -149,7 +149,8 @@ main {
 
     button {
         @include button-primary;
-        &:disabled{
+
+        &:disabled {
             background: $secondary-color-gris-fonce !important;
         }
     }
@@ -176,10 +177,10 @@ main {
     section article {
         @include article-card;
 
-        > header {
+        >header {
             @include article-header;
 
-            > span {
+            >span {
                 padding: 6px 16px;
                 border-radius: 20px;
                 font-size: 0.9em;
@@ -209,14 +210,14 @@ main {
             }
         }
 
-        > main {
+        >main {
             padding: 1.5em;
 
-            > div {
+            >div {
                 @include flex-between;
                 gap: 2em;
 
-                > div {
+                >div {
                     display: flex;
                     align-items: center;
                     gap: 0.6em;
@@ -244,13 +245,13 @@ main {
             font-style: normal;
         }
 
-        > footer {
+        >footer {
             padding: 1.5em;
             border-top: 1px solid $secondary-color-gris-clair;
             background: #FAFAFA;
 
-            display: flex;         
-            gap: 1em;              
+            display: flex;
+            gap: 1em;
             align-items: center;
 
             a:link {
@@ -258,7 +259,8 @@ main {
                 flex: 1;
             }
 
-            > button, a > button {
+            >button,
+            a>button {
                 width: 100%;
                 border: 2px solid $primary-color-bleu;
                 color: $primary-color-bleu;
@@ -279,14 +281,14 @@ main {
                     box-shadow: 0 4px 8px rgba(113, 113, 163, 0.3);
                 }
 
-                > svg {
+                >svg {
                     width: 18px;
                     height: 18px;
                     stroke-width: 2.5;
                     @include transition(transform);
                 }
 
-                &:hover > svg {
+                &:hover>svg {
                     transform: translateX(4px);
                 }
             }
@@ -296,13 +298,13 @@ main {
 
     section:nth-of-type(1) {
         article {
-            > header {
-                > span[data-type="profil"] {
+            >header {
+                >span[data-type="profil"] {
                     @include icon-circle(profil);
                 }
             }
 
-            > main {
+            >main {
                 padding: 2em;
             }
 
@@ -311,12 +313,12 @@ main {
                 flex-direction: column;
                 gap: 1.5em;
 
-                > div {
+                >div {
                     display: flex;
                     flex-direction: column;
                 }
 
-                > button {
+                >button {
                     width: 100%;
                     @include flex-center;
                     gap: 0.5em;
@@ -332,12 +334,12 @@ main {
                     margin-top: 0.5em;
 
                     &:hover {
-                        filter: brightness(0.9); 
+                        filter: brightness(0.9);
                         transform: translateY(-2px);
                         box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                     }
 
-                    > svg {
+                    >svg {
                         width: 20px;
                         height: 20px;
                         stroke-width: 2;
@@ -350,7 +352,7 @@ main {
                 flex-direction: column;
                 gap: 0.5em;
 
-                > span {
+                >span {
                     color: #333;
                     font-weight: 600;
                     font-size: 1em;
@@ -377,17 +379,17 @@ main {
     }
 
     section:nth-of-type(2) {
-        > div:first-child {
+        >div:first-child {
             @include flex-between;
             margin-bottom: 1.5em;
             flex-wrap: wrap;
             gap: 1em;
 
-            > h2 {
+            >h2 {
                 margin: 0;
             }
 
-            > button {
+            >button {
                 padding: 10px 20px;
                 background: $primary-color-bleu;
                 color: $primary-color-blanc;
@@ -399,14 +401,14 @@ main {
                 @include transition();
 
                 &:hover {
-                    filter: brightness(0.9); 
+                    filter: brightness(0.9);
                     transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                 }
             }
         }
 
-        > p {
+        >p {
             text-align: center;
             color: #999;
             padding: 3em 2em;
@@ -415,28 +417,28 @@ main {
         }
 
         article {
-            > header {
-                > span[data-type="adresse"] {
+            >header {
+                >span[data-type="adresse"] {
                     @include icon-circle(adresse);
                 }
             }
 
-            > main {
-                > div {
+            >main {
+                >div {
                     display: flex;
 
-                    > p {
+                    >p {
                         margin: 0;
                         line-height: 1.8;
                         color: #555;
                         font-size: 1em;
 
-                        > strong {
+                        >strong {
                             color: #333;
                             font-size: 1.05em;
                         }
 
-                        > em {
+                        >em {
                             color: #777;
                             font-style: italic;
                             font-size: 0.95em;
@@ -445,11 +447,11 @@ main {
                 }
             }
 
-            > footer {
+            >footer {
                 display: flex;
                 gap: 1em;
 
-                > button {
+                >button {
                     flex: 1;
                     @include flex-center;
                     gap: 0.5em;
@@ -473,7 +475,7 @@ main {
                         }
                     }
 
-                    > svg {
+                    >svg {
                         width: 16px;
                         height: 16px;
                         stroke-width: 2.5;
@@ -485,13 +487,13 @@ main {
 
     section:nth-of-type(4) {
         article {
-            > header {
-                > span[data-type="securite"] {
+            >header {
+                >span[data-type="securite"] {
                     @include icon-circle(securite);
                 }
             }
 
-            > main {
+            >main {
                 padding: 2em;
             }
 
@@ -500,7 +502,7 @@ main {
                 flex-direction: column;
                 gap: 1.5em;
 
-                > div {
+                >div {
                     display: flex;
                     flex-direction: column;
                 }
@@ -523,16 +525,16 @@ main {
                 margin-top: 0.5em;
 
                 &:hover {
-                    background: brightness(0.9); 
+                    background: brightness(0.9);
                     transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
                 }
 
-                &disabled{
+                &disabled {
                     background: $secondary-color-gris-fonce !important;
                 }
 
-                > svg {
+                >svg {
                     width: 20px;
                     height: 20px;
                     stroke-width: 2;
@@ -544,7 +546,7 @@ main {
                 flex-direction: column;
                 gap: 0.5em;
 
-                > span {
+                >span {
                     color: #333;
                     font-weight: 600;
                     font-size: 1em;
@@ -574,9 +576,9 @@ main {
     background-color: $primary-color-blanc;
     color: $primary-color-noir;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
-    position: sticky; 
-    top: 0;            
-    z-index: 1000; 
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     width: 100%;
     box-sizing: border-box;
     height: 72px;
@@ -644,6 +646,7 @@ main {
     margin-right: 8px;
 
     .search-input {
+
         &:-webkit-input-placeholder,
         &:-moz-placeholder,
         &-ms-input-placeholder,
@@ -724,6 +727,7 @@ main {
         gap: 10px;
     }
 }
+
 @media (max-width: 768px) {
     main {
         section {
@@ -744,17 +748,17 @@ main {
         }
 
         section article {
-            > main > div {
+            >main>div {
                 flex-direction: column;
                 gap: 1em;
                 align-items: flex-start;
 
-                > div:last-child {
+                >div:last-child {
                     margin-left: 0;
                 }
             }
 
-            > header > div > strong {
+            >header>div>strong {
                 font-size: 1.1em;
             }
 
@@ -763,26 +767,26 @@ main {
             }
         }
 
-        section:nth-of-type(1) article > main {
+        section:nth-of-type(1) article>main {
             padding: 1.5em;
         }
 
         section:nth-of-type(2) {
-            > div:first-child {
+            >div:first-child {
                 flex-direction: column;
                 align-items: stretch;
 
-                > button {
+                >button {
                     width: 100%;
                 }
             }
 
-            article > footer {
+            article>footer {
                 flex-direction: column;
             }
         }
 
-        section:nth-of-type(4) article > main {
+        section:nth-of-type(4) article>main {
             padding: 1.5em;
         }
     }
@@ -872,7 +876,7 @@ main {
         background: transparent;
         border: 2px solid $secondary-color-rouge;
         color: $secondary-color-rouge;
-        border-radius: 8px;
+        border-radius: $border-radius-primary;
         padding: 10px 20px;
         font-size: 1em;
         font-weight: 600;
@@ -893,13 +897,13 @@ main {
     .image-fields-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .profile-image,
     .profile-image-placeholder {
         width: 120px;
         height: 120px;
     }
-    
+
     .profile-image-placeholder svg {
         width: 60px;
         height: 60px;
@@ -965,7 +969,7 @@ main {
     }
 }
 
-main section:nth-of-type(2) article > footer > form {
+main section:nth-of-type(2) article>footer>form {
     button {
         border: 2px solid $secondary-color-rouge;
         color: $secondary-color-rouge;
@@ -985,52 +989,55 @@ main section:nth-of-type(2) article > footer > form {
 #modalAjoutAdresse,
 #modalOTP,
 #modalDesactivationOTP {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  backdrop-filter: blur(4px);
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
 
 
-  >div{
-    position: relative;
-    display:block;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: $primary-color-blanc;
-    padding: 3em;
-    border-radius: 12px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  }
+    >div {
+        position: relative;
+        display: block;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: $primary-color-blanc;
+        padding: 3em;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
 
-  h2 {
-    color: $primary-color-bleu;
-    margin-bottom: 2rem;
-    font-size: 1.5em;
-    border-bottom: 2px solid $secondary-color-gris-clair;
-    padding-bottom: 1rem;
-    text-align: center;
-  }
+    h2 {
+        color: $primary-color-bleu;
+        margin-bottom: 2rem;
+        font-size: 1.5em;
+        border-bottom: 2px solid $secondary-color-gris-clair;
+        padding-bottom: 1rem;
+        text-align: center;
+    }
 }
 
-#modalOTP, #modalDesactivationOTP {
-    img{
+#modalOTP,
+#modalDesactivationOTP {
+    img {
         display: flex;
         align-self: center;
     }
-    small{
+
+    small {
         background-color: $secondary-color-gris-clair;
         overflow: auto;
-        padding-bottom:1em;
+        padding-bottom: 1em;
     }
-    form{
+
+    form {
         margin-bottom: 0.5em;
     }
 }
@@ -1039,22 +1046,24 @@ main section:nth-of-type(2) article > footer > form {
 #formulaireModificationAdresse,
 #formulaireAjoutAdresse,
 #modalOTP form,
-#modalDesactivationOTP form{
+#modalDesactivationOTP form {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    label{
+
+    label {
         display: flex;
         flex-direction: column;
         gap: 0.5em;
-        span{
+
+        span {
             color: #333;
             font-weight: 600;
             font-size: 1em;
         }
     }
 
-    input[type="text"]{
+    input[type="text"] {
         padding: 12px 16px;
         border: 2px solid $secondary-color-gris-clair;
         border-radius: 8px;
@@ -1062,14 +1071,14 @@ main section:nth-of-type(2) article > footer > form {
         font-family: "Quicksand", sans-serif;
         transition: all 0.3s ease;
 
-        &:focus{
+        &:focus {
             outline: none;
             border-color: $primary-color-bleu;
             box-shadow: 0 0 0 3px rgba(113, 113, 163, 0.1);
         }
     }
 
-    button{
+    button {
         padding: 12px 20px;
         border-radius: 8px;
         font-size: 1em;
@@ -1078,23 +1087,25 @@ main section:nth-of-type(2) article > footer > form {
         transition: all 0.3s ease;
         font-family: "Quicksand", sans-serif;
 
-        &[type="submit"]{
+        &[type="submit"] {
             background: $primary-color-bleu;
             color: $primary-color-blanc;
             border: none;
             margin-top: 0.5rem;
-            &:hover{
+
+            &:hover {
                 background: $primary-color-bleu;
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
             }
         }
 
-        &[type="button"]{
+        &[type="button"] {
             background: $primary-color-blanc;
             color: $primary-color-bleu;
             border: 2px solid $primary-color-bleu;
-            &:hover{
+
+            &:hover {
                 background: $primary-color-bleu;
                 color: $primary-color-blanc;
                 transform: translateY(-2px);
@@ -1102,41 +1113,45 @@ main section:nth-of-type(2) article > footer > form {
             }
         }
     }
-  }
+}
 
 /* Responsive pour les modaux */
 @media (max-width: 768px) {
-  #modalModificationAdresse,
-  #modalAjoutAdresse,
-  #modalOTP,
-  #modalDesactivationOTP {
-    > div {
-        padding: 2em;
-        width: 95%;
-    }
-    h2 {
-        font-size: 1.3em;
-        margin-bottom: 1.5rem;
-    }
-  }
 
-  #formulaireModificationAdresse,
-  #formulaireAjoutAdresse,
-  #modalOTP form,
-  #modalDesactivationOTP form {
-    gap: 1.2rem;
-  }
-}
-
-@media (max-width: 428px) {
     #modalModificationAdresse,
     #modalAjoutAdresse,
     #modalOTP,
     #modalDesactivationOTP {
-        > div {
+        >div {
+            padding: 2em;
+            width: 95%;
+        }
+
+        h2 {
+            font-size: 1.3em;
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    #formulaireModificationAdresse,
+    #formulaireAjoutAdresse,
+    #modalOTP form,
+    #modalDesactivationOTP form {
+        gap: 1.2rem;
+    }
+}
+
+@media (max-width: 428px) {
+
+    #modalModificationAdresse,
+    #modalAjoutAdresse,
+    #modalOTP,
+    #modalDesactivationOTP {
+        >div {
             padding: 1.5em;
             border-radius: 8px;
         }
+
         h2 {
             font-size: 1.2em;
             margin-bottom: 1.2rem;
@@ -1147,18 +1162,20 @@ main section:nth-of-type(2) article > footer > form {
     #formulaireAjoutAdresse,
     #modalOTP form,
     #modalDesactivationOTP form {
-        button{
+        button {
             font-size: 0.95em;
             padding: 10px 16px;
         }
     }
 
     .btn-text-desktop {
-        display: none; /* Cache le texte long */
+        display: none;
+        /* Cache le texte long */
     }
-    
+
     .btn-text-mobile {
-        display: inline; /* Affiche le texte court */
+        display: inline;
+        /* Affiche le texte court */
     }
 }
 
@@ -1187,8 +1204,8 @@ main section:nth-of-type(1) article select:hover {
 .daltonien-switcher {
     display: flex;
     align-items: center;
-    justify-content: flex-start; 
-    gap: 1rem; 
+    justify-content: flex-start;
+    gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid $secondary-color-gris-clair;
@@ -1197,11 +1214,11 @@ main section:nth-of-type(1) article select:hover {
         color: #333;
         font-weight: 600;
         font-size: 1.1em;
-        white-space: nowrap; 
+        white-space: nowrap;
     }
 
     .filtre__item {
-        min-width: 200px; 
+        min-width: 200px;
         max-width: 300px;
         padding: 10px 16px;
         border: 2px solid $secondary-color-gris-clair;

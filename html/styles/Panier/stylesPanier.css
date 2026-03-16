@@ -450,6 +450,23 @@ ul li {
   list-style: none;
 }
 
+#viderFavoris {
+  margin-top: 20px;
+  width: 100%;
+  border: 1px solid var(--semantic-rouge);
+  color: var(--semantic-rouge);
+  border-radius: 14px;
+  background: #FFFFFF;
+  cursor: pointer;
+  font-size: 1.3em;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+#viderFavoris:hover {
+  background: var(--semantic-rouge);
+  color: #FFFFFF;
+}
+
 .lesFavoris {
   max-width: 1380px;
   margin: auto;

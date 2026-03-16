@@ -460,6 +460,25 @@ ul {
   }
 }
 
+
+#viderFavoris {
+  margin-top: 20px;
+  width: 100%;
+  border: 1px solid $secondary-color-rouge;
+  color: $secondary-color-rouge;
+  border-radius: $border-radius-primary;
+  background: $primary-color-blanc;
+  cursor: pointer;
+  font-size: 1.3em;
+  padding: 10px 20px;
+  @include transition();
+
+  &:hover {
+    background: $secondary-color-rouge;
+    color: $primary-color-blanc;
+  }
+}
+
 .lesFavoris {
   max-width: 1380px;
   margin: auto;
