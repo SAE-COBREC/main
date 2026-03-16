@@ -1,0 +1,10 @@
+{
+    "montserrat": {
+        "300": "\/home\/etudiant\/Bureau\/BUT_1E2\/COURS\/Semestre_3\/SAE\/SAE 3.04\/main\/html\/vendor\/dompdf\/dompdf\/lib\/fonts\/montserrat_300_02d531d0f5215bf7732e2a46e1236eae",
+        "normal": "\/home\/etudiant\/Bureau\/BUT_1E2\/COURS\/Semestre_3\/SAE\/SAE 3.04\/main\/html\/vendor\/dompdf\/dompdf\/lib\/fonts\/montserrat_normal_95c77d2830d640f06faa8261ded6db33",
+        "600": "montserrat_600_da2f80af0e6d548904b08d3547b44b1c"
+    },
+    "playfair display": {
+        "bold": "playfair_display_bold_1e531eb7e3e1e9744697b9dd01c254b4"
+    }
+}
