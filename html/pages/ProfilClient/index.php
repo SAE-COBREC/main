@@ -5,6 +5,29 @@ require_once(__DIR__."/../../vendor/autoload.php");
 use OTPHP\TOTP;
 use OTPHP\Factory;
 
+// Polyfill for mbstring if missing
+if (!function_exists('mb_convert_encoding')) {
+    function mb_convert_encoding($string, $to_encoding, $from_encoding = null) {
+        if (!function_exists('iconv')) return $string;
+        return iconv($from_encoding ?? 'UTF-8', $to_encoding . '//IGNORE', (string)$string);
+    }
+}
+if (!function_exists('mb_internal_encoding')) {
+    function mb_internal_encoding($encoding = null) {
+        return $encoding === null ? 'UTF-8' : true;
+    }
+}
+if (!function_exists('mb_detect_encoding')) {
+    function mb_detect_encoding($str, $encoding_list = null, $strict = false) {
+        return 'UTF-8';
+    }
+}
+if (!function_exists('mb_detect_order')) {
+    function mb_detect_order($encoding_list = null) {
+        return ['UTF-8', 'ISO-8859-1'];
+    }
+}
+
 //inclure le fichier de configuration pour la connexion à la base de données
 include '../../selectBDD.php';
 
@@ -303,7 +326,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const sections = document.querySelectorAll('.profile-section');
-        const navLinks = document.querySelectorAll('.sidebar-btn');
+        const navLinks = document.querySelectorAll('a.sidebar-btn[href]');
 
         // Update active class on scroll
         window.addEventListener('scroll', () => {
@@ -318,7 +341,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
             navLinks.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
+                const href = link.getAttribute('href');
+                if (current && href && href.includes(current)) {
                     link.classList.add('active');
                 }
             });
@@ -327,8 +351,10 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         // Smooth scroll for anchors
         navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
-                e.preventDefault();
                 const targetId = link.getAttribute('href');
+                if (!targetId) return;
+
+                e.preventDefault();
                 const targetSection = document.querySelector(targetId);
                 if (targetSection) {
                     window.scrollTo({
@@ -341,7 +367,9 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     });
     </script>
 
-                    <nav>
+            <main class="profile-layout">
+            <aside class="profile-sidebar">
+                <nav>
                     <ul>
                         <li>
                             <a href="#personal-info" class="sidebar-btn active">
@@ -396,11 +424,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                 <span>Préférences</span>
                             </a>
                         </li>
-an>Préférences</span>
-                            </button>
-                        </li>
                         <li>
-                            <!-- Formulaire de déconnexion -->
                             <form method="get" class="logout-form-sidebar">
                                 <button type="submit" name="action" value="logout" class="sidebar-btn logout">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -1597,6 +1621,7 @@ an>Préférences</span>
         }
     });
     </script>
+            </main>
     <script src="/js/notifications.js"></script>
 </body>
 

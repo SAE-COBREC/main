@@ -112,7 +112,7 @@ html[data-animations="off"] *::after {
                 <!--champ de saisie pour le nom de produit-->
                 <input type="search" id="nomChercher" name="nomChercher"
                     placeholder="Rechercher un produit (ex: Smartphone, Pull, Bracelet...)" class="search-input"
-                    value="<?= htmlspecialchars($rechercheNom) ?>" autofocus>
+                    value="<?= htmlspecialchars($rechercheNom ?? '') ?>" autofocus>
             </form>
         </div>
 

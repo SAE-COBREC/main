@@ -106,12 +106,6 @@
     }
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: $font-family-secondaire;
     background: $secondary-color-gris-clair;
@@ -119,6 +113,7 @@ body {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
     min-height: 100vh;
+    scroll-behavior: smooth;
 }
 
 main {
@@ -192,6 +187,7 @@ main {
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         text-align: left;
+        text-decoration: none;
 
         @media screen and (max-width: 768px) {
             flex-direction: column;
@@ -240,6 +236,7 @@ main {
                 margin-top: 0;
                 border-top: none;
                 padding-top: 10px;
+                border-radius: 12px;
             }
         }
     }
@@ -249,12 +246,9 @@ main {
     }
 
     .profile-section {
-        display: none;
+        display: block; // Always visible
         animation: fadeIn 0.4s ease-out;
-
-        &.active {
-            display: block;
-        }
+        scroll-margin-top: 100px; // Offset for sticky sidebar/header
     }
 
     @keyframes fadeIn {

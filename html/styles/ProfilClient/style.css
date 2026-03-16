@@ -1,7 +1,4 @@
 @charset "UTF-8";
-* {
-  margin: 0;
-}
 
 :root {
   --primary-bleu: #7171A3;
@@ -44,6 +41,7 @@ body {
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
+  scroll-behavior: smooth;
 }
 
 main {
@@ -52,15 +50,24 @@ main {
   margin: 0 auto;
   width: 100%;
 }
-
-.profile-layout {
+main .profile-layout {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 2.5rem;
   align-items: start;
 }
-
-.profile-sidebar {
+@media screen and (max-width: 1024px) {
+  main .profile-layout {
+    grid-template-columns: 220px 1fr;
+    gap: 1.5rem;
+  }
+}
+@media screen and (max-width: 768px) {
+  main .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+main .profile-sidebar {
   position: sticky;
   top: 100px;
   background: #FFFFFF;
@@ -69,15 +76,31 @@ main {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #EFEFEF;
 }
-
-.profile-sidebar nav ul {
+@media screen and (max-width: 768px) {
+  main .profile-sidebar {
+    position: static;
+    margin-bottom: 2rem;
+    padding: 1rem;
+  }
+}
+main .profile-sidebar nav ul {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-
-.sidebar-btn {
+@media screen and (max-width: 768px) {
+  main .profile-sidebar nav ul {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+  }
+  main .profile-sidebar nav ul::-webkit-scrollbar {
+    display: none;
+  }
+}
+main .sidebar-btn {
   width: 100%;
   display: flex;
   align-items: center;
@@ -92,56 +115,63 @@ main {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
+  text-decoration: none;
 }
-
-.sidebar-btn svg {
+@media screen and (max-width: 768px) {
+  main .sidebar-btn {
+    flex-direction: column;
+    padding: 10px;
+    font-size: 0.8em;
+    min-width: 90px;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+main .sidebar-btn svg {
   width: 20px;
   height: 20px;
   stroke-width: 2;
   transition: transform 0.3s ease;
 }
-
-.sidebar-btn:hover {
+main .sidebar-btn:hover {
   background: #F0F4F8;
   color: var(--primary-bleu);
 }
-
-.sidebar-btn.active {
+main .sidebar-btn.active {
   background: var(--primary-bleu);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
-
-.sidebar-btn.active svg {
+main .sidebar-btn.active svg {
   transform: scale(1.1);
 }
-
-.sidebar-btn.logout {
+main .sidebar-btn.logout {
   margin-top: 1rem;
   border-top: 1px solid #EFEFEF;
   border-radius: 0 0 12px 12px;
   padding-top: 1.5rem;
   color: var(--semantic-rouge);
 }
-
-.sidebar-btn.logout:hover {
+main .sidebar-btn.logout:hover {
   background: #FEE9E8;
   color: var(--semantic-rouge);
 }
-
-.profile-content {
-  min-width: 0; /* Prevent grid blowout */
+@media screen and (max-width: 768px) {
+  main .sidebar-btn.logout {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 10px;
+    border-radius: 12px;
+  }
 }
-
-.profile-section {
-  display: none;
-  animation: fadeIn 0.4s ease-out;
+main .profile-content {
+  min-width: 0;
 }
-
-.profile-section.active {
+main .profile-section {
   display: block;
+  animation: fadeIn 0.4s ease-out;
+  scroll-margin-top: 100px;
 }
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -152,56 +182,6 @@ main {
     transform: translateY(0);
   }
 }
-
-@media screen and (max-width: 1024px) {
-  .profile-layout {
-    grid-template-columns: 220px 1fr;
-    gap: 1.5rem;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
-  
-  .profile-sidebar {
-    position: static;
-    margin-bottom: 2rem;
-    padding: 1rem;
-  }
-  
-  .profile-sidebar nav ul {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-    scrollbar-width: none;
-  }
-  
-  .profile-sidebar nav ul::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .sidebar-btn {
-    flex-direction: column;
-    padding: 10px;
-    font-size: 0.8em;
-    min-width: 90px;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .sidebar-btn span {
-    display: block;
-  }
-  
-  .sidebar-btn.logout {
-    margin-top: 0;
-    border-top: none;
-    padding-top: 10px;
-  }
-}
-
 main section {
   background: #FFFFFF;
   border-radius: 12px;
