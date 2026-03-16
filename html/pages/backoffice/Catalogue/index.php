@@ -474,11 +474,6 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
 
             var searchInput = document.getElementById('filtre-search');
             if (searchInput) {
-                var searchTimer;
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(searchTimer);
-                    searchTimer = setTimeout(appliquerFiltres, 400);
-                });
                 searchInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         clearTimeout(searchTimer);
