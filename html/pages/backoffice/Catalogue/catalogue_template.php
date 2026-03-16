@@ -64,7 +64,7 @@ if (empty($listeProduits)) {
                         <div>
                             <span class="price-badge">
                                 <span class="label">PRIX</span>
-                                ' . $prix . '€
+                                ' . number_format((float)$prix, 2, ',', ' ') . '€
                             </span>
                         </div>
                         <div class="info-row">
