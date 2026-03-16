@@ -498,11 +498,25 @@ article button {
   font-size: 1.2em;
   transition: background 0.2s ease;
 }
+article button .icon-panier-dynamic {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #FFFFFF;
+  -webkit-mask-image: url("/img/svg/panier.svg");
+  mask-image: url("/img/svg/panier.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  vertical-align: middle;
+  margin-right: 8px;
+}
 article button:hover:not(:disabled) {
   background: var(--primary-bleu);
 }
-article button:hover:not(:disabled) img {
-  filter: none;
+article button:hover:not(:disabled) span {
+  background-color: #FFFFFF;
 }
 article button:disabled {
   background: #c0c0c0;
@@ -547,6 +561,9 @@ article button:disabled {
 .produit-promotion button:hover:not(:disabled) {
   background: #FFFFFF !important;
   color: var(--primary-bleu) !important;
+}
+.produit-promotion button:hover:not(:disabled) span {
+  background-color: var(--primary-bleu) !important;
 }
 
 .produit-rupture.produit-promotion {
@@ -864,10 +881,10 @@ article button:disabled {
   position: absolute;
   top: 0;
   left: 0;
-  background: #e74c3c;
+  background: var(--semantic-rouge);
   color: white;
   padding: 5px 10px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-weight: bold;
   font-size: 0.9rem;
 }
@@ -1057,4 +1074,8 @@ article button:disabled {
 
 .carte {
   display: flex;
+}
+
+.panier-icon {
+  display: none !important;
 }/*# sourceMappingURL=style.css.map */

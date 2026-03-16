@@ -1122,6 +1122,11 @@ input[type=number] {
   margin-bottom: 6px;
 }
 
+#btnFavIcon {
+  width: 24px;
+  height: 24px;
+}
+
 @keyframes slideInReview {
   from {
     opacity: 0;

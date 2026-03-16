@@ -2135,13 +2135,23 @@ function traiterAjaxAjoutPanierVendeur($pdo, $idClient, $idPanier)
 //génère le HTML des étoiles de notation
 function afficherEtoilesVendeur(float $note, int $taille = 16): string
 {
+    // On détermine la classe de taille définie dans ton style.scss
+    $sizeClass = 'small';
+    if ($taille >= 24) {
+        $sizeClass = 'large';
+    } elseif ($taille >= 20) {
+        $sizeClass = 'medium';
+    }
+
     $html = '';
     for ($i = 1; $i <= 5; $i++) {
+        // Logique de détermination du type d'étoile
         if ($note >= $i)           $type = 'full';
         elseif ($note >= $i - 0.5) $type = 'alf';
         else                       $type = 'empty';
 
-        $html .= '<img src="/img/svg/star-' . $type . '.svg" alt="Etoile" width="' . $taille . '">';
+        // On génère le span dynamique au lieu de l'image
+        $html .= '<span class="star-icon ' . $sizeClass . ' ' . $type . '"></span>';
     }
     return $html;
 }

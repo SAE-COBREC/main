@@ -1,0 +1,33 @@
+.star-icon {
+  display: inline-block;
+  background-color: var(--star-color);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  vertical-align: middle;
+}
+.star-icon.small {
+  width: 16px;
+  height: 16px;
+}
+.star-icon.medium {
+  width: 20px;
+  height: 20px;
+}
+.star-icon.large {
+  width: 24px;
+  height: 24px;
+}
+.star-icon.full {
+  -webkit-mask-image: url("/img/svg/star-full.svg");
+  mask-image: url("/img/svg/star-full.svg");
+}
+.star-icon.empty {
+  -webkit-mask-image: url("/img/svg/star-empty.svg");
+  mask-image: url("/img/svg/star-empty.svg");
+}
+.star-icon.alf {
+  -webkit-mask-image: url("/img/svg/star-alf.svg");
+  mask-image: url("/img/svg/star-alf.svg");
+}/*# sourceMappingURL=star.css.map */

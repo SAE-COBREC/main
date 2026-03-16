@@ -1,0 +1,17 @@
+.star-icon {
+    display: inline-block; // Indispensable pour un span vide
+    background-color: var(--star-color); // La couleur du thème
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    vertical-align: middle;
+
+    &.small { width: 16px; height: 16px; }
+    &.medium { width: 20px; height: 20px; } // Taille utilisée dans le PHP ci-dessus
+    &.large { width: 24px; height: 24px; }
+
+    &.full { -webkit-mask-image: url('/img/svg/star-full.svg'); mask-image: url('/img/svg/star-full.svg'); }
+    &.empty { -webkit-mask-image: url('/img/svg/star-empty.svg'); mask-image: url('/img/svg/star-empty.svg'); }
+    &.alf { -webkit-mask-image: url('/img/svg/star-alf.svg'); mask-image: url('/img/svg/star-alf.svg'); }
+}

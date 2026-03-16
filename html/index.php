@@ -283,6 +283,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <link rel="stylesheet" href="/styles/Index/style.css">
+    <link rel="stylesheet" href="/styles/Star/star.css">
 
     <script src="js/accessibility.js"></script>
 </head>
@@ -541,8 +542,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                             </button>
                                             <button class="btn-carousel-cart" <?= $estEnRuptureC ? 'disabled' : '' ?>
                                                 onclick="event.stopPropagation(); <?= !$estEnRuptureC ? 'ajouterAuPanier(' . $prodCarousel['id_produit'] . ')' : 'return false;' ?>">
-                                                <img src="/img/svg/panier.svg" alt="Panier" width="20"
-                                                    style="margin-right:8px; filter: brightness(0) invert(1);">
+                                                <span class="icon-panier-dynamic"></span>
                                                 <?= $estEnRuptureC ? 'Rupture de stock' : 'Ajouter au panier' ?>
                                             </button>
                                         </div>
@@ -673,7 +673,11 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             <!--bouton pour ajouter au panier-->
                             <button <?= $estEnRupture ? 'disabled' : '' ?>
                                 onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
-                                <?= $estEnRupture ? 'Indisponible' : '<img src="/img/svg/panier.svg" alt="Panier" class="panier-icon"> Ajouter au panier' ?>
+                                <?php if ($estEnRupture): ?>
+                                    Indisponible
+                                <?php else: ?>
+                                    <span class="icon-panier-dynamic"></span> Ajouter au panier
+                                <?php endif; ?>
                             </button>
                         </div>
                     </div>
