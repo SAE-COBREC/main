@@ -17,13 +17,18 @@ ob_start();
 
 <body>
     <main>
+        <?php
+            $telephoneBrut = $vendeurInfos['num_telephone'] ?? '';
+            $telephoneNettoye = preg_replace('/\D+/', '', (string)$telephoneBrut);
+            $telephoneAffiche = $telephoneNettoye !== '' ? trim(chunk_split($telephoneNettoye, 2, ' ')) : 'Non spécifié';
+        ?>
         <?php if (empty($listeProduits)): ?>
         <p class="message-vide">Ce vendeur n'a aucun produit en ligne pour le moment.</p>
         <?php else: ?>
         <div class="titre-page">CATALOGUE DE <?= mb_strtoupper(htmlspecialchars($nom_entreprise)) ?></div>
         <div class="informations-entreprise">
             <p>
-                <strong>Téléphone:</strong> <?= htmlspecialchars($vendeurInfos['num_telephone'] ?? 'Non spécifié') ?> |
+                <strong>Téléphone:</strong> <?= htmlspecialchars($telephoneAffiche) ?> |
                 <strong>Email:</strong> <?= htmlspecialchars($vendeurInfos['email'] ?? 'Non spécifié') ?>
             </p>
         </div>
@@ -75,7 +80,7 @@ ob_start();
                             <div>
                                 <span class="badge-prix">
                                     <span class="etiquette">PRIX</span>
-                                    <?= number_format((float)$prix, 2, ',', ' ') ?>€
+                                    <?= number_format((float)$prix, 2, ',', ' ') ?> €
                                 </span>
                             </div>
                             <div class="ligne-info">
