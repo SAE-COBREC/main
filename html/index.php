@@ -705,7 +705,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
     <script>
     function filterByVendeur(nom) {
-        window.location.href = '/pages/vendeur/index.php?denomination=' + encodeURIComponent(nom);
+        location.assign('/pages/vendeur/index.php?denomination=' + encodeURIComponent(nom));
     }
     </script>
 
