@@ -382,8 +382,8 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
             if (statut && statut.value !== 'all') params.set('statut', statut.value);
             if (tri && tri.value !== 'nom_asc') params.set('tri', tri.value);
             if (cat && cat.value !== 'all') params.set('cat', cat.value);
-            window.location.href = window.location.pathname + (params.toString() ? '?' + params.toString() :
-                '');
+            location.assign(window.location.pathname + (params.toString() ? '?' + params.toString() :
+                ''));
         }
 
         ['filtre-statut', 'filtre-tri', 'filtre-cat'].forEach(function(id) {
@@ -394,7 +394,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
         var boutonEffacerFiltres = document.getElementById('btn-clear-filters');
         if (boutonEffacerFiltres) {
             boutonEffacerFiltres.addEventListener('click', function() {
-                window.location.href = window.location.pathname;
+                location.assign(window.location.pathname);
             });
         }
 
