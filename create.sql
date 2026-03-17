@@ -1973,7 +1973,7 @@ VALUES (
     (
         1,
         1,
-        'Kig-ha-Farz du Léo',
+        'Kig-ha-Farz de Léo',
         'Le Kig-ha-Farz du Léon est un plat traditionnel emblématique du Finistère, profondément ancré dans la culture culinaire bretonne. Comparable à un pot-au-feu, il se compose de viandes savoureuses mijotées longuement avec des légumes de saison tels que carottes, poireaux et choux. Sa particularité réside dans le far de sarrasin, une pâte rustique cuite dans un sac en tissu directement dans le bouillon, lui conférant une texture dense et unique. Riche, généreux et convivial, ce plat authentique est souvent partagé en famille ou lors de grandes tablées, incarnant à lui seul la tradition et la gourmandise du terroir breton.',
         14.99,
         0,
