@@ -813,11 +813,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                     );
                                 //document.location.href = "/index.php"; 
                                 document.getElementById('modalDesactivationOTP').style.display = 'none';
-
-                                const xhttp3 = new XMLHttpRequest();
-                                xhttp3.open("POST", "../../../pages/ProfilClient/statut_otp_desact.php", true);
-                                xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                                xhttp3.send("statutOTP=unactive");
                                 succesDesactOTP();
                             } else {
                                 alert("Echec. Veuillez réessayer.");

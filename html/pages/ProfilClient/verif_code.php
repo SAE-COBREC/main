@@ -16,17 +16,17 @@
             $logFile = "../../pages/ProfilClient/verif_code.txt";
             if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){
                 //si code bon
-                // $stmt = $pdo->prepare("UPDATE _compte SET etat_otp = false WHERE id_compte = :compte");
-                // $stmt->execute([':compte' => $_SESSION['idCompte']]);
+                $stmt = $pdo->prepare("UPDATE _compte SET etat_otp = false WHERE id_compte = :compte");
+                $stmt->execute([':compte' => $_SESSION['idCompte']]);
                 file_put_contents($logFile, "true");
             }else{
                 file_put_contents($logFile, "false");
             }
-            // if ($_POST['send'] == 0){
-            //     unset($_SESSION['OTP']['statut']);
-            // }else{
-            //     unset($_SESSION['OTPvendeur']['statut']);
-            // }
+            if ($_POST['send'] == 0){
+                unset($_SESSION['OTP']['statut']);
+            }else{
+                unset($_SESSION['OTPvendeur']['statut']);
+            }
             unset($_POST);
         }
     } catch (Exception $e) {}
