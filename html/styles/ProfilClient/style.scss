@@ -1063,15 +1063,15 @@ main {
     border-radius: 8px;
     cursor: pointer;
     @include transition();
-    background-color: rgba(240, 243, 250, 0.95); // gris très clair
+    background-color: rgba(240, 243, 250, 0.95);
 
     &:hover {
         border-color: $primary-color-bleu;
-        background-color: rgba(220, 235, 255, 0.98); // bleu très clair
+        background-color: rgba(220, 235, 255, 0.98);
     }
 
     &.drag-over {
-        background-color: rgba(200, 220, 255, 1); // bleu plus marqué
+        background-color: rgba(200, 220, 255, 1);
         border-color: $primary-color-bleu;
         transform: scale(1.02);
     }
