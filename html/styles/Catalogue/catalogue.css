@@ -90,8 +90,9 @@ ul li {
   vertical-align: middle;
 }
 .ligne-produit .image-produit img {
-  height: 190px;
   width: 100%;
+  height: auto;
+  max-height: 190px;
   -o-object-fit: contain;
      object-fit: contain;
   display: block;
