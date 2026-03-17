@@ -1,4 +1,7 @@
 @charset "UTF-8";
+* {
+  margin: 0;
+}
 
 :root {
   --primary-bleu: #7171A3;
@@ -26,12 +29,6 @@
   --semantic-jaune: #CC79A7;
   --secondary-promotion: #e2f2e4;
   --star-color: #009E73;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
 }
 
 body {
@@ -163,17 +160,6 @@ main .sidebar-btn.logout:hover {
     padding-top: 10px;
     border-radius: 12px;
   }
-}
-main .sidebar-btn.add-btn {
-  background: rgba(var(--primary-bleu), 0.1);
-  color: var(--primary-bleu);
-  margin-top: 0.5rem;
-  border: 1px dashed var(--primary-bleu);
-}
-main .sidebar-btn.add-btn:hover {
-  background: var(--primary-bleu);
-  color: #FFFFFF;
-  border-style: solid;
 }
 main .profile-content {
   min-width: 0;
