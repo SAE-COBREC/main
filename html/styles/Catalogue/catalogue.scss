@@ -8,7 +8,7 @@ $text-light: #777777;
 $bg-white: #FFFFFF;
 $border-color: #eeeeee;
 
-$font-serif: 'Playfair Display', serif;
+$font-family-primaire: 'Playfair Display', serif;
 
 // --- Styles Généraux ---
 * {
@@ -32,7 +32,7 @@ main {
 
     .titre-page {
         text-align: center;
-        font-family: $font-serif;
+        font-family: $font-family-primaire;
         font-size: 32pt;
         color: $primary-color;
         margin-bottom: 10px;
@@ -99,7 +99,7 @@ ul {
         vertical-align: middle;
 
         h3 {
-            font-family: $font-serif;
+            font-family: $font-family-primaire;
             font-size: 20pt;
             color: $primary-color;
             margin-bottom: 12px;
