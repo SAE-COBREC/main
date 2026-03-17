@@ -29,20 +29,34 @@ try {
 
     //on crée un tableau pour les catégories ou il y a des commandes pour le selecte avec le filtre
     $categories = array();
-    
+
     // Nouveau tableau pour la liste des articles (Graphique 3)
     $listeArticles = array();
 
+
+    $totalChiffreAffaire = 0;
+    $totalCommande = 0;
+    $totalVenteArticle = 0;
+    $CommadeCompte = array();
     foreach ($commandes as $articleCommande){                          //pour chaque article de toutes les commandes
         if (!empty($articleCommande['date'])) {                        //si la date n'est pas vide
+            
             $date = new DateTime($articleCommande['date']);            //cree un objet date avec la date courante
+            $totalVenteArticle += $articleCommande["quantite"];        //on ajoute la quantite au nombre d'article vendu
+            $totalChiffreAffaire += $articleCommande["p_prix"];        //on ajoute le prix des articles au CA
+            
+            if (!in_array($articleCommande['id_panier'], $CommadeCompte)){
+                array_push($CommadeCompte, $articleCommande['id_panier']);
+                $totalCommande += 1;
+            }
+
             if (!in_array($date->format('Y'), $anneeAvecVente))        //regarde si l'année n'est pas déjà dans le tableau
                 array_push($anneeAvecVente, $date->format('Y'));       //on l'ajoute au tableau
         }
         if (!in_array($articleCommande['nom_categorie'], $categories))  { //regarde si la catégorie n'est pas déjà dans le tableau
             array_push($categories, $articleCommande['nom_categorie']);   //on l'ajoute au tableau
         }
-        // On récupère les noms d'articles pour le nouveau filtre
+        //on récupère les noms d'articles pour le nouveau filtre
         if (!in_array($articleCommande['p_nom'], $listeArticles)) {
             array_push($listeArticles, $articleCommande['p_nom']);
         }
@@ -75,6 +89,20 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             <header class="header">
                 <h1>Statistiques</h1>
             </header>
+            <section class="contientStatsGeneral">
+                <div class="statsGeneral">
+                    <h3>Chiffre d'affaire:</h3>
+                    <p><?= $totalChiffreAffaire?>€</p>
+                </div>
+                <div class="statsGeneral">
+                    <h3>Nombre de commande:</h3>
+                    <p><?= $totalCommande?></p>
+                </div>
+                <div class="statsGeneral">
+                    <h3>Nombre de produit vendu:</h3>
+                    <p><?= $totalVenteArticle?></p>
+                </div>
+            </section>
             <section class="graphique-filtre">
                 <div id="filre">
                     <div id="divModeAffichage">
@@ -106,7 +134,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         <select id="selectType">
                             <option value="montant">Montant en €</option>
                             <option value="nbCommande">nombre de commandes</option>
-                            <option value="nbArticle">nombre d'articles commandés</option>
+                            <option value="nbArticle">nombre d'articles achetés</option>
                         </select>
                     </div>
 
@@ -197,7 +225,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         options: {
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grace: '10%'
                 }
             }
         }

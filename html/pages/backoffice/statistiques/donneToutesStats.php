@@ -5,11 +5,9 @@ include '../../fonctions.php';
 header('Content-Type: application/json');
 
 $vendeur_id = $_SESSION['vendeur_id'];
-
+unlink("test.txt");
 try {
     $commandes = recupInfoPourStatsGeneral($pdo, $vendeur_id);
-
-
 
     //on créé un tableau de taille 12 rempli de 0
     $donneesParMois = array_fill(1, 12, 0);
@@ -91,6 +89,7 @@ try {
                             if (!in_array($articleCommande['p_nom'], $estDejaLabel)){
                                 array_push($estDejaLabel, $articleCommande['p_nom']);
                                 array_push($compteParLabel, $articleCommande['quantite']);
+                                $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
                             } else {
                                 $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
                                 $compteParLabel[$indiceProduit] += $articleCommande['quantite'];
@@ -109,8 +108,7 @@ try {
                 }
             }     
         }
-    }
-    sort($estDejaLabel);
+    }   
     $reponse = [
         "graph1" => array_values($donneesParMois), //on converti le tableau pour qu'il soit au bon format pour le graphique
         "graph2" => [

@@ -95,4 +95,24 @@ html {
 }
 .main #divSelectArticle {
   padding-top: 20px;
+}
+
+.contientStatsGeneral {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.contientStatsGeneral .statsGeneral {
+  background-color: #FFFFFF;
+  border: 1px solid #E5D5C5;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 1em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1em;
+}
+.contientStatsGeneral .statsGeneral p {
+  font-size: large;
 }/*# sourceMappingURL=statistique.css.map */

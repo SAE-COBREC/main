@@ -1993,7 +1993,8 @@ function recupInfoPourStatsGeneral($pdo, $idVendeur){
     LEFT JOIN cobrec1._produit p ON c.id_produit = p.id_produit
     LEFT JOIN cobrec1._fait_partie_de fpd ON p.id_produit = fpd.id_produit
     LEFT JOIN cobrec1._categorie_produit cp ON cp.id_categorie = fpd.id_categorie
-    WHERE p.id_vendeur = :id_vendeur and timestamp_commande is not null";
+    WHERE p.id_vendeur = :id_vendeur and timestamp_commande is not null
+    ORDER BY p_nom ASC ";
     $stmt = $pdo->prepare($query);
     $stmt->execute(['id_vendeur' => $idVendeur]);
     $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);

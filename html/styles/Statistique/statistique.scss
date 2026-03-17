@@ -74,3 +74,25 @@ html {
     padding-top: 20px;
   }
 }
+
+.contientStatsGeneral {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .statsGeneral {
+    background-color: $primary-color-blanc;
+    border: 1px solid $secondary-color-orange-clair;
+    border-radius: $border-radius-primary;
+    padding: 20px 24px;
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+
+    p {
+      font-size: large;
+    }
+  }
+}
