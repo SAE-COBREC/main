@@ -163,7 +163,7 @@ main {
 
         @media screen and (max-width: 768px) {
             position: static;
-            margin-bottom: 2rem;
+            margin-top: 0;
             padding: 1rem;
         }
 
@@ -178,6 +178,7 @@ main {
                 overflow-x: auto;
                 padding-bottom: 0.5rem;
                 scrollbar-width: none;
+                justify-content: center;
 
                 &::-webkit-scrollbar {
                     display: none;
@@ -257,12 +258,16 @@ main {
     .profile-content {
         min-width: 0;
         margin-top: -2em;
+
+        @media screen and (max-width: 768px) {
+            margin-top: -3em;
+        }
     }
 
     .profile-section {
-        display: block; // Always visible
+        display: block;
         animation: fadeIn 0.4s ease-out;
-        scroll-margin-top: 100px; // Offset for sticky sidebar/header
+        scroll-margin-top: 100px;
     }
 
     @keyframes fadeIn {
@@ -944,6 +949,92 @@ main {
     }
 }
 
+@media screen and (max-width: 708px) {
+    main {
+        padding: 1.5rem 1rem;
+
+        h1 {
+            font-size: 1.4em;
+            margin: 1.5rem 0;
+        }
+
+        h2 {
+            font-size: 1.1em;
+            margin-bottom: 1.2rem;
+        }
+
+        section {
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .back-button {
+            top: 2.5em;
+            font-size: 1em;
+        }
+
+        .profile-sidebar {
+            padding: 0.8rem;
+            
+            nav ul {
+                gap: 0.4rem;
+                padding-bottom: 0.4rem;
+            }
+        }
+
+        .sidebar-btn {
+            min-width: 80px;
+            padding: 8px;
+            font-size: 0.75em;
+            
+            svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        section article {
+            >header {
+                padding: 1rem;
+                
+                >div >strong {
+                    font-size: 1em;
+                }
+            }
+
+            >main {
+                padding: 1rem;
+            }
+
+            >footer {
+                padding: 1rem;
+                gap: 0.8rem;
+
+                button, a > button {
+                    padding: 10px 15px;
+                    font-size: 1em;
+                }
+            }
+        }
+
+        form {
+            gap: 1.2rem;
+        }
+
+        label {
+            font-size: 1em;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"] {
+            padding: 10px 12px;
+        }
+    }
+}
+
 /* Styles pour l'image de profil */
 .profile-image-container {
     text-align: center;
@@ -1059,6 +1150,19 @@ main {
     .profile-image-placeholder svg {
         width: 60px;
         height: 60px;
+    }
+}
+
+@media screen and (max-width: 708px) {
+    .profile-image,
+    .profile-image-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-image-placeholder svg {
+        width: 50px;
+        height: 50px;
     }
 }
 
@@ -1290,6 +1394,22 @@ main section:nth-of-type(2) article>footer>form {
     #modalOTP form,
     #modalDesactivationOTP form {
         gap: 1.2rem;
+    }
+}
+
+@media screen and (max-width: 708px) {
+    #modalModificationAdresse,
+    #modalAjoutAdresse,
+    #modalOTP,
+    #modalDesactivationOTP {
+        >div {
+            padding: 1.5em;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-bottom: 1rem;
+        }
     }
 }
 
