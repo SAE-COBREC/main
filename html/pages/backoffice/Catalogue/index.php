@@ -48,20 +48,7 @@ $produitsHorsCatalogue = ProduitsHorsCatalogue($connexionBaseDeDonnees, $idVende
 // FUSION DE TOUS LES PRODUITS
 // ============================================
 
-//fusionne les produits hors ligne et en ligne dans une seule liste
-$tousProduits = [];
-
-//ajoute les produits hors catalogue avec le marqueur _en_ligne = false
-foreach ($produitsHorsCatalogue as $produitCourant) {
-    $produitCourant['_en_ligne'] = false;
-    $tousProduits[] = $produitCourant;
-}
-
-//ajoute les produits en ligne avec le marqueur _en_ligne = true
-foreach ($listeProduits as $produitCourant) {
-    $produitCourant['_en_ligne'] = true;
-    $tousProduits[] = $produitCourant;
-}
+list($tousProduits, $categoriesDisponibles) = preparerTousLesProduits($listeProduits, $produitsHorsCatalogue);
 
 // ============================================
 // FILTRES ET TRI DU CATALOGUE
@@ -73,36 +60,6 @@ $filtreCategorie = $_GET['cat'] ?? 'all';
 $triCatalogue = $_GET['tri'] ?? 'nom_asc';
 
 $statutsDisponibles = ['En ligne', 'Hors ligne', 'Ébauche', 'Épuisé'];
-$categoriesDisponibles = [];
-
-foreach ($tousProduits as &$produitCourant) {
-    $statutAffichage = 'Hors ligne';
-
-    if ($produitCourant['_en_ligne']) {
-        $statutAffichage = ((int) ($produitCourant['p_stock'] ?? 0) <= 0) ? 'Épuisé' : 'En ligne';
-    } elseif (($produitCourant['p_statut'] ?? '') === 'Ébauche') {
-        $statutAffichage = 'Ébauche';
-    }
-
-    $produitCourant['_statut_affichage'] = $statutAffichage;
-
-    $listeCategoriesProduit = [];
-    $categoriesBrutes = trim((string) ($produitCourant['categories'] ?? ''));
-
-    if ($categoriesBrutes !== '' && $categoriesBrutes !== 'Aucune') {
-        $listeCategoriesProduit = array_values(array_filter(array_map('trim', explode(',', $categoriesBrutes))));
-        foreach ($listeCategoriesProduit as $categorieCourante) {
-            $categoriesDisponibles[$categorieCourante] = true;
-        }
-    }
-
-    $produitCourant['_categories_liste'] = $listeCategoriesProduit;
-}
-unset($produitCourant);
-
-$categoriesDisponibles = array_keys($categoriesDisponibles);
-natcasesort($categoriesDisponibles);
-$categoriesDisponibles = array_values($categoriesDisponibles);
 
 if (!in_array($filtreStatut, array_merge(['all'], $statutsDisponibles), true)) {
     $filtreStatut = 'all';
@@ -117,46 +74,8 @@ if (!in_array($triCatalogue, $trisAutorises, true)) {
     $triCatalogue = 'nom_asc';
 }
 
-$produitsFiltres = array_values(array_filter($tousProduits, function ($produitCourant) use ($rechercheNom, $filtreStatut, $filtreCategorie) {
-    if ($rechercheNom !== '' && stripos((string) ($produitCourant['p_nom'] ?? ''), $rechercheNom) === false) {
-        return false;
-    }
-
-    if ($filtreStatut !== 'all' && ($produitCourant['_statut_affichage'] ?? '') !== $filtreStatut) {
-        return false;
-    }
-
-    if ($filtreCategorie !== 'all' && !in_array($filtreCategorie, $produitCourant['_categories_liste'] ?? [], true)) {
-        return false;
-    }
-
-    return true;
-}));
-
-usort($produitsFiltres, function ($produitA, $produitB) use ($triCatalogue) {
-    $nomA = strtolower((string) ($produitA['p_nom'] ?? ''));
-    $nomB = strtolower((string) ($produitB['p_nom'] ?? ''));
-    $prixA = (float) ($produitA['p_prix'] ?? 0);
-    $prixB = (float) ($produitB['p_prix'] ?? 0);
-    $stockA = (int) ($produitA['p_stock'] ?? 0);
-    $stockB = (int) ($produitB['p_stock'] ?? 0);
-
-    switch ($triCatalogue) {
-        case 'nom_desc':
-            return $nomB <=> $nomA;
-        case 'prix_asc':
-            return $prixA <=> $prixB;
-        case 'prix_desc':
-            return $prixB <=> $prixA;
-        case 'stock_asc':
-            return $stockA <=> $stockB;
-        case 'stock_desc':
-            return $stockB <=> $stockA;
-        case 'nom_asc':
-        default:
-            return $nomA <=> $nomB;
-    }
-});
+$produitsFiltres = filtrerProduitsCatalogueVendeur($tousProduits, $rechercheNom, $filtreStatut, $filtreCategorie);
+$produitsFiltres = trierProduitsCatalogueVendeur($produitsFiltres, $triCatalogue);
 
 // ============================================
 // GESTION DU THÈME D'ACCESSIBILITÉ
