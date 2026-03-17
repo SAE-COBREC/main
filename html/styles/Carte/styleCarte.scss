@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  height: 415px;
+  height: 414px;
   overflow: hidden;
 }
 
@@ -100,4 +100,8 @@ body {
   display: flex;
   align-items: center;
   margin-bottom: 4px;
+}
+
+.leaflet-control-attribution{
+  display: none;
 }
