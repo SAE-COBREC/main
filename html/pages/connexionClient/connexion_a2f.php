@@ -1,11 +1,11 @@
 <?php 
+//DÉBUT EXTRAIT SOURCE OTP
 session_start(); 
 require_once(__DIR__."/../../vendor/autoload.php");
 use OTPHP\TOTP;
 use OTPHP\Factory;
-$hasError = false;
 ?>
-<?php if (!empty($_SESSION['A2F'])){ ?>
+<?php if (!empty($_SESSION['A2F'])){//si l'utilisateur est arrivé via la redirection de connexion ?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -32,20 +32,20 @@ $hasError = false;
                         Valider
                     </button>
                 </div>
-                <div class="error">
-                    <?php if ($hasError){ 
-                        print_r("ERREUR OK"); ?>
-                        <strong>Erreur</strong> : Code A2F incorrect.
-                    <?php } ?>
+                <div class="error2">
+                    <strong>Erreur</strong> : Code A2F incorrect
                 </div>
+                <script>
+                    document.querySelector(".error2").style.display = 'none';
+                </script>
             </form>
         </div>
     </main>
 </body>
 </html>
 <script>
-    const inputCarte = document.querySelector("input");
-    inputCarte.addEventListener("input", function() {
+    //sert à automatiquement avoir un espace tous les 3 chiffres
+    document.querySelector("input").addEventListener("input", function() {
         let valeur = this.value;
         valeur = valeur.replace(/\D/g, "");
         valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
@@ -57,6 +57,7 @@ $hasError = false;
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         print_r($otp->now());
         if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){
+            //établit la connexion
             $_SESSION['idClient'] = $_SESSION['A2F']['idClient'];
             $_SESSION['idCompte'] = $_SESSION['A2F']['idCompte'];
             $_SESSION['OTP']['secret'] = $_SESSION['A2F']['secret_otp'];
@@ -64,17 +65,19 @@ $hasError = false;
             $_SESSION['OTP']['statut'] = 'active';
             $url = '../../index.php';
             echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
-        }else{
-            $hasError = true;
+        }else{?>
+            <script>
+                document.querySelector(".error2").style.display = 'block';
+            </script><?php
         }
     }
     
     ?>
 <?php
-}else{
+}else{//sinon redirection
     $url = '../../index.php';
     echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
 }
 
-
+//FIN EXTRAIT SOURCE OTP
 ?>

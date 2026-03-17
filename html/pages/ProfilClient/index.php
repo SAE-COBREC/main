@@ -1024,9 +1024,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 };
             });
             </script>
-            <?php
-                //}
-            ?>
             <form>
                 <button type="button" onclick="fermerModalDesactivationOTP()">Annuler</button>
             </form>

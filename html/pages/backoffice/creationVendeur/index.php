@@ -89,32 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Créer un compte vendeur - Alizon</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
-    <style>
-    /* Local fonts: Baloo 2 and Quicksand
-    @font-face {
-        font-family: 'Baloo 2';
-        src: url('../../fonts/baloo.regular.ttf') format('truetype');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'Quicksand';
-        src: url('../../fonts/quicksand.light-regular.otf') format('opentype');
-        font-weight: 300;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    @font-face {
-        font-family: 'Quicksand';
-        src: url('../../fonts/quicksand.light-regular.otf') format('opentype');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-    } */
-    </style>
     <link rel="stylesheet" href="../../../styles/Connexion_Creation/styleCoCrea.css">
     <link rel="stylesheet" href="../../../styles/Connexion_Creation/vendeurCoCrea.css">
     <link rel="stylesheet" href="../../../styles/Connexion_Creation/creaOTP.css">
@@ -209,9 +183,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $vendeur = $vendeurStmt->fetch(PDO::FETCH_ASSOC);
       if ($vendeur) {
         $vendeurId = (int)$vendeur['id_vendeur'];
-      }
-      $_SESSION['vendeur_id'] = $vendeurId;
-      
+        $_SESSION['vendeur_id'] = $vendeurId;
+
+      }      
       if (!empty($complement)){
         $sqlAdrss = 'INSERT INTO cobrec1._adresse(id_compte, a_numero, a_adresse, a_complement, a_ville, a_code_postal, a_pays, longitude, latitude)
                 VALUES (:id_compte, :numero, :adresse, :complement, :ville, :code_postal, :pays, :longitude, :latitude)';
@@ -531,6 +505,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <small><?php echo $_SESSION['OTPvendeur']['secret']; ?></small>
                     </label>
                     <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                    <div class="error2">
+                        <strong>Erreur</strong> : Code A2F incorrect
+                    </div>
                     <button type="submit" id="validationOTP">Valider</button>
                     <button type="submit" id="fermerOTP" onclick="fermerMdpOtp()">Annuler</button>
                 </div>
@@ -563,6 +540,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 xhttp2.abort();
                                 alert("Vérification à double facteurs activée avec succès.");
                                 document.querySelector(".mdpOtp").style.display = 'none';
+                                document.querySelector(".error2").style.display = 'none';
                                 document.querySelector("#checkboxotp").style.display = 'none';
                                 document.querySelector("#checkboxotp + label").style.display = 'block';
 
@@ -572,11 +550,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                                 xhttp3.send("statutOTP=active");
                             } else {
-                                const err = document.querySelector('.card#\\34  .error');
-                                if (err) {
-                                    err.classList.remove('hidden');
-                                    err.innerHTML = '<strong>Erreur</strong> : Le code est incorrect.';
-                                }
+                                document.querySelector('.error2').style.display = 'block';
+                                document.querySelector('.error2').value = '';
                             }
                         }
                     };
@@ -596,20 +571,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <script>
             document.querySelector(".mdpOtp").style.display = "none";
+            document.querySelector(".error2").style.display = "none";
             document.querySelector("#checkboxotp + label").style.display = 'none';
 
             function fermerMdpOtp(){
                 document.querySelector("#checkboxotp input").checked = false;
                 changer_OTP();
             }
-
+            
             function changer_OTP() {
                 const checkboxOtp = document.querySelector("#checkboxotp input");
                 const mdpOtp = document.querySelector(".mdpOtp");
                 if (checkboxOtp.checked) {
                     mdpOtp.style.display = 'block';
+                    document.querySelector('.error2').style.display = 'none';
                 } else {
                     mdpOtp.style.display = 'none';
+                    document.querySelector('.error2').style.display = 'none'
                 }
             }
 
@@ -909,7 +887,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const message = getFieldValidationMessage(invalid);
                 const fieldName = invalid.name || invalid.id || 'inconnu';
                 if (errDiv) {
-                    errDiv.innerHTML = '<strong>Erreur</strong> (' + fieldName + ') : ' + message;
+                    errDiv.innerHTML = '<strong>Erreur</strong> : ' + message;
                     errDiv.classList.remove('hidden');
                 }
                 invalid.focus();

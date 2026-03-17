@@ -16,13 +16,7 @@ $pdo->exec("SET search_path TO cobrec1");
             if (el && el.validity) {
                 //cas ou aucune valeur n'est entrée
                 if (el.validity.valueMissing) return 'Ce champ est requis.';
-
-                // Vérification d'âge
-                if (el.id === 'naissance') {
-                    if (el.validity.customError) {
-                        return el.validationMessage;
-                    }
-                }
+                
                 //verification du mdp
                 if (el.id === 'mdp') {
                     var val = (el.value || '').trim();
@@ -127,24 +121,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $error_card = 1;
           $error_message = ' mail, pseudo ou mot de passe incorrecte.';
         } else {
-          // Redirection sans header() (serveur peut bloquer header)
+          //DÉBUT EXTRAIT SOURCE OTP, cf. plus haut pour le SELECT de la BDD
           if ($row['etat_otp'] == 'true'){
+            //sauvegarde les infos nécessaires à la connexion
             $_SESSION['A2F']['idClient'] = $clientId;
             $_SESSION['A2F']['secret_otp'] = $row['secret_otp'];
             $_SESSION['A2F']['idCompte'] = (int)$row['id_compte'];
+            //redirige vers la page de vérification A2F
             $url = './connexion_a2f.php';
           }else{
             //ajout des identifiant a la session
             $_SESSION['idClient'] = $clientId;
             $_SESSION['idCompte'] = (int)$row['id_compte'];
-            if (!empty($_SESSION['A2F'])){
+            if (!empty($_SESSION['A2F'])){//afin de ne pas garder de données périmées
                 unset($_SESSION['A2F']);
             }
 
+             //redirige vers le catalogue client
             $url = '../../index.php';
           }
+          // Redirection sans header() (serveur peut bloquer header)
           echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
           exit;
+          //FIN EXTRAIT SOURCE OTP
         }
       }
     }

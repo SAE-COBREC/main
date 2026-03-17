@@ -1,4 +1,5 @@
 <?php
+//nécessités pour la génération de QR code et de l'OTP
 try{
     require_once(__DIR__."/../../vendor/autoload.php");
     require_once(__DIR__."/../../vendor/QRcodes/vendor/autoload.php");
@@ -35,11 +36,6 @@ function retry(){
     }else{
         $otp = $otp->withLabel('Alizon');
     }
-    $grCodeUri = $otp->getQrCodeUri(
-        'https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M',
-        '[DATA]'
-    );
-    //echo "<img src='{$grCodeUri}'>";
     $writer = new PngWriter();
     try{
         // Create QR code
@@ -61,6 +57,7 @@ function retry(){
         return [$otp,$result];
     }catch(Exception $e){
         return retry();
+        //si exception alors on réessaie
     }
 }
 [$otp,$result] = retry();

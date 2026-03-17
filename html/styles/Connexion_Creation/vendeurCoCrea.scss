@@ -23,6 +23,16 @@ body {
     }
   }
 
+#validationOTP {
+  background: $primary-color-bronze;
+  color: $primary-color-blanc;
+  transition: background-color 0.3s;
+
+  &:hover {
+  background: rgba($secondary-color-bronze-clair, 0.9);
+  }
+}
+
 .card[id="3"] {
     label {
         margin-left: 20px;

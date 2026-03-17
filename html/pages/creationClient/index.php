@@ -485,6 +485,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <small><?php echo $otp->getSecret() ?></small>
                     </label>
                     <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                    <div class="error2">
+                        <strong>Erreur</strong> : Code A2F incorrect
+                    </div>
                     <button type="submit" id="validationOTP">Valider</button>
                     <button type="submit" id="fermerOTP" onclick="fermerMdpOtp()">Annuler</button>
                 </div>
@@ -517,6 +520,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 xhttp2.abort();
                                 alert("Vérification à double facteurs activée avec succès.");
                                 document.querySelector(".mdpOtp").style.display = 'none';
+                                document.querySelector(".error2").style.display = 'none';
                                 document.querySelector("#checkboxotp").style.display = 'none';
                                 document.querySelector("#checkboxotp + label").style.display = 'block';
 
@@ -528,11 +532,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 // const btnFleche = document.querySelector("#finishBtn");
                                 // btnFleche.disabled = false;
                             } else {
-                                const err = document.querySelector('.card#\\34  .error');
-                                if (err) {
-                                    err.classList.remove('hidden');
-                                    err.innerHTML = '<strong>Erreur</strong> : Le code est incorrect.';
-                                }
+                                document.querySelector('.error2').style.display = 'block';
+                                document.querySelector('.error2').value = '';
                             }
                         }
                     };
@@ -554,6 +555,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <script>
             document.querySelector(".mdpOtp").style.display = "none";
+            document.querySelector(".error2").style.display = "none";
             document.querySelector("#checkboxotp + label").style.display = 'none';
 
             function fermerMdpOtp(){
@@ -564,23 +566,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             function changer_OTP() {
                 const checkboxOtp = document.querySelector("#checkboxotp input");
                 const mdpOtp = document.querySelector(".mdpOtp");
-                // const btnFleche = document.querySelector("#finishBtn");
-                //const cgv = document.querySelector("#cgv");
                 if (checkboxOtp.checked) {
                     mdpOtp.style.display = 'block';
-                    // btnFleche.disabled = true;
-                    // cgv.checked = false;
-                    // cgv.disabled = true;
+                    document.querySelector(".error2").style.display = "none";
                 } else {
                     mdpOtp.style.display = 'none';
-                    // btnFleche.disabled = false;
-                    // cgv.disabled = false;
+                    document.querySelector(".error2").style.display = "none";
                 }
             }
 
             function echecOTP() {
                 return 'Code OTP invalide. Veuillez réessayer.';
             }
+
+
+
+
+            // document.querySelector('checkboxotp input').addEventListener('click', function(event) {
+            //     event.preventDefault();
+            //     const formData = new FormData(document.getElementById('multiForm'), document.getElementById(
+            //         'validationOTP'));
+            //     const code = formData.get('code');
+
+            //     const xhttp = new XMLHttpRequest();
+            //     xhttp.open("POST", "./transmettre_pseudo.php", true);
+            //     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            //     xhttp.send("pseudo=" + htmlspecialchars(document.getElementById('pseudo').value ?? '', ENT_QUOTES, 'UTF-8'));
+            // });
             </script>
 
             <div>

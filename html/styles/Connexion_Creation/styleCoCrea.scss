@@ -68,6 +68,15 @@ body {
     > label{
       padding-left: 10px;
     }
+    button {
+      border: none;
+      padding: 10px 20px;
+      border-radius: $border-radius-primary;
+      font-weight: 600;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
   }
 
   &.hidden {
@@ -172,7 +181,7 @@ body {
 
   }
 
-  .error {
+  .error, .error2 {
     background: $primary-color-blanc;
     border-radius: $border-radius-primary;
     color: #c00;
@@ -325,6 +334,12 @@ body {
   .step {
     margin-top: 1.2rem;
     font-size: 18px;
+  }
+
+  .mdpOtp {
+    input {
+      width:auto;
+    }
   }
 }
 .modal {

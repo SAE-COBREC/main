@@ -47,6 +47,15 @@ body {
   color: black;
 }
 
+#validationOTP {
+  background: var(--primary-bronze);
+  color: #FFFFFF;
+  transition: background-color 0.3s;
+}
+#validationOTP:hover {
+  background: rgba(230, 169, 110, 0.9);
+}
+
 .card[id="3"] label {
   margin-left: 20px;
 }

@@ -98,6 +98,14 @@ body.centered {
 .card .mdpOtp > label {
   padding-left: 10px;
 }
+.card .mdpOtp button {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 22px;
+  cursor: pointer;
+}
 .card.hidden {
   display: none !important;
 }
@@ -193,7 +201,7 @@ body.centered {
 .card input#rue {
   width: 325px;
 }
-.card .error {
+.card .error, .card .error2 {
   background: #FFFFFF;
   border-radius: 14px;
   color: #c00;
@@ -203,11 +211,11 @@ body.centered {
   margin-left: 40px;
 }
 @media screen and (max-width: 508px) {
-  .card .error {
+  .card .error, .card .error2 {
     padding: 0;
     margin-left: 0px;
   }
-  .card .error:not(.hidden) {
+  .card .error:not(.hidden), .card .error2:not(.hidden) {
     margin-bottom: 20px;
   }
 }
@@ -332,6 +340,9 @@ body.centered {
 .card .step {
   margin-top: 1.2rem;
   font-size: 18px;
+}
+.card .mdpOtp input {
+  width: auto;
 }
 
 .modal {

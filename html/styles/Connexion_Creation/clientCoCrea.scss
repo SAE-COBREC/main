@@ -26,6 +26,16 @@ body {
     }
 }
 
+#validationOTP {
+    background: $primary-color-bleu;
+    color: $primary-color-blanc;
+    transition: background-color 0.3s;
+
+    &:hover {
+    background: rgba($secondary-color-bleu-clair, 0.9);
+    }
+}
+
 .field-error {
     border-color: #dc143c !important;
     box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.18);

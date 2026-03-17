@@ -717,7 +717,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         </script>
                     <?php } ?>
                 </form>
-
+                <br>
                 <div id="modalOTP">
         <div>
             <h2 class="profil-card__title">Authentification à doubles facteurs</h2>
@@ -726,11 +726,14 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 $_SESSION['OTPvendeur']['secret'] = $otp->getSecret();
                 ?>
             <form id="otpform">
-                <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
-                <label>Code secret :
-                    <small><?php echo $otp->getSecret() ?></small>
-                </label>
+                <div>
+                    <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
+                    <label>Code secret :
+                        <small><?php echo $otp->getSecret() ?></small>
+                    </label>
+                </div>
                 <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <button type="button" onclick="fermerModalOTP()">Annuler</button>
                 <button type="submit">Valider</button>
             </form>
             <script>
@@ -771,12 +774,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 };
             });
             </script>
-            <?php
-                //}
-            ?>
-            <form>
-                <button type="button" onclick="fermerModalOTP()">Annuler</button>
-            </form>
         </div>
     </div>
 
@@ -788,6 +785,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <p>Code secret :</p>
                 </label>
                 <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <button type="button" onclick="fermerModalDesactivationOTP()">Annuler</button>
                 <button type="submit">Valider</button>
             </form>
             <script>
@@ -828,9 +826,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     };
                 });
                 </script>
-                <form>
-                    <button type="button" onclick="fermerModalDesactivationOTP()">Annuler</button>
-                </form>
+            </div>
             </div>
             </div>
 

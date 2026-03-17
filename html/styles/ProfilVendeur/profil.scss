@@ -135,11 +135,10 @@ body {
 #modalOTP, #modalDesactivationOTP {
   img{
       display: flex;
-      align-self: center;
+      margin: 40px auto;
   }
   small{
       display: block;
-      width:25%;
       background-color: $secondary-color-gris-clair;
       overflow: auto;
       padding-bottom:1em;
@@ -163,19 +162,19 @@ button {
   font-size: 22px;
   cursor: pointer;
 
-  .btn--primary {
-    background: $primary-color-bronze;
-    color: $primary-color-blanc;
-    transition: background-color 0.3s;
-
-    &:hover {
-      background: rgba($secondary-color-bronze-clair, 0.9);
-    }
-  }
-
    &:disabled{
       background: $secondary-color-gris-fonce !important;
     }
+}
+
+.btn--primary, button[type='submit'] {
+  background: $primary-color-bronze;
+  color: $primary-color-blanc;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background: rgba($secondary-color-bronze-clair, 0.9);
+  }
 }
 
 input,
@@ -193,6 +192,10 @@ input,
       outline: none;
       border-color: $primary-color-bronze;
       box-shadow: 0 0 0 2px rgba($primary-color-bronze, 0.2);
+    }
+
+    &[name='code']{
+      margin-bottom:15px;
     }
   }
 

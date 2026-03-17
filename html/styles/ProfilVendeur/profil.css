@@ -159,11 +159,10 @@ body {
 
 #modalOTP img, #modalDesactivationOTP img {
   display: flex;
-  align-self: center;
+  margin: 40px auto;
 }
 #modalOTP small, #modalDesactivationOTP small {
   display: block;
-  width: 25%;
   background-color: #EFEFEF;
   overflow: auto;
   padding-bottom: 1em;
@@ -186,16 +185,17 @@ button {
   font-size: 22px;
   cursor: pointer;
 }
-button .btn--primary {
+button:disabled {
+  background: #c0c0c0 !important;
+}
+
+.btn--primary, button[type=submit] {
   background: var(--primary-bronze);
   color: #FFFFFF;
   transition: background-color 0.3s;
 }
-button .btn--primary:hover {
+.btn--primary:hover, button[type=submit]:hover {
   background: rgba(230, 169, 110, 0.9);
-}
-button:disabled {
-  background: #c0c0c0 !important;
 }
 
 input,
@@ -214,6 +214,10 @@ select:focus {
   outline: none;
   border-color: var(--primary-bronze);
   box-shadow: 0 0 0 2px rgba(var(--primary-bronze), 0.2);
+}
+input[name=code],
+select[name=code] {
+  margin-bottom: 15px;
 }
 
 @keyframes fadeIn {
