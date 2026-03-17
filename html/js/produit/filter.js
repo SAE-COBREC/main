@@ -8,7 +8,7 @@
     function closeMenu(){ menu.classList.remove('is-open'); btn.setAttribute('aria-expanded','false'); }
 
     async function applyFilter(href) {
-        if (!listEl) { window.location.href = href; return; }
+        if (!listEl) { location.assign(href); return; }
         const url = new URL(href, window.location.href);
         url.searchParams.set('partial', 'reviews');
         btn.disabled = true; btn.style.opacity = '0.75';
@@ -31,7 +31,7 @@
             history.replaceState({}, '', newUrl.toString());
             document.dispatchEvent(new CustomEvent('reviews:updated'));
         } catch (e) {
-            window.location.href = href;
+            location.assign(href);
         } finally { btn.disabled = false; btn.style.opacity = '1'; }
     }
 

@@ -371,7 +371,9 @@ input[type=number] {
 
 .features ul {
   padding-left: 18px;
-  color: #030212;
+}
+.features ul li:first-child {
+  list-style-type: none;
 }
 
 .smaller {
@@ -904,6 +906,32 @@ input[type=number] {
     width: 100%;
   }
 }
+.vendeur-info {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  width: -moz-fit-content;
+  width: fit-content;
+  background-color: #F0F4F8;
+  border-radius: 20px;
+  border: 1px solid rgba(var(--primary-bleu), 0.1);
+  gap: 6px;
+  padding: 4px 8px;
+}
+.vendeur-info img {
+  width: 24px;
+  height: 24px;
+  color: var(--primary-bleu);
+}
+.vendeur-info span {
+  font-size: 0.85rem;
+  color: var(--primary-bleu);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .disabled {
   background: #EFEFEF !important;
   cursor: not-allowed !important;

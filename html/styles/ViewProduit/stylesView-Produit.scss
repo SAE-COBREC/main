@@ -381,7 +381,10 @@ input[type="number"] {
 .features {
     ul {
         padding-left: 18px;
-        color: vars.$primary-color-noir;
+
+        li:first-child {
+            list-style-type: none;
+        }
     }
 }
 
@@ -1014,6 +1017,34 @@ input[type="number"] {
             width: 100%;
         }
     }
+}
+
+.vendeur-info {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  width: fit-content; // Ajouté pour que l'élément ne prenne que sa taille
+  background-color: vars.$secondary-color-bleu-clair; 
+  border-radius: 20px;
+  border: 1px solid rgba(vars.$primary-color-bleu, 0.1);
+  gap: 6px;
+  padding: 4px 8px;
+  
+
+  img {
+    width: 24px;
+    height: 24px;
+    color: vars.$primary-color-bleu;
+  }
+
+  span {
+    font-size: 0.85rem;
+    color: vars.$primary-color-bleu;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .disabled {

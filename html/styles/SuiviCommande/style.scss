@@ -315,7 +315,8 @@ main {
 
     // Surcharge spécifique pour la couleur de fond au hover si besoin
     &:hover {
-      background: color.adjust($primary-color-bleu, $lightness: -10%); // Calcul automatique de la couleur sombre
+      background: $primary-color-bleu;
+      opacity: 0.9;
     }
 
     svg {

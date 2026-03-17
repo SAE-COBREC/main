@@ -478,7 +478,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     } else {
                         url.searchParams.set('st', 'aucun');
                     }
-                    window.location.href = url.href;
+                    location.assign(url.href);
                 });
 
                 tabsStatuts.forEach(tab => {
@@ -496,7 +496,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             url.searchParams.set('st', 'aucun');
                         }
 
-                        window.location.href = url.href;
+                        location.assign(url.href);
                     });
                 });
 
@@ -510,7 +510,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         url.searchParams.set('low_stock', '1');
                     }
 
-                    window.location.href = url.href;
+                    location.assign(url.href);
                 });
 
                 const selectCate = document.getElementById('categorie');
@@ -524,7 +524,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         url.searchParams.set('cat', val);
                     }
 
-                    window.location.href = url.href;
+                    location.assign(url.href);
                 });
 
                 const searchInput = document.getElementById('search_bar');
@@ -546,7 +546,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         }
 
                         // On recharge la page avec le nouveau paramètre de recherche
-                        window.location.href = url.href;
+                        location.assign(url.href);
                     }
                 });
             });
