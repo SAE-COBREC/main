@@ -457,7 +457,7 @@ article {
     }
   }
 
-  //bouton panier
+  //bouton "Ajouter au panier"
   button {
     margin-top: auto;
     width: 100%;
@@ -469,13 +469,33 @@ article {
     cursor: pointer;
     font-weight: 600;
     font-size: 1.2em;
-    font-family: $font-family-secondaire;
     @include transition(background);
 
-    &:hover:not(:disabled) {
-      background: $primary-color-bleu;
+    .icon-panier-dynamic {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-color: $primary-color-blanc;
+      -webkit-mask-image: url('/img/svg/panier.svg');
+      mask-image: url('/img/svg/panier.svg');
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      vertical-align: middle;
+      margin-right: 8px;
     }
 
+    //effet hover sur le bouton
+    &:hover:not(:disabled) {
+      background: $primary-color-bleu;
+
+      span{
+        background-color: $primary-color-blanc;
+      }
+    }
+
+    //style du bouton désactivé
     &:disabled {
       background: $secondary-color-gris-fonce;
       cursor: not-allowed;
@@ -494,6 +514,19 @@ article[data-promo] {
   background-color: $secondary-color-promotion !important;
   position: relative;
   overflow: hidden;
+
+  button {
+    background-color: $primary-color-bleu;
+    color: $primary-color-blanc;
+    &:hover:not(:disabled) {
+      background: $primary-color-blanc;
+      color: $primary-color-bleu;
+      
+      .icon-panier-dynamic{
+        filter: invert(49%) sepia(11%) saturate(1212%) hue-rotate(201deg) brightness(91%) contrast(85%);
+      }
+    }
+  }
 }
 
 //produit en rupture  →  article[data-rupture]

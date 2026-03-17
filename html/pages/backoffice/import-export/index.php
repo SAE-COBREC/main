@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 if (empty($lines)) {
                     $message_error = "Le fichier CSV ne contient aucune ligne de données. Assurez-vous que le fichier contient au moins une ligne d'en-tête (nom;description;prix;stock) suivie d'une ou plusieurs lignes de produits.";
                 } else {
-                    // Parser la ligne d'en-tête — auto-détection du séparateur
+                    // Parser la ligne d'en-tête - auto-détection du séparateur
                     $firstLine = $lines[0];
                     $separator = ';';
                     if (substr_count($firstLine, ',') > substr_count($firstLine, ';')) {
@@ -162,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 if ($row['prix'] === '') $champs_vides[] = 'prix';
                                 if ($row['stock'] === '') $champs_vides[] = 'stock';
                                 if (!empty($champs_vides)) {
-                                    $import_details[] = "Ligne $ligne : les champs obligatoires suivants sont vides ou manquants : " . implode(', ', $champs_vides) . " — ligne ignorée.";
+                                    $import_details[] = "Ligne $ligne : les champs obligatoires suivants sont vides ou manquants : " . implode(', ', $champs_vides) . " - ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
@@ -171,22 +171,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 $stock = intval($row['stock']);
 
                                 if ($prix < 0) {
-                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le prix est négatif (" . $row['prix'] . "). Le prix doit être un nombre positif ou zéro — ligne ignorée.";
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le prix est négatif (" . $row['prix'] . "). Le prix doit être un nombre positif ou zéro - ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
                                 if ($stock < 0) {
-                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le stock est négatif (" . $row['stock'] . "). Le stock doit être un nombre entier positif ou zéro — ligne ignorée.";
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le stock est négatif (" . $row['stock'] . "). Le stock doit être un nombre entier positif ou zéro - ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
                                 if (!is_numeric(str_replace(',', '.', $row['prix']))) {
-                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le prix '" . htmlspecialchars($row['prix']) . "' n'est pas un nombre valide — ligne ignorée.";
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le prix '" . htmlspecialchars($row['prix']) . "' n'est pas un nombre valide - ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
                                 if (!ctype_digit(ltrim($row['stock'], '-'))) {
-                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le stock '" . htmlspecialchars($row['stock']) . "' n'est pas un nombre entier valide — ligne ignorée.";
+                                    $import_details[] = "Ligne $ligne (\"" . htmlspecialchars($row['nom']) . "\") : le stock '" . htmlspecialchars($row['stock']) . "' n'est pas un nombre entier valide - ligne ignorée.";
                                     $nb_erreurs++;
                                     continue;
                                 }
@@ -248,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                         }
 
                                         $pdo->exec("RELEASE SAVEPOINT import_row");
-                                        $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" — mis à jour.";
+                                        $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" - mis à jour.";
                                         $nb_importes++;
                                     } else {
                                         // Déterminer la TVA
@@ -293,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                         }
 
                                         $pdo->exec("RELEASE SAVEPOINT import_row");
-                                        $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" — créé (ID: $new_id).";
+                                        $import_details[] = "Ligne $ligne : \"" . htmlspecialchars($row['nom']) . "\" - créé (ID: $new_id).";
                                         $nb_importes++;
                                     }
                                 } catch (Exception $rowEx) {
@@ -314,46 +314,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     // 23505 = violation de contrainte UNIQUE
                                     if ($sqlState === '23505' || stripos($errMsg, 'unique') !== false || stripos($errMsg, 'duplicate key') !== false) {
                                         if (stripos($errMsg, 'unique_produit_nom') !== false || stripos($errMsg, 'p_nom') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : un produit portant exactement ce nom existe déjà sur la plateforme (chez un autre vendeur). Veuillez choisir un nom de produit différent — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : un produit portant exactement ce nom existe déjà sur la plateforme (chez un autre vendeur). Veuillez choisir un nom de produit différent - ligne ignorée.";
                                         } else {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur en doublon empêche l'enregistrement (contrainte d'unicité). Vérifiez que les données ne sont pas déjà présentes — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur en doublon empêche l'enregistrement (contrainte d'unicité). Vérifiez que les données ne sont pas déjà présentes - ligne ignorée.";
                                         }
                                     }
                                     // 23514 = violation de contrainte CHECK
                                     elseif ($sqlState === '23514' || stripos($errMsg, 'check') !== false) {
                                         if (stripos($errMsg, 'verif_produit_statut') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le statut indiqué n'est pas valide. Valeurs acceptées : Ébauche, En ligne, Hors ligne, Supprimé — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le statut indiqué n'est pas valide. Valeurs acceptées : Ébauche, En ligne, Hors ligne, Supprimé - ligne ignorée.";
                                         } elseif (stripos($errMsg, 'verif_produit_origine') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : l'origine indiquée n'est pas valide. Valeurs acceptées : Inconnu, Bretagne, France, UE, Hors UE — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : l'origine indiquée n'est pas valide. Valeurs acceptées : Inconnu, Bretagne, France, UE, Hors UE - ligne ignorée.";
                                         } elseif (stripos($errMsg, 'verif_produit_prix') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le prix doit être un nombre positif ou zéro — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le prix doit être un nombre positif ou zéro - ligne ignorée.";
                                         } elseif (stripos($errMsg, 'verif_produit_stock') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le stock doit être un nombre entier positif ou zéro — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le stock doit être un nombre entier positif ou zéro - ligne ignorée.";
                                         } elseif (stripos($errMsg, 'verif_produit_poids') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le poids doit être un nombre positif ou zéro — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le poids doit être un nombre positif ou zéro - ligne ignorée.";
                                         } elseif (stripos($errMsg, 'verif_produit_volume') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le volume doit être un nombre positif ou zéro — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : le volume doit être un nombre positif ou zéro - ligne ignorée.";
                                         } elseif (stripos($errMsg, 'verif_produit_frais_de_port') !== false) {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : les frais de port doivent être un nombre positif ou zéro — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : les frais de port doivent être un nombre positif ou zéro - ligne ignorée.";
                                         } else {
-                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur ne respecte pas les contraintes autorisées (statut, origine, prix, stock…). Vérifiez les données — ligne ignorée.";
+                                            $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur ne respecte pas les contraintes autorisées (statut, origine, prix, stock…). Vérifiez les données - ligne ignorée.";
                                         }
                                     }
                                     // 23503 = violation de clé étrangère
                                     elseif ($sqlState === '23503' || stripos($errMsg, 'foreign key') !== false) {
-                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une référence est invalide (catégorie ou TVA inexistante). Vérifiez que la catégorie et la TVA indiquées existent bien — ligne ignorée.";
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une référence est invalide (catégorie ou TVA inexistante). Vérifiez que la catégorie et la TVA indiquées existent bien - ligne ignorée.";
                                     }
                                     // 22001 = chaîne trop longue
                                     elseif ($sqlState === '22001' || stripos($errMsg, 'value too long') !== false) {
-                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur est trop longue (le nom ne doit pas dépasser 100 caractères, l'origine 20 caractères). Raccourcissez le texte — ligne ignorée.";
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur est trop longue (le nom ne doit pas dépasser 100 caractères, l'origine 20 caractères). Raccourcissez le texte - ligne ignorée.";
                                     }
                                     // 22003 = valeur numérique hors limite
                                     elseif ($sqlState === '22003' || stripos($errMsg, 'out of range') !== false || stripos($errMsg, 'numeric field overflow') !== false) {
-                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur numérique est hors des limites autorisées (prix, poids ou volume trop grand). Vérifiez les montants — ligne ignorée.";
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : une valeur numérique est hors des limites autorisées (prix, poids ou volume trop grand). Vérifiez les montants - ligne ignorée.";
                                     }
                                     // Erreur non identifiée
                                     else {
-                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : impossible d'enregistrer ce produit en base de données. Vérifiez que les valeurs respectent les contraintes (longueur du nom, format du prix, etc.) — ligne ignorée.";
+                                        $import_details[] = "Ligne $ligne (\"$prodNom\") : impossible d'enregistrer ce produit en base de données. Vérifiez que les valeurs respectent les contraintes (longueur du nom, format du prix, etc.) - ligne ignorée.";
                                     }
 
                                     $nb_erreurs++;
@@ -361,10 +361,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             }
 
                             $pdo->commit();
-                            $message_success = "$nb_importes produit(s) importé(s) avec succès.";
-                            if ($nb_erreurs > 0) {
-                                $message_success .= " $nb_erreurs ligne(s) ignorée(s).";
+                            if ($nb_importes == 0) {
+                                $message_error = "$nb_importes produit(s) importé(s)";
+                                if ($nb_erreurs > 0) {
+                                    $message_error .= " $nb_erreurs ligne(s) ignorée(s).";
+                                }
                             }
+                            else {
+                                $message_success = "$nb_importes produit(s) importé(s) avec succès.";
+                                if ($nb_erreurs > 0) {
+                                    $message_success .= " $nb_erreurs ligne(s) ignorée(s).";
+                                }
+                            }
+                            
 
                         } catch (Exception $e) {
                             $pdo->rollBack();
@@ -411,7 +420,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'produits') {
         // BOM UTF-8 pour compatibilité Excel
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        // En-tête — même ordre que le modèle d'import pour pouvoir réimporter directement
+        // En-tête - même ordre que le modèle d'import pour pouvoir réimporter directement
         fputcsv($output, ['nom', 'description', 'prix', 'stock', 'poids', 'volume', 'frais_de_port', 'statut', 'origine', 'categorie', 'tva'], ';');
 
         foreach ($produits as $produit) {
@@ -593,8 +602,21 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
             <?php if (!empty($message_error)): ?>
             <div class="alert alert--error">
+
                 <span class="alert__icon">✕</span>
-                <p class="alert__text"><?= nl2br(htmlspecialchars($message_error)) ?></p>
+                <div class="alert__content">
+                    <p class="alert__text"><?= nl2br(htmlspecialchars($message_error)) ?></p>
+                    <?php if (!empty($import_details)): ?>
+                    <details class="alert__details">
+                        <summary>Voir le détail</summary>
+                        <ul>
+                            <?php foreach ($import_details as $detail): ?>
+                            <li><?= $detail ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </details>
+                    <?php endif; ?>
+                </div>
             </div>
             <?php endif; ?>
 
