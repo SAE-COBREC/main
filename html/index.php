@@ -269,7 +269,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 ?>
 
 <!doctype html>
-<html lang="fr" <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -575,7 +576,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             }
             $_SESSION['listesVendeurs'] = $vendeursUniques;
             ?>
-            <div class="carousel-container" id="main-map" style="padding-bottom: 0px; display: none;">
+            <div class="carousel-container" id="main-map" style="padding-bottom: 0px; display: none; height: 414px;">
             </div>
 
             <div class="product-grid">
@@ -674,9 +675,9 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             <button <?= $estEnRupture ? 'disabled' : '' ?>
                                 onclick="event.stopPropagation(); ajouterAuPanier(<?= $produitCourant['id_produit'] ?>)">
                                 <?php if ($estEnRupture): ?>
-                                    Indisponible
+                                Indisponible
                                 <?php else: ?>
-                                    <span class="icon-panier-dynamic"></span> Ajouter au panier
+                                <span class="icon-panier-dynamic"></span> Ajouter au panier
                                 <?php endif; ?>
                             </button>
                         </div>
@@ -731,7 +732,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         var iframe = document.createElement('iframe');
                         iframe.src = '/partials/carte.php';
                         iframe.style.width = '100%';
-                        iframe.style.height = '412px';
+                        iframe.style.height = '414px';
                         iframe.style.border = 'none';
                         iframe.title = 'Carte des vendeurs';
                         mainMap.appendChild(iframe);
