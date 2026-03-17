@@ -1,4 +1,7 @@
 // --- Variables de Design ---
+
+@use "../variable" as *;
+
 $primary-color: #1a2e1a;    // Vert forêt très sombre (Luxe)
 $accent-color: #6d8354;     // Vert sauge (Rappel artisanat)
 $text-main: #333333;
@@ -7,7 +10,7 @@ $bg-white: #FFFFFF;
 $border-color: #eeeeee;
 
 $font-serif: 'Playfair Display', serif;
-$font-sans: 'Montserrat', sans-serif;
+$font-family-secondaire: 'Montserrat', sans-serif;
 
 // --- Styles Généraux ---
 * {
@@ -17,7 +20,7 @@ $font-sans: 'Montserrat', sans-serif;
 }
 
 body {
-    font-family: $font-sans;
+    font-family: $font-family-secondaire;
     color: $text-main;
     background-color: $bg-white;
     line-height: 1.5;
