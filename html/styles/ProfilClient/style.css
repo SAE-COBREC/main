@@ -31,6 +31,11 @@
   --star-color: #009E73;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: "Quicksand", sans-serif;
   background: #EFEFEF;
@@ -98,7 +103,6 @@ main .profile-sidebar nav ul {
   }
 }
 main .sidebar-btn {
-  width: 100%;
   display: flex;
   align-items: center;
   gap: 1rem;
