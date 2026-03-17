@@ -32,7 +32,7 @@ ob_start();
                 $compteur = 1;
                 foreach ($listeProduits as $produit): 
                     // Ajouter un titre de page tous les 3 produits
-                    if ($compteur % 3 === 1 && $compteur > 1): 
+                    if ($compteur % 2 === 1 && $compteur > 1): 
                 ?>
         </ul>
         <div class="titre-page" style="page-break-before: always;">CATALOGUE DE
