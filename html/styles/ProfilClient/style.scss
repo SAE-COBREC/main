@@ -1,9 +1,12 @@
 @use "../variable" as *;
 @use "sass:color";
 
-* {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 @mixin flex-center {
@@ -1060,15 +1063,15 @@ main {
     border-radius: 8px;
     cursor: pointer;
     @include transition();
-    background-color: lighten($secondary-color-gris-clair, 2%);
+    background-color: rgba(240, 243, 250, 0.95); // gris très clair
 
     &:hover {
         border-color: $primary-color-bleu;
-        background-color: lighten($secondary-color-bleu-clair, 2%);
+        background-color: rgba(220, 235, 255, 0.98); // bleu très clair
     }
 
     &.drag-over {
-        background-color: lighten($secondary-color-bleu-clair, 1%);
+        background-color: rgba(200, 220, 255, 1); // bleu plus marqué
         border-color: $primary-color-bleu;
         transform: scale(1.02);
     }

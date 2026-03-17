@@ -31,9 +31,12 @@
   --star-color: #009E73;
 }
 
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
@@ -962,14 +965,14 @@ main section:nth-of-type(4) article input[type=password]:focus {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: rgb(244.1, 244.1, 244.1);
+  background-color: rgba(240, 243, 250, 0.95);
 }
 #drop-zone:hover {
   border-color: var(--primary-bleu);
-  background-color: rgb(246.9545454545, 249.1, 251.2454545455);
+  background-color: rgba(220, 235, 255, 0.98);
 }
 #drop-zone.drag-over {
-  background-color: rgb(243.4772727273, 246.55, 249.6227272727);
+  background-color: rgb(200, 220, 255);
   border-color: var(--primary-bleu);
   transform: scale(1.02);
 }

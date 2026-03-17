@@ -11,6 +11,8 @@
   --semantic-rouge: #D4183D;
   --semantic-jaune: #DDCA00;
   --semantic-info: #0C5460;
+  --secondary-promotion: #e4e4f5;
+  --star-color: #7171A3;
 }
 
 [data-theme=dalto-red-green] {
@@ -18,11 +20,15 @@
   --semantic-success-bg: #0072B2;
   --semantic-rouge: #D55E00;
   --semantic-jaune: #F0E442;
+  --secondary-promotion: #dbe0ff;
+  --star-color: #7171A3;
 }
 
 [data-theme=dalto-blue-yellow] {
   --primary-bleu: #009E73;
   --semantic-jaune: #CC79A7;
+  --secondary-promotion: #e2f2e4;
+  --star-color: #009E73;
 }
 
 * {
@@ -48,7 +54,7 @@ main {
   margin: 0 auto;
 }
 main h1 {
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-size: 2em;
   text-align: center;
   margin: 2rem 0 3rem 0;
@@ -58,7 +64,7 @@ main .error-message {
   color: #721c24;
   padding: 1.5em;
   border-radius: 14px;
-  border: 1px solid #D4183D;
+  border: 1px solid var(--semantic-rouge);
   margin-bottom: 2em;
   text-align: center;
   font-weight: 600;
@@ -80,11 +86,11 @@ main .error-message {
   border-bottom: 2px solid #EFEFEF;
 }
 .tracking-section .tracking-header h2 {
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-size: 1.5em;
 }
 .tracking-section .tracking-header .bordereau-badge {
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   padding: 8px 20px;
   border-radius: 20px;
@@ -115,7 +121,7 @@ main .error-message {
   top: 0;
   left: 0;
   height: 100%;
-  background: linear-gradient(90deg, #7171A3, #9191C3);
+  background: linear-gradient(90deg, var(--primary-bleu), #9191C3);
   transition: width 0.6s ease;
   border-radius: 2px;
 }
@@ -155,19 +161,19 @@ main .error-message {
   justify-content: center;
 }
 .tracking-section .progress-container .progress-steps .step.active .step-circle {
-  background: #7171A3;
-  border-color: #7171A3;
+  background: var(--primary-bleu);
+  border-color: var(--primary-bleu);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.4);
   transform: scale(1.1);
 }
 .tracking-section .progress-container .progress-steps .step.active .step-label {
-  color: #7171A3;
+  color: var(--primary-bleu);
   font-weight: 700;
 }
 .tracking-section .progress-container .progress-steps .step.completed .step-circle {
-  background: #7171A3;
-  border-color: #7171A3;
+  background: var(--primary-bleu);
+  border-color: var(--primary-bleu);
   color: #FFFFFF;
 }
 .tracking-section .progress-container .progress-steps .step.completed .step-circle::after {
@@ -176,14 +182,14 @@ main .error-message {
 }
 .tracking-section .delivery-complete {
   background: linear-gradient(135deg, #D4EDDA 0%, #C3E6CB 100%);
-  border: 2px solid #28A745;
+  border: 2px solid var(--semantic-success-bg);
   border-radius: 12px;
   padding: 2em;
   margin-bottom: 2em;
   text-align: center;
 }
 .tracking-section .delivery-complete h3 {
-  color: #155724;
+  color: var(--semantic-success);
   font-size: 1.8em;
   margin-bottom: 0.5em;
   display: flex;
@@ -193,7 +199,7 @@ main .error-message {
 }
 .tracking-section .delivery-complete h3::before {
   content: "✓";
-  background: #28A745;
+  background: var(--semantic-success-bg);
   color: #FFFFFF;
   width: 48px;
   height: 48px;
@@ -204,7 +210,7 @@ main .error-message {
   font-size: 1.2em;
 }
 .tracking-section .delivery-complete .delivery-detail {
-  color: #155724;
+  color: var(--semantic-success);
   font-size: 1.1em;
   margin-top: 1em;
   font-weight: 600;
@@ -217,7 +223,7 @@ main .error-message {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 .tracking-section .delivery-complete .proof-photo p {
-  color: #155724;
+  color: var(--semantic-success);
   font-weight: 600;
   margin-bottom: 1em;
   font-size: 1.1em;
@@ -226,7 +232,7 @@ main .error-message {
   max-width: 100%;
   height: auto;
   border-radius: 8px;
-  border: 3px solid #7171A3;
+  border: 3px solid var(--primary-bleu);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -243,7 +249,7 @@ main .error-message {
   justify-content: center;
   gap: 0.5em;
   padding: 14px 28px;
-  background: #7171A3;
+  background: var(--primary-bleu);
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -259,7 +265,8 @@ main .error-message {
   box-shadow: 0 4px 12px rgba(113, 113, 163, 0.3);
 }
 .invoice-section .invoice-btn:hover {
-  background: rgb(88.4615384615, 88.4615384615, 136.5384615385);
+  background: var(--primary-bleu);
+  opacity: 0.9;
 }
 .invoice-section .invoice-btn svg {
   width: 20px;
