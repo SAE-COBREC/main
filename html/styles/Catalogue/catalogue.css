@@ -65,7 +65,6 @@ main .informations-entreprise {
 main .informations-entreprise p {
   font-size: 10pt;
   color: #777777;
-  text-transform: uppercase;
   letter-spacing: 2px;
 }
 main .informations-entreprise p strong {
