@@ -135,7 +135,7 @@ $themeActuel = $_SESSION['colorblind_mode'] ?? 'default';
                                 <tr>
                                     <th class="products-table__head-cell col-check">
                                         <button type="button" id="btn-clear-filters" class="filtre__item">
-                                            <img src="/img/svg/poubelle.svg" alt="Effacer les filtres" width="20"
+                                            <img src="/img/png/balai.png" alt="Effacer les filtres" width="20"
                                                 height="20">
                                         </button>
                                     </th>
