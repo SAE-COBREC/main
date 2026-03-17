@@ -1,4 +1,5 @@
 <?php
+//DÉBUT EXTRAIT SOURCE OTP
 //nécessités pour la génération de QR code et de l'OTP
 try{
     require_once(__DIR__."/../../vendor/autoload.php");
@@ -61,5 +62,5 @@ function retry(){
     }
 }
 [$otp,$result] = retry();
-
+//FIN EXTRAIT SOURCE OTP
 ?>

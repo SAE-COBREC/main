@@ -130,7 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $motDePasseActuelSaisi = $_POST['actuel_password'] ?? '';
         $nouveauMotDePasseSaisi = $_POST['nouveau_password'] ?? '';
         $confirmationMotDePasseSaisie = $_POST['confirm_password'] ?? '';
-        if (empty($_SESSION['OTP']['statut'])){
+        //DÉBUT EXTRAIT SOURCE OTP 1
+        if (empty($_SESSION['OTP']['statut'])){//si OTP non activé
             
             
 
@@ -149,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else{
                 $messageErreur = $resultatModificationMotDePasse['message'];
             }
-        }else{
+        }else{//si OTP activé
             $otp_saisi = $_POST['code_OTP'] ?? '';
             $succes = true;
             try{
@@ -158,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $otp = TOTP::createFromSecret($row['secret_otp']);
                 if (($row['etat_otp'] == 'true' && $otp->verify(str_replace(' ', '', $otp_saisi), null, 20))){
-
+                //si code bon
                     $resultatModificationMotDePasse = modifierMotDePasseCompte(
                         $connexionBaseDeDonnees,
                         $identifiantCompteClient,
@@ -187,6 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }else{
                 $messageErreur = $messageErreur2;
             }
+            //FIN EXTRAIT SOURCE OTP 1
         }
     }
 
@@ -783,21 +785,17 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                             required>
                                     </label>
                                 </div>
+                                <!-- DÉBUT EXTRAIT SOURCE OTP 2 -->
                                 <div class="mdpOTP" style='display: <?php
                                 if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
                                     <label>
                                         <span>Code A2F</span>
                                         <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}"
-                                            placeholder="123 456" name="code_OTP" />
+                                             min="7" max="7" placeholder="123 456" name="code_OTP" />
                                     </label>
                                 </div>
                                 <button type="submit" name="change_password"
-                                    onclick="return confirm('Confirmer le changement de mot de passe ?')" <?php 
-                                    // if (empty($_SESSION['OTP']['statut'])){ 
-                                    //     echo 'onclick="return confirm(Confirmer le changement de mot de passe ?)"';
-                                    // }else{ 
-                                    //     echo 'onclick="return confirm(Désactiver l'authentification à doubles facteurs et changer de mot de passe ?)"'; 
-                                    // } ?>>
+                                    onclick="return confirm('Confirmer le changement de mot de passe ?')">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -844,6 +842,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             <?php } ?>
                         </main>
                     </article>
+                    <!-- FIN EXTRAIT SOURCE OTP 2 -->
                 </section>
 
                 <section id="preferences" class="profile-section">
@@ -898,22 +897,22 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </div>
         </div>
     </main>
-
+                        
+    <!-- DÉBUT EXTRAIT SOURCE OTP 3 -->
     <div id="modalOTP">
         <div>
             <h2>Authentification à doubles facteurs</h2>
             <?php
-                //if (empty($_SESSION['OTP']['statut'])){
-                    include_once '../connexionClient/OTP.php';
-                    $_SESSION['OTP']['secret'] = $otp->getSecret();
-                    ?>
+                include_once '../connexionClient/OTP.php';
+                $_SESSION['OTP']['secret'] = $otp->getSecret();
+            ?>
             <form id="otpform">
                 <img src='<?php echo $result->getDataUri() ?>' width="250em" height="250em">
                 <label>
                     <p>Code secret :</p>
                     <small><?php echo $otp->getSecret() ?></small>
                 </label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                 <button type="submit">Valider</button>
             </form>
             <script>
@@ -921,20 +920,21 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 event.preventDefault();
                 const formData = new FormData(event.target);
                 const code = formData.get('code');
-
+                
+                //charge le PHP de vérifier le code
                 const xhttp = new XMLHttpRequest();
                 xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
                 xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xhttp.send("code=" + code + '&send=0');
 
-
+                //va chercher la réponse du PHP dans ajax.txt
                 const xhttp2 = new XMLHttpRequest();
                 xhttp2.open("GET", "../../pages/connexionClient/ajax.txt", true);
                 xhttp2.send();
                 xhttp2.onreadystatechange = () => {
                     if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
                         const contentLength = xhttp2.getResponseHeader("Content-Length");
-                        if (contentLength == 4) {
+                        if (contentLength == 4) {//si code bon
                             xhttp2.abort();
                             alert(
                                 "Authentification à doubles facteurs activée avec succès."
@@ -942,12 +942,13 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             //document.location.href = "/index.php"; 
                             document.getElementById('modalOTP').style.display = 'none';
 
+                            //envoie accusé-réception de la réponse du PHP
                             const xhttp3 = new XMLHttpRequest();
                             xhttp3.open("POST", "../../pages/connexionClient/statut_otp.php", true);
                             xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                             xhttp3.send("statutOTP=active");
                             succesOTP();
-                        } else {
+                        } else {//sinon
                             alert("Echec. Veuillez réessayer.");
                         }
                     }
@@ -966,17 +967,15 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <div id="modalDesactivationOTP">
         <div>
             <h2>Désactiver l'authentification à doubles facteurs</h2>
-            <?php
-                //if (!empty($_SESSION['OTP']['statut'])){
-            ?>
             <form>
                 <label>
                     <p>Code secret :</p>
                 </label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                 <button type="submit">Valider</button>
             </form>
             <script>
+            //sert à mettre un espace tous els trois caractères pour les champs de saisie de code
             document.querySelectorAll("input[placeholder='123 456']").forEach(champOTP => {
                 champOTP.addEventListener("input", function() {
                     let valeur = this.value;
@@ -992,19 +991,20 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 const formData = new FormData(event.target);
                 const code = formData.get('code');
 
+                //charge le PHP de vérifier le code
                 const xhttp = new XMLHttpRequest();
                 xhttp.open("POST", "../../pages/ProfilClient/verif_code.php", true);
                 xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xhttp.send("code=" + code + '&send=0');
 
-
+                //va chercher la réponse du ¨PHP
                 const xhttp2 = new XMLHttpRequest();
                 xhttp2.open("GET", "../../pages/ProfilClient/verif_code.txt", true);
                 xhttp2.send();
                 xhttp2.onreadystatechange = () => {
                     if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
                         const contentLength = xhttp2.getResponseHeader("Content-Length");
-                        if (contentLength == 4) {
+                        if (contentLength == 4) {//si code bon
                             xhttp2.abort();
                             alert(
                                 "Authentification à doubles facteurs désactivée avec succès."
@@ -1012,6 +1012,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             //document.location.href = "/index.php"; 
                             document.getElementById('modalDesactivationOTP').style.display = 'none';
 
+                            //envoie accusé-réception au PHP
                             const xhttp3 = new XMLHttpRequest();
                             xhttp3.open("POST", "../../pages/ProfilClient/statut_otp_desact.php", true);
                             xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -1029,6 +1030,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </form>
         </div>
     </div>
+    <!-- FIN EXTRAIT SOURCE OTP 3 -->
 
     <!-- modif une adresse -->
     <div id="modalModificationAdresse">
@@ -1246,6 +1248,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         document.getElementById('modalModificationAdresse').style.display = 'none';
     }
 
+    //DÉBUT EXTRAIT SOURCE OTP 4
     //fonction pour fermer le modal de la double authentification (OTP)
     function fermerModalOTP() {
         //cache le modal OTP
@@ -1257,6 +1260,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         //cache le modal OTP
         document.getElementById('modalDesactivationOTP').style.display = 'none';
     }
+    //FIN EXTRAIT SOURCE OTP 4
 
 
     //fonction pour ouvrir le modal d'ajout d'adresse
@@ -1575,6 +1579,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         form.submit();
     }
 
+    //DÉBUT EXTRAIT SOURCE OTP 5
+
     function ouvrirModalOTP() {
         document.getElementById('modalOTP').style.display = 'block';
     }
@@ -1600,6 +1606,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         document.getElementById('activerOTP').textContent = "Activer l'authentification à doubles facteurs.";
         document.getElementById('activerOTP').disabled = false;
     }
+
+    //FIN EXTRAIT SOURCE OTP 5
 
     document.getElementById('modalSuppressionMdp')?.addEventListener('click', function(event) {
         if (event.target === this) {

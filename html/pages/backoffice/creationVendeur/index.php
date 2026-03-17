@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //$bdd_errors = [];
   if (!$hasError && isset($_POST['action']) === false) {
     try {
-
+    //DÉBUT EXTRAIT SOURCE OTP 1
       if(empty($_SESSION['OTPvendeur']['statut'])){
             //insertion dans la bdd des données de compte
             $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom)
@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'nom' => $nom,
             'prenom' => $prenom
             ]);
-        }else{
+        }else{//si OTP activé
             //insertion dans la bdd des données de compte
             $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom, secret_OTP, etat_OTP)
                     VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP, true)';
@@ -154,6 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'secretOTP' => $_SESSION['OTPvendeur']['secret']
             ]);
         }
+        //FIN EXTRAIT SOURCE OTP 1
 
       // Récupérer l'id du compte créé
       try {
@@ -485,6 +486,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Créer un compte</h1>
             <p class="subtitle">Mot de passe</p>
 
+            <!-- DÉBUT EXTRAIT SOURCE OTP 2 -->
             <div>
                 <label id="checkboxotp">
                     <input type="checkbox" name="checkboxotp" onclick="changer_OTP();"> 
@@ -504,7 +506,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p>Code secret :</p>
                         <small><?php echo $_SESSION['OTPvendeur']['secret']; ?></small>
                     </label>
-                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                     <div class="error2">
                         <strong>Erreur</strong> : Code A2F incorrect
                     </div>
@@ -512,6 +514,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" id="fermerOTP" onclick="fermerMdpOtp()">Annuler</button>
                 </div>
                 <script>
+                //sert à automatiquement avoir un espace tous les 3 chiffres
                 document.querySelector(".mdpOtp input[type='text']").addEventListener("input", function() {
                     let valeur = this.value;
                     valeur = valeur.replace(/\D/g, "");
@@ -519,24 +522,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     this.value = valeur;
                 });
                 document.getElementById('validationOTP').addEventListener('click', function(event) {
-                    event.preventDefault();
+                    event.preventDefault();//sert à ne pas recharger la page
                     const formData = new FormData(document.getElementById('multiForm'), document.getElementById(
                         'validationOTP'));
                     const code = formData.get('code');
 
+                    //sert à vérifier la validité du code sans recharger la page
                     const xhttp = new XMLHttpRequest();
                     xhttp.open("POST", "../../../pages/connexionClient/ajax_otp.php", true);
                     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                     xhttp.send("code=" + code + '&send=1');
 
-
+                    //appeler résultat de vérif
                     const xhttp2 = new XMLHttpRequest();
                     xhttp2.open("GET", "../../../pages/connexionClient/ajax.txt", true);
                     xhttp2.send();
                     xhttp2.onreadystatechange = () => {
                         if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
                             const contentLength = xhttp2.getResponseHeader("Content-Length");
-                            if (contentLength == 4) {
+                            //à l'arrivée du résultat
+                            if (contentLength == 4) {//si true
                                 xhttp2.abort();
                                 alert("Vérification à double facteurs activée avec succès.");
                                 document.querySelector(".mdpOtp").style.display = 'none';
@@ -544,12 +549,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 document.querySelector("#checkboxotp").style.display = 'none';
                                 document.querySelector("#checkboxotp + label").style.display = 'block';
 
-
+                                //transmettre la bonne activation au PHP (n'est fait qu'une fois que le JS a eu true, c'est volontaire)
                                 const xhttp3 = new XMLHttpRequest();
                                 xhttp3.open("POST", "../../../pages/backoffice/creationVendeur/otp_session_crea_vendeur.php", true);
                                 xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                                 xhttp3.send("statutOTP=active");
-                            } else {
+                            } else {//false, afficher erreur
                                 document.querySelector('.error2').style.display = 'block';
                                 document.querySelector('.error2').value = '';
                             }
@@ -570,6 +575,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <script>
+            //OTP caché, état de base
             document.querySelector(".mdpOtp").style.display = "none";
             document.querySelector(".error2").style.display = "none";
             document.querySelector("#checkboxotp + label").style.display = 'none';
@@ -582,10 +588,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             function changer_OTP() {
                 const checkboxOtp = document.querySelector("#checkboxotp input");
                 const mdpOtp = document.querySelector(".mdpOtp");
-                if (checkboxOtp.checked) {
+                if (checkboxOtp.checked) {//affichage
                     mdpOtp.style.display = 'block';
                     document.querySelector('.error2').style.display = 'none';
-                } else {
+                } else {//fermeture de l'affichage
                     mdpOtp.style.display = 'none';
                     document.querySelector('.error2').style.display = 'none'
                 }
@@ -594,6 +600,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             function echecOTP() {
                 return 'Code OTP invalide. Veuillez réessayer.';
             }
+
+            //FIN EXTRAIT SOURCE OTP 2
             </script>
 
             <div class="error">

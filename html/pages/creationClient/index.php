@@ -132,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           }
         }
 
+        //DÉBUT EXTRAIT SOURCE OTP
         if(empty($_SESSION['OTP']['statut'])){
             //insertion dans la bdd des données de compte
             $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom)
@@ -145,8 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'nom' => $nom,
             'prenom' => $prenom
             ]);
-        }else{
-            //insertion dans la bdd des données de compte
+        }else{//si OTP activé
             $sql = 'INSERT INTO cobrec1._compte(email, num_telephone, mdp, timestamp_inscription, civilite, nom, prenom, secret_OTP, etat_OTP)
                     VALUES (:email, :telephone, :mdp, CURRENT_TIMESTAMP, :civilite, :nom, :prenom, :secretOTP, true)';
             $stmt = $pdo->prepare($sql);
@@ -470,7 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" name="checkboxotp" onclick="changer_OTP();"> 
                     Activer la vérification à double facteurs ?
                 </label>
-                <label> Vérification à double facteurs activée</label>
+                <label>Vérification à double facteurs activée</label>
             </div>
             <br>
             <div class="mdpOtp">
@@ -484,7 +484,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p>Code secret :</p>
                         <small><?php echo $otp->getSecret() ?></small>
                     </label>
-                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                    <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" min="7" max="7"/>
                     <div class="error2">
                         <strong>Erreur</strong> : Code A2F incorrect
                     </div>

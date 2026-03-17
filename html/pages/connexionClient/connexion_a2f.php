@@ -26,7 +26,7 @@ use OTPHP\Factory;
             </div>
             <form action="connexion_a2f.php" method="post" enctype="multipart/form-data">
                 <h1>Connexion à double facteurs</h1>
-                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                 <div class="connex-btn">
                     <button type="submit">
                         Valider

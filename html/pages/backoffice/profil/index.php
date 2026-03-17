@@ -682,7 +682,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <div class="form-row mdpOTP" style='display: <?php
                             if (empty($_SESSION['OTPvendeur']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
                         <label for="code_OTP">Code d'authentification à double facteurs</label>
-                        <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code_OTP">
+                        <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code_OTP">
                     </div>
 
 
@@ -732,7 +732,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         <small><?php echo $otp->getSecret() ?></small>
                     </label>
                 </div>
-                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                 <button type="button" onclick="fermerModalOTP()">Annuler</button>
                 <button type="submit">Valider</button>
             </form>
@@ -784,7 +784,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <label>
                     <p>Code secret :</p>
                 </label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" placeholder="123 456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                 <button type="button" onclick="fermerModalDesactivationOTP()">Annuler</button>
                 <button type="submit">Valider</button>
             </form>
