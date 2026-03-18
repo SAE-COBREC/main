@@ -235,9 +235,13 @@ function old($name, $default = '') {
     return htmlspecialchars($_POST[$name] ?? $default);
 }
 
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
+
+<!doctype html>
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -245,6 +249,7 @@ function old($name, $default = '') {
     <title>Paiement - Alizon</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/finaliserCommande/styleFinaliserCommande.css">
+    <script src="/js/accessibility.js"></script>
 </head>
 
 <body>
