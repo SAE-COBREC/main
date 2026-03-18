@@ -20,7 +20,7 @@ $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
 //redirige vers la page de connexion si le vendeur n'est pas connecté
 if (empty($_SESSION['vendeur_id']) === true) {
-    $url = '/pages/backoffice/connexionVendeur/test.php';
+    $url = '/pages/backoffice/connexionVendeur/index.php';
     echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
     exit;
 }

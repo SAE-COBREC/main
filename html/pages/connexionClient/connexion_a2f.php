@@ -55,7 +55,7 @@ use OTPHP\Factory;
     <?php
     $otp = TOTP::createFromSecret($_SESSION['A2F']['secret_otp']);
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        print_r($otp->now());
+        // print_r($otp->now());
         if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){
             //établit la connexion
             $_SESSION['idClient'] = $_SESSION['A2F']['idClient'];
