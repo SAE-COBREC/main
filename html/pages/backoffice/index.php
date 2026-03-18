@@ -31,7 +31,7 @@ foreach ($fichiers as $value) {
 
 // Gestion de la suppression 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_product') {
-    header('Content-Type: application/json');
+    header('Content-Type: text/plain; charset=utf-8');
 
     try {
         if (!isset($_POST['id_produit']) || empty($_POST['id_produit'])) {
@@ -40,13 +40,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $id_produit = $_POST['id_produit'];
 
-        // Vérifier que le produit appartient bien au vendeur et qu'il est en ébauche
-        $sql_check = 'SELECT id_produit FROM cobrec1._produit WHERE id_produit = :id_produit AND id_vendeur = :vendeur_id AND p_statut = :statut';
+        // Vérifier que le produit appartient bien au vendeur
+        $sql_check = 'SELECT id_produit, p_statut FROM cobrec1._produit WHERE id_produit = :id_produit AND id_vendeur = :vendeur_id';
         $stmt_check = $pdo->prepare($sql_check);
-        $stmt_check->execute(['id_produit' => $id_produit, 'vendeur_id' => $vendeur_id, 'statut' => 'Ébauche']);
+        $stmt_check->execute(['id_produit' => $id_produit, 'vendeur_id' => $vendeur_id]);
+        $produit = $stmt_check->fetch(PDO::FETCH_ASSOC);
 
-        if ($stmt_check->rowCount() === 0) {
-            throw new Exception('Produit non trouvé, accès non autorisé ou produit pas en ébauche');
+        if (!$produit) {
+            throw new Exception('Produit non trouvé ou accès non autorisé');
+        }
+
+        $statut = trim((string)$produit['p_statut']);
+        $statutSansAccent = str_replace(['É', 'é', 'È', 'è', 'Ê', 'ê', 'Ë', 'ë'], ['E', 'e', 'E', 'e', 'E', 'e', 'E', 'e'], $statut);
+        if (strtolower($statutSansAccent) !== 'ebauche') {
+            throw new Exception('Produit pas en ébauche');
         }
         // Supprimer de _contient
         $sql1 = 'DELETE FROM cobrec1._contient WHERE id_produit = :id_produit;';
@@ -73,11 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmt5 = $pdo->prepare($sql5);
         $stmt5->execute(['id_produit' => $id_produit]);
 
-        echo json_encode(['success' => true, 'message' => 'Produit supprimé avec succès']);
+        echo 'OK|Produit supprimé avec succès';
         exit;
 
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        echo 'ERROR|' . $e->getMessage();
         exit;
     }
 }
@@ -440,12 +447,15 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
                             },
-                            body: `action=delete_product&id_produit=${productID}`
+                            body: `action=delete_product&id_produit=${encodeURIComponent(productID)}`
                         });
 
-                        const result = await response.json();
+                        const rawResult = await response.text();
+                        const result = rawResult.replace(/^\uFEFF/, '').trim();
+                        const isSuccess = result.startsWith('OK|');
+                        const message = result.includes('|') ? result.split('|').slice(1).join('|').trim() : result;
 
-                        if (result.success) {
+                        if (isSuccess) {
                             // Supprimer la ligne du tableau
                             selectedRow.remove();
 
@@ -454,11 +464,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             btnRemise.classList.add('btn--disabled');
                             btnPromotion.classList.add('btn--disabled');
                             btnSuppr.classList.add('btn--disabled');
-
-                            // Afficher un message de succès
-                            alert('Produit supprimé avec succès');
                         } else {
-                            alert('Erreur lors de la suppression: ' + result.message);
+                            alert('Erreur lors de la suppression: ' + (message || 'Réponse invalide du serveur'));
                         }
                     } catch (error) {
                         alert('Erreur de connexion: ' + error.message);
