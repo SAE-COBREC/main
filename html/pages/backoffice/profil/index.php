@@ -469,7 +469,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <title>Profil Vendeur - Alizon</title>
     <link rel="icon" type="image/png" href="../../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/ProfilVendeur/profil.css">
-    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /> -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="../../../js/accessibility.js"></script>
 </head>
 
@@ -602,7 +602,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     </div>
 
                     <!-- ===== SECTION GPS ===== -->
-                    <!-- <div class="form-row" style="gap: 10px; display: flex; flex-wrap: wrap;">
+                    <div class="form-row" style="gap: 10px; display: flex; flex-wrap: wrap;">
                         <button type="button" id="btn-geocode" class="btn btn--secondary">
                             Valider les coordonnées GPS
                         </button>
@@ -616,13 +616,13 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             <div class="form-row form-row--small">
                                 <label>Latitude</label>
                                 <input type="number" step="any" id="latitude" name="latitude"
-                                    value="<?//= htmlspecialchars($vendeur['latitude'] ?? '') ?>"
+                                    value="<?= htmlspecialchars($vendeur['latitude'] ?? '') ?>"
                                     placeholder="ex : 47.218371">
                             </div>
                             <div class="form-row form-row--small">
                                 <label>Longitude</label>
                                 <input type="number" step="any" id="longitude" name="longitude"
-                                    value="<?//= htmlspecialchars($vendeur['longitude'] ?? '') ?>"
+                                    value="<?= htmlspecialchars($vendeur['longitude'] ?? '') ?>"
                                     placeholder="ex : -1.553621">
                             </div>
                         </div>
@@ -631,7 +631,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         <p style="font-size: 0.83em; color: #666; margin-top: 6px;">
                             Vous pouvez faire glisser le marqueur ou cliquer sur la carte pour ajuster la position.
                         </p>
-                    </div> -->
+                    </div>
 
                     <button title="Enregistrer" class="btn btn--primary" type="submit">Enregistrer</button>
                 </form>
@@ -1121,8 +1121,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <div id="custom-popup-success" class="popup-success"></div>
     <div id="custom-popup-error" class="popup-error"></div>
 
-    <!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> -->
-    <!-- <script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
     // ============================================================
     // GPS – Géocodage Nominatim (OpenStreetMap) + carte Leaflet
     // ============================================================
@@ -1321,7 +1321,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             this.textContent = 'Valider les coordonnées GPS';
         }
     });
-    </script> -->
+    </script>
 </body>
 
 </html>
