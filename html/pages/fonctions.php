@@ -3,7 +3,24 @@
 // Fonction vide (maintenue pour compatibilité avec code existant)
 function ensureAvisSchema($pdo)
 {
-    // Pas d'action - la table _avis existe déjà avec sa structure finale
+    try {
+        // Vérifier si la colonne id_compte existe déjà dans la table _avis
+        $stmt = $pdo->query("SELECT column_name FROM information_schema.columns WHERE table_name = '_avis' AND column_name = 'id_compte'");
+        $columnExists = $stmt->fetch();
+
+        if (!$columnExists) {
+            // Ajouter la colonne id_compte
+            $pdo->exec("ALTER TABLE _avis ADD COLUMN id_compte integer");
+            
+            // Ajouter la contrainte de clé étrangère
+            $pdo->exec("ALTER TABLE ONLY _avis ADD CONSTRAINT fk_avis_compte FOREIGN KEY (id_compte) REFERENCES _compte (id_compte) ON DELETE SET NULL");
+            
+            // Optionnel: On pourrait essayer de peupler id_compte à partir de id_client si possible
+            $pdo->exec("UPDATE _avis a SET id_compte = cl.id_compte FROM _client cl WHERE a.id_client = cl.id_client AND a.id_compte IS NULL");
+        }
+    } catch (Exception $e) {
+        error_log("Erreur ensureAvisSchema: " . $e->getMessage());
+    }
 }
 
 //fonction pour charger tous les produits depuis la base de données

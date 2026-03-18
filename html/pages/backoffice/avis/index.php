@@ -13,6 +13,14 @@ if (empty($_SESSION['vendeur_id'])) {
 $idVendeur = $_SESSION['vendeur_id'];
 $pdo->exec("SET search_path TO cobrec1");
 
+// Ensure schema is up to date
+ensureAvisSchema($pdo);
+
+// Get idCompte for the vendor
+$stmtCompte = $pdo->prepare('SELECT id_compte FROM cobrec1._vendeur WHERE id_vendeur = :vid');
+$stmtCompte->execute([':vid' => $idVendeur]);
+$idCompte = $stmtCompte->fetchColumn();
+
 // Traitement des actions (Répondre, Modifier, Supprimer)
 $notification = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -53,12 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         // Créer l'avis "réponse"
                         $insertAvisSql = "
                             INSERT INTO cobrec1._avis (id_produit, id_client, id_compte, a_texte, a_titre, a_timestamp_creation)
-                            VALUES (:idProduit, NULL, NULL, :texte, 'Réponse du vendeur', CURRENT_TIMESTAMP)
+                            VALUES (:idProduit, NULL, :idCompte, :texte, 'Réponse du vendeur', CURRENT_TIMESTAMP)
                             RETURNING id_avis
                         ";
                         $stmtInsAvis = $pdo->prepare($insertAvisSql);
                         $stmtInsAvis->execute([
                             ':idProduit' => $idProduit,
+                            ':idCompte' => $idCompte,
                             ':texte' => $reponseTexte
                         ]);
                         $idReponse = $stmtInsAvis->fetchColumn();

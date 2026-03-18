@@ -423,6 +423,7 @@ CREATE TABLE cobrec1._avis (
     id_avis SERIAL NOT NULL,
     id_produit integer NOT NULL,
     id_client integer,
+    id_compte integer,
     a_texte text,
     a_note integer,
     a_owner_token text,
@@ -444,6 +445,9 @@ ADD CONSTRAINT fk_avis_produit FOREIGN KEY (id_produit) REFERENCES cobrec1._prod
 
 ALTER TABLE ONLY cobrec1._avis
 ADD CONSTRAINT fk_avis_client FOREIGN KEY (id_client) REFERENCES cobrec1._client (id_client) ON DELETE SET NULL;
+
+ALTER TABLE ONLY cobrec1._avis
+ADD CONSTRAINT fk_avis_compte FOREIGN KEY (id_compte) REFERENCES cobrec1._compte (id_compte) ON DELETE SET NULL;
 
 -- TABLE VOTE_AVIS
 CREATE TABLE cobrec1._vote_avis (
