@@ -31,7 +31,6 @@ foreach ($fichiers as $value) {
 
 // Gestion de la suppression 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_product') {
-    header('Content-Type: text/plain; charset=utf-8');
 
     $id_produit = $_POST['id_produit'] ?? null;
 
@@ -59,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
         exit;
     }
 
-    // 2) Supprimer dans les tables liées
     $tables = ['_contient', '_fait_partie_de', '_represente_produit', '_reduction'];
     foreach ($tables as $table) {
         $sql = "DELETE FROM cobrec1.$table WHERE id_produit = :id_produit";
@@ -67,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
         $stmt->execute(['id_produit' => $id_produit]);
     }
 
-    // 3) Supprimer le produit
     $sql = 'DELETE FROM cobrec1._produit WHERE id_produit = :id_produit';
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id_produit' => $id_produit]);
@@ -75,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     echo 'OK|Produit supprimé';
     exit;
 }
+
 
 
 try {
@@ -435,7 +433,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             return;
                         }
 
-                        if (text.startsWith('OK')) {
+                        if (text.includes('OK|')) {
                             row.remove();
                             btnModifier.classList.add('btn--disabled');
                             btnRemise.classList.add('btn--disabled');
@@ -444,6 +442,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         } else {
                             alert('Erreur lors de la suppression: ' + text);
                         }
+
                     } catch (err) {
                         alert('Erreur de connexion: ' + err.message);
                     }
