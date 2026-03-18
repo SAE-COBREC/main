@@ -54,7 +54,7 @@ $hasError = false;
     <?php
     $otp = TOTP::createFromSecret($_SESSION['A2Fvendeur']['secret_otp']);
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        print_r($otp->now());
+        // print_r($otp->now());
         if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){
             $_SESSION['vendeur_id'] = $_SESSION['A2Fvendeur']['vendeur_id'];
             $_SESSION['idCompte'] = $_SESSION['A2Fvendeur']['idCompte'];
