@@ -858,6 +858,73 @@ main section:nth-of-type(4) article input[type=password]:focus {
     padding: 1.5em;
   }
 }
+@media screen and (max-width: 708px) {
+  main {
+    padding: 1.5rem 1rem;
+  }
+  main h1 {
+    font-size: 1.4em;
+    margin: 1.5rem 0;
+  }
+  main h2 {
+    font-size: 1.1em;
+    margin-bottom: 1.2rem;
+  }
+  main section {
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+  }
+  main .back-button {
+    top: 2.5em;
+    font-size: 1em;
+  }
+  main .profile-sidebar {
+    padding: 0.8rem;
+  }
+  main .profile-sidebar nav ul {
+    gap: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+  main .sidebar-btn {
+    min-width: 80px;
+    padding: 8px;
+    font-size: 0.75em;
+  }
+  main .sidebar-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  main section article > header {
+    padding: 1rem;
+  }
+  main section article > header > div > strong {
+    font-size: 1em;
+  }
+  main section article > main {
+    padding: 1rem;
+  }
+  main section article > footer {
+    padding: 1rem;
+    gap: 0.8rem;
+  }
+  main section article > footer button, main section article > footer a > button {
+    padding: 10px 15px;
+    font-size: 1em;
+  }
+  main form {
+    gap: 1.2rem;
+  }
+  main label {
+    font-size: 1em;
+  }
+  main input[type=text],
+  main input[type=email],
+  main input[type=tel],
+  main input[type=password] {
+    padding: 10px 12px;
+  }
+}
 /* Styles pour l'image de profil */
 .profile-image-container {
   text-align: center;
@@ -970,6 +1037,17 @@ main section:nth-of-type(4) article input[type=password]:focus {
   .profile-image-placeholder svg {
     width: 60px;
     height: 60px;
+  }
+}
+@media screen and (max-width: 708px) {
+  .profile-image,
+  .profile-image-placeholder {
+    width: 100px;
+    height: 100px;
+  }
+  .profile-image-placeholder svg {
+    width: 50px;
+    height: 50px;
   }
 }
 #drop-zone {
@@ -1206,6 +1284,21 @@ main section:nth-of-type(2) article > footer > form button:hover {
   #modalOTP form,
   #modalDesactivationOTP form {
     gap: 1.2rem;
+  }
+}
+@media screen and (max-width: 708px) {
+  #modalModificationAdresse > div,
+  #modalAjoutAdresse > div,
+  #modalOTP > div,
+  #modalDesactivationOTP > div {
+    padding: 1.5em;
+  }
+  #modalModificationAdresse h2,
+  #modalAjoutAdresse h2,
+  #modalOTP h2,
+  #modalDesactivationOTP h2 {
+    font-size: 1.2em;
+    margin-bottom: 1rem;
   }
 }
 @media (max-width: 428px) {

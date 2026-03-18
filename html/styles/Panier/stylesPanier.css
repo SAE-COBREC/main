@@ -72,6 +72,9 @@ button {
 .conteneurArticles {
   min-width: 0;
 }
+.conteneurArticles .articleBaliseA {
+  text-decoration: none;
+}
 
 .unArticleP {
   display: grid;
