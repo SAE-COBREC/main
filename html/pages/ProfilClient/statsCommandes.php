@@ -83,9 +83,14 @@ try {
 
 //détermine l'année par défaut à sélectionner dans le filtre (la plus récente)
 $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
+
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
+
 <!doctype html>
-<html lang="fr">
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="utf-8" />
@@ -96,6 +101,7 @@ $anneeSelectionneeParDefaut = $listeAnneesDisponibles[0] ?? date('Y');
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css" />
     <link rel="stylesheet" href="/styles/ProfilClient/statsCommandes.css" />
     <script src="/js/chart.js"></script>
+    <script src="../../js/accessibility.js"></script>
 </head>
 
 <body>
