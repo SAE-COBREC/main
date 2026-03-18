@@ -759,7 +759,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             alert(
                                 "Authentification à doubles facteurs activée avec succès."
                                 );
-                            //document.location.href = "/index.php"; 
                             document.getElementById('modalOTP').style.display = 'none';
 
                             const xhttp3 = new XMLHttpRequest();
@@ -811,7 +810,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                 alert(
                                     "Authentification à doubles facteurs désactivée avec succès."
                                     );
-                                //document.location.href = "/index.php"; 
                                 document.getElementById('modalDesactivationOTP').style.display = 'none';
                                 succesDesactOTP();
                             } else {
@@ -1129,8 +1127,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     let gpsMap = null;
     let gpsMarker = null;
 
-    const initLat = <?//= !empty($vendeur['latitude'])  ? (float)$vendeur['latitude']  : 'null' ?>;
-    const initLon = <?//= !empty($vendeur['longitude']) ? (float)$vendeur['longitude'] : 'null' ?>;
+    const initLat = <?= !empty($vendeur['latitude'])  ? (float)$vendeur['latitude']  : 'null' ?>;
+    const initLon = <?= !empty($vendeur['longitude']) ? (float)$vendeur['longitude'] : 'null' ?>;
 
     function updateCoordinates(lat, lon) {
         document.getElementById('latitude').value = parseFloat(lat).toFixed(6);
