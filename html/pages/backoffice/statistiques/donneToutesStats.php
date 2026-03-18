@@ -5,7 +5,6 @@ include '../../fonctions.php';
 header('Content-Type: application/json');
 
 $vendeur_id = $_SESSION['vendeur_id'];
-unlink("test.txt");
 try {
     $commandes = recupInfoPourStatsGeneral($pdo, $vendeur_id);
 
