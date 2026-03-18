@@ -1742,7 +1742,7 @@ function supprimerCompteClient($connexionBaseDeDonnees, $identifiantClient, $ide
         $idClientFantome = $requeteRechercheClientFantome->fetchColumn();
 
         if ($idClientFantome === false) {
-            $pseudoFantome = 'Anonyme_Systeme_' . (int) $idCompteFantome;
+            $pseudoFantome = 'Anonyme';
             $requeteCreationClientFantome = "
                 INSERT INTO cobrec1._client (id_compte, c_pseudo, c_cloture, c_datenaissance)
                 VALUES (?, ?, TRUE, '1970-01-01')
