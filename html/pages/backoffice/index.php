@@ -30,64 +30,52 @@ foreach ($fichiers as $value) {
 }
 
 // Gestion de la suppression 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_product') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_product') {
     header('Content-Type: text/plain; charset=utf-8');
 
-    try {
-        if (!isset($_POST['id_produit']) || empty($_POST['id_produit'])) {
-            throw new Exception('ID produit manquant');
-        }
+    $id_produit = $_POST['id_produit'] ?? null;
 
-        $id_produit = $_POST['id_produit'];
-
-        // Vérifier que le produit appartient bien au vendeur
-        $sql_check = 'SELECT id_produit, p_statut FROM cobrec1._produit WHERE id_produit = :id_produit AND id_vendeur = :vendeur_id';
-        $stmt_check = $pdo->prepare($sql_check);
-        $stmt_check->execute(['id_produit' => $id_produit, 'vendeur_id' => $vendeur_id]);
-        $produit = $stmt_check->fetch(PDO::FETCH_ASSOC);
-
-        if (!$produit) {
-            throw new Exception('Produit non trouvé ou accès non autorisé');
-        }
-
-        $statut = trim((string)$produit['p_statut']);
-        $statutSansAccent = str_replace(['É', 'é', 'È', 'è', 'Ê', 'ê', 'Ë', 'ë'], ['E', 'e', 'E', 'e', 'E', 'e', 'E', 'e'], $statut);
-        if (strtolower($statutSansAccent) !== 'ebauche') {
-            throw new Exception('Produit pas en ébauche');
-        }
-        // Supprimer de _contient
-        $sql1 = 'DELETE FROM cobrec1._contient WHERE id_produit = :id_produit;';
-        $stmt1 = $pdo->prepare($sql1);
-        $stmt1->execute(['id_produit' => $id_produit]);
-
-        // Supprimer de _fait_partie_de
-        $sql2 = 'DELETE FROM cobrec1._fait_partie_de WHERE id_produit = :id_produit;';
-        $stmt2 = $pdo->prepare($sql2);
-        $stmt2->execute(['id_produit' => $id_produit]);
-
-        // Supprimer de _represente_produit
-        $sql3 = 'DELETE FROM cobrec1._represente_produit WHERE id_produit = :id_produit;';
-        $stmt3 = $pdo->prepare($sql3);
-        $stmt3->execute(['id_produit' => $id_produit]);
-
-        // Supprimer de _reduction
-        $sql4 = 'DELETE FROM cobrec1._reduction WHERE id_produit = :id_produit;';
-        $stmt4 = $pdo->prepare($sql4);
-        $stmt4->execute(['id_produit' => $id_produit]);
-
-        // Supprimer le produit lui-même
-        $sql5 = 'DELETE FROM cobrec1._produit WHERE id_produit = :id_produit;';
-        $stmt5 = $pdo->prepare($sql5);
-        $stmt5->execute(['id_produit' => $id_produit]);
-
-        echo 'OK|Produit supprimé avec succès';
-        exit;
-
-    } catch (Exception $e) {
-        echo 'ERROR|' . $e->getMessage();
+    if (!$id_produit) {
+        echo 'ERROR|ID produit manquant';
         exit;
     }
+
+    $sql_check = '
+        SELECT id_produit 
+        FROM cobrec1._produit 
+        WHERE id_produit = :id_produit 
+          AND id_vendeur = :vendeur_id 
+          AND p_statut = :statut
+    ';
+    $stmt_check = $pdo->prepare($sql_check);
+    $stmt_check->execute([
+        'id_produit' => $id_produit,
+        'vendeur_id' => $vendeur_id,
+        'statut'     => 'Ébauche',
+    ]);
+
+    if (!$stmt_check->fetch()) {
+        echo 'ERROR|Produit introuvable, accès refusé ou pas en ébauche';
+        exit;
+    }
+
+    // 2) Supprimer dans les tables liées
+    $tables = ['_contient', '_fait_partie_de', '_represente_produit', '_reduction'];
+    foreach ($tables as $table) {
+        $sql = "DELETE FROM cobrec1.$table WHERE id_produit = :id_produit";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_produit' => $id_produit]);
+    }
+
+    // 3) Supprimer le produit
+    $sql = 'DELETE FROM cobrec1._produit WHERE id_produit = :id_produit';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_produit' => $id_produit]);
+
+    echo 'OK|Produit supprimé';
+    exit;
 }
+
 
 try {
     $rechercheNom = $_GET['search'] ?? '';
@@ -419,58 +407,48 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     });
                 });
 
-                // Gestionnaire pour le bouton supprimer
                 btnSuppr.addEventListener('click', async (e) => {
                     e.preventDefault();
+                    if (btnSuppr.classList.contains('btn--disabled')) return;
 
-                    if (btnSuppr.classList.contains('btn--disabled')) {
-                        return;
-                    }
+                    const row = document.querySelector('.products-table__row.selected');
+                    if (!row) return;
 
-                    const selectedRow = document.querySelector('.products-table__row.selected');
-                    if (!selectedRow) {
-                        return;
-                    }
+                    const id = row.dataset.id;
+                    const name = row.querySelector('.product__name').textContent;
 
-                    const productID = selectedRow.dataset.id;
-                    const productName = selectedRow.querySelector('.product__name').textContent;
-
-                    if (!confirm(
-                            `Êtes-vous sûr de vouloir supprimer le produit "${productName}" ? Cette action est irréversible.`
-                        )) {
+                    if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${name}" ? Cette action est irréversible.`)) {
                         return;
                     }
 
                     try {
                         const response = await fetch('index.php', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `action=delete_product&id_produit=${encodeURIComponent(productID)}`
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `action=delete_product&id_produit=${encodeURIComponent(id)}`
                         });
 
-                        const rawResult = await response.text();
-                        const result = rawResult.replace(/^\uFEFF/, '').trim();
-                        const isSuccess = result.startsWith('OK|');
-                        const message = result.includes('|') ? result.split('|').slice(1).join('|').trim() : result;
+                        const text = (await response.text()).trim();
 
-                        if (isSuccess) {
-                            // Supprimer la ligne du tableau
-                            selectedRow.remove();
+                        if (!response.ok) {
+                            alert('Erreur HTTP: ' + response.status);
+                            return;
+                        }
 
-                            // Désactiver tous les boutons
+                        if (text.startsWith('OK')) {
+                            row.remove();
                             btnModifier.classList.add('btn--disabled');
                             btnRemise.classList.add('btn--disabled');
                             btnPromotion.classList.add('btn--disabled');
                             btnSuppr.classList.add('btn--disabled');
                         } else {
-                            alert('Erreur lors de la suppression: ' + (message || 'Réponse invalide du serveur'));
+                            alert('Erreur lors de la suppression: ' + text);
                         }
-                    } catch (error) {
-                        alert('Erreur de connexion: ' + error.message);
+                    } catch (err) {
+                        alert('Erreur de connexion: ' + err.message);
                     }
                 });
+
 
                 const tabAll = document.getElementById('tab-all');
                 const tabsStatuts = document.querySelectorAll('.tab-status');
