@@ -133,8 +133,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         <label>Montant / volume :</label>
                         <select id="selectType">
                             <option value="montant">Montant en €</option>
-                            <option value="nbCommande">nombre de commandes</option>
-                            <option value="nbArticle">nombre d'articles achetés</option>
+                            <option value="nbCommande">Nombre de commandes</option>
+                            <option value="nbArticle">Nombre d'articles achetés</option>
                         </select>
                     </div>
 
