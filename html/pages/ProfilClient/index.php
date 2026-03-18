@@ -314,7 +314,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <link rel="stylesheet" href="/styles/ProfilClient/style.css" />
     <link rel="icon" type="image/png" href="../../img/favicon.svg">
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
-    <script src="/js/chart.js"></script>
     <script src="../../js/accessibility.js"></script>
 </head>
 
@@ -369,8 +368,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     });
     </script>
 
-            <main>
-                <div class="profile-layout">
+    <main>
+        <div class="profile-layout">
             <aside class="profile-sidebar">
                 <nav>
                     <ul>
@@ -496,7 +495,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                         <line x1="12" y1="3" x2="12" y2="15"></line>
                                     </svg>
                                     <p><strong>Glissez-déposez votre image ici</strong></p>
-                                    <p style="font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner un fichier</p>
+                                    <p style="font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner un fichier
+                                    </p>
                                     <input type="file" id="file-input" accept="image/*" style="display: none;">
                                 </div>
 
@@ -575,7 +575,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
 
                                 <button type="submit" name="update_info">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z">
+                                        </path>
                                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                         <polyline points="7 3 7 8 15 8"></polyline>
                                     </svg>
@@ -790,14 +791,15 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                 if (empty($_SESSION['OTP']['statut'])){ echo 'none'; } else{ echo 'block';} ?>'>
                                     <label>
                                         <span>Code A2F</span>
-                                        <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}"
-                                             min="7" max="7" placeholder="123 456" name="code_OTP" />
+                                        <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7"
+                                            max="7" placeholder="123 456" name="code_OTP" />
                                     </label>
                                 </div>
                                 <button type="submit" name="change_password"
                                     onclick="return confirm('Confirmer le changement de mot de passe ?')">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z">
+                                        </path>
                                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                         <polyline points="7 3 7 8 15 8"></polyline>
                                     </svg>
@@ -877,11 +879,14 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <div class="daltonien-switcher">
                         <label for="colorblind-mode">Mode daltonien :</label>
                         <select id="colorblind-mode" class="filtre__item">
-                            <option value="default" <?= $current_theme === 'default' ? 'selected' : '' ?>>Désactivé</option>
-                            <option value="dalto-red-green" <?= $current_theme === 'dalto-red-green' ? 'selected' : '' ?>>
+                            <option value="default" <?= $current_theme === 'default' ? 'selected' : '' ?>>Désactivé
+                            </option>
+                            <option value="dalto-red-green"
+                                <?= $current_theme === 'dalto-red-green' ? 'selected' : '' ?>>
                                 Rouge/Vert (Protan/Deutan)</option>
                             <option value="dalto-blue-yellow"
-                                <?= $current_theme === 'dalto-blue-yellow' ? 'selected' : '' ?>>Bleu/Jaune (Tritan)</option>
+                                <?= $current_theme === 'dalto-blue-yellow' ? 'selected' : '' ?>>Bleu/Jaune (Tritan)
+                            </option>
                         </select>
                     </div>
                 </section>
@@ -897,7 +902,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </div>
         </div>
     </main>
-                        
+
     <!-- DÉBUT EXTRAIT SOURCE OTP 3 -->
     <div id="modalOTP">
         <div>
@@ -912,7 +917,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <p>Code secret :</p>
                     <small><?php echo $otp->getSecret() ?></small>
                 </label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456"
+                    name="code" />
                 <button type="submit">Valider</button>
             </form>
             <script>
@@ -920,7 +926,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 event.preventDefault();
                 const formData = new FormData(event.target);
                 const code = formData.get('code');
-                
+
                 //charge le PHP de vérifier le code
                 const xhttp = new XMLHttpRequest();
                 xhttp.open("POST", "../../pages/connexionClient/ajax_otp.php", true);
@@ -934,7 +940,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 xhttp2.onreadystatechange = () => {
                     if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
                         const contentLength = xhttp2.getResponseHeader("Content-Length");
-                        if (contentLength == 4) {//si code bon
+                        if (contentLength == 4) { //si code bon
                             xhttp2.abort();
                             alert(
                                 "Authentification à doubles facteurs activée avec succès."
@@ -948,7 +954,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                             xhttp3.send("statutOTP=active");
                             succesOTP();
-                        } else {//sinon
+                        } else { //sinon
                             alert("Echec. Veuillez réessayer.");
                         }
                     }
@@ -971,7 +977,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <label>
                     <p>Code secret :</p>
                 </label>
-                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456"
+                    name="code" />
                 <button type="submit">Valider</button>
             </form>
             <script>
@@ -1004,7 +1011,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 xhttp2.onreadystatechange = () => {
                     if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
                         const contentLength = xhttp2.getResponseHeader("Content-Length");
-                        if (contentLength == 4) {//si code bon
+                        if (contentLength == 4) { //si code bon
                             xhttp2.abort();
                             alert(
                                 "Authentification à doubles facteurs désactivée avec succès."
@@ -1622,8 +1629,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         }
     });
     </script>
-                </div>
-            </main>
+    </div>
+    </main>
     <script src="/js/notifications.js"></script>
 </body>
 
