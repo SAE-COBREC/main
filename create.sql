@@ -3416,12 +3416,12 @@ VALUES (
         'Photo de profil Marie'
     ),
     (
-        '/img/photo/logo_techstore.jpg',
+        '',
         'Logo TechStore.jpg',
         'Logo entreprise TechStore'
     ),
     (
-        '/img/photo/logo_fashionhub.jpg',
+        '',
         'Logo FashionHub.jpg',
         'Logo entreprise FashionHub'
     ),
