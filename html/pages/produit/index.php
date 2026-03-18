@@ -572,7 +572,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 </div>
             </div>
             <div id="listeAvisProduit">
-                <?php renderAvisHtml($avisTextes, $reponsesMap, $idClient, $_SESSION['idCompte'], $ownerTokenServer); ?>
+                <?php renderAvisHtml($avisTextes, $reponsesMap, $idClient, $idCompte ?? null, $ownerTokenServer); ?>
             </div>
         </section>
     </main>
