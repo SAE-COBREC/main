@@ -237,10 +237,13 @@ if (isset($status) && isset($status['step']) && $id_commande) {
     }
 }
 
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
+<!doctype html>
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -250,6 +253,7 @@ if (isset($status) && isset($status['step']) && $id_commande) {
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
     <link rel="stylesheet" href="/styles/SuiviCommande/style.css">
+    <script src="/js/accessibility.js"></script>
 </head>
 
 <body>
