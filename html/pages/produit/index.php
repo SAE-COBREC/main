@@ -306,7 +306,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
-    <link rel="stylesheet" href="/styles/Star/star.css">
     <script src="/js/accessibility.js"></script>
 </head>
 
@@ -352,18 +351,16 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <div class="product-ref">Ref : #<?= (int) $produit['id_produit'] ?></div>
                 <div class="title"><?= htmlspecialchars($produit['p_nom']) ?></div>
                 <div class="rating">
-                    <span>
-                        <!--affiche les étoiles de notation-->
+                    <span class="stars" id="summaryStars" aria-hidden="true">
                         <?php for ($i = 1; $i <= 5; $i++):
-                                    //détermine le type d'étoile à afficher
-                                    if ($noteArrondie >= $i)
-                                        $s = 'full';
-                                    elseif ($noteArrondie >= $i - 0.5)
-                                        $s = 'alf';
-                                    else
-                                        $s = 'empty';
-                                    ?>
-                        <span class="star-icon medium <?= $s ?>"></span>
+                            if ($note >= $i)
+                                $s = 'full';
+                            elseif ($note >= $i - 0.5)
+                                $s = 'alf';
+                            else
+                                $s = 'empty';
+                            ?>
+                        <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                         <?php endfor; ?>
                     </span>
                     <span id="summaryRatingValue" class="summary-rating-value"><?= number_format($note, 1) ?></span>
@@ -461,20 +458,18 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <div class="reviews-summary-row">
                     <span id="reviewsRatingValue" class="reviews-rating-value"><?= number_format($note, 1) ?></span>
                     <div>
-                        <span>
-                            <!--affiche les étoiles de notation-->
+                        <div class="stars" id="reviewsStars">
                             <?php for ($i = 1; $i <= 5; $i++):
-                                        //détermine le type d'étoile à afficher
-                                        if ($noteArrondie >= $i)
-                                            $s = 'full';
-                                        elseif ($noteArrondie >= $i - 0.5)
-                                            $s = 'alf';
-                                        else
-                                            $s = 'empty';
-                                        ?>
-                            <span class="star-icon medium <?= $s ?>"></span>
+                                if ($note >= $i)
+                                    $s = 'full';
+                                elseif ($note >= $i - 0.5)
+                                    $s = 'alf';
+                                else
+                                    $s = 'empty';
+                                ?>
+                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
                             <?php endfor; ?>
-                        </span>
+                        </div>
                         <div id="reviewsRatingCount" class="reviews-rating-count">Basé sur <?= $nbAvis ?> avis</div>
                     </div>
                 </div>
@@ -509,9 +504,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <div class="review-head-right">
                         <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles">
-                                    <span class="star-icon large empty"></span>
-                                </button>
+                            <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                                    src="/img/svg/star-empty.svg" alt=""></button>
                             <?php endfor; ?>
                         </div>
                         <input type="hidden" id="inlineNote" name="note" value="0">
@@ -594,10 +588,9 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             <h3>Modifier votre avis</h3>
             <div class="star-input" id="editStarInput" title="Sélectionnez une note">
                 <?php for ($i = 1; $i <= 5; $i++): ?>
-                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles">
-                    <span class="star-icon large empty"></span>
-                </button>
-            <?php endfor; ?>
+                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
+                        src="/img/svg/star-empty.svg" alt=""></button>
+                <?php endfor; ?>
             </div>
             <input type="text" id="editReviewTitle" name="titre" class="review-title-input"
                 placeholder="Titre de votre avis" maxlength="255" required>
