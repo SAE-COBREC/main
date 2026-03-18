@@ -108,18 +108,21 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     <!--PARCOURS CHAQUE ARTICLE DANS LE PANIER QUAND IL EST CONNECTE, et affiche-->
 
                     <?php foreach ($panierCourant as $article): ?>
-                    <a class="articleBaliseA" href="/pages/produit/index.php?id=<?= $article['id_produit'] ?>">
                         <article class="unArticleP"
                             data-prix="<?php echo ($article['p_prix'] - (($article['reduction_pourcentage'] / 100) * $article['p_prix'])) * (1 + $article['montant_tva'] / 100)?>"
                             data-stock="<?php echo intval($article['p_stock'])?>"
                             data-tva="<?php echo number_format($article['montant_tva'], 2, '.')?>">
                             <div class="imageArticleP">
-                                <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
-                                    alt="<?php echo htmlspecialchars($article['i_alt']) ?>"
-                                    title="<?php echo htmlspecialchars($article['i_title'])?>">
+                                <a class="articleBaliseA" href="/pages/produit/index.php?id=<?= $article['id_produit'] ?>">
+                                    <img src="<?php echo str_replace("/img/photo", "../../img/photo", htmlspecialchars($article['i_lien'])) ?>"
+                                        alt="<?php echo htmlspecialchars($article['i_alt']) ?>"
+                                        title="<?php echo htmlspecialchars($article['i_title'])?>">
+                                </a>
                             </div>
                             <div class="articleDetailP">
-                                <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                                <a class="articleBaliseA" href="/pages/produit/index.php?id=<?= $article['id_produit'] ?>">
+                                    <h2 class="articleTitreP"><?php echo htmlspecialchars($article['p_nom'])?></h2>
+                                </a>
                                 <p><strong>Vendu par :
                                     </strong><?php echo htmlspecialchars($article['denomination'] ?? "Vendeur non trouvé ou Erreur de chargement")?><br>
                                     <strong>HT : </strong><?php echo number_format($article['p_prix'], 2, ',', ' ')?> €<br>
@@ -159,7 +162,6 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                 </div>
                             </div>
                         </article>
-                    </a>
                     <?php endforeach;?>
                 </div>
                 <!-- BLOCK DU RECAP DE LA COMMANDE -->
