@@ -416,7 +416,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         <li>
                             <div class="vendeur-info"
                                 title="Voir la page de <?= urlencode($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? '') ?>"
-                                onclick="event.stopPropagation(); location.assign('/pages/vendeur/index.php?denomination=<?= urlencode($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? '') ?>'))"
+                                onclick="event.stopPropagation(); window.location.href='/pages/vendeur/index.php?denomination=<?= urlencode($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? '') ?>';"
                                 style="cursor:pointer;">
                                 <img src="/img/svg/market.svg" alt="Vendeur">
                                 <span><?= urlencode($produit['vendeur_denomination'] ?? $produit['vendeur_nom'] ?? '') ?></span>
