@@ -366,7 +366,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         });
 
                         if (!isSelected) {
-                            // Sélectionner la ligne cliquée
+                            // Sélectionner la ligne cliqué
                             row.classList.add('selected');
                             checkbox.classList.add('checkbox--active');
 
