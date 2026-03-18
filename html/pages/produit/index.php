@@ -289,9 +289,14 @@ if ($idClient && $idProduit) {
     $stmtFav->execute([$idClient, $idProduit]);
     $estEnFavoris = (bool) $stmtFav->fetch();
 }
+
+// Récupération du thème de daltonisme depuis la session
+$current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mode'] : 'default';
 ?>
+
 <!doctype html>
-<html lang="fr">
+<html lang="fr"
+    <?php echo ($current_theme !== 'default') ? 'data-theme="' . htmlspecialchars($current_theme) . '"' : ''; ?>>
 
 <head>
     <meta charset="utf-8" />
@@ -301,6 +306,8 @@ if ($idClient && $idProduit) {
     <link rel="stylesheet" href="/styles/ViewProduit/stylesView-Produit.css" />
     <link rel="stylesheet" href="/styles/Header/stylesHeader.css">
     <link rel="stylesheet" href="/styles/Footer/stylesFooter.css">
+    <link rel="stylesheet" href="/styles/Star/star.css">
+    <script src="/js/accessibility.js"></script>
 </head>
 
 <body>
@@ -345,16 +352,18 @@ if ($idClient && $idProduit) {
                 <div class="product-ref">Ref : #<?= (int) $produit['id_produit'] ?></div>
                 <div class="title"><?= htmlspecialchars($produit['p_nom']) ?></div>
                 <div class="rating">
-                    <span class="stars" id="summaryStars" aria-hidden="true">
+                    <span>
+                        <!--affiche les étoiles de notation-->
                         <?php for ($i = 1; $i <= 5; $i++):
-                            if ($note >= $i)
-                                $s = 'full';
-                            elseif ($note >= $i - 0.5)
-                                $s = 'alf';
-                            else
-                                $s = 'empty';
-                            ?>
-                        <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                    //détermine le type d'étoile à afficher
+                                    if ($noteArrondie >= $i)
+                                        $s = 'full';
+                                    elseif ($noteArrondie >= $i - 0.5)
+                                        $s = 'alf';
+                                    else
+                                        $s = 'empty';
+                                    ?>
+                        <span class="star-icon medium <?= $s ?>"></span>
                         <?php endfor; ?>
                     </span>
                     <span id="summaryRatingValue" class="summary-rating-value"><?= number_format($note, 1) ?></span>
@@ -452,18 +461,20 @@ if ($idClient && $idProduit) {
                 <div class="reviews-summary-row">
                     <span id="reviewsRatingValue" class="reviews-rating-value"><?= number_format($note, 1) ?></span>
                     <div>
-                        <div class="stars" id="reviewsStars">
+                        <span>
+                            <!--affiche les étoiles de notation-->
                             <?php for ($i = 1; $i <= 5; $i++):
-                                if ($note >= $i)
-                                    $s = 'full';
-                                elseif ($note >= $i - 0.5)
-                                    $s = 'alf';
-                                else
-                                    $s = 'empty';
-                                ?>
-                            <img src="/img/svg/star-<?= $s ?>.svg" alt="Etoile" width="20">
+                                        //détermine le type d'étoile à afficher
+                                        if ($noteArrondie >= $i)
+                                            $s = 'full';
+                                        elseif ($noteArrondie >= $i - 0.5)
+                                            $s = 'alf';
+                                        else
+                                            $s = 'empty';
+                                        ?>
+                            <span class="star-icon medium <?= $s ?>"></span>
                             <?php endfor; ?>
-                        </div>
+                        </span>
                         <div id="reviewsRatingCount" class="reviews-rating-count">Basé sur <?= $nbAvis ?> avis</div>
                     </div>
                 </div>
@@ -498,8 +509,9 @@ if ($idClient && $idProduit) {
                     <div class="review-head-right">
                         <div class="star-input" id="inlineStarInput" title="Sélectionnez une note">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
-                                    src="/img/svg/star-empty.svg" alt=""></button>
+                                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles">
+                                    <span class="star-icon large empty"></span>
+                                </button>
                             <?php endfor; ?>
                         </div>
                         <input type="hidden" id="inlineNote" name="note" value="0">
@@ -582,9 +594,10 @@ if ($idClient && $idProduit) {
             <h3>Modifier votre avis</h3>
             <div class="star-input" id="editStarInput" title="Sélectionnez une note">
                 <?php for ($i = 1; $i <= 5; $i++): ?>
-                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles"><img
-                        src="/img/svg/star-empty.svg" alt=""></button>
-                <?php endfor; ?>
+                <button type="button" data-value="<?= $i ?>" aria-label="<?= $i ?> étoiles">
+                    <span class="star-icon large empty"></span>
+                </button>
+            <?php endfor; ?>
             </div>
             <input type="text" id="editReviewTitle" name="titre" class="review-title-input"
                 placeholder="Titre de votre avis" maxlength="255" required>
