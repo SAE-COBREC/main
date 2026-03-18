@@ -439,7 +439,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 graph2.data.datasets[0].data = donnees.graph2.data;
                 graph2.data.datasets[0].label = obtenirLibelleType(typeAffichage);
                 document.getElementById('titreGraph2').textContent =
-                    `Top produits – ${obtenirLibelleType(typeAffichage)}`;
+                    `Top 10 des produits - ${obtenirLibelleType(typeAffichage)}`;
                 graph2.update();
 
                 //met à jour les labels et les données du graphique 3 (répartition catégories)
