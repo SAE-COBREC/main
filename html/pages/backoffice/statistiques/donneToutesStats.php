@@ -24,6 +24,9 @@ try {
     $modeChoisi = $_GET['modeAffichage'];
     $type = $_GET['type'] ?? 'montant';
     $categoriesChoisi = $_GET['categorie'];
+    $labelGraph1 = "";
+    $labelGraph2 = "";
+
 
     if ($modeChoisi !== "annee"){
         $debutPeriode = new DateTime($_GET['debut']);
@@ -78,7 +81,9 @@ try {
                             } else {
                                 $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
                                 $compteParLabel[$indiceProduit] += $articleCommande['quantite'] * $articleCommande['p_prix'];
-                            } 
+                            }
+                            $labelGraph1 = "Montant total en €";
+                            $labelGraph2 = "Montant rapporté par article en €";
                             break;
                         
                     //================
@@ -93,7 +98,9 @@ try {
                             } else {
                                 $indiceProduit = array_search($articleCommande['p_nom'], $estDejaLabel);
                                 $compteParLabel[$indiceProduit] += $articleCommande['quantite'];
-                            } 
+                            }
+                            $labelGraph1 = "Nombre total d'articles vendus";
+                            $labelGraph2 = "Nombre de ventes par article";
                             break;
 
                     //==================
@@ -104,16 +111,21 @@ try {
                                 array_push($panierTraites, $articleCommande['id_panier']);
                                 $donneesParMois[$mois] += 1;
                             }
+                            $labelGraph1 = "Nombre de commandes";
                             break;
                 }
             }     
         }
     }   
     $reponse = [
-        "graph1" => array_values($donneesParMois), //on converti le tableau pour qu'il soit au bon format pour le graphique
+        "graph1" => [
+            "data" => array_values($donneesParMois), //on converti le tableau pour qu'il soit au bon format pour le graphique
+            "titre" => $labelGraph1
+        ],
         "graph2" => [
             "labels" => array_values($estDejaLabel), //on converti le tableau pour qu'il soit au bon format pour le graphique
-            "data" => array_values($compteParLabel) //on converti le tableau pour qu'il soit au bon format pour le graphique
+            "data" => array_values($compteParLabel), //on converti le tableau pour qu'il soit au bon format pour le graphique
+            "titre" => $labelGraph2
         ]
     ];
     echo json_encode($reponse);                       

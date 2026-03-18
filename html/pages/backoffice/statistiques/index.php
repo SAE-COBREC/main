@@ -91,15 +91,15 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
             </header>
             <section class="contientStatsGeneral">
                 <div class="statsGeneral">
-                    <h3>Chiffre d'affaire:</h3>
-                    <p><?= $totalChiffreAffaire?>€</p>
+                    <h3>Chiffre d'affaire :</h3>
+                    <p><?= number_format($totalChiffreAffaire, 2, ',', ' ')?> €</p>
                 </div>
                 <div class="statsGeneral">
-                    <h3>Nombre de commande:</h3>
+                    <h3>Nombre de commande :</h3>
                     <p><?= $totalCommande?></p>
                 </div>
                 <div class="statsGeneral">
-                    <h3>Nombre de produit vendu:</h3>
+                    <h3>Nombre de produit vendu :</h3>
                     <p><?= $totalVenteArticle?></p>
                 </div>
             </section>
@@ -215,7 +215,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 'Octobre', 'Novembre', 'Décembre'
             ],
             datasets: [{
-                label: 'gains total en €',
+                label: 'Gains totaux en €',
                 data: [],
                 backgroundColor: 'rgba(230, 169, 110, 1)',
                 borderColor: 'rgba(236, 142, 55, 0.9)',
@@ -240,7 +240,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         data: {
             labels: [],
             datasets: [{
-                label: "nombres d'articles vendus",
+                label: "Nombres d'articles vendus",
                 data: [],
                 backgroundColor: 'rgba(230, 169, 110, 1)',
                 borderColor: 'rgba(236, 142, 55, 0.9)',
@@ -297,25 +297,27 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
         // Paramètres communs pour les deux requêtes
         let queryParams = `type=${type}&modeAffichage=${modeAffichage}`;
 
-        if (modeAffichage === "annee") { //si le mode est annnee
-            const annee = document.getElementById("annee").value; //on récup l'année
-            queryParams += `&annee=${annee}`; //on l'ajoute a l'url les données
-        } else { //sinon le mode est période
-            const debut = document.getElementById("dateDebut").value; // on récup le début
-            const fin = document.getElementById("dateFin").value; // on récup la fin
-            if (!debut || !fin) return; //on regarde si les 2 ont été saisient
-            queryParams += `&debut=${debut}&fin=${fin}`; //on ajoute a l'url les données
+        if (modeAffichage === "annee") {                            //si le mode est annnee
+            const annee = document.getElementById("annee").value;   //on récup l'année
+            queryParams += `&annee=${annee}`;                       //on l'ajoute a l'url les données
+        } else {                                                    //sinon le mode est période
+            const debut = document.getElementById("dateDebut").value;// on récup le début
+            const fin = document.getElementById("dateFin").value;   // on récup la fin
+            if (!debut || !fin) return;                             //on regarde si les 2 ont été saisient
+            queryParams += `&debut=${debut}&fin=${fin}`;            //on ajoute a l'url les données
         }
 
         //Appel pour les graphiques 1 et 2
         fetch(`donneToutesStats.php?${queryParams}&categorie=${categorie}`)
             .then(reponse => reponse.json())
             .then(donnees => {
-                graph1.data.datasets[0].data = donnees.graph1;
+                graph1.data.datasets[0].data = donnees.graph1.data;
+                graph1.data.datasets[0].label = donnees.graph1.titre;
                 graph1.update();
 
                 graph2.data.labels = donnees.graph2.labels;
                 graph2.data.datasets[0].data = donnees.graph2.data;
+                graph2.data.datasets[0].label = donnees.graph2.titre;
                 graph2.update();
             })
             .catch(err => console.error("Erreur AJAX Graph 1&2 :", err));
