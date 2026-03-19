@@ -312,7 +312,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                     </div>
                                     <div class="divBtnFav">
                                         <button class="btnFavIcon"
-                                            onclick="event.stopPropagation(); ajoutSuppFavoris(<?= (int) $produitCourant['id_produit'] ?>, this, <?= $nbFavoris?>)" id="btnFav">
+                                            onclick="event.stopPropagation(); ajoutSuppFavoris(<?= (int) $produitCourant['id_produit'] ?>, this)" id="btnFav">
                                             <img id="imgFavIcon"
                                                 src="/img/png/coeur.png"
                                                 alt="Favori actif" >
@@ -399,7 +399,9 @@ formViderFavoris.addEventListener('submit', (event) => {
     });
 });
 
-function ajoutSuppFavoris(idProduit, elem, nbFav) {
+let nbFav = <?= (int)$nbFavoris ?>;
+
+function ajoutSuppFavoris(idProduit, elem) {
     const btn = document.getElementById('btnFav'); //on regarde l'état du bouton
     fetch(`/pages/produit/action_favoris.php?idProduit=${idProduit}&page="panier"`) //envoie l'id du produit pour ajouter au favoris
         .then(reponse => reponse.json())
@@ -411,14 +413,19 @@ function ajoutSuppFavoris(idProduit, elem, nbFav) {
                     btn.setAttribute('title', 'Ajouter aux favoris');
                     notify("Retirer des favoris", 'info');   //on notify le client
                     const article = elem.closest("article");
+                    const sectionFav = document.querySelector('.lesFavoris');
                     article.remove();
-                    console.log(nbFav);
                     nbFav -= 1;
-                    console.log(nbFav);
-                    if (nbFav == 0){
-                        console.log("condition ok");
+                    const htmlFavVide = `
+                    <div id="favorisVide">
+                        <img id="imgFavorisVide" src="/img/png/aucunFavoris.png" title="Les Favoris sont vide" alt="Les favoris sont vide"/>
+                    </div>`;
+                    if (nbFav <= 0){
+                        const listeUl = sectionFav.querySelector('ul');
+                        listeUl.remove();
                         const viderFav = document.getElementById("viderFavoris");
                         viderFav.remove();
+                        sectionFav.insertAdjacentHTML('beforeend', htmlFavVide);
                     }
                 }
             }
