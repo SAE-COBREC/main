@@ -312,7 +312,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                     </div>
                                     <div class="divBtnFav">
                                         <button class="btnFavIcon"
-                                            onclick="event.stopPropagation(); ajoutSuppFavoris(<?= (int) $produitCourant['id_produit'] ?>, this)" id="btnFav">
+                                            onclick="event.stopPropagation(); ajoutSuppFavoris(<?= (int) $produitCourant['id_produit'] ?>, this, <?= $nbFavoris?>)" id="btnFav">
                                             <img id="imgFavIcon"
                                                 src="/img/png/coeur.png"
                                                 alt="Favori actif" >
@@ -399,9 +399,8 @@ formViderFavoris.addEventListener('submit', (event) => {
     });
 });
 
-function ajoutSuppFavoris(idProduit, elem) {
+function ajoutSuppFavoris(idProduit, elem, nbFav) {
     const btn = document.getElementById('btnFav'); //on regarde l'état du bouton
-
     fetch(`/pages/produit/action_favoris.php?idProduit=${idProduit}&page="panier"`) //envoie l'id du produit pour ajouter au favoris
         .then(reponse => reponse.json())
         .then(data => {
@@ -413,6 +412,14 @@ function ajoutSuppFavoris(idProduit, elem) {
                     notify("Retirer des favoris", 'info');   //on notify le client
                     const article = elem.closest("article");
                     article.remove();
+                    console.log(nbFav);
+                    nbFav -= 1;
+                    console.log(nbFav);
+                    if (nbFav == 0){
+                        console.log("condition ok");
+                        const viderFav = document.getElementById("viderFavoris");
+                        viderFav.remove();
+                    }
                 }
             }
         })
