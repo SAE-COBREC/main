@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         //verification que le compte est un compte vendeur
-        if (!$vendeurId) {
+        if (!isset($vendeurId)) {
           $hasError = true;
           $error_card = 1;
           $error_message = 'Adresse mail ou mot de passe incorrecte.';
