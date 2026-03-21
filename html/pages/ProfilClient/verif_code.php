@@ -19,13 +19,13 @@
                 $stmt = $pdo->prepare("UPDATE _compte SET etat_otp = false WHERE id_compte = :compte");
                 $stmt->execute([':compte' => $_SESSION['idCompte']]);
                 file_put_contents($logFile, "true");
+                if ($_POST['send'] == 0){
+                    unset($_SESSION['OTP']['statut']);
+                }else{
+                    unset($_SESSION['OTPvendeur']['statut']);
+                }
             }else{
                 file_put_contents($logFile, "false");
-            }
-            if ($_POST['send'] == 0){
-                unset($_SESSION['OTP']['statut']);
-            }else{
-                unset($_SESSION['OTPvendeur']['statut']);
             }
             unset($_POST);
         }
