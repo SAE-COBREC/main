@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'civilite' => $civilite,
             'nom' => $nom,
             'prenom' => $prenom,
-            'secretOTP' => $_SESSION['OTPvendeur']['secret']
+            'secretOTP' => base64_encode($_SESSION['OTPvendeur']['secret']) //chiffrement de la clé
             ]);
         }
         //FIN EXTRAIT SOURCE OTP 1
@@ -493,6 +493,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Activer la vérification à double facteurs ?
                 </label>
                 <label> Vérification à double facteurs activée</label>
+                <script src="../../connexionClient/timer.js">
+                </script>
             </div>
             <br>
             <div class="mdpOtp">
@@ -521,6 +523,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
                     this.value = valeur;
                 });
+                let nbCLics = 0;
                 document.getElementById('validationOTP').addEventListener('click', function(event) {
                     event.preventDefault();//sert à ne pas recharger la page
                     const formData = new FormData(document.getElementById('multiForm'), document.getElementById(
@@ -556,7 +559,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 xhttp3.send("statutOTP=active");
                             } else {//false, afficher erreur
                                 document.querySelector('.error2').style.display = 'block';
+                                document.querySelector(".error2").innerHTML = "<strong>Erreur</strong> : Code A2F incorrect";
                                 document.querySelector('.error2').value = '';
+                                nbCLics++;
+                                if (nbCLics > 3){
+                                    nbCLics = 0;
+                                    timer(30, document.querySelector(".error2"), document.getElementById('validationOTP'));
+                                    document.getElementById('validationOTP').disabled = "disabled";
+                                    document.querySelector(".error2").style.display = 'block';
+                                }
                             }
                         }
                     };

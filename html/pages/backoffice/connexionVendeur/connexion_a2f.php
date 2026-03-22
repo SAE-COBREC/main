@@ -3,9 +3,13 @@ session_start();
 require_once(__DIR__."/../../../vendor/autoload.php");
 use OTPHP\TOTP;
 use OTPHP\Factory;
-$hasError = false;
 ?>
-<?php if (!empty($_SESSION['A2Fvendeur'])){ ?>
+<?php 
+if (!empty($_SESSION['A2Fvendeur'])){//si l'utilisateur est arrivé via la redirection de connexion 
+    if (empty($_SESSION['connexion_a2f_vendeur'])){
+        $_SESSION['connexion_a2f_vendeur'] = 0;
+    }
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -32,12 +36,12 @@ $hasError = false;
                         Valider
                     </button>
                 </div>
-                <div class="error">
-                    <?php if ($hasError){ 
-                        print_r("ERREUR OK"); ?>
-                        <strong>Erreur</strong> : Code A2F incorrect.
-                    <?php } ?>
+                <div class="error2">
+                    <strong>Erreur</strong> : Code A2F incorrect
                 </div>
+                <script>
+                    document.querySelector(".error2").style.display = 'none';
+                </script>
             </form>
         </div>
     </main>
@@ -51,8 +55,9 @@ $hasError = false;
         this.value = valeur;
     });
 </script>
+<script src="../../connexionClient/timer.js">//import de la fonction permettant de faire attendre l'utilisateur 30 secondes</script>
     <?php
-    $otp = TOTP::createFromSecret($_SESSION['A2Fvendeur']['secret_otp']);
+    $otp = TOTP::createFromSecret(base64_decode($_SESSION['A2Fvendeur']['secret_otp']));
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // print_r($otp->now());
         if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){
@@ -60,11 +65,25 @@ $hasError = false;
             $_SESSION['idCompte'] = $_SESSION['A2Fvendeur']['idCompte'];
             $_SESSION['OTPvendeur']['secret'] = $_SESSION['A2Fvendeur']['secret_otp'];
             unset($_SESSION['A2Fvendeur']);
+            unset($_SESSION['connexion_a2f_vendeur']);
             $_SESSION['OTPvendeur']['statut'] = 'active';
             $url = '../index.php';
             echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url='.$url.'">';
         }else{
-            $hasError = true;
+            ?>
+            <script>
+                document.querySelector(".error2").style.display = 'block';
+                document.querySelector(".error2").innerHTML = "<strong>Erreur</strong> : Code A2F incorrect";
+            </script><?php
+            if ($_SESSION['connexion_a2f_vendeur'] < 3){//si moins de 3 tentatives
+                $_SESSION['connexion_a2f_vendeur']++;
+            }else{//faire attendre 30 secondes
+                $_SESSION['connexion_a2f_vendeur'] = 0;//remettre le compteur de tentatives à 0
+                ?><script>
+                    document.querySelector("button").disabled = "disabled";
+                    timer(30, document.querySelector(".error2"), document.querySelector("button"));
+                </script><?php
+            }
         }
     }
     

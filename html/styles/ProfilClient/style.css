@@ -48,6 +48,9 @@ body {
   min-height: 100vh;
   scroll-behavior: smooth;
 }
+body button:disabled {
+  background: #c0c0c0 !important;
+}
 
 .back-button {
   position: relative;
@@ -234,9 +237,6 @@ main button {
 main button:hover {
   background: var(--primary-bleu);
   color: #FFFFFF;
-}
-main button:disabled {
-  background: #c0c0c0 !important;
 }
 main form {
   display: flex;

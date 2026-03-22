@@ -3,7 +3,7 @@ session_start();
 include '../../selectBDD.php';
 $pdo->exec("SET search_path TO cobrec1");
 if (!(empty($_POST['statutOTP']))){
-    try {//enregistrement du secret_A2F dans la BDD
+    try {//désactivation de l'A2F dans la bdd
         $sql = '
         UPDATE cobrec1._compte
         SET etat_otp = false,

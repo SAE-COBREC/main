@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'civilite' => $civilite,
             'nom' => $nom,
             'prenom' => $prenom,
-            'secretOTP' => $_SESSION['OTP']['secret']
+            'secretOTP' => base64_encode($_SESSION['OTP']['secret']) //chiffrement de la clé
             ]);
         }
 
@@ -471,6 +471,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Activer la vérification à double facteurs ?
                 </label>
                 <label>Vérification à double facteurs activée</label>
+                <script src="../connexionClient/timer.js">//import du timer</script>
             </div>
             <br>
             <div class="mdpOtp">
@@ -498,6 +499,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     valeur = valeur.replace(/(.{3})/g, "$1 ").trim();
                     this.value = valeur;
                 });
+                let nbCLics = 0;
                 document.getElementById('validationOTP').addEventListener('click', function(event) {
                     event.preventDefault();
                     const formData = new FormData(document.getElementById('multiForm'), document.getElementById(
@@ -534,6 +536,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             } else {
                                 document.querySelector('.error2').style.display = 'block';
                                 document.querySelector('.error2').value = '';
+                                document.querySelector(".error2").innerHTML = "<strong>Erreur</strong> : Code A2F incorrect";
+                                nbCLics++;
+                                if (nbCLics > 3){
+                                    nbCLics = 0;
+                                    timer(30, document.querySelector(".error2"), document.getElementById('validationOTP'));
+                                    document.getElementById('validationOTP').disabled = "disabled";
+                                    document.querySelector(".error2").style.display = 'block';
+                                }
                             }
                         }
                     };

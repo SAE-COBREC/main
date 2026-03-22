@@ -8,10 +8,10 @@
     if(!(empty($_SESSION['OTP']['secret']) && empty($_SESSION['OTPvendeur']['secret']))){
         if (!empty($_SESSION['OTP']['secret']) && $_POST['send'] == 0){
             //si appel provient du côté client
-            $otp = TOTP::createFromSecret($_SESSION['OTP']['secret']);
+            $otp = TOTP::createFromSecret($_SESSION['OTP']['secret']); //non déchiffrée car code ne provenant pas de la bdd (donc non chiffré)
         }else{
             //si appel provient de côté vendeur
-            $otp = TOTP::createFromSecret($_SESSION['OTPvendeur']['secret']);
+            $otp = TOTP::createFromSecret($_SESSION['OTPvendeur']['secret']); //non déchiffrée car code ne provenant pas de la bdd (donc non chiffré)
         }
         $logFile = "../../pages/connexionClient/ajax.txt";
         if ($otp->verify(str_replace(' ', '', $_POST['code']), null, 20)){

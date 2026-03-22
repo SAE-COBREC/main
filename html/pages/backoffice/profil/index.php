@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("SELECT secret_otp, etat_otp FROM cobrec1._compte WHERE id_compte = :compte");
             $stmt->execute([':compte' => $vendeur['compte']]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            $otp = TOTP::createFromSecret($row['secret_otp']);
+            $otp = TOTP::createFromSecret(base64_decode($row['secret_otp']));
             if (!(($row['etat_otp'] == 'true' && $otp->verify(str_replace(' ', '', $otp_saisi), null, 20)))){
                 header("Location: index.php?password_error=" . urlencode("Le code A2F est faux."));
                 exit;
@@ -684,7 +684,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                         <label for="code_OTP">Code d'authentification à double facteurs</label>
                         <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code_OTP">
                     </div>
-
+                    <script src="../../connexionClient/timer.js">//import timer 30 secondes (si trop de codes A2F incorrects)</script>
 
 
                     <button title="Modifier mon mot de passe" class="btn btn--primary" type="submit"
@@ -735,8 +735,15 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                 <button type="button" onclick="fermerModalOTP()">Annuler</button>
                 <button type="submit">Valider</button>
+                <div class="error2">
+                    <strong>Erreur</strong> : Code A2F incorrect
+                </div>
+                <script>
+                    document.querySelector("#modalOTP .error2").style.display = 'none';
+                </script>
             </form>
             <script>
+            let nbCLicsActivation = 0;
             document.getElementById('otpform').addEventListener('submit', function(event) {
                 event.preventDefault();
                 const formData = new FormData(event.target);
@@ -755,6 +762,7 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
                         const contentLength = xhttp2.getResponseHeader("Content-Length");
                         if (contentLength == 4) {
+                            document.querySelector("#modalOTP .error2").style.display = 'none';
                             xhttp2.abort();
                             alert(
                                 "Authentification à doubles facteurs activée avec succès."
@@ -766,8 +774,17 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                             xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                             xhttp3.send("statutOTP=active&send=1");
                             succesOTP();
-                        } else {
-                            alert("Echec. Veuillez réessayer.");
+                        } else {//erreur
+                            document.querySelector('#modalOTP .error2').style.display = 'block';
+                            document.querySelector("#modalOTP .error2").innerHTML = "<strong>Erreur</strong> : Code A2F incorrect";
+                            document.querySelector('#modalOTP .error2').value = '';
+                            nbCLicsActivation++;
+                            if (nbCLicsActivation > 3){//erreur trop d'essais
+                                nbCLicsActivation = 0;
+                                timer(30, document.querySelector("#modalOTP .error2"), document.querySelector("#modalOTP button[type='submit']"));
+                                document.querySelector("#modalOTP button[type='submit']").disabled = "disabled";
+                                document.querySelector(".error2").style.display = 'block';
+                            }
                         }
                     }
                 };
@@ -786,8 +803,15 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                 <input type="text" inputmode="numeric" pattern="[0-9]{3} [0-9]{3}" min="7" max="7" placeholder="123 456" name="code" />
                 <button type="button" onclick="fermerModalDesactivationOTP()">Annuler</button>
                 <button type="submit">Valider</button>
+                <label class="error2">
+                    <strong>Erreur</strong> : Code A2F incorrect
+                </label>
+                <script>
+                    document.querySelector("#modalDesactivationOTP .error2").style.display = 'none';
+                </script>
             </form>
             <script>
+                let nbCLicsDesactivation = 0;
                 document.querySelector("#modalDesactivationOTP form").addEventListener('submit', function(event) {
                     event.preventDefault();
                     const formData = new FormData(event.target);
@@ -805,7 +829,8 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                     xhttp2.onreadystatechange = () => {
                         if (xhttp2.readyState === xhttp2.HEADERS_RECEIVED) {
                             const contentLength = xhttp2.getResponseHeader("Content-Length");
-                            if (contentLength == 4) {
+                            if (contentLength == 4) {//si code bon
+                            document.querySelector("#modalDesactivationOTP .error2").style.display = 'none';
                                 xhttp2.abort();
                                 alert(
                                     "Authentification à doubles facteurs désactivée avec succès."
@@ -813,7 +838,16 @@ $current_theme = isset($_SESSION['colorblind_mode']) ? $_SESSION['colorblind_mod
                                 document.getElementById('modalDesactivationOTP').style.display = 'none';
                                 succesDesactOTP();
                             } else {
-                                alert("Echec. Veuillez réessayer.");
+                                document.querySelector('#modalDesactivationOTP .error2').style.display = 'block';
+                                document.querySelector("#modalDesactivationOTP .error2").innerHTML = "<strong>Erreur</strong> : Code A2F incorrect";
+                                document.querySelector('#modalDesactivationOTP .error2').value = '';
+                                nbCLicsDesactivation++;
+                                if (nbCLicsDesactivation > 3){//erreur trop d'essais
+                                    nbCLicsDesactivation = 0;
+                                    timer(30, document.querySelector("#modalDesactivationOTP .error2"), document.querySelector("#modalDesactivationOTP button[type='submit']"));
+                                    document.querySelector("#modalDesactivationOTP button[type='submit']").disabled = "disabled";
+                                    document.querySelector(".error2").style.display = 'block';
+                                }
                             }
                         }
                     };

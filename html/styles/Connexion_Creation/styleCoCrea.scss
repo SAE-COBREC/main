@@ -45,6 +45,11 @@ body {
   border-radius: $border-radius-primary;
   text-align: center;
 
+  button:disabled {
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+
   input[type="checkbox"] {
     width: 20px;
     height: 20px;

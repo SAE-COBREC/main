@@ -122,6 +122,9 @@ body {
     grid-template-rows: auto 1fr auto;
     min-height: 100vh;
     scroll-behavior: smooth;
+    button:disabled {
+        background: $secondary-color-gris-fonce !important;
+    }
 }
 .back-button {
     position: relative;
@@ -306,10 +309,6 @@ main {
 
     button {
         @include button-primary;
-
-        &:disabled {
-            background: $secondary-color-gris-fonce !important;
-        }
     }
 
     form {

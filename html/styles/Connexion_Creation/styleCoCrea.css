@@ -75,6 +75,10 @@ body.centered {
   border-radius: 14px;
   text-align: center;
 }
+.card button:disabled {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
 .card input[type=checkbox] {
   width: 20px;
   height: 20px;
