@@ -10,13 +10,13 @@ use Dompdf\Options;
 // Vérification de la connexion du vendeur
 if (empty($_SESSION['vendeur_id'])) {
     $url = '/pages/backoffice/connexionVendeur/index.php';
-    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">';
+    echo '<!doctype html><html lang="fr"><head><meta http-equiv="refresh" content="0;url=' . $url . '">' ;
     exit;
 }
 
 $vendeur_id = $_SESSION['vendeur_id'];
 
-// Connexion BDD
+//Connexion BDD
 $connexionBaseDeDonnees = $pdo;
 $connexionBaseDeDonnees->exec("SET search_path TO cobrec1");
 
@@ -42,27 +42,21 @@ if (!empty($listeIdProduit)) {
         }
     }
 } else {
-    // Si aucun produit sélectionné, prendre tous les produits en ligne
     $listeProduits = ProduitDenominationVendeur($connexionBaseDeDonnees, $nom_entreprise);
 }
 
-// Chemin de base pour les images
-$basePath = realpath(__DIR__ . '/../../../');
 
-// Construction du HTML via le template (produit la variable $html)
+$basePath = realpath(__DIR__ . '/../../../');
 include __DIR__ . '/catalogue_template.php';
 
-// Conversion HTML → PDF avec DOMPDF
 $options = new Options();
 $options->set('isRemoteEnabled', true);
 $options->set('isHtml5ParserEnabled', true);
 $options->set('chroot', $basePath);
-
 $dompdf = new Dompdf($options);
 $dompdf->loadHtml($html, 'UTF-8');
 $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
-
 $filename = 'Catalogue_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $nom_entreprise) . '_' . date('Y-m-d') . '.pdf';
 $dompdf->stream($filename, ['Attachment' => true]);
 exit;
